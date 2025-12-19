@@ -1,0 +1,17 @@
+# Light Keepers 災防平台 - 後端開發用 Dockerfile
+
+FROM node:20-alpine
+
+WORKDIR /app
+
+# 安裝開發依賴
+RUN apk add --no-cache python3 make g++
+
+COPY package*.json ./
+RUN npm install
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["npm", "run", "start:dev"]

@@ -1,0 +1,68 @@
+# Light Keepers - 本地開發環境
+# 使用 docker-compose up -d 啟動
+
+version: '3.8'
+
+services:
+  # PostgreSQL + PostGIS 資料庫
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: light-keepers-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-localdev123}
+      POSTGRES_DB: lightkeepers
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./infra/docker/init-db:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # 後端 API（開發模式）
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.dev
+    container_name: light-keepers-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      PORT: 3000
+      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:-localdev123}@postgres:5432/lightkeepers
+      JWT_SECRET: ${JWT_SECRET:-dev-secret-change-in-production}
+      GEMINI_API_KEY: ${GEMINI_API_KEY}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: npm run start:dev
+
+  # pgAdmin（資料庫管理介面）
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: light-keepers-pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@lightkeepers.local
+      PGADMIN_DEFAULT_PASSWORD: admin123
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: light-keepers-network
