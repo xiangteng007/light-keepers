@@ -4,6 +4,7 @@ const navItems = [
     { path: '/dashboard', label: '儀表板', icon: '📊' },
     { path: '/events', label: '災情事件', icon: '🚨' },
     { path: '/tasks', label: '任務管理', icon: '📋' },
+    { path: '/map', label: '地圖總覽', icon: '🗺️' },
 ]
 
 export default function Layout() {
@@ -13,8 +14,11 @@ export default function Layout() {
         <div className="layout">
             <aside className="sidebar">
                 <div className="logo">
-                    <span className="logo-icon">🌟</span>
-                    <h1>Light Keepers</h1>
+                    <div className="logo-icon">🏛️</div>
+                    <div>
+                        <h1>Light Keepers</h1>
+                        <div className="logo-subtitle">曦望燈塔</div>
+                    </div>
                 </div>
                 <nav className="nav">
                     {navItems.map((item) => (
@@ -29,7 +33,7 @@ export default function Layout() {
                     ))}
                 </nav>
                 <div className="sidebar-footer">
-                    <span>v0.1.0 MVP</span>
+                    <span>v1.0.0 • 曦望燈塔救援協會</span>
                 </div>
             </aside>
             <main className="main-content">
