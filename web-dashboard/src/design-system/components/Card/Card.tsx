@@ -10,7 +10,9 @@ export interface CardProps {
     variant?: 'default' | 'elevated' | 'outlined';
     padding?: 'sm' | 'md' | 'lg';
     className?: string;
+    onClick?: (e: React.MouseEvent) => void;
 }
+
 
 export const Card: React.FC<CardProps> = ({
     children,
@@ -21,9 +23,13 @@ export const Card: React.FC<CardProps> = ({
     variant = 'default',
     padding = 'md',
     className = '',
+    onClick,
 }) => {
     return (
-        <div className={`lk-card lk-card--${variant} lk-card--padding-${padding} ${className}`}>
+        <div
+            className={`lk-card lk-card--${variant} lk-card--padding-${padding} ${className}`}
+            onClick={onClick}
+        >
             {(title || icon) && (
                 <div className="lk-card__header">
                     {icon && <span className="lk-card__icon">{icon}</span>}
@@ -38,5 +44,6 @@ export const Card: React.FC<CardProps> = ({
         </div>
     );
 };
+
 
 export default Card;

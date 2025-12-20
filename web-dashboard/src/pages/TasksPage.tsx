@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getTaskKanban, createTask, updateTask } from '../api';
 import type { Task } from '../api';
+import { Button, Card, Tag, Badge } from '../design-system';
 
 export default function TasksPage() {
     const queryClient = useQueryClient();
@@ -47,11 +48,18 @@ export default function TasksPage() {
         return <div className="page tasks-page"><div className="loading">載入中...</div></div>;
     }
 
+    const totalTasks = (kanban?.pending?.length || 0) + (kanban?.inProgress?.length || 0) + (kanban?.completed?.length || 0);
+
     return (
         <div className="page tasks-page">
             <div className="page-header">
-                <h2>任務管理</h2>
-                <button className="btn-primary" onClick={() => setShowAddModal(true)}>+ 新增任務</button>
+                <div className="page-header__left">
+                    <h2>任務管理</h2>
+                    <Badge variant="default">共 {totalTasks} 個任務</Badge>
+                </div>
+                <Button variant="primary" onClick={() => setShowAddModal(true)}>
+                    + 新增任務
+                </Button>
             </div>
 
             <div className="task-board">
@@ -60,25 +68,28 @@ export default function TasksPage() {
                     status="pending"
                     tasks={kanban?.pending || []}
                     onStatusChange={handleStatusChange}
+                    color="warning"
                 />
                 <TaskColumn
                     title="進行中"
                     status="in_progress"
                     tasks={kanban?.inProgress || []}
                     onStatusChange={handleStatusChange}
+                    color="info"
                 />
                 <TaskColumn
                     title="已完成"
                     status="completed"
                     tasks={kanban?.completed || []}
                     onStatusChange={handleStatusChange}
+                    color="success"
                 />
             </div>
 
             {/* 新增任務 Modal */}
             {showAddModal && (
                 <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
+                    <Card className="modal" padding="lg" onClick={e => e.stopPropagation()}>
                         <h3>新增任務</h3>
                         <div className="form-group">
                             <label>任務標題</label>
@@ -111,16 +122,18 @@ export default function TasksPage() {
                             </select>
                         </div>
                         <div className="modal-actions">
-                            <button className="btn-secondary" onClick={() => setShowAddModal(false)}>取消</button>
-                            <button
-                                className="btn-primary"
+                            <Button variant="secondary" onClick={() => setShowAddModal(false)}>
+                                取消
+                            </Button>
+                            <Button
+                                variant="primary"
                                 onClick={handleAddTask}
-                                disabled={addTaskMutation.isPending}
+                                loading={addTaskMutation.isPending}
                             >
-                                {addTaskMutation.isPending ? '新增中...' : '新增任務'}
-                            </button>
+                                新增任務
+                            </Button>
                         </div>
-                    </div>
+                    </Card>
                 </div>
             )}
         </div>
@@ -132,35 +145,53 @@ interface TaskColumnProps {
     status: string;
     tasks: Task[];
     onStatusChange: (id: string, status: string) => void;
+    color: 'warning' | 'info' | 'success';
 }
 
-function TaskColumn({ title, status, tasks, onStatusChange }: TaskColumnProps) {
+function TaskColumn({ title, status, tasks, onStatusChange, color }: TaskColumnProps) {
     const nextStatus = status === 'pending' ? 'in_progress' : status === 'in_progress' ? 'completed' : null;
+
+    const getPriorityColor = (priority: number): 'danger' | 'warning' | 'success' | 'default' => {
+        if (priority >= 4) return 'danger';
+        if (priority === 3) return 'warning';
+        return 'default';
+    };
 
     return (
         <div className="task-column">
             <div className={`column-header ${status.replace('_', '-')}`}>
                 <span>{title}</span>
-                <span className="count">{tasks.length}</span>
+                <Badge variant={color} size="sm">{tasks.length}</Badge>
             </div>
             <div className="task-list">
                 {tasks.length === 0 && (
                     <div className="empty-column">無任務</div>
                 )}
                 {tasks.map((task) => (
-                    <div key={task.id} className={`task-card ${status === 'completed' ? 'completed' : ''}`}>
-                        <div className="task-priority">P{task.priority}</div>
-                        <div className="task-title">{task.title}</div>
-                        {task.description && <div className="task-desc">{task.description}</div>}
+                    <Card
+                        key={task.id}
+                        className={`task-card-vi ${status === 'completed' ? 'task-card-vi--completed' : ''}`}
+                        padding="sm"
+                    >
+                        <div className="task-card-vi__header">
+                            <Tag color={getPriorityColor(task.priority)} size="sm">
+                                P{task.priority}
+                            </Tag>
+                        </div>
+                        <div className="task-card-vi__title">{task.title}</div>
+                        {task.description && (
+                            <div className="task-card-vi__desc">{task.description}</div>
+                        )}
                         {nextStatus && (
-                            <button
-                                className="btn-small"
+                            <Button
+                                variant="ghost"
+                                size="sm"
                                 onClick={() => onStatusChange(task.id, nextStatus)}
                             >
                                 {nextStatus === 'in_progress' ? '開始處理' : '標記完成'}
-                            </button>
+                            </Button>
                         )}
-                    </div>
+                    </Card>
                 ))}
             </div>
         </div>
