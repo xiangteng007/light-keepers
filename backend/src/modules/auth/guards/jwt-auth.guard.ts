@@ -3,6 +3,11 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account } from '../../accounts/entities';
+import { Request } from 'express';
+
+interface RequestWithUser extends Request {
+    user?: Account;
+}
 
 @Injectable()
 export class JwtAuthGuard implements CanActivate {
@@ -13,7 +18,7 @@ export class JwtAuthGuard implements CanActivate {
     ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
-        const request = context.switchToHttp().getRequest();
+        const request = context.switchToHttp().getRequest<RequestWithUser>();
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
@@ -38,7 +43,7 @@ export class JwtAuthGuard implements CanActivate {
         }
     }
 
-    private extractTokenFromHeader(request: any): string | null {
+    private extractTokenFromHeader(request: Request): string | null {
         const [type, token] = request.headers.authorization?.split(' ') ?? [];
         return type === 'Bearer' ? token : null;
     }

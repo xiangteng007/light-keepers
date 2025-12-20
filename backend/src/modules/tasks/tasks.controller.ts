@@ -7,7 +7,7 @@ export class TasksController {
     constructor(private readonly tasksService: TasksService) { }
 
     @Post()
-    create(@Body() dto: CreateTaskDto, @Request() req) {
+    create(@Body() dto: CreateTaskDto, @Request() req: { user?: { id: string } }) {
         return this.tasksService.create(dto, req.user?.id);
     }
 
