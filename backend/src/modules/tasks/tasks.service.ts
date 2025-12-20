@@ -83,25 +83,30 @@ export class TasksService {
         inProgress: Task[];
         completed: Task[];
     }> {
-        const pending = await this.taskRepository.find({
-            where: { status: 'pending' },
-            order: { priority: 'DESC', createdAt: 'DESC' },
-            take: 50,
-        });
+        try {
+            const pending = await this.taskRepository.find({
+                where: { status: 'pending' },
+                order: { createdAt: 'DESC' },
+                take: 50,
+            });
 
-        const inProgress = await this.taskRepository.find({
-            where: { status: 'in_progress' },
-            order: { priority: 'DESC', createdAt: 'DESC' },
-            take: 50,
-        });
+            const inProgress = await this.taskRepository.find({
+                where: { status: 'in_progress' },
+                order: { createdAt: 'DESC' },
+                take: 50,
+            });
 
-        const completed = await this.taskRepository.find({
-            where: { status: 'completed' },
-            order: { completedAt: 'DESC' },
-            take: 20,
-        });
+            const completed = await this.taskRepository.find({
+                where: { status: 'completed' },
+                order: { createdAt: 'DESC' },
+                take: 20,
+            });
 
-        return { pending, inProgress, completed };
+            return { pending, inProgress, completed };
+        } catch (error) {
+            console.error('getKanbanBoard error:', error);
+            return { pending: [], inProgress: [], completed: [] };
+        }
     }
 
     async getStats(): Promise<{
