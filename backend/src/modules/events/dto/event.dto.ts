@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNumber, Min, Max, IsIn } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateEventDto {
     @IsString()
@@ -78,14 +79,17 @@ export class EventQueryDto {
     @IsOptional()
     category?: string;
 
+    @Type(() => Number)
     @IsNumber()
     @IsOptional()
     severity?: number;
 
+    @Type(() => Number)
     @IsNumber()
     @IsOptional()
     limit?: number;
 
+    @Type(() => Number)
     @IsNumber()
     @IsOptional()
     offset?: number;
