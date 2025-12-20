@@ -101,7 +101,7 @@ export default function MapPage() {
     // 獲取所有事件
     const { data: eventsData, isLoading } = useQuery({
         queryKey: ['allEvents'],
-        queryFn: () => getEvents({ limit: 100 }).then(res => res.data),
+        queryFn: () => getEvents().then(res => res.data),
     });
 
     const events = eventsData?.data || [];
