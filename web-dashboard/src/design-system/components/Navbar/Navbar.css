@@ -1,0 +1,60 @@
+/* Navbar Component Styles */
+
+.lk-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: var(--navbar-height);
+    padding: var(--navbar-padding);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.lk-navbar__brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}
+
+.lk-navbar__logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-600));
+    border-radius: var(--radius-md);
+    font-size: 20px;
+}
+
+.lk-navbar__title-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.lk-navbar__title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--accent-primary);
+    line-height: 1.2;
+}
+
+.lk-navbar__subtitle {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
+
+.lk-navbar__content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-4);
+    flex: 1;
+    justify-content: center;
+}
+
+.lk-navbar__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+}

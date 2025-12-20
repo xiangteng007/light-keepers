@@ -1,0 +1,58 @@
+/* Badge Component Styles */
+
+.lk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-1);
+    padding: var(--badge-padding);
+    font-size: var(--badge-font-size);
+    font-weight: var(--font-weight-semibold);
+    border-radius: var(--badge-radius);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Sizes */
+.lk-badge--sm {
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+.lk-badge--md {
+    padding: 4px 8px;
+    font-size: 11px;
+}
+
+/* Variants */
+.lk-badge--default {
+    background: rgba(196, 167, 125, 0.2);
+    color: var(--accent-primary);
+}
+
+.lk-badge--success {
+    background: rgba(107, 142, 92, 0.2);
+    color: var(--color-success);
+}
+
+.lk-badge--warning {
+    background: rgba(201, 162, 86, 0.2);
+    color: var(--color-warning);
+}
+
+.lk-badge--danger {
+    background: rgba(184, 92, 92, 0.2);
+    color: var(--color-danger);
+}
+
+.lk-badge--info {
+    background: rgba(92, 123, 142, 0.2);
+    color: var(--color-info);
+}
+
+/* Dot */
+.lk-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}

@@ -1,0 +1,70 @@
+/* Tag Component Styles */
+
+.lk-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--tag-padding);
+    font-size: var(--tag-font-size);
+    font-weight: var(--font-weight-bold);
+    border-radius: var(--tag-radius);
+    text-transform: uppercase;
+}
+
+/* Sizes */
+.lk-tag--sm {
+    padding: 1px 4px;
+    font-size: 9px;
+}
+
+.lk-tag--md {
+    padding: 2px 6px;
+    font-size: 10px;
+}
+
+/* Colors */
+.lk-tag--default {
+    background: var(--bg-hover);
+    color: var(--text-secondary);
+}
+
+.lk-tag--brown {
+    background: var(--color-brown-700);
+    color: var(--color-beige-200);
+}
+
+.lk-tag--gold {
+    background: var(--color-gold-500);
+    color: var(--color-brown-900);
+}
+
+.lk-tag--success {
+    background: var(--color-success);
+    color: white;
+}
+
+.lk-tag--warning {
+    background: var(--color-warning);
+    color: var(--color-brown-900);
+}
+
+.lk-tag--danger {
+    background: var(--color-danger);
+    color: white;
+}
+
+.lk-tag__remove {
+    background: none;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    opacity: 0.7;
+    padding: 0;
+    margin-left: 2px;
+}
+
+.lk-tag__remove:hover {
+    opacity: 1;
+}
