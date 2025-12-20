@@ -2,7 +2,10 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HealthModule } from './modules/health/health.module';
+import { AuthModule } from './modules/auth/auth.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
+import { EventsModule } from './modules/events/events.module';
+import { TasksModule } from './modules/tasks/tasks.module';
 
 @Module({
     imports: [
@@ -19,7 +22,6 @@ import { AccountsModule } from './modules/accounts/accounts.module';
 
                 return {
                     type: 'postgres',
-                    // Cloud Run 使用 Unix socket 連接 Cloud SQL
                     host: isProduction
                         ? `/cloudsql/${configService.get('CLOUD_SQL_CONNECTION_NAME')}`
                         : configService.get('DB_HOST', 'localhost'),
@@ -40,8 +42,12 @@ import { AccountsModule } from './modules/accounts/accounts.module';
             inject: [ConfigService],
         }),
 
+        // 功能模組
         HealthModule,
+        AuthModule,
         AccountsModule,
+        EventsModule,
+        TasksModule,
     ],
 })
 export class AppModule { }

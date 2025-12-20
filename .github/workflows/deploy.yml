@@ -1,0 +1,69 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: light-keepers-mvp
+  REGION: asia-east1
+  API_SERVICE: light-keepers-api
+  DASHBOARD_SERVICE: light-keepers-dashboard
+
+jobs:
+  deploy-api:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy API to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.API_SERVICE }} \
+            --source ./backend \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --add-cloudsql-instances=${{ env.PROJECT_ID }}:${{ env.REGION }}:light-keepers-db \
+            --set-env-vars="NODE_ENV=production,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:${{ env.REGION }}:light-keepers-db" \
+            --set-secrets="DB_PASSWORD=db-password:latest" \
+            --quiet
+
+  deploy-dashboard:
+    runs-on: ubuntu-latest
+    needs: deploy-api
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Deploy Dashboard to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.DASHBOARD_SERVICE }} \
+            --source ./web-dashboard \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --quiet
