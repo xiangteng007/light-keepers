@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import DashboardPage from './pages/DashboardPage'
 import EventsPage from './pages/EventsPage'
 import TasksPage from './pages/TasksPage'
+import MapPage from './pages/MapPage'
 import './App.css'
 
 function App() {
@@ -13,6 +14,7 @@ function App() {
         <Route path="dashboard" element={<DashboardPage />} />
         <Route path="events" element={<EventsPage />} />
         <Route path="tasks" element={<TasksPage />} />
+        <Route path="map" element={<MapPage />} />
       </Route>
     </Routes>
   )

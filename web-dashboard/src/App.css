@@ -958,3 +958,206 @@ body {
   background: rgba(107, 142, 92, 0.2);
   color: var(--color-success);
 }
+
+/* ============================================
+   Map Page Styles
+============================================ */
+
+.map-page {
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+}
+
+.map-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+}
+
+.map-container {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+}
+
+/* Leaflet 樣式覆寫 */
+.leaflet-container {
+  font-family: var(--font-family-primary);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card);
+}
+
+.map-popup h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.map-popup__category {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.map-popup__severity {
+  font-weight: 600;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+/* 地圖圖例 */
+.map-legend {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: var(--bg-card);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+}
+
+.map-legend__title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 4px 0;
+}
+
+.map-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* 側邊欄 */
+.map-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.map-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.map-event-item {
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.map-event-item:hover {
+  background: var(--bg-hover);
+}
+
+.map-event-item--selected {
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+}
+
+.map-event-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.map-event-item__location {
+  font-size: 14px;
+}
+
+.map-event-item__title {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.map-event-item__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 事件詳情 */
+.map-event-detail__content h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.map-event-detail__desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.map-event-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.map-event-detail__info strong {
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+.map-event-detail__actions {
+  display: flex;
+  gap: 8px;
+}
+
+/* 響應式 */
+@media (max-width: 1024px) {
+  .map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    min-height: 400px;
+  }
+
+  .map-sidebar {
+    max-height: 300px;
+  }
+}

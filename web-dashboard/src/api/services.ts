@@ -21,6 +21,8 @@ export interface Event {
     severity?: number;
     status: string;
     address?: string;
+    latitude?: number;
+    longitude?: number;
     createdAt: string;
 }
 
