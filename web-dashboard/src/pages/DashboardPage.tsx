@@ -1,4 +1,30 @@
+import { useQuery } from '@tanstack/react-query';
+import { getEvents, getTaskStats, getEventStats } from '../api';
+
 export default function DashboardPage() {
+    // 獲取事件統計
+    const { data: eventStats } = useQuery({
+        queryKey: ['eventStats'],
+        queryFn: () => getEventStats().then(res => res.data),
+    });
+
+    // 獲取任務統計
+    const { data: taskStats } = useQuery({
+        queryKey: ['taskStats'],
+        queryFn: () => getTaskStats().then(res => res.data),
+    });
+
+    // 獲取最新事件
+    const { data: eventsData } = useQuery({
+        queryKey: ['recentEvents'],
+        queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data),
+    });
+
+    // 計算完成率
+    const completionRate = taskStats
+        ? Math.round((taskStats.completed / (taskStats.pending + taskStats.inProgress + taskStats.completed || 1)) * 100)
+        : 0;
+
     return (
         <div className="page dashboard-page">
             <h2>儀表板</h2>
@@ -7,28 +33,28 @@ export default function DashboardPage() {
                 <div className="stat-card">
                     <div className="stat-icon">🚨</div>
                     <div className="stat-content">
-                        <span className="stat-value">12</span>
+                        <span className="stat-value">{eventStats?.active || 0}</span>
                         <span className="stat-label">進行中事件</span>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-icon">📋</div>
                     <div className="stat-content">
-                        <span className="stat-value">28</span>
+                        <span className="stat-value">{taskStats?.pending || 0}</span>
                         <span className="stat-label">待處理任務</span>
                     </div>
                 </div>
                 <div className="stat-card">
-                    <div className="stat-icon">👥</div>
+                    <div className="stat-icon">⏳</div>
                     <div className="stat-content">
-                        <span className="stat-value">45</span>
-                        <span className="stat-label">活躍志工</span>
+                        <span className="stat-value">{taskStats?.inProgress || 0}</span>
+                        <span className="stat-label">進行中任務</span>
                     </div>
                 </div>
                 <div className="stat-card">
                     <div className="stat-icon">✅</div>
                     <div className="stat-content">
-                        <span className="stat-value">89%</span>
+                        <span className="stat-value">{completionRate}%</span>
                         <span className="stat-label">任務完成率</span>
                     </div>
                 </div>
@@ -38,21 +64,19 @@ export default function DashboardPage() {
                 <section className="recent-events">
                     <h3>最新事件</h3>
                     <div className="event-list">
-                        <div className="event-item priority-high">
-                            <span className="event-category">淹水</span>
-                            <span className="event-title">光復路積水達50公分</span>
-                            <span className="event-time">10分鐘前</span>
-                        </div>
-                        <div className="event-item priority-medium">
-                            <span className="event-category">道路</span>
-                            <span className="event-title">大進路樹木倒塌</span>
-                            <span className="event-time">25分鐘前</span>
-                        </div>
-                        <div className="event-item priority-low">
-                            <span className="event-category">物資</span>
-                            <span className="event-title">社區需要沙包支援</span>
-                            <span className="event-time">1小時前</span>
-                        </div>
+                        {eventsData?.data?.length === 0 && (
+                            <div className="empty-state">
+                                <span>📭</span>
+                                <p>目前沒有進行中的事件</p>
+                            </div>
+                        )}
+                        {eventsData?.data?.map((event) => (
+                            <div key={event.id} className={`event-item priority-${event.severity && event.severity >= 4 ? 'high' : event.severity === 3 ? 'medium' : 'low'}`}>
+                                <span className="event-category">{event.category || '其他'}</span>
+                                <span className="event-title">{event.title}</span>
+                                <span className="event-time">{formatTime(event.createdAt)}</span>
+                            </div>
+                        ))}
                     </div>
                 </section>
 
@@ -65,5 +89,19 @@ export default function DashboardPage() {
                 </section>
             </div>
         </div>
-    )
+    );
+}
+
+function formatTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return '剛剛';
+    if (minutes < 60) return `${minutes}分鐘前`;
+    if (hours < 24) return `${hours}小時前`;
+    return `${days}天前`;
 }
