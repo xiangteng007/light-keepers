@@ -25,6 +25,19 @@ export class CreateEventDto {
     @IsString()
     @IsOptional()
     adminCode?: string;
+
+    @IsNumber()
+    @IsOptional()
+    latitude?: number;
+
+    @IsNumber()
+    @IsOptional()
+    longitude?: number;
+
+    @IsString()
+    @IsOptional()
+    @IsIn(['active', 'resolved', 'archived'])
+    status?: string;
 }
 
 export class UpdateEventDto {

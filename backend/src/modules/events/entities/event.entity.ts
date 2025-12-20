@@ -26,6 +26,12 @@ export class Event {
     @Column({ name: 'admin_code', length: 20, nullable: true })
     adminCode: string;
 
+    @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+    latitude: number;
+
+    @Column({ type: 'decimal', precision: 10, scale: 6, nullable: true })
+    longitude: number;
+
     @Column({ name: 'started_at', type: 'timestamp', nullable: true })
     startedAt: Date;
 
