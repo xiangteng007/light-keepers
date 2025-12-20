@@ -11,10 +11,9 @@ export class TasksService {
         private readonly taskRepository: Repository<Task>,
     ) { }
 
-    async create(dto: CreateTaskDto, assignedBy?: string): Promise<Task> {
+    async create(dto: CreateTaskDto): Promise<Task> {
         const task = this.taskRepository.create({
             ...dto,
-            assignedBy,
             dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
         });
         return this.taskRepository.save(task);

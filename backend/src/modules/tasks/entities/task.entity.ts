@@ -1,6 +1,5 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Event } from '../../events/entities';
-import { Account } from '../../accounts/entities';
 
 @Entity('tasks')
 export class Task {
@@ -25,8 +24,8 @@ export class Task {
     @Column({ name: 'assigned_to', type: 'uuid', nullable: true })
     assignedTo: string;
 
-    @Column({ name: 'assigned_by', type: 'uuid', nullable: true })
-    assignedBy: string;
+    @Column({ type: 'text', nullable: true })
+    address: string;
 
     @Column({ name: 'due_at', type: 'timestamp', nullable: true })
     dueAt: Date;

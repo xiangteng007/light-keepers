@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto, TaskQueryDto } from './dto/task.dto';
 
@@ -7,8 +7,8 @@ export class TasksController {
     constructor(private readonly tasksService: TasksService) { }
 
     @Post()
-    create(@Body() dto: CreateTaskDto, @Request() req: { user?: { id: string } }) {
-        return this.tasksService.create(dto, req.user?.id);
+    create(@Body() dto: CreateTaskDto) {
+        return this.tasksService.create(dto);
     }
 
     @Get()
