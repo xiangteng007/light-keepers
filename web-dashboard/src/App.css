@@ -967,6 +967,7 @@ body {
   height: calc(100vh - 64px);
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .map-layout {
@@ -975,6 +976,7 @@ body {
   gap: 24px;
   flex: 1;
   min-height: 0;
+  width: 100%;
 }
 
 .map-container {
@@ -983,6 +985,8 @@ body {
   overflow: hidden;
   border: 1px solid var(--border-color);
   background: var(--bg-card);
+  min-height: 500px;
+  width: 100%;
 }
 
 /* Leaflet 樣式覆寫 */
