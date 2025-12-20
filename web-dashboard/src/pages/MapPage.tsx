@@ -240,13 +240,55 @@ export default function MapPage() {
                                             <strong>地址:</strong> {selectedEvent.address}
                                         </div>
                                     )}
+                                    {/* GPS 座標顯示 */}
+                                    {selectedEvent.latitude && selectedEvent.longitude && (
+                                        <div className="map-event-detail__gps">
+                                            <strong>GPS 座標:</strong>
+                                            <code className="gps-coords">
+                                                {selectedEvent.latitude.toFixed(6)}, {selectedEvent.longitude.toFixed(6)}
+                                            </code>
+                                            <button
+                                                className="copy-btn"
+                                                onClick={() => {
+                                                    navigator.clipboard.writeText(
+                                                        `${selectedEvent.latitude}, ${selectedEvent.longitude}`
+                                                    );
+                                                }}
+                                                title="複製座標"
+                                            >
+                                                📋
+                                            </button>
+                                        </div>
+                                    )}
                                 </div>
                                 <div className="map-event-detail__actions">
-                                    <Button variant="primary" size="sm">
-                                        查看詳情
-                                    </Button>
+                                    {/* Google Maps 導航按鈕 */}
+                                    {selectedEvent.latitude && selectedEvent.longitude && (
+                                        <Button
+                                            variant="primary"
+                                            size="sm"
+                                            onClick={() => {
+                                                const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedEvent.latitude},${selectedEvent.longitude}`;
+                                                window.open(url, '_blank');
+                                            }}
+                                        >
+                                            🧭 導航
+                                        </Button>
+                                    )}
+                                    {selectedEvent.latitude && selectedEvent.longitude && (
+                                        <Button
+                                            variant="secondary"
+                                            size="sm"
+                                            onClick={() => {
+                                                const url = `https://www.google.com/maps?q=${selectedEvent.latitude},${selectedEvent.longitude}`;
+                                                window.open(url, '_blank');
+                                            }}
+                                        >
+                                            📍 開啟地圖
+                                        </Button>
+                                    )}
                                     <Button variant="secondary" size="sm">
-                                        建立任務
+                                        📋 建立任務
                                     </Button>
                                 </div>
                             </div>
