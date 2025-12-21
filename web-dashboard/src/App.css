@@ -1152,13 +1152,27 @@ body {
   margin: 4px 0;
 }
 
-/* 地圖圖例 */
+/* 地圖圖例 - 左下角圖層篩選 */
 .map-legend {
   position: absolute;
   bottom: 24px;
   left: 24px;
   background: var(--bg-card);
   padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* 嚴重程度圖例 - 右下角 */
+.map-severity-legend {
+  position: absolute;
+  bottom: 24px;
+  right: 380px;
+  background: var(--bg-card);
+  padding: 10px 14px;
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-md);
   z-index: 1000;

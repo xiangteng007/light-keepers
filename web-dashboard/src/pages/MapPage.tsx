@@ -511,8 +511,11 @@ export default function MapPage() {
                                 )}
                             </div>
                         )}
+                    </div>
 
-                        <div className="map-legend__title" style={{ marginTop: '12px' }}>嚴重程度</div>
+                    {/* 嚴重程度圖例 - 獨立於右下角 */}
+                    <div className="map-severity-legend">
+                        <div className="map-legend__title">嚴重程度</div>
                         {[5, 4, 3, 2, 1].map((level) => (
                             <div key={level} className="map-legend__item">
                                 <span
