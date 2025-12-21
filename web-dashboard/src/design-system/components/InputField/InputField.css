@@ -1,0 +1,170 @@
+/* ============================================
+   InputField Component - Premium Design
+   極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
+
+.lk-input {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1-5);
+}
+
+.lk-input--full-width {
+    width: 100%;
+}
+
+/* ===== Label ===== */
+.lk-input__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    transition: color var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-input--focused .lk-input__label {
+    color: var(--accent-primary);
+}
+
+.lk-input--error .lk-input__label {
+    color: var(--color-danger);
+}
+
+/* ===== Wrapper ===== */
+.lk-input__wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: var(--bg-secondary);
+    border: var(--input-border);
+    border-radius: var(--input-radius);
+    transition: all var(--duration-normal) var(--ease-smooth);
+}
+
+.lk-input--focused .lk-input__wrapper {
+    border-color: var(--accent-primary);
+    background: var(--bg-card);
+}
+
+.lk-input--error .lk-input__wrapper {
+    border-color: var(--color-danger);
+}
+
+.lk-input--disabled .lk-input__wrapper {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Variant: Filled */
+.lk-input--filled .lk-input__wrapper {
+    background: var(--bg-hover);
+    border-color: transparent;
+}
+
+.lk-input--filled.lk-input--focused .lk-input__wrapper {
+    background: var(--bg-card);
+    border-color: var(--accent-primary);
+}
+
+/* Variant: Outlined */
+.lk-input--outlined .lk-input__wrapper {
+    background: transparent;
+    border-width: 1.5px;
+}
+
+/* ===== Focus Ring (Glow Effect) ===== */
+.lk-input__focus-ring {
+    position: absolute;
+    inset: -3px;
+    border-radius: calc(var(--input-radius) + 3px);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-smooth);
+    box-shadow: var(--shadow-glow);
+}
+
+.lk-input--focused .lk-input__focus-ring {
+    opacity: 1;
+}
+
+.lk-input--error .lk-input__focus-ring {
+    box-shadow: var(--shadow-glow-danger);
+}
+
+/* ===== Input Field ===== */
+.lk-input__field {
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-family-primary);
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    padding: var(--input-padding);
+}
+
+.lk-input__field::placeholder {
+    color: var(--text-muted);
+}
+
+.lk-input__field:disabled {
+    cursor: not-allowed;
+}
+
+/* Size variants */
+.lk-input--sm .lk-input__wrapper {
+    height: var(--input-height-sm);
+}
+
+.lk-input--sm .lk-input__field {
+    font-size: var(--font-size-sm);
+}
+
+.lk-input--md .lk-input__wrapper {
+    height: var(--input-height-md);
+}
+
+.lk-input--lg .lk-input__wrapper {
+    height: var(--input-height-lg);
+}
+
+.lk-input--lg .lk-input__field {
+    font-size: var(--font-size-md);
+}
+
+/* ===== Prefix & Suffix ===== */
+.lk-input__prefix,
+.lk-input__suffix {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: var(--font-size-base);
+    padding: 0 var(--spacing-3);
+    flex-shrink: 0;
+    transition: color var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-input--focused .lk-input__prefix,
+.lk-input--focused .lk-input__suffix {
+    color: var(--accent-primary);
+}
+
+.lk-input__prefix {
+    padding-right: 0;
+}
+
+.lk-input__suffix {
+    padding-left: 0;
+}
+
+/* ===== Helper Text ===== */
+.lk-input__helper {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    line-height: var(--line-height-normal);
+}
+
+.lk-input__helper--error {
+    color: var(--color-danger);
+}

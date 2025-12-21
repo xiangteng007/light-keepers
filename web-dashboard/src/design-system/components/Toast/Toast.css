@@ -1,0 +1,221 @@
+/* ============================================
+   Toast Component - Premium Design
+   極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
+
+/* ===== Toast Container ===== */
+.lk-toast-container {
+    position: fixed;
+    z-index: var(--z-toast);
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-3);
+    pointer-events: none;
+    max-width: var(--toast-width);
+    padding: var(--spacing-4);
+}
+
+.lk-toast-container--top-right {
+    top: 0;
+    right: 0;
+}
+
+.lk-toast-container--top-left {
+    top: 0;
+    left: 0;
+}
+
+.lk-toast-container--bottom-right {
+    bottom: 0;
+    right: 0;
+}
+
+.lk-toast-container--bottom-left {
+    bottom: 0;
+    left: 0;
+}
+
+.lk-toast-container--top-center {
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+.lk-toast-container--bottom-center {
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* ===== Toast ===== */
+.lk-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--spacing-3);
+    padding: var(--toast-padding);
+    background: var(--bg-card);
+    border-radius: var(--toast-radius);
+    box-shadow: var(--shadow-xl);
+    pointer-events: auto;
+    position: relative;
+    overflow: hidden;
+    animation: toastSlideIn var(--duration-normal) var(--ease-spring);
+    min-width: 280px;
+    max-width: var(--toast-width);
+}
+
+@keyframes toastSlideIn {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.lk-toast--exiting {
+    animation: toastSlideOut var(--duration-normal) var(--ease-smooth) forwards;
+}
+
+@keyframes toastSlideOut {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* ===== Left Indicator Bar ===== */
+.lk-toast__indicator {
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    border-radius: var(--radius-full) 0 0 var(--radius-full);
+}
+
+.lk-toast--default .lk-toast__indicator {
+    background: var(--gradient-gold);
+}
+
+.lk-toast--success .lk-toast__indicator {
+    background: var(--gradient-success);
+}
+
+.lk-toast--warning .lk-toast__indicator {
+    background: var(--gradient-warning);
+}
+
+.lk-toast--danger .lk-toast__indicator {
+    background: var(--gradient-danger);
+}
+
+.lk-toast--info .lk-toast__indicator {
+    background: var(--gradient-info);
+}
+
+/* ===== Icon ===== */
+.lk-toast__icon {
+    font-size: var(--font-size-lg);
+    flex-shrink: 0;
+    margin-left: var(--spacing-1);
+}
+
+/* ===== Content ===== */
+.lk-toast__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.lk-toast__title {
+    display: block;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-0-5);
+}
+
+.lk-toast__message {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+    line-height: var(--line-height-normal);
+}
+
+/* ===== Close Button ===== */
+.lk-toast__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    font-size: 12px;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    flex-shrink: 0;
+}
+
+.lk-toast__close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+
+/* ===== Progress Bar ===== */
+.lk-toast__progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(0, 0, 0, 0.05);
+}
+
+.lk-toast__progress::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    background: var(--accent-primary);
+    animation: toastProgress linear forwards;
+    animation-duration: inherit;
+}
+
+.lk-toast--success .lk-toast__progress::after {
+    background: var(--color-success);
+}
+
+.lk-toast--warning .lk-toast__progress::after {
+    background: var(--color-warning);
+}
+
+.lk-toast--danger .lk-toast__progress::after {
+    background: var(--color-danger);
+}
+
+.lk-toast--info .lk-toast__progress::after {
+    background: var(--color-info);
+}
+
+@keyframes toastProgress {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}

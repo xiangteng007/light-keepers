@@ -1,6 +1,7 @@
 // Lightkeepers VI Design System - UI Components
-// Generated from lightkeepers_vi.tokens.json
+// Premium Design: 極簡高端 · 現代 SaaS · 北歐溫暖
 
+// Core Components
 export { Button } from './Button';
 export type { ButtonProps } from './Button';
 
@@ -18,3 +19,20 @@ export type { TagProps } from './Tag';
 
 export { Navbar } from './Navbar';
 export type { NavbarProps } from './Navbar';
+
+// New Premium Components
+export { Modal } from './Modal';
+export type { ModalProps } from './Modal';
+
+export { Toast, ToastContainer } from './Toast';
+export type { ToastProps, ToastContainerProps } from './Toast';
+
+export { InputField } from './InputField';
+export type { InputFieldProps } from './InputField';
+
+export { WidgetWrapper } from './WidgetWrapper';
+export type { WidgetWrapperProps } from './WidgetWrapper';
+
+export { ProgressBar, CircularProgress, StatIndicator } from './Indicators';
+export type { ProgressBarProps, CircularProgressProps, StatIndicatorProps } from './Indicators';
+

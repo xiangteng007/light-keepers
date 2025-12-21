@@ -7,8 +7,9 @@ export interface CardProps {
     subtitle?: string;
     icon?: React.ReactNode;
     footer?: React.ReactNode;
-    variant?: 'default' | 'elevated' | 'outlined';
-    padding?: 'sm' | 'md' | 'lg';
+    variant?: 'default' | 'elevated' | 'outlined' | 'glass' | 'gradient' | 'interactive';
+    padding?: 'none' | 'sm' | 'md' | 'lg';
+    hoverable?: boolean;
     className?: string;
     onClick?: (e: React.MouseEvent) => void;
 }
@@ -22,13 +23,25 @@ export const Card: React.FC<CardProps> = ({
     footer,
     variant = 'default',
     padding = 'md',
+    hoverable = false,
     className = '',
     onClick,
 }) => {
+    const cardClasses = [
+        'lk-card',
+        `lk-card--${variant}`,
+        `lk-card--padding-${padding}`,
+        hoverable ? 'lk-card--hoverable' : '',
+        onClick ? 'lk-card--clickable' : '',
+        className,
+    ].filter(Boolean).join(' ');
+
     return (
         <div
-            className={`lk-card lk-card--${variant} lk-card--padding-${padding} ${className}`}
+            className={cardClasses}
             onClick={onClick}
+            role={onClick ? 'button' : undefined}
+            tabIndex={onClick ? 0 : undefined}
         >
             {(title || icon) && (
                 <div className="lk-card__header">
@@ -47,3 +60,4 @@ export const Card: React.FC<CardProps> = ({
 
 
 export default Card;
+

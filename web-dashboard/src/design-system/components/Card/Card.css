@@ -1,17 +1,42 @@
-/* Card Component Styles */
+/* ============================================
+   Card Component - Premium Design
+   極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
 
 .lk-card {
     background: var(--bg-card);
     border-radius: var(--card-radius);
     border: var(--card-border);
-    transition: all 0.2s ease;
+    transition: all var(--duration-normal) var(--ease-smooth);
+    position: relative;
 }
 
-/* Variants */
+/* ===== Padding Sizes ===== */
+.lk-card--padding-none {
+    padding: 0;
+}
+
+.lk-card--padding-sm {
+    padding: var(--card-padding-sm);
+}
+
+.lk-card--padding-md {
+    padding: var(--card-padding);
+}
+
+.lk-card--padding-lg {
+    padding: var(--card-padding-lg);
+}
+
+/* ===== Variants ===== */
+
+/* Default */
 .lk-card--default {
     background: var(--bg-card);
+    box-shadow: var(--shadow-xs);
 }
 
+/* Elevated */
 .lk-card--elevated {
     background: var(--bg-card);
     box-shadow: var(--shadow-md);
@@ -19,34 +44,111 @@
 }
 
 .lk-card--elevated:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-xl), var(--shadow-glow-sm);
+}
+
+/* Outlined */
+.lk-card--outlined {
+    background: transparent;
+    border: 2px solid var(--border-color);
+    box-shadow: none;
+}
+
+.lk-card--outlined:hover {
+    border-color: var(--accent-primary);
+}
+
+/* Glass - 玻璃態 */
+.lk-card--glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--shadow-md);
+}
+
+.lk-card--glass:hover {
+    background: var(--glass-bg-light);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
+}
+
+/* Gradient - 漸變邊框 */
+.lk-card--gradient {
+    background: var(--bg-card);
+    border: none;
+    position: relative;
+    box-shadow: var(--shadow-sm);
+}
+
+.lk-card--gradient::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1.5px;
+    background: var(--gradient-gold);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask-composite: xor;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-card--gradient:hover::before {
+    opacity: 1;
+}
+
+.lk-card--gradient:hover {
+    box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
+}
+
+/* Interactive - 可互動 */
+.lk-card--interactive {
+    background: var(--bg-card);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+}
+
+.lk-card--interactive:hover {
+    transform: translateY(-4px) scale(1.01);
+    box-shadow: var(--shadow-xl), var(--shadow-glow);
+    border-color: var(--accent-primary);
+}
+
+.lk-card--interactive:active {
+    transform: translateY(-2px) scale(0.99);
+    box-shadow: var(--shadow-md);
+}
+
+/* ===== Hoverable Modifier ===== */
+.lk-card--hoverable {
+    cursor: pointer;
+}
+
+.lk-card--hoverable:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lg);
 }
 
-.lk-card--outlined {
-    background: transparent;
-    border: 2px solid var(--border-color);
+/* ===== Clickable Modifier ===== */
+.lk-card--clickable {
+    cursor: pointer;
 }
 
-/* Padding Sizes */
-.lk-card--padding-sm {
-    padding: var(--spacing-3);
+.lk-card--clickable:focus {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary);
 }
 
-.lk-card--padding-md {
-    padding: var(--spacing-6);
-}
-
-.lk-card--padding-lg {
-    padding: var(--spacing-8);
-}
-
-/* Header */
+/* ===== Header ===== */
 .lk-card__header {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-3);
-    margin-bottom: var(--spacing-4);
+    margin-bottom: var(--spacing-5);
 }
 
 .lk-card__icon {
@@ -55,14 +157,26 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-600));
+    background: var(--gradient-gold);
     border-radius: var(--radius-lg);
     font-size: 20px;
     flex-shrink: 0;
+    box-shadow: var(--shadow-sm), var(--shadow-glow-sm);
+    position: relative;
+    overflow: hidden;
+}
+
+.lk-card__icon::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
+    border-radius: inherit;
 }
 
 .lk-card__header-text {
     flex: 1;
+    min-width: 0;
 }
 
 .lk-card__title {
@@ -70,22 +184,26 @@
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
     margin: 0;
+    line-height: var(--line-height-tight);
 }
 
 .lk-card__subtitle {
     font-size: var(--font-size-sm);
     color: var(--text-muted);
     margin: var(--spacing-1) 0 0;
+    line-height: var(--line-height-normal);
 }
 
-/* Body */
+/* ===== Body ===== */
 .lk-card__body {
     color: var(--text-primary);
+    position: relative;
+    z-index: 1;
 }
 
-/* Footer */
+/* ===== Footer ===== */
 .lk-card__footer {
-    margin-top: var(--spacing-4);
+    margin-top: var(--spacing-5);
     padding-top: var(--spacing-4);
     border-top: 1px solid var(--border-color);
 }

@@ -1,4 +1,10 @@
-/* Light Keepers Dashboard - Base Styles */
+/* ============================================
+   Light Keepers Dashboard - Base Styles
+   Premium Design System Foundation
+   融合：極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
 
 :root {
   font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
@@ -12,6 +18,10 @@
 
 * {
   box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 html,
@@ -41,4 +51,303 @@ input,
 textarea,
 select {
   font-family: inherit;
+}
+
+/* ============================================
+   Custom Scrollbar - 精緻滾動條
+============================================ */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary, #F5EDE4);
+  border-radius: var(--radius-full, 9999px);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-beige-400, #D9CCC0);
+  border-radius: var(--radius-full, 9999px);
+  border: 2px solid var(--bg-secondary, #F5EDE4);
+  transition: background var(--duration-fast, 150ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-500, #B8976F);
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--bg-secondary, #F5EDE4);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-beige-400, #D9CCC0) var(--bg-secondary, #F5EDE4);
+}
+
+/* ============================================
+   Selection - 選取樣式
+============================================ */
+
+::selection {
+  background: rgba(196, 167, 125, 0.3);
+  color: var(--text-primary, #3D2E24);
+}
+
+::-moz-selection {
+  background: rgba(196, 167, 125, 0.3);
+  color: var(--text-primary, #3D2E24);
+}
+
+/* ============================================
+   Focus Ring - 焦點環
+============================================ */
+
+.focus-ring:focus,
+.focus-ring:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg-primary, #FAF8F5),
+    0 0 0 4px var(--color-gold-400, #C4A77D);
+}
+
+.focus-ring-inset:focus,
+.focus-ring-inset:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-gold-400, #C4A77D);
+}
+
+/* ============================================
+   Glassmorphism Utilities - 玻璃態效果
+============================================ */
+
+.glass {
+  background: var(--glass-bg, rgba(255, 255, 255, 0.7));
+  backdrop-filter: blur(var(--glass-blur, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+  border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
+}
+
+.glass-light {
+  background: var(--glass-bg-light, rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(var(--glass-blur, 20px));
+  -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+  border: 1px solid var(--glass-border-light, rgba(255, 255, 255, 0.3));
+}
+
+.glass-subtle {
+  background: var(--glass-bg-subtle, rgba(255, 255, 255, 0.5));
+  backdrop-filter: blur(var(--glass-blur-sm, 10px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm, 10px));
+}
+
+.glass-dark {
+  background: var(--glass-bg-dark, rgba(61, 46, 36, 0.85));
+  backdrop-filter: blur(var(--glass-blur-lg, 40px));
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg, 40px));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================
+   Gradient Utilities - 漸變效果
+============================================ */
+
+.gradient-text {
+  background: var(--gradient-gold, linear-gradient(135deg, #C4A77D 0%, #A68660 100%));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-border {
+  position: relative;
+  background: var(--bg-card, #FFFFFF);
+  border-radius: inherit;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: var(--gradient-gold, linear-gradient(135deg, #C4A77D 0%, #A68660 100%));
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  pointer-events: none;
+}
+
+/* ============================================
+   Animation Utilities - 動畫效果
+============================================ */
+
+.animate-fade-in {
+  animation: fadeIn var(--duration-normal, 250ms) var(--ease-smooth, cubic-bezier(0.4, 0, 0.2, 1));
+}
+
+.animate-slide-up {
+  animation: slideUp var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275));
+}
+
+.animate-slide-down {
+  animation: slideDown var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275));
+}
+
+.animate-scale-in {
+  animation: scaleIn var(--duration-normal, 250ms) var(--ease-spring, cubic-bezier(0.175, 0.885, 0.32, 1.275));
+}
+
+.animate-pulse {
+  animation: pulse 2s var(--ease-in-out, cubic-bezier(0.4, 0, 0.2, 1)) infinite;
+}
+
+.animate-spin {
+  animation: spin 1s var(--ease-linear, linear) infinite;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* ============================================
+   Skeleton Loading - 骨架載入
+============================================ */
+
+.skeleton {
+  background: linear-gradient(90deg,
+      var(--bg-secondary, #F5EDE4) 25%,
+      var(--bg-hover, #E8DDD0) 50%,
+      var(--bg-secondary, #F5EDE4) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md, 8px);
+}
+
+/* ============================================
+   Utility Classes - 工具類別
+============================================ */
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

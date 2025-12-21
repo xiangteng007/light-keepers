@@ -1,0 +1,166 @@
+/* ============================================
+   Modal Component - Premium Design
+   極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
+
+/* ===== Overlay - Glass Background ===== */
+.lk-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(61, 46, 36, 0.6);
+    backdrop-filter: blur(var(--glass-blur-sm));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: var(--z-modal);
+    padding: var(--spacing-6);
+    animation: modalOverlayIn var(--duration-normal) var(--ease-smooth);
+}
+
+@keyframes modalOverlayIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* ===== Modal Container ===== */
+.lk-modal {
+    background: var(--bg-card);
+    border-radius: var(--modal-radius);
+    box-shadow: var(--shadow-2xl);
+    width: 100%;
+    max-height: calc(100vh - var(--spacing-12));
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    animation: modalSlideIn var(--duration-slow) var(--ease-spring);
+    position: relative;
+}
+
+/* Subtle gradient overlay */
+.lk-modal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 120px;
+    background: linear-gradient(180deg, rgba(196, 167, 125, 0.03) 0%, transparent 100%);
+    pointer-events: none;
+    border-radius: var(--modal-radius) var(--modal-radius) 0 0;
+}
+
+@keyframes modalSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* ===== Sizes ===== */
+.lk-modal--sm {
+    max-width: var(--modal-width-sm);
+}
+
+.lk-modal--md {
+    max-width: var(--modal-width-md);
+}
+
+.lk-modal--lg {
+    max-width: var(--modal-width-lg);
+}
+
+.lk-modal--xl {
+    max-width: var(--modal-width-xl);
+}
+
+/* ===== Header ===== */
+.lk-modal__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--spacing-4);
+    padding: var(--modal-padding);
+    padding-bottom: var(--spacing-4);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    z-index: 1;
+}
+
+.lk-modal__header-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.lk-modal__title {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: var(--line-height-tight);
+}
+
+.lk-modal__subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin: var(--spacing-1) 0 0;
+}
+
+/* ===== Close Button ===== */
+.lk-modal__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-lg);
+    border: none;
+    background: var(--bg-secondary);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all var(--duration-fast) var(--ease-smooth);
+    flex-shrink: 0;
+}
+
+.lk-modal__close:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.lk-modal__close:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--accent-primary);
+}
+
+/* ===== Body ===== */
+.lk-modal__body {
+    padding: var(--modal-padding);
+    overflow-y: auto;
+    flex: 1;
+    position: relative;
+    z-index: 1;
+}
+
+/* ===== Footer ===== */
+.lk-modal__footer {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--spacing-3);
+    padding: var(--spacing-5) var(--modal-padding);
+    border-top: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    position: relative;
+    z-index: 1;
+}

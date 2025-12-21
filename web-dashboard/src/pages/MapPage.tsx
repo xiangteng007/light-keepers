@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { MapContainer, TileLayer, CircleMarker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, CircleMarker, Popup, useMap, ScaleControl } from 'react-leaflet';
 import { useQuery } from '@tanstack/react-query';
 import { getEvents } from '../api';
 import type { Event } from '../api';
@@ -23,6 +23,20 @@ L.Icon.Default.mergeOptions({
 // 台灣中心座標
 const TAIWAN_CENTER: [number, number] = [23.5, 121];
 const DEFAULT_ZOOM = 7;
+const MAX_ZOOM = 21;
+
+// Google Maps API Key
+const GOOGLE_MAPS_API_KEY = 'AIzaSyDP3KEDizgPPNwXvS6LpcxsrF9_Lyt1bgA';
+
+// 圖層類型配置
+const MAP_LAYERS = {
+    roadmap: { name: '預設', lyrs: 'm' },
+    satellite: { name: '衛星', lyrs: 's' },
+    terrain: { name: '地形', lyrs: 'p' },
+    hybrid: { name: '衛星+標籤', lyrs: 'y' },
+} as const;
+
+type LayerType = keyof typeof MAP_LAYERS;
 
 // 嚴重程度對應的顏色
 const getSeverityColor = (severity: number) => {
@@ -41,13 +55,16 @@ const getSeverityLabel = (severity: number) => {
     return '一般';
 };
 
+// 50m = zoom level 18
+const EVENT_ZOOM_LEVEL = 18;
+
 // 地圖控制組件
 function MapController({ center }: { center?: [number, number] }) {
     const map = useMap();
 
     useEffect(() => {
         if (center) {
-            map.flyTo(center, 12);
+            map.flyTo(center, EVENT_ZOOM_LEVEL, { duration: 0.5 }); // 快速放大到50m
         }
     }, [center, map]);
 
@@ -97,6 +114,10 @@ function EventMarker({ event, onSelect }: EventMarkerProps) {
 export default function MapPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [mapCenter, setMapCenter] = useState<[number, number] | undefined>();
+    const [categoryFilter, setCategoryFilter] = useState<string>('all');
+    const [severityFilter, setSeverityFilter] = useState<string>('all');
+    const [layerType, setLayerType] = useState<LayerType>('roadmap');
+    const [showLayerMenu, setShowLayerMenu] = useState(false);
 
     // 獲取所有事件
     const { data: eventsData, isLoading } = useQuery({
@@ -105,17 +126,50 @@ export default function MapPage() {
     });
 
     const events = eventsData?.data || [];
-    const eventsWithLocation = events.filter(
-        (e): e is Event & { latitude: number; longitude: number } =>
-            typeof e.latitude === 'number' && typeof e.longitude === 'number'
-    );
+
+    // 將事件座標轉換為數字（API 可能返回字串）
+    const parseCoord = (val: unknown): number | null => {
+        if (typeof val === 'number' && !isNaN(val)) return val;
+        if (typeof val === 'string') {
+            const num = parseFloat(val);
+            return !isNaN(num) ? num : null;
+        }
+        return null;
+    };
+
+    const eventsWithLocation = events
+        .map(e => ({
+            ...e,
+            latitude: parseCoord(e.latitude),
+            longitude: parseCoord(e.longitude),
+        }))
+        .filter((e): e is Event & { latitude: number; longitude: number } =>
+            e.latitude !== null && e.longitude !== null
+        );
 
     const handleEventSelect = (event: Event) => {
         setSelectedEvent(event);
-        if (event.latitude && event.longitude) {
-            setMapCenter([event.latitude, event.longitude]);
+        const lat = parseCoord(event.latitude);
+        const lng = parseCoord(event.longitude);
+        if (lat && lng) {
+            setMapCenter([lat, lng]);
         }
     };
+
+    // 取得所有分類選項
+    const categories = [...new Set(events.map(e => e.category || '其他').filter(Boolean))];
+
+    // 篩選事件
+    const filteredEvents = events.filter(e => {
+        const matchCategory = categoryFilter === 'all' || (e.category || '其他') === categoryFilter;
+        const matchSeverity = severityFilter === 'all' ||
+            (severityFilter === '5' && (e.severity || 0) >= 5) ||
+            (severityFilter === '4' && (e.severity || 0) === 4) ||
+            (severityFilter === '3' && (e.severity || 0) === 3) ||
+            (severityFilter === '2' && (e.severity || 0) === 2) ||
+            (severityFilter === '1' && (e.severity || 0) <= 1);
+        return matchCategory && matchSeverity;
+    });
 
     // 統計數據
     const stats = {
@@ -140,12 +194,16 @@ export default function MapPage() {
                     <MapContainer
                         center={TAIWAN_CENTER}
                         zoom={DEFAULT_ZOOM}
+                        maxZoom={MAX_ZOOM}
                         style={{ height: '100%', width: '100%' }}
                     >
                         <TileLayer
-                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                            key={layerType}
+                            attribution='&copy; Google Maps'
+                            url={`https://mt1.google.com/vt/lyrs=${MAP_LAYERS[layerType].lyrs}&x={x}&y={y}&z={z}&key=${GOOGLE_MAPS_API_KEY}`}
+                            maxZoom={MAX_ZOOM}
                         />
+                        <ScaleControl position="bottomleft" metric={true} imperial={false} />
                         <MapController center={mapCenter} />
 
                         {eventsWithLocation.map((event) => (
@@ -156,6 +214,33 @@ export default function MapPage() {
                             />
                         ))}
                     </MapContainer>
+
+                    {/* 圖層選擇器 */}
+                    <div className="map-layer-selector">
+                        <button
+                            className="map-layer-btn"
+                            onClick={() => setShowLayerMenu(!showLayerMenu)}
+                            title="切換圖層"
+                        >
+                            🗺️ {MAP_LAYERS[layerType].name}
+                        </button>
+                        {showLayerMenu && (
+                            <div className="map-layer-menu">
+                                {(Object.keys(MAP_LAYERS) as LayerType[]).map((key) => (
+                                    <button
+                                        key={key}
+                                        className={`map-layer-option ${layerType === key ? 'active' : ''}`}
+                                        onClick={() => {
+                                            setLayerType(key);
+                                            setShowLayerMenu(false);
+                                        }}
+                                    >
+                                        {MAP_LAYERS[key].name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </div>
 
                     {/* 圖例 */}
                     <div className="map-legend">
@@ -175,17 +260,47 @@ export default function MapPage() {
                 {/* 側邊欄 - 事件列表 */}
                 <div className="map-sidebar">
                     <Card title="事件列表" padding="sm">
+                        {/* 篩選器 */}
+                        <div className="map-filters">
+                            <div className="map-filter">
+                                <label>分類</label>
+                                <select
+                                    value={categoryFilter}
+                                    onChange={(e) => setCategoryFilter(e.target.value)}
+                                >
+                                    <option value="all">全部分類</option>
+                                    {categories.map(cat => (
+                                        <option key={cat} value={cat}>{cat}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="map-filter">
+                                <label>程度</label>
+                                <select
+                                    value={severityFilter}
+                                    onChange={(e) => setSeverityFilter(e.target.value)}
+                                >
+                                    <option value="all">全部程度</option>
+                                    <option value="5">危機</option>
+                                    <option value="4">緊急</option>
+                                    <option value="3">警戒</option>
+                                    <option value="2">注意</option>
+                                    <option value="1">一般</option>
+                                </select>
+                            </div>
+                        </div>
+
                         {isLoading && <div className="loading">載入中...</div>}
 
-                        {!isLoading && events.length === 0 && (
+                        {!isLoading && filteredEvents.length === 0 && (
                             <div className="empty-state">
                                 <span>📭</span>
-                                <p>目前沒有事件</p>
+                                <p>沒有符合條件的事件</p>
                             </div>
                         )}
 
                         <div className="map-event-list">
-                            {events.map((event) => (
+                            {filteredEvents.map((event) => (
                                 <div
                                     key={event.id}
                                     className={`map-event-item ${selectedEvent?.id === event.id ? 'map-event-item--selected' : ''}`}
@@ -245,7 +360,7 @@ export default function MapPage() {
                                         <div className="map-event-detail__gps">
                                             <strong>GPS 座標:</strong>
                                             <code className="gps-coords">
-                                                {selectedEvent.latitude.toFixed(6)}, {selectedEvent.longitude.toFixed(6)}
+                                                {Number(selectedEvent.latitude).toFixed(6)}, {Number(selectedEvent.longitude).toFixed(6)}
                                             </code>
                                             <button
                                                 className="copy-btn"

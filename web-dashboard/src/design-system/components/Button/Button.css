@@ -1,4 +1,7 @@
-/* Button Component Styles */
+/* ============================================
+   Button Component - Premium Design
+   極簡高端 · 現代 SaaS · 北歐溫暖
+============================================ */
 
 .lk-btn {
     display: inline-flex;
@@ -9,18 +12,43 @@
     font-weight: var(--font-weight-semibold);
     border-radius: var(--btn-radius);
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all var(--duration-normal) var(--ease-smooth);
     border: none;
     outline: none;
     white-space: nowrap;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Ripple effect layer */
+.lk-btn::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-btn:hover::before {
+    opacity: 1;
 }
 
 .lk-btn:disabled {
-    opacity: 0.6;
+    opacity: 0.5;
     cursor: not-allowed;
+    transform: none !important;
+    box-shadow: none !important;
 }
 
-/* Sizes */
+/* ===== Sizes ===== */
+.lk-btn--xs {
+    height: var(--btn-height-xs);
+    padding: var(--btn-padding-xs);
+    font-size: var(--font-size-xs);
+    border-radius: var(--radius-md);
+}
+
 .lk-btn--sm {
     height: var(--btn-height-sm);
     padding: var(--btn-padding-sm);
@@ -39,41 +67,87 @@
     font-size: var(--font-size-md);
 }
 
-/* Variants */
+.lk-btn--xl {
+    height: var(--btn-height-xl);
+    padding: var(--btn-padding-xl);
+    font-size: var(--font-size-lg);
+    border-radius: var(--radius-xl);
+}
+
+/* ===== Variants ===== */
+
+/* Primary */
 .lk-btn--primary {
-    background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-600));
+    background: var(--gradient-gold);
     color: var(--color-brown-900);
+    box-shadow: var(--shadow-sm);
 }
 
 .lk-btn--primary:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
 }
 
 .lk-btn--primary:active:not(:disabled) {
-    transform: translateY(0);
+    transform: translateY(0) scale(0.98);
+    box-shadow: var(--shadow-sm);
 }
 
+.lk-btn--primary:focus-visible {
+    box-shadow: var(--shadow-md), 0 0 0 3px rgba(196, 167, 125, 0.4);
+}
+
+/* Secondary */
 .lk-btn--secondary {
     background: transparent;
     color: var(--text-secondary);
-    border: 1px solid var(--border-color);
+    border: 1.5px solid var(--border-color);
 }
 
 .lk-btn--secondary:hover:not(:disabled) {
     background: var(--bg-hover);
     border-color: var(--border-light);
+    color: var(--text-primary);
 }
 
+.lk-btn--secondary:focus-visible {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
+}
+
+/* Danger */
 .lk-btn--danger {
-    background: var(--color-danger);
+    background: var(--gradient-danger);
     color: white;
+    box-shadow: var(--shadow-sm);
 }
 
 .lk-btn--danger:hover:not(:disabled) {
-    filter: brightness(0.9);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-danger);
 }
 
+.lk-btn--danger:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Success */
+.lk-btn--success {
+    background: var(--gradient-success);
+    color: white;
+    box-shadow: var(--shadow-sm);
+}
+
+.lk-btn--success:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg), var(--shadow-glow-success);
+}
+
+.lk-btn--success:active:not(:disabled) {
+    transform: translateY(0) scale(0.98);
+}
+
+/* Ghost */
 .lk-btn--ghost {
     background: transparent;
     color: var(--accent-primary);
@@ -83,9 +157,13 @@
     background: rgba(196, 167, 125, 0.1);
 }
 
-/* Loading */
+.lk-btn--ghost:active:not(:disabled) {
+    background: rgba(196, 167, 125, 0.15);
+}
+
+/* ===== Loading State ===== */
 .lk-btn--loading {
-    position: relative;
+    pointer-events: none;
 }
 
 .lk-btn__spinner {
@@ -93,17 +171,34 @@
     height: 16px;
     border: 2px solid transparent;
     border-top-color: currentColor;
-    border-radius: 50%;
-    animation: spin 0.6s linear infinite;
+    border-right-color: currentColor;
+    border-radius: var(--radius-full);
+    animation: btnSpin 0.6s linear infinite;
 }
 
-@keyframes spin {
+.lk-btn--lg .lk-btn__spinner,
+.lk-btn--xl .lk-btn__spinner {
+    width: 20px;
+    height: 20px;
+    border-width: 2.5px;
+}
+
+@keyframes btnSpin {
     to {
         transform: rotate(360deg);
     }
 }
 
+/* ===== Icon ===== */
 .lk-btn__icon {
     display: flex;
     align-items: center;
+    justify-content: center;
+    font-size: 1.1em;
+}
+
+/* ===== Text ===== */
+.lk-btn__text {
+    position: relative;
+    z-index: 1;
 }
