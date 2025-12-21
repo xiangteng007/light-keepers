@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
 import { getEvents, getNcdrAlertsForMap, type NcdrAlert } from '../api';
@@ -12,6 +12,34 @@ const GOOGLE_MAPS_API_KEY = 'AIzaSyDP3KEDizgPPNwXvS6LpcxsrF9_Lyt1bgA';
 const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
 const DEFAULT_ZOOM = 7;
 const EVENT_ZOOM_LEVEL = 16;
+
+// NCDR 核心示警類型定義（含圖標）
+const NCDR_CORE_TYPES = [
+    { id: 33, name: '地震', icon: '🌍' },
+    { id: 34, name: '海嘯', icon: '🌊' },
+    { id: 5, name: '颱風', icon: '🌀' },
+    { id: 6, name: '雷雨', icon: '⛈️' },
+    { id: 37, name: '降雨', icon: '🌧️' },
+    { id: 38, name: '土石流', icon: '⛰️' },
+    { id: 53, name: '火災', icon: '🔥' },
+];
+
+// NCDR 擴展示警類型
+const NCDR_EXTENDED_TYPES = [
+    { id: 14, name: '低溫', icon: '❄️' },
+    { id: 15, name: '濃霧', icon: '🌫️' },
+    { id: 32, name: '強風', icon: '💨' },
+    { id: 56, name: '高溫', icon: '🌡️' },
+    { id: 7, name: '淹水', icon: '🌊' },
+    { id: 43, name: '水庫放流', icon: '💧' },
+    { id: 36, name: '河川高水位', icon: '🏞️' },
+    { id: 3, name: '道路封閉', icon: '🚧' },
+    { id: 55, name: '傳染病', icon: '🦠' },
+    { id: 12, name: '空氣品質', icon: '😷' },
+    { id: 52, name: '林火', icon: '🌲' },
+    { id: 61, name: '電力', icon: '⚡' },
+    { id: 44, name: '停水', icon: '🚰' },
+];
 
 // 圖層類型配置
 const MAP_TYPES = {
@@ -93,6 +121,14 @@ const mapOptions: google.maps.MapOptions = {
     ],
 };
 
+// 初始化核心類型為全選
+const initNcdrFilters = (): Record<number, boolean> => {
+    const filters: Record<number, boolean> = {};
+    NCDR_CORE_TYPES.forEach(t => { filters[t.id] = true; });
+    NCDR_EXTENDED_TYPES.forEach(t => { filters[t.id] = false; });
+    return filters;
+};
+
 export default function MapPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [mapCenter, setMapCenter] = useState(TAIWAN_CENTER);
@@ -106,6 +142,8 @@ export default function MapPage() {
     // NCDR 整合狀態
     const [showEvents, setShowEvents] = useState(true);
     const [showNcdrAlerts, setShowNcdrAlerts] = useState(true);
+    const [ncdrTypeFilters, setNcdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
+    const [showExtendedTypes, setShowExtendedTypes] = useState(false);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
     const mapRef = useRef<google.maps.Map | null>(null);
@@ -132,6 +170,36 @@ export default function MapPage() {
 
     const events = eventsData?.data || [];
     const ncdrAlerts = ncdrData?.data || [];
+
+    // 根據類型過濾 NCDR 警報
+    const filteredNcdrAlerts = useMemo(() => {
+        if (!showNcdrAlerts) return [];
+        return ncdrAlerts.filter(alert => {
+            const typeId = alert.alertTypeId;
+            return ncdrTypeFilters[typeId] === true;
+        });
+    }, [ncdrAlerts, ncdrTypeFilters, showNcdrAlerts]);
+
+    // 計算每個類型的警報數量
+    const ncdrTypeCounts = useMemo(() => {
+        const counts: Record<number, number> = {};
+        NCDR_CORE_TYPES.forEach(t => { counts[t.id] = 0; });
+        NCDR_EXTENDED_TYPES.forEach(t => { counts[t.id] = 0; });
+        ncdrAlerts.forEach(alert => {
+            if (counts[alert.alertTypeId] !== undefined) {
+                counts[alert.alertTypeId]++;
+            }
+        });
+        return counts;
+    }, [ncdrAlerts]);
+
+    // NCDR 類型過濾切換
+    const toggleNcdrType = useCallback((typeId: number) => {
+        setNcdrTypeFilters(prev => ({
+            ...prev,
+            [typeId]: !prev[typeId]
+        }));
+    }, []);
 
     // 將事件座標轉換為數字
     const parseCoord = (val: unknown): number | null => {
@@ -251,8 +319,8 @@ export default function MapPage() {
                                 />
                             ))}
 
-                            {/* NCDR 警報標記 */}
-                            {showNcdrAlerts && ncdrAlerts.filter(a => a.latitude && a.longitude).map((alert) => (
+                            {/* NCDR 警報標記 - 按類型過濾 */}
+                            {filteredNcdrAlerts.filter(a => a.latitude && a.longitude).map((alert) => (
                                 <MarkerF
                                     key={alert.id}
                                     position={{ lat: Number(alert.latitude), lng: Number(alert.longitude) }}
@@ -399,8 +467,50 @@ export default function MapPage() {
                                 checked={showNcdrAlerts}
                                 onChange={(e) => setShowNcdrAlerts(e.target.checked)}
                             />
-                            <span>⚠️ NCDR示警 ({ncdrAlerts.length})</span>
+                            <span>⚠️ NCDR示警 ({filteredNcdrAlerts.length}/{ncdrAlerts.length})</span>
                         </label>
+
+                        {/* NCDR 類型細分篩選 */}
+                        {showNcdrAlerts && (
+                            <div className="ncdr-type-filters">
+                                {NCDR_CORE_TYPES.map(type => (
+                                    <label key={type.id} className="ncdr-type-filter">
+                                        <input
+                                            type="checkbox"
+                                            checked={ncdrTypeFilters[type.id] || false}
+                                            onChange={() => toggleNcdrType(type.id)}
+                                        />
+                                        <span className="ncdr-type-icon">{type.icon}</span>
+                                        <span className="ncdr-type-name">{type.name}</span>
+                                        <span className="ncdr-type-count">({ncdrTypeCounts[type.id] || 0})</span>
+                                    </label>
+                                ))}
+
+                                <button
+                                    className="ncdr-type-expand"
+                                    onClick={() => setShowExtendedTypes(!showExtendedTypes)}
+                                >
+                                    {showExtendedTypes ? '▲ 收起' : '▼ 更多類型'}
+                                </button>
+
+                                {showExtendedTypes && (
+                                    <div className="ncdr-extended-types">
+                                        {NCDR_EXTENDED_TYPES.map(type => (
+                                            <label key={type.id} className="ncdr-type-filter ncdr-type-filter--extended">
+                                                <input
+                                                    type="checkbox"
+                                                    checked={ncdrTypeFilters[type.id] || false}
+                                                    onChange={() => toggleNcdrType(type.id)}
+                                                />
+                                                <span className="ncdr-type-icon">{type.icon}</span>
+                                                <span className="ncdr-type-name">{type.name}</span>
+                                                <span className="ncdr-type-count">({ncdrTypeCounts[type.id] || 0})</span>
+                                            </label>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        )}
 
                         <div className="map-legend__title" style={{ marginTop: '12px' }}>嚴重程度</div>
                         {[5, 4, 3, 2, 1].map((level) => (

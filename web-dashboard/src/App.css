@@ -1780,3 +1780,99 @@ body {
 .map-legend__toggle input {
   accent-color: var(--accent-primary);
 }
+
+/* NCDR 類型細分篩選器 */
+.ncdr-type-filters {
+  margin-left: 24px;
+  padding-left: 12px;
+  border-left: 2px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 4px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.ncdr-type-filter {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s ease;
+}
+
+.ncdr-type-filter:hover {
+  background: rgba(196, 167, 125, 0.1);
+}
+
+.ncdr-type-filter input {
+  accent-color: var(--accent-primary);
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.ncdr-type-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.ncdr-type-name {
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.ncdr-type-count {
+  color: var(--text-muted);
+  font-size: 11px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.ncdr-type-filter--extended {
+  opacity: 0.85;
+}
+
+.ncdr-type-filter--extended:hover {
+  opacity: 1;
+}
+
+.ncdr-type-expand {
+  background: none;
+  border: none;
+  color: var(--accent-primary);
+  font-size: 11px;
+  padding: 6px 8px;
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.15s ease;
+  margin-top: 4px;
+}
+
+.ncdr-type-expand:hover {
+  color: var(--accent-secondary);
+}
+
+.ncdr-extended-types {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 4px;
+  border-top: 1px dashed var(--border-color);
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
