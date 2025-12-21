@@ -1,5 +1,5 @@
 import { IsOptional, IsArray, IsInt, IsString, IsBoolean } from 'class-validator';
-import { Type } from 'class-transformer';
+import { Type, Transform } from 'class-transformer';
 
 // 示警類別定義
 export interface AlertTypeDefinition {
@@ -65,8 +65,16 @@ export const ALERT_TYPE_DEFINITIONS: AlertTypeDefinition[] = [
 
 export class NcdrAlertQueryDto {
     @IsOptional()
-    @IsArray()
-    @Type(() => Number)
+    @Transform(({ value }: { value: unknown }) => {
+        // 支援 comma-separated 字串 (types=33,34,5) 或陣列 (types[]=33&types[]=34)
+        if (typeof value === 'string') {
+            return value.split(',').map(Number).filter(n => !isNaN(n));
+        }
+        if (Array.isArray(value)) {
+            return value.map(Number).filter((n: number) => !isNaN(n));
+        }
+        return value;
+    })
     types?: number[]; // 篩選類別 IDs
 
     @IsOptional()
