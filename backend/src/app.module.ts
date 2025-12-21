@@ -35,7 +35,7 @@ import { NcdrAlertsModule } from './modules/ncdr-alerts/ncdr-alerts.module';
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_DATABASE', 'lightkeepers'),
                     autoLoadEntities: true,
-                    synchronize: false,
+                    synchronize: true, // 暫時啟用以建立 ncdr_alerts 表，之後需改回 false
                     logging: !isProduction,
                     retryAttempts: 3,
                     retryDelay: 3000,
