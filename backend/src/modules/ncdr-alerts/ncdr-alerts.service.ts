@@ -92,6 +92,64 @@ export class NcdrAlertsService {
                 severity = 'info';
             }
 
+            // 解析座標 - 支援多種格式
+            let latitude: number | null = null;
+            let longitude: number | null = null;
+
+            // 嘗試 georss:point (格式: "lat lon")
+            const point = entry['georss:point'] || entry.point;
+            if (point) {
+                const coords = String(point).trim().split(/\s+/);
+                if (coords.length >= 2) {
+                    latitude = parseFloat(coords[0]);
+                    longitude = parseFloat(coords[1]);
+                }
+            }
+
+            // 嘗試 geo:lat 和 geo:long
+            if (!latitude) {
+                const geoLat = entry['geo:lat'] || entry.lat;
+                const geoLong = entry['geo:long'] || entry['geo:lon'] || entry.long || entry.lon;
+                if (geoLat && geoLong) {
+                    latitude = parseFloat(String(geoLat));
+                    longitude = parseFloat(String(geoLong));
+                }
+            }
+
+            // 嘗試 georss:polygon (格式: "lat1 lon1 lat2 lon2 ...")，取中心點
+            const polygon = entry['georss:polygon'] || entry.polygon;
+            if (!latitude && polygon) {
+                const coords = String(polygon).trim().split(/\s+/);
+                if (coords.length >= 2) {
+                    const lats: number[] = [];
+                    const lngs: number[] = [];
+                    for (let i = 0; i < coords.length - 1; i += 2) {
+                        lats.push(parseFloat(coords[i]));
+                        lngs.push(parseFloat(coords[i + 1]));
+                    }
+                    // 計算中心點
+                    latitude = lats.reduce((a, b) => a + b, 0) / lats.length;
+                    longitude = lngs.reduce((a, b) => a + b, 0) / lngs.length;
+                }
+            }
+
+            // 對於台灣的警報，如果沒有座標，使用類型預設座標
+            if (!latitude || !longitude || isNaN(latitude) || isNaN(longitude)) {
+                // 根據警報類型設定預設座標（台灣中心附近）
+                const defaultCoords: Record<number, [number, number]> = {
+                    33: [23.6978, 120.9605], // 地震 - 台灣中心
+                    34: [23.5, 121.5],       // 海嘯 - 東海岸
+                    5: [23.6978, 120.9605],  // 颱風 - 台灣中心
+                    6: [25.0330, 121.5654],  // 雷雨 - 台北
+                    37: [23.6978, 120.9605], // 降雨 - 台灣中心
+                    38: [23.8, 120.8],       // 土石流 - 中部山區
+                    53: [25.0330, 121.5654], // 火災 - 台北
+                };
+                const defaultCoord = defaultCoords[alertTypeId] || [23.6978, 120.9605];
+                latitude = defaultCoord[0];
+                longitude = defaultCoord[1];
+            }
+
             return {
                 alertId: String(alertId).substring(0, 255),
                 alertTypeId,
@@ -102,6 +160,8 @@ export class NcdrAlertsService {
                 sourceUnit: typeInfo?.sourceUnit || '未知',
                 publishedAt: new Date(updated),
                 sourceLink: String(link).substring(0, 1000),
+                latitude,
+                longitude,
                 isActive: true,
             };
         } catch (error) {
@@ -143,6 +203,13 @@ export class NcdrAlertsService {
 
                         if (!existing) {
                             await this.ncdrAlertRepository.save(parsed);
+                            synced++;
+                        } else if (!existing.latitude || !existing.longitude) {
+                            // 更新缺少座標的現有記錄
+                            await this.ncdrAlertRepository.update(existing.id, {
+                                latitude: parsed.latitude,
+                                longitude: parsed.longitude,
+                            });
                             synced++;
                         }
                     } catch (err) {
