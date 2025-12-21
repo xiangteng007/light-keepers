@@ -3,6 +3,7 @@ import logoImage from '../assets/logo.jpg'
 
 const navItems = [
     { path: '/dashboard', label: '儀表板', icon: '📊' },
+    { path: '/ncdr-alerts', label: '災害示警', icon: '⚠️' },
     { path: '/events', label: '災情事件', icon: '🚨' },
     { path: '/tasks', label: '任務管理', icon: '📋' },
     { path: '/map', label: '地圖總覽', icon: '🗺️' },

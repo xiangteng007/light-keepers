@@ -4,6 +4,7 @@ import DashboardPage from './pages/DashboardPage'
 import EventsPage from './pages/EventsPage'
 import TasksPage from './pages/TasksPage'
 import MapPage from './pages/MapPage'
+import NcdrAlertsPage from './pages/NcdrAlertsPage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
@@ -14,6 +15,7 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route index element={<Navigate to="/dashboard" replace />} />
         <Route path="dashboard" element={<DashboardPage />} />
+        <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
         <Route path="events" element={<EventsPage />} />
         <Route path="tasks" element={<TasksPage />} />
         <Route path="map" element={<MapPage />} />
@@ -23,4 +25,5 @@ function App() {
 }
 
 export default App
+
 

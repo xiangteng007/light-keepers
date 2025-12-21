@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ScheduleModule } from '@nestjs/schedule';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
 import { EventsModule } from './modules/events/events.module';
 import { TasksModule } from './modules/tasks/tasks.module';
+import { NcdrAlertsModule } from './modules/ncdr-alerts/ncdr-alerts.module';
 
 @Module({
     imports: [
@@ -13,6 +15,9 @@ import { TasksModule } from './modules/tasks/tasks.module';
             isGlobal: true,
             envFilePath: ['.env.local', '.env'],
         }),
+
+        // 排程模組 (NCDR 自動同步)
+        ScheduleModule.forRoot(),
 
         // Cloud SQL 連線
         TypeOrmModule.forRootAsync({
@@ -48,6 +53,8 @@ import { TasksModule } from './modules/tasks/tasks.module';
         AccountsModule,
         EventsModule,
         TasksModule,
+        NcdrAlertsModule,
     ],
 })
 export class AppModule { }
+

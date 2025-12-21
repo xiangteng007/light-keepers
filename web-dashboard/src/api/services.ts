@@ -67,3 +67,66 @@ export const updateTask = (id: string, data: Partial<Task>) =>
 
 // Accounts
 export const getRoles = () => api.get('/accounts/roles');
+
+// ===== NCDR 災害示警 =====
+
+export interface NcdrAlert {
+    id: string;
+    alertId: string;
+    alertTypeId: number;
+    alertTypeName: string;
+    title: string;
+    description?: string;
+    severity: 'critical' | 'warning' | 'info';
+    sourceUnit?: string;
+    publishedAt: string;
+    expiresAt?: string;
+    sourceLink?: string;
+    latitude?: number;
+    longitude?: number;
+    affectedAreas?: string;
+    isActive: boolean;
+}
+
+export interface AlertTypeDefinition {
+    id: number;
+    name: string;
+    sourceUnit: string;
+    category: 'central' | 'enterprise' | 'local';
+    priority: 'core' | 'extended';
+}
+
+// 獲取示警類別定義
+export const getNcdrAlertTypes = () =>
+    api.get<{ types: AlertTypeDefinition[]; coreTypes: number[] }>('/ncdr-alerts/types');
+
+// 獲取警報列表
+export const getNcdrAlerts = (params?: { types?: string; activeOnly?: boolean; limit?: number }) =>
+    api.get<{ data: NcdrAlert[]; total: number }>('/ncdr-alerts', { params });
+
+// 獲取地圖用警報 (有座標)
+export const getNcdrAlertsForMap = (types?: number[]) =>
+    api.get<{ data: NcdrAlert[]; total: number }>('/ncdr-alerts/map', {
+        params: types ? { types: types.join(',') } : undefined,
+    });
+
+// 獲取統計
+export const getNcdrAlertStats = () =>
+    api.get<{
+        total: number;
+        active: number;
+        byType: { typeId: number; typeName: string; count: number }[];
+        lastSyncTime: string | null;
+    }>('/ncdr-alerts/stats');
+
+// 手動觸發同步 (核心類別)
+export const syncNcdrAlerts = () =>
+    api.post<{ message: string; synced: number; errors: number }>('/ncdr-alerts/sync');
+
+// 手動觸發同步指定類別
+export const syncNcdrAlertTypes = (typeIds: number[]) =>
+    api.post<{ message: string; synced: number; errors: number; syncedTypes: number[] }>(
+        '/ncdr-alerts/sync-types',
+        { typeIds }
+    );
+
