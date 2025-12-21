@@ -1166,11 +1166,11 @@ body {
   overflow-y: auto;
 }
 
-/* 嚴重程度圖例 - 右下角 */
+/* 嚴重程度圖例 - 右下角 (靠近縮放控件) */
 .map-severity-legend {
   position: absolute;
-  bottom: 24px;
-  right: 380px;
+  bottom: 140px;
+  right: 60px;
   background: var(--bg-card);
   padding: 10px 14px;
   border-radius: var(--radius-md);
