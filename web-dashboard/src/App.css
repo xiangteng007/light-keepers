@@ -189,31 +189,30 @@ body {
 }
 
 .logo-icon {
-  width: 44px;
-  height: 44px;
-  background: var(--gradient-gold);
+  width: 48px;
+  height: 48px;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1.5px solid rgba(196, 167, 125, 0.3);
   border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
-  box-shadow: var(--shadow-glow-sm), var(--shadow-md);
-  transition: all var(--duration-normal) var(--ease-spring);
-  position: relative;
   overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-spring);
+  flex-shrink: 0;
 }
 
-.logo-icon::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
-  border-radius: inherit;
+.logo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 4px;
 }
 
 .logo:hover .logo-icon {
-  transform: scale(1.08) rotate(3deg);
-  box-shadow: var(--shadow-glow), var(--shadow-lg);
+  transform: scale(1.05);
+  border-color: rgba(196, 167, 125, 0.5);
+  box-shadow: 0 4px 12px rgba(139, 107, 75, 0.15);
 }
 
 .logo h1 {
@@ -299,15 +298,15 @@ body {
 }
 
 .nav-item.active {
-  background: var(--gradient-gold);
-  color: var(--color-brown-900);
+  background: rgba(196, 167, 125, 0.18);
+  color: var(--color-brown-800);
   font-weight: var(--font-weight-semibold);
-  box-shadow: var(--shadow-md), var(--shadow-glow-sm);
+  border: 1.5px solid rgba(196, 167, 125, 0.35);
 }
 
 .nav-item.active::before {
   transform: translateY(-50%) scaleY(1);
-  background: var(--color-brown-900);
+  background: var(--gradient-gold);
 }
 
 .nav-item.active::after {
@@ -983,15 +982,24 @@ body {
 }
 
 .stat-card-vi__icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-600));
+  font-size: 26px;
+  background: rgba(196, 167, 125, 0.12);
+  border: 1.5px solid rgba(196, 167, 125, 0.25);
+  color: var(--color-gold-600);
   flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.stat-card-vi:hover .stat-card-vi__icon {
+  background: rgba(196, 167, 125, 0.18);
+  border-color: rgba(196, 167, 125, 0.4);
+  transform: scale(1.05);
 }
 
 .stat-card-vi__data {

@@ -188,38 +188,43 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-gold);
+    background: rgba(196, 167, 125, 0.12);
+    border: 1.5px solid rgba(196, 167, 125, 0.25);
     border-radius: var(--radius-lg);
-    font-size: 20px;
-    box-shadow: var(--shadow-sm), var(--shadow-glow-sm);
+    font-size: 22px;
+    color: var(--color-gold-600);
+    transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-stat--sm .lk-stat__icon {
     width: 40px;
     height: 40px;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .lk-stat--lg .lk-stat__icon {
     width: 56px;
     height: 56px;
-    font-size: 24px;
+    font-size: 26px;
 }
 
 /* Variant icons */
 .lk-stat--success .lk-stat__icon {
-    background: var(--gradient-success);
-    box-shadow: var(--shadow-sm), var(--shadow-glow-success);
+    background: rgba(107, 142, 92, 0.12);
+    border-color: rgba(107, 142, 92, 0.25);
+    color: var(--color-success);
 }
 
 .lk-stat--warning .lk-stat__icon {
-    background: var(--gradient-warning);
-    box-shadow: var(--shadow-sm), var(--shadow-glow-warning);
+    background: rgba(201, 162, 86, 0.12);
+    border-color: rgba(201, 162, 86, 0.25);
+    color: var(--color-warning);
 }
 
 .lk-stat--danger .lk-stat__icon {
-    background: var(--gradient-danger);
-    box-shadow: var(--shadow-sm), var(--shadow-glow-danger);
+    background: rgba(184, 92, 92, 0.12);
+    border-color: rgba(184, 92, 92, 0.25);
+    color: var(--color-danger);
 }
 
 .lk-stat__content {

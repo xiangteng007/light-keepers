@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom'
+import logoImage from '../assets/logo.jpg'
 
 const navItems = [
     { path: '/dashboard', label: '儀表板', icon: '📊' },
@@ -14,7 +15,9 @@ export default function Layout() {
         <div className="layout">
             <aside className="sidebar">
                 <div className="logo">
-                    <div className="logo-icon">🏛️</div>
+                    <div className="logo-icon">
+                        <img src={logoImage} alt="Light Keepers Logo" className="logo-image" />
+                    </div>
                     <div>
                         <h1>Light Keepers</h1>
                         <div className="logo-subtitle">曦望燈塔</div>

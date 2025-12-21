@@ -58,11 +58,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-gold);
+    background: rgba(196, 167, 125, 0.12);
+    border: 1.5px solid rgba(196, 167, 125, 0.25);
     border-radius: var(--radius-md);
-    font-size: 16px;
+    font-size: 18px;
     flex-shrink: 0;
-    box-shadow: var(--shadow-glow-sm);
+    color: var(--color-gold-600);
+    transition: all var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-widget__header-text {

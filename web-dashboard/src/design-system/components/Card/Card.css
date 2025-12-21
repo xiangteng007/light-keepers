@@ -152,26 +152,24 @@
 }
 
 .lk-card__icon {
-    width: 48px;
-    height: 48px;
+    width: 44px;
+    height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--gradient-gold);
+    background: rgba(196, 167, 125, 0.12);
+    border: 1.5px solid rgba(196, 167, 125, 0.25);
     border-radius: var(--radius-lg);
-    font-size: 20px;
+    font-size: 22px;
     flex-shrink: 0;
-    box-shadow: var(--shadow-sm), var(--shadow-glow-sm);
-    position: relative;
-    overflow: hidden;
+    color: var(--color-gold-600);
+    transition: all var(--duration-normal) var(--ease-smooth);
 }
 
-.lk-card__icon::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3) 0%, transparent 50%);
-    border-radius: inherit;
+.lk-card:hover .lk-card__icon {
+    background: rgba(196, 167, 125, 0.18);
+    border-color: rgba(196, 167, 125, 0.4);
+    transform: scale(1.05);
 }
 
 .lk-card__header-text {
