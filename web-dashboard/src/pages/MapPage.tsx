@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents } from '../api';
+import { getEvents, getNcdrAlertsForMap, type NcdrAlert } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -40,7 +40,7 @@ const getSeverityLabel = (severity: number) => {
     return '一般';
 };
 
-// 自訂標記圖標 (SVG)
+// 自訂標記圖標 - 災情事件 (PIN 形狀)
 const createMarkerIcon = (severity: number) => {
     const color = getSeverityColor(severity);
     return {
@@ -50,6 +50,24 @@ const createMarkerIcon = (severity: number) => {
         strokeColor: '#fff',
         strokeWeight: 2,
         scale: 1.8,
+        anchor: new google.maps.Point(12, 22),
+    };
+};
+
+// NCDR 警報圖標 - 三角形警告符號
+const createNcdrMarkerIcon = (severity: 'critical' | 'warning' | 'info') => {
+    const colors = {
+        critical: '#B85C5C',
+        warning: '#C9A256',
+        info: '#5C7B8E',
+    };
+    return {
+        path: 'M12 2L2 22h20L12 2zm0 4l7.53 14H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z',
+        fillColor: colors[severity],
+        fillOpacity: 1,
+        strokeColor: '#fff',
+        strokeWeight: 2,
+        scale: 1.5,
         anchor: new google.maps.Point(12, 22),
     };
 };
@@ -85,6 +103,11 @@ export default function MapPage() {
     const [showLayerMenu, setShowLayerMenu] = useState(false);
     const [infoWindowEvent, setInfoWindowEvent] = useState<Event | null>(null);
 
+    // NCDR 整合狀態
+    const [showEvents, setShowEvents] = useState(true);
+    const [showNcdrAlerts, setShowNcdrAlerts] = useState(true);
+    const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
+
     const mapRef = useRef<google.maps.Map | null>(null);
 
     // 載入 Google Maps API
@@ -100,7 +123,15 @@ export default function MapPage() {
         queryFn: () => getEvents().then(res => res.data),
     });
 
+    // 獲取 NCDR 警報 (有座標的)
+    const { data: ncdrData } = useQuery({
+        queryKey: ['ncdrAlertsMap'],
+        queryFn: () => getNcdrAlertsForMap().then(res => res.data),
+        enabled: showNcdrAlerts,
+    });
+
     const events = eventsData?.data || [];
+    const ncdrAlerts = ncdrData?.data || [];
 
     // 將事件座標轉換為數字
     const parseCoord = (val: unknown): number | null => {
@@ -206,7 +237,7 @@ export default function MapPage() {
                             }}
                         >
                             {/* 災情事件標記 */}
-                            {eventsWithLocation.map((event) => (
+                            {showEvents && eventsWithLocation.map((event) => (
                                 <MarkerF
                                     key={event.id}
                                     position={{ lat: event.latitude, lng: event.longitude }}
@@ -214,8 +245,23 @@ export default function MapPage() {
                                     onClick={() => {
                                         setInfoWindowEvent(event);
                                         setSelectedEvent(event);
+                                        setSelectedNcdrAlert(null);
                                     }}
                                     title={event.title}
+                                />
+                            ))}
+
+                            {/* NCDR 警報標記 */}
+                            {showNcdrAlerts && ncdrAlerts.filter(a => a.latitude && a.longitude).map((alert) => (
+                                <MarkerF
+                                    key={alert.id}
+                                    position={{ lat: Number(alert.latitude), lng: Number(alert.longitude) }}
+                                    icon={createNcdrMarkerIcon(alert.severity)}
+                                    onClick={() => {
+                                        setSelectedNcdrAlert(alert);
+                                        setInfoWindowEvent(null);
+                                    }}
+                                    title={alert.title}
                                 />
                             ))}
 
@@ -265,6 +311,47 @@ export default function MapPage() {
                                     </div>
                                 </InfoWindowF>
                             )}
+
+                            {/* NCDR 警報 InfoWindow */}
+                            {selectedNcdrAlert && selectedNcdrAlert.latitude && selectedNcdrAlert.longitude && (
+                                <InfoWindowF
+                                    position={{
+                                        lat: Number(selectedNcdrAlert.latitude),
+                                        lng: Number(selectedNcdrAlert.longitude),
+                                    }}
+                                    onCloseClick={() => setSelectedNcdrAlert(null)}
+                                    options={{
+                                        pixelOffset: new google.maps.Size(0, -30),
+                                    }}
+                                >
+                                    <div className="gmap-infowindow">
+                                        <div className="gmap-infowindow__header">
+                                            <span
+                                                className="gmap-infowindow__severity"
+                                                style={{ background: selectedNcdrAlert.severity === 'critical' ? '#B85C5C' : selectedNcdrAlert.severity === 'warning' ? '#C9A256' : '#5C7B8E' }}
+                                            >
+                                                {selectedNcdrAlert.alertTypeName}
+                                            </span>
+                                            <span className="gmap-infowindow__category">
+                                                NCDR 示警
+                                            </span>
+                                        </div>
+                                        <h4 className="gmap-infowindow__title">{selectedNcdrAlert.title}</h4>
+                                        <p className="gmap-infowindow__desc">
+                                            {selectedNcdrAlert.description || '無描述'}
+                                        </p>
+                                        <div className="gmap-infowindow__actions">
+                                            {selectedNcdrAlert.sourceLink && (
+                                                <button
+                                                    onClick={() => window.open(selectedNcdrAlert.sourceLink, '_blank')}
+                                                >
+                                                    📎 查看詳情
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </InfoWindowF>
+                            )}
                         </GoogleMap>
                     )}
 
@@ -295,9 +382,27 @@ export default function MapPage() {
                         )}
                     </div>
 
-                    {/* 圖例 */}
+                    {/* 圖例及篩選器 */}
                     <div className="map-legend">
-                        <div className="map-legend__title">嚴重程度</div>
+                        <div className="map-legend__title">圖層顯示</div>
+                        <label className="map-legend__toggle">
+                            <input
+                                type="checkbox"
+                                checked={showEvents}
+                                onChange={(e) => setShowEvents(e.target.checked)}
+                            />
+                            <span>📍 災情事件 ({eventsWithLocation.length})</span>
+                        </label>
+                        <label className="map-legend__toggle">
+                            <input
+                                type="checkbox"
+                                checked={showNcdrAlerts}
+                                onChange={(e) => setShowNcdrAlerts(e.target.checked)}
+                            />
+                            <span>⚠️ NCDR示警 ({ncdrAlerts.length})</span>
+                        </label>
+
+                        <div className="map-legend__title" style={{ marginTop: '12px' }}>嚴重程度</div>
                         {[5, 4, 3, 2, 1].map((level) => (
                             <div key={level} className="map-legend__item">
                                 <span
