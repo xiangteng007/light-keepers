@@ -150,8 +150,7 @@ export default function MapPage() {
     // NCDR 整合狀態
     const [showEvents, setShowEvents] = useState(true);
     const [showNcdrAlerts, setShowNcdrAlerts] = useState(true);
-    const [ncdrTypeFilters, setNcdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
-    const [showExtendedTypes, setShowExtendedTypes] = useState(false);
+    const [ncdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
     // 側邊欄 Tab 切換
@@ -214,26 +213,7 @@ export default function MapPage() {
         return result;
     }, [filteredNcdrAlerts, ncdrSidebarTypeFilter, ncdrSidebarSeverityFilter]);
 
-    // 計算每個類型的警報數量
-    const ncdrTypeCounts = useMemo(() => {
-        const counts: Record<number, number> = {};
-        NCDR_CORE_TYPES.forEach(t => { counts[t.id] = 0; });
-        NCDR_EXTENDED_TYPES.forEach(t => { counts[t.id] = 0; });
-        ncdrAlerts.forEach(alert => {
-            if (counts[alert.alertTypeId] !== undefined) {
-                counts[alert.alertTypeId]++;
-            }
-        });
-        return counts;
-    }, [ncdrAlerts]);
 
-    // NCDR 類型過濾切換
-    const toggleNcdrType = useCallback((typeId: number) => {
-        setNcdrTypeFilters(prev => ({
-            ...prev,
-            [typeId]: !prev[typeId]
-        }));
-    }, []);
 
     // 將事件座標轉換為數字
     const parseCoord = (val: unknown): number | null => {
@@ -343,13 +323,7 @@ export default function MapPage() {
         return matchCategory && matchSeverity;
     });
 
-    // 統計數據
-    const stats = {
-        total: events.length,
-        active: events.filter(e => e.status === 'active').length,
-        critical: events.filter(e => (e.severity || 0) >= 4).length,
-        withLocation: eventsWithLocation.length,
-    };
+
 
     if (loadError) {
         return (
