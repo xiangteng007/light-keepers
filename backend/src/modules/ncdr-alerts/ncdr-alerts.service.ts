@@ -215,13 +215,22 @@ export class NcdrAlertsService {
                         if (!existing) {
                             await this.ncdrAlertRepository.save(parsed);
                             synced++;
-                        } else if (!existing.latitude || !existing.longitude) {
-                            // 更新缺少座標的現有記錄
-                            await this.ncdrAlertRepository.update(existing.id, {
-                                latitude: parsed.latitude,
-                                longitude: parsed.longitude,
-                            });
-                            synced++;
+                        } else {
+                            // 檢查是否需要更新分類或座標
+                            const needsUpdate =
+                                existing.alertTypeId !== parsed.alertTypeId ||
+                                existing.alertTypeName !== parsed.alertTypeName ||
+                                !existing.latitude || !existing.longitude;
+
+                            if (needsUpdate) {
+                                await this.ncdrAlertRepository.update(existing.id, {
+                                    alertTypeId: parsed.alertTypeId,
+                                    alertTypeName: parsed.alertTypeName,
+                                    latitude: parsed.latitude || existing.latitude,
+                                    longitude: parsed.longitude || existing.longitude,
+                                });
+                                synced++;
+                            }
                         }
                     } catch (err) {
                         errors++;
