@@ -8,6 +8,7 @@ import { NcdrAlert } from './entities';
 import {
     NcdrAlertQueryDto,
     CORE_ALERT_TYPES,
+    NATURAL_DISASTER_TYPES,
     ALERT_TYPE_DEFINITIONS,
     AlertTypeDefinition,
 } from './dto';
@@ -239,6 +240,7 @@ export class NcdrAlertsService {
 
     /**
      * 查詢警報列表
+     * 自然災害保留 7 天，非自然災害保留 24 小時
      */
     async findAll(query: NcdrAlertQueryDto): Promise<{ data: NcdrAlert[]; total: number }> {
         const { types, county, activeOnly, withLocation, limit = 50, offset = 0 } = query;
@@ -266,6 +268,25 @@ export class NcdrAlertsService {
             qb.andWhere('alert.affectedAreas LIKE :county', { county: `%${county}%` });
         }
 
+        // 時間範圍過濾：自然災害 7 天，非自然災害 24 小時
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+        // 使用 OR 條件：(自然災害 AND 7天內) OR (非自然災害 AND 24小時內)
+        qb.andWhere(
+            `(
+                (alert.alertTypeId IN (:...naturalTypes) AND alert.publishedAt >= :sevenDaysAgo)
+                OR
+                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :oneDayAgo)
+            )`,
+            {
+                naturalTypes: NATURAL_DISASTER_TYPES,
+                sevenDaysAgo,
+                oneDayAgo,
+            }
+        );
+
         qb.orderBy('alert.publishedAt', 'DESC')
             .take(limit)
             .skip(offset);
@@ -276,6 +297,7 @@ export class NcdrAlertsService {
 
     /**
      * 獲取有座標的警報 (地圖用)
+     * 自然災害保留 7 天，非自然災害保留 24 小時
      */
     async findWithLocation(types?: number[]): Promise<NcdrAlert[]> {
         const qb = this.ncdrAlertRepository.createQueryBuilder('alert')
@@ -286,6 +308,24 @@ export class NcdrAlertsService {
         if (types && types.length > 0) {
             qb.andWhere('alert.alertTypeId IN (:...types)', { types });
         }
+
+        // 時間範圍過濾：自然災害 7 天，非自然災害 24 小時
+        const now = new Date();
+        const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+
+        qb.andWhere(
+            `(
+                (alert.alertTypeId IN (:...naturalTypes) AND alert.publishedAt >= :sevenDaysAgo)
+                OR
+                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :oneDayAgo)
+            )`,
+            {
+                naturalTypes: NATURAL_DISASTER_TYPES,
+                sevenDaysAgo,
+                oneDayAgo,
+            }
+        );
 
         return qb.orderBy('alert.publishedAt', 'DESC').getMany();
     }

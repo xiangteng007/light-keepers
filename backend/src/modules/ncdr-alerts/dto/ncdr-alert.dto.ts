@@ -13,6 +13,29 @@ export interface AlertTypeDefinition {
 // 預設核心類別 (避免流量爆掉)
 export const CORE_ALERT_TYPES: number[] = [33, 34, 5, 6, 37, 38, 53]; // 地震/海嘯/颱風/雷雨/降雨/土石流/火災
 
+// 自然災害類型 - 保留 7 天資料
+export const NATURAL_DISASTER_TYPES: number[] = [
+    33, // 地震
+    34, // 海嘯
+    5,  // 颱風
+    6,  // 雷雨
+    37, // 降雨
+    38, // 土石流
+    14, // 低溫
+    56, // 高溫
+    32, // 強風
+    67, // 火山
+    7,  // 淹水
+    36, // 河川高水位
+    52, // 林火
+    15, // 濃霧
+    48, // 枯旱預報
+    70, // 淹水感測
+];
+
+// 非自然災害類型 - 保留 24 小時資料
+// 包括：火災(53)、鐵路事故(35,51)、道路封閉(3)、捷運營運(65)、停水(44)、電力(61) 等
+
 // 所有示警類別定義
 export const ALERT_TYPE_DEFINITIONS: AlertTypeDefinition[] = [
     // 中央部會 - 核心

@@ -34,11 +34,14 @@ const NCDR_EXTENDED_TYPES = [
     { id: 43, name: '水庫放流', icon: '💧', color: '#5AAAE8' },  // 深藍
     { id: 36, name: '河川高水位', icon: '🏞️', color: '#6BB3C9' }, // 河藍
     { id: 3, name: '道路封閉', icon: '🚧', color: '#F5A623' },   // 警告橙
+    { id: 35, name: '鐵路事故', icon: '🚃', color: '#607D8B' },  // 灰藍 - 臺鐵公司
+    { id: 51, name: '鐵路事故(高鐵)', icon: '🚄', color: '#FF5722' }, // 橘紅 - 台灣高鐵
     { id: 55, name: '傳染病', icon: '🦠', color: '#8BC34A' },    // 綠色
     { id: 12, name: '空氣品質', icon: '😷', color: '#9E9E9E' },  // 灰色
     { id: 52, name: '林火', icon: '🌲', color: '#4CAF50' },      // 森林綠
     { id: 61, name: '電力', icon: '⚡', color: '#FFC107' },      // 黃色
     { id: 44, name: '停水', icon: '🚰', color: '#2196F3' },      // 藍色
+    { id: 65, name: '捷運營運', icon: '🚇', color: '#9C27B0' },  // 紫色
 ];
 
 // 圖層類型配置

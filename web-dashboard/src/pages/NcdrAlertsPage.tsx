@@ -24,13 +24,15 @@ const ALERT_TYPE_DEFINITIONS = [
     { id: 56, name: '高溫', sourceUnit: '中央氣象署', category: 'central' as const, priority: 'extended' as const },
     { id: 7, name: '淹水', sourceUnit: '水利署', category: 'central' as const, priority: 'extended' as const },
     { id: 43, name: '水庫放流', sourceUnit: '水利署', category: 'central' as const, priority: 'extended' as const },
-    { id: 3, name: '道路封閉', sourceUnit: '交通部', category: 'central' as const, priority: 'extended' as const },
+    { id: 3, name: '道路封閉', sourceUnit: '交通部公路局', category: 'central' as const, priority: 'extended' as const },
     { id: 62, name: '防空', sourceUnit: '內政部', category: 'central' as const, priority: 'extended' as const },
     { id: 47, name: '停班停課', sourceUnit: '行政院', category: 'central' as const, priority: 'extended' as const },
     // 事業單位
-    { id: 65, name: '捷運營運', sourceUnit: '捷運公司', category: 'enterprise' as const, priority: 'extended' as const },
+    { id: 35, name: '鐵路事故', sourceUnit: '臺鐵公司', category: 'enterprise' as const, priority: 'extended' as const },
+    { id: 51, name: '鐵路事故(高鐵)', sourceUnit: '台灣高鐵', category: 'enterprise' as const, priority: 'extended' as const },
+    { id: 65, name: '捷運營運', sourceUnit: '各捷運公司', category: 'enterprise' as const, priority: 'extended' as const },
     { id: 44, name: '停水', sourceUnit: '自來水公司', category: 'enterprise' as const, priority: 'extended' as const },
-    { id: 61, name: '電力', sourceUnit: '台電公司', category: 'enterprise' as const, priority: 'extended' as const },
+    { id: 61, name: '電力', sourceUnit: '台灣電力公司', category: 'enterprise' as const, priority: 'extended' as const },
     // 地方政府
     { id: 45, name: '水位警戒', sourceUnit: '地方政府', category: 'local' as const, priority: 'extended' as const },
     { id: 19, name: '道路施工', sourceUnit: '地方政府', category: 'local' as const, priority: 'extended' as const },
