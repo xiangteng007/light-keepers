@@ -8,6 +8,7 @@ import { AccountsModule } from './modules/accounts/accounts.module';
 import { EventsModule } from './modules/events/events.module';
 import { TasksModule } from './modules/tasks/tasks.module';
 import { NcdrAlertsModule } from './modules/ncdr-alerts/ncdr-alerts.module';
+import { PublicResourcesModule } from './modules/public-resources/public-resources.module';
 
 @Module({
     imports: [
@@ -54,6 +55,7 @@ import { NcdrAlertsModule } from './modules/ncdr-alerts/ncdr-alerts.module';
         EventsModule,
         TasksModule,
         NcdrAlertsModule,
+        PublicResourcesModule,
     ],
 })
 export class AppModule { }
