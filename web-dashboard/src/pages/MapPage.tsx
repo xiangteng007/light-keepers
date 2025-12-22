@@ -118,9 +118,12 @@ const mapOptions: google.maps.MapOptions = {
     mapTypeControl: false, // We'll create our own
     scaleControl: true,
     streetViewControl: true,
-    rotateControl: false,
+    rotateControl: false, // 關閉旋轉控制
     fullscreenControl: true,
     clickableIcons: true, // Enable POI clicking
+    keyboardShortcuts: false, // 關閉鍵盤快捷鍵控制介面
+    tilt: 0, // 禁用傾斜
+    heading: 0, // 固定朝向北方
     styles: [
         // 可選：自訂地圖樣式
     ],
@@ -157,6 +160,10 @@ export default function MapPage() {
     // NCDR 側邊欄篩選器
     const [ncdrSidebarTypeFilter, setNcdrSidebarTypeFilter] = useState<string>('all');
     const [ncdrSidebarSeverityFilter, setNcdrSidebarSeverityFilter] = useState<string>('all');
+
+    // 定位當前位置狀態
+    const [isLocating, setIsLocating] = useState(false);
+    const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
 
     const mapRef = useRef<google.maps.Map | null>(null);
 
@@ -280,6 +287,47 @@ export default function MapPage() {
         setInfoWindowEvent(null);
     }, []);
 
+    // 定位當前位置
+    const handleLocateMe = useCallback(() => {
+        if (!navigator.geolocation) {
+            alert('您的瀏覽器不支援定位功能');
+            return;
+        }
+
+        setIsLocating(true);
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                const { latitude, longitude } = position.coords;
+                const newLocation = { lat: latitude, lng: longitude };
+                setUserLocation(newLocation);
+                setMapCenter(newLocation);
+                setMapZoom(15); // 較高縮放以便查看周圍
+                setIsLocating(false);
+            },
+            (error) => {
+                setIsLocating(false);
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        alert('定位權限被拒絕，請在瀏覽器設定中允許定位');
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        alert('無法取得位置資訊');
+                        break;
+                    case error.TIMEOUT:
+                        alert('定位逾時，請重試');
+                        break;
+                    default:
+                        alert('定位時發生錯誤');
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0,
+            }
+        );
+    }, []);
+
     // 取得所有分類選項
     const categories = [...new Set(events.map(e => e.category || '其他').filter(Boolean))];
 
@@ -319,7 +367,25 @@ export default function MapPage() {
             <div className="page-header">
                 <div className="page-header__left">
                     <h2>地圖總覽</h2>
-                    <Badge variant="info">{stats.withLocation} 個有定位事件</Badge>
+                    {/* 圖層顯示切換 - 移至標題列 */}
+                    <div className="header-layer-toggles">
+                        <label className="header-layer-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showEvents}
+                                onChange={(e) => setShowEvents(e.target.checked)}
+                            />
+                            <span>📍 災情事件</span>
+                        </label>
+                        <label className="header-layer-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showNcdrAlerts}
+                                onChange={(e) => setShowNcdrAlerts(e.target.checked)}
+                            />
+                            <span>⚠️ NCDR示警</span>
+                        </label>
+                    </div>
                 </div>
                 <div className="page-header__right">
                     {/* 嚴重程度圖例 - 水平排列 */}
@@ -474,6 +540,40 @@ export default function MapPage() {
                                     </div>
                                 </InfoWindowF>
                             )}
+
+                            {/* 用戶位置標記 - Google Maps 藍點樣式 */}
+                            {userLocation && (
+                                <>
+                                    {/* 外圈脈動光暈 */}
+                                    <MarkerF
+                                        position={userLocation}
+                                        icon={{
+                                            path: google.maps.SymbolPath.CIRCLE,
+                                            fillColor: '#4285F4',
+                                            fillOpacity: 0.2,
+                                            strokeColor: '#4285F4',
+                                            strokeWeight: 1,
+                                            strokeOpacity: 0.5,
+                                            scale: 25,
+                                        }}
+                                        zIndex={999}
+                                    />
+                                    {/* 中心藍點 */}
+                                    <MarkerF
+                                        position={userLocation}
+                                        icon={{
+                                            path: google.maps.SymbolPath.CIRCLE,
+                                            fillColor: '#4285F4',
+                                            fillOpacity: 1,
+                                            strokeColor: '#ffffff',
+                                            strokeWeight: 3,
+                                            scale: 8,
+                                        }}
+                                        title="您的位置"
+                                        zIndex={1000}
+                                    />
+                                </>
+                            )}
                         </GoogleMap>
                     )}
 
@@ -504,68 +604,28 @@ export default function MapPage() {
                         )}
                     </div>
 
-                    {/* 圖例及篩選器 */}
-                    <div className="map-legend">
-                        <div className="map-legend__title">圖層顯示</div>
-                        <label className="map-legend__toggle">
-                            <input
-                                type="checkbox"
-                                checked={showEvents}
-                                onChange={(e) => setShowEvents(e.target.checked)}
-                            />
-                            <span>📍 災情事件 ({eventsWithLocation.length})</span>
-                        </label>
-                        <label className="map-legend__toggle">
-                            <input
-                                type="checkbox"
-                                checked={showNcdrAlerts}
-                                onChange={(e) => setShowNcdrAlerts(e.target.checked)}
-                            />
-                            <span>⚠️ NCDR示警 ({filteredNcdrAlerts.length}/{ncdrAlerts.length})</span>
-                        </label>
-
-                        {/* NCDR 類型細分篩選 */}
-                        {showNcdrAlerts && (
-                            <div className="ncdr-type-filters">
-                                {NCDR_CORE_TYPES.map(type => (
-                                    <label key={type.id} className="ncdr-type-filter">
-                                        <input
-                                            type="checkbox"
-                                            checked={ncdrTypeFilters[type.id] || false}
-                                            onChange={() => toggleNcdrType(type.id)}
-                                        />
-                                        <span className="ncdr-type-icon">{type.icon}</span>
-                                        <span className="ncdr-type-name">{type.name}</span>
-                                        <span className="ncdr-type-count">({ncdrTypeCounts[type.id] || 0})</span>
-                                    </label>
-                                ))}
-
-                                <button
-                                    className="ncdr-type-expand"
-                                    onClick={() => setShowExtendedTypes(!showExtendedTypes)}
-                                >
-                                    {showExtendedTypes ? '▲ 收起' : '▼ 更多類型'}
-                                </button>
-
-                                {showExtendedTypes && (
-                                    <div className="ncdr-extended-types">
-                                        {NCDR_EXTENDED_TYPES.map(type => (
-                                            <label key={type.id} className="ncdr-type-filter ncdr-type-filter--extended">
-                                                <input
-                                                    type="checkbox"
-                                                    checked={ncdrTypeFilters[type.id] || false}
-                                                    onChange={() => toggleNcdrType(type.id)}
-                                                />
-                                                <span className="ncdr-type-icon">{type.icon}</span>
-                                                <span className="ncdr-type-name">{type.name}</span>
-                                                <span className="ncdr-type-count">({ncdrTypeCounts[type.id] || 0})</span>
-                                            </label>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
+                    {/* 定位目前位置按鈕 - Google Maps 風格 */}
+                    <button
+                        className={`map-locate-btn ${isLocating ? 'map-locate-btn--loading' : ''}`}
+                        onClick={handleLocateMe}
+                        disabled={isLocating}
+                        title="定位目前位置"
+                    >
+                        {isLocating ? (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="10" opacity="0.25" />
+                                <path d="M12 2a10 10 0 0 1 10 10" />
+                            </svg>
+                        ) : (
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <circle cx="12" cy="12" r="4" />
+                                <line x1="12" y1="2" x2="12" y2="6" />
+                                <line x1="12" y1="18" x2="12" y2="22" />
+                                <line x1="2" y1="12" x2="6" y2="12" />
+                                <line x1="18" y1="12" x2="22" y2="12" />
+                            </svg>
                         )}
-                    </div>
+                    </button>
                 </div>
 
                 {/* 側邊欄 - Tab切換式列表 */}

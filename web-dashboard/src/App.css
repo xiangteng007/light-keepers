@@ -1453,6 +1453,54 @@ body {
   font-weight: 600;
 }
 
+/* 定位目前位置按鈕 - Google Maps 風格 */
+.map-locate-btn {
+  position: absolute;
+  bottom: 195px;
+  right: 10px;
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.map-locate-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.map-locate-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.map-locate-btn--loading {
+  color: #4285F4;
+}
+
+.map-locate-btn--loading svg {
+  animation: spin-locate 1s linear infinite;
+}
+
+@keyframes spin-locate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 /* ===== Google Maps Loading & Error States ===== */
 .map-loading {
   display: flex;
@@ -1600,6 +1648,17 @@ body {
 .gm-ui-hover-effect {
   top: 2px !important;
   right: 2px !important;
+}
+
+/* 隱藏傾斜/旋轉控制項和方向鍵導航控制 */
+.gm-style gmp-internal-camera-control,
+.gm-style gmp-internal-camera-control.gmnoprint,
+button[aria-label="Keyboard shortcuts"],
+button[aria-label="鍵盤快速鍵"],
+button[aria-label="Map camera controls"],
+button[aria-label="地圖相機控制"],
+.gm-tilt {
+  display: none !important;
 }
 
 /* ===== NCDR 災害示警頁面 ===== */
@@ -1957,6 +2016,39 @@ body {
 .ncdr-source {
   color: var(--text-muted);
   font-size: 11px;
+}
+
+/* ===== 頁首圖層切換 ===== */
+.header-layer-toggles {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: 20px;
+}
+
+.header-layer-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-secondary);
+  transition: color 0.2s ease;
+}
+
+.header-layer-toggle:hover {
+  color: var(--text-primary);
+}
+
+.header-layer-toggle input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+}
+
+.header-layer-toggle span {
+  white-space: nowrap;
 }
 
 /* ===== 頁首嚴重程度圖例 ===== */
