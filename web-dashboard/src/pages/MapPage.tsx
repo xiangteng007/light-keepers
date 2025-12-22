@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, type NcdrAlert } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, type NcdrAlert, type Shelter, type AedLocation } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -105,6 +105,28 @@ const createNcdrMarkerIcon = (alertTypeId: number) => {
     };
 };
 
+// 避難所標記圖標 - 房子形狀（綠色系）
+const createShelterMarkerIcon = () => ({
+    path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
+    fillColor: '#4CAF50',
+    fillOpacity: 1,
+    strokeColor: '#fff',
+    strokeWeight: 2,
+    scale: 1.5,
+    anchor: new google.maps.Point(12, 20),
+});
+
+// AED 標記圖標 - 心臟形狀（紅色）
+const createAedMarkerIcon = () => ({
+    path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
+    fillColor: '#E53935',
+    fillOpacity: 1,
+    strokeColor: '#fff',
+    strokeWeight: 2,
+    scale: 1.2,
+    anchor: new google.maps.Point(12, 21),
+});
+
 // Map container style
 const containerStyle = {
     width: '100%',
@@ -153,6 +175,12 @@ export default function MapPage() {
     const [ncdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
+    // 公共資源圖層狀態（避難所/AED）
+    const [showShelters, setShowShelters] = useState(false);
+    const [showAed, setShowAed] = useState(false);
+    const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
+    const [selectedAed, setSelectedAed] = useState<AedLocation | null>(null);
+
     // 側邊欄 Tab 切換
     const [sidebarTab, setSidebarTab] = useState<'events' | 'ncdr'>('events');
 
@@ -186,8 +214,24 @@ export default function MapPage() {
         enabled: showNcdrAlerts,
     });
 
+    // 獲取公共資源（避難所/AED）
+    const { data: publicResourcesData } = useQuery({
+        queryKey: ['publicResourcesMap', showShelters, showAed],
+        queryFn: async () => {
+            const types: ('shelters' | 'aed')[] = [];
+            if (showShelters) types.push('shelters');
+            if (showAed) types.push('aed');
+            const res = await getPublicResourcesForMap(types);
+            return res.data;
+        },
+        enabled: showShelters || showAed,
+        staleTime: 1000 * 60 * 30, // 30 分鐘快取
+    });
+
     const events = eventsData?.data || [];
     const ncdrAlerts = ncdrData?.data || [];
+    const shelters = publicResourcesData?.shelters || [];
+    const aedLocations = publicResourcesData?.aed || [];
 
     // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {
@@ -359,6 +403,22 @@ export default function MapPage() {
                             />
                             <span>⚠️ NCDR示警</span>
                         </label>
+                        <label className="header-layer-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showShelters}
+                                onChange={(e) => setShowShelters(e.target.checked)}
+                            />
+                            <span>🏠 避難所</span>
+                        </label>
+                        <label className="header-layer-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showAed}
+                                onChange={(e) => setShowAed(e.target.checked)}
+                            />
+                            <span>❤️ AED</span>
+                        </label>
                     </div>
                 </div>
                 <div className="page-header__right">
@@ -422,8 +482,42 @@ export default function MapPage() {
                                     onClick={() => {
                                         setSelectedNcdrAlert(alert);
                                         setInfoWindowEvent(null);
+                                        setSelectedShelter(null);
+                                        setSelectedAed(null);
                                     }}
                                     title={alert.title}
+                                />
+                            ))}
+
+                            {/* 避難收容所標記 */}
+                            {showShelters && shelters.map((shelter) => (
+                                <MarkerF
+                                    key={shelter.id}
+                                    position={{ lat: shelter.latitude, lng: shelter.longitude }}
+                                    icon={createShelterMarkerIcon()}
+                                    onClick={() => {
+                                        setSelectedShelter(shelter);
+                                        setSelectedAed(null);
+                                        setSelectedNcdrAlert(null);
+                                        setInfoWindowEvent(null);
+                                    }}
+                                    title={shelter.name}
+                                />
+                            ))}
+
+                            {/* AED 位置標記 */}
+                            {showAed && aedLocations.map((aed) => (
+                                <MarkerF
+                                    key={aed.id}
+                                    position={{ lat: aed.latitude, lng: aed.longitude }}
+                                    icon={createAedMarkerIcon()}
+                                    onClick={() => {
+                                        setSelectedAed(aed);
+                                        setSelectedShelter(null);
+                                        setSelectedNcdrAlert(null);
+                                        setInfoWindowEvent(null);
+                                    }}
+                                    title={aed.name}
                                 />
                             ))}
 
@@ -510,6 +604,100 @@ export default function MapPage() {
                                                     📎 查看詳情
                                                 </button>
                                             )}
+                                        </div>
+                                    </div>
+                                </InfoWindowF>
+                            )}
+
+                            {/* 避難收容所 InfoWindow */}
+                            {selectedShelter && (
+                                <InfoWindowF
+                                    position={{
+                                        lat: selectedShelter.latitude,
+                                        lng: selectedShelter.longitude,
+                                    }}
+                                    onCloseClick={() => setSelectedShelter(null)}
+                                    options={{
+                                        pixelOffset: new google.maps.Size(0, -25),
+                                    }}
+                                >
+                                    <div className="gmap-infowindow">
+                                        <div className="gmap-infowindow__header">
+                                            <span
+                                                className="gmap-infowindow__severity"
+                                                style={{ background: '#4CAF50' }}
+                                            >
+                                                🏠 避難所
+                                            </span>
+                                            <span className="gmap-infowindow__category">
+                                                {selectedShelter.type}
+                                            </span>
+                                        </div>
+                                        <h4 className="gmap-infowindow__title">{selectedShelter.name}</h4>
+                                        <p className="gmap-infowindow__desc">
+                                            📍 {selectedShelter.address || `${selectedShelter.city}${selectedShelter.district}`}
+                                        </p>
+                                        <p className="gmap-infowindow__desc">
+                                            👥 可收容人數：{selectedShelter.capacity || '未知'}
+                                        </p>
+                                        <div className="gmap-infowindow__actions">
+                                            <button
+                                                onClick={() => {
+                                                    const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedShelter.latitude},${selectedShelter.longitude}`;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            >
+                                                🧭 導航
+                                            </button>
+                                        </div>
+                                    </div>
+                                </InfoWindowF>
+                            )}
+
+                            {/* AED 位置 InfoWindow */}
+                            {selectedAed && (
+                                <InfoWindowF
+                                    position={{
+                                        lat: selectedAed.latitude,
+                                        lng: selectedAed.longitude,
+                                    }}
+                                    onCloseClick={() => setSelectedAed(null)}
+                                    options={{
+                                        pixelOffset: new google.maps.Size(0, -25),
+                                    }}
+                                >
+                                    <div className="gmap-infowindow">
+                                        <div className="gmap-infowindow__header">
+                                            <span
+                                                className="gmap-infowindow__severity"
+                                                style={{ background: '#E53935' }}
+                                            >
+                                                ❤️ AED
+                                            </span>
+                                        </div>
+                                        <h4 className="gmap-infowindow__title">{selectedAed.name}</h4>
+                                        <p className="gmap-infowindow__desc">
+                                            📍 {selectedAed.address}
+                                        </p>
+                                        {selectedAed.placeName && (
+                                            <p className="gmap-infowindow__desc">
+                                                🏢 {selectedAed.placeName} {selectedAed.floor && `(${selectedAed.floor})`}
+                                            </p>
+                                        )}
+                                        {selectedAed.openHours && (
+                                            <p className="gmap-infowindow__desc">
+                                                🕐 開放時間：{selectedAed.openHours}
+                                            </p>
+                                        )}
+                                        <div className="gmap-infowindow__actions">
+                                            <button
+                                                onClick={() => {
+                                                    const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedAed.latitude},${selectedAed.longitude}`;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            >
+                                                🧭 導航
+                                            </button>
                                         </div>
                                     </div>
                                 </InfoWindowF>
