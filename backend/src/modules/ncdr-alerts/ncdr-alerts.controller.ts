@@ -90,4 +90,18 @@ export class NcdrAlertsController {
             ...result,
         };
     }
+
+    /**
+     * 更新現有警報的 sourceLink 為 HTML 網頁連結
+     * POST /ncdr-alerts/update-source-links
+     */
+    @Post('update-source-links')
+    @HttpCode(HttpStatus.OK)
+    async updateSourceLinks() {
+        const result = await this.ncdrAlertsService.updateExistingSourceLinks();
+        return {
+            message: 'Source links update completed',
+            ...result,
+        };
+    }
 }

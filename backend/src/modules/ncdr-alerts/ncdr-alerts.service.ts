@@ -72,6 +72,41 @@ export class NcdrAlertsService {
     }
 
     /**
+     * 從 CAP 檔案中擷取 HTML 網頁連結
+     * CAP 檔案中的 <web> 元素包含政府公告的實際網頁連結
+     * @param capUrl CAP 檔案的 URL
+     */
+    async fetchWebLinkFromCap(capUrl: string): Promise<string | null> {
+        try {
+            const response = await axios.get(capUrl, { timeout: 8000 });
+            const result = await parseStringPromise(response.data, {
+                explicitArray: false,
+                ignoreAttrs: true,
+            });
+
+            // CAP 結構：alert > info > web
+            const alert = result.alert;
+            if (!alert || !alert.info) {
+                return null;
+            }
+
+            // info 可能是陣列或單一物件
+            const info = Array.isArray(alert.info) ? alert.info[0] : alert.info;
+            const webLink = info?.web;
+
+            if (webLink && typeof webLink === 'string' && webLink.startsWith('http')) {
+                return webLink;
+            }
+
+            return null;
+        } catch (error) {
+            // CAP 擷取失敗不影響主流程，只記錄警告
+            this.logger.warn(`Failed to fetch web link from CAP: ${capUrl} - ${error.message}`);
+            return null;
+        }
+    }
+
+    /**
      * 解析 Atom Entry 為 NcdrAlert
      */
     parseAtomEntry(entry: any, alertTypeId: number): Partial<NcdrAlert> | null {
@@ -260,6 +295,13 @@ export class NcdrAlertsService {
                         });
 
                         if (!existing) {
+                            // 嘗試從 CAP 擷取真正的 HTML 網頁連結
+                            if (parsed.sourceLink && parsed.sourceLink.endsWith('.cap')) {
+                                const webLink = await this.fetchWebLinkFromCap(parsed.sourceLink);
+                                if (webLink) {
+                                    parsed.sourceLink = webLink;
+                                }
+                            }
                             await this.ncdrAlertRepository.save(parsed);
                             synced++;
                         } else {
@@ -438,5 +480,45 @@ export class NcdrAlertsService {
             .execute();
 
         return result.affected || 0;
+    }
+
+    /**
+     * 更新現有警報的 sourceLink 為 HTML 網頁連結
+     * 用於一次性更新已存在但使用 CAP 連結的警報
+     */
+    async updateExistingSourceLinks(): Promise<{ updated: number; errors: number }> {
+        let updated = 0;
+        let errors = 0;
+
+        // 找出所有使用 CAP 連結的警報
+        const alertsWithCapLinks = await this.ncdrAlertRepository.find({
+            where: {},
+        });
+
+        const capAlerts = alertsWithCapLinks.filter(
+            alert => alert.sourceLink && alert.sourceLink.endsWith('.cap')
+        );
+
+        this.logger.log(`Found ${capAlerts.length} alerts with CAP links to update`);
+
+        for (const alert of capAlerts) {
+            try {
+                // 限制請求頻率
+                await new Promise(resolve => setTimeout(resolve, 300));
+
+                const webLink = await this.fetchWebLinkFromCap(alert.sourceLink);
+                if (webLink) {
+                    await this.ncdrAlertRepository.update(alert.id, { sourceLink: webLink });
+                    updated++;
+                    this.logger.log(`Updated alert ${alert.id}: ${webLink}`);
+                }
+            } catch (err) {
+                errors++;
+                this.logger.error(`Failed to update alert ${alert.id}: ${err.message}`);
+            }
+        }
+
+        this.logger.log(`Source link update completed: ${updated} updated, ${errors} errors`);
+        return { updated, errors };
     }
 }
