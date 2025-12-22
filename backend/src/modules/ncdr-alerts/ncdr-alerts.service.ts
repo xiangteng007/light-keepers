@@ -264,17 +264,21 @@ export class NcdrAlertsService {
                             synced++;
                         } else {
                             // 檢查是否需要更新分類或座標
+                            const coordsDiffer =
+                                Math.abs((existing.latitude || 0) - (parsed.latitude || 0)) > 0.001 ||
+                                Math.abs((existing.longitude || 0) - (parsed.longitude || 0)) > 0.001;
+
                             const needsUpdate =
                                 existing.alertTypeId !== parsed.alertTypeId ||
                                 existing.alertTypeName !== parsed.alertTypeName ||
-                                !existing.latitude || !existing.longitude;
+                                coordsDiffer;
 
                             if (needsUpdate) {
                                 await this.ncdrAlertRepository.update(existing.id, {
                                     alertTypeId: parsed.alertTypeId,
                                     alertTypeName: parsed.alertTypeName,
-                                    latitude: parsed.latitude || existing.latitude,
-                                    longitude: parsed.longitude || existing.longitude,
+                                    latitude: parsed.latitude,
+                                    longitude: parsed.longitude,
                                 });
                                 synced++;
                             }
