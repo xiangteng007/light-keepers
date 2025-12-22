@@ -82,8 +82,18 @@ export class NcdrAlertsService {
             const updated = entry.updated || new Date().toISOString();
             const link = entry.link?.$?.href || entry.link?.href || '';
 
+            // 根據標題內容修正類別 (NCDR API 有時會將事故放在錯誤的 feed 中)
+            let actualTypeId = alertTypeId;
+            if (title.includes('鐵路事故') || title.includes('臺鐵')) {
+                actualTypeId = 35; // 鐵路事故
+            } else if (title.includes('高鐵')) {
+                actualTypeId = 51; // 鐵路事故(高鐵)
+            } else if (title.includes('捷運')) {
+                actualTypeId = 65; // 捷運營運
+            }
+
             // 從類別定義獲取資訊
-            const typeInfo = ALERT_TYPE_DEFINITIONS.find(t => t.id === alertTypeId);
+            const typeInfo = ALERT_TYPE_DEFINITIONS.find(t => t.id === actualTypeId);
 
             // 判斷嚴重程度
             let severity: 'critical' | 'warning' | 'info' = 'warning';
@@ -153,7 +163,7 @@ export class NcdrAlertsService {
 
             return {
                 alertId: String(alertId).substring(0, 255),
-                alertTypeId,
+                alertTypeId: actualTypeId,
                 alertTypeName: typeInfo?.name || '未知',
                 title: String(title).substring(0, 500),
                 description: String(summary),
