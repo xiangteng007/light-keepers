@@ -1166,11 +1166,11 @@ body {
   overflow-y: auto;
 }
 
-/* 嚴重程度圖例 - 右下角 (靠近縮放控件) */
+/* 嚴重程度圖例 - 右下角 (與縮放按鈕等高) */
 .map-severity-legend {
   position: absolute;
-  bottom: 140px;
-  right: 60px;
+  bottom: 95px;
+  right: 75px;
   background: var(--bg-card);
   padding: 10px 14px;
   border-radius: var(--radius-md);
@@ -1889,4 +1889,72 @@ body {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* ===== 側邊欄 Tab 切換器 ===== */
+.sidebar-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--bg-secondary);
+  padding: 4px;
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.sidebar-tab:hover {
+  color: var(--text-primary);
+  background: rgba(196, 167, 125, 0.1);
+}
+
+.sidebar-tab--active {
+  background: var(--accent-primary);
+  color: var(--brown-900);
+  font-weight: 600;
+}
+
+.sidebar-tab--active:hover {
+  background: var(--accent-primary);
+  color: var(--brown-900);
+}
+
+.sidebar-tab__count {
+  font-size: 11px;
+  font-weight: 600;
+  background: rgba(0, 0, 0, 0.15);
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 20px;
+  text-align: center;
+}
+
+.sidebar-tab--active .sidebar-tab__count {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* NCDR 項目樣式 */
+.map-event-item--ncdr {
+  border-left: 3px solid var(--color-warning);
+}
+
+.ncdr-source {
+  color: var(--text-muted);
+  font-size: 11px;
 }

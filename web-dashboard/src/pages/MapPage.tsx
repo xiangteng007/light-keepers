@@ -146,6 +146,9 @@ export default function MapPage() {
     const [showExtendedTypes, setShowExtendedTypes] = useState(false);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
+    // 側邊欄 Tab 切換
+    const [sidebarTab, setSidebarTab] = useState<'events' | 'ncdr'>('events');
+
     const mapRef = useRef<google.maps.Map | null>(null);
 
     // 載入 Google Maps API
@@ -223,12 +226,24 @@ export default function MapPage() {
 
     const handleEventSelect = useCallback((event: Event) => {
         setSelectedEvent(event);
+        setSelectedNcdrAlert(null);
         const lat = parseCoord(event.latitude);
         const lng = parseCoord(event.longitude);
         if (lat && lng) {
             setMapCenter({ lat, lng });
             setMapZoom(EVENT_ZOOM_LEVEL);
             setInfoWindowEvent(event);
+        }
+    }, []);
+
+    // 處理 NCDR 警報選擇
+    const handleNcdrAlertSelect = useCallback((alert: NcdrAlert) => {
+        setSelectedNcdrAlert(alert);
+        setSelectedEvent(null);
+        setInfoWindowEvent(null);
+        if (alert.latitude && alert.longitude) {
+            setMapCenter({ lat: Number(alert.latitude), lng: Number(alert.longitude) });
+            setMapZoom(EVENT_ZOOM_LEVEL);
         }
     }, []);
 
@@ -528,76 +543,136 @@ export default function MapPage() {
                     </div>
                 </div>
 
-                {/* 側邊欄 - 事件列表 */}
+                {/* 側邊欄 - Tab切換式列表 */}
                 <div className="map-sidebar">
-                    <Card title="事件列表" padding="sm">
-                        {/* 篩選器 */}
-                        <div className="map-filters">
-                            <div className="map-filter">
-                                <label>分類</label>
-                                <select
-                                    value={categoryFilter}
-                                    onChange={(e) => setCategoryFilter(e.target.value)}
-                                >
-                                    <option value="all">全部分類</option>
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat}>{cat}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div className="map-filter">
-                                <label>程度</label>
-                                <select
-                                    value={severityFilter}
-                                    onChange={(e) => setSeverityFilter(e.target.value)}
-                                >
-                                    <option value="all">全部程度</option>
-                                    <option value="5">危機</option>
-                                    <option value="4">緊急</option>
-                                    <option value="3">警戒</option>
-                                    <option value="2">注意</option>
-                                    <option value="1">一般</option>
-                                </select>
-                            </div>
+                    <Card padding="sm">
+                        {/* Tab 切換器 */}
+                        <div className="sidebar-tabs">
+                            <button
+                                className={`sidebar-tab ${sidebarTab === 'events' ? 'sidebar-tab--active' : ''}`}
+                                onClick={() => setSidebarTab('events')}
+                            >
+                                📍 災情事件 <span className="sidebar-tab__count">{filteredEvents.length}</span>
+                            </button>
+                            <button
+                                className={`sidebar-tab ${sidebarTab === 'ncdr' ? 'sidebar-tab--active' : ''}`}
+                                onClick={() => setSidebarTab('ncdr')}
+                            >
+                                ⚠️ NCDR示警 <span className="sidebar-tab__count">{filteredNcdrAlerts.length}</span>
+                            </button>
                         </div>
 
-                        {isLoading && <div className="loading">載入中...</div>}
-
-                        {!isLoading && filteredEvents.length === 0 && (
-                            <div className="empty-state">
-                                <span>📭</span>
-                                <p>沒有符合條件的事件</p>
-                            </div>
-                        )}
-
-                        <div className="map-event-list">
-                            {filteredEvents.map((event) => (
-                                <div
-                                    key={event.id}
-                                    className={`map-event-item ${selectedEvent?.id === event.id ? 'map-event-item--selected' : ''}`}
-                                    onClick={() => handleEventSelect(event)}
-                                >
-                                    <div className="map-event-item__header">
-                                        <Badge
-                                            variant={(event.severity || 0) >= 4 ? 'danger' : (event.severity || 0) >= 3 ? 'warning' : 'default'}
-                                            size="sm"
+                        {/* 事件 Tab */}
+                        {sidebarTab === 'events' && (
+                            <>
+                                {/* 篩選器 */}
+                                <div className="map-filters">
+                                    <div className="map-filter">
+                                        <label>分類</label>
+                                        <select
+                                            value={categoryFilter}
+                                            onChange={(e) => setCategoryFilter(e.target.value)}
                                         >
-                                            {event.category || '其他'}
-                                        </Badge>
-                                        {event.latitude && event.longitude && (
-                                            <span className="map-event-item__location">📍</span>
-                                        )}
+                                            <option value="all">全部分類</option>
+                                            {categories.map(cat => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
                                     </div>
-                                    <div className="map-event-item__title">{event.title}</div>
-                                    <div className="map-event-item__meta">
-                                        <span style={{ color: getSeverityColor(event.severity || 1) }}>
-                                            {getSeverityLabel(event.severity || 1)}
-                                        </span>
-                                        <span>{formatTime(event.createdAt)}</span>
+                                    <div className="map-filter">
+                                        <label>程度</label>
+                                        <select
+                                            value={severityFilter}
+                                            onChange={(e) => setSeverityFilter(e.target.value)}
+                                        >
+                                            <option value="all">全部程度</option>
+                                            <option value="5">危機</option>
+                                            <option value="4">緊急</option>
+                                            <option value="3">警戒</option>
+                                            <option value="2">注意</option>
+                                            <option value="1">一般</option>
+                                        </select>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
+
+                                {isLoading && <div className="loading">載入中...</div>}
+
+                                {!isLoading && filteredEvents.length === 0 && (
+                                    <div className="empty-state">
+                                        <span>📭</span>
+                                        <p>沒有符合條件的事件</p>
+                                    </div>
+                                )}
+
+                                <div className="map-event-list">
+                                    {filteredEvents.map((event) => (
+                                        <div
+                                            key={event.id}
+                                            className={`map-event-item ${selectedEvent?.id === event.id ? 'map-event-item--selected' : ''}`}
+                                            onClick={() => handleEventSelect(event)}
+                                        >
+                                            <div className="map-event-item__header">
+                                                <Badge
+                                                    variant={(event.severity || 0) >= 4 ? 'danger' : (event.severity || 0) >= 3 ? 'warning' : 'default'}
+                                                    size="sm"
+                                                >
+                                                    {event.category || '其他'}
+                                                </Badge>
+                                                {event.latitude && event.longitude && (
+                                                    <span className="map-event-item__location">📍</span>
+                                                )}
+                                            </div>
+                                            <div className="map-event-item__title">{event.title}</div>
+                                            <div className="map-event-item__meta">
+                                                <span style={{ color: getSeverityColor(event.severity || 1) }}>
+                                                    {getSeverityLabel(event.severity || 1)}
+                                                </span>
+                                                <span>{formatTime(event.createdAt)}</span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </>
+                        )}
+
+                        {/* NCDR 示警 Tab */}
+                        {sidebarTab === 'ncdr' && (
+                            <>
+                                {filteredNcdrAlerts.length === 0 ? (
+                                    <div className="empty-state">
+                                        <span>📭</span>
+                                        <p>沒有符合條件的 NCDR 示警</p>
+                                    </div>
+                                ) : (
+                                    <div className="map-event-list">
+                                        {filteredNcdrAlerts.map((alert) => (
+                                            <div
+                                                key={alert.id}
+                                                className={`map-event-item map-event-item--ncdr ${selectedNcdrAlert?.id === alert.id ? 'map-event-item--selected' : ''}`}
+                                                onClick={() => handleNcdrAlertSelect(alert)}
+                                            >
+                                                <div className="map-event-item__header">
+                                                    <Badge
+                                                        variant={alert.severity === 'critical' ? 'danger' : alert.severity === 'warning' ? 'warning' : 'info'}
+                                                        size="sm"
+                                                    >
+                                                        {alert.alertTypeName}
+                                                    </Badge>
+                                                    {alert.latitude && alert.longitude && (
+                                                        <span className="map-event-item__location">📍</span>
+                                                    )}
+                                                </div>
+                                                <div className="map-event-item__title">{alert.title}</div>
+                                                <div className="map-event-item__meta">
+                                                    <span className="ncdr-source">{alert.sourceUnit}</span>
+                                                    <span>{formatTime(alert.publishedAt)}</span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                            </>
+                        )}
                     </Card>
 
                     {/* 選中事件詳情 */}
