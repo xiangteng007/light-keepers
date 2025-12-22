@@ -13,32 +13,32 @@ const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
 const DEFAULT_ZOOM = 7;
 const EVENT_ZOOM_LEVEL = 16;
 
-// NCDR 核心示警類型定義（含圖標）
+// NCDR 核心示警類型定義（含圖標與顏色）
 const NCDR_CORE_TYPES = [
-    { id: 33, name: '地震', icon: '🌍' },
-    { id: 34, name: '海嘯', icon: '🌊' },
-    { id: 5, name: '颱風', icon: '🌀' },
-    { id: 6, name: '雷雨', icon: '⛈️' },
-    { id: 37, name: '降雨', icon: '🌧️' },
-    { id: 38, name: '土石流', icon: '⛰️' },
-    { id: 53, name: '火災', icon: '🔥' },
+    { id: 33, name: '地震', icon: '🌍', color: '#5BA3C0' },      // 藍綠色
+    { id: 34, name: '海嘯', icon: '🌊', color: '#4DA6E8' },      // 海洋藍
+    { id: 5, name: '颱風', icon: '🌀', color: '#7B6FA6' },       // 紫色
+    { id: 6, name: '雷雨', icon: '⛈️', color: '#A67B5B' },       // 棕色
+    { id: 37, name: '降雨', icon: '🌧️', color: '#6B8EC9' },      // 淺藍
+    { id: 38, name: '土石流', icon: '⛰️', color: '#8B6B5A' },    // 土棕色
+    { id: 53, name: '火災', icon: '🔥', color: '#E85A5A' },      // 紅色
 ];
 
 // NCDR 擴展示警類型
 const NCDR_EXTENDED_TYPES = [
-    { id: 14, name: '低溫', icon: '❄️' },
-    { id: 15, name: '濃霧', icon: '🌫️' },
-    { id: 32, name: '強風', icon: '💨' },
-    { id: 56, name: '高溫', icon: '🌡️' },
-    { id: 7, name: '淹水', icon: '🌊' },
-    { id: 43, name: '水庫放流', icon: '💧' },
-    { id: 36, name: '河川高水位', icon: '🏞️' },
-    { id: 3, name: '道路封閉', icon: '🚧' },
-    { id: 55, name: '傳染病', icon: '🦠' },
-    { id: 12, name: '空氣品質', icon: '😷' },
-    { id: 52, name: '林火', icon: '🌲' },
-    { id: 61, name: '電力', icon: '⚡' },
-    { id: 44, name: '停水', icon: '🚰' },
+    { id: 14, name: '低溫', icon: '❄️', color: '#88CCEE' },      // 冰藍
+    { id: 15, name: '濃霧', icon: '🌫️', color: '#9AA5B1' },      // 灰色
+    { id: 32, name: '強風', icon: '💨', color: '#7EC8E3' },      // 天藍
+    { id: 56, name: '高溫', icon: '🌡️', color: '#E8A65A' },      // 橙色
+    { id: 7, name: '淹水', icon: '🌊', color: '#5AB3E8' },       // 水藍
+    { id: 43, name: '水庫放流', icon: '💧', color: '#5AAAE8' },  // 深藍
+    { id: 36, name: '河川高水位', icon: '🏞️', color: '#6BB3C9' }, // 河藍
+    { id: 3, name: '道路封閉', icon: '🚧', color: '#F5A623' },   // 警告橙
+    { id: 55, name: '傳染病', icon: '🦠', color: '#8BC34A' },    // 綠色
+    { id: 12, name: '空氣品質', icon: '😷', color: '#9E9E9E' },  // 灰色
+    { id: 52, name: '林火', icon: '🌲', color: '#4CAF50' },      // 森林綠
+    { id: 61, name: '電力', icon: '⚡', color: '#FFC107' },      // 黃色
+    { id: 44, name: '停水', icon: '🚰', color: '#2196F3' },      // 藍色
 ];
 
 // 圖層類型配置
@@ -82,21 +82,23 @@ const createMarkerIcon = (severity: number) => {
     };
 };
 
-// NCDR 警報圖標 - 三角形警告符號
-const createNcdrMarkerIcon = (severity: 'critical' | 'warning' | 'info') => {
-    const colors = {
-        critical: '#B85C5C',
-        warning: '#C9A256',
-        info: '#5C7B8E',
-    };
+// NCDR 警報圖標 - 圓形圖標（根據類型顯示不同顏色）
+const getNcdrTypeColor = (alertTypeId: number): string => {
+    const allTypes = [...NCDR_CORE_TYPES, ...NCDR_EXTENDED_TYPES];
+    const typeInfo = allTypes.find(t => t.id === alertTypeId);
+    return typeInfo?.color || '#C9A256';
+};
+
+const createNcdrMarkerIcon = (alertTypeId: number) => {
+    const color = getNcdrTypeColor(alertTypeId);
+    // 使用圓形帶圖標的設計
     return {
-        path: 'M12 2L2 22h20L12 2zm0 4l7.53 14H4.47L12 6zm-1 5v4h2v-4h-2zm0 6v2h2v-2h-2z',
-        fillColor: colors[severity],
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: color,
         fillOpacity: 1,
         strokeColor: '#fff',
-        strokeWeight: 2,
-        scale: 1.5,
-        anchor: new google.maps.Point(12, 22),
+        strokeWeight: 3,
+        scale: 12,
     };
 };
 
@@ -149,6 +151,10 @@ export default function MapPage() {
     // 側邊欄 Tab 切換
     const [sidebarTab, setSidebarTab] = useState<'events' | 'ncdr'>('events');
 
+    // NCDR 側邊欄篩選器
+    const [ncdrSidebarTypeFilter, setNcdrSidebarTypeFilter] = useState<string>('all');
+    const [ncdrSidebarSeverityFilter, setNcdrSidebarSeverityFilter] = useState<string>('all');
+
     const mapRef = useRef<google.maps.Map | null>(null);
 
     // 載入 Google Maps API
@@ -174,7 +180,7 @@ export default function MapPage() {
     const events = eventsData?.data || [];
     const ncdrAlerts = ncdrData?.data || [];
 
-    // 根據類型過濾 NCDR 警報
+    // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {
         if (!showNcdrAlerts) return [];
         return ncdrAlerts.filter(alert => {
@@ -182,6 +188,21 @@ export default function MapPage() {
             return ncdrTypeFilters[typeId] === true;
         });
     }, [ncdrAlerts, ncdrTypeFilters, showNcdrAlerts]);
+
+    // 側邊欄 NCDR 過濾後列表 (額外篩選)
+    const filteredNcdrSidebarAlerts = useMemo(() => {
+        let result = filteredNcdrAlerts;
+        // 類型篩選
+        if (ncdrSidebarTypeFilter !== 'all') {
+            const typeId = parseInt(ncdrSidebarTypeFilter, 10);
+            result = result.filter(alert => alert.alertTypeId === typeId);
+        }
+        // 嚴重程度篩選
+        if (ncdrSidebarSeverityFilter !== 'all') {
+            result = result.filter(alert => alert.severity === ncdrSidebarSeverityFilter);
+        }
+        return result;
+    }, [filteredNcdrAlerts, ncdrSidebarTypeFilter, ncdrSidebarSeverityFilter]);
 
     // 計算每個類型的警報數量
     const ncdrTypeCounts = useMemo(() => {
@@ -297,6 +318,21 @@ export default function MapPage() {
                     <h2>地圖總覽</h2>
                     <Badge variant="info">{stats.withLocation} 個有定位事件</Badge>
                 </div>
+                <div className="page-header__right">
+                    {/* 嚴重程度圖例 - 水平排列 */}
+                    <div className="header-severity-legend">
+                        <span className="header-severity-legend__label">嚴重程度：</span>
+                        {[5, 4, 3, 2, 1].map((level) => (
+                            <span key={level} className="header-severity-legend__item">
+                                <span
+                                    className="header-severity-legend__dot"
+                                    style={{ background: getSeverityColor(level) }}
+                                />
+                                <span className="header-severity-legend__text">{getSeverityLabel(level)}</span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             <div className="map-layout">
@@ -339,7 +375,7 @@ export default function MapPage() {
                                 <MarkerF
                                     key={alert.id}
                                     position={{ lat: Number(alert.latitude), lng: Number(alert.longitude) }}
-                                    icon={createNcdrMarkerIcon(alert.severity)}
+                                    icon={createNcdrMarkerIcon(alert.alertTypeId)}
                                     onClick={() => {
                                         setSelectedNcdrAlert(alert);
                                         setInfoWindowEvent(null);
@@ -527,20 +563,6 @@ export default function MapPage() {
                             </div>
                         )}
                     </div>
-
-                    {/* 嚴重程度圖例 - 獨立於右下角 */}
-                    <div className="map-severity-legend">
-                        <div className="map-legend__title">嚴重程度</div>
-                        {[5, 4, 3, 2, 1].map((level) => (
-                            <div key={level} className="map-legend__item">
-                                <span
-                                    className="map-legend__color"
-                                    style={{ background: getSeverityColor(level) }}
-                                />
-                                <span>{getSeverityLabel(level)}</span>
-                            </div>
-                        ))}
-                    </div>
                 </div>
 
                 {/* 側邊欄 - Tab切換式列表 */}
@@ -638,14 +660,44 @@ export default function MapPage() {
                         {/* NCDR 示警 Tab */}
                         {sidebarTab === 'ncdr' && (
                             <>
-                                {filteredNcdrAlerts.length === 0 ? (
+                                {/* NCDR 篩選器 */}
+                                <div className="map-filters">
+                                    <div className="map-filter">
+                                        <label>類型</label>
+                                        <select
+                                            value={ncdrSidebarTypeFilter}
+                                            onChange={(e) => setNcdrSidebarTypeFilter(e.target.value)}
+                                        >
+                                            <option value="all">全部類型</option>
+                                            {[...NCDR_CORE_TYPES, ...NCDR_EXTENDED_TYPES].map(t => (
+                                                <option key={t.id} value={t.id.toString()}>
+                                                    {t.icon} {t.name}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="map-filter">
+                                        <label>程度</label>
+                                        <select
+                                            value={ncdrSidebarSeverityFilter}
+                                            onChange={(e) => setNcdrSidebarSeverityFilter(e.target.value)}
+                                        >
+                                            <option value="all">全部程度</option>
+                                            <option value="critical">危急</option>
+                                            <option value="warning">警告</option>
+                                            <option value="info">資訊</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                {filteredNcdrSidebarAlerts.length === 0 ? (
                                     <div className="empty-state">
                                         <span>📭</span>
                                         <p>沒有符合條件的 NCDR 示警</p>
                                     </div>
                                 ) : (
                                     <div className="map-event-list">
-                                        {filteredNcdrAlerts.map((alert) => (
+                                        {filteredNcdrSidebarAlerts.map((alert) => (
                                             <div
                                                 key={alert.id}
                                                 className={`map-event-item map-event-item--ncdr ${selectedNcdrAlert?.id === alert.id ? 'map-event-item--selected' : ''}`}
