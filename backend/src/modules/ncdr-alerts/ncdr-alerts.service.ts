@@ -82,14 +82,59 @@ export class NcdrAlertsService {
             const updated = entry.updated || new Date().toISOString();
             const link = entry.link?.$?.href || entry.link?.href || '';
 
-            // 根據標題內容修正類別 (NCDR API 有時會將事故放在錯誤的 feed 中)
+            // 根據標題內容修正類別 (NCDR API 有時會將警報放在錯誤的 feed 中)
             let actualTypeId = alertTypeId;
-            if (title.includes('鐵路事故') || title.includes('臺鐵')) {
+            const titleStr = String(title);
+
+            // 自然災害優先檢測
+            if (titleStr.includes('地震') || titleStr.includes('有感地震')) {
+                actualTypeId = 33; // 地震
+            } else if (titleStr.includes('海嘯')) {
+                actualTypeId = 34; // 海嘯
+            } else if (titleStr.includes('颱風') || titleStr.includes('熱帶性低氣壓')) {
+                actualTypeId = 5; // 颱風
+            } else if (titleStr.includes('雷雨') || titleStr.includes('大雷雨')) {
+                actualTypeId = 6; // 雷雨
+            } else if (titleStr.includes('大雨') || titleStr.includes('豪雨') || titleStr.includes('降雨')) {
+                actualTypeId = 37; // 降雨
+            } else if (titleStr.includes('土石流')) {
+                actualTypeId = 38; // 土石流
+            } else if (titleStr.includes('火災') && !titleStr.includes('鐵路')) {
+                actualTypeId = 53; // 火災
+            } else if (titleStr.includes('林火') || titleStr.includes('森林火災')) {
+                actualTypeId = 52; // 林火
+                // 氣象類
+            } else if (titleStr.includes('低溫') || titleStr.includes('寒流')) {
+                actualTypeId = 14; // 低溫
+            } else if (titleStr.includes('濃霧') || titleStr.includes('大霧')) {
+                actualTypeId = 15; // 濃霧
+            } else if (titleStr.includes('強風') || titleStr.includes('陣風')) {
+                actualTypeId = 32; // 強風
+            } else if (titleStr.includes('高溫') || titleStr.includes('熱浪')) {
+                actualTypeId = 56; // 高溫
+                // 水利類
+            } else if (titleStr.includes('淹水')) {
+                actualTypeId = 7; // 淹水
+            } else if (titleStr.includes('水庫') && titleStr.includes('放流')) {
+                actualTypeId = 43; // 水庫放流
+            } else if (titleStr.includes('河川') && titleStr.includes('水位')) {
+                actualTypeId = 36; // 河川高水位
+                // 交通類
+            } else if (titleStr.includes('鐵路事故') || titleStr.includes('臺鐵') || titleStr.includes('台鐵')) {
                 actualTypeId = 35; // 鐵路事故
-            } else if (title.includes('高鐵')) {
+            } else if (titleStr.includes('高鐵')) {
                 actualTypeId = 51; // 鐵路事故(高鐵)
-            } else if (title.includes('捷運')) {
+            } else if (titleStr.includes('捷運')) {
                 actualTypeId = 65; // 捷運營運
+            } else if (titleStr.includes('道路封閉') || titleStr.includes('道路中斷')) {
+                actualTypeId = 3; // 道路封閉
+                // 公共服務類
+            } else if (titleStr.includes('停水')) {
+                actualTypeId = 44; // 停水
+            } else if (titleStr.includes('停電') || titleStr.includes('電力')) {
+                actualTypeId = 61; // 電力
+            } else if (titleStr.includes('空氣品質') || titleStr.includes('空污')) {
+                actualTypeId = 12; // 空氣品質
             }
 
             // 從類別定義獲取資訊
