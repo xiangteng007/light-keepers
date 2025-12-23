@@ -1,14 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, LessThan } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { ScrapingSource } from './scraping-source.entity';
-import { ScrapedCourse } from './scraped-course.entity';
+import { ScrapedCourse, ScrapedCourseCategory } from './scraped-course.entity';
 import * as cheerio from 'cheerio';
 
 /**
  * 課程爬蟲服務
  * 定期從設定的外部網站爬取課程資訊
+ * 資料保留 24 小時
  */
 @Injectable()
 export class CourseScraperService {
@@ -29,6 +30,21 @@ export class CourseScraperService {
         this.logger.log('🕷️ 開始執行排程課程爬蟲...');
         await this.scrapeAllSources();
     }
+
+    /**
+     * ⏰ 每小時清理超過 24 小時的舊資料
+     */
+    @Cron(CronExpression.EVERY_HOUR)
+    async cleanupOldCourses() {
+        const cutoffTime = new Date(Date.now() - 24 * 60 * 60 * 1000); // 24 小時前
+        const result = await this.scrapedCourseRepo.delete({
+            scrapedAt: LessThan(cutoffTime),
+        });
+        if (result.affected && result.affected > 0) {
+            this.logger.log(`🗑️ 已清理 ${result.affected} 筆超過 24 小時的課程資料`);
+        }
+    }
+
 
     /**
      * 爬取所有啟用的來源
@@ -136,6 +152,7 @@ export class CourseScraperService {
                         originalUrl: fullUrl,
                         imageUrl: image ? new URL(image, source.url).href : undefined,
                         organizer: source.name,
+                        category: this.categorizeByTitle(title), // 🏷️ 自動分類
                         externalId,
                     } as ScrapedCourse);
                 }
@@ -186,6 +203,46 @@ export class CourseScraperService {
             };
         }
         return {};
+    }
+
+    /**
+     * 🏷️ 根據課程標題自動分類
+     */
+    private categorizeByTitle(title: string): ScrapedCourseCategory {
+        const lowerTitle = title.toLowerCase();
+
+        // EMT 緊急醫療救護
+        if (lowerTitle.includes('emt') || lowerTitle.includes('緊急醫療') || lowerTitle.includes('救護員')) {
+            return 'emt';
+        }
+        // TECC 戰術緊急傷患照護
+        if (lowerTitle.includes('tecc') || lowerTitle.includes('戰術緊急')) {
+            return 'tecc';
+        }
+        // TCCC 戰術戰傷救護
+        if (lowerTitle.includes('tccc') || lowerTitle.includes('戰傷') || lowerTitle.includes('戰術戰傷')) {
+            return 'tccc';
+        }
+        // 無人機
+        if (lowerTitle.includes('無人機') || lowerTitle.includes('drone') || lowerTitle.includes('uav') || lowerTitle.includes('空拍')) {
+            return 'drone';
+        }
+        // 搜救技能
+        if (lowerTitle.includes('搜救') || lowerTitle.includes('山域') || lowerTitle.includes('水域') ||
+            lowerTitle.includes('繩索') || lowerTitle.includes('救難')) {
+            return 'rescue';
+        }
+        // 急救訓練
+        if (lowerTitle.includes('急救') || lowerTitle.includes('cpr') || lowerTitle.includes('aed') ||
+            lowerTitle.includes('bls') || lowerTitle.includes('acls')) {
+            return 'first_aid';
+        }
+        // 防災教育
+        if (lowerTitle.includes('防災') || lowerTitle.includes('減災') || lowerTitle.includes('災害')) {
+            return 'disaster';
+        }
+
+        return 'other';
     }
 
     // ==================== CRUD 操作 ====================

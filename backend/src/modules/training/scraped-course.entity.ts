@@ -2,8 +2,21 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, Jo
 import { ScrapingSource } from './scraping-source.entity';
 
 /**
+ * 課程分類
+ */
+export type ScrapedCourseCategory =
+    | 'emt'           // EMT 緊急醫療救護
+    | 'tecc'          // TECC 戰術緊急傷患照護
+    | 'tccc'          // TCCC 戰術戰傷救護
+    | 'drone'         // 無人機證照
+    | 'rescue'        // 搜救技能
+    | 'first_aid'     // 急救訓練
+    | 'disaster'      // 防災教育
+    | 'other';        // 其他
+
+/**
  * 已爬取的課程資料
- * 從外部網站爬取的課程資訊
+ * 從外部網站爬取的課程資訊 (保留 24 小時)
  */
 @Entity('scraped_courses')
 export class ScrapedCourse {
@@ -45,6 +58,10 @@ export class ScrapedCourse {
     // 主辦單位
     @Column({ type: 'varchar', length: 100, nullable: true })
     organizer?: string;
+
+    // 課程分類
+    @Column({ type: 'varchar', length: 20, default: 'other' })
+    category: ScrapedCourseCategory;
 
     // 課程費用
     @Column({ type: 'varchar', length: 50, nullable: true })
