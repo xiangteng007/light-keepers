@@ -1,4 +1,5 @@
 import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { EncryptedColumnTransformer } from '../../common/crypto.util';
 
 export type VolunteerStatus = 'available' | 'busy' | 'offline';
 
@@ -14,15 +15,25 @@ export class Volunteer {
     @Column({ type: 'varchar', length: 200, nullable: true })
     email?: string;
 
-    @Column({ type: 'varchar', length: 50 })
+    // 🔐 加密儲存
+    @Column({
+        type: 'varchar',
+        length: 500,  // 加密後長度增加
+        transformer: EncryptedColumnTransformer
+    })
     phone: string;
 
     // 所在區域
     @Column({ type: 'varchar', length: 100 })
     region: string;
 
-    // 詳細地址 (可選)
-    @Column({ type: 'varchar', length: 300, nullable: true })
+    // 🔐 詳細地址 - 加密儲存
+    @Column({
+        type: 'varchar',
+        length: 1000, // 加密後長度增加
+        nullable: true,
+        transformer: EncryptedColumnTransformer
+    })
     address?: string;
 
     // 技能標籤 (JSON array)
@@ -33,11 +44,22 @@ export class Volunteer {
     @Column({ type: 'varchar', length: 20, default: 'available' })
     status: VolunteerStatus;
 
-    // 緊急聯絡人
-    @Column({ type: 'varchar', length: 100, nullable: true })
+    // 🔐 緊急聯絡人 - 加密儲存
+    @Column({
+        type: 'varchar',
+        length: 500,
+        nullable: true,
+        transformer: EncryptedColumnTransformer
+    })
     emergencyContact?: string;
 
-    @Column({ type: 'varchar', length: 50, nullable: true })
+    // 🔐 緊急聯絡電話 - 加密儲存
+    @Column({
+        type: 'varchar',
+        length: 500,
+        nullable: true,
+        transformer: EncryptedColumnTransformer
+    })
     emergencyPhone?: string;
 
     // 備註
