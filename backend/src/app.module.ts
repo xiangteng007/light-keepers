@@ -17,6 +17,7 @@ import { NotificationsModule } from './modules/notifications/notifications.modul
 import { ResourcesModule } from './modules/resources/resources.module';
 import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ReportsExportModule } from './modules/reports-export/reports-export.module';
+import { LineBotModule } from './modules/line-bot/line-bot.module';
 
 @Module({
     imports: [
@@ -72,6 +73,7 @@ import { ReportsExportModule } from './modules/reports-export/reports-export.mod
         ResourcesModule,
         RealtimeModule,
         ReportsExportModule,
+        LineBotModule,
     ],
 })
 export class AppModule { }

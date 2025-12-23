@@ -13,6 +13,7 @@
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
+        "@line/bot-sdk": "^10.5.0",
         "@nestjs/axios": "^4.0.1",
         "@nestjs/common": "^10.3.0",
         "@nestjs/config": "^3.1.0",
