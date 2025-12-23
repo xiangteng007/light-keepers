@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button, Badge } from '../design-system';
+import './ReportPage.css';
 
 // 災害類型選項
 const DISASTER_TYPES = [
@@ -32,6 +33,7 @@ interface FormData {
     address: string;
     contactName: string;
     contactPhone: string;
+    photos: string[]; // 📷 圖片 URL 陣列
 }
 
 export default function ReportPage() {
@@ -51,6 +53,7 @@ export default function ReportPage() {
         address: '',
         contactName: '',
         contactPhone: '',
+        photos: [], // 📷 照片陣列
     });
 
     // 自動獲取 GPS 位置
@@ -256,6 +259,67 @@ export default function ReportPage() {
                             onChange={(e) => updateField('description', e.target.value)}
                             rows={4}
                         />
+                    </div>
+
+                    {/* 📷 圖片上傳（選填） */}
+                    <div className="form-section">
+                        <label className="form-label">現場照片（選填，最多 5 張）</label>
+                        <div className="photo-upload-section">
+                            {/* 已選擇的圖片預覽 */}
+                            <div className="photo-preview-grid">
+                                {formData.photos.map((photo, index) => (
+                                    <div key={index} className="photo-preview-item">
+                                        <img src={photo} alt={`災情照片 ${index + 1}`} />
+                                        <button
+                                            type="button"
+                                            className="photo-remove-btn"
+                                            onClick={() => {
+                                                setFormData(prev => ({
+                                                    ...prev,
+                                                    photos: prev.photos.filter((_, i) => i !== index)
+                                                }));
+                                            }}
+                                        >
+                                            ✕
+                                        </button>
+                                    </div>
+                                ))}
+
+                                {/* 新增照片按鈕 */}
+                                {formData.photos.length < 5 && (
+                                    <label className="photo-add-btn">
+                                        <span className="photo-add-icon">📷</span>
+                                        <span>新增照片</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            multiple
+                                            hidden
+                                            onChange={(e) => {
+                                                const files = e.target.files;
+                                                if (files) {
+                                                    const remainingSlots = 5 - formData.photos.length;
+                                                    const filesToProcess = Array.from(files).slice(0, remainingSlots);
+
+                                                    filesToProcess.forEach((file) => {
+                                                        const reader = new FileReader();
+                                                        reader.onloadend = () => {
+                                                            setFormData(prev => ({
+                                                                ...prev,
+                                                                photos: [...prev.photos, reader.result as string].slice(0, 5)
+                                                            }));
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    });
+                                                }
+                                                e.target.value = ''; // 重置 input
+                                            }}
+                                        />
+                                    </label>
+                                )}
+                            </div>
+                            <p className="photo-hint">📌 照片可幫助審核人員更快了解災情狀況</p>
+                        </div>
                     </div>
 
                     {/* 位置資訊 */}
