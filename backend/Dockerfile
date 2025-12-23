@@ -9,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # 安裝所有依賴（包含 dev）以便構建
-RUN npm ci
+RUN npm install --legacy-peer-deps
 
 # 複製源碼
 COPY . .
@@ -30,7 +30,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
 # 只安裝生產依賴
-RUN npm ci --only=production
+RUN npm install --legacy-peer-deps --omit=dev
 
 EXPOSE 8080
 
