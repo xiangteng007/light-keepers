@@ -21,6 +21,11 @@ const MOCK_VOLUNTEERS = [
     { id: '4', name: '陳志強', phone: '0945-678-901', region: '台中市', skills: ['construction', 'logistics'], status: 'offline', serviceHours: 45, taskCount: 5 },
 ];
 
+// 模擬任務指派資料
+const MOCK_ASSIGNMENTS = [
+    { id: 'a1', volunteerId: '2', taskTitle: '物資運送 - 新北市板橋區', status: 'in_progress', scheduledStart: '2024-12-23T09:00:00' },
+];
+
 type VolunteerStatus = 'available' | 'busy' | 'offline';
 
 const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgColor: string }> = {
@@ -29,10 +34,29 @@ const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgC
     offline: { label: '離線', color: '#9E9E9E', bgColor: 'rgba(158, 158, 158, 0.15)' },
 };
 
+interface AssignmentForm {
+    volunteerId: string;
+    volunteerName: string;
+    taskTitle: string;
+    taskDescription: string;
+    location: string;
+    scheduledStart: string;
+}
+
 export default function VolunteersPage() {
     const [showRegisterForm, setShowRegisterForm] = useState(false);
+    const [showAssignModal, setShowAssignModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState<VolunteerStatus | ''>('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [assignmentForm, setAssignmentForm] = useState<AssignmentForm>({
+        volunteerId: '',
+        volunteerName: '',
+        taskTitle: '',
+        taskDescription: '',
+        location: '',
+        scheduledStart: '',
+    });
+    const [successMessage, setSuccessMessage] = useState('');
 
     // 篩選志工
     const filteredVolunteers = MOCK_VOLUNTEERS.filter(v => {
@@ -47,11 +71,40 @@ export default function VolunteersPage() {
         available: MOCK_VOLUNTEERS.filter(v => v.status === 'available').length,
         busy: MOCK_VOLUNTEERS.filter(v => v.status === 'busy').length,
         totalHours: MOCK_VOLUNTEERS.reduce((sum, v) => sum + v.serviceHours, 0),
+        activeAssignments: MOCK_ASSIGNMENTS.length,
     };
 
     const getSkillLabel = (skillValue: string) => {
         const skill = SKILL_OPTIONS.find(s => s.value === skillValue);
         return skill ? `${skill.icon} ${skill.label}` : skillValue;
+    };
+
+    // 開啟指派任務
+    const openAssignModal = (volunteer: typeof MOCK_VOLUNTEERS[0]) => {
+        setAssignmentForm({
+            volunteerId: volunteer.id,
+            volunteerName: volunteer.name,
+            taskTitle: '',
+            taskDescription: '',
+            location: '',
+            scheduledStart: new Date().toISOString().slice(0, 16),
+        });
+        setShowAssignModal(true);
+    };
+
+    // 提交任務指派
+    const handleAssign = async () => {
+        if (!assignmentForm.taskTitle) {
+            alert('請輸入任務標題');
+            return;
+        }
+
+        // 實際應呼叫 API
+        // await fetch('/api/v1/volunteer-assignments', { method: 'POST', body: JSON.stringify(assignmentForm) });
+
+        setShowAssignModal(false);
+        setSuccessMessage(`已成功指派任務給 ${assignmentForm.volunteerName}`);
+        setTimeout(() => setSuccessMessage(''), 3000);
     };
 
     return (
@@ -67,6 +120,13 @@ export default function VolunteersPage() {
                     </Button>
                 </div>
             </div>
+
+            {/* 成功訊息 */}
+            {successMessage && (
+                <div className="success-toast">
+                    ✅ {successMessage}
+                </div>
+            )}
 
             {/* 統計卡片 */}
             <div className="volunteers-stats">
@@ -85,6 +145,10 @@ export default function VolunteersPage() {
                 <Card className="stat-card stat-card--info" padding="md">
                     <div className="stat-card__value">{stats.totalHours}</div>
                     <div className="stat-card__label">總服務時數</div>
+                </Card>
+                <Card className="stat-card stat-card--primary" padding="md">
+                    <div className="stat-card__value">{stats.activeAssignments}</div>
+                    <div className="stat-card__label">進行中任務</div>
                 </Card>
             </div>
 
@@ -161,8 +225,13 @@ export default function VolunteersPage() {
                                 <Button variant="secondary" size="sm">
                                     檢視詳情
                                 </Button>
-                                <Button variant="secondary" size="sm">
-                                    指派任務
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => openAssignModal(volunteer)}
+                                    disabled={volunteer.status !== 'available'}
+                                >
+                                    📋 指派任務
                                 </Button>
                             </div>
                         </Card>
@@ -175,7 +244,68 @@ export default function VolunteersPage() {
                 )}
             </div>
 
-            {/* 新增志工表單 Modal (簡化版) */}
+            {/* 指派任務 Modal */}
+            {showAssignModal && (
+                <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
+                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
+                        <h3>📋 指派任務給 {assignmentForm.volunteerName}</h3>
+
+                        <div className="form-section">
+                            <label className="form-label">任務標題 *</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="例如：物資運送 - 新北市板橋區"
+                                value={assignmentForm.taskTitle}
+                                onChange={(e) => setAssignmentForm({ ...assignmentForm, taskTitle: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">任務描述</label>
+                            <textarea
+                                className="form-textarea"
+                                placeholder="詳細說明任務內容..."
+                                value={assignmentForm.taskDescription}
+                                onChange={(e) => setAssignmentForm({ ...assignmentForm, taskDescription: e.target.value })}
+                                rows={3}
+                            />
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">地點</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="任務地點"
+                                value={assignmentForm.location}
+                                onChange={(e) => setAssignmentForm({ ...assignmentForm, location: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">預定開始時間</label>
+                            <input
+                                type="datetime-local"
+                                className="form-input"
+                                value={assignmentForm.scheduledStart}
+                                onChange={(e) => setAssignmentForm({ ...assignmentForm, scheduledStart: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <Button variant="secondary" onClick={() => setShowAssignModal(false)}>
+                                取消
+                            </Button>
+                            <Button onClick={handleAssign}>
+                                確認指派
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {/* 新增志工表單 Modal */}
             {showRegisterForm && (
                 <div className="modal-overlay" onClick={() => setShowRegisterForm(false)}>
                     <Card className="modal-content" padding="lg" onClick={e => e.stopPropagation()}>

@@ -3276,3 +3276,60 @@ button[aria-label="地圖相機控制"],
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ============================================
+   Enhanced Volunteer System CSS
+============================================ */
+
+/* Success Toast */
+.success-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #4CAF50;
+  color: white;
+  padding: 16px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Primary stat card */
+.stat-card--primary .stat-card__value {
+  color: var(--accent-primary);
+}
+
+/* Larger modal */
+.modal-content--lg {
+  max-width: 600px;
+}
+
+/* 5-column stats grid for volunteers */
+.volunteers-stats {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+@media (max-width: 1000px) {
+  .volunteers-stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .volunteers-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
