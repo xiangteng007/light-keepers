@@ -43,6 +43,10 @@ steps:
       - '$PROJECT_ID:asia-east1:light-keepers-db'
       - '--set-env-vars'
       - 'DATABASE_URL=postgresql://postgres:${_DB_PASSWORD}@localhost/lightkeepers?host=/cloudsql/$PROJECT_ID:asia-east1:light-keepers-db'
+      - '--set-env-vars'
+      - 'LINE_CHANNEL_ACCESS_TOKEN=${_LINE_CHANNEL_ACCESS_TOKEN}'
+      - '--set-env-vars'
+      - 'LINE_CHANNEL_SECRET=${_LINE_CHANNEL_SECRET}'
       - '--memory'
       - '512Mi'
       - '--cpu'
@@ -60,6 +64,8 @@ images:
 # 替換變數（需在 Cloud Build 觸發器中設定）
 substitutions:
   _DB_PASSWORD: ''  # 在 Cloud Build 中設定為 Secret
+  _LINE_CHANNEL_ACCESS_TOKEN: ''  # LINE Messaging API Token
+  _LINE_CHANNEL_SECRET: ''  # LINE Channel Secret
 
 # 建置選項
 options:
