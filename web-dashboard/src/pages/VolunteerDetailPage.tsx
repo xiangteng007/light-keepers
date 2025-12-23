@@ -18,6 +18,7 @@ interface Volunteer {
     serviceHours: number;
     taskCount: number;
     lineUserId?: string;
+    photoUrl?: string; // 📷 志工照片
     createdAt: string;
 }
 
@@ -46,6 +47,7 @@ const MOCK_VOLUNTEER: Volunteer = {
     serviceHours: 120,
     taskCount: 15,
     lineUserId: 'U1234567890',
+    photoUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WangDaming', // 📷 預設頭像
     createdAt: '2024-06-15T10:30:00Z',
 };
 
@@ -128,8 +130,41 @@ export default function VolunteerDetailPage() {
             {/* 志工基本資訊卡片 */}
             <div className="volunteer-profile-card">
                 <div className="profile-header">
-                    <div className="avatar-large">
-                        {volunteer.name.charAt(0)}
+                    {/* 📷 志工照片區塊 */}
+                    <div className="avatar-section">
+                        {volunteer.photoUrl ? (
+                            <img
+                                src={volunteer.photoUrl}
+                                alt={volunteer.name}
+                                className="avatar-large avatar-photo"
+                            />
+                        ) : (
+                            <div className="avatar-large">
+                                {volunteer.name.charAt(0)}
+                            </div>
+                        )}
+                        {isAdmin && (
+                            <label className="photo-upload-btn">
+                                📷 更換照片
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    hidden
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            // 模擬照片上傳
+                                            const reader = new FileReader();
+                                            reader.onloadend = () => {
+                                                // 實際上應呼叫 API 上傳
+                                                alert(`照片已選擇: ${file.name}\n實際上傳功能需連接後端 API`);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                />
+                            </label>
+                        )}
                     </div>
                     <div className="profile-info">
                         <h2>{volunteer.name}</h2>

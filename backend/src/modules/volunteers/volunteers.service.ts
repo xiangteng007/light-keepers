@@ -15,6 +15,7 @@ export interface CreateVolunteerDto {
     emergencyContact?: string;
     emergencyPhone?: string;
     notes?: string;
+    photoUrl?: string; // 📷 志工照片
 }
 
 export interface UpdateVolunteerDto {
@@ -27,6 +28,7 @@ export interface UpdateVolunteerDto {
     emergencyContact?: string;
     emergencyPhone?: string;
     notes?: string;
+    photoUrl?: string; // 📷 志工照片
 }
 
 export interface VolunteerFilter {

@@ -78,6 +78,10 @@ export class Volunteer {
     @Column({ type: 'varchar', length: 100, nullable: true })
     lineUserId?: string;
 
+    // 📷 志工照片 URL
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    photoUrl?: string;
+
     // 時間戳記
     @CreateDateColumn()
     createdAt: Date;
