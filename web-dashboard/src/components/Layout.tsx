@@ -10,6 +10,8 @@ const navItems = [
     { path: '/manuals', label: '實務手冊', icon: '📖' },
     { path: '/report', label: '災情回報', icon: '📢' },
     { path: '/volunteers', label: '志工管理', icon: '👥' },
+    { path: '/training', label: '培訓中心', icon: '🎓' },
+    { path: '/resources', label: '物資管理', icon: '📦' },
 ]
 
 export default function Layout() {

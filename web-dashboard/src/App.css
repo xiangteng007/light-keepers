@@ -3333,3 +3333,218 @@ button[aria-label="地圖相機控制"],
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+/* ============================================
+   Training Page 培訓中心
+============================================ */
+
+.training-page {
+  max-width: 1200px;
+}
+
+.training-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.training-categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.category-btn {
+  padding: 8px 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  background: var(--bg-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  transition: all 0.2s ease;
+}
+
+.category-btn:hover {
+  background: var(--bg-hover);
+}
+
+.category-btn.active {
+  background: var(--accent-primary);
+  border-color: var(--accent-primary);
+  color: white;
+}
+
+.courses-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+}
+
+.course-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.course-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.course-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  color: white;
+}
+
+.course-card__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.course-card__desc {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.course-card__meta {
+  display: flex;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.progress-bar {
+  height: 6px;
+  background: var(--bg-hover);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 0.3s ease;
+}
+
+.course-card__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.progress-text {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.course-content {
+  background: var(--bg-secondary);
+  padding: 16px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.course-content h4 {
+  margin: 0 0 8px 0;
+}
+
+/* RWD */
+@media (max-width: 768px) {
+  .training-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   Resources Page 物資管理
+============================================ */
+
+.resources-page {
+  max-width: 1400px;
+}
+
+.resources-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card--danger .stat-card__value {
+  color: #F44336;
+}
+
+.resources-categories {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+
+.resources-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--bg-card);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.resources-table th,
+.resources-table td {
+  padding: 12px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.resources-table th {
+  background: var(--bg-secondary);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.resources-table tbody tr:hover {
+  background: var(--bg-hover);
+}
+
+.resource-name {
+  font-weight: 500;
+}
+
+.resource-actions {
+  display: flex;
+  gap: 8px;
+}
+
+@media (max-width: 768px) {
+  .resources-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .resources-table {
+    font-size: 13px;
+  }
+
+  .resources-table th,
+  .resources-table td {
+    padding: 8px 12px;
+  }
+}

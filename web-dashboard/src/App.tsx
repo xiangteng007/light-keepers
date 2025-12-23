@@ -10,6 +10,8 @@ import ManualsPage from './pages/ManualsPage'
 import ManualDetailPage from './pages/ManualDetailPage'
 import ReportPage from './pages/ReportPage'
 import VolunteersPage from './pages/VolunteersPage'
+import TrainingPage from './pages/TrainingPage'
+import ResourcesPage from './pages/ResourcesPage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
@@ -64,6 +66,8 @@ function App() {
           <Route path="manuals/:id" element={<ManualDetailPage />} />
           <Route path="report" element={<ReportPage />} />
           <Route path="volunteers" element={<VolunteersPage />} />
+          <Route path="training" element={<TrainingPage />} />
+          <Route path="resources" element={<ResourcesPage />} />
         </Route>
       </Routes>
     </>
