@@ -12,6 +12,8 @@ import { PublicResourcesModule } from './modules/public-resources/public-resourc
 import { ManualsModule } from './modules/manuals/manuals.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
+import { TrainingModule } from './modules/training/training.module';
+import { NotificationsModule } from './modules/notifications/notifications.module';
 
 @Module({
     imports: [
@@ -62,6 +64,8 @@ import { VolunteersModule } from './modules/volunteers/volunteers.module';
         ManualsModule,
         ReportsModule,
         VolunteersModule,
+        TrainingModule,
+        NotificationsModule,
     ],
 })
 export class AppModule { }
