@@ -3548,3 +3548,151 @@ button[aria-label="地圖相機控制"],
     padding: 8px 12px;
   }
 }
+
+/* ============================================
+   Phase E: 行動裝置優化
+============================================ */
+
+/* 觸控友善 - 更大的點擊區域 */
+@media (hover: none) and (pointer: coarse) {
+
+  .btn,
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  .nav-item {
+    padding: 14px 16px;
+  }
+
+  .category-btn,
+  .status-filter-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+
+  .form-input,
+  .form-select,
+  .form-textarea {
+    font-size: 16px;
+    /* 防止 iOS 縮放 */
+    padding: 14px;
+  }
+}
+
+/* PWA 全螢幕模式 */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .main-layout {
+    min-height: 100vh;
+    min-height: -webkit-fill-available;
+  }
+}
+
+/* 橫向模式調整 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .sidebar {
+    padding: 8px;
+  }
+
+  .nav-item {
+    padding: 8px 12px;
+  }
+}
+
+/* 離線指示器 */
+.offline-indicator {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #FF9800;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.offline-indicator::before {
+  content: '📡';
+}
+
+/* 下拉更新提示 */
+.pull-to-refresh {
+  position: absolute;
+  top: -60px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+}
+
+/* 觸控回饋 */
+.touch-feedback {
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-feedback::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.3);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.touch-feedback:active::after {
+  opacity: 1;
+}
+
+/* 手勢滑動卡片 */
+.swipeable-card {
+  touch-action: pan-y;
+  transition: transform 0.3s ease;
+}
+
+/* 底部安全區域 */
+.bottom-nav {
+  padding-bottom: calc(16px + env(safe-area-inset-bottom));
+}
+
+/* 快速操作 FAB */
+.fab {
+  position: fixed;
+  bottom: calc(24px + env(safe-area-inset-bottom));
+  right: 24px;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.fab:active {
+  transform: scale(0.95);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
