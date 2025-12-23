@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
-import { ResourcesService, CreateResourceDto } from './resources.service';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { ResourcesService, CreateResourceDto, TransactionDto, CreateDonationSourceDto } from './resources.service';
 import { ResourceCategory } from './resources.entity';
 
 @Controller('resources')
 export class ResourcesController {
     constructor(private readonly resourcesService: ResourcesService) { }
+
+    // ==================== 基本 CRUD ====================
 
     @Post()
     async create(@Body() dto: CreateResourceDto) {
@@ -36,21 +38,163 @@ export class ResourcesController {
         return { success: true, data: resources, count: resources.length };
     }
 
+    // ==================== 📱 條碼查詢 (功能4) ====================
+
+    @Get('barcode/:barcode')
+    async findByBarcode(@Param('barcode') barcode: string) {
+        const resource = await this.resourcesService.findByBarcode(barcode);
+        if (!resource) {
+            return { success: false, message: '找不到此條碼的物資' };
+        }
+        return { success: true, data: resource };
+    }
+
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const resource = await this.resourcesService.findOne(id);
         return { success: true, data: resource };
     }
 
+    @Patch(':id')
+    async update(@Param('id') id: string, @Body() dto: Partial<CreateResourceDto>) {
+        const resource = await this.resourcesService.update(id, dto);
+        return { success: true, message: '物資已更新', data: resource };
+    }
+
+    @Delete(':id')
+    async delete(@Param('id') id: string) {
+        await this.resourcesService.delete(id);
+        return { success: true, message: '物資已刪除' };
+    }
+
+    // ==================== 📊 異動紀錄 (功能1) ====================
+
     @Patch(':id/add')
-    async addStock(@Param('id') id: string, @Body('amount') amount: number) {
-        const resource = await this.resourcesService.addStock(id, amount);
-        return { success: true, message: `已入庫 ${amount} ${resource.unit}`, data: resource };
+    async addStock(
+        @Param('id') id: string,
+        @Body() body: { amount: number; operatorName: string; notes?: string }
+    ) {
+        const resource = await this.resourcesService.addStock(id, body.amount, body.operatorName, body.notes);
+        return { success: true, message: `已入庫 ${body.amount} ${resource.unit}`, data: resource };
     }
 
     @Patch(':id/deduct')
-    async deductStock(@Param('id') id: string, @Body('amount') amount: number) {
-        const resource = await this.resourcesService.deductStock(id, amount);
-        return { success: true, message: `已出庫 ${amount} ${resource.unit}`, data: resource };
+    async deductStock(
+        @Param('id') id: string,
+        @Body() body: { amount: number; operatorName: string; notes?: string }
+    ) {
+        const resource = await this.resourcesService.deductStock(id, body.amount, body.operatorName, body.notes);
+        return { success: true, message: `已出庫 ${body.amount} ${resource.unit}`, data: resource };
+    }
+
+    @Get(':id/transactions')
+    async getTransactions(@Param('id') id: string) {
+        const transactions = await this.resourcesService.getTransactions(id);
+        return { success: true, data: transactions, count: transactions.length };
+    }
+
+    @Get('transactions/all')
+    async getAllTransactions() {
+        const transactions = await this.resourcesService.getTransactions();
+        return { success: true, data: transactions, count: transactions.length };
+    }
+
+    // ==================== 🔄 調撥功能 (功能3) ====================
+
+    @Post(':id/transfer')
+    async transferResource(
+        @Param('id') id: string,
+        @Body() body: {
+            quantity: number;
+            fromLocation: string;
+            toLocation: string;
+            operatorName: string;
+        }
+    ) {
+        const transaction = await this.resourcesService.transferResource(
+            id,
+            body.quantity,
+            body.fromLocation,
+            body.toLocation,
+            body.operatorName
+        );
+        return {
+            success: true,
+            message: `已調撥 ${body.quantity} 從 ${body.fromLocation} 到 ${body.toLocation}`,
+            data: transaction
+        };
+    }
+
+    // ==================== 🎁 捐贈來源管理 (功能2) ====================
+
+    @Post('donations/sources')
+    async createDonationSource(@Body() dto: CreateDonationSourceDto) {
+        const source = await this.resourcesService.createDonationSource(dto);
+        return { success: true, message: '捐贈來源已新增', data: source };
+    }
+
+    @Get('donations/sources')
+    async getDonationSources() {
+        const sources = await this.resourcesService.getAllDonationSources();
+        return { success: true, data: sources, count: sources.length };
+    }
+
+    @Post(':id/donate')
+    async recordDonation(
+        @Param('id') id: string,
+        @Body() body: {
+            quantity: number;
+            donationSourceId: string;
+            operatorName: string;
+            estimatedValue?: number;
+        }
+    ) {
+        const transaction = await this.resourcesService.recordDonation(
+            id,
+            body.quantity,
+            body.donationSourceId,
+            body.operatorName,
+            body.estimatedValue
+        );
+        return { success: true, message: '捐贈已登記', data: transaction };
+    }
+
+    // ==================== 📦 批次管理 (功能5) ====================
+
+    @Post(':id/batches')
+    async createBatch(
+        @Param('id') resourceId: string,
+        @Body() body: {
+            batchNo: string;
+            quantity: number;
+            expiresAt?: string;
+            manufacturedAt?: string;
+            donationSourceId?: string;
+            unitPrice?: number;
+            location?: string;
+            barcode?: string;
+            photoUrl?: string;
+            notes?: string;
+        }
+    ) {
+        const batch = await this.resourcesService.createBatch({
+            resourceId,
+            ...body,
+            expiresAt: body.expiresAt ? new Date(body.expiresAt) : undefined,
+            manufacturedAt: body.manufacturedAt ? new Date(body.manufacturedAt) : undefined,
+        });
+        return { success: true, message: '批次已新增', data: batch };
+    }
+
+    @Get(':id/batches')
+    async getBatches(@Param('id') id: string) {
+        const batches = await this.resourcesService.getBatches(id);
+        return { success: true, data: batches, count: batches.length };
+    }
+
+    @Get('batches/expiring')
+    async getExpiringBatches(@Query('days') days?: string) {
+        const batches = await this.resourcesService.getExpiringBatches(Number(days) || 30);
+        return { success: true, data: batches, count: batches.length };
     }
 }

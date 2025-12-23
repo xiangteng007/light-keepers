@@ -40,6 +40,14 @@ export class Resource {
     @Column({ type: 'varchar', length: 200, nullable: true })
     location?: string;
 
+    // 📷 物資照片
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    photoUrl?: string;
+
+    // 📱 條碼/QR Code
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    barcode?: string;
+
     // 過期日期
     @Column({ type: 'date', nullable: true })
     expiresAt?: Date;
