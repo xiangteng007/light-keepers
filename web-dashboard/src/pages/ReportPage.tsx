@@ -162,6 +162,7 @@ export default function ReportPage() {
                                 address: '',
                                 contactName: '',
                                 contactPhone: '',
+                                photos: [], // 重置照片
                             });
                         }}>
                             繼續回報
