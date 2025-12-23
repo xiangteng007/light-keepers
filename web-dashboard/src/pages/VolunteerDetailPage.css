@@ -89,6 +89,32 @@
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
 }
 
+/* 📷 照片操作按鈕組 */
+.photo-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 💚 LINE 照片按鈕 */
+.photo-line-btn {
+    padding: 0.35rem 0.75rem;
+    background: linear-gradient(135deg, #06C755 0%, #00B843 100%);
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 20px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.photo-line-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(6, 199, 85, 0.4);
+}
+
 .profile-info {
     flex: 1;
 }

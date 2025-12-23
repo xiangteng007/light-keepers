@@ -130,7 +130,7 @@ export default function VolunteerDetailPage() {
             {/* 志工基本資訊卡片 */}
             <div className="volunteer-profile-card">
                 <div className="profile-header">
-                    {/* 📷 志工照片區塊 */}
+                    {/* 📷 志工照片區塊 - 可自行上傳或使用 LINE 照片 */}
                     <div className="avatar-section">
                         {volunteer.photoUrl ? (
                             <img
@@ -143,9 +143,12 @@ export default function VolunteerDetailPage() {
                                 {volunteer.name.charAt(0)}
                             </div>
                         )}
-                        {isAdmin && (
+
+                        {/* 照片上傳選項 - 志工可自行操作 */}
+                        <div className="photo-actions">
+                            {/* 自行上傳照片 */}
                             <label className="photo-upload-btn">
-                                📷 更換照片
+                                📷 上傳照片
                                 <input
                                     type="file"
                                     accept="image/*"
@@ -153,18 +156,31 @@ export default function VolunteerDetailPage() {
                                     onChange={(e) => {
                                         const file = e.target.files?.[0];
                                         if (file) {
-                                            // 模擬照片上傳
                                             const reader = new FileReader();
                                             reader.onloadend = () => {
-                                                // 實際上應呼叫 API 上傳
-                                                alert(`照片已選擇: ${file.name}\n實際上傳功能需連接後端 API`);
+                                                // 預覽並模擬上傳
+                                                alert(`✅ 照片已選擇: ${file.name}\n\n實際上傳功能需連接後端 API`);
                                             };
                                             reader.readAsDataURL(file);
                                         }
                                     }}
                                 />
                             </label>
-                        )}
+
+                            {/* 使用 LINE 帳號照片 */}
+                            {volunteer.lineUserId && (
+                                <button
+                                    className="photo-line-btn"
+                                    onClick={() => {
+                                        // 模擬引入 LINE 照片
+                                        // 實際需呼叫 LINE API 取得使用者頭像
+                                        alert(`📱 將從 LINE 帳號引入照片\n\nLINE User ID: ${volunteer.lineUserId}\n\n實際功能需整合 LINE Messaging API`);
+                                    }}
+                                >
+                                    💚 使用 LINE 照片
+                                </button>
+                            )}
+                        </div>
                     </div>
                     <div className="profile-info">
                         <h2>{volunteer.name}</h2>
