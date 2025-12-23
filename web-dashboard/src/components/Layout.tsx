@@ -7,6 +7,9 @@ const navItems = [
     { path: '/events', label: '災情事件', icon: '🚨' },
     { path: '/tasks', label: '任務管理', icon: '📋' },
     { path: '/map', label: '地圖總覽', icon: '🗺️' },
+    { path: '/manuals', label: '實務手冊', icon: '📖' },
+    { path: '/report', label: '災情回報', icon: '📢' },
+    { path: '/volunteers', label: '志工管理', icon: '👥' },
 ]
 
 export default function Layout() {

@@ -1,24 +1,56 @@
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getTaskStats, getEventStats } from '../api';
-import { Card, Badge, Alert } from '../design-system';
+import { Link } from 'react-router-dom';
+import { getEvents, getTaskStats, getEventStats, getNcdrAlerts } from '../api';
+import { Card, Badge, Alert, Button } from '../design-system';
 
 // 統計卡片組件
 interface StatCardProps {
     icon: string;
     value: number | string;
     label: string;
-    variant?: 'default' | 'success' | 'warning' | 'danger';
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+    trend?: 'up' | 'down' | 'stable';
 }
 
-function StatCard({ icon, value, label, variant = 'default' }: StatCardProps) {
+function StatCard({ icon, value, label, variant = 'default', trend }: StatCardProps) {
+    const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '';
     return (
         <Card variant="elevated" padding="md" className="stat-card-vi">
             <div className="stat-card-vi__content">
                 <div className="stat-card-vi__icon">{icon}</div>
                 <div className="stat-card-vi__data">
-                    <span className={`stat-card-vi__value stat-card-vi__value--${variant}`}>{value}</span>
+                    <span className={`stat-card-vi__value stat-card-vi__value--${variant}`}>
+                        {value}
+                        {trendIcon && <span className={`trend trend--${trend}`}>{trendIcon}</span>}
+                    </span>
                     <span className="stat-card-vi__label">{label}</span>
                 </div>
+            </div>
+        </Card>
+    );
+}
+
+// 快速操作按鈕
+function QuickActions() {
+    return (
+        <Card title="快速操作" icon="⚡" padding="md">
+            <div className="quick-actions-grid">
+                <Link to="/report" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">📢</span>
+                    <span className="quick-action-btn__label">新增回報</span>
+                </Link>
+                <Link to="/volunteers" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">👥</span>
+                    <span className="quick-action-btn__label">志工調度</span>
+                </Link>
+                <Link to="/map" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">🗺️</span>
+                    <span className="quick-action-btn__label">地圖總覽</span>
+                </Link>
+                <Link to="/manuals" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">📖</span>
+                    <span className="quick-action-btn__label">實務手冊</span>
+                </Link>
             </div>
         </Card>
     );
@@ -43,21 +75,35 @@ export default function DashboardPage() {
         queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data),
     });
 
+    // 獲取 NCDR 警報
+    const { data: alertsData } = useQuery({
+        queryKey: ['recentAlerts'],
+        queryFn: () => getNcdrAlerts({ limit: 5 }).then(res => res.data),
+        refetchInterval: 60000, // 每分鐘刷新
+    });
+
     // 計算完成率
     const total = (taskStats?.pending || 0) + (taskStats?.inProgress || 0) + (taskStats?.completed || 0);
     const completionRate = total > 0 ? Math.round((taskStats?.completed || 0) / total * 100) : 0;
 
     const isLoading = eventsLoading || tasksLoading;
 
+    // 模擬志工和回報統計 (實際應從 API 獲取)
+    const volunteerStats = { available: 12, total: 25 };
+    const reportStats = { pending: 3, today: 8 };
+
     return (
         <div className="page dashboard-page">
             <div className="page-header">
-                <h2>儀表板</h2>
+                <div className="page-header__left">
+                    <h2>📊 決策儀表板</h2>
+                    <p className="page-subtitle">Light Keepers 災害應變系統總覽</p>
+                </div>
                 <Badge variant="success" dot>系統運作正常</Badge>
             </div>
 
-            {/* 統計卡片 */}
-            <div className="stats-grid">
+            {/* KPI 統計卡片 - 第一行 */}
+            <div className="stats-grid stats-grid--6">
                 <StatCard
                     icon="🚨"
                     value={eventStats?.active || 0}
@@ -65,16 +111,28 @@ export default function DashboardPage() {
                     variant="danger"
                 />
                 <StatCard
-                    icon="📋"
-                    value={taskStats?.pending || 0}
-                    label="待處理任務"
+                    icon="⚠️"
+                    value={alertsData?.data?.length || 0}
+                    label="NCDR 警報"
                     variant="warning"
                 />
                 <StatCard
-                    icon="⏳"
-                    value={taskStats?.inProgress || 0}
-                    label="進行中任務"
-                    variant="default"
+                    icon="📢"
+                    value={reportStats.pending}
+                    label="待審核回報"
+                    variant="warning"
+                />
+                <StatCard
+                    icon="👥"
+                    value={volunteerStats.available}
+                    label="可用志工"
+                    variant="success"
+                />
+                <StatCard
+                    icon="📋"
+                    value={taskStats?.pending || 0}
+                    label="待處理任務"
+                    variant="info"
                 />
                 <StatCard
                     icon="✅"
@@ -91,18 +149,39 @@ export default function DashboardPage() {
                 </Alert>
             )}
 
-            <div className="dashboard-sections">
+            {/* 主要內容區 */}
+            <div className="dashboard-sections dashboard-sections--3col">
+                {/* 快速操作 */}
+                <QuickActions />
+
+                {/* 最新 NCDR 警報 */}
+                <Card title="即時警報" icon="⚠️" padding="md">
+                    <div className="alert-list">
+                        {alertsData?.data?.slice(0, 4).map((alert: any) => (
+                            <div key={alert.id} className="alert-item">
+                                <Badge
+                                    variant={alert.severity === 'extreme' ? 'danger' : alert.severity === 'severe' ? 'warning' : 'default'}
+                                    size="sm"
+                                >
+                                    {alert.type}
+                                </Badge>
+                                <span className="alert-title">{alert.title?.substring(0, 30)}...</span>
+                            </div>
+                        )) || <div className="empty-state-mini">暫無警報</div>}
+                    </div>
+                    <Link to="/ncdr-alerts" className="view-more-link">
+                        查看全部 →
+                    </Link>
+                </Card>
+
                 {/* 最新事件 */}
                 <Card title="最新事件" icon="📢" padding="md">
                     <div className="event-list">
                         {isLoading && <div className="loading">載入中...</div>}
                         {!isLoading && eventsData?.data?.length === 0 && (
-                            <div className="empty-state">
-                                <span>📭</span>
-                                <p>目前沒有進行中的事件</p>
-                            </div>
+                            <div className="empty-state-mini">目前沒有進行中的事件</div>
                         )}
-                        {eventsData?.data?.map((event) => (
+                        {eventsData?.data?.slice(0, 4).map((event) => (
                             <div
                                 key={event.id}
                                 className={`event-item priority-${event.severity && event.severity >= 4 ? 'high' : event.severity === 3 ? 'medium' : 'low'}`}
@@ -115,13 +194,45 @@ export default function DashboardPage() {
                             </div>
                         ))}
                     </div>
+                    <Link to="/events" className="view-more-link">
+                        查看全部 →
+                    </Link>
+                </Card>
+            </div>
+
+            {/* 資源分布概覽 */}
+            <div className="dashboard-sections">
+                <Card title="志工資源概覽" icon="👥" padding="md">
+                    <div className="resource-grid">
+                        <div className="resource-item">
+                            <span className="resource-label">總志工數</span>
+                            <span className="resource-value">{volunteerStats.total}</span>
+                        </div>
+                        <div className="resource-item">
+                            <span className="resource-label">可用</span>
+                            <span className="resource-value resource-value--success">{volunteerStats.available}</span>
+                        </div>
+                        <div className="resource-item">
+                            <span className="resource-label">執勤中</span>
+                            <span className="resource-value resource-value--warning">{volunteerStats.total - volunteerStats.available}</span>
+                        </div>
+                        <div className="resource-item">
+                            <span className="resource-label">今日回報</span>
+                            <span className="resource-value">{reportStats.today}</span>
+                        </div>
+                    </div>
+                    <Link to="/volunteers" className="view-more-link">
+                        前往志工管理 →
+                    </Link>
                 </Card>
 
-                {/* 地圖概覽 */}
                 <Card title="地圖概覽" icon="🗺️" padding="md">
                     <div className="map-placeholder">
                         <span>🗺️</span>
-                        <p>整合 MapView 後將在此顯示事件分佈</p>
+                        <p>地圖顯示災情與資源分布</p>
+                        <Link to="/map">
+                            <Button variant="secondary" size="sm">開啟地圖</Button>
+                        </Link>
                     </div>
                 </Card>
             </div>
