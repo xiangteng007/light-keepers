@@ -47,10 +47,12 @@ import { LineBotModule } from './modules/line-bot/line-bot.module';
                     autoLoadEntities: true,
                     synchronize: true, // 暫時啟用以建立 ncdr_alerts 表，之後需改回 false
                     logging: !isProduction,
-                    retryAttempts: 3,
-                    retryDelay: 3000,
+                    retryAttempts: 10, // 增加重試次數給 Cloud SQL cold start
+                    retryDelay: 5000,  // 增加重試間隔
+                    connectTimeoutMS: 60000, // 60秒連線超時
                     extra: isProduction ? {
                         socketPath: `/cloudsql/${configService.get('CLOUD_SQL_CONNECTION_NAME')}`,
+                        connectionTimeoutMillis: 60000,
                     } : {},
                 };
             },
