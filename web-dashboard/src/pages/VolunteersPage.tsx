@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Card, Button, Badge } from '../design-system';
 
 // 技能選項
@@ -222,9 +223,11 @@ export default function VolunteersPage() {
                             </div>
 
                             <div className="volunteer-card__actions">
-                                <Button variant="secondary" size="sm">
-                                    檢視詳情
-                                </Button>
+                                <Link to={`/volunteers/${volunteer.id}`}>
+                                    <Button variant="secondary" size="sm">
+                                        檢視詳情
+                                    </Button>
+                                </Link>
                                 <Button
                                     variant="primary"
                                     size="sm"

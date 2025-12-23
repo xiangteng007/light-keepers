@@ -7,16 +7,20 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { VolunteersService, CreateVolunteerDto, UpdateVolunteerDto, VolunteerFilter } from './volunteers.service';
 import { VolunteerStatus } from './volunteers.entity';
+import { AdminGuard, Roles } from '../../common/guards/admin.guard';
 
 @Controller('volunteers')
+@UseGuards(AdminGuard) // 🔐 全域管理員權限守衛
 export class VolunteersController {
     constructor(private readonly volunteersService: VolunteersService) { }
 
-    // 志工註冊
+    // 🔐 志工註冊 - 僅管理員
     @Post()
+    @Roles(['admin'])
     async create(@Body() dto: CreateVolunteerDto) {
         const volunteer = await this.volunteersService.create(dto);
         return {
@@ -75,8 +79,9 @@ export class VolunteersController {
         };
     }
 
-    // 取得單一志工
+    // 🔐 取得單一志工完整資料 - 僅管理員
     @Get(':id')
+    @Roles(['admin'])
     async findOne(@Param('id') id: string) {
         const volunteer = await this.volunteersService.findOne(id);
         return {
