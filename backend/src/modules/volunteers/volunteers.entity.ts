@@ -52,6 +52,10 @@ export class Volunteer {
     @Column({ type: 'int', default: 0 })
     taskCount: number;
 
+    // LINE User ID (綁定後儲存)
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    lineUserId?: string;
+
     // 時間戳記
     @CreateDateColumn()
     createdAt: Date;

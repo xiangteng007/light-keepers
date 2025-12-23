@@ -271,4 +271,42 @@ export class LineBotService {
             messages: [message],
         });
     }
+
+    // === Option C: Rich Menu 管理 ===
+
+    // 取得 Rich Menu 配置 JSON (需手動上傳圖片到 LINE)
+    getRichMenuConfig(): object {
+        return {
+            size: { width: 2500, height: 1686 },
+            selected: true,
+            name: 'Light Keepers 主選單',
+            chatBarText: '📋 選單',
+            areas: [
+                {
+                    bounds: { x: 0, y: 0, width: 833, height: 843 },
+                    action: { type: 'message', text: '任務' },
+                },
+                {
+                    bounds: { x: 833, y: 0, width: 834, height: 843 },
+                    action: { type: 'message', text: '時數' },
+                },
+                {
+                    bounds: { x: 1667, y: 0, width: 833, height: 843 },
+                    action: { type: 'message', text: '簽到' },
+                },
+                {
+                    bounds: { x: 0, y: 843, width: 833, height: 843 },
+                    action: { type: 'uri', uri: 'https://your-domain/report' },
+                },
+                {
+                    bounds: { x: 833, y: 843, width: 834, height: 843 },
+                    action: { type: 'uri', uri: 'https://your-domain/training' },
+                },
+                {
+                    bounds: { x: 1667, y: 843, width: 833, height: 843 },
+                    action: { type: 'message', text: '說明' },
+                },
+            ],
+        };
+    }
 }

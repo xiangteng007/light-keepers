@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VolunteerAssignment, AssignmentStatus } from './volunteer-assignments.entity';
 import { VolunteersService } from './volunteers.service';
+import { LineBotService } from '../line-bot/line-bot.service';
 
 export interface CreateAssignmentDto {
     volunteerId: string;
@@ -35,12 +36,13 @@ export class AssignmentsService {
         @InjectRepository(VolunteerAssignment)
         private assignmentsRepository: Repository<VolunteerAssignment>,
         private volunteersService: VolunteersService,
+        private lineBotService: LineBotService,
     ) { }
 
     // 建立任務指派
     async create(dto: CreateAssignmentDto): Promise<VolunteerAssignment> {
         // 驗證志工存在
-        await this.volunteersService.findOne(dto.volunteerId);
+        const volunteer = await this.volunteersService.findOne(dto.volunteerId);
 
         const assignment = this.assignmentsRepository.create({
             ...dto,
@@ -49,6 +51,22 @@ export class AssignmentsService {
 
         const saved = await this.assignmentsRepository.save(assignment);
         this.logger.log(`Assignment created: ${saved.id} for volunteer ${dto.volunteerId}`);
+
+        // 🔔 LINE 推播：任務指派通知
+        if (volunteer.lineUserId && this.lineBotService.isEnabled()) {
+            try {
+                await this.lineBotService.sendTaskAssignment(volunteer.lineUserId, {
+                    id: saved.id,
+                    title: dto.taskTitle,
+                    location: dto.location || '待定',
+                    scheduledStart: new Date(dto.scheduledStart).toLocaleString('zh-TW'),
+                });
+                this.logger.log(`LINE notification sent for assignment ${saved.id}`);
+            } catch (err) {
+                this.logger.warn(`Failed to send LINE notification: ${err.message}`);
+            }
+        }
+
         return saved;
     }
 

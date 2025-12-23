@@ -1,5 +1,6 @@
 import {
     Controller,
+    Get,
     Post,
     Body,
     Headers,
@@ -195,5 +196,21 @@ export class LineBotController {
 
         await this.lineBotService.broadcast(body.message);
         return { success: true, message: 'Broadcast sent' };
+    }
+
+    // Rich Menu 配置 (手動上傳用)
+    @Get('rich-menu-config')
+    getRichMenuConfig() {
+        return {
+            success: true,
+            data: this.lineBotService.getRichMenuConfig(),
+            instructions: {
+                step1: '複製 data 的 JSON 內容',
+                step2: '到 LINE Developers Console → Messaging API → Rich menus',
+                step3: '建立 Rich Menu 並貼上 JSON',
+                step4: '上傳 2500x1686 的選單圖片',
+                step5: '設為預設 Rich Menu',
+            },
+        };
     }
 }

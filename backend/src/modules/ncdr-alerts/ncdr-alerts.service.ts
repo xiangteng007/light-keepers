@@ -12,6 +12,7 @@ import {
     ALERT_TYPE_DEFINITIONS,
     AlertTypeDefinition,
 } from './dto';
+import { LineBotService } from '../line-bot/line-bot.service';
 
 // NCDR API 端點
 const NCDR_BASE_URL = 'https://alerts.ncdr.nat.gov.tw';
@@ -26,6 +27,7 @@ export class NcdrAlertsService {
     constructor(
         @InjectRepository(NcdrAlert)
         private readonly ncdrAlertRepository: Repository<NcdrAlert>,
+        private readonly lineBotService: LineBotService,
     ) { }
 
     /**
@@ -304,6 +306,17 @@ export class NcdrAlertsService {
                             }
                             await this.ncdrAlertRepository.save(parsed);
                             synced++;
+
+                            // 🔔 LINE 推播：重大災害警報自動廣播
+                            if (parsed.severity === 'critical' && this.lineBotService.isEnabled()) {
+                                try {
+                                    const alertMsg = `⚠️ ${parsed.alertTypeName}警報\n\n${parsed.title}\n\n${parsed.description?.substring(0, 100) || ''}`;
+                                    await this.lineBotService.broadcast(alertMsg);
+                                    this.logger.log(`LINE broadcast sent for critical alert: ${parsed.title}`);
+                                } catch (lineErr) {
+                                    this.logger.warn(`Failed to send LINE broadcast: ${lineErr.message}`);
+                                }
+                            }
                         } else {
                             // 檢查是否需要更新分類或座標
                             const coordsDiffer =

@@ -12,6 +12,7 @@ const navItems = [
     { path: '/volunteers', label: '志工管理', icon: '👥' },
     { path: '/training', label: '培訓中心', icon: '🎓' },
     { path: '/resources', label: '物資管理', icon: '📦' },
+    { path: '/notifications', label: '通知中心', icon: '🔔' },
 ]
 
 export default function Layout() {
