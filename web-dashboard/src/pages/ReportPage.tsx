@@ -180,8 +180,8 @@ export default function ReportPage() {
         <div className="page report-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📢 災情回報</h2>
-                    <p className="page-subtitle">協助我們掌握即時災情資訊</p>
+                    <h2>📣 回報系統</h2>
+                    <p className="page-subtitle">即時回報災情、需求或現場狀況</p>
                 </div>
             </div>
 
