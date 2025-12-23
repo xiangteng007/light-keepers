@@ -2,6 +2,8 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Volunteer, VolunteerStatus } from './volunteers.entity';
+import { AccessLogService } from '../access-log/access-log.service';
+import { CryptoUtil } from '../../common/crypto.util';
 
 export interface CreateVolunteerDto {
     name: string;
@@ -42,6 +44,7 @@ export class VolunteersService {
     constructor(
         @InjectRepository(Volunteer)
         private volunteersRepository: Repository<Volunteer>,
+        private accessLogService: AccessLogService, // 🔐 存取日誌
     ) { }
 
     // 註冊志工
@@ -87,12 +90,47 @@ export class VolunteersService {
         return query.getMany();
     }
 
+    // 🔐 取得志工列表（遮罩敏感資料，用於非管理員）
+    async findAllMasked(filter: VolunteerFilter = {}): Promise<Partial<Volunteer>[]> {
+        const volunteers = await this.findAll(filter);
+        return volunteers.map(v => ({
+            id: v.id,
+            name: v.name,
+            region: v.region,
+            skills: v.skills,
+            status: v.status,
+            serviceHours: v.serviceHours,
+            taskCount: v.taskCount,
+            phone: CryptoUtil.maskPhone(v.phone), // 🔐 遮罩電話
+            createdAt: v.createdAt,
+        }));
+    }
+
     // 取得單一志工
     async findOne(id: string): Promise<Volunteer> {
         const volunteer = await this.volunteersRepository.findOne({ where: { id } });
         if (!volunteer) {
             throw new NotFoundException(`Volunteer ${id} not found`);
         }
+        return volunteer;
+    }
+
+    // 🔐 取得單一志工（含完整資料 + 存取日誌）
+    async findOneFull(id: string, accessedBy?: { userId?: string; userName?: string; ipAddress?: string }): Promise<Volunteer> {
+        const volunteer = await this.findOne(id);
+
+        // 記錄敏感資料存取
+        await this.accessLogService.log({
+            userId: accessedBy?.userId,
+            userName: accessedBy?.userName,
+            action: 'VIEW',
+            targetTable: 'volunteers',
+            targetId: id,
+            sensitiveFieldsAccessed: ['phone', 'address', 'emergencyContact', 'emergencyPhone'],
+            ipAddress: accessedBy?.ipAddress,
+        });
+
+        this.logger.log(`Full volunteer data accessed: ${id} by ${accessedBy?.userName || 'unknown'}`);
         return volunteer;
     }
 
