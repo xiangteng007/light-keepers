@@ -1,77 +1,78 @@
 /* ============================================
    Light Keepers 曦望燈塔 Design System
-   風格參考: Senteng Design System
-   配色: 柔和淡雅色調，方便閱讀
+   風格: Senteng Design System 完整移植
 ============================================ */
 
 :root {
-  /* ===== 柔和核心色 ===== */
-  /* 淡藍灰色系 - 強調/選中狀態 */
-  --navy-900: #475569;
-  --navy-800: #64748b;
-  --navy-700: #94a3b8;
-  --navy-600: #cbd5e1;
-  --navy-500: #e2e8f0;
+  /* ===== Senteng 核心色 ===== */
+  /* Slate 深色系 */
+  --slate-900: #0f172a;
+  --slate-800: #1e293b;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
 
-  /* 純白灰色系 - 背景 */
-  --gray-50: #fafbfc;
-  --gray-100: #f5f7f9;
-  --gray-200: #e8ecf0;
-  --gray-300: #d1d9e0;
-  --gray-400: #a0aec0;
-  --gray-500: #718096;
+  /* 主色 - Emerald */
+  --primary-500: #10b981;
+  --primary-600: #059669;
+  --primary-700: #047857;
 
-  /* 強調色 - 柔和綠色 */
-  --primary-500: #48bb78;
-  --primary-600: #38a169;
+  /* ===== 功能色 ===== */
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --info: #3b82f6;
 
-  /* ===== 功能色 (柔和版) ===== */
-  --success: #48bb78;
-  --warning: #ecc94b;
-  --danger: #fc8181;
-  --info: #63b3ed;
-
-  /* ===== 柔和主題配置 ===== */
-  --bg-primary: #fafbfc;
-  --bg-secondary: #f5f7f9;
+  /* ===== Senteng 主題 ===== */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
-  --bg-hover: #edf2f7;
-  --bg-sidebar: #fafbfc;
+  --bg-hover: #f1f5f9;
+  --bg-sidebar: #f8fafc;
 
-  --text-primary: #2d3748;
-  --text-secondary: #4a5568;
-  --text-muted: #a0aec0;
+  --text-primary: #1e293b;
+  --text-secondary: #64748b;
+  --text-muted: #94a3b8;
 
   --border-color: #e2e8f0;
-  --border-light: #edf2f7;
+  --border-light: #f1f5f9;
 
-  /* 選中狀態 - 柔和藍灰背景 */
-  --accent-primary: #4a5568;
-  --accent-hover: #718096;
-  --accent-active-bg: #64748b;
+  /* 導覽選中狀態 - Senteng 深藍灰 */
+  --nav-active-bg: #334155;
+  --nav-active-text: #ffffff;
+  --nav-hover-bg: #f1f5f9;
+
+  --accent-primary: #334155;
+  --accent-hover: #475569;
+  --accent-active-bg: #334155;
   --accent-active-text: #ffffff;
 
-  /* ===== 柔和陰影 ===== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06);
-  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.08);
+  /* ===== 陰影 ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
   /* 相容舊變數 */
-  --brown-900: #2d3748;
-  --brown-800: #4a5568;
-  --gold-400: #48bb78;
-  --gold-500: #38a169;
-  --gold-600: #2f855a;
-  --beige-100: #fafbfc;
-  --beige-200: #f5f7f9;
+  --brown-900: #1e293b;
+  --brown-800: #334155;
+  --gold-400: #10b981;
+  --gold-500: #059669;
+  --gold-600: #047857;
+  --beige-100: #f8fafc;
+  --beige-200: #f1f5f9;
   --beige-300: #e2e8f0;
-  --color-brown-900: #2d3748;
-  --color-brown-800: #4a5568;
-  --color-gold-500: #48bb78;
-  --color-success: #48bb78;
-  --color-warning: #ecc94b;
-  --color-danger: #fc8181;
-  --color-info: #63b3ed;
+  --color-brown-900: #1e293b;
+  --color-brown-800: #334155;
+  --color-gold-500: #10b981;
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
+  --color-info: #3b82f6;
 }
 
 /* 淺色主題 (Theme B) */
@@ -121,57 +122,40 @@ body {
 .layout {
   display: flex;
   min-height: 100vh;
-  background: var(--gradient-warm-soft);
+  background: var(--bg-primary);
 }
 
-/* ===== Premium Glass Sidebar ===== */
+/* ===== Senteng Style Sidebar ===== */
 .sidebar {
-  width: var(--sidebar-width, 280px);
-  background: var(--gradient-sidebar);
-  backdrop-filter: blur(var(--glass-blur, 20px));
-  -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
-  padding: var(--spacing-6) var(--spacing-4);
+  width: 260px;
+  background: var(--bg-sidebar);
+  padding: 16px 12px;
   display: flex;
   flex-direction: column;
-  border-right: 1px solid var(--glass-border);
-  box-shadow: var(--shadow-xl);
+  border-right: 1px solid var(--border-color);
   position: relative;
-  z-index: var(--z-sticky, 200);
+  z-index: 200;
 }
 
-/* Sidebar subtle pattern overlay */
-.sidebar::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at 20% 20%, rgba(196, 167, 125, 0.05) 0%, transparent 50%),
-    radial-gradient(circle at 80% 80%, rgba(196, 167, 125, 0.03) 0%, transparent 50%);
-  pointer-events: none;
-}
-
-/* ===== Logo - Gradient Design ===== */
+/* ===== Logo - Senteng Style ===== */
 .logo {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-2) var(--spacing-3) var(--spacing-6);
-  border-bottom: 1px solid rgba(196, 167, 125, 0.15);
-  margin-bottom: var(--spacing-6);
-  position: relative;
+  gap: 12px;
+  padding: 8px 12px 24px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 16px;
 }
 
 .logo-icon {
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.9);
-  border: 1.5px solid rgba(196, 167, 125, 0.3);
-  border-radius: var(--radius-lg);
+  width: 40px;
+  height: 40px;
+  background: var(--slate-700, #334155);
+  border-radius: 10px;
   display: flex;
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  transition: all var(--duration-normal) var(--ease-spring);
   flex-shrink: 0;
 }
 
@@ -182,126 +166,84 @@ body {
   padding: 4px;
 }
 
-.logo:hover .logo-icon {
-  transform: scale(1.05);
-  border-color: rgba(196, 167, 125, 0.5);
-  box-shadow: 0 4px 12px rgba(139, 107, 75, 0.15);
-}
-
 .logo h1 {
-  font-size: var(--font-size-lg);
-  font-weight: var(--font-weight-bold);
-  background: var(--gradient-gold);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-  letter-spacing: var(--letter-spacing-tight);
-  line-height: var(--line-height-tight);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
 }
 
 .logo-subtitle {
-  font-size: var(--font-size-xs);
+  font-size: 12px;
   color: var(--text-muted);
   margin-top: 2px;
-  font-weight: var(--font-weight-medium);
-  letter-spacing: var(--letter-spacing-wide);
 }
 
-/* ===== Navigation - Enhanced Animation ===== */
+/* ===== Navigation - Senteng Style ===== */
 .nav {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-1-5);
+  gap: 4px;
   flex: 1;
-  padding: 0 var(--spacing-1);
+  overflow-y: auto;
 }
 
 .nav-item {
   display: flex;
   align-items: center;
-  gap: var(--spacing-3);
-  padding: var(--spacing-3) var(--spacing-4);
-  border-radius: var(--radius-lg);
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: all var(--duration-normal) var(--ease-smooth);
-  font-weight: var(--font-weight-medium);
-  position: relative;
-  overflow: hidden;
-}
-
-/* Left indicator bar */
-.nav-item::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%) scaleY(0);
-  width: 3px;
-  height: 60%;
-  background: var(--gradient-gold);
-  border-radius: var(--radius-full);
-  transition: transform var(--duration-normal) var(--ease-spring);
-  box-shadow: var(--shadow-glow-sm);
-}
-
-/* Hover background effect */
-.nav-item::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: var(--gradient-gold);
-  opacity: 0;
-  border-radius: inherit;
-  transition: opacity var(--duration-fast) var(--ease-smooth);
-  z-index: -1;
+  transition: all 0.15s ease;
+  font-size: 14px;
+  font-weight: 500;
 }
 
 .nav-item:hover {
+  background: var(--bg-hover);
   color: var(--text-primary);
-  transform: translateX(4px);
-}
-
-.nav-item:hover::before {
-  transform: translateY(-50%) scaleY(0.5);
-}
-
-.nav-item:hover::after {
-  opacity: 0.08;
 }
 
 .nav-item.active {
-  background: var(--accent-active-bg, #334155);
-  color: var(--accent-active-text, #ffffff);
-  font-weight: var(--font-weight-semibold);
-  border: none;
-  border-radius: 8px;
-}
-
-.nav-item.active::before {
-  display: none;
-}
-
-.nav-item.active::after {
-  opacity: 0;
+  background: var(--nav-active-bg, #334155);
+  color: var(--nav-active-text, #ffffff);
+  font-weight: 600;
 }
 
 .nav-icon {
-  font-size: var(--font-size-lg);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  transition: transform var(--duration-fast) var(--ease-bounce);
-}
-
-.nav-item:hover .nav-icon {
-  transform: scale(1.1);
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
 }
 
 .nav-label {
-  font-size: var(--font-size-base);
+  font-size: 14px;
+}
+
+/* ===== Sidebar Footer ===== */
+.sidebar-footer {
+  padding: 16px 12px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 12px;
+  border-top: 1px solid var(--border-color);
+  margin-top: 16px;
+}
+
+/* ===== Main Content ===== */
+.main-content {
+  flex: 1;
+  padding: 24px;
+  overflow-y: auto;
+  background: var(--bg-primary);
+}
+
+font-size: var(--font-size-base);
 }
 
 /* ===== Sidebar Footer ===== */
