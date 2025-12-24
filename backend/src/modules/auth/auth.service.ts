@@ -96,6 +96,43 @@ export class AuthService {
     }
 
     /**
+     * LINE Login Callback - 用 authorization code 換取 access token
+     */
+    async exchangeLineCode(code: string, redirectUri: string): Promise<TokenResponseDto | { needsRegistration: true; lineProfile: { userId: string; displayName: string; pictureUrl?: string } }> {
+        const clientId = process.env.LINE_CLIENT_ID;
+        const clientSecret = process.env.LINE_CLIENT_SECRET;
+
+        if (!clientId || !clientSecret) {
+            throw new UnauthorizedException('LINE Login 尚未設定');
+        }
+
+        // 用 code 換取 access token
+        const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code,
+                redirect_uri: redirectUri,
+                client_id: clientId,
+                client_secret: clientSecret,
+            }),
+        });
+
+        if (!tokenResponse.ok) {
+            const error = await tokenResponse.text();
+            console.error('LINE token exchange failed:', error);
+            throw new UnauthorizedException('LINE 登入失敗');
+        }
+
+        const tokenData = await tokenResponse.json();
+        const lineAccessToken = tokenData.access_token;
+
+        // 使用取得的 access token 進行登入
+        return this.loginWithLine(lineAccessToken);
+    }
+
+    /**
      * LINE Login - 驗證 LINE Access Token 並獲取用戶資訊
      */
     async verifyLineToken(accessToken: string): Promise<{ userId: string; displayName: string; pictureUrl?: string }> {

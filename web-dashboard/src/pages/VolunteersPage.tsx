@@ -154,10 +154,16 @@ export default function VolunteersPage() {
 
         setIsSubmitting(true);
         try {
+            // 取得認證 token
+            const token = localStorage.getItem('accessToken');
+
             // 呼叫後端 API 建立志工
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/volunteers`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': token ? `Bearer ${token}` : '',
+                },
                 body: JSON.stringify({
                     ...volunteerForm,
                     status: 'available',

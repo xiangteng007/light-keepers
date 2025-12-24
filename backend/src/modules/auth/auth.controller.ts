@@ -45,6 +45,15 @@ export class AuthController {
     }
 
     /**
+     * LINE OAuth Callback
+     * 前端重導向回來時，用 authorization code 換取 access token
+     */
+    @Post('line/callback')
+    async lineCallback(@Body() body: { code: string; redirectUri: string }) {
+        return this.authService.exchangeLineCode(body.code, body.redirectUri);
+    }
+
+    /**
      * LINE 登入
      * 前端透過 LINE SDK 取得 access token 後呼叫此 API
      */
