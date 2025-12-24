@@ -1,77 +1,77 @@
 /* ============================================
    Light Keepers 曦望燈塔 Design System
    風格參考: Senteng Design System
-   配色: 現代簡約 Navy + White
+   配色: 柔和淡雅色調，方便閱讀
 ============================================ */
 
 :root {
-  /* ===== Senteng 風格核心色 ===== */
-  /* Navy 深色系 - 強調/選中狀態 */
-  --navy-900: #1e293b;
-  --navy-800: #334155;
-  --navy-700: #475569;
-  --navy-600: #64748b;
-  --navy-500: #94a3b8;
+  /* ===== 柔和核心色 ===== */
+  /* 淡藍灰色系 - 強調/選中狀態 */
+  --navy-900: #475569;
+  --navy-800: #64748b;
+  --navy-700: #94a3b8;
+  --navy-600: #cbd5e1;
+  --navy-500: #e2e8f0;
 
-  /* 灰白色系 - 背景 */
-  --gray-50: #f8fafc;
-  --gray-100: #f1f5f9;
-  --gray-200: #e2e8f0;
-  --gray-300: #cbd5e1;
-  --gray-400: #94a3b8;
-  --gray-500: #64748b;
+  /* 純白灰色系 - 背景 */
+  --gray-50: #fafbfc;
+  --gray-100: #f5f7f9;
+  --gray-200: #e8ecf0;
+  --gray-300: #d1d9e0;
+  --gray-400: #a0aec0;
+  --gray-500: #718096;
 
-  /* 強調色 - 綠色系 */
-  --primary-500: #10b981;
-  --primary-600: #059669;
+  /* 強調色 - 柔和綠色 */
+  --primary-500: #48bb78;
+  --primary-600: #38a169;
 
-  /* ===== 功能色 ===== */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --danger: #ef4444;
-  --info: #3b82f6;
+  /* ===== 功能色 (柔和版) ===== */
+  --success: #48bb78;
+  --warning: #ecc94b;
+  --danger: #fc8181;
+  --info: #63b3ed;
 
-  /* ===== Senteng 主題配置 ===== */
-  --bg-primary: #f8fafc;
-  --bg-secondary: #f1f5f9;
+  /* ===== 柔和主題配置 ===== */
+  --bg-primary: #fafbfc;
+  --bg-secondary: #f5f7f9;
   --bg-card: #ffffff;
-  --bg-hover: #e2e8f0;
-  --bg-sidebar: #f8fafc;
+  --bg-hover: #edf2f7;
+  --bg-sidebar: #fafbfc;
 
-  --text-primary: #1e293b;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
+  --text-primary: #2d3748;
+  --text-secondary: #4a5568;
+  --text-muted: #a0aec0;
 
   --border-color: #e2e8f0;
-  --border-light: #f1f5f9;
+  --border-light: #edf2f7;
 
-  /* 選中狀態 - Navy 背景 */
-  --accent-primary: #334155;
-  --accent-hover: #475569;
-  --accent-active-bg: #334155;
+  /* 選中狀態 - 柔和藍灰背景 */
+  --accent-primary: #4a5568;
+  --accent-hover: #718096;
+  --accent-active-bg: #64748b;
   --accent-active-text: #ffffff;
 
-  /* ===== 陰影 - Senteng 風格 ===== */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+  /* ===== 柔和陰影 ===== */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 4px 8px rgba(0, 0, 0, 0.08);
 
   /* 相容舊變數 */
-  --brown-900: #1e293b;
-  --brown-800: #334155;
-  --gold-400: #10b981;
-  --gold-500: #059669;
-  --gold-600: #047857;
-  --beige-100: #f8fafc;
-  --beige-200: #f1f5f9;
+  --brown-900: #2d3748;
+  --brown-800: #4a5568;
+  --gold-400: #48bb78;
+  --gold-500: #38a169;
+  --gold-600: #2f855a;
+  --beige-100: #fafbfc;
+  --beige-200: #f5f7f9;
   --beige-300: #e2e8f0;
-  --color-brown-900: #1e293b;
-  --color-brown-800: #334155;
-  --color-gold-500: #10b981;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-danger: #ef4444;
-  --color-info: #3b82f6;
+  --color-brown-900: #2d3748;
+  --color-brown-800: #4a5568;
+  --color-gold-500: #48bb78;
+  --color-success: #48bb78;
+  --color-warning: #ecc94b;
+  --color-danger: #fc8181;
+  --color-info: #63b3ed;
 }
 
 /* 淺色主題 (Theme B) */
