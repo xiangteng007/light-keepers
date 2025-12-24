@@ -5,11 +5,11 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
-import { Account, Role } from '../accounts/entities';
+import { Account, Role, PagePermission } from '../accounts/entities';
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Account, Role]),
+        TypeOrmModule.forFeature([Account, Role, PagePermission]),
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({

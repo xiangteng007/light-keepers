@@ -36,7 +36,7 @@ export default function LoginPage() {
         try {
             if (isLogin) {
                 const response = await loginApi(formData.email, formData.password);
-                login(response.data.accessToken);
+                await login(response.data.accessToken);
                 navigate(from, { replace: true });
             } else {
                 if (formData.password !== formData.confirmPassword) {
@@ -51,7 +51,7 @@ export default function LoginPage() {
                 });
                 // Auto login after registration
                 const loginResponse = await loginApi(formData.email, formData.password);
-                login(loginResponse.data.accessToken);
+                await login(loginResponse.data.accessToken);
                 navigate(from, { replace: true });
             }
         } catch (err: unknown) {

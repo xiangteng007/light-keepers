@@ -17,7 +17,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (token: string) => void;
+    login: (token: string) => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
 }
@@ -56,9 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     // 登入
-    const login = (token: string) => {
+    const login = async (token: string): Promise<void> => {
         localStorage.setItem('accessToken', token);
-        loadUser();
+        await loadUser();
     };
 
     // 登出
