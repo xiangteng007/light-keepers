@@ -2,27 +2,33 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import Layout from '../components/Layout';
+import { AuthProvider } from '../context/AuthContext';
 
 describe('Layout Component', () => {
     it('renders the sidebar with navigation items', () => {
         render(
             <BrowserRouter>
-                <Layout />
+                <AuthProvider>
+                    <Layout />
+                </AuthProvider>
             </BrowserRouter>
         );
 
-        // Check for main navigation items
-        expect(screen.getByText('儀表板')).toBeInTheDocument();
-        expect(screen.getByText('數據分析')).toBeInTheDocument();
-        expect(screen.getByText('回報系統')).toBeInTheDocument();
-        expect(screen.getByText('志工管理')).toBeInTheDocument();
-        expect(screen.getByText('物資管理')).toBeInTheDocument();
+        // Check for navigation items visible at default role level (1 = 志工)
+        // Only items with requiredLevel <= 1 are visible to default logged-in users
+        expect(screen.getByText('儀表板')).toBeInTheDocument(); // requiredLevel: 1
+        expect(screen.getByText('災害示警')).toBeInTheDocument(); // requiredLevel: 0
+        expect(screen.getByText('地圖總覽')).toBeInTheDocument(); // requiredLevel: 0
+        expect(screen.getByText('實務手冊')).toBeInTheDocument(); // requiredLevel: 0
+        expect(screen.getByText('回報系統')).toBeInTheDocument(); // requiredLevel: 1
     });
 
     it('renders the Light Keepers logo', () => {
         render(
             <BrowserRouter>
-                <Layout />
+                <AuthProvider>
+                    <Layout />
+                </AuthProvider>
             </BrowserRouter>
         );
 
@@ -31,3 +37,4 @@ describe('Layout Component', () => {
         expect(screen.getByText('曦望燈塔')).toBeInTheDocument();
     });
 });
+
