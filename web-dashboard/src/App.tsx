@@ -22,6 +22,7 @@ import ReportsExportPage from './pages/ReportsExportPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
+import ProfilePage from './pages/ProfilePage'
 import './App.css'
 
 /**
@@ -82,6 +83,7 @@ function App() {
             <Route path="report" element={<ReportPage />} />
             <Route path="training" element={<TrainingPage />} />
             <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="profile" element={<ProfilePage />} />
             {/* 公開頁面 (0) - 但已在 Layout 內，不用另外設 */}
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />

@@ -9,9 +9,21 @@ const api = axios.create({
     },
 });
 
+// Helper: 獲取存儲的 token (from either localStorage or sessionStorage)
+const getStoredToken = (): string | null => {
+    return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+};
+
+// Helper: 清除 token
+const clearToken = (): void => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('rememberMe');
+    sessionStorage.removeItem('accessToken');
+};
+
 // 請求攔截器 - 添加 Token
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('accessToken');
+    const token = getStoredToken();
     if (token) {
         config.headers.Authorization = `Bearer ${token}`;
     }
@@ -23,7 +35,7 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            localStorage.removeItem('accessToken');
+            clearToken();
             window.location.href = '/login';
         }
         return Promise.reject(error);
@@ -31,3 +43,4 @@ api.interceptors.response.use(
 );
 
 export default api;
+

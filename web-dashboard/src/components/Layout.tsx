@@ -260,7 +260,7 @@ export default function Layout() {
 
                 {/* User Profile Section */}
                 <div className="sidebar-user">
-                    <div className="sidebar-user__info">
+                    <Link to="/profile" className="sidebar-user__info" onClick={handleNavClick}>
                         <div className="sidebar-user__avatar">
                             <User size={18} />
                         </div>
@@ -268,7 +268,7 @@ export default function Layout() {
                             <span className="sidebar-user__name">{user?.displayName || user?.email || '用戶'}</span>
                             <span className="sidebar-user__role">{user?.roleDisplayName || '登記志工'}</span>
                         </div>
-                    </div>
+                    </Link>
                     <button className="sidebar-user__logout" onClick={handleLogout} title="登出">
                         <LogOut size={18} />
                     </button>

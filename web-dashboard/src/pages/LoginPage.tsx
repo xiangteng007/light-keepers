@@ -19,6 +19,7 @@ export default function LoginPage() {
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [rememberMe, setRememberMe] = useState(true);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -95,7 +96,7 @@ export default function LoginPage() {
         try {
             if (isLogin) {
                 const response = await loginApi(formData.email, formData.password);
-                await login(response.data.accessToken);
+                await login(response.data.accessToken, rememberMe);
                 navigate(from, { replace: true });
             } else {
                 if (formData.password !== formData.confirmPassword) {
@@ -110,7 +111,7 @@ export default function LoginPage() {
                 });
                 // Auto login after registration
                 const loginResponse = await loginApi(formData.email, formData.password);
-                await login(loginResponse.data.accessToken);
+                await login(loginResponse.data.accessToken, true); // Always remember after registration
                 navigate(from, { replace: true });
             }
         } catch (err: unknown) {
@@ -263,6 +264,26 @@ export default function LoginPage() {
                                 required={!isLogin}
                                 minLength={6}
                             />
+                        </div>
+                    )}
+
+                    {isLogin && (
+                        <div className="form-group form-group--checkbox">
+                            <label className="checkbox-label">
+                                <input
+                                    type="checkbox"
+                                    checked={rememberMe}
+                                    onChange={(e) => setRememberMe(e.target.checked)}
+                                />
+                                <span className="checkbox-text">記住我</span>
+                            </label>
+                            <a href="#forgot" className="forgot-password-link" onClick={(e) => {
+                                e.preventDefault();
+                                // TODO: 實作忘記密碼功能
+                                alert('忘記密碼功能開發中');
+                            }}>
+                                忘記密碼？
+                            </a>
                         </div>
                     )}
 

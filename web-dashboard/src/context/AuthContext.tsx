@@ -2,6 +2,10 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { getProfile } from '../api/services';
 
+// Token 存儲 key
+const TOKEN_KEY = 'accessToken';
+const REMEMBER_KEY = 'rememberMe';
+
 // 使用者資訊介面
 export interface User {
     id: string;
@@ -10,6 +14,9 @@ export interface User {
     roles?: string[];
     roleLevel: number;
     roleDisplayName: string;
+    avatarUrl?: string;
+    lineLinked?: boolean;
+    googleLinked?: boolean;
 }
 
 // Auth Context 介面
@@ -17,12 +24,37 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (token: string) => Promise<void>;
+    login: (token: string, remember?: boolean) => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+// Helper: 獲取存儲的 token
+const getStoredToken = (): string | null => {
+    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
+};
+
+// Helper: 存儲 token
+const storeToken = (token: string, remember: boolean): void => {
+    if (remember) {
+        localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(REMEMBER_KEY, 'true');
+        sessionStorage.removeItem(TOKEN_KEY);
+    } else {
+        sessionStorage.setItem(TOKEN_KEY, token);
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(REMEMBER_KEY);
+    }
+};
+
+// Helper: 清除 token
+const clearToken = (): void => {
+    localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(REMEMBER_KEY);
+    sessionStorage.removeItem(TOKEN_KEY);
+};
 
 // AuthProvider 元件
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -31,7 +63,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 載入使用者資訊
     const loadUser = async () => {
-        const token = localStorage.getItem('accessToken');
+        const token = getStoredToken();
         if (!token) {
             setUser(null);
             setIsLoading(false);
@@ -43,7 +75,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(response.data);
         } catch (error) {
             console.error('Failed to load user profile:', error);
-            localStorage.removeItem('accessToken');
+            clearToken();
             setUser(null);
         } finally {
             setIsLoading(false);
@@ -56,14 +88,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     // 登入
-    const login = async (token: string): Promise<void> => {
-        localStorage.setItem('accessToken', token);
+    const login = async (token: string, remember: boolean = true): Promise<void> => {
+        storeToken(token, remember);
         await loadUser();
     };
 
     // 登出
     const logout = () => {
-        localStorage.removeItem('accessToken');
+        clearToken();
         setUser(null);
     };
 
@@ -96,3 +128,4 @@ export function useAuth() {
     }
     return context;
 }
+

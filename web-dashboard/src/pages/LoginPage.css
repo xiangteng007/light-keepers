@@ -122,6 +122,46 @@
     color: var(--text-muted);
 }
 
+/* Remember Me & Forgot Password */
+.form-group--checkbox {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--accent-primary);
+    cursor: pointer;
+}
+
+.checkbox-text {
+    font-weight: 400;
+}
+
+.forgot-password-link {
+    font-size: 14px;
+    color: var(--accent-primary);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.forgot-password-link:hover {
+    color: var(--gold-600);
+    text-decoration: underline;
+}
+
 .login-error {
     background: rgba(184, 92, 92, 0.1);
     border: 1px solid var(--danger);
