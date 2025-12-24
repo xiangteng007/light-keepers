@@ -7,7 +7,9 @@ export interface User {
     id: string;
     email: string;
     displayName?: string;
-    role?: 'admin' | 'volunteer' | 'user';
+    roles?: string[];
+    roleLevel: number;
+    roleDisplayName: string;
 }
 
 // Auth Context 介面

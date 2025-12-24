@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
     DndContext,
     closestCenter,
@@ -36,33 +36,37 @@ import {
     Menu,
     X,
     GripVertical,
+    LogOut,
+    User,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
+import { useAuth } from '../context/AuthContext';
 
 interface NavItem {
     id: string;
     path: string;
     label: string;
     icon: LucideIcon;
+    requiredLevel: number; // 0=公開, 1=志工, 2=幹部, 3=常務理事, 4=理事長, 5=系統擁有者
 }
 
 const defaultNavItems: NavItem[] = [
-    { id: 'dashboard', path: '/dashboard', label: '儀表板', icon: LayoutDashboard },
-    { id: 'analytics', path: '/analytics', label: '數據分析', icon: BarChart3 },
-    { id: 'ncdr-alerts', path: '/ncdr-alerts', label: '災害示警', icon: AlertTriangle },
-    { id: 'events', path: '/events', label: '災情事件', icon: Siren },
-    { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList },
-    { id: 'map', path: '/map', label: '地圖總覽', icon: Map },
-    { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen },
-    { id: 'report', path: '/report', label: '回報系統', icon: MessageSquareWarning },
-    { id: 'reports-admin', path: '/reports/admin', label: '回報審核', icon: CheckSquare },
-    { id: 'reports-export', path: '/reports/export', label: '報表匯出', icon: FileDown },
-    { id: 'volunteers', path: '/volunteers', label: '志工管理', icon: Users },
-    { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays },
-    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap },
-    { id: 'resources', path: '/resources', label: '物資管理', icon: Package },
-    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell },
+    { id: 'dashboard', path: '/dashboard', label: '儀表板', icon: LayoutDashboard, requiredLevel: 1 },
+    { id: 'analytics', path: '/analytics', label: '數據分析', icon: BarChart3, requiredLevel: 3 },
+    { id: 'ncdr-alerts', path: '/ncdr-alerts', label: '災害示警', icon: AlertTriangle, requiredLevel: 0 },
+    { id: 'events', path: '/events', label: '災情事件', icon: Siren, requiredLevel: 1 },
+    { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList, requiredLevel: 2 },
+    { id: 'map', path: '/map', label: '地圖總覽', icon: Map, requiredLevel: 0 },
+    { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen, requiredLevel: 0 },
+    { id: 'report', path: '/report', label: '回報系統', icon: MessageSquareWarning, requiredLevel: 1 },
+    { id: 'reports-admin', path: '/reports/admin', label: '回報審核', icon: CheckSquare, requiredLevel: 2 },
+    { id: 'reports-export', path: '/reports/export', label: '報表匯出', icon: FileDown, requiredLevel: 3 },
+    { id: 'volunteers', path: '/volunteers', label: '志工管理', icon: Users, requiredLevel: 2 },
+    { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays, requiredLevel: 2 },
+    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1 },
+    { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2 },
+    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1 },
 ];
 
 // Sortable Nav Item Component
@@ -117,8 +121,16 @@ const NAV_ORDER_KEY = 'light-keepers-nav-order';
 
 export default function Layout() {
     const location = useLocation();
+    const navigate = useNavigate();
+    const { user, logout } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [navItems, setNavItems] = useState<NavItem[]>(defaultNavItems);
+
+    // Get user's role level (default to 1 for logged in users)
+    const userLevel = user?.roleLevel ?? 1;
+
+    // Filter nav items based on user's role level
+    const visibleNavItems = navItems.filter(item => item.requiredLevel <= userLevel);
 
     // Load saved order from localStorage
     useEffect(() => {
@@ -179,6 +191,11 @@ export default function Layout() {
         }
     };
 
+    const handleLogout = () => {
+        logout();
+        navigate('/login');
+    };
+
     return (
         <div className="layout">
             {/* Mobile Header */}
@@ -226,10 +243,10 @@ export default function Layout() {
                         onDragEnd={handleDragEnd}
                     >
                         <SortableContext
-                            items={navItems.map(item => item.id)}
+                            items={visibleNavItems.map(item => item.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {navItems.map((item) => (
+                            {visibleNavItems.map((item) => (
                                 <SortableNavItem
                                     key={item.id}
                                     item={item}
@@ -240,6 +257,22 @@ export default function Layout() {
                         </SortableContext>
                     </DndContext>
                 </nav>
+
+                {/* User Profile Section */}
+                <div className="sidebar-user">
+                    <div className="sidebar-user__info">
+                        <div className="sidebar-user__avatar">
+                            <User size={18} />
+                        </div>
+                        <div className="sidebar-user__details">
+                            <span className="sidebar-user__name">{user?.displayName || user?.email || '用戶'}</span>
+                            <span className="sidebar-user__role">{user?.roleDisplayName || '登記志工'}</span>
+                        </div>
+                    </div>
+                    <button className="sidebar-user__logout" onClick={handleLogout} title="登出">
+                        <LogOut size={18} />
+                    </button>
+                </div>
 
                 <div className="sidebar-footer">
                     <span>v1.0.0 • 曦望燈塔救援協會</span>
@@ -252,3 +285,4 @@ export default function Layout() {
         </div>
     );
 }
+

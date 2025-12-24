@@ -41,5 +41,8 @@ export class TokenResponseDto {
         phone?: string;
         displayName?: string;
         roles: string[];
+        roleLevel: number;
+        roleDisplayName: string;
     };
 }
+

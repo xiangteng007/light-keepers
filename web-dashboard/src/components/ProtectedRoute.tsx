@@ -3,20 +3,27 @@ import { useAuth } from '../context/AuthContext';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
-    requireAdmin?: boolean;
+    requiredLevel?: number;
 }
 
 /**
- * ProtectedRoute - 保護需要登入的路由
+ * 受保護路由元件
+ * - 未登入用戶會被導向登入頁
+ * - 權限不足會顯示錯誤
  * 
- * @param children - 子元件
- * @param requireAdmin - 是否需要管理員權限
+ * requiredLevel 對應：
+ * 0 = 公開 (不用登入)
+ * 1 = 登記志工
+ * 2 = 幹部
+ * 3 = 常務理事
+ * 4 = 理事長
+ * 5 = 系統擁有者
  */
-export default function ProtectedRoute({ children, requireAdmin = false }: ProtectedRouteProps) {
+export default function ProtectedRoute({ children, requiredLevel = 1 }: ProtectedRouteProps) {
     const { isAuthenticated, isLoading, user } = useAuth();
     const location = useLocation();
 
-    // 載入中
+    // 等待驗證完成
     if (isLoading) {
         return (
             <div className="loading-screen">
@@ -26,17 +33,32 @@ export default function ProtectedRoute({ children, requireAdmin = false }: Prote
         );
     }
 
-    // 未登入 - 重定向到登入頁
+    // 公開頁面不需要登入
+    if (requiredLevel === 0) {
+        return <>{children}</>;
+    }
+
+    // 未登入導向登入頁
     if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // 需要管理員但不是管理員
-    if (requireAdmin && user?.role !== 'admin') {
+    // 檢查權限等級
+    const userLevel = user?.roleLevel ?? 1;
+    if (userLevel < requiredLevel) {
         return (
             <div className="access-denied">
-                <h2>🚫 權限不足</h2>
-                <p>您沒有權限訪問此頁面</p>
+                <div className="access-denied__content">
+                    <span className="access-denied__icon">🔒</span>
+                    <h2>權限不足</h2>
+                    <p>您的權限等級不足以訪問此頁面</p>
+                    <p className="access-denied__info">
+                        您的身份：<strong>{user?.roleDisplayName || '登記志工'}</strong>
+                    </p>
+                    <a href="/dashboard" className="lk-btn lk-btn--primary">
+                        返回儀表板
+                    </a>
+                </div>
             </div>
         );
     }

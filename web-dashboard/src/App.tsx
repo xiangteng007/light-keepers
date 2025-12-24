@@ -3,6 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react'
 import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
 import Layout from './components/Layout'
+import ProtectedRoute from './components/ProtectedRoute'
 import DashboardPage from './pages/DashboardPage'
 import EventsPage from './pages/EventsPage'
 import TasksPage from './pages/TasksPage'
@@ -23,6 +24,15 @@ import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
+/**
+ * 頁面權限等級對應：
+ * 0 = 公開 (不用登入)
+ * 1 = 登記志工
+ * 2 = 幹部
+ * 3 = 常務理事
+ * 4 = 理事長
+ * 5 = 系統擁有者
+ */
 function App() {
   // PWA Service Worker registration with update prompt
   const {
@@ -64,25 +74,29 @@ function App() {
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<Layout />}>
+          <Route path="/" element={<ProtectedRoute requiredLevel={1}><Layout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />
+            {/* 志工等級 (1) */}
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="events" element={<EventsPage />} />
-            <Route path="tasks" element={<TasksPage />} />
+            <Route path="report" element={<ReportPage />} />
+            <Route path="training" element={<TrainingPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            {/* 公開頁面 (0) - 但已在 Layout 內，不用另外設 */}
+            <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:id" element={<ManualDetailPage />} />
-            <Route path="report" element={<ReportPage />} />
-            <Route path="volunteers" element={<VolunteersPage />} />
-            <Route path="volunteers/:id" element={<VolunteerDetailPage />} />
-            <Route path="training" element={<TrainingPage />} />
-            <Route path="resources" element={<ResourcesPage />} />
-            <Route path="notifications" element={<NotificationsPage />} />
-            <Route path="reports/admin" element={<ReportsAdminPage />} />
-            <Route path="reports/export" element={<ReportsExportPage />} />
-            <Route path="analytics" element={<AnalyticsPage />} />
-            <Route path="volunteers/schedule" element={<VolunteerSchedulePage />} />
+            {/* 幹部等級 (2) */}
+            <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
+            <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
+            <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
+            <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
+            <Route path="resources" element={<ProtectedRoute requiredLevel={2}><ResourcesPage /></ProtectedRoute>} />
+            <Route path="reports/admin" element={<ProtectedRoute requiredLevel={2}><ReportsAdminPage /></ProtectedRoute>} />
+            {/* 常務理事等級 (3) */}
+            <Route path="reports/export" element={<ProtectedRoute requiredLevel={3}><ReportsExportPage /></ProtectedRoute>} />
+            <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>
@@ -91,3 +105,4 @@ function App() {
 }
 
 export default App
+

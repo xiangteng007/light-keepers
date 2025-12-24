@@ -3,7 +3,7 @@ import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { Account, Role } from '../accounts/entities';
+import { Account, Role, PagePermission } from '../accounts/entities';
 import { RegisterDto, LoginDto, TokenResponseDto } from './dto/auth.dto';
 
 @Injectable()
@@ -13,6 +13,8 @@ export class AuthService {
         private readonly accountRepository: Repository<Account>,
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
+        @InjectRepository(PagePermission)
+        private readonly pagePermissionRepository: Repository<PagePermission>,
         private readonly jwtService: JwtService,
     ) { }
 
@@ -93,11 +95,25 @@ export class AuthService {
         }
     }
 
+    /**
+     * 獲取頁面權限配置
+     */
+    async getPagePermissions(): Promise<PagePermission[]> {
+        return this.pagePermissionRepository.find({
+            where: { isVisible: true },
+            order: { sortOrder: 'ASC' },
+        });
+    }
+
     private generateTokenResponse(account: Account): TokenResponseDto {
+        const roles = account.roles || [];
+        const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => (r as any).level || 0)) : 0;
+
         const payload = {
             sub: account.id,
             email: account.email,
-            roles: account.roles?.map(r => r.name) || [],
+            roles: roles.map(r => r.name),
+            roleLevel,
         };
 
         const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
@@ -110,8 +126,11 @@ export class AuthService {
                 email: account.email,
                 phone: account.phone,
                 displayName: account.displayName,
-                roles: account.roles?.map(r => r.name) || [],
+                roles: roles.map(r => r.name),
+                roleLevel,
+                roleDisplayName: (roles.find(r => (r as any).level === roleLevel) as any)?.displayName || '登記志工',
             },
         };
     }
 }
+

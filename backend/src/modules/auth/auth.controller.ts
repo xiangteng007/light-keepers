@@ -19,13 +19,28 @@ export class AuthController {
 
     @Get('me')
     @UseGuards(JwtAuthGuard)
-    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; roles?: { name: string }[] } }) {
+    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
+        const roles = req.user.roles || [];
+        const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => r.level || 0)) : 0;
+
         return {
             id: req.user.id,
             email: req.user.email,
             phone: req.user.phone,
             displayName: req.user.displayName,
-            roles: req.user.roles?.map(r => r.name) || [],
+            roles: roles.map(r => r.name),
+            roleLevel,
+            roleDisplayName: roles.find(r => r.level === roleLevel)?.displayName || '一般民眾',
         };
     }
+
+    /**
+     * 獲取頁面權限配置
+     * 公開 API，用於前端判斷頁面可見性
+     */
+    @Get('permissions')
+    async getPermissions() {
+        return this.authService.getPagePermissions();
+    }
 }
+
