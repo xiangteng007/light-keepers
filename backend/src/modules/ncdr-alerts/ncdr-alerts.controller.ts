@@ -104,4 +104,18 @@ export class NcdrAlertsController {
             ...result,
         };
     }
+
+    /**
+     * 手動觸發 CWA 地震同步
+     * POST /ncdr-alerts/sync-cwa-earthquakes
+     */
+    @Post('sync-cwa-earthquakes')
+    @HttpCode(HttpStatus.OK)
+    async syncCwaEarthquakes() {
+        const result = await this.ncdrAlertsService.syncCwaEarthquakes();
+        return {
+            message: 'CWA earthquake sync completed',
+            ...result,
+        };
+    }
 }

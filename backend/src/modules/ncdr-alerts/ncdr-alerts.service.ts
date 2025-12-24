@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { ConfigService } from '@nestjs/config';
 import axios from 'axios';
 import { parseStringPromise } from 'xml2js';
 import { NcdrAlert } from './entities';
@@ -18,17 +19,26 @@ import { LineBotService } from '../line-bot/line-bot.service';
 const NCDR_BASE_URL = 'https://alerts.ncdr.nat.gov.tw';
 const NCDR_ATOM_FEED = `${NCDR_BASE_URL}/RssAtomFeed.ashx`;
 
+// CWA (中央氣象署) OpenData API
+const CWA_BASE_URL = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore';
+const CWA_EARTHQUAKE_ENDPOINT = `${CWA_BASE_URL}/E-A0015-001`; // 顯著有感地震
+
 @Injectable()
 export class NcdrAlertsService {
     private readonly logger = new Logger(NcdrAlertsService.name);
     private lastSyncTime: Date | null = null;
     private syncInProgress = false;
+    private readonly cwaApiKey: string;
 
     constructor(
         @InjectRepository(NcdrAlert)
         private readonly ncdrAlertRepository: Repository<NcdrAlert>,
         private readonly lineBotService: LineBotService,
-    ) { }
+        private readonly configService: ConfigService,
+    ) {
+        // CWA API Key (需到 opendata.cwa.gov.tw 申請)
+        this.cwaApiKey = this.configService.get<string>('CWA_API_KEY', 'CWA-423AE96E-5E49-46E3-AD03-08A3A71E9034');
+    }
 
     /**
      * 獲取所有示警類別定義
@@ -361,6 +371,132 @@ export class NcdrAlertsService {
     async scheduledSync(): Promise<void> {
         this.logger.log('Running scheduled sync for core alert types...');
         await this.syncAlertTypes(CORE_ALERT_TYPES);
+    }
+
+    /**
+     * 排程任務：每 5 分鐘同步 CWA 地震資料
+     * 使用 CWA OpenData API 取得最新地震報告
+     */
+    @Cron('0 */5 * * * *') // 每 5 分鐘
+    async scheduledCwaEarthquakeSync(): Promise<void> {
+        this.logger.log('Running scheduled CWA earthquake sync...');
+        await this.syncCwaEarthquakes();
+    }
+
+    /**
+     * 從 CWA OpenData 取得地震報告
+     */
+    async fetchCwaEarthquakes(): Promise<any[]> {
+        try {
+            const url = `${CWA_EARTHQUAKE_ENDPOINT}?Authorization=${this.cwaApiKey}&format=JSON&limit=10`;
+            this.logger.log(`Fetching CWA earthquakes from: ${url.replace(this.cwaApiKey, '***')}`);
+
+            const response = await axios.get(url, { timeout: 15000 });
+            const records = response.data?.records?.Earthquake;
+
+            if (!records || !Array.isArray(records)) {
+                this.logger.warn('No earthquake data found in CWA response');
+                return [];
+            }
+
+            return records;
+        } catch (error) {
+            this.logger.error(`Failed to fetch CWA earthquakes: ${error.message}`);
+            return [];
+        }
+    }
+
+    /**
+     * 同步 CWA 地震資料到資料庫
+     */
+    async syncCwaEarthquakes(): Promise<{ synced: number; errors: number }> {
+        let synced = 0;
+        let errors = 0;
+
+        try {
+            const earthquakes = await this.fetchCwaEarthquakes();
+            this.logger.log(`Fetched ${earthquakes.length} earthquakes from CWA`);
+
+            for (const eq of earthquakes) {
+                try {
+                    const eqNo = eq.EarthquakeNo?.toString() || '';
+                    const alertId = `CWA-EQ-${eqNo}`;
+
+                    // 檢查是否已存在
+                    const existing = await this.ncdrAlertRepository.findOne({
+                        where: { alertId },
+                    });
+
+                    if (existing) {
+                        continue; // 已存在，跳過
+                    }
+
+                    // 解析地震資料
+                    const info = eq.EarthquakeInfo || {};
+                    const epicenter = info.Epicenter || {};
+                    const magnitude = info.EarthquakeMagnitude || {};
+                    const originTime = info.OriginTime || new Date().toISOString();
+
+                    // 生成描述
+                    const location = epicenter.Location || '台灣地區';
+                    const depth = info.FocalDepth || 0;
+                    const magValue = magnitude.MagnitudeValue || 0;
+                    const reportContent = eq.ReportContent || '';
+
+                    // 決定嚴重程度
+                    let severity: 'critical' | 'warning' | 'info' = 'info';
+                    if (magValue >= 6.0) {
+                        severity = 'critical';
+                    } else if (magValue >= 4.5) {
+                        severity = 'warning';
+                    }
+
+                    // 建立警報記錄
+                    const alert: Partial<NcdrAlert> = {
+                        alertId,
+                        alertTypeId: 33, // 地震
+                        alertTypeName: '地震',
+                        title: `${location} 發生規模 ${magValue} 地震`,
+                        description: reportContent || `震央位於 ${location}，震源深度 ${depth} 公里，地震規模 ${magValue}`,
+                        severity,
+                        sourceUnit: '中央氣象署',
+                        publishedAt: new Date(originTime),
+                        sourceLink: eq.ReportImageURI || `https://www.cwa.gov.tw/V8/C/E/EQ/EQ${eqNo}.html`,
+                        latitude: parseFloat(epicenter.EpicenterLatitude) || 23.9,
+                        longitude: parseFloat(epicenter.EpicenterLongitude) || 121.6,
+                        isActive: true,
+                    };
+
+                    await this.ncdrAlertRepository.save(alert);
+                    synced++;
+                    this.logger.log(`Synced CWA earthquake: ${alert.title}`);
+
+                    // 🔔 LINE 推播：規模 5.0 以上自動廣播
+                    if (magValue >= 5.0 && this.lineBotService.isEnabled()) {
+                        try {
+                            const alertMsg = `🚨 地震警報\n\n${alert.title}\n\n${alert.description?.substring(0, 150) || ''}`;
+                            await this.lineBotService.broadcast(alertMsg);
+                            this.logger.log(`LINE broadcast sent for earthquake: ${alert.title}`);
+                        } catch (lineErr) {
+                            this.logger.warn(`Failed to send LINE broadcast: ${lineErr.message}`);
+                        }
+                    }
+                } catch (err) {
+                    errors++;
+                    this.logger.error(`Failed to process earthquake: ${err.message}`);
+                }
+            }
+
+            if (synced > 0) {
+                this.lastSyncTime = new Date();
+            }
+            this.logger.log(`CWA earthquake sync completed: ${synced} new, ${errors} errors`);
+        } catch (err) {
+            this.logger.error(`CWA earthquake sync failed: ${err.message}`);
+            errors++;
+        }
+
+        return { synced, errors };
     }
 
     /**
