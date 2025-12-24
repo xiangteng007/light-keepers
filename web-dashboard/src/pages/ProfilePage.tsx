@@ -18,10 +18,36 @@ export default function ProfilePage() {
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+    // Profile form data
     const [formData, setFormData] = useState({
         displayName: user?.displayName || '',
         email: user?.email || '',
     });
+
+    // Notification preferences
+    const [preferences, setPreferences] = useState({
+        alertNotifications: true,
+        taskNotifications: true,
+        trainingNotifications: true,
+    });
+
+
+    // Password change
+    const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [passwordData, setPasswordData] = useState({
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+    });
+    const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+    const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
+
+    // Fetch preferences on mount
+    useEffect(() => {
+        fetchPreferences();
+    }, []);
 
     // Handle OAuth callback for binding
     useEffect(() => {
@@ -35,6 +61,93 @@ export default function ProfilePage() {
             handleGoogleBindCallback(code);
         }
     }, []);
+
+    // Fetch notification preferences
+    const fetchPreferences = async () => {
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/auth/preferences`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setPreferences(data);
+            }
+        } catch (err) {
+            console.error('Failed to fetch preferences:', err);
+        }
+    };
+
+    // Handle preference change
+    const handlePreferenceChange = async (key: keyof typeof preferences, value: boolean) => {
+        const newPreferences = { ...preferences, [key]: value };
+        setPreferences(newPreferences);
+
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/auth/preferences`, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({ [key]: value }),
+            });
+
+            if (response.ok) {
+                setMessage({ type: 'success', text: '通知偏好已更新' });
+                setTimeout(() => setMessage(null), 2000);
+            } else {
+                setMessage({ type: 'error', text: '更新失敗' });
+                setPreferences(preferences); // Revert
+            }
+        } catch (err) {
+            setMessage({ type: 'error', text: '更新失敗' });
+            setPreferences(preferences); // Revert
+        }
+    };
+
+    // Handle password change
+    const handleChangePassword = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage({ type: 'error', text: '新密碼與確認密碼不符' });
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            setMessage({ type: 'error', text: '新密碼至少需要 6 個字元' });
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/auth/change-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    currentPassword: passwordData.currentPassword,
+                    newPassword: passwordData.newPassword,
+                }),
+            });
+
+            if (response.ok) {
+                setMessage({ type: 'success', text: '密碼已成功變更！' });
+                setShowPasswordModal(false);
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            } else {
+                const error = await response.json();
+                setMessage({ type: 'error', text: error.message || '密碼變更失敗' });
+            }
+        } catch (err) {
+            setMessage({ type: 'error', text: '密碼變更失敗，請稍後再試' });
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
 
     const handleLineBindCallback = async (code: string) => {
         try {
@@ -298,7 +411,7 @@ export default function ProfilePage() {
                                         <h4>變更密碼</h4>
                                         <p>定期更換密碼以保護帳號安全</p>
                                     </div>
-                                    <button className="lk-btn lk-btn--secondary" onClick={() => alert('功能開發中')}>
+                                    <button className="lk-btn lk-btn--secondary" onClick={() => setShowPasswordModal(true)}>
                                         變更密碼
                                     </button>
                                 </div>
@@ -317,7 +430,11 @@ export default function ProfilePage() {
                                         <p>接收 NCDR 災害示警即時推播</p>
                                     </div>
                                     <label className="toggle">
-                                        <input type="checkbox" defaultChecked />
+                                        <input
+                                            type="checkbox"
+                                            checked={preferences.alertNotifications}
+                                            onChange={(e) => handlePreferenceChange('alertNotifications', e.target.checked)}
+                                        />
                                         <span className="slider"></span>
                                     </label>
                                 </div>
@@ -327,7 +444,11 @@ export default function ProfilePage() {
                                         <p>當有新任務指派給您時收到通知</p>
                                     </div>
                                     <label className="toggle">
-                                        <input type="checkbox" defaultChecked />
+                                        <input
+                                            type="checkbox"
+                                            checked={preferences.taskNotifications}
+                                            onChange={(e) => handlePreferenceChange('taskNotifications', e.target.checked)}
+                                        />
                                         <span className="slider"></span>
                                     </label>
                                 </div>
@@ -337,7 +458,11 @@ export default function ProfilePage() {
                                         <p>接收新課程和培訓活動通知</p>
                                     </div>
                                     <label className="toggle">
-                                        <input type="checkbox" defaultChecked />
+                                        <input
+                                            type="checkbox"
+                                            checked={preferences.trainingNotifications}
+                                            onChange={(e) => handlePreferenceChange('trainingNotifications', e.target.checked)}
+                                        />
                                         <span className="slider"></span>
                                     </label>
                                 </div>
@@ -346,6 +471,57 @@ export default function ProfilePage() {
                     )}
                 </div>
             </div>
+
+            {/* Password Change Modal */}
+            {showPasswordModal && (
+                <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
+                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                        <h3><Lock size={20} /> 變更密碼</h3>
+                        <div className="password-form">
+                            <div className="form-group">
+                                <label>目前密碼</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                    placeholder="請輸入目前密碼"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>新密碼</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.newPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                    placeholder="請輸入新密碼（至少 6 字元）"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label>確認新密碼</label>
+                                <input
+                                    type="password"
+                                    value={passwordData.confirmPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                    placeholder="請再次輸入新密碼"
+                                />
+                            </div>
+                        </div>
+                        <div className="modal-actions">
+                            <button className="lk-btn lk-btn--secondary" onClick={() => setShowPasswordModal(false)}>
+                                取消
+                            </button>
+                            <button
+                                className="lk-btn lk-btn--primary"
+                                onClick={handleChangePassword}
+                                disabled={isChangingPassword}
+                            >
+                                {isChangingPassword ? '變更中...' : '確認變更'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
+

@@ -433,5 +433,119 @@ export class AuthService {
             },
         };
     }
+
+    // =========================================
+    // 個人資料管理
+    // =========================================
+
+    /**
+     * 更新個人資料
+     */
+    async updateProfile(accountId: string, data: { displayName?: string; avatarUrl?: string }): Promise<{
+        id: string;
+        displayName: string;
+        avatarUrl: string;
+    }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        if (data.displayName !== undefined) {
+            account.displayName = data.displayName;
+        }
+
+        if (data.avatarUrl !== undefined) {
+            account.avatarUrl = data.avatarUrl;
+        }
+
+        await this.accountRepository.save(account);
+
+        return {
+            id: account.id,
+            displayName: account.displayName,
+            avatarUrl: account.avatarUrl,
+        };
+    }
+
+    /**
+     * 變更密碼
+     */
+    async changePassword(accountId: string, currentPassword: string, newPassword: string): Promise<{ success: boolean }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        // 驗證舊密碼
+        const isValid = await bcrypt.compare(currentPassword, account.passwordHash);
+        if (!isValid) {
+            throw new UnauthorizedException('目前密碼不正確');
+        }
+
+        // 更新密碼
+        account.passwordHash = await bcrypt.hash(newPassword, 10);
+        await this.accountRepository.save(account);
+
+        return { success: true };
+    }
+
+    /**
+     * 更新通知偏好設定
+     */
+    async updatePreferences(accountId: string, data: {
+        alertNotifications?: boolean;
+        taskNotifications?: boolean;
+        trainingNotifications?: boolean;
+    }): Promise<{
+        alertNotifications: boolean;
+        taskNotifications: boolean;
+        trainingNotifications: boolean;
+    }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        if (data.alertNotifications !== undefined) {
+            account.prefAlertNotifications = data.alertNotifications;
+        }
+
+        if (data.taskNotifications !== undefined) {
+            account.prefTaskNotifications = data.taskNotifications;
+        }
+
+        if (data.trainingNotifications !== undefined) {
+            account.prefTrainingNotifications = data.trainingNotifications;
+        }
+
+        await this.accountRepository.save(account);
+
+        return {
+            alertNotifications: account.prefAlertNotifications,
+            taskNotifications: account.prefTaskNotifications,
+            trainingNotifications: account.prefTrainingNotifications,
+        };
+    }
+
+    /**
+     * 獲取通知偏好設定
+     */
+    async getPreferences(accountId: string): Promise<{
+        alertNotifications: boolean;
+        taskNotifications: boolean;
+        trainingNotifications: boolean;
+    }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        return {
+            alertNotifications: account.prefAlertNotifications ?? true,
+            taskNotifications: account.prefTaskNotifications ?? true,
+            trainingNotifications: account.prefTrainingNotifications ?? true,
+        };
+    }
 }
 

@@ -1,6 +1,6 @@
-import { Controller, Post, Body, Get, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterDto, LoginDto } from './dto/auth.dto';
+import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
@@ -133,6 +133,55 @@ export class AuthController {
         const googleProfile = await this.authService.verifyGoogleToken(body.accessToken);
         await this.authService.bindGoogleAccount(req.user.id, googleProfile.id, googleProfile.email);
         return { success: true, googleEmail: googleProfile.email };
+    }
+
+    // =========================================
+    // 個人資料管理端點
+    // =========================================
+
+    /**
+     * 更新個人資料
+     */
+    @Patch('profile')
+    @UseGuards(JwtAuthGuard)
+    async updateProfile(
+        @Request() req: { user: { id: string } },
+        @Body() dto: UpdateProfileDto
+    ) {
+        return this.authService.updateProfile(req.user.id, dto);
+    }
+
+    /**
+     * 變更密碼
+     */
+    @Post('change-password')
+    @UseGuards(JwtAuthGuard)
+    async changePassword(
+        @Request() req: { user: { id: string } },
+        @Body() dto: ChangePasswordDto
+    ) {
+        return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
+    }
+
+    /**
+     * 獲取通知偏好設定
+     */
+    @Get('preferences')
+    @UseGuards(JwtAuthGuard)
+    async getPreferences(@Request() req: { user: { id: string } }) {
+        return this.authService.getPreferences(req.user.id);
+    }
+
+    /**
+     * 更新通知偏好設定
+     */
+    @Patch('preferences')
+    @UseGuards(JwtAuthGuard)
+    async updatePreferences(
+        @Request() req: { user: { id: string } },
+        @Body() dto: UpdatePreferencesDto
+    ) {
+        return this.authService.updatePreferences(req.user.id, dto);
     }
 }
 

@@ -47,6 +47,16 @@ export class Account {
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
 
+    // 通知偏好設定
+    @Column({ name: 'pref_alert_notifications', default: true })
+    prefAlertNotifications: boolean;
+
+    @Column({ name: 'pref_task_notifications', default: true })
+    prefTaskNotifications: boolean;
+
+    @Column({ name: 'pref_training_notifications', default: true })
+    prefTrainingNotifications: boolean;
+
     @ManyToMany(() => Role)
     @JoinTable({
         name: 'account_roles',
