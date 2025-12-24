@@ -609,3 +609,62 @@ select {
     grid-template-columns: 1fr !important;
   }
 }
+
+/* ============================================
+   Drag-and-Drop Navigation Styles
+============================================ */
+
+.nav-item-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.nav-item-wrapper:hover .nav-item-drag-handle {
+  opacity: 1;
+}
+
+.nav-item-wrapper.dragging {
+  background: var(--bg-card, #ffffff);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 8px;
+}
+
+.nav-item-drag-handle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 100%;
+  padding: 10px 2px;
+  cursor: grab;
+  color: var(--text-muted, #9CA3AF);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+  flex-shrink: 0;
+}
+
+.nav-item-drag-handle:hover {
+  color: var(--text-secondary, #6B7280);
+}
+
+.nav-item-drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Adjust nav-item within wrapper */
+.nav-item-wrapper .nav-item {
+  flex: 1;
+  margin: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+/* Show drag handle always on touch devices */
+@media (max-width: 768px) {
+  .nav-item-drag-handle {
+    opacity: 0.5;
+  }
+}
