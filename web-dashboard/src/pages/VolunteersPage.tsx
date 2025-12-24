@@ -147,8 +147,8 @@ export default function VolunteersPage() {
 
     // 提交志工註冊
     const handleRegisterVolunteer = async () => {
-        if (!volunteerForm.name || !volunteerForm.phone || !volunteerForm.region) {
-            alert('請填寫必填欄位：姓名、電話、所在地區');
+        if (!volunteerForm.name || !volunteerForm.phone || !volunteerForm.region || !volunteerForm.emergencyContact || !volunteerForm.emergencyPhone) {
+            alert('請填寫必填欄位：姓名、電話、所在地區、緊急聯絡人、緊急聯絡電話');
             return;
         }
 
@@ -459,10 +459,13 @@ export default function VolunteersPage() {
                         </div>
 
                         <div className="form-section">
-                            <label className="form-label">詳細地址</label>
+                            <label className="form-label">
+                                詳細地址
+                                <span className="admin-only-badge">🔒 僅管理員可見</span>
+                            </label>
                             <input
                                 type="text"
-                                className="form-input"
+                                className="form-input form-input--private"
                                 placeholder="詳細地址（選填）"
                                 value={volunteerForm.address}
                                 onChange={e => setVolunteerForm({ ...volunteerForm, address: e.target.value })}
@@ -471,15 +474,19 @@ export default function VolunteersPage() {
 
                         <div className="form-section">
                             <label className="form-label">專長技能</label>
-                            <div className="skills-grid">
+                            <div className="skills-grid skills-grid--improved">
                                 {SKILL_OPTIONS.map(skill => (
                                     <button
                                         key={skill.value}
                                         type="button"
-                                        className={`skill-btn ${volunteerForm.skills.includes(skill.value) ? 'active' : ''}`}
+                                        className={`skill-btn skill-btn--toggle ${volunteerForm.skills.includes(skill.value) ? 'skill-btn--selected' : ''}`}
                                         onClick={() => toggleSkill(skill.value)}
                                     >
-                                        {skill.icon} {skill.label}
+                                        <span className="skill-btn__icon">{skill.icon}</span>
+                                        <span className="skill-btn__label">{skill.label}</span>
+                                        {volunteerForm.skills.includes(skill.value) && (
+                                            <span className="skill-btn__check">✓</span>
+                                        )}
                                     </button>
                                 ))}
                             </div>
@@ -487,35 +494,43 @@ export default function VolunteersPage() {
 
                         <div className="form-row">
                             <div className="form-section">
-                                <label className="form-label">緊急聯絡人</label>
+                                <label className="form-label">
+                                    緊急聯絡人 *
+                                    <span className="admin-only-badge">🔒 僅管理員可見</span>
+                                </label>
                                 <input
                                     type="text"
-                                    className="form-input"
+                                    className="form-input form-input--private"
                                     placeholder="聯絡人姓名"
                                     value={volunteerForm.emergencyContact}
                                     onChange={e => setVolunteerForm({ ...volunteerForm, emergencyContact: e.target.value })}
+                                    required
                                 />
                             </div>
                             <div className="form-section">
-                                <label className="form-label">緊急聯絡電話</label>
+                                <label className="form-label">
+                                    緊急聯絡電話 *
+                                    <span className="admin-only-badge">🔒 僅管理員可見</span>
+                                </label>
                                 <input
                                     type="tel"
-                                    className="form-input"
+                                    className="form-input form-input--private"
                                     placeholder="緊急聯絡電話"
                                     value={volunteerForm.emergencyPhone}
                                     onChange={e => setVolunteerForm({ ...volunteerForm, emergencyPhone: e.target.value })}
+                                    required
                                 />
                             </div>
                         </div>
 
                         <div className="form-section">
-                            <label className="form-label">備註</label>
+                            <label className="form-label">備註事項（過敏原或慢性疾病等等需特別註記事項）</label>
                             <textarea
                                 className="form-textarea"
-                                placeholder="其他說明事項..."
+                                placeholder="請填寫過敏原、慢性疾病或其他需要特別注意的事項..."
                                 value={volunteerForm.notes}
                                 onChange={e => setVolunteerForm({ ...volunteerForm, notes: e.target.value })}
-                                rows={2}
+                                rows={3}
                             />
                         </div>
 
