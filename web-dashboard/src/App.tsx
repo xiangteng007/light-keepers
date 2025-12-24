@@ -23,6 +23,7 @@ import AnalyticsPage from './pages/AnalyticsPage'
 import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
+import PermissionsPage from './pages/PermissionsPage'
 import './App.css'
 
 /**
@@ -99,6 +100,8 @@ function App() {
             {/* 常務理事等級 (3) */}
             <Route path="reports/export" element={<ProtectedRoute requiredLevel={3}><ReportsExportPage /></ProtectedRoute>} />
             <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
+            {/* 理事長等級 (4) */}
+            <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

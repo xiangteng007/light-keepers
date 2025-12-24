@@ -38,6 +38,7 @@ import {
     GripVertical,
     LogOut,
     User,
+    Shield,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
@@ -67,6 +68,7 @@ const defaultNavItems: NavItem[] = [
     { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1 },
     { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2 },
     { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1 },
+    { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4 },
 ];
 
 // Sortable Nav Item Component
