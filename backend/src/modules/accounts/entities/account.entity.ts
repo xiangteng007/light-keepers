@@ -28,6 +28,13 @@ export class Account {
     @Column({ name: 'line_display_name', nullable: true, length: 100 })
     lineDisplayName: string;
 
+    // Google Login 綁定欄位
+    @Column({ name: 'google_id', unique: true, nullable: true, length: 50 })
+    googleId: string;
+
+    @Column({ name: 'google_email', nullable: true, length: 255 })
+    googleEmail: string;
+
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 

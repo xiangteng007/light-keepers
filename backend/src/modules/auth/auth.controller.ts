@@ -82,6 +82,50 @@ export class AuthController {
         await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
         return { success: true, lineDisplayName: lineProfile.displayName };
     }
+
+    // =========================================
+    // Google OAuth 端點
+    // =========================================
+
+    /**
+     * Google OAuth Callback
+     * 前端重導向回來時，用 authorization code 換取 access token
+     */
+    @Post('google/callback')
+    async googleCallback(@Body() body: { code: string; redirectUri: string }) {
+        return this.authService.exchangeGoogleCode(body.code, body.redirectUri);
+    }
+
+    /**
+     * Google 登入
+     * 前端透過 Google SDK 取得 access token 後呼叫此 API
+     */
+    @Post('google/login')
+    async loginWithGoogle(@Body() body: { accessToken: string }) {
+        return this.authService.loginWithGoogle(body.accessToken);
+    }
+
+    /**
+     * Google 註冊新帳號
+     * 若 Google 帳號未綁定，使用此 API 建立新帳號
+     */
+    @Post('google/register')
+    async registerWithGoogle(@Body() body: { accessToken: string; displayName?: string }) {
+        return this.authService.registerWithGoogle(body.accessToken, body.displayName);
+    }
+
+    /**
+     * 綁定 Google 帳號
+     * 已登入用戶綁定 Google 帳號
+     */
+    @Post('google/bind')
+    @UseGuards(JwtAuthGuard)
+    async bindGoogle(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
+        const googleProfile = await this.authService.verifyGoogleToken(body.accessToken);
+        await this.authService.bindGoogleAccount(req.user.id, googleProfile.id, googleProfile.email);
+        return { success: true, googleEmail: googleProfile.email };
+    }
 }
+
 
 

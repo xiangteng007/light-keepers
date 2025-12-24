@@ -236,6 +236,167 @@ export class AuthService {
         });
     }
 
+    // =========================================
+    // Google OAuth 相關方法
+    // =========================================
+
+    /**
+     * Google OAuth Callback - 用 authorization code 換取 access token
+     */
+    async exchangeGoogleCode(code: string, redirectUri: string): Promise<TokenResponseDto | { needsRegistration: true; googleProfile: { id: string; email: string; name: string; picture?: string } }> {
+        const clientId = process.env.GOOGLE_CLIENT_ID;
+        const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+
+        if (!clientId || !clientSecret) {
+            throw new UnauthorizedException('Google Login 尚未設定');
+        }
+
+        // 用 code 換取 access token
+        const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                grant_type: 'authorization_code',
+                code,
+                redirect_uri: redirectUri,
+                client_id: clientId,
+                client_secret: clientSecret,
+            }),
+        });
+
+        if (!tokenResponse.ok) {
+            const error = await tokenResponse.text();
+            console.error('Google token exchange failed:', error);
+            throw new UnauthorizedException('Google 登入失敗');
+        }
+
+        const tokenData = await tokenResponse.json();
+        const googleAccessToken = tokenData.access_token;
+
+        // 使用取得的 access token 進行登入
+        return this.loginWithGoogle(googleAccessToken);
+    }
+
+    /**
+     * Google Login - 驗證 Google Access Token 並獲取用戶資訊
+     */
+    async verifyGoogleToken(accessToken: string): Promise<{ id: string; email: string; name: string; picture?: string }> {
+        const response = await fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+            throw new UnauthorizedException('Google Token 驗證失敗');
+        }
+
+        const profile = await response.json();
+        return {
+            id: profile.id,
+            email: profile.email,
+            name: profile.name,
+            picture: profile.picture,
+        };
+    }
+
+    /**
+     * Google Login - 使用 Google 帳號登入
+     */
+    async loginWithGoogle(googleAccessToken: string): Promise<TokenResponseDto | { needsRegistration: true; googleProfile: { id: string; email: string; name: string; picture?: string } }> {
+        // 驗證 Google Token
+        const googleProfile = await this.verifyGoogleToken(googleAccessToken);
+
+        // 查找已綁定的帳號 (優先用 Google ID，其次用 email)
+        let account = await this.accountRepository.findOne({
+            where: { googleId: googleProfile.id },
+            relations: ['roles'],
+        });
+
+        // 如果沒有綁定 Google ID，嘗試用 email 查找
+        if (!account && googleProfile.email) {
+            account = await this.accountRepository.findOne({
+                where: { email: googleProfile.email },
+                relations: ['roles'],
+            });
+
+            // 如果找到，自動綁定 Google ID
+            if (account) {
+                account.googleId = googleProfile.id;
+                account.googleEmail = googleProfile.email;
+                if (!account.avatarUrl && googleProfile.picture) {
+                    account.avatarUrl = googleProfile.picture;
+                }
+                await this.accountRepository.save(account);
+            }
+        }
+
+        if (account) {
+            // 已綁定 - 直接登入
+            account.lastLoginAt = new Date();
+            await this.accountRepository.save(account);
+            return this.generateTokenResponse(account);
+        }
+
+        // 未綁定 - 返回需要註冊/綁定
+        return {
+            needsRegistration: true,
+            googleProfile,
+        };
+    }
+
+    /**
+     * 綁定 Google 帳號到現有帳號
+     */
+    async bindGoogleAccount(accountId: string, googleId: string, googleEmail: string): Promise<void> {
+        // 檢查 Google 是否已被其他帳號綁定
+        const existing = await this.accountRepository.findOne({ where: { googleId } });
+        if (existing && existing.id !== accountId) {
+            throw new ConflictException('此 Google 帳號已被其他帳號綁定');
+        }
+
+        await this.accountRepository.update(accountId, {
+            googleId,
+            googleEmail,
+        });
+    }
+
+    /**
+     * 使用 Google 註冊新帳號
+     */
+    async registerWithGoogle(googleAccessToken: string, displayName?: string): Promise<TokenResponseDto> {
+        const googleProfile = await this.verifyGoogleToken(googleAccessToken);
+
+        // 檢查 Google 是否已綁定
+        const existingGoogle = await this.accountRepository.findOne({ where: { googleId: googleProfile.id } });
+        if (existingGoogle) {
+            throw new ConflictException('此 Google 帳號已註冊');
+        }
+
+        // 檢查 email 是否已存在
+        if (googleProfile.email) {
+            const existingEmail = await this.accountRepository.findOne({ where: { email: googleProfile.email } });
+            if (existingEmail) {
+                throw new ConflictException('此 Email 已有帳號，請直接登入');
+            }
+        }
+
+        // 取得預設角色
+        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
+
+        // 建立帳號
+        const account = this.accountRepository.create({
+            email: googleProfile.email || undefined,
+            passwordHash: '', // Google 登入不需要密碼
+            displayName: displayName || googleProfile.name,
+            avatarUrl: googleProfile.picture,
+            googleId: googleProfile.id,
+            googleEmail: googleProfile.email,
+            roles: volunteerRole ? [volunteerRole] : [],
+        });
+
+        await this.accountRepository.save(account);
+        return this.generateTokenResponse(account);
+    }
+
     private generateTokenResponse(account: Account): TokenResponseDto {
         const roles = account.roles || [];
         const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => (r as any).level || 0)) : 0;
