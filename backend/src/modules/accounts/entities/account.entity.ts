@@ -21,6 +21,13 @@ export class Account {
     @Column({ name: 'avatar_url', type: 'text', nullable: true })
     avatarUrl: string;
 
+    // LINE Login 綁定欄位
+    @Column({ name: 'line_user_id', unique: true, nullable: true, length: 50 })
+    lineUserId: string;
+
+    @Column({ name: 'line_display_name', nullable: true, length: 100 })
+    lineDisplayName: string;
+
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 

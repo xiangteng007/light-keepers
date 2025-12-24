@@ -96,6 +96,100 @@ export class AuthService {
     }
 
     /**
+     * LINE Login - 驗證 LINE Access Token 並獲取用戶資訊
+     */
+    async verifyLineToken(accessToken: string): Promise<{ userId: string; displayName: string; pictureUrl?: string }> {
+        const response = await fetch('https://api.line.me/v2/profile', {
+            headers: { Authorization: `Bearer ${accessToken}` },
+        });
+
+        if (!response.ok) {
+            throw new UnauthorizedException('LINE Token 驗證失敗');
+        }
+
+        const profile = await response.json();
+        return {
+            userId: profile.userId,
+            displayName: profile.displayName,
+            pictureUrl: profile.pictureUrl,
+        };
+    }
+
+    /**
+     * LINE Login - 使用 LINE 帳號登入
+     */
+    async loginWithLine(lineAccessToken: string): Promise<TokenResponseDto | { needsRegistration: true; lineProfile: { userId: string; displayName: string; pictureUrl?: string } }> {
+        // 驗證 LINE Token
+        const lineProfile = await this.verifyLineToken(lineAccessToken);
+
+        // 查找已綁定的帳號
+        const account = await this.accountRepository.findOne({
+            where: { lineUserId: lineProfile.userId },
+            relations: ['roles'],
+        });
+
+        if (account) {
+            // 已綁定 - 直接登入
+            account.lastLoginAt = new Date();
+            await this.accountRepository.save(account);
+            return this.generateTokenResponse(account);
+        }
+
+        // 未綁定 - 返回需要註冊/綁定
+        return {
+            needsRegistration: true,
+            lineProfile,
+        };
+    }
+
+    /**
+     * 綁定 LINE 帳號到現有帳號
+     */
+    async bindLineAccount(accountId: string, lineUserId: string, lineDisplayName: string): Promise<void> {
+        // 檢查 LINE 是否已被其他帳號綁定
+        const existing = await this.accountRepository.findOne({ where: { lineUserId } });
+        if (existing && existing.id !== accountId) {
+            throw new ConflictException('此 LINE 帳號已被其他帳號綁定');
+        }
+
+        await this.accountRepository.update(accountId, {
+            lineUserId,
+            lineDisplayName,
+        });
+    }
+
+    /**
+     * 使用 LINE 註冊新帳號
+     */
+    async registerWithLine(lineAccessToken: string, displayName: string, email?: string, phone?: string): Promise<TokenResponseDto> {
+        const lineProfile = await this.verifyLineToken(lineAccessToken);
+
+        // 檢查 LINE 是否已綁定
+        const existingLine = await this.accountRepository.findOne({ where: { lineUserId: lineProfile.userId } });
+        if (existingLine) {
+            throw new ConflictException('此 LINE 帳號已註冊');
+        }
+
+        // 取得預設角色
+        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
+
+        // 建立帳號
+        const account = this.accountRepository.create({
+            email: email || undefined,
+            phone: phone || undefined,
+            passwordHash: '', // LINE 登入不需要密碼
+            displayName: displayName || lineProfile.displayName,
+            avatarUrl: lineProfile.pictureUrl,
+            lineUserId: lineProfile.userId,
+            lineDisplayName: lineProfile.displayName,
+            roles: volunteerRole ? [volunteerRole] : [],
+        });
+
+        await this.accountRepository.save(account);
+        return this.generateTokenResponse(account);
+    }
+
+    /**
      * 獲取頁面權限配置
      */
     async getPagePermissions(): Promise<PagePermission[]> {

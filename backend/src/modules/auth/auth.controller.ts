@@ -19,7 +19,7 @@ export class AuthController {
 
     @Get('me')
     @UseGuards(JwtAuthGuard)
-    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
+    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; lineUserId?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
         const roles = req.user.roles || [];
         const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => r.level || 0)) : 0;
 
@@ -28,6 +28,7 @@ export class AuthController {
             email: req.user.email,
             phone: req.user.phone,
             displayName: req.user.displayName,
+            lineLinked: !!req.user.lineUserId,
             roles: roles.map(r => r.name),
             roleLevel,
             roleDisplayName: roles.find(r => r.level === roleLevel)?.displayName || '一般民眾',
@@ -42,5 +43,36 @@ export class AuthController {
     async getPermissions() {
         return this.authService.getPagePermissions();
     }
+
+    /**
+     * LINE 登入
+     * 前端透過 LINE SDK 取得 access token 後呼叫此 API
+     */
+    @Post('line/login')
+    async loginWithLine(@Body() body: { accessToken: string }) {
+        return this.authService.loginWithLine(body.accessToken);
+    }
+
+    /**
+     * LINE 註冊新帳號
+     * 若 LINE 帳號未綁定，使用此 API 建立新帳號
+     */
+    @Post('line/register')
+    async registerWithLine(@Body() body: { accessToken: string; displayName: string; email?: string; phone?: string }) {
+        return this.authService.registerWithLine(body.accessToken, body.displayName, body.email, body.phone);
+    }
+
+    /**
+     * 綁定 LINE 帳號
+     * 已登入用戶綁定 LINE 帳號
+     */
+    @Post('line/bind')
+    @UseGuards(JwtAuthGuard)
+    async bindLine(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
+        const lineProfile = await this.authService.verifyLineToken(body.accessToken);
+        await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
+        return { success: true, lineDisplayName: lineProfile.displayName };
+    }
 }
+
 
