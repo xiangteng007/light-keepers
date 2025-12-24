@@ -357,24 +357,11 @@ select {
 ============================================ */
 
 @media (max-width: 768px) {
+  /* 側邊欄 - 使用漢堡選單模式，展開時顯示完整文字 */
+  /* 側邊欄寬度和文字顯示由 App.css 的 hamburger menu 樣式控制 */
 
-  /* 側邊欄在手機隱藏文字 */
-  .sidebar__nav-item span {
-    display: none;
-  }
+  /* 主內容區由 App.css 控制 */
 
-  .sidebar {
-    width: 60px !important;
-    min-width: 60px !important;
-  }
-
-  .sidebar__logo span {
-    display: none;
-  }
-
-  .main-content {
-    margin-left: 60px !important;
-  }
 
   /* 頁面標題 */
   .page-header {
