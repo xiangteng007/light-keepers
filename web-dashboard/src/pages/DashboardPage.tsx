@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { getEvents, getTaskStats, getEventStats, getNcdrAlerts } from '../api';
+import { getEvents, getTaskStats, getEventStats, getNcdrAlerts, getVolunteerStats, getReportStats, getResourceStats } from '../api';
 import { Card, Badge, Alert, Button } from '../design-system';
+import { useRealtime } from '../context/RealtimeContext';
 
 // 統計卡片組件
 interface StatCardProps {
@@ -57,6 +58,9 @@ function QuickActions() {
 }
 
 export default function DashboardPage() {
+    // 即時連線狀態
+    const { isConnected, onlineCount } = useRealtime();
+
     // 獲取事件統計
     const { data: eventStats, isLoading: eventsLoading } = useQuery({
         queryKey: ['eventStats'],
@@ -82,15 +86,29 @@ export default function DashboardPage() {
         refetchInterval: 60000, // 每分鐘刷新
     });
 
+    // 獲取志工統計 (真實 API)
+    const { data: volunteerStats } = useQuery({
+        queryKey: ['volunteerStats'],
+        queryFn: () => getVolunteerStats().then(res => res.data),
+    });
+
+    // 獲取回報統計 (真實 API)
+    const { data: reportStats } = useQuery({
+        queryKey: ['reportStats'],
+        queryFn: () => getReportStats().then(res => res.data),
+    });
+
+    // 獲取物資統計 (真實 API)
+    const { data: resourceStats } = useQuery({
+        queryKey: ['resourceStats'],
+        queryFn: () => getResourceStats().then(res => res.data),
+    });
+
     // 計算完成率
     const total = (taskStats?.pending || 0) + (taskStats?.inProgress || 0) + (taskStats?.completed || 0);
     const completionRate = total > 0 ? Math.round((taskStats?.completed || 0) / total * 100) : 0;
 
     const isLoading = eventsLoading || tasksLoading;
-
-    // 模擬志工和回報統計 (實際應從 API 獲取)
-    const volunteerStats = { available: 12, total: 25 };
-    const reportStats = { pending: 3, today: 8 };
 
     return (
         <div className="page dashboard-page">
@@ -99,7 +117,14 @@ export default function DashboardPage() {
                     <h2>📊 決策儀表板</h2>
                     <p className="page-subtitle">Light Keepers 災害應變系統總覽</p>
                 </div>
-                <Badge variant="success" dot>系統運作正常</Badge>
+                <div className="page-header__right" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    {onlineCount > 0 && (
+                        <Badge variant="info">👥 {onlineCount} 人在線</Badge>
+                    )}
+                    <Badge variant={isConnected ? 'success' : 'default'} dot>
+                        {isConnected ? '即時連線中' : '系統運作正常'}
+                    </Badge>
+                </div>
             </div>
 
             {/* KPI 統計卡片 - 第一行 */}
@@ -118,13 +143,13 @@ export default function DashboardPage() {
                 />
                 <StatCard
                     icon="📢"
-                    value={reportStats.pending}
+                    value={reportStats?.pending || 0}
                     label="待審核回報"
                     variant="warning"
                 />
                 <StatCard
                     icon="👥"
-                    value={volunteerStats.available}
+                    value={volunteerStats?.available || 0}
                     label="可用志工"
                     variant="success"
                 />
@@ -206,19 +231,19 @@ export default function DashboardPage() {
                     <div className="resource-grid">
                         <div className="resource-item">
                             <span className="resource-label">總志工數</span>
-                            <span className="resource-value">{volunteerStats.total}</span>
+                            <span className="resource-value">{volunteerStats?.total || 0}</span>
                         </div>
                         <div className="resource-item">
                             <span className="resource-label">可用</span>
-                            <span className="resource-value resource-value--success">{volunteerStats.available}</span>
+                            <span className="resource-value resource-value--success">{volunteerStats?.available || 0}</span>
                         </div>
                         <div className="resource-item">
                             <span className="resource-label">執勤中</span>
-                            <span className="resource-value resource-value--warning">{volunteerStats.total - volunteerStats.available}</span>
+                            <span className="resource-value resource-value--warning">{volunteerStats?.busy || 0}</span>
                         </div>
                         <div className="resource-item">
-                            <span className="resource-label">今日回報</span>
-                            <span className="resource-value">{reportStats.today}</span>
+                            <span className="resource-label">回報總數</span>
+                            <span className="resource-value">{reportStats?.total || 0}</span>
                         </div>
                     </div>
                     <Link to="/volunteers" className="view-more-link">
@@ -234,6 +259,26 @@ export default function DashboardPage() {
                             <Button variant="secondary" size="sm">開啟地圖</Button>
                         </Link>
                     </div>
+                </Card>
+
+                <Card title="物資庫存" icon="📦" padding="md">
+                    <div className="resource-grid">
+                        <div className="resource-item">
+                            <span className="resource-label">物資種類</span>
+                            <span className="resource-value">{resourceStats?.total || 0}</span>
+                        </div>
+                        <div className="resource-item">
+                            <span className="resource-label">低庫存</span>
+                            <span className="resource-value resource-value--warning">{resourceStats?.lowStock || 0}</span>
+                        </div>
+                        <div className="resource-item">
+                            <span className="resource-label">即期品</span>
+                            <span className="resource-value resource-value--danger">{resourceStats?.expiringSoon || 0}</span>
+                        </div>
+                    </div>
+                    <Link to="/resources" className="view-more-link">
+                        前往物資管理 →
+                    </Link>
                 </Card>
             </div>
         </div>

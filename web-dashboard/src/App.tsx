@@ -1,5 +1,7 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useRegisterSW } from 'virtual:pwa-register/react'
+import { AuthProvider } from './context/AuthContext'
+import { RealtimeProvider } from './context/RealtimeContext'
 import Layout from './components/Layout'
 import DashboardPage from './pages/DashboardPage'
 import EventsPage from './pages/EventsPage'
@@ -14,6 +16,10 @@ import VolunteerDetailPage from './pages/VolunteerDetailPage'
 import TrainingPage from './pages/TrainingPage'
 import ResourcesPage from './pages/ResourcesPage'
 import NotificationsPage from './pages/NotificationsPage'
+import ReportsAdminPage from './pages/ReportsAdminPage'
+import ReportsExportPage from './pages/ReportsExportPage'
+import AnalyticsPage from './pages/AnalyticsPage'
+import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
@@ -32,49 +38,55 @@ function App() {
   })
 
   return (
-    <>
-      {/* PWA Update Prompt */}
-      {needRefresh && (
-        <div className="pwa-update-prompt">
-          <div className="pwa-update-prompt__content">
-            <span className="pwa-update-prompt__icon">🔄</span>
-            <span className="pwa-update-prompt__text">有新版本可用</span>
-            <button
-              className="pwa-update-prompt__btn pwa-update-prompt__btn--primary"
-              onClick={() => updateServiceWorker(true)}
-            >
-              更新
-            </button>
-            <button
-              className="pwa-update-prompt__btn pwa-update-prompt__btn--secondary"
-              onClick={() => setNeedRefresh(false)}
-            >
-              稍後
-            </button>
+    <RealtimeProvider>
+      <AuthProvider>
+        {/* PWA Update Prompt */}
+        {needRefresh && (
+          <div className="pwa-update-prompt">
+            <div className="pwa-update-prompt__content">
+              <span className="pwa-update-prompt__icon">🔄</span>
+              <span className="pwa-update-prompt__text">有新版本可用</span>
+              <button
+                className="pwa-update-prompt__btn pwa-update-prompt__btn--primary"
+                onClick={() => updateServiceWorker(true)}
+              >
+                更新
+              </button>
+              <button
+                className="pwa-update-prompt__btn pwa-update-prompt__btn--secondary"
+                onClick={() => setNeedRefresh(false)}
+              >
+                稍後
+              </button>
+            </div>
           </div>
-        </div>
-      )}
+        )}
 
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<DashboardPage />} />
-          <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
-          <Route path="events" element={<EventsPage />} />
-          <Route path="tasks" element={<TasksPage />} />
-          <Route path="map" element={<MapPage />} />
-          <Route path="manuals" element={<ManualsPage />} />
-          <Route path="manuals/:id" element={<ManualDetailPage />} />
-          <Route path="report" element={<ReportPage />} />
-          <Route path="volunteers" element={<VolunteersPage />} />
-          <Route path="volunteers/:id" element={<VolunteerDetailPage />} />
-          <Route path="training" element={<TrainingPage />} />
-          <Route path="resources" element={<ResourcesPage />} />
-          <Route path="notifications" element={<NotificationsPage />} />
-        </Route>
-      </Routes>
-    </>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/" element={<Layout />}>
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
+            <Route path="events" element={<EventsPage />} />
+            <Route path="tasks" element={<TasksPage />} />
+            <Route path="map" element={<MapPage />} />
+            <Route path="manuals" element={<ManualsPage />} />
+            <Route path="manuals/:id" element={<ManualDetailPage />} />
+            <Route path="report" element={<ReportPage />} />
+            <Route path="volunteers" element={<VolunteersPage />} />
+            <Route path="volunteers/:id" element={<VolunteerDetailPage />} />
+            <Route path="training" element={<TrainingPage />} />
+            <Route path="resources" element={<ResourcesPage />} />
+            <Route path="notifications" element={<NotificationsPage />} />
+            <Route path="reports/admin" element={<ReportsAdminPage />} />
+            <Route path="reports/export" element={<ReportsExportPage />} />
+            <Route path="analytics" element={<AnalyticsPage />} />
+            <Route path="volunteers/schedule" element={<VolunteerSchedulePage />} />
+          </Route>
+        </Routes>
+      </AuthProvider>
+    </RealtimeProvider>
   )
 }
 

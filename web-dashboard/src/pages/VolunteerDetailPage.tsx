@@ -1,26 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { getVolunteer } from '../api/services';
+import type { Volunteer as VolunteerType } from '../api/services';
 import './VolunteerDetailPage.css';
-
-// 模擬志工詳細資料
-interface Volunteer {
-    id: string;
-    name: string;
-    email: string;
-    phone: string;
-    region: string;
-    address: string;
-    skills: string[];
-    status: 'available' | 'busy' | 'offline';
-    emergencyContact: string;
-    emergencyPhone: string;
-    notes: string;
-    serviceHours: number;
-    taskCount: number;
-    lineUserId?: string;
-    photoUrl?: string; // 📷 志工照片
-    createdAt: string;
-}
 
 interface ServiceRecord {
     id: string;
@@ -31,32 +13,12 @@ interface ServiceRecord {
     location: string;
 }
 
-// 模擬資料
-const MOCK_VOLUNTEER: Volunteer = {
-    id: '1',
-    name: '王大明',
-    email: 'wang.daming@example.com',
-    phone: '0912-345-678',
-    region: '台北市中正區',
-    address: '台北市中正區忠孝東路一段100號',
-    skills: ['急救', '搜救', '通訊'],
-    status: 'available',
-    emergencyContact: '王媽媽',
-    emergencyPhone: '0923-456-789',
-    notes: '具有 EMT-1 證照，曾參與多次災害救援',
-    serviceHours: 120,
-    taskCount: 15,
-    lineUserId: 'U1234567890',
-    photoUrl: 'https://api.dicebear.com/7.x/avataaars/svg?seed=WangDaming', // 📷 預設頭像
-    createdAt: '2024-06-15T10:30:00Z',
-};
-
+// 模擬服務紀錄 (未來可改為真實 API)
 const MOCK_SERVICE_RECORDS: ServiceRecord[] = [
     { id: '1', taskTitle: '0403 花蓮地震救災支援', date: '2024-04-05', hours: 12, status: 'completed', location: '花蓮縣花蓮市' },
     { id: '2', taskTitle: '社區防災演習協助', date: '2024-03-20', hours: 4, status: 'completed', location: '台北市中正區' },
     { id: '3', taskTitle: '物資發放站志工', date: '2024-02-28', hours: 6, status: 'completed', location: '台北市萬華區' },
     { id: '4', taskTitle: '颱風災前準備作業', date: '2024-07-22', hours: 8, status: 'completed', location: '新北市板橋區' },
-    { id: '5', taskTitle: '臨時取消的活動', date: '2024-01-15', hours: 0, status: 'cancelled', location: '台北市信義區' },
 ];
 
 const STATUS_CONFIG = {
@@ -68,21 +30,32 @@ const STATUS_CONFIG = {
 export default function VolunteerDetailPage() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const [volunteer, setVolunteer] = useState<Volunteer | null>(null);
+    const [volunteer, setVolunteer] = useState<VolunteerType | null>(null);
     const [serviceRecords, setServiceRecords] = useState<ServiceRecord[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [activeTab, setActiveTab] = useState<'info' | 'records' | 'settings'>('info');
 
     // 模擬管理員權限檢查
     const isAdmin = true; // 實際應從 auth context 取得
 
     useEffect(() => {
-        // 模擬 API 載入
-        setTimeout(() => {
-            setVolunteer(MOCK_VOLUNTEER);
-            setServiceRecords(MOCK_SERVICE_RECORDS);
-            setIsLoading(false);
-        }, 500);
+        const fetchVolunteer = async () => {
+            if (!id) return;
+            setIsLoading(true);
+            setError(null);
+            try {
+                const response = await getVolunteer(id);
+                setVolunteer(response.data);
+                setServiceRecords(MOCK_SERVICE_RECORDS); // 服務紀錄暫用 mock
+            } catch (err) {
+                console.error('Failed to fetch volunteer:', err);
+                setError('載入志工資料失敗');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchVolunteer();
     }, [id]);
 
     if (isLoading) {
@@ -91,6 +64,17 @@ export default function VolunteerDetailPage() {
                 <div className="loading-container">
                     <div className="loading-spinner"></div>
                     <p>載入志工資料中...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="page volunteer-detail-page">
+                <div className="error-container">
+                    <h2>⚠️ {error}</h2>
+                    <Link to="/volunteers" className="btn btn-primary">返回志工列表</Link>
                 </div>
             </div>
         );

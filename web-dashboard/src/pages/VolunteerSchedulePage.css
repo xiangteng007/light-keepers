@@ -1,0 +1,160 @@
+.volunteer-schedule-page {
+    padding: 1.5rem;
+}
+
+.schedule-card {
+    overflow-x: auto;
+}
+
+/* 排班網格 */
+.schedule-grid {
+    min-width: 900px;
+}
+
+.schedule-header,
+.schedule-row {
+    display: grid;
+    grid-template-columns: 120px repeat(7, 1fr);
+    gap: 2px;
+}
+
+.schedule-cell {
+    padding: 0.75rem;
+    background: white;
+    border: 1px solid #e2e8f0;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.schedule-cell--header {
+    background: #f8fafc;
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.85rem;
+}
+
+.schedule-cell--shift {
+    flex-direction: column;
+    gap: 0.25rem;
+    border-left: 4px solid;
+    justify-content: center;
+}
+
+.shift-name {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.shift-time {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.schedule-cell--slot {
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.schedule-cell--slot:hover {
+    background: #f1f5f9;
+}
+
+.schedule-cell--slot.has-volunteer {
+    background: #f0fdf4;
+}
+
+.schedule-cell--slot.empty {
+    background: #fafafa;
+}
+
+.empty-slot {
+    color: #94a3b8;
+    font-size: 0.85rem;
+}
+
+.slot-content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    justify-content: center;
+}
+
+.volunteer-name {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.remove-btn {
+    background: none;
+    border: none;
+    color: #ef4444;
+    cursor: pointer;
+    padding: 2px 4px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+}
+
+.remove-btn:hover {
+    background: #fecaca;
+}
+
+/* Modal */
+.modal-subtitle {
+    color: #64748b;
+    margin-bottom: 1rem;
+}
+
+.volunteer-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.volunteer-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.volunteer-item:hover {
+    background: #f1f5f9;
+}
+
+.volunteer-avatar {
+    font-size: 1.5rem;
+}
+
+.volunteer-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.volunteer-info .name {
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.volunteer-info .region {
+    font-size: 0.8rem;
+    color: #94a3b8;
+}
+
+/* 響應式 */
+@media (max-width: 1024px) {
+    .schedule-grid {
+        min-width: 700px;
+    }
+
+    .schedule-header,
+    .schedule-row {
+        grid-template-columns: 100px repeat(7, 1fr);
+    }
+}

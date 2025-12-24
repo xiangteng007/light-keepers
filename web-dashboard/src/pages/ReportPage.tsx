@@ -1,7 +1,21 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button, Badge } from '../design-system';
+import { createReport } from '../api/services';
+import type { ReportType, ReportSeverity } from '../api/services';
 import './ReportPage.css';
+
+// 前端災害類型對應後端 ReportType
+const TYPE_MAPPING: Record<string, ReportType> = {
+    earthquake: 'other',
+    typhoon: 'other',
+    flood: 'flood',
+    fire: 'other',
+    landslide: 'landslide',
+    traffic: 'road_damage',
+    infrastructure: 'building_damage',
+    other: 'other',
+};
 
 // 災害類型選項
 const DISASTER_TYPES = [
@@ -119,27 +133,29 @@ export default function ReportPage() {
         setError(null);
 
         try {
-            const response = await fetch('/api/v1/reports', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...formData,
-                    latitude: formData.latitude,
-                    longitude: formData.longitude,
-                }),
+            // 使用 API 服務提交回報
+            await createReport({
+                type: TYPE_MAPPING[formData.type] || 'other',
+                severity: formData.severity as ReportSeverity,
+                title: formData.title,
+                description: formData.description,
+                latitude: formData.latitude,
+                longitude: formData.longitude,
+                address: formData.address || undefined,
+                photos: formData.photos.length > 0 ? formData.photos : undefined,
+                contactName: formData.contactName || undefined,
+                contactPhone: formData.contactPhone || undefined,
             });
-
-            if (!response.ok) {
-                throw new Error('提交失敗');
-            }
 
             setSubmitSuccess(true);
         } catch (err) {
+            console.error('Report submission error:', err);
             setError('提交失敗，請稍後再試');
         } finally {
             setIsSubmitting(false);
         }
     };
+
 
     // 成功畫面
     if (submitSuccess) {

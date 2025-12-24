@@ -1,13 +1,19 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { login, register } from '../api';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
+import { login as loginApi, register } from '../api';
 import './LoginPage.css';
 
 export default function LoginPage() {
     const navigate = useNavigate();
+    const location = useLocation();
+    const { login } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+
+    // 取得重定向目標 (登入後跳轉回原頁面)
+    const from = (location.state as { from?: Location })?.from?.pathname || '/dashboard';
 
     const [formData, setFormData] = useState({
         email: '',
@@ -29,9 +35,9 @@ export default function LoginPage() {
 
         try {
             if (isLogin) {
-                const response = await login(formData.email, formData.password);
-                localStorage.setItem('accessToken', response.data.accessToken);
-                navigate('/dashboard');
+                const response = await loginApi(formData.email, formData.password);
+                login(response.data.accessToken);
+                navigate(from, { replace: true });
             } else {
                 if (formData.password !== formData.confirmPassword) {
                     setError('密碼不一致');
@@ -44,9 +50,9 @@ export default function LoginPage() {
                     displayName: formData.displayName,
                 });
                 // Auto login after registration
-                const loginResponse = await login(formData.email, formData.password);
-                localStorage.setItem('accessToken', loginResponse.data.accessToken);
-                navigate('/dashboard');
+                const loginResponse = await loginApi(formData.email, formData.password);
+                login(loginResponse.data.accessToken);
+                navigate(from, { replace: true });
             }
         } catch (err: unknown) {
             const error = err as { response?: { data?: { message?: string } } };

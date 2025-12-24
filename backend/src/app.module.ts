@@ -19,6 +19,7 @@ import { RealtimeModule } from './modules/realtime/realtime.module';
 import { ReportsExportModule } from './modules/reports-export/reports-export.module';
 import { LineBotModule } from './modules/line-bot/line-bot.module';
 import { AccessLogModule } from './modules/access-log/access-log.module';
+import { UploadsModule } from './modules/uploads/uploads.module';
 
 @Module({
     imports: [
@@ -78,6 +79,7 @@ import { AccessLogModule } from './modules/access-log/access-log.module';
         ReportsExportModule,
         LineBotModule,
         AccessLogModule, // 🔐 存取日誌
+        UploadsModule,   // 📁 檔案上傳
     ],
 })
 export class AppModule { }

@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Button, Badge } from '../design-system';
+import { getVolunteers, getVolunteerStats } from '../api/services';
+import type { Volunteer as VolunteerType, VolunteerStatus } from '../api/services';
 
 // 技能選項
 const SKILL_OPTIONS = [
@@ -13,21 +15,6 @@ const SKILL_OPTIONS = [
     { value: 'construction', label: '土木修繕', icon: '🔧' },
     { value: 'social', label: '社工關懷', icon: '💝' },
 ];
-
-// 模擬志工資料
-const MOCK_VOLUNTEERS = [
-    { id: '1', name: '王大明', phone: '0912-345-678', region: '台北市', skills: ['medical', 'rescue'], status: 'available', serviceHours: 120, taskCount: 15 },
-    { id: '2', name: '李小華', phone: '0923-456-789', region: '新北市', skills: ['logistics', 'driving'], status: 'busy', serviceHours: 85, taskCount: 10 },
-    { id: '3', name: '張阿美', phone: '0934-567-890', region: '桃園市', skills: ['cooking', 'social'], status: 'available', serviceHours: 200, taskCount: 25 },
-    { id: '4', name: '陳志強', phone: '0945-678-901', region: '台中市', skills: ['construction', 'logistics'], status: 'offline', serviceHours: 45, taskCount: 5 },
-];
-
-// 模擬任務指派資料
-const MOCK_ASSIGNMENTS = [
-    { id: 'a1', volunteerId: '2', taskTitle: '物資運送 - 新北市板橋區', status: 'in_progress', scheduledStart: '2024-12-23T09:00:00' },
-];
-
-type VolunteerStatus = 'available' | 'busy' | 'offline';
 
 const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgColor: string }> = {
     available: { label: '可用', color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.15)' },
@@ -44,7 +31,42 @@ interface AssignmentForm {
     scheduledStart: string;
 }
 
+interface VolunteerForm {
+    name: string;
+    phone: string;
+    email: string;
+    region: string;
+    address: string;
+    skills: string[];
+    emergencyContact: string;
+    emergencyPhone: string;
+    notes: string;
+}
+
+const INITIAL_VOLUNTEER_FORM: VolunteerForm = {
+    name: '',
+    phone: '',
+    email: '',
+    region: '',
+    address: '',
+    skills: [],
+    emergencyContact: '',
+    emergencyPhone: '',
+    notes: '',
+};
+
 export default function VolunteersPage() {
+    const [volunteers, setVolunteers] = useState<VolunteerType[]>([]);
+    const [stats, setStats] = useState({
+        total: 0,
+        available: 0,
+        busy: 0,
+        offline: 0,
+        totalServiceHours: 0,
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
     const [showRegisterForm, setShowRegisterForm] = useState(false);
     const [showAssignModal, setShowAssignModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState<VolunteerStatus | ''>('');
@@ -57,31 +79,46 @@ export default function VolunteersPage() {
         location: '',
         scheduledStart: '',
     });
+    const [volunteerForm, setVolunteerForm] = useState<VolunteerForm>(INITIAL_VOLUNTEER_FORM);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
-    // 篩選志工
-    const filteredVolunteers = MOCK_VOLUNTEERS.filter(v => {
-        if (filterStatus && v.status !== filterStatus) return false;
+    // 載入志工資料
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            setError(null);
+            try {
+                const [volunteersRes, statsRes] = await Promise.all([
+                    getVolunteers({ status: filterStatus || undefined }),
+                    getVolunteerStats(),
+                ]);
+                setVolunteers(volunteersRes.data);
+                setStats(statsRes.data);
+            } catch (err) {
+                console.error('Failed to fetch volunteers:', err);
+                setError('載入志工資料失敗');
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchData();
+    }, [filterStatus]);
+
+    // 篩選志工 (搜尋)
+    const filteredVolunteers = volunteers.filter(v => {
         if (searchQuery && !v.name.includes(searchQuery) && !v.region.includes(searchQuery)) return false;
         return true;
     });
-
-    // 統計
-    const stats = {
-        total: MOCK_VOLUNTEERS.length,
-        available: MOCK_VOLUNTEERS.filter(v => v.status === 'available').length,
-        busy: MOCK_VOLUNTEERS.filter(v => v.status === 'busy').length,
-        totalHours: MOCK_VOLUNTEERS.reduce((sum, v) => sum + v.serviceHours, 0),
-        activeAssignments: MOCK_ASSIGNMENTS.length,
-    };
 
     const getSkillLabel = (skillValue: string) => {
         const skill = SKILL_OPTIONS.find(s => s.value === skillValue);
         return skill ? `${skill.icon} ${skill.label}` : skillValue;
     };
 
+
     // 開啟指派任務
-    const openAssignModal = (volunteer: typeof MOCK_VOLUNTEERS[0]) => {
+    const openAssignModal = (volunteer: VolunteerType) => {
         setAssignmentForm({
             volunteerId: volunteer.id,
             volunteerName: volunteer.name,
@@ -106,6 +143,54 @@ export default function VolunteersPage() {
         setShowAssignModal(false);
         setSuccessMessage(`已成功指派任務給 ${assignmentForm.volunteerName}`);
         setTimeout(() => setSuccessMessage(''), 3000);
+    };
+
+    // 提交志工註冊
+    const handleRegisterVolunteer = async () => {
+        if (!volunteerForm.name || !volunteerForm.phone || !volunteerForm.region) {
+            alert('請填寫必填欄位：姓名、電話、所在地區');
+            return;
+        }
+
+        setIsSubmitting(true);
+        try {
+            // 呼叫後端 API 建立志工
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/volunteers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...volunteerForm,
+                    status: 'available',
+                    serviceHours: 0,
+                    taskCount: 0,
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to create volunteer');
+
+            setShowRegisterForm(false);
+            setVolunteerForm(INITIAL_VOLUNTEER_FORM);
+            setSuccessMessage(`志工 ${volunteerForm.name} 已成功註冊！`);
+            setTimeout(() => setSuccessMessage(''), 3000);
+
+            // 重新載入資料
+            window.location.reload();
+        } catch (err) {
+            console.error('Failed to register volunteer:', err);
+            alert('註冊失敗，請稍後再試');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // 技能選擇切換
+    const toggleSkill = (skillValue: string) => {
+        setVolunteerForm(prev => ({
+            ...prev,
+            skills: prev.skills.includes(skillValue)
+                ? prev.skills.filter(s => s !== skillValue)
+                : [...prev.skills, skillValue]
+        }));
     };
 
     return (
@@ -144,12 +229,12 @@ export default function VolunteersPage() {
                     <div className="stat-card__label">執勤中</div>
                 </Card>
                 <Card className="stat-card stat-card--info" padding="md">
-                    <div className="stat-card__value">{stats.totalHours}</div>
+                    <div className="stat-card__value">{stats.totalServiceHours}</div>
                     <div className="stat-card__label">總服務時數</div>
                 </Card>
                 <Card className="stat-card stat-card--primary" padding="md">
-                    <div className="stat-card__value">{stats.activeAssignments}</div>
-                    <div className="stat-card__label">進行中任務</div>
+                    <div className="stat-card__value">{stats.offline}</div>
+                    <div className="stat-card__label">離線</div>
                 </Card>
             </div>
 
@@ -187,7 +272,20 @@ export default function VolunteersPage() {
 
             {/* 志工列表 */}
             <div className="volunteers-list">
-                {filteredVolunteers.length > 0 ? (
+                {isLoading ? (
+                    <div className="volunteers-empty">
+                        <span>⏳</span>
+                        <p>載入志工資料中...</p>
+                    </div>
+                ) : error ? (
+                    <div className="volunteers-empty">
+                        <span>⚠️</span>
+                        <p>{error}</p>
+                        <Button variant="secondary" onClick={() => window.location.reload()}>
+                            重新載入
+                        </Button>
+                    </div>
+                ) : filteredVolunteers.length > 0 ? (
                     filteredVolunteers.map(volunteer => (
                         <Card key={volunteer.id} className="volunteer-card" padding="md">
                             <div className="volunteer-card__header">
@@ -311,12 +409,125 @@ export default function VolunteersPage() {
             {/* 新增志工表單 Modal */}
             {showRegisterForm && (
                 <div className="modal-overlay" onClick={() => setShowRegisterForm(false)}>
-                    <Card className="modal-content" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>新增志工</h3>
-                        <p className="modal-desc">志工註冊表單功能開發中...</p>
+                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
+                        <h3>➕ 新增志工</h3>
+
+                        <div className="form-row">
+                            <div className="form-section">
+                                <label className="form-label">姓名 *</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="請輸入姓名"
+                                    value={volunteerForm.name}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-section">
+                                <label className="form-label">電話 *</label>
+                                <input
+                                    type="tel"
+                                    className="form-input"
+                                    placeholder="09XX-XXX-XXX"
+                                    value={volunteerForm.phone}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, phone: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-section">
+                                <label className="form-label">Email</label>
+                                <input
+                                    type="email"
+                                    className="form-input"
+                                    placeholder="volunteer@email.com"
+                                    value={volunteerForm.email}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, email: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-section">
+                                <label className="form-label">所在地區 *</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="例如：台北市中山區"
+                                    value={volunteerForm.region}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, region: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">詳細地址</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                placeholder="詳細地址（選填）"
+                                value={volunteerForm.address}
+                                onChange={e => setVolunteerForm({ ...volunteerForm, address: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">專長技能</label>
+                            <div className="skills-grid">
+                                {SKILL_OPTIONS.map(skill => (
+                                    <button
+                                        key={skill.value}
+                                        type="button"
+                                        className={`skill-btn ${volunteerForm.skills.includes(skill.value) ? 'active' : ''}`}
+                                        onClick={() => toggleSkill(skill.value)}
+                                    >
+                                        {skill.icon} {skill.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-section">
+                                <label className="form-label">緊急聯絡人</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    placeholder="聯絡人姓名"
+                                    value={volunteerForm.emergencyContact}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, emergencyContact: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-section">
+                                <label className="form-label">緊急聯絡電話</label>
+                                <input
+                                    type="tel"
+                                    className="form-input"
+                                    placeholder="緊急聯絡電話"
+                                    value={volunteerForm.emergencyPhone}
+                                    onChange={e => setVolunteerForm({ ...volunteerForm, emergencyPhone: e.target.value })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">備註</label>
+                            <textarea
+                                className="form-textarea"
+                                placeholder="其他說明事項..."
+                                value={volunteerForm.notes}
+                                onChange={e => setVolunteerForm({ ...volunteerForm, notes: e.target.value })}
+                                rows={2}
+                            />
+                        </div>
+
                         <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => setShowRegisterForm(false)}>
-                                關閉
+                            <Button variant="secondary" onClick={() => {
+                                setShowRegisterForm(false);
+                                setVolunteerForm(INITIAL_VOLUNTEER_FORM);
+                            }}>
+                                取消
+                            </Button>
+                            <Button onClick={handleRegisterVolunteer} disabled={isSubmitting}>
+                                {isSubmitting ? '註冊中...' : '✅ 確認註冊'}
                             </Button>
                         </div>
                     </Card>

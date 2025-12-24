@@ -351,3 +351,151 @@ select {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
+/* ============================================
+   Mobile Responsive - 行動裝置響應式
+============================================ */
+
+@media (max-width: 768px) {
+
+  /* 側邊欄在手機隱藏文字 */
+  .sidebar__nav-item span {
+    display: none;
+  }
+
+  .sidebar {
+    width: 60px !important;
+    min-width: 60px !important;
+  }
+
+  .sidebar__logo span {
+    display: none;
+  }
+
+  .main-content {
+    margin-left: 60px !important;
+  }
+
+  /* 頁面標題 */
+  .page-header {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start !important;
+  }
+
+  .page-header__right {
+    width: 100%;
+  }
+
+  .page-header__right .lk-btn {
+    width: 100%;
+  }
+
+  /* Modal 全屏 */
+  .modal-content,
+  .modal-content--lg {
+    width: 95vw !important;
+    max-width: 95vw !important;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
+  /* 表單兩欄變一欄 */
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .form-row .form-section {
+    width: 100%;
+  }
+
+  /* 技能選擇網格 */
+  .skills-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.5rem !important;
+  }
+
+  .skill-btn {
+    font-size: 0.75rem !important;
+    padding: 0.5rem !important;
+  }
+
+  /* 統計卡片 */
+  .volunteers-stats,
+  .resources-stats,
+  .dashboard-stats {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* 按鈕更大觸控區 */
+  .lk-btn {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+  }
+
+  .lk-btn--sm {
+    min-height: 36px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* 篩選按鈕 */
+  .status-filter-btn,
+  .category-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    min-height: 36px;
+  }
+
+  /* 志工卡片 */
+  .volunteer-card__actions {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .volunteer-card__actions .lk-btn {
+    width: 100%;
+  }
+
+  /* 表格響應式 */
+  .resources-table {
+    font-size: 0.8rem;
+  }
+
+  .resources-table th,
+  .resources-table td {
+    padding: 0.5rem 0.25rem;
+  }
+
+  /* 隱藏位置欄 */
+  .resources-table th:nth-child(5),
+  .resources-table td:nth-child(5) {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+
+  /* 超小螢幕 */
+  .sidebar {
+    width: 50px !important;
+    min-width: 50px !important;
+  }
+
+  .main-content {
+    margin-left: 50px !important;
+    padding: 0.75rem !important;
+  }
+
+  /* 統計卡片全寬 */
+  .volunteers-stats,
+  .resources-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* 技能選擇全寬 */
+  .skills-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

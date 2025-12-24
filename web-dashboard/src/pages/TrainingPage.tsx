@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
+import { getScrapedCourses, triggerScrape } from '../api/services';
+import type { ScrapedCourse } from '../api/services';
 import './TrainingPage.css';
 
 // 🏷️ 爬取課程分類
@@ -31,7 +33,7 @@ const LEVEL_CONFIG = {
     advanced: { label: '高級', color: '#F44336' },
 };
 
-// 模擬內部課程
+// 模擬內部課程 (未來可改為真實 API)
 const MOCK_COURSES = [
     { id: '1', title: '地震應變基礎', category: 'disaster_basics', level: 'beginner', durationMinutes: 30, isRequired: true, description: '學習地震發生時的基本應變措施' },
     { id: '2', title: '急救技能入門', category: 'first_aid', level: 'beginner', durationMinutes: 45, isRequired: true, description: 'CPR、止血、包紮等基本急救技能' },
@@ -45,33 +47,33 @@ const MOCK_PROGRESS: Record<string, { status: string; progress: number }> = {
     '2': { status: 'in_progress', progress: 60 },
 };
 
-// 模擬爬取的外部課程
-const MOCK_SCRAPED_COURSES = [
-    { id: 's1', title: 'EMT-1 初級救護技術員訓練班', category: 'emt', organizer: '緊急醫療救護學會', courseDate: '2025/01/15-20', location: '台北市', originalUrl: 'https://www.emt.org.tw' },
-    { id: 's2', title: 'TECC 戰術緊急傷患照護課程', category: 'tecc', organizer: '中華搜救總隊', courseDate: '2025/02/01-02', location: '新北市', originalUrl: 'https://www.sfast.org' },
-    { id: 's3', title: 'TCCC 戰術戰傷救護訓練', category: 'tccc', organizer: '天使之翼協會', courseDate: '2025/01/25', location: '高雄市', originalUrl: 'https://angel-wings.tw' },
-    { id: 's4', title: '無人機 G2 證照考取班', category: 'drone', organizer: '無人機訓練中心', courseDate: '2025/02/10-12', location: '台中市', originalUrl: '#' },
-    { id: 's5', title: '山域搜救技術研習', category: 'rescue', organizer: '王英基金會', courseDate: '2025/01/30', location: '南投縣', originalUrl: 'https://www.wangyingfoundation.org' },
-    { id: 's6', title: 'AED+CPR 認證班', category: 'first_aid', organizer: '紅十字會', courseDate: '每月開班', location: '全台', originalUrl: '#' },
-];
-
-interface ScrapedCourse {
-    id: string;
-    title: string;
-    category: string;
-    organizer: string;
-    courseDate?: string;
-    location?: string;
-    originalUrl: string;
-}
-
 export default function TrainingPage() {
     const [activeTab, setActiveTab] = useState<'internal' | 'external'>('external');
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [scrapedCategory, setScrapedCategory] = useState<string>('all');
     const [showCourseDetail, setShowCourseDetail] = useState<string | null>(null);
-    const [scrapedCourses] = useState<ScrapedCourse[]>(MOCK_SCRAPED_COURSES);
+    const [scrapedCourses, setScrapedCourses] = useState<ScrapedCourse[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoadingCourses, setIsLoadingCourses] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+
+    // 載入爬取的課程
+    useEffect(() => {
+        const fetchCourses = async () => {
+            setIsLoadingCourses(true);
+            setError(null);
+            try {
+                const response = await getScrapedCourses();
+                setScrapedCourses(response.data);
+            } catch (err) {
+                console.error('Failed to fetch scraped courses:', err);
+                setError('載入外部課程失敗');
+            } finally {
+                setIsLoadingCourses(false);
+            }
+        };
+        fetchCourses();
+    }, []);
 
     // 統計
     const stats = {
@@ -103,16 +105,20 @@ export default function TrainingPage() {
     const handleRefreshCourses = async () => {
         setIsLoading(true);
         try {
-            // TODO: 連接實際 API
-            // const response = await fetch('/api/v1/training/scraper/scrape', { method: 'POST' });
-            await new Promise(resolve => setTimeout(resolve, 1500)); // 模擬延遲
-            alert('✅ 課程資料已更新！');
-        } catch (error) {
+            const response = await triggerScrape();
+            const result = response.data;
+            alert(`✅ 課程資料已更新！\n成功: ${result.success} 個來源\n失敗: ${result.failed} 個來源`);
+            // 重新載入課程
+            const coursesResponse = await getScrapedCourses();
+            setScrapedCourses(coursesResponse.data);
+        } catch (err) {
+            console.error('Scrape trigger failed:', err);
             alert('❌ 更新失敗，請稍後再試');
         } finally {
             setIsLoading(false);
         }
     };
+
 
     return (
         <div className="page training-page">
@@ -190,7 +196,17 @@ export default function TrainingPage() {
 
                     {/* 外部課程列表 */}
                     <div className="scraped-courses-grid">
-                        {filteredScrapedCourses.length === 0 ? (
+                        {isLoadingCourses ? (
+                            <div className="empty-state">
+                                <span className="empty-icon">⏳</span>
+                                <p>載入外部課程中...</p>
+                            </div>
+                        ) : error ? (
+                            <div className="empty-state">
+                                <span className="empty-icon">⚠️</span>
+                                <p>{error}</p>
+                            </div>
+                        ) : filteredScrapedCourses.length === 0 ? (
                             <div className="empty-state">
                                 <span className="empty-icon">🔍</span>
                                 <p>尚無此分類的課程</p>
