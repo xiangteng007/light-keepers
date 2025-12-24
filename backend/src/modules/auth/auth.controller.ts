@@ -45,6 +45,15 @@ export class AuthController {
     }
 
     /**
+     * 獲取所有角色
+     * 公開 API，用於前端顯示角色資訊
+     */
+    @Get('roles')
+    async getRoles() {
+        return this.authService.getAllRoles();
+    }
+
+    /**
      * LINE OAuth Callback
      * 前端重導向回來時，用 authorization code 換取 access token
      */

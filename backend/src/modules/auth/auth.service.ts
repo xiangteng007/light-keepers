@@ -236,6 +236,15 @@ export class AuthService {
         });
     }
 
+    /**
+     * 獲取所有角色
+     */
+    async getAllRoles(): Promise<Role[]> {
+        return this.roleRepository.find({
+            order: { level: 'ASC' },
+        });
+    }
+
     // =========================================
     // Google OAuth 相關方法
     // =========================================
