@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { Resource } from '../modules/resources/entities/resource.entity';
+import { Resource } from '../modules/resources/resources.entity';
 import { config } from 'dotenv';
 
 config({ path: '.env.local' });

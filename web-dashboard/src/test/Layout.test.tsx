@@ -26,7 +26,8 @@ describe('Layout Component', () => {
             </BrowserRouter>
         );
 
-        expect(screen.getByText('Light Keepers')).toBeInTheDocument();
+        // Multiple occurrences: sidebar logo + mobile header
+        expect(screen.getAllByText('Light Keepers').length).toBeGreaterThan(0);
         expect(screen.getByText('曦望燈塔')).toBeInTheDocument();
     });
 });
