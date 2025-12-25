@@ -1,6 +1,9 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import * as line from '@line/bot-sdk';
+import { Account } from '../accounts/entities';
 
 export interface LineConfig {
     channelAccessToken: string;
@@ -13,7 +16,11 @@ export class LineBotService {
     private client: line.messagingApi.MessagingApiClient | null = null;
     private config: LineConfig;
 
-    constructor(private configService: ConfigService) {
+    constructor(
+        private configService: ConfigService,
+        @InjectRepository(Account)
+        private readonly accountRepository: Repository<Account>,
+    ) {
         this.config = {
             channelAccessToken: this.configService.get('LINE_CHANNEL_ACCESS_TOKEN', ''),
             channelSecret: this.configService.get('LINE_CHANNEL_SECRET', ''),
@@ -28,6 +35,7 @@ export class LineBotService {
             this.logger.warn('LINE credentials not configured - Bot disabled');
         }
     }
+
 
     getConfig(): LineConfig {
         return this.config;
@@ -296,11 +304,11 @@ export class LineBotService {
                 },
                 {
                     bounds: { x: 0, y: 843, width: 833, height: 843 },
-                    action: { type: 'uri', uri: 'https://your-domain/report' },
+                    action: { type: 'uri', uri: 'https://light-keepers-dashboard.vercel.app/report' },
                 },
                 {
                     bounds: { x: 833, y: 843, width: 834, height: 843 },
-                    action: { type: 'uri', uri: 'https://your-domain/training' },
+                    action: { type: 'uri', uri: 'https://light-keepers-dashboard.vercel.app/training' },
                 },
                 {
                     bounds: { x: 1667, y: 843, width: 833, height: 843 },
@@ -308,5 +316,220 @@ export class LineBotService {
                 },
             ],
         };
+    }
+
+    // === 帳號綁定功能 ===
+
+    /**
+     * 生成帳號綁定連結
+     */
+    generateBindingLink(lineUserId: string): string {
+        const frontendUrl = this.configService.get('FRONTEND_URL', 'https://light-keepers-dashboard.vercel.app');
+        // 使用 LINE User ID 作為綁定 token
+        const bindingToken = Buffer.from(`${lineUserId}:${Date.now()}`).toString('base64');
+        return `${frontendUrl}/bind-line?token=${bindingToken}`;
+    }
+
+    /**
+     * 發送帳號綁定訊息
+     */
+    async sendBindingMessage(replyToken: string, lineUserId: string): Promise<void> {
+        if (!this.client) return;
+
+        const bindingLink = this.generateBindingLink(lineUserId);
+
+        const message: line.messagingApi.FlexMessage = {
+            type: 'flex',
+            altText: '🔗 帳號綁定',
+            contents: {
+                type: 'bubble',
+                header: {
+                    type: 'box',
+                    layout: 'vertical',
+                    backgroundColor: '#4CAF50',
+                    contents: [{
+                        type: 'text',
+                        text: '🔗 帳號綁定',
+                        color: '#ffffff',
+                        weight: 'bold',
+                        size: 'lg',
+                    }],
+                },
+                body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [
+                        {
+                            type: 'text',
+                            text: '請點擊下方按鈕綁定您的志工帳號，綁定後即可收到任務通知和災害警報。',
+                            wrap: true,
+                            size: 'sm',
+                            color: '#666666',
+                        },
+                    ],
+                },
+                footer: {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [{
+                        type: 'button',
+                        style: 'primary',
+                        action: {
+                            type: 'uri',
+                            label: '立即綁定',
+                            uri: bindingLink,
+                        },
+                    }],
+                },
+            },
+        };
+
+        await this.client.replyMessage({
+            replyToken,
+            messages: [message],
+        });
+    }
+
+    /**
+     * 綁定 LINE 帳號到系統帳號
+     */
+    async bindAccount(accountId: string, lineUserId: string): Promise<boolean> {
+        try {
+            const account = await this.accountRepository.findOne({ where: { id: accountId } });
+            if (!account) {
+                this.logger.warn(`Account ${accountId} not found for LINE binding`);
+                return false;
+            }
+
+            account.lineUserId = lineUserId;
+            await this.accountRepository.save(account);
+
+            // 發送綁定成功通知
+            await this.pushText(lineUserId, '✅ 帳號綁定成功！\n\n您現在可以透過 LINE 接收任務通知和災害警報了。');
+
+            this.logger.log(`Bound LINE user ${lineUserId} to account ${accountId}`);
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to bind account: ${error.message}`);
+            return false;
+        }
+    }
+
+    /**
+     * 解除 LINE 帳號綁定
+     */
+    async unbindAccount(accountId: string): Promise<boolean> {
+        try {
+            const account = await this.accountRepository.findOne({ where: { id: accountId } });
+            if (!account) return false;
+
+            const lineUserId = account.lineUserId;
+            account.lineUserId = undefined as any;
+            await this.accountRepository.save(account);
+
+            if (lineUserId) {
+                await this.pushText(lineUserId, '已解除帳號綁定。如需重新綁定，請發送「綁定」。');
+            }
+
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to unbind account: ${error.message}`);
+            return false;
+        }
+    }
+
+    /**
+     * 查詢綁定狀態
+     */
+    async getBindingStatus(lineUserId: string): Promise<{ bound: boolean; accountId?: string }> {
+        const account = await this.accountRepository.findOne({ where: { lineUserId } });
+        return {
+            bound: !!account,
+            accountId: account?.id,
+        };
+    }
+
+    // === NCDR 災害推播整合 ===
+
+    /**
+     * 推播 NCDR 災害示警給所有綁定用戶
+     */
+    async broadcastNcdrAlert(alert: {
+        title: string;
+        description: string;
+        severity: 'critical' | 'warning' | 'info';
+        affectedAreas?: string;
+        sourceLink?: string;
+    }): Promise<{ success: boolean; sentCount: number }> {
+        if (!this.client) {
+            return { success: false, sentCount: 0 };
+        }
+
+        try {
+            // 獲取所有綁定 LINE 的用戶
+            const boundAccounts = await this.accountRepository
+                .createQueryBuilder('account')
+                .where('account.lineUserId IS NOT NULL')
+                .andWhere('account.prefAlertNotifications = true')
+                .select(['account.lineUserId'])
+                .getMany();
+
+            if (boundAccounts.length === 0) {
+                return { success: true, sentCount: 0 };
+            }
+
+            const userIds = boundAccounts.map(a => a.lineUserId).filter(Boolean) as string[];
+
+            // 使用現有的災害警報方法
+            await this.sendDisasterAlert(userIds, {
+                title: alert.title,
+                description: alert.description,
+                severity: alert.severity === 'critical' ? 'high' : alert.severity === 'warning' ? 'medium' : 'low',
+                location: alert.affectedAreas,
+            });
+
+            this.logger.log(`Broadcast NCDR alert to ${userIds.length} users`);
+            return { success: true, sentCount: userIds.length };
+        } catch (error) {
+            this.logger.error(`Failed to broadcast NCDR alert: ${error.message}`);
+            return { success: false, sentCount: 0 };
+        }
+    }
+
+    /**
+     * 推播給特定區域的用戶
+     */
+    async sendAlertToRegion(region: string, alert: {
+        title: string;
+        description: string;
+        severity: string;
+    }): Promise<{ success: boolean; sentCount: number }> {
+        if (!this.client) {
+            return { success: false, sentCount: 0 };
+        }
+
+        try {
+            // TODO: 實作區域篩選邏輯（需要在 Account 中添加區域欄位）
+            // 暫時廣播給所有用戶
+            return this.broadcastNcdrAlert({
+                title: alert.title,
+                description: alert.description,
+                severity: alert.severity as 'critical' | 'warning' | 'info',
+                affectedAreas: region,
+            });
+        } catch (error) {
+            this.logger.error(`Failed to send alert to region: ${error.message}`);
+            return { success: false, sentCount: 0 };
+        }
+    }
+
+    /**
+     * 獲取已綁定 LINE 的用戶數
+     */
+    async getBoundUserCount(): Promise<number> {
+        return this.accountRepository
+            .createQueryBuilder('account')
+            .where('account.lineUserId IS NOT NULL')
+            .getCount();
     }
 }

@@ -80,6 +80,44 @@ export class LineBotController {
     private async handleTextMessage(text: string, replyToken: string, userId?: string) {
         const lowerText = text.toLowerCase();
 
+        // 綁定帳號
+        if (lowerText.includes('綁定')) {
+            if (userId) {
+                // 檢查是否已綁定
+                const status = await this.lineBotService.getBindingStatus(userId);
+                if (status.bound) {
+                    await this.lineBotService.replyMessage(
+                        replyToken,
+                        '✅ 您的帳號已綁定！\n\n' +
+                        '如需解除綁定，請發送「解除綁定」。'
+                    );
+                } else {
+                    await this.lineBotService.sendBindingMessage(replyToken, userId);
+                }
+            } else {
+                await this.lineBotService.replyMessage(replyToken, '無法取得您的 LINE ID，請稍後再試。');
+            }
+            return;
+        }
+
+        // 解除綁定
+        if (lowerText.includes('解除綁定')) {
+            if (userId) {
+                const status = await this.lineBotService.getBindingStatus(userId);
+                if (status.bound && status.accountId) {
+                    const success = await this.lineBotService.unbindAccount(status.accountId);
+                    if (success) {
+                        await this.lineBotService.replyMessage(replyToken, '✅ 已解除帳號綁定。');
+                    } else {
+                        await this.lineBotService.replyMessage(replyToken, '❌ 解除綁定失敗，請稍後再試。');
+                    }
+                } else {
+                    await this.lineBotService.replyMessage(replyToken, '您的帳號尚未綁定。');
+                }
+            }
+            return;
+        }
+
         // 簽到
         if (lowerText.includes('簽到')) {
             await this.lineBotService.replyMessage(
@@ -211,6 +249,87 @@ export class LineBotController {
                 step4: '上傳 2500x1686 的選單圖片',
                 step5: '設為預設 Rich Menu',
             },
+        };
+    }
+
+    // === 帳號綁定 API ===
+
+    // 執行帳號綁定（由前端呼叫）
+    @Post('bind')
+    async bindAccount(@Body() body: { accountId: string; lineUserId: string }) {
+        const success = await this.lineBotService.bindAccount(body.accountId, body.lineUserId);
+        return { success, message: success ? '綁定成功' : '綁定失敗' };
+    }
+
+    // 解除帳號綁定
+    @Post('unbind')
+    async unbindAccount(@Body() body: { accountId: string }) {
+        const success = await this.lineBotService.unbindAccount(body.accountId);
+        return { success, message: success ? '解除綁定成功' : '解除綁定失敗' };
+    }
+
+    // 取得綁定狀態
+    @Get('binding-status/:lineUserId')
+    async getBindingStatus(@Headers('x-line-user-id') lineUserId: string) {
+        const status = await this.lineBotService.getBindingStatus(lineUserId);
+        return { success: true, ...status };
+    }
+
+    // 取得已綁定用戶數
+    @Get('stats')
+    async getStats() {
+        const boundUserCount = await this.lineBotService.getBoundUserCount();
+        return {
+            success: true,
+            boundUserCount,
+            botEnabled: this.lineBotService.isEnabled(),
+        };
+    }
+
+    // === 管理員 NCDR 推播 API ===
+
+    // 手動推播 NCDR 示警（管理員用）
+    @Post('ncdr-broadcast')
+    async broadcastNcdrAlert(@Body() body: {
+        title: string;
+        description: string;
+        severity: 'critical' | 'warning' | 'info';
+        affectedAreas?: string;
+    }) {
+        if (!this.lineBotService.isEnabled()) {
+            return { success: false, message: 'Bot not configured', sentCount: 0 };
+        }
+
+        const result = await this.lineBotService.broadcastNcdrAlert(body);
+        return {
+            success: result.success,
+            message: result.success ? `成功推播給 ${result.sentCount} 位用戶` : '推播失敗',
+            sentCount: result.sentCount,
+        };
+    }
+
+    // 推播給特定區域
+    @Post('ncdr-broadcast/region')
+    async broadcastToRegion(@Body() body: {
+        region: string;
+        title: string;
+        description: string;
+        severity: string;
+    }) {
+        if (!this.lineBotService.isEnabled()) {
+            return { success: false, message: 'Bot not configured', sentCount: 0 };
+        }
+
+        const result = await this.lineBotService.sendAlertToRegion(body.region, {
+            title: body.title,
+            description: body.description,
+            severity: body.severity,
+        });
+
+        return {
+            success: result.success,
+            message: result.success ? `成功推播給 ${body.region} 區域 ${result.sentCount} 位用戶` : '推播失敗',
+            sentCount: result.sentCount,
         };
     }
 }
