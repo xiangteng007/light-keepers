@@ -172,6 +172,80 @@
     margin-bottom: 20px;
 }
 
+.login-success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid #4CAF50;
+    color: #4CAF50;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Phone & OTP Input Groups */
+.phone-input-group,
+.otp-input-group {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.phone-input-group input,
+.otp-input-group input {
+    flex: 1;
+}
+
+.otp-send-btn,
+.otp-verify-btn {
+    flex-shrink: 0;
+    padding: 14px 16px;
+    border: none;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.otp-send-btn {
+    background: var(--accent-primary);
+    color: var(--brown-900);
+}
+
+.otp-send-btn:hover:not(:disabled) {
+    background: var(--gold-600);
+}
+
+.otp-send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.otp-verify-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.otp-verify-btn:hover:not(:disabled) {
+    background: #43A047;
+}
+
+.otp-verify-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.otp-verified-badge {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    background: rgba(76, 175, 80, 0.1);
+    color: #4CAF50;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+}
+
 .login-submit {
     width: 100%;
     padding: 16px;

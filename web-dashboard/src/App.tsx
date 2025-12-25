@@ -22,9 +22,12 @@ import ReportsExportPage from './pages/ReportsExportPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
+import ForgotPasswordPage from './pages/ForgotPasswordPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import ProfilePage from './pages/ProfilePage'
 import PermissionsPage from './pages/PermissionsPage'
 import BindLinePage from './pages/BindLinePage'
+import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
 import './App.css'
 
 
@@ -78,7 +81,10 @@ function App() {
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
+          <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/" element={<ProtectedRoute requiredLevel={1}><Layout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 志工等級 (1) */}

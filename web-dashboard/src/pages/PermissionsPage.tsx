@@ -9,7 +9,12 @@ import {
     ChevronUp,
     RefreshCw,
     AlertTriangle,
+    UserCheck,
+    UserX,
+    Clock,
 } from 'lucide-react';
+import { getPendingAccounts, approveAccount, rejectAccount } from '../api/services';
+import type { PendingAccount } from '../api/services';
 import './PermissionsPage.css';
 
 // Types
@@ -47,8 +52,9 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-9552
 
 export default function PermissionsPage() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'users' | 'pages'>('users');
+    const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'pages'>('pending');
     const [accounts, setAccounts] = useState<AdminAccount[]>([]);
+    const [pendingAccounts, setPendingAccounts] = useState<PendingAccount[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [pagePermissions, setPagePermissions] = useState<PagePermission[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +62,7 @@ export default function PermissionsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedUser, setExpandedUser] = useState<string | null>(null);
     const [savingUser, setSavingUser] = useState<string | null>(null);
+    const [processingApproval, setProcessingApproval] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     // 獲取 token
@@ -77,10 +84,11 @@ export default function PermissionsPage() {
                 'Authorization': `Bearer ${token}`,
             };
 
-            const [accountsRes, rolesRes, permissionsRes] = await Promise.all([
+            const [accountsRes, rolesRes, permissionsRes, pendingRes] = await Promise.all([
                 fetch(`${API_BASE}/accounts/admin`, { headers }),
                 fetch(`${API_BASE}/accounts/roles`, { headers }),
                 fetch(`${API_BASE}/accounts/page-permissions`, { headers }),
+                getPendingAccounts().catch(() => ({ data: [] })),
             ]);
 
             if (!accountsRes.ok || !rolesRes.ok || !permissionsRes.ok) {
@@ -96,6 +104,7 @@ export default function PermissionsPage() {
             setAccounts(accountsData);
             setRoles(rolesData);
             setPagePermissions(permissionsData);
+            setPendingAccounts(pendingRes.data || []);
         } catch (err) {
             setError('載入資料失敗，請稍後再試');
             console.error('Failed to fetch data:', err);
@@ -187,6 +196,45 @@ export default function PermissionsPage() {
         }
     };
 
+    // Handle approve account
+    const handleApprove = async (accountId: string) => {
+        setProcessingApproval(accountId);
+        try {
+            await approveAccount(accountId);
+            setPendingAccounts(prev => prev.filter(acc => acc.id !== accountId));
+            setMessage({ type: 'success', text: '帳號已核准' });
+            setTimeout(() => setMessage(null), 3000);
+            // Refresh data to update user list
+            fetchData();
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setMessage({ type: 'error', text: error.response?.data?.message || '核准失敗' });
+            setTimeout(() => setMessage(null), 5000);
+        } finally {
+            setProcessingApproval(null);
+        }
+    };
+
+    // Handle reject account
+    const handleReject = async (accountId: string) => {
+        const reason = window.prompt('請輸入拒絕原因（可選）：');
+        if (reason === null) return; // User cancelled
+
+        setProcessingApproval(accountId);
+        try {
+            await rejectAccount(accountId, reason || undefined);
+            setPendingAccounts(prev => prev.filter(acc => acc.id !== accountId));
+            setMessage({ type: 'success', text: '帳號已拒絕' });
+            setTimeout(() => setMessage(null), 3000);
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setMessage({ type: 'error', text: error.response?.data?.message || '拒絕失敗' });
+            setTimeout(() => setMessage(null), 5000);
+        } finally {
+            setProcessingApproval(null);
+        }
+    };
+
     // Filter accounts by search term
     const filteredAccounts = accounts.filter(
         acc =>
@@ -267,6 +315,16 @@ export default function PermissionsPage() {
 
             <div className="permissions-tabs">
                 <button
+                    className={`permissions-tab ${activeTab === 'pending' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('pending')}
+                >
+                    <Clock size={18} />
+                    待審核
+                    {pendingAccounts.length > 0 && (
+                        <span className="permissions-tab__badge">{pendingAccounts.length}</span>
+                    )}
+                </button>
+                <button
                     className={`permissions-tab ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                 >
@@ -283,6 +341,60 @@ export default function PermissionsPage() {
             </div>
 
             <div className="permissions-content">
+                {activeTab === 'pending' && (
+                    <div className="pending-section">
+                        {pendingAccounts.length === 0 ? (
+                            <div className="pending-empty">
+                                <UserCheck size={48} />
+                                <h3>沒有待審核的帳號</h3>
+                                <p>所有註冊申請都已處理完成</p>
+                            </div>
+                        ) : (
+                            <div className="pending-list">
+                                {pendingAccounts.map(account => (
+                                    <div key={account.id} className="pending-card">
+                                        <div className="pending-card__info">
+                                            <div className="pending-card__avatar">
+                                                {account.displayName?.charAt(0) || account.email?.charAt(0) || '?'}
+                                            </div>
+                                            <div className="pending-card__details">
+                                                <span className="pending-card__name">
+                                                    {account.displayName || '未設定名稱'}
+                                                </span>
+                                                <span className="pending-card__email">{account.email}</span>
+                                                {account.phone && (
+                                                    <span className="pending-card__phone">{account.phone}</span>
+                                                )}
+                                                <span className="pending-card__date">
+                                                    申請時間：{new Date(account.createdAt).toLocaleString('zh-TW')}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="pending-card__actions">
+                                            <button
+                                                className="lk-btn lk-btn--success"
+                                                onClick={() => handleApprove(account.id)}
+                                                disabled={processingApproval === account.id}
+                                            >
+                                                <UserCheck size={16} />
+                                                {processingApproval === account.id ? '處理中...' : '核准'}
+                                            </button>
+                                            <button
+                                                className="lk-btn lk-btn--danger"
+                                                onClick={() => handleReject(account.id)}
+                                                disabled={processingApproval === account.id}
+                                            >
+                                                <UserX size={16} />
+                                                拒絕
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {activeTab === 'users' && (
                     <div className="users-section">
                         <div className="users-search">

@@ -103,6 +103,166 @@
     padding: 24px;
 }
 
+/* Tab Badge */
+.permissions-tab__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    background: var(--danger);
+    color: white;
+    border-radius: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+/* Pending Section */
+.pending-section {
+    min-height: 200px;
+}
+
+.pending-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.pending-empty h3 {
+    margin: 16px 0 8px;
+    color: var(--text-secondary);
+    font-size: 18px;
+    font-weight: 500;
+}
+
+.pending-empty p {
+    margin: 0;
+    font-size: 14px;
+}
+
+.pending-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.pending-card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    transition: border-color 0.2s ease;
+}
+
+.pending-card:hover {
+    border-color: var(--accent-primary);
+}
+
+.pending-card__info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.pending-card__avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 600;
+    font-size: 18px;
+}
+
+.pending-card__details {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.pending-card__name {
+    font-weight: 500;
+    color: var(--text-primary);
+    font-size: 15px;
+}
+
+.pending-card__email {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+.pending-card__phone {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.pending-card__date {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-top: 4px;
+}
+
+.pending-card__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.lk-btn--success {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.lk-btn--success:hover:not(:disabled) {
+    background: #43A047;
+}
+
+.lk-btn--danger {
+    background: #f44336;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+}
+
+.lk-btn--danger:hover:not(:disabled) {
+    background: #E53935;
+}
+
+.lk-btn--success:disabled,
+.lk-btn--danger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Users Section */
 .users-search {
     display: flex;
