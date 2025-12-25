@@ -8,6 +8,7 @@ import { RegisterDto, LoginDto, TokenResponseDto } from './dto/auth.dto';
 import { OtpService } from './services/otp.service';
 import { SmsService } from './services/sms.service';
 import { PasswordResetService } from './services/password-reset.service';
+import { EmailService } from './services/email.service';
 import { LineBotService } from '../line-bot/line-bot.service';
 
 @Injectable()
@@ -23,6 +24,7 @@ export class AuthService {
         private readonly otpService: OtpService,
         private readonly smsService: SmsService,
         private readonly passwordResetService: PasswordResetService,
+        private readonly emailService: EmailService,
         private readonly lineBotService: LineBotService,
     ) { }
 
@@ -619,6 +621,44 @@ export class AuthService {
             const account = await this.accountRepository.findOne({ where: { phone } });
             if (account) {
                 account.phoneVerified = true;
+                await this.accountRepository.save(account);
+            }
+        }
+
+        return { success: true, verified };
+    }
+
+    /**
+     * 發送 Email OTP 驗證碼
+     */
+    async sendEmailOtp(email: string): Promise<{ success: boolean; message: string }> {
+        if (!email) {
+            throw new BadRequestException('請提供 Email');
+        }
+
+        // 生成 OTP
+        const code = await this.otpService.generateOtp(email, 'email');
+
+        // 發送郵件
+        await this.emailService.sendOtp(email, code);
+
+        return {
+            success: true,
+            message: '驗證碼已發送至您的 Email',
+        };
+    }
+
+    /**
+     * 驗證 Email OTP
+     */
+    async verifyEmailOtp(email: string, code: string): Promise<{ success: boolean; verified: boolean }> {
+        const verified = await this.otpService.verifyOtp(email, 'email', code);
+
+        if (verified) {
+            // 更新帳號的 Email 驗證狀態
+            const account = await this.accountRepository.findOne({ where: { email } });
+            if (account) {
+                account.emailVerified = true;
                 await this.accountRepository.save(account);
             }
         }

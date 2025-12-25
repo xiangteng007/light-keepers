@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login as loginApi, register } from '../api/services';
+import { login as loginApi, register, sendEmailOtp, verifyEmailOtp } from '../api/services';
 import './LoginPage.css';
 
 // LINE Login Config - 需要在 LINE Developers Console 設定
@@ -21,6 +21,13 @@ export default function LoginPage() {
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [rememberMe, setRememberMe] = useState(true);
+
+    // Email OTP 驗證狀態
+    const [otpSent, setOtpSent] = useState(false);
+    const [otpVerified, setOtpVerified] = useState(false);
+    const [otpCode, setOtpCode] = useState('');
+    const [countdown, setCountdown] = useState(0);
+    const [isSendingOtp, setIsSendingOtp] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -52,11 +59,18 @@ export default function LoginPage() {
         }
     }, []);
 
+    // OTP 倒計時
+    useEffect(() => {
+        if (countdown > 0) {
+            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [countdown]);
+
     const handleLineCallback = async (code: string) => {
         setIsLoading(true);
         setError(null);
         try {
-            // 用 authorization code 換取 access token (需後端處理)
             const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/line/callback`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -66,11 +80,9 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (data.accessToken) {
-                // 已綁定帳號，直接登入
                 await login(data.accessToken);
                 navigate(from, { replace: true });
             } else if (data.needsRegistration) {
-                // 未綁定，需要註冊或綁定
                 setError('LINE 帳號尚未綁定，請先使用 Email 登入後在設定中綁定 LINE');
             }
         } catch (err) {
@@ -78,60 +90,8 @@ export default function LoginPage() {
             setError('LINE 登入失敗，請稍後再試');
         } finally {
             setIsLoading(false);
-            // 清除 URL 參數
             window.history.replaceState({}, document.title, window.location.pathname);
         }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setError(null);
-        setSuccessMessage(null);
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setIsLoading(true);
-
-        try {
-            if (isLogin) {
-                const response = await loginApi(formData.email, formData.password);
-                await login(response.data.accessToken, rememberMe);
-                navigate(from, { replace: true });
-            } else {
-                if (formData.password !== formData.confirmPassword) {
-                    setError('密碼不一致');
-                    setIsLoading(false);
-                    return;
-                }
-                await register({
-                    email: formData.email,
-                    password: formData.password,
-                    displayName: formData.displayName,
-                });
-                // Auto login after registration
-                const loginResponse = await loginApi(formData.email, formData.password);
-                await login(loginResponse.data.accessToken, true); // Always remember after registration
-                navigate(from, { replace: true });
-            }
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '發生錯誤，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleLineLogin = () => {
-        if (!LINE_CLIENT_ID) {
-            setError('LINE 登入尚未設定，請聯繫系統管理員');
-            return;
-        }
-        // 導向 LINE 授權頁面
-        const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(LINE_REDIRECT_URI)}&state=line-login&scope=profile%20openid`;
-        window.location.href = lineAuthUrl;
     };
 
     const handleGoogleCallback = async (code: string) => {
@@ -150,7 +110,6 @@ export default function LoginPage() {
                 await login(data.accessToken);
                 navigate(from, { replace: true });
             } else if (data.needsRegistration) {
-                // Google 帳號可以自動註冊 (因為有 email)
                 const registerResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/google/register`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -174,12 +133,118 @@ export default function LoginPage() {
         }
     };
 
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
+        setError(null);
+        setSuccessMessage(null);
+        // 如果修改 Email，重置 OTP 狀態
+        if (name === 'email') {
+            setOtpSent(false);
+            setOtpVerified(false);
+            setOtpCode('');
+        }
+    };
+
+    // 發送 Email OTP
+    const handleSendOtp = useCallback(async () => {
+        if (!formData.email || !formData.email.includes('@')) {
+            setError('請輸入有效的 Email 地址');
+            return;
+        }
+        setIsSendingOtp(true);
+        setError(null);
+        try {
+            await sendEmailOtp(formData.email);
+            setOtpSent(true);
+            setCountdown(60);
+            setSuccessMessage('驗證碼已發送至您的 Email');
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setError(error.response?.data?.message || '發送驗證碼失敗，請稍後再試');
+        } finally {
+            setIsSendingOtp(false);
+        }
+    }, [formData.email]);
+
+    // 驗證 Email OTP
+    const handleVerifyOtp = useCallback(async () => {
+        if (otpCode.length !== 6) {
+            setError('請輸入 6 位數驗證碼');
+            return;
+        }
+        setIsLoading(true);
+        setError(null);
+        try {
+            const response = await verifyEmailOtp(formData.email, otpCode);
+            if (response.data.verified) {
+                setOtpVerified(true);
+                setSuccessMessage('Email 驗證成功！');
+            } else {
+                setError('驗證碼錯誤');
+            }
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setError(error.response?.data?.message || '驗證失敗，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
+    }, [formData.email, otpCode]);
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            if (isLogin) {
+                const response = await loginApi(formData.email, formData.password);
+                await login(response.data.accessToken, rememberMe);
+                navigate(from, { replace: true });
+            } else {
+                if (formData.password !== formData.confirmPassword) {
+                    setError('密碼不一致');
+                    setIsLoading(false);
+                    return;
+                }
+                // 必須先完成 Email 驗證
+                if (!otpVerified) {
+                    setError('請先完成 Email 驗證');
+                    setIsLoading(false);
+                    return;
+                }
+                await register({
+                    email: formData.email,
+                    password: formData.password,
+                    displayName: formData.displayName,
+                });
+                // Auto login after registration
+                const loginResponse = await loginApi(formData.email, formData.password);
+                await login(loginResponse.data.accessToken, true);
+                navigate(from, { replace: true });
+            }
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setError(error.response?.data?.message || '發生錯誤，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleLineLogin = () => {
+        if (!LINE_CLIENT_ID) {
+            setError('LINE 登入尚未設定，請聯繫系統管理員');
+            return;
+        }
+        const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(LINE_REDIRECT_URI)}&state=line-login&scope=profile%20openid`;
+        window.location.href = lineAuthUrl;
+    };
+
     const handleGoogleLogin = () => {
         if (!GOOGLE_CLIENT_ID) {
             setError('Google 登入尚未設定，請聯繫系統管理員');
             return;
         }
-        // 導向 Google 授權頁面
         const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}&state=google-login&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
         window.location.href = googleAuthUrl;
     };
@@ -227,16 +292,69 @@ export default function LoginPage() {
 
                     <div className="form-group">
                         <label htmlFor="email">電子郵件</label>
-                        <input
-                            type="email"
-                            id="email"
-                            name="email"
-                            placeholder="請輸入電子郵件"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
+                        {!isLogin ? (
+                            <div className="email-input-group">
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="請輸入電子郵件"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    disabled={otpVerified}
+                                    required
+                                />
+                                {!otpVerified && (
+                                    <button
+                                        type="button"
+                                        className="otp-send-btn"
+                                        onClick={handleSendOtp}
+                                        disabled={isSendingOtp || countdown > 0 || !formData.email}
+                                    >
+                                        {isSendingOtp ? '發送中...' : countdown > 0 ? `${countdown}s` : (otpSent ? '重發' : '發送驗證碼')}
+                                    </button>
+                                )}
+                                {otpVerified && (
+                                    <span className="otp-verified-badge">✓ 已驗證</span>
+                                )}
+                            </div>
+                        ) : (
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                placeholder="請輸入電子郵件"
+                                value={formData.email}
+                                onChange={handleChange}
+                                required
+                            />
+                        )}
                     </div>
+
+                    {/* Email OTP 驗證 (僅註冊模式) */}
+                    {!isLogin && otpSent && !otpVerified && (
+                        <div className="form-group">
+                            <label htmlFor="otpCode">驗證碼</label>
+                            <div className="otp-input-group">
+                                <input
+                                    type="text"
+                                    id="otpCode"
+                                    placeholder="請輸入 6 位數驗證碼"
+                                    value={otpCode}
+                                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                    maxLength={6}
+                                />
+                                <button
+                                    type="button"
+                                    className="otp-verify-btn"
+                                    onClick={handleVerifyOtp}
+                                    disabled={isLoading || otpCode.length !== 6}
+                                >
+                                    驗證
+                                </button>
+                            </div>
+                        </div>
+                    )}
 
                     <div className="form-group">
                         <label htmlFor="password">密碼</label>
@@ -299,7 +417,7 @@ export default function LoginPage() {
                     <button
                         type="submit"
                         className="login-submit"
-                        disabled={isLoading}
+                        disabled={isLoading || (!isLogin && !otpVerified)}
                     >
                         {isLoading ? '處理中...' : (isLogin ? '登入' : '註冊')}
                     </button>

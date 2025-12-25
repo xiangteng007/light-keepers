@@ -28,6 +28,14 @@ export const sendLineOtp = () =>
 export const verifyLineOtp = (code: string) =>
     api.post<{ success: boolean; verified: boolean }>('/auth/verify-line-otp', { code });
 
+// ===== Email OTP 驗證 =====
+
+export const sendEmailOtp = (email: string) =>
+    api.post<{ success: boolean; message: string }>('/auth/send-email-otp', { email });
+
+export const verifyEmailOtp = (email: string, code: string) =>
+    api.post<{ success: boolean; verified: boolean }>('/auth/verify-email-otp', { email, code });
+
 // ===== 密碼重設 =====
 
 export const forgotPassword = (data: { email?: string; phone?: string }) =>

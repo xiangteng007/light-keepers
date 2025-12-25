@@ -261,6 +261,7 @@
 
 /* OTP Input Groups */
 .phone-input-group,
+.email-input-group,
 .otp-input-group {
     display: flex;
     gap: 12px;
@@ -268,6 +269,7 @@
 }
 
 .phone-input-group input,
+.email-input-group input,
 .otp-input-group input {
     flex: 1;
 }

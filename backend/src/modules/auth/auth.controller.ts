@@ -231,6 +231,22 @@ export class AuthController {
         return this.authService.verifyPhoneOtp(body.phone, body.code);
     }
 
+    /**
+     * 發送 Email OTP 驗證碼
+     */
+    @Post('send-email-otp')
+    async sendEmailOtp(@Body() body: { email: string }) {
+        return this.authService.sendEmailOtp(body.email);
+    }
+
+    /**
+     * 驗證 Email OTP
+     */
+    @Post('verify-email-otp')
+    async verifyEmailOtp(@Body() body: { email: string; code: string }) {
+        return this.authService.verifyEmailOtp(body.email, body.code);
+    }
+
     // =========================================
     // 密碼重設端點
     // =========================================
