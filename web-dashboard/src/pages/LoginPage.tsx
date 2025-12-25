@@ -263,7 +263,6 @@ export default function LoginPage() {
             <div className="login-container">
                 <div className="login-header">
                     <div className="login-logo">
-                        <span className="login-logo-icon">🏛️</span>
                         <h1>Light Keepers</h1>
                         <p className="login-subtitle">曦望燈塔災情管理平台</p>
                     </div>
