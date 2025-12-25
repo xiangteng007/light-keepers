@@ -325,11 +325,11 @@ export class LineBotService {
                 },
                 {
                     bounds: { x: 0, y: 843, width: 833, height: 843 },
-                    action: { type: 'uri', uri: 'https://light-keepers-dashboard.vercel.app/report' },
+                    action: { type: 'uri', uri: 'https://lightkeepers.ngo/report' },
                 },
                 {
                     bounds: { x: 833, y: 843, width: 834, height: 843 },
-                    action: { type: 'uri', uri: 'https://light-keepers-dashboard.vercel.app/training' },
+                    action: { type: 'uri', uri: 'https://lightkeepers.ngo/training' },
                 },
                 {
                     bounds: { x: 1667, y: 843, width: 833, height: 843 },
@@ -345,7 +345,7 @@ export class LineBotService {
      * 生成帳號綁定連結
      */
     generateBindingLink(lineUserId: string): string {
-        const frontendUrl = this.configService.get('FRONTEND_URL', 'https://light-keepers-dashboard.vercel.app');
+        const frontendUrl = this.configService.get('FRONTEND_URL', 'https://lightkeepers.ngo');
         // 使用 LINE User ID 作為綁定 token
         const bindingToken = Buffer.from(`${lineUserId}:${Date.now()}`).toString('base64');
         return `${frontendUrl}/bind-line?token=${bindingToken}`;

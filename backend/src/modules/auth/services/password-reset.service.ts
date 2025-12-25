@@ -52,7 +52,7 @@ export class PasswordResetService {
      * 產生重設密碼的完整 URL
      */
     generateResetUrl(token: string): string {
-        const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://light-keepers-dashboard.vercel.app';
+        const frontendUrl = this.configService.get('FRONTEND_URL') || 'https://lightkeepers.ngo';
         return `${frontendUrl}/reset-password?token=${token}`;
     }
 
