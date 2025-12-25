@@ -13,7 +13,7 @@ export class SeedService implements OnModuleInit {
     private readonly logger = new Logger(SeedService.name);
 
     // 系統擁有者帳號 Email
-    private readonly OWNER_EMAIL = 'owner@lightkeepers.tw';
+    private readonly OWNER_EMAIL = 'xiangteng007@gmail.com';
 
     constructor(
         @InjectRepository(Role)

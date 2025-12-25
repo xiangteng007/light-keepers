@@ -20,8 +20,8 @@ async function bootstrap() {
     const roleRepository: Repository<Role> = app.get(getRepositoryToken(Role));
 
     // 擁有者帳號配置
-    const ownerEmail = 'owner@lightkeepers.tw';
-    const ownerPassword = 'LightKeepers2024!'; // 預設密碼
+    const ownerEmail = 'xiangteng007@gmail.com';
+    const ownerPassword = 'Birthday@1007';
     const ownerDisplayName = '系統擁有者';
 
     try {
