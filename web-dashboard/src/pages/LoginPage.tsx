@@ -457,7 +457,7 @@ export default function LoginPage() {
                 </button>
 
                 <div className="login-footer">
-                    <p>© 2024 曦望燈塔救援協會</p>
+                    <p>© 2026 曦望燈塔救援協會</p>
                 </div>
             </div>
         </div>
