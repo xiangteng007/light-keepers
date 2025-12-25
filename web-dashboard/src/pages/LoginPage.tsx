@@ -255,7 +255,7 @@ export default function LoginPage() {
                 <div className="login-header">
                     <div className="login-logo">
                         <h1>Light Keepers</h1>
-                        <p className="login-subtitle">曦望燈塔災情管理平台</p>
+                        <p className="login-subtitle">曦望燈塔資訊管理平台</p>
                     </div>
                 </div>
 
