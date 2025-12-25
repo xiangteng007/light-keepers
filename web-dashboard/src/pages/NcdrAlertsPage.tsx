@@ -5,8 +5,11 @@ import {
     getNcdrAlerts,
     getNcdrAlertStats,
     syncNcdrAlerts,
+    broadcastNcdrAlert,
+    getLineBotStats,
     type NcdrAlert,
 } from '../api';
+import { useAuth } from '../context/AuthContext';
 
 // 類別定義 (前端靜態，避免每次請求)
 const ALERT_TYPE_DEFINITIONS = [
@@ -76,8 +79,13 @@ const getSeverityLabel = (severity: string) => {
 
 export default function NcdrAlertsPage() {
     const queryClient = useQueryClient();
+    const { user } = useAuth();
     const [selectedTypes, setSelectedTypes] = useState<number[]>(getStoredTypes);
     const [showFilter, setShowFilter] = useState(false);
+    const [broadcastResult, setBroadcastResult] = useState<{ success: boolean; message: string } | null>(null);
+
+    // 是否為管理員（幹部以上）
+    const isAdmin = (user?.roleLevel ?? 0) >= 2;
 
     // 同步選擇到 localStorage
     useEffect(() => {
@@ -101,12 +109,37 @@ export default function NcdrAlertsPage() {
         queryFn: () => getNcdrAlertStats().then(res => res.data),
     });
 
+    // 獲取 LINE BOT 統計
+    const { data: lineBotStats } = useQuery({
+        queryKey: ['lineBotStats'],
+        queryFn: () => getLineBotStats().then(res => res.data),
+        enabled: isAdmin,
+    });
+
     // 同步 mutation
     const syncMutation = useMutation({
         mutationFn: syncNcdrAlerts,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['ncdrAlerts'] });
             queryClient.invalidateQueries({ queryKey: ['ncdrStats'] });
+        },
+    });
+
+    // LINE 推播 mutation
+    const broadcastMutation = useMutation({
+        mutationFn: (data: { title: string; description: string; severity: 'critical' | 'warning' | 'info'; affectedAreas?: string }) =>
+            broadcastNcdrAlert(data),
+        onSuccess: (response) => {
+            setBroadcastResult({
+                success: response.data.success,
+                message: response.data.message,
+            });
+        },
+        onError: () => {
+            setBroadcastResult({
+                success: false,
+                message: '推播失敗，請稍後再試',
+            });
         },
     });
 
@@ -136,6 +169,17 @@ export default function NcdrAlertsPage() {
             minute: '2-digit',
         });
     };
+
+    // 執行 LINE 推播
+    const handleBroadcast = (alert: NcdrAlert) => {
+        broadcastMutation.mutate({
+            title: alert.title,
+            description: alert.description || '',
+            severity: alert.severity as 'critical' | 'warning' | 'info',
+            affectedAreas: alert.sourceUnit,
+        });
+    };
+
 
     return (
         <div className="page ncdr-page">
@@ -283,9 +327,43 @@ export default function NcdrAlertsPage() {
                                 查看詳情 →
                             </a>
                         )}
+                        {/* 管理員推播按鈕 */}
+                        {isAdmin && lineBotStats?.botEnabled && (
+                            <div className="ncdr-alert__actions" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
+                                    onClick={() => handleBroadcast(alert)}
+                                    loading={broadcastMutation.isPending}
+                                >
+                                    📱 LINE 推播 ({lineBotStats.boundUserCount} 人)
+                                </Button>
+                            </div>
+                        )}
                     </Card>
                 ))}
             </div>
+
+            {/* 推播結果提示 */}
+            {broadcastResult && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        bottom: '2rem',
+                        right: '2rem',
+                        padding: '1rem 1.5rem',
+                        borderRadius: '0.5rem',
+                        backgroundColor: broadcastResult.success ? 'var(--color-success)' : 'var(--color-danger)',
+                        color: 'white',
+                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+                        zIndex: 1000,
+                    }}
+                    onClick={() => setBroadcastResult(null)}
+                >
+                    {broadcastResult.success ? '✅' : '❌'} {broadcastResult.message}
+                </div>
+            )}
         </div>
     );
 }
+

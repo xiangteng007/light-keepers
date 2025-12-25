@@ -24,7 +24,9 @@ import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
 import PermissionsPage from './pages/PermissionsPage'
+import BindLinePage from './pages/BindLinePage'
 import './App.css'
+
 
 /**
  * 頁面權限等級對應：
@@ -76,6 +78,7 @@ function App() {
 
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/" element={<ProtectedRoute requiredLevel={1}><Layout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 志工等級 (1) */}

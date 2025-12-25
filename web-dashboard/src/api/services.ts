@@ -687,3 +687,49 @@ export const downloadDisasterJSON = (start?: string, end?: string) => {
     const baseUrl = api.defaults.baseURL || '';
     window.open(`${baseUrl}/reports-export/disaster-stats/json?${params.toString()}`, '_blank');
 };
+
+// ===== LINE BOT 整合 =====
+
+export interface LineBotStats {
+    success: boolean;
+    boundUserCount: number;
+    botEnabled: boolean;
+}
+
+export interface NcdrBroadcastResult {
+    success: boolean;
+    message: string;
+    sentCount: number;
+}
+
+// 取得 LINE BOT 統計
+export const getLineBotStats = () =>
+    api.get<LineBotStats>('/line-bot/stats');
+
+// 帳號綁定
+export const bindLineAccount = (accountId: string, lineUserId: string) =>
+    api.post<{ success: boolean; message: string }>('/line-bot/bind', { accountId, lineUserId });
+
+// 解除綁定
+export const unbindLineAccount = (accountId: string) =>
+    api.post<{ success: boolean; message: string }>('/line-bot/unbind', { accountId });
+
+// 推播 NCDR 災害示警給所有用戶
+export const broadcastNcdrAlert = (data: {
+    title: string;
+    description: string;
+    severity: 'critical' | 'warning' | 'info';
+    affectedAreas?: string;
+}) => api.post<NcdrBroadcastResult>('/line-bot/ncdr-broadcast', data);
+
+// 推播給特定區域
+export const broadcastNcdrAlertToRegion = (data: {
+    region: string;
+    title: string;
+    description: string;
+    severity: string;
+}) => api.post<NcdrBroadcastResult>('/line-bot/ncdr-broadcast/region', data);
+
+// 廣播訊息
+export const broadcastLineMessage = (message: string) =>
+    api.post<{ success: boolean; message: string }>('/line-bot/broadcast', { message });
