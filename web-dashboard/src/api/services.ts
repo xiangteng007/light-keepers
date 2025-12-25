@@ -7,10 +7,64 @@ export const getHealth = () => api.get('/health');
 export const login = (email: string, password: string) =>
     api.post('/auth/login', { email, password });
 
-export const register = (data: { email: string; password: string; displayName?: string }) =>
+export const register = (data: { email?: string; phone?: string; password: string; displayName?: string }) =>
     api.post('/auth/register', data);
 
 export const getProfile = () => api.get('/auth/me');
+
+// ===== OTP 驗證 =====
+
+export const sendPhoneOtp = (phone: string) =>
+    api.post<{ success: boolean; message: string }>('/auth/send-otp', { phone });
+
+export const verifyPhoneOtp = (phone: string, code: string) =>
+    api.post<{ success: boolean; verified: boolean }>('/auth/verify-otp', { phone, code });
+
+// ===== 密碼重設 =====
+
+export const forgotPassword = (data: { email?: string; phone?: string }) =>
+    api.post<{ success: boolean; message: string }>('/auth/forgot-password', data);
+
+export const resetPassword = (token: string, newPassword: string) =>
+    api.post<{ success: boolean; message: string }>('/auth/reset-password', { token, newPassword });
+
+// ===== 帳號狀態 =====
+
+export interface AccountStatus {
+    approvalStatus: 'pending' | 'approved' | 'rejected';
+    phoneVerified: boolean;
+    emailVerified: boolean;
+    volunteerProfileCompleted: boolean;
+    needsSetup: boolean;
+}
+
+export const getAccountStatus = () =>
+    api.get<AccountStatus>('/auth/me/status');
+
+export const markVolunteerProfileCompleted = () =>
+    api.post<{ success: boolean }>('/auth/me/volunteer-profile-completed');
+
+// ===== 帳號審核 (管理員) =====
+
+export interface PendingAccount {
+    id: string;
+    email: string;
+    phone: string;
+    displayName: string;
+    createdAt: string;
+}
+
+export const getPendingAccounts = () =>
+    api.get<PendingAccount[]>('/accounts/pending');
+
+export const approveAccount = (accountId: string) =>
+    api.patch<{ success: boolean; message: string }>(`/accounts/${accountId}/approve`);
+
+export const rejectAccount = (accountId: string, reason?: string) =>
+    api.patch<{ success: boolean; message: string }>(`/accounts/${accountId}/reject`, { reason });
+
+// Accounts
+export const getRoles = () => api.get('/accounts/roles');
 
 // Events
 export interface Event {
@@ -64,9 +118,6 @@ export const createTask = (data: Partial<Task>) =>
 
 export const updateTask = (id: string, data: Partial<Task>) =>
     api.put<Task>(`/tasks/${id}`, data);
-
-// Accounts
-export const getRoles = () => api.get('/accounts/roles');
 
 // ===== NCDR 災害示警 =====
 

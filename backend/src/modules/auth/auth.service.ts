@@ -1,10 +1,13 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { RegisterDto, LoginDto, TokenResponseDto } from './dto/auth.dto';
+import { OtpService } from './services/otp.service';
+import { SmsService } from './services/sms.service';
+import { PasswordResetService } from './services/password-reset.service';
 
 @Injectable()
 export class AuthService {
@@ -16,6 +19,9 @@ export class AuthService {
         @InjectRepository(PagePermission)
         private readonly pagePermissionRepository: Repository<PagePermission>,
         private readonly jwtService: JwtService,
+        private readonly otpService: OtpService,
+        private readonly smsService: SmsService,
+        private readonly passwordResetService: PasswordResetService,
     ) { }
 
     async register(dto: RegisterDto): Promise<TokenResponseDto> {
@@ -547,5 +553,152 @@ export class AuthService {
             trainingNotifications: account.prefTrainingNotifications ?? true,
         };
     }
-}
 
+    // =========================================
+    // OTP 相關方法
+    // =========================================
+
+    /**
+     * 發送手機 OTP 驗證碼
+     */
+    async sendPhoneOtp(phone: string): Promise<{ success: boolean; message: string }> {
+        if (!phone) {
+            throw new BadRequestException('請提供手機號碼');
+        }
+
+        // 生成 OTP
+        const code = await this.otpService.generateOtp(phone, 'phone');
+
+        // 發送簡訊
+        await this.smsService.sendOtp(phone, code);
+
+        return {
+            success: true,
+            message: '驗證碼已發送，請查看您的手機簡訊',
+        };
+    }
+
+    /**
+     * 驗證手機 OTP
+     */
+    async verifyPhoneOtp(phone: string, code: string): Promise<{ success: boolean; verified: boolean }> {
+        const verified = await this.otpService.verifyOtp(phone, 'phone', code);
+
+        if (verified) {
+            // 更新帳號的手機驗證狀態
+            const account = await this.accountRepository.findOne({ where: { phone } });
+            if (account) {
+                account.phoneVerified = true;
+                await this.accountRepository.save(account);
+            }
+        }
+
+        return { success: true, verified };
+    }
+
+    // =========================================
+    // 密碼重設相關方法
+    // =========================================
+
+    /**
+     * 請求密碼重設（忘記密碼）
+     */
+    async requestPasswordReset(email?: string, phone?: string): Promise<{ success: boolean; message: string }> {
+        if (!email && !phone) {
+            throw new BadRequestException('請提供 Email 或手機號碼');
+        }
+
+        // 查找帳號
+        const account = await this.passwordResetService.findAccountByEmailOrPhone(email, phone);
+
+        if (!account) {
+            // 為了安全，不透露帳號是否存在
+            return {
+                success: true,
+                message: '如果帳號存在，您將會收到重設密碼的通知',
+            };
+        }
+
+        // 建立重設 Token
+        const token = await this.passwordResetService.createResetToken(account.id);
+        const resetUrl = this.passwordResetService.generateResetUrl(token);
+
+        // 發送重設通知（簡訊或 Email）
+        if (phone && account.phone) {
+            await this.smsService.sendPasswordResetSms(account.phone, resetUrl);
+        }
+        // TODO: 未來可加入 Email 發送
+
+        return {
+            success: true,
+            message: '如果帳號存在，您將會收到重設密碼的通知',
+        };
+    }
+
+    /**
+     * 重設密碼
+     */
+    async resetPassword(token: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+        if (!token || !newPassword) {
+            throw new BadRequestException('缺少必要參數');
+        }
+
+        if (newPassword.length < 6) {
+            throw new BadRequestException('密碼長度至少 6 個字元');
+        }
+
+        await this.passwordResetService.verifyAndResetPassword(token, newPassword);
+
+        return {
+            success: true,
+            message: '密碼已成功重設，請使用新密碼登入',
+        };
+    }
+
+    // =========================================
+    // 帳號狀態相關方法
+    // =========================================
+
+    /**
+     * 獲取帳號完整狀態
+     */
+    async getAccountStatus(accountId: string): Promise<{
+        approvalStatus: string;
+        phoneVerified: boolean;
+        emailVerified: boolean;
+        volunteerProfileCompleted: boolean;
+        needsSetup: boolean;
+    }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        const needsSetup = !account.volunteerProfileCompleted && account.approvalStatus === 'approved';
+
+        return {
+            approvalStatus: account.approvalStatus,
+            phoneVerified: account.phoneVerified,
+            emailVerified: account.emailVerified,
+            volunteerProfileCompleted: account.volunteerProfileCompleted,
+            needsSetup,
+        };
+    }
+
+    /**
+     * 標記志工資料已完成
+     */
+    async markVolunteerProfileCompleted(accountId: string): Promise<{ success: boolean }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        account.volunteerProfileCompleted = true;
+        await this.accountRepository.save(account);
+
+        return { success: true };
+    }
+}

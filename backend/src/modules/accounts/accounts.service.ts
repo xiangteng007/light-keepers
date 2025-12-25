@@ -233,5 +233,89 @@ export class AccountsService {
             };
         });
     }
-}
 
+    // =========================================
+    // 註冊審核相關方法
+    // =========================================
+
+    /**
+     * 獲取待審核帳號列表
+     */
+    async getPendingAccounts(): Promise<{
+        id: string;
+        email: string;
+        phone: string;
+        displayName: string;
+        createdAt: Date;
+    }[]> {
+        const accounts = await this.accountRepository.find({
+            where: { approvalStatus: 'pending' as const },
+            order: { createdAt: 'ASC' },
+        });
+
+        return accounts.map(account => ({
+            id: account.id,
+            email: account.email || '',
+            phone: account.phone || '',
+            displayName: account.displayName || '',
+            createdAt: account.createdAt,
+        }));
+    }
+
+    /**
+     * 審批帳號
+     */
+    async approveAccount(accountId: string, approverId: string): Promise<{ success: boolean; message: string }> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+        });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        if (account.approvalStatus !== 'pending') {
+            throw new ForbiddenException('此帳號不是待審核狀態');
+        }
+
+        account.approvalStatus = 'approved';
+        account.approvedBy = approverId;
+        account.approvedAt = new Date();
+
+        await this.accountRepository.save(account);
+
+        return {
+            success: true,
+            message: '帳號已審批通過',
+        };
+    }
+
+    /**
+     * 拒絕帳號
+     */
+    async rejectAccount(accountId: string, approverId: string, reason?: string): Promise<{ success: boolean; message: string }> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+        });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        if (account.approvalStatus !== 'pending') {
+            throw new ForbiddenException('此帳號不是待審核狀態');
+        }
+
+        account.approvalStatus = 'rejected';
+        account.approvedBy = approverId;
+        account.approvedAt = new Date();
+        account.approvalNote = reason || '未提供原因';
+
+        await this.accountRepository.save(account);
+
+        return {
+            success: true,
+            message: '帳號已被拒絕',
+        };
+    }
+}

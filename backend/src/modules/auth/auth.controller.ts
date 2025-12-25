@@ -183,7 +183,66 @@ export class AuthController {
     ) {
         return this.authService.updatePreferences(req.user.id, dto);
     }
+
+    // =========================================
+    // OTP 驗證端點
+    // =========================================
+
+    /**
+     * 發送手機 OTP 驗證碼
+     */
+    @Post('send-otp')
+    async sendPhoneOtp(@Body() body: { phone: string }) {
+        return this.authService.sendPhoneOtp(body.phone);
+    }
+
+    /**
+     * 驗證手機 OTP
+     */
+    @Post('verify-otp')
+    async verifyPhoneOtp(@Body() body: { phone: string; code: string }) {
+        return this.authService.verifyPhoneOtp(body.phone, body.code);
+    }
+
+    // =========================================
+    // 密碼重設端點
+    // =========================================
+
+    /**
+     * 忘記密碼 - 發送重設連結
+     */
+    @Post('forgot-password')
+    async forgotPassword(@Body() body: { email?: string; phone?: string }) {
+        return this.authService.requestPasswordReset(body.email, body.phone);
+    }
+
+    /**
+     * 重設密碼
+     */
+    @Post('reset-password')
+    async resetPassword(@Body() body: { token: string; newPassword: string }) {
+        return this.authService.resetPassword(body.token, body.newPassword);
+    }
+
+    // =========================================
+    // 帳號狀態端點
+    // =========================================
+
+    /**
+     * 獲取帳號完整狀態（包含審核狀態和志工資料狀態）
+     */
+    @Get('me/status')
+    @UseGuards(JwtAuthGuard)
+    async getAccountStatus(@Request() req: { user: { id: string } }) {
+        return this.authService.getAccountStatus(req.user.id);
+    }
+
+    /**
+     * 標記志工資料已完成
+     */
+    @Post('me/volunteer-profile-completed')
+    @UseGuards(JwtAuthGuard)
+    async markVolunteerProfileCompleted(@Request() req: { user: { id: string } }) {
+        return this.authService.markVolunteerProfileCompleted(req.user.id);
+    }
 }
-
-
-

@@ -2,6 +2,7 @@ import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Role, RoleLevel, PagePermission } from './entities';
+import { Account } from './entities/account.entity';
 
 /**
  * 初始化角色和頁面權限的 Seed 服務
@@ -11,17 +12,23 @@ import { Role, RoleLevel, PagePermission } from './entities';
 export class SeedService implements OnModuleInit {
     private readonly logger = new Logger(SeedService.name);
 
+    // 系統擁有者帳號 Email
+    private readonly OWNER_EMAIL = 'owner@lightkeepers.tw';
+
     constructor(
         @InjectRepository(Role)
         private readonly roleRepository: Repository<Role>,
         @InjectRepository(PagePermission)
         private readonly pagePermissionRepository: Repository<PagePermission>,
+        @InjectRepository(Account)
+        private readonly accountRepository: Repository<Account>,
     ) { }
 
     async onModuleInit() {
         try {
             await this.seedRoles();
             await this.seedPagePermissions();
+            await this.seedOwnerAccount();
             this.logger.log('Seed completed successfully');
         } catch (error) {
             this.logger.error(`Seed failed: ${error.message}`);
@@ -91,5 +98,43 @@ export class SeedService implements OnModuleInit {
                 await this.pagePermissionRepository.update(existing.id, pageData);
             }
         }
+    }
+
+    /**
+     * 確保系統擁有者帳號擁有 owner 角色
+     */
+    async seedOwnerAccount() {
+        const ownerAccount = await this.accountRepository.findOne({
+            where: { email: this.OWNER_EMAIL },
+            relations: ['roles'],
+        });
+
+        if (!ownerAccount) {
+            this.logger.log(`Owner account ${this.OWNER_EMAIL} not found, skipping role assignment`);
+            return;
+        }
+
+        const ownerRole = await this.roleRepository.findOne({ where: { name: 'owner' } });
+        if (!ownerRole) {
+            this.logger.warn('Owner role not found');
+            return;
+        }
+
+        // 檢查是否已有 owner 角色
+        const hasOwnerRole = ownerAccount.roles?.some(r => r.name === 'owner');
+        if (hasOwnerRole) {
+            this.logger.log(`Account ${this.OWNER_EMAIL} already has owner role`);
+            return;
+        }
+
+        // 賦予 owner 角色
+        ownerAccount.roles = [...(ownerAccount.roles || []), ownerRole];
+        ownerAccount.approvalStatus = 'approved';
+        ownerAccount.phoneVerified = true;
+        ownerAccount.emailVerified = true;
+        ownerAccount.volunteerProfileCompleted = true;
+
+        await this.accountRepository.save(ownerAccount);
+        this.logger.log(`✅ Granted owner role to ${this.OWNER_EMAIL}`);
     }
 }

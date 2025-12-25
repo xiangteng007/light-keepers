@@ -57,6 +57,35 @@ export class Account {
     @Column({ name: 'pref_training_notifications', default: true })
     prefTrainingNotifications: boolean;
 
+    // 驗證狀態
+    @Column({ name: 'phone_verified', default: false })
+    phoneVerified: boolean;
+
+    @Column({ name: 'email_verified', default: false })
+    emailVerified: boolean;
+
+    // 註冊審核
+    @Column({
+        name: 'approval_status',
+        type: 'varchar',
+        length: 20,
+        default: 'pending'
+    })
+    approvalStatus: 'pending' | 'approved' | 'rejected';
+
+    @Column({ name: 'approval_note', nullable: true, type: 'text' })
+    approvalNote: string;
+
+    @Column({ name: 'approved_by', nullable: true })
+    approvedBy: string;
+
+    @Column({ name: 'approved_at', type: 'timestamp', nullable: true })
+    approvedAt: Date;
+
+    // 志工資料完成狀態
+    @Column({ name: 'volunteer_profile_completed', default: false })
+    volunteerProfileCompleted: boolean;
+
     @ManyToMany(() => Role)
     @JoinTable({
         name: 'account_roles',

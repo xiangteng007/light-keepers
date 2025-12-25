@@ -96,5 +96,45 @@ export class AccountsController {
         const operatorLevel = req.user.roleLevel;
         return this.accountsService.updatePagePermission(pageKey, body, operatorLevel);
     }
-}
 
+    // =========================================
+    // 註冊審核相關端點
+    // =========================================
+
+    /**
+     * 獲取待審核帳號列表 - 需要理事長或以上權限
+     */
+    @Get('pending')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @MinLevel(RoleLevel.CHAIRMAN)
+    getPendingAccounts() {
+        return this.accountsService.getPendingAccounts();
+    }
+
+    /**
+     * 審批帳號 - 需要理事長或以上權限
+     */
+    @Patch(':id/approve')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @MinLevel(RoleLevel.CHAIRMAN)
+    async approveAccount(
+        @Param('id') id: string,
+        @Request() req: { user: { id: string } }
+    ) {
+        return this.accountsService.approveAccount(id, req.user.id);
+    }
+
+    /**
+     * 拒絕帳號 - 需要理事長或以上權限
+     */
+    @Patch(':id/reject')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @MinLevel(RoleLevel.CHAIRMAN)
+    async rejectAccount(
+        @Param('id') id: string,
+        @Body() body: { reason?: string },
+        @Request() req: { user: { id: string } }
+    ) {
+        return this.accountsService.rejectAccount(id, req.user.id, body.reason);
+    }
+}
