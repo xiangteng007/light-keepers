@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login as loginApi, register, sendPhoneOtp, verifyPhoneOtp } from '../api/services';
+import { login as loginApi, register } from '../api/services';
 import './LoginPage.css';
 
 // LINE Login Config - 需要在 LINE Developers Console 設定
@@ -22,16 +22,8 @@ export default function LoginPage() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [rememberMe, setRememberMe] = useState(true);
 
-    // OTP 驗證狀態
-    const [otpSent, setOtpSent] = useState(false);
-    const [otpVerified, setOtpVerified] = useState(false);
-    const [otpCode, setOtpCode] = useState('');
-    const [countdown, setCountdown] = useState(0);
-    const [isSendingOtp, setIsSendingOtp] = useState(false);
-
     const [formData, setFormData] = useState({
         email: '',
-        phone: '',
         password: '',
         confirmPassword: '',
         displayName: '',
@@ -96,66 +88,7 @@ export default function LoginPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
         setError(null);
         setSuccessMessage(null);
-        // 如果修改手機號碼，重置 OTP 狀態
-        if (name === 'phone') {
-            setOtpSent(false);
-            setOtpVerified(false);
-            setOtpCode('');
-        }
     };
-
-    // OTP 倒計時
-    useEffect(() => {
-        if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [countdown]);
-
-    // 發送 OTP
-    const handleSendOtp = useCallback(async () => {
-        if (!formData.phone || formData.phone.length < 10) {
-            setError('請輸入有效的手機號碼');
-            return;
-        }
-        setIsSendingOtp(true);
-        setError(null);
-        try {
-            await sendPhoneOtp(formData.phone);
-            setOtpSent(true);
-            setCountdown(60);
-            setSuccessMessage('驗證碼已發送至您的手機');
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '發送驗證碼失敗，請稍後再試');
-        } finally {
-            setIsSendingOtp(false);
-        }
-    }, [formData.phone]);
-
-    // 驗證 OTP
-    const handleVerifyOtp = useCallback(async () => {
-        if (otpCode.length !== 6) {
-            setError('請輸入 6 位數驗證碼');
-            return;
-        }
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await verifyPhoneOtp(formData.phone, otpCode);
-            if (response.data.verified) {
-                setOtpVerified(true);
-                setSuccessMessage('手機號碼驗證成功！');
-            } else {
-                setError('驗證碼錯誤');
-            }
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '驗證失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [formData.phone, otpCode]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -173,15 +106,8 @@ export default function LoginPage() {
                     setIsLoading(false);
                     return;
                 }
-                // 如果有填手機號碼但未驗證，提示先驗證
-                if (formData.phone && !otpVerified) {
-                    setError('請先完成手機號碼驗證');
-                    setIsLoading(false);
-                    return;
-                }
                 await register({
                     email: formData.email,
-                    phone: formData.phone || undefined,
                     password: formData.password,
                     displayName: formData.displayName,
                 });
@@ -340,63 +266,6 @@ export default function LoginPage() {
                                 minLength={6}
                             />
                         </div>
-                    )}
-
-                    {/* 手機號碼與 OTP 驗證 (僅註冊模式) */}
-                    {!isLogin && (
-                        <>
-                            <div className="form-group">
-                                <label htmlFor="phone">手機號碼 (選填)</label>
-                                <div className="phone-input-group">
-                                    <input
-                                        type="tel"
-                                        id="phone"
-                                        name="phone"
-                                        placeholder="例如：0912345678"
-                                        value={formData.phone}
-                                        onChange={handleChange}
-                                        disabled={otpVerified}
-                                    />
-                                    {formData.phone && !otpVerified && (
-                                        <button
-                                            type="button"
-                                            className="otp-send-btn"
-                                            onClick={handleSendOtp}
-                                            disabled={isSendingOtp || countdown > 0}
-                                        >
-                                            {isSendingOtp ? '發送中...' : countdown > 0 ? `${countdown}s` : (otpSent ? '重發' : '發送驗證碼')}
-                                        </button>
-                                    )}
-                                    {otpVerified && (
-                                        <span className="otp-verified-badge">✓ 已驗證</span>
-                                    )}
-                                </div>
-                            </div>
-
-                            {otpSent && !otpVerified && (
-                                <div className="form-group">
-                                    <label htmlFor="otpCode">驗證碼</label>
-                                    <div className="otp-input-group">
-                                        <input
-                                            type="text"
-                                            id="otpCode"
-                                            placeholder="請輸入 6 位數驗證碼"
-                                            value={otpCode}
-                                            onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                            maxLength={6}
-                                        />
-                                        <button
-                                            type="button"
-                                            className="otp-verify-btn"
-                                            onClick={handleVerifyOtp}
-                                            disabled={isLoading || otpCode.length !== 6}
-                                        >
-                                            驗證
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </>
                     )}
 
                     {isLogin && (
