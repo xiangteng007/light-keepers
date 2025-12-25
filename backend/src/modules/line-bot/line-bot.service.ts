@@ -58,6 +58,27 @@ export class LineBotService {
         this.logger.log(`Pushed text to ${userId}`);
     }
 
+    /**
+     * 發送 OTP 驗證碼到 LINE
+     */
+    async sendOtp(lineUserId: string, code: string): Promise<boolean> {
+        if (!this.client) {
+            this.logger.warn(`[DEV MODE] LINE OTP for ${lineUserId}: ${code}`);
+            return true;
+        }
+
+        try {
+            const message = `【曦望燈塔驗證碼】\n\n您的驗證碼是：${code}\n\n⏰ 有效期限 5 分鐘\n⚠️ 請勿將驗證碼告知他人`;
+            await this.pushText(lineUserId, message);
+            this.logger.log(`OTP sent to LINE user ${lineUserId.substring(0, 8)}...`);
+            return true;
+        } catch (error) {
+            this.logger.error(`Failed to send LINE OTP: ${error.message}`);
+            this.logger.warn(`[DEV MODE] LINE OTP for ${lineUserId}: ${code}`);
+            return true;
+        }
+    }
+
     // 發送給多人
     async multicast(userIds: string[], text: string): Promise<void> {
         if (!this.client || userIds.length === 0) return;

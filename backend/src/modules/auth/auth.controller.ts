@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, UseGuards, Request, BadRequestException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -189,11 +189,38 @@ export class AuthController {
     // =========================================
 
     /**
-     * 發送手機 OTP 驗證碼
+     * 發送手機 OTP 驗證碼 (SMS - 備用)
      */
     @Post('send-otp')
     async sendPhoneOtp(@Body() body: { phone: string }) {
         return this.authService.sendPhoneOtp(body.phone);
+    }
+
+    /**
+     * 發送 LINE OTP 驗證碼
+     */
+    @Post('send-line-otp')
+    @UseGuards(JwtAuthGuard)
+    async sendLineOtp(@Request() req: { user: { lineUserId?: string } }) {
+        if (!req.user.lineUserId) {
+            throw new BadRequestException('請先綁定 LINE 帳號');
+        }
+        return this.authService.sendLineOtp(req.user.lineUserId);
+    }
+
+    /**
+     * 驗證 LINE OTP
+     */
+    @Post('verify-line-otp')
+    @UseGuards(JwtAuthGuard)
+    async verifyLineOtp(
+        @Request() req: { user: { lineUserId?: string } },
+        @Body() body: { code: string }
+    ) {
+        if (!req.user.lineUserId) {
+            throw new BadRequestException('請先綁定 LINE 帳號');
+        }
+        return this.authService.verifyLineOtp(req.user.lineUserId, body.code);
     }
 
     /**

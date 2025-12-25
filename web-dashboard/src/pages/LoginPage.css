@@ -19,13 +19,13 @@
 }
 
 .login-header {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
     padding: 40px 32px;
     text-align: center;
 }
 
 .login-logo {
-    color: var(--brown-900);
+    color: #f9fafb;
 }
 
 .login-logo-icon {
@@ -209,12 +209,12 @@
 }
 
 .otp-send-btn {
-    background: var(--accent-primary);
-    color: var(--brown-900);
+    background: #6b7280;
+    color: white;
 }
 
 .otp-send-btn:hover:not(:disabled) {
-    background: var(--gold-600);
+    background: #4b5563;
 }
 
 .otp-send-btn:disabled {
@@ -223,12 +223,12 @@
 }
 
 .otp-verify-btn {
-    background: #4CAF50;
+    background: #374151;
     color: white;
 }
 
 .otp-verify-btn:hover:not(:disabled) {
-    background: #43A047;
+    background: #1f2937;
 }
 
 .otp-verify-btn:disabled {
@@ -251,8 +251,8 @@
     padding: 16px;
     border: none;
     border-radius: var(--radius-md);
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
-    color: var(--brown-900);
+    background: linear-gradient(135deg, #374151 0%, #1f2937 100%);
+    color: #f9fafb;
     font-size: 16px;
     font-weight: 600;
     cursor: pointer;

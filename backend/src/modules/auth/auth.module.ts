@@ -8,6 +8,7 @@ import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
 import { SmsService, OtpService, PasswordResetService } from './services';
+import { LineBotModule } from '../line-bot/line-bot.module';
 
 @Module({
     imports: [
@@ -25,6 +26,7 @@ import { SmsService, OtpService, PasswordResetService } from './services';
                 signOptions: { expiresIn: '7d' },
             }),
         }),
+        LineBotModule,
     ],
     controllers: [AuthController],
     providers: [
@@ -38,4 +40,3 @@ import { SmsService, OtpService, PasswordResetService } from './services';
     exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService],
 })
 export class AuthModule { }
-

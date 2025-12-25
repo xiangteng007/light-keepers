@@ -20,6 +20,14 @@ export const sendPhoneOtp = (phone: string) =>
 export const verifyPhoneOtp = (phone: string, code: string) =>
     api.post<{ success: boolean; verified: boolean }>('/auth/verify-otp', { phone, code });
 
+// ===== LINE OTP 驗證 =====
+
+export const sendLineOtp = () =>
+    api.post<{ success: boolean; message: string }>('/auth/send-line-otp');
+
+export const verifyLineOtp = (code: string) =>
+    api.post<{ success: boolean; verified: boolean }>('/auth/verify-line-otp', { code });
+
 // ===== 密碼重設 =====
 
 export const forgotPassword = (data: { email?: string; phone?: string }) =>

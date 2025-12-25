@@ -8,6 +8,7 @@ import { RegisterDto, LoginDto, TokenResponseDto } from './dto/auth.dto';
 import { OtpService } from './services/otp.service';
 import { SmsService } from './services/sms.service';
 import { PasswordResetService } from './services/password-reset.service';
+import { LineBotService } from '../line-bot/line-bot.service';
 
 @Injectable()
 export class AuthService {
@@ -22,6 +23,7 @@ export class AuthService {
         private readonly otpService: OtpService,
         private readonly smsService: SmsService,
         private readonly passwordResetService: PasswordResetService,
+        private readonly lineBotService: LineBotService,
     ) { }
 
     async register(dto: RegisterDto): Promise<TokenResponseDto> {
@@ -559,7 +561,7 @@ export class AuthService {
     // =========================================
 
     /**
-     * 發送手機 OTP 驗證碼
+     * 發送手機 OTP 驗證碼 (SMS - 備用)
      */
     async sendPhoneOtp(phone: string): Promise<{ success: boolean; message: string }> {
         if (!phone) {
@@ -576,6 +578,34 @@ export class AuthService {
             success: true,
             message: '驗證碼已發送，請查看您的手機簡訊',
         };
+    }
+
+    /**
+     * 發送 LINE OTP 驗證碼
+     */
+    async sendLineOtp(lineUserId: string): Promise<{ success: boolean; message: string }> {
+        if (!lineUserId) {
+            throw new BadRequestException('請先綁定 LINE 帳號');
+        }
+
+        // 生成 OTP (使用 lineUserId 作為 target)
+        const code = await this.otpService.generateOtp(lineUserId, 'phone');
+
+        // 透過 LINE 發送驗證碼
+        await this.lineBotService.sendOtp(lineUserId, code);
+
+        return {
+            success: true,
+            message: '驗證碼已發送至您的 LINE',
+        };
+    }
+
+    /**
+     * 驗證 LINE OTP
+     */
+    async verifyLineOtp(lineUserId: string, code: string): Promise<{ success: boolean; verified: boolean }> {
+        const verified = await this.otpService.verifyOtp(lineUserId, 'phone', code);
+        return { success: true, verified };
     }
 
     /**
