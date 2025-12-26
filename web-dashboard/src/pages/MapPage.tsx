@@ -236,11 +236,11 @@ export default function MapPage() {
         staleTime: 1000 * 60 * 30, // 30 分鐘快取
     });
 
-    const events = eventsData || [];
-    const confirmedReports = reportsData || [];
-    const ncdrAlerts = ncdrData || [];
-    const shelters = publicResourcesData?.shelters || [];
-    const aedLocations = publicResourcesData?.aed || [];
+    const events = Array.isArray(eventsData) ? eventsData : [];
+    const confirmedReports = Array.isArray(reportsData) ? reportsData : [];
+    const ncdrAlerts = Array.isArray(ncdrData) ? ncdrData : [];
+    const shelters = Array.isArray(publicResourcesData?.shelters) ? publicResourcesData.shelters : [];
+    const aedLocations = Array.isArray(publicResourcesData?.aed) ? publicResourcesData.aed : [];
 
     // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {
