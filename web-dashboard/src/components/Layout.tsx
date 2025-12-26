@@ -46,7 +46,7 @@ import {
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
-import { getMenuConfig, updateMenuConfig } from '../api/services';
+import { getMenuConfig, updateMenuConfig, getTasks } from '../api/services';
 
 interface NavItem {
     id: string;
@@ -168,6 +168,36 @@ export default function Layout() {
 
     // Filter nav items based on user's role level
     const visibleNavItems = navItems.filter(item => item.requiredLevel <= userLevel);
+
+    // 登入任務提醒 - 顯示用戶待處理的任務數量
+    useEffect(() => {
+        const checkPendingTasks = async () => {
+            if (!user?.id) return;
+
+            try {
+                const response = await getTasks({ status: 'pending', limit: 50 });
+                const allPendingTasks = response.data?.data || [];
+                // 過濾出分配給當前用戶的任務
+                const myTasks = allPendingTasks.filter(t => t.assignedTo === user.id);
+
+                if (myTasks.length > 0) {
+                    // 使用 setTimeout 避免太快顯示
+                    setTimeout(() => {
+                        alert(`📋 您有 ${myTasks.length} 個待處理的任務！請前往「任務管理」查看。`);
+                    }, 1000);
+                }
+            } catch (error) {
+                console.error('Failed to check pending tasks:', error);
+            }
+        };
+
+        // 只在首次登入時檢查
+        const hasChecked = sessionStorage.getItem(`task-reminder-${user?.id}`);
+        if (!hasChecked && user?.id) {
+            checkPendingTasks();
+            sessionStorage.setItem(`task-reminder-${user?.id}`, 'true');
+        }
+    }, [user?.id]);
 
     // Load menu config from backend
     useEffect(() => {
