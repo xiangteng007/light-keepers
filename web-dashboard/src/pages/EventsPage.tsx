@@ -115,7 +115,8 @@ export default function EventsPage() {
             description: taskForm.description,
             priority: priorityMap[taskForm.priority] || 2,
             dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
-            eventId: selectedReport?.id, // 關聯到原始事件
+            // 注意：eventId 指向 Event 實體，但這裡是從 Report 建立任務
+            // Report 資訊已包含在 description 中
         });
     };
 
