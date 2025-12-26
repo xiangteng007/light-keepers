@@ -10,93 +10,86 @@ export interface AlertTypeDefinition {
     priority: 'core' | 'extended'; // 核心類別預設載入
 }
 
+// =============================================
+// NCDR AlertType ID 對照表 (5 位數格式)
+// 來源: https://alerts.ncdr.nat.gov.tw/RSS.aspx
+// =============================================
+
 // 預設核心類別 (每 10 分鐘自動同步)
 // 包含常見且重要的自然災害警報
 export const CORE_ALERT_TYPES: number[] = [
-    33, // 地震
-    34, // 海嘯
-    5,  // 颱風
-    6,  // 雷雨
-    37, // 降雨
-    38, // 土石流
-    53, // 火災
-    14, // 低溫 (寒流)
-    56, // 高溫 (熱浪)
-    32, // 強風
-    15, // 濃霧
+    10501, // 地震
+    10502, // 海嘯
+    10401, // 颱風
+    10701, // 大雨特報
+    10702, // 豪雨特報
+    10601, // 低溫特報
+    10604, // 高溫特報
+    10602, // 陸上強風特報
+    10603, // 濃霧特報
+    30501, // 土石流
+    40601, // 火災
 ];
 
 // 自然災害類型 - 保留 7 天資料
 export const NATURAL_DISASTER_TYPES: number[] = [
-    33, // 地震
-    34, // 海嘯
-    5,  // 颱風
-    6,  // 雷雨
-    37, // 降雨
-    38, // 土石流
-    14, // 低溫
-    56, // 高溫
-    32, // 強風
-    67, // 火山
-    7,  // 淹水
-    36, // 河川高水位
-    52, // 林火
-    15, // 濃霧
-    48, // 枯旱預報
-    70, // 淹水感測
+    10501, // 地震
+    10502, // 海嘯
+    10401, // 颱風
+    10701, // 大雨特報
+    10702, // 豪雨特報
+    10601, // 低溫特報
+    10604, // 高溫特報
+    10602, // 陸上強風特報
+    10603, // 濃霧特報
+    30501, // 土石流
+    20101, // 淹水警戒
+    20201, // 水庫放流
+    20301, // 河川高水位
+    30301, // 林火
 ];
 
 // 非自然災害類型 - 保留 24 小時資料
-// 包括：火災(53)、鐵路事故(35,51)、道路封閉(3)、捷運營運(65)、停水(44)、電力(61) 等
+// 包括：火災、鐵路事故、道路封閉、捷運營運、停水、電力 等
 
-// 所有示警類別定義
+// 所有示警類別定義 (使用正確的 NCDR 5 位數 ID)
 export const ALERT_TYPE_DEFINITIONS: AlertTypeDefinition[] = [
-    // 中央部會 - 核心
-    { id: 33, name: '地震', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
-    { id: 34, name: '海嘯', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
-    { id: 5, name: '颱風', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
-    { id: 6, name: '雷雨', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
-    { id: 37, name: '降雨', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
-    { id: 38, name: '土石流', sourceUnit: '農業部', category: 'central', priority: 'core' },
-    { id: 53, name: '火災', sourceUnit: '內政部消防署', category: 'central', priority: 'core' },
+    // ============ 中央氣象署 ============
+    { id: 10501, name: '地震', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10502, name: '海嘯', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10401, name: '颱風', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10701, name: '大雨特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10702, name: '豪雨特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10601, name: '低溫特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10604, name: '高溫特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10602, name: '陸上強風特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
+    { id: 10603, name: '濃霧特報', sourceUnit: '中央氣象署', category: 'central', priority: 'core' },
 
-    // 中央部會 - 擴展
-    { id: 14, name: '低溫', sourceUnit: '中央氣象署', category: 'central', priority: 'extended' },
-    { id: 15, name: '濃霧', sourceUnit: '中央氣象署', category: 'central', priority: 'extended' },
-    { id: 32, name: '強風', sourceUnit: '中央氣象署', category: 'central', priority: 'extended' },
-    { id: 56, name: '高溫', sourceUnit: '中央氣象署', category: 'central', priority: 'extended' },
-    { id: 67, name: '火山', sourceUnit: '中央氣象署', category: 'central', priority: 'extended' },
-    { id: 7, name: '淹水', sourceUnit: '水利署', category: 'central', priority: 'extended' },
-    { id: 43, name: '水庫放流', sourceUnit: '水利署', category: 'central', priority: 'extended' },
-    { id: 36, name: '河川高水位', sourceUnit: '水利署', category: 'central', priority: 'extended' },
-    { id: 48, name: '枯旱預報', sourceUnit: '水利署', category: 'central', priority: 'extended' },
-    { id: 70, name: '淹水感測', sourceUnit: '水利署', category: 'central', priority: 'extended' },
-    { id: 3, name: '道路封閉', sourceUnit: '交通部公路局', category: 'central', priority: 'extended' },
-    { id: 35, name: '鐵路事故', sourceUnit: '臺鐵公司', category: 'central', priority: 'extended' },
-    { id: 55, name: '傳染病', sourceUnit: '疾病管制署', category: 'central', priority: 'extended' },
-    { id: 12, name: '空氣品質', sourceUnit: '環境部', category: 'central', priority: 'extended' },
-    { id: 52, name: '林火', sourceUnit: '林業署', category: 'central', priority: 'extended' },
-    { id: 63, name: '海洋污染', sourceUnit: '海洋保育署', category: 'central', priority: 'extended' },
-    { id: 50, name: '輻射災害', sourceUnit: '核能安全委員會', category: 'central', priority: 'extended' },
-    { id: 62, name: '防空', sourceUnit: '內政部', category: 'central', priority: 'extended' },
-    { id: 47, name: '停班停課', sourceUnit: '行政院', category: 'central', priority: 'extended' },
+    // ============ 農業部 ============
+    { id: 30501, name: '土石流', sourceUnit: '農業部', category: 'central', priority: 'core' },
+    { id: 30301, name: '林火', sourceUnit: '林業署', category: 'central', priority: 'extended' },
 
-    // 事業單位
-    { id: 65, name: '捷運營運', sourceUnit: '各捷運公司', category: 'enterprise', priority: 'extended' },
-    { id: 39, name: '行動電話中斷', sourceUnit: 'NCC', category: 'enterprise', priority: 'extended' },
-    { id: 44, name: '停水', sourceUnit: '自來水公司', category: 'enterprise', priority: 'extended' },
-    { id: 61, name: '電力', sourceUnit: '台灣電力公司', category: 'enterprise', priority: 'extended' },
-    { id: 51, name: '鐵路事故(高鐵)', sourceUnit: '台灣高鐵', category: 'enterprise', priority: 'extended' },
-    { id: 66, name: '急門診通報', sourceUnit: '衛生福利部', category: 'enterprise', priority: 'extended' },
+    // ============ 消防署 ============
+    { id: 40601, name: '火災', sourceUnit: '內政部消防署', category: 'central', priority: 'core' },
 
-    // 地方政府
-    { id: 41, name: '水門資訊', sourceUnit: '地方政府', category: 'local', priority: 'extended' },
-    { id: 45, name: '水位警戒', sourceUnit: '地方政府', category: 'local', priority: 'extended' },
-    { id: 19, name: '道路施工', sourceUnit: '地方政府', category: 'local', priority: 'extended' },
-    { id: 4, name: '開放臨時停車', sourceUnit: '地方政府', category: 'local', priority: 'extended' },
-    { id: 8, name: '強風管制(高速)', sourceUnit: '交通部高速公路局', category: 'local', priority: 'extended' },
-    { id: 59, name: '高速公路事件', sourceUnit: '交通部高速公路局', category: 'local', priority: 'extended' },
-    { id: 72, name: '疏散避難', sourceUnit: '內政部消防署', category: 'local', priority: 'extended' },
+    // ============ 水利署 ============
+    { id: 20101, name: '淹水警戒', sourceUnit: '水利署', category: 'central', priority: 'extended' },
+    { id: 20201, name: '水庫放流', sourceUnit: '水利署', category: 'central', priority: 'extended' },
+    { id: 20301, name: '河川高水位', sourceUnit: '水利署', category: 'central', priority: 'extended' },
+
+    // ============ 交通部 ============
+    { id: 50101, name: '鐵路事故', sourceUnit: '臺鐵公司', category: 'enterprise', priority: 'extended' },
+    { id: 50201, name: '鐵路事故(高鐵)', sourceUnit: '台灣高鐵', category: 'enterprise', priority: 'extended' },
+    { id: 50301, name: '道路封閉', sourceUnit: '交通部公路局', category: 'central', priority: 'extended' },
+    { id: 50501, name: '捷運營運', sourceUnit: '各捷運公司', category: 'enterprise', priority: 'extended' },
+
+    // ============ 公共設施 ============
+    { id: 60101, name: '停水', sourceUnit: '自來水公司', category: 'enterprise', priority: 'extended' },
+    { id: 60201, name: '電力', sourceUnit: '台灣電力公司', category: 'enterprise', priority: 'extended' },
+
+    // ============ 其他 ============
+    { id: 70101, name: '空氣品質', sourceUnit: '環境部', category: 'central', priority: 'extended' },
+    { id: 80101, name: '傳染病', sourceUnit: '疾病管制署', category: 'central', priority: 'extended' },
 ];
 
 export class NcdrAlertQueryDto {
