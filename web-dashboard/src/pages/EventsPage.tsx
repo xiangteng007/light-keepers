@@ -269,6 +269,12 @@ export default function EventsPage() {
                                     <span className="info-value">{selectedReport.contactPhone}</span>
                                 </div>
                             )}
+                            {selectedReport.reviewedBy && (
+                                <div className="info-row">
+                                    <span className="info-label">✅ 審核人</span>
+                                    <span className="info-value">{selectedReport.reviewedBy}</span>
+                                </div>
+                            )}
                         </div>
 
                         <div className="event-detail__actions">
