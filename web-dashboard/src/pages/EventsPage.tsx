@@ -174,6 +174,26 @@ export default function EventsPage() {
         });
     };
 
+    // 志工主動領取任務
+    const handleClaimTask = (report: Report) => {
+        if (!user?.id) {
+            alert('請先登入');
+            return;
+        }
+        const priorityMap: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 3 };
+        const defaultDue = new Date();
+        defaultDue.setDate(defaultDue.getDate() + 3);
+
+        createTaskMutation.mutate({
+            title: `處理：${report.title}`,
+            description: `【災情事件】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
+            priority: priorityMap[report.severity] || 2,
+            dueAt: defaultDue.toISOString(),
+            assignedTo: user.id,
+            eventId: report.id,
+        });
+    };
+
     if (isLoading) {
         return (
             <div className="page events-page">
@@ -282,6 +302,18 @@ export default function EventsPage() {
                                         <button className="btn-small" onClick={() => openDetailModal(report)}>
                                             查看
                                         </button>
+                                        {user && (
+                                            <button
+                                                className="btn-small btn-success-outline"
+                                                onClick={() => {
+                                                    if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
+                                                        handleClaimTask(report);
+                                                    }
+                                                }}
+                                            >
+                                                領取任務
+                                            </button>
+                                        )}
                                         {canAssignTask && (
                                             <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
                                                 分派任務

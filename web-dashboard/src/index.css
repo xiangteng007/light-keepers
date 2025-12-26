@@ -908,3 +908,53 @@ select {
     transform: rotate(360deg);
   }
 }
+
+/* ============================================
+   Button Utilities - 按鈕輔助樣式
+============================================ */
+
+.btn-small {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 6px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  color: #475569;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-small:hover {
+  background: #f8fafc;
+}
+
+.btn-primary-outline {
+  border-color: #667eea;
+  color: #667eea;
+  background: transparent;
+}
+
+.btn-primary-outline:hover {
+  background: rgba(102, 126, 234, 0.1);
+}
+
+.btn-success-outline {
+  border-color: #10B981;
+  color: #10B981;
+  background: transparent;
+}
+
+.btn-success-outline:hover {
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.btn-danger-outline {
+  border-color: #EF4444;
+  color: #EF4444;
+  background: transparent;
+}
+
+.btn-danger-outline:hover {
+  background: rgba(239, 68, 68, 0.1);
+}
