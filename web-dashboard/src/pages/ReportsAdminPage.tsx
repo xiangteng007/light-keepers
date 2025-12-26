@@ -6,12 +6,13 @@ import './ReportsAdminPage.css';
 
 // 回報類型設定
 const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
+    earthquake: { label: '地震', icon: '🌍', color: '#795548' },
     flood: { label: '淹水', icon: '🌊', color: '#2196F3' },
+    fire: { label: '火災', icon: '🔥', color: '#FF5722' },
+    typhoon: { label: '颱風', icon: '🌀', color: '#00BCD4' },
     landslide: { label: '土石流', icon: '⛰️', color: '#795548' },
-    road_damage: { label: '道路損壞', icon: '🛣️', color: '#FF9800' },
-    power_outage: { label: '停電', icon: '⚡', color: '#9C27B0' },
-    water_outage: { label: '停水', icon: '💧', color: '#00BCD4' },
-    building_damage: { label: '建物損壞', icon: '🏚️', color: '#F44336' },
+    traffic: { label: '交通事故', icon: '🚗', color: '#FF9800' },
+    infrastructure: { label: '設施損壞', icon: '🏗️', color: '#F44336' },
     other: { label: '其他', icon: '📋', color: '#607D8B' },
 };
 

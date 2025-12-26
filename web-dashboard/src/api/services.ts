@@ -257,9 +257,9 @@ export const getPublicResourcesForMap = (types?: ('shelters' | 'aed')[]) =>
 
 // ===== 回報系統 Reports =====
 
-export type ReportType = 'flood' | 'landslide' | 'road_damage' | 'power_outage' | 'water_outage' | 'building_damage' | 'other';
+export type ReportType = 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other';
 export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
-export type ReportStatus = 'pending' | 'confirmed' | 'rejected' | 'resolved';
+export type ReportStatus = 'pending' | 'confirmed' | 'rejected';
 
 export interface Report {
     id: string;

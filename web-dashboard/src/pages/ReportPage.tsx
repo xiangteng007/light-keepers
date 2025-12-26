@@ -7,13 +7,13 @@ import './ReportPage.css';
 
 // 前端災害類型對應後端 ReportType
 const TYPE_MAPPING: Record<string, ReportType> = {
-    earthquake: 'other',
-    typhoon: 'other',
+    earthquake: 'earthquake',
+    typhoon: 'typhoon',
     flood: 'flood',
-    fire: 'other',
+    fire: 'fire',
     landslide: 'landslide',
-    traffic: 'road_damage',
-    infrastructure: 'building_damage',
+    traffic: 'traffic',
+    infrastructure: 'infrastructure',
     other: 'other',
 };
 
