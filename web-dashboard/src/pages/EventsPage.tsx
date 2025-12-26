@@ -78,6 +78,7 @@ export default function EventsPage() {
         mutationFn: createTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] });
+            queryClient.invalidateQueries({ queryKey: ['allTasks'] }); // 刷新事件任務狀態
             setShowTaskModal(false);
             setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '' });
             alert('任務已建立！');
@@ -169,6 +170,7 @@ export default function EventsPage() {
             priority: priorityMap[taskForm.priority] || 2,
             dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
             assignedTo: taskForm.assignedTo,
+            eventId: selectedReport?.id, // 關聯事件ID以顯示任務狀態
         });
     };
 
