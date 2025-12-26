@@ -1,4 +1,5 @@
 import { IsString, IsOptional, IsNumber, IsUUID, IsDateString, Min, Max, IsIn } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class CreateTaskDto {
     @IsString()
@@ -71,9 +72,11 @@ export class TaskQueryDto {
 
     @IsNumber()
     @IsOptional()
+    @Transform(({ value }) => value ? parseInt(value, 10) : undefined)
     limit?: number;
 
     @IsNumber()
     @IsOptional()
+    @Transform(({ value }) => value ? parseInt(value, 10) : undefined)
     offset?: number;
 }
