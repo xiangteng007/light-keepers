@@ -49,7 +49,7 @@ export default function EventsPage() {
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showTaskModal, setShowTaskModal] = useState(false);
-    const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium' });
+    const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', dueDate: '' });
 
     // 獲取已確認的回報作為災情事件
     const { data: reportsData, isLoading, error } = useQuery({
@@ -63,7 +63,7 @@ export default function EventsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] });
             setShowTaskModal(false);
-            setTaskForm({ title: '', description: '', priority: 'medium' });
+            setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '' });
             alert('任務已建立！');
         },
         onError: () => {
@@ -89,10 +89,16 @@ export default function EventsPage() {
     // 開啟分派任務彈窗
     const openTaskModal = (report: Report) => {
         setSelectedReport(report);
+        // 預設截止日期為 3 天後
+        const defaultDue = new Date();
+        defaultDue.setDate(defaultDue.getDate() + 3);
+        const dueStr = defaultDue.toISOString().split('T')[0];
+
         setTaskForm({
             title: `處理：${report.title}`,
-            description: `災情事件：${report.description}\n\n位置：${report.address || `${report.latitude}, ${report.longitude}`}`,
+            description: `【災情事件】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
             priority: report.severity === 'critical' ? 'high' : report.severity === 'high' ? 'high' : 'medium',
+            dueDate: dueStr,
         });
         setShowTaskModal(true);
     };
@@ -327,10 +333,19 @@ export default function EventsPage() {
                                 value={taskForm.priority}
                                 onChange={(e) => setTaskForm(prev => ({ ...prev, priority: e.target.value }))}
                             >
-                                <option value="low">低</option>
-                                <option value="medium">中</option>
-                                <option value="high">高</option>
+                                <option value="low">🟢 低</option>
+                                <option value="medium">🟡 中</option>
+                                <option value="high">🔴 高</option>
                             </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>截止日期</label>
+                            <input
+                                type="date"
+                                value={taskForm.dueDate}
+                                onChange={(e) => setTaskForm(prev => ({ ...prev, dueDate: e.target.value }))}
+                            />
                         </div>
 
                         <div className="form-actions">
