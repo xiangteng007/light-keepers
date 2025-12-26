@@ -166,6 +166,20 @@ interface TaskColumnProps {
 }
 
 function TaskColumn({ title, status, tasks, onStatusChange, onDelete, color }: TaskColumnProps) {
+    const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
+
+    const toggleExpand = (id: string) => {
+        setExpandedIds(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(id)) {
+                newSet.delete(id);
+            } else {
+                newSet.add(id);
+            }
+            return newSet;
+        });
+    };
+
     const nextStatus = status === 'pending' ? 'in_progress' : status === 'in_progress' ? 'completed' : null;
 
     const getPriorityColor = (priority: number): 'danger' | 'warning' | 'success' | 'default' => {
@@ -174,7 +188,8 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, color }: T
         return 'default';
     };
 
-    const handleDelete = (taskId: string, taskTitle: string) => {
+    const handleDelete = (e: React.MouseEvent, taskId: string, taskTitle: string) => {
+        e.stopPropagation();
         if (confirm(`確定要刪除任務「${taskTitle}」嗎？`)) {
             onDelete(taskId);
         }
@@ -190,39 +205,62 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, color }: T
                 {tasks.length === 0 && (
                     <div className="empty-column">無任務</div>
                 )}
-                {tasks.map((task) => (
-                    <Card
-                        key={task.id}
-                        className={`task-card-vi ${status === 'completed' ? 'task-card-vi--completed' : ''}`}
-                        padding="sm"
-                    >
-                        <div className="task-card-vi__header">
-                            <Tag color={getPriorityColor(task.priority)} size="sm">
-                                P{task.priority}
-                            </Tag>
-                            <button
-                                className="task-delete-btn"
-                                onClick={() => handleDelete(task.id, task.title)}
-                                title="刪除任務"
+                {tasks.map((task) => {
+                    const isExpanded = expandedIds.has(task.id);
+                    return (
+                        <Card
+                            key={task.id}
+                            className={`task-card-vi ${status === 'completed' ? 'task-card-vi--completed' : ''} ${isExpanded ? 'task-card-vi--expanded' : ''}`}
+                            padding="sm"
+                        >
+                            {/* 摺疊標題列 - 點擊展開 */}
+                            <div
+                                className="task-card-vi__header task-card-vi__toggle"
+                                onClick={() => toggleExpand(task.id)}
                             >
-                                ✕
-                            </button>
-                        </div>
-                        <div className="task-card-vi__title">{task.title}</div>
-                        {task.description && (
-                            <div className="task-card-vi__desc">{task.description}</div>
-                        )}
-                        {nextStatus && (
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => onStatusChange(task.id, nextStatus)}
-                            >
-                                {nextStatus === 'in_progress' ? '開始處理' : '標記完成'}
-                            </Button>
-                        )}
-                    </Card>
-                ))}
+                                <div className="task-card-vi__header-left">
+                                    <Tag color={getPriorityColor(task.priority)} size="sm">
+                                        P{task.priority}
+                                    </Tag>
+                                    <span className="task-card-vi__title-inline">{task.title}</span>
+                                </div>
+                                <div className="task-card-vi__header-right">
+                                    <span className="task-card-vi__chevron">{isExpanded ? '▼' : '▶'}</span>
+                                    <button
+                                        className="task-delete-btn"
+                                        onClick={(e) => handleDelete(e, task.id, task.title)}
+                                        title="刪除任務"
+                                    >
+                                        ✕
+                                    </button>
+                                </div>
+                            </div>
+
+                            {/* 展開內容 */}
+                            {isExpanded && (
+                                <div className="task-card-vi__content">
+                                    {task.description && (
+                                        <div className="task-card-vi__desc">{task.description}</div>
+                                    )}
+                                    {task.dueAt && (
+                                        <div className="task-card-vi__due">
+                                            📅 截止：{new Date(task.dueAt).toLocaleDateString('zh-TW')}
+                                        </div>
+                                    )}
+                                    {nextStatus && (
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            onClick={() => onStatusChange(task.id, nextStatus)}
+                                        >
+                                            {nextStatus === 'in_progress' ? '開始處理' : '標記完成'}
+                                        </Button>
+                                    )}
+                                </div>
+                            )}
+                        </Card>
+                    );
+                })}
             </div>
         </div>
     );

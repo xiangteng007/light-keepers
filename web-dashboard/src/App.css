@@ -936,10 +936,43 @@ font-size: var(--font-size-base);
 }
 
 .task-card-vi__header {
-  margin-bottom: 8px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.task-card-vi__toggle {
+  cursor: pointer;
+  padding: 4px 0;
+}
+
+.task-card-vi__header-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.task-card-vi__header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.task-card-vi__title-inline {
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+}
+
+.task-card-vi__chevron {
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
 }
 
 .task-delete-btn {
@@ -958,6 +991,12 @@ font-size: var(--font-size-base);
   opacity: 1;
 }
 
+.task-card-vi__content {
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  margin-top: 8px;
+}
+
 .task-card-vi__title {
   font-weight: 500;
   margin-bottom: 8px;
@@ -969,6 +1008,13 @@ font-size: var(--font-size-base);
   font-size: 12px;
   margin-bottom: 12px;
   line-height: 1.4;
+  white-space: pre-wrap;
+}
+
+.task-card-vi__due {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin-bottom: 12px;
 }
 
 /* Dashboard Alert */
