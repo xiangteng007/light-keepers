@@ -1,7 +1,7 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getReports, createTask, getAccounts, deleteReport } from '../api/services';
-import type { Report, ReportType, ReportSeverity } from '../api/services';
+import { getReports, createTask, getAccounts, deleteReport, getTasks } from '../api/services';
+import type { Report, ReportType, ReportSeverity, Task } from '../api/services';
 import { Modal, Button, Card } from '../design-system';
 import { useAuth } from '../context/AuthContext';
 
@@ -65,6 +65,14 @@ export default function EventsPage() {
         queryFn: () => getAccounts().then(res => res.data),
     });
 
+    // 獲取所有任務
+    const { data: tasksData } = useQuery({
+        queryKey: ['allTasks'],
+        queryFn: () => getTasks({ limit: 500 }).then(res => res.data.data),
+    });
+
+    const tasks = (tasksData as Task[]) || [];
+
     // 建立任務
     const createTaskMutation = useMutation({
         mutationFn: createTask,
@@ -96,6 +104,22 @@ export default function EventsPage() {
     const canDeleteEvent = (user?.roleLevel ?? 0) >= 3; // 常務理事以上才能刪除
 
     const reports = reportsData || [];
+
+    // 計算每個事件的任務狀態
+    const getEventTaskStatus = useMemo(() => {
+        const statusMap = new Map<string, { pending: number; inProgress: number; completed: number }>();
+
+        tasks.forEach((task: Task) => {
+            if (!task.eventId) return;
+            const existing = statusMap.get(task.eventId) || { pending: 0, inProgress: 0, completed: 0 };
+            if (task.status === 'pending') existing.pending++;
+            else if (task.status === 'in_progress') existing.inProgress++;
+            else if (task.status === 'completed') existing.completed++;
+            statusMap.set(task.eventId, existing);
+        });
+
+        return (reportId: string) => statusMap.get(reportId) || null;
+    }, [tasks]);
 
     // 過濾
     const filteredReports = reports.filter(report => {
@@ -236,9 +260,20 @@ export default function EventsPage() {
                                         </span>
                                     </td>
                                     <td>
-                                        <span className="status status-active">
-                                            🔴 進行中
-                                        </span>
+                                        {(() => {
+                                            const taskStatus = getEventTaskStatus(report.id);
+                                            if (!taskStatus) {
+                                                return <span className="status status-pending">⚪ 未派發</span>;
+                                            }
+                                            const total = taskStatus.pending + taskStatus.inProgress + taskStatus.completed;
+                                            if (taskStatus.completed === total) {
+                                                return <span className="status status-completed">✅ 已完成</span>;
+                                            }
+                                            if (taskStatus.inProgress > 0) {
+                                                return <span className="status status-active">🟡 處理中 ({taskStatus.inProgress}/{total})</span>;
+                                            }
+                                            return <span className="status status-pending">🔵 已派發 ({total})</span>;
+                                        })()}
                                     </td>
                                     <td>{formatTimeAgo(report.createdAt)}</td>
                                     <td className="actions-cell">
