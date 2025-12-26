@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTaskKanban, createTask, updateTask, deleteTask } from '../api';
+import { getTaskKanban, createTask, updateTask } from '../api';
 import type { Task } from '../api';
 import { Button, Card, Tag, Badge } from '../design-system';
 
@@ -35,9 +35,9 @@ export default function TasksPage() {
         },
     });
 
-    // 刪除任務
-    const deleteTaskMutation = useMutation({
-        mutationFn: (id: string) => deleteTask(id),
+    // 刪除任務（改為取消指派，回到未指派狀態）
+    const unassignTaskMutation = useMutation({
+        mutationFn: (id: string) => updateTask(id, { assignedTo: undefined, status: 'pending' }),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['taskKanban'] });
             queryClient.invalidateQueries({ queryKey: ['taskStats'] });
@@ -54,7 +54,8 @@ export default function TasksPage() {
     };
 
     const handleDeleteTask = (taskId: string) => {
-        deleteTaskMutation.mutate(taskId);
+        // 改為取消指派而非刪除
+        unassignTaskMutation.mutate(taskId);
     };
 
     if (isLoading) {
