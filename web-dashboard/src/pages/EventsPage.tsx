@@ -257,24 +257,20 @@ export default function EventsPage() {
                                 <span className="info-label">📅 回報時間</span>
                                 <span className="info-value">{formatDateTime(selectedReport.createdAt)}</span>
                             </div>
-                            {selectedReport.contactName && (
-                                <div className="info-row">
-                                    <span className="info-label">👤 回報人</span>
-                                    <span className="info-value">{selectedReport.contactName}</span>
-                                </div>
-                            )}
+                            <div className="info-row">
+                                <span className="info-label">👤 回報人</span>
+                                <span className="info-value">{selectedReport.contactName || '(未提供)'}</span>
+                            </div>
                             {selectedReport.contactPhone && (
                                 <div className="info-row">
                                     <span className="info-label">📞 聯絡電話</span>
                                     <span className="info-value">{selectedReport.contactPhone}</span>
                                 </div>
                             )}
-                            {selectedReport.reviewedBy && (
-                                <div className="info-row">
-                                    <span className="info-label">✅ 審核人</span>
-                                    <span className="info-value">{selectedReport.reviewedBy}</span>
-                                </div>
-                            )}
+                            <div className="info-row">
+                                <span className="info-label">✅ 審核人</span>
+                                <span className="info-value">{selectedReport.reviewedBy || '(未審核)'}</span>
+                            </div>
                         </div>
 
                         <div className="event-detail__actions">
