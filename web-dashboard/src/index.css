@@ -587,15 +587,12 @@ select {
 
 @media (max-width: 480px) {
 
-  /* 超小螢幕 */
-  .sidebar {
-    width: 50px !important;
-    min-width: 50px !important;
-  }
+  /* 超小螢幕 - 側邊欄使用漢堡選單模式，不再壓縮 */
+  /* 已移除 .sidebar 50px 壓縮，改用 App.css 的漢堡選單模式 */
 
   .main-content {
-    margin-left: 50px !important;
-    padding: 0.75rem !important;
+    margin-left: 0 !important;
+    padding: 72px 12px 12px !important;
   }
 
   /* 統計卡片全寬 */
