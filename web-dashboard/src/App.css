@@ -3797,7 +3797,8 @@ button[aria-label="地圖相機控制"],
     width: 280px !important;
     z-index: 950;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-top: 16px;
+    padding-top: 60px;
+    /* 為手機頂部導覽列留空間 */
   }
 
   .sidebar--open {
