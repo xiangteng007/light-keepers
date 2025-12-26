@@ -405,6 +405,73 @@
     color: #3b82f6;
 }
 
+/* ===== 時數統計 ===== */
+.hours-stats-card {
+    margin-top: 1.5rem;
+}
+
+.hours-stats-card h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+    color: #1e293b;
+}
+
+.stats-subtitle {
+    color: #64748b;
+    font-size: 0.85rem;
+    margin-bottom: 1rem;
+}
+
+.hours-stats-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.hours-stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.hours-stat-item:hover {
+    background: #f1f5f9;
+}
+
+.stat-rank {
+    font-weight: 700;
+    color: #94a3b8;
+    min-width: 36px;
+}
+
+.stat-name {
+    flex: 1;
+    font-weight: 500;
+    color: #1e293b;
+}
+
+.stat-info {
+    min-width: 60px;
+}
+
+.stat-hours {
+    font-weight: 600;
+    color: #3b82f6;
+    min-width: 80px;
+    text-align: right;
+}
+
+.stats-more {
+    margin-top: 0.75rem;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
 /* ===== 響應式 ===== */
 @media (max-width: 768px) {
     .view-range-selector {

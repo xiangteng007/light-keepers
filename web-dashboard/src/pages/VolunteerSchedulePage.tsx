@@ -211,6 +211,44 @@ export default function VolunteerSchedulePage() {
         return `${startTime} - ${endTime}`;
     };
 
+    // 計算班別時長（小時）
+    const getShiftHours = (shift: ShiftConfig): number => {
+        const [startH, startM] = shift.startTime.split(':').map(Number);
+        const endTime = shift.endTime === '24:00' ? '00:00' : shift.endTime;
+        const [endH, endM] = endTime.split(':').map(Number);
+        let hours = (shift.endTime === '24:00' ? 24 : endH) - startH;
+        hours += (endM - startM) / 60;
+        return hours > 0 ? hours : 24 + hours; // 處理跨日
+    };
+
+    // 統計各志工排班時數
+    const volunteerHoursStats = useMemo(() => {
+        const stats: { id: string; name: string; hours: number; shifts: number }[] = [];
+        const volunteerMap = new Map<string, { name: string; hours: number; shifts: number }>();
+
+        schedule.forEach(slot => {
+            const shift = shifts.find(s => s.id === slot.shiftId);
+            if (!shift) return;
+            const shiftHours = getShiftHours(shift);
+
+            slot.volunteers.forEach(v => {
+                const existing = volunteerMap.get(v.id);
+                if (existing) {
+                    existing.hours += shiftHours;
+                    existing.shifts += 1;
+                } else {
+                    volunteerMap.set(v.id, { name: v.name, hours: shiftHours, shifts: 1 });
+                }
+            });
+        });
+
+        volunteerMap.forEach((value, key) => {
+            stats.push({ id: key, ...value });
+        });
+
+        return stats.sort((a, b) => b.hours - a.hours);
+    }, [schedule, shifts]);
+
     // 獲取當前選中班別的資訊
     const selectedShift = selectedSlot ? shifts.find(s => s.id === selectedSlot.shiftId) : null;
 
@@ -466,6 +504,29 @@ export default function VolunteerSchedulePage() {
                         </div>
                     </Card>
                 </div>
+            )}
+
+            {/* 志工時數統計 */}
+            {volunteerHoursStats.length > 0 && (
+                <Card padding="lg" className="hours-stats-card">
+                    <h3>📊 排班時數統計</h3>
+                    <p className="stats-subtitle">根據目前排班計算的預估時數</p>
+                    <div className="hours-stats-list">
+                        {volunteerHoursStats.slice(0, 10).map((stat, index) => (
+                            <div key={stat.id} className="hours-stat-item">
+                                <span className="stat-rank">#{index + 1}</span>
+                                <span className="stat-name">{stat.name}</span>
+                                <span className="stat-info">
+                                    <Badge variant="info" size="sm">{stat.shifts} 班</Badge>
+                                </span>
+                                <span className="stat-hours">{stat.hours.toFixed(1)} 小時</span>
+                            </div>
+                        ))}
+                    </div>
+                    {volunteerHoursStats.length > 10 && (
+                        <p className="stats-more">還有 {volunteerHoursStats.length - 10} 位志工...</p>
+                    )}
+                </Card>
             )}
         </div>
     );
