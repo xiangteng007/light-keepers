@@ -1,14 +1,21 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Task } from './entities';
 import { CreateTaskDto, UpdateTaskDto, TaskQueryDto } from './dto/task.dto';
+import { Account } from '../accounts/entities';
+import { LineBotService } from '../line-bot/line-bot.service';
 
 @Injectable()
 export class TasksService {
+    private readonly logger = new Logger(TasksService.name);
+
     constructor(
         @InjectRepository(Task)
         private readonly taskRepository: Repository<Task>,
+        @InjectRepository(Account)
+        private readonly accountRepository: Repository<Account>,
+        private readonly lineBotService: LineBotService,
     ) { }
 
     async create(dto: CreateTaskDto): Promise<Task> {
@@ -16,7 +23,29 @@ export class TasksService {
             ...dto,
             dueAt: dto.dueAt ? new Date(dto.dueAt) : undefined,
         });
-        return this.taskRepository.save(task);
+        const savedTask = await this.taskRepository.save(task);
+
+        // 如果有指派志工，發送 LINE 通知
+        if (dto.assignedTo) {
+            try {
+                const account = await this.accountRepository.findOne({
+                    where: { id: dto.assignedTo },
+                });
+                if (account?.lineUserId) {
+                    await this.lineBotService.sendTaskAssignment(account.lineUserId, {
+                        id: savedTask.id,
+                        title: savedTask.title,
+                        location: savedTask.description?.slice(0, 50) || '待確認',
+                        scheduledStart: dto.dueAt || '待確認',
+                    });
+                    this.logger.log(`Sent task notification to ${account.displayName}`);
+                }
+            } catch (error) {
+                this.logger.warn(`Failed to send task notification: ${error.message}`);
+            }
+        }
+
+        return savedTask;
     }
 
     async findAll(query: TaskQueryDto): Promise<{ data: Task[]; total: number }> {

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getReports, createTask } from '../api/services';
+import { getReports, createTask, getAccounts } from '../api/services';
 import type { Report, ReportType, ReportSeverity } from '../api/services';
 import { Modal, Button, Card } from '../design-system';
 
@@ -49,12 +49,18 @@ export default function EventsPage() {
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
     const [showTaskModal, setShowTaskModal] = useState(false);
-    const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', dueDate: '' });
+    const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '' });
 
     // 獲取已確認的回報作為災情事件
     const { data: reportsData, isLoading, error } = useQuery({
         queryKey: ['confirmedReports'],
         queryFn: () => getReports({ status: 'confirmed' }).then(res => res.data.data),
+    });
+
+    // 獲取志工列表
+    const { data: accountsData } = useQuery({
+        queryKey: ['accounts'],
+        queryFn: () => getAccounts().then(res => res.data),
     });
 
     // 建立任務
@@ -63,7 +69,7 @@ export default function EventsPage() {
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] });
             setShowTaskModal(false);
-            setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '' });
+            setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '' });
             alert('任務已建立！');
         },
         onError: () => {
@@ -99,6 +105,7 @@ export default function EventsPage() {
             description: `【災情事件】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
             priority: report.severity === 'critical' ? 'high' : report.severity === 'high' ? 'high' : 'medium',
             dueDate: dueStr,
+            assignedTo: '',
         });
         setShowTaskModal(true);
     };
@@ -109,14 +116,17 @@ export default function EventsPage() {
             alert('請輸入任務標題');
             return;
         }
+        if (!taskForm.assignedTo) {
+            alert('請選擇指派志工');
+            return;
+        }
         const priorityMap: Record<string, number> = { low: 1, medium: 2, high: 3 };
         createTaskMutation.mutate({
             title: taskForm.title,
             description: taskForm.description,
             priority: priorityMap[taskForm.priority] || 2,
             dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
-            // 注意：eventId 指向 Event 實體，但這裡是從 Report 建立任務
-            // Report 資訊已包含在 description 中
+            assignedTo: taskForm.assignedTo,
         });
     };
 
@@ -338,6 +348,21 @@ export default function EventsPage() {
                                 <option value="low">🟢 低</option>
                                 <option value="medium">🟡 中</option>
                                 <option value="high">🔴 高</option>
+                            </select>
+                        </div>
+
+                        <div className="form-group">
+                            <label>指派志工 *</label>
+                            <select
+                                value={taskForm.assignedTo}
+                                onChange={(e) => setTaskForm(prev => ({ ...prev, assignedTo: e.target.value }))}
+                            >
+                                <option value="">-- 請選擇志工 --</option>
+                                {accountsData?.map(account => (
+                                    <option key={account.id} value={account.id}>
+                                        {account.displayName} ({account.email})
+                                    </option>
+                                ))}
                             </select>
                         </div>
 

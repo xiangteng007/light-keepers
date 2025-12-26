@@ -82,6 +82,18 @@ export const rejectAccount = (accountId: string, reason?: string) =>
 // Accounts
 export const getRoles = () => api.get('/accounts/roles');
 
+// 志工/帳號列表 (用於選擇指派對象)
+export interface AccountSimple {
+    id: string;
+    email: string;
+    displayName: string;
+    roles: string[];
+    roleLevel: number;
+}
+
+export const getAccounts = () =>
+    api.get<AccountSimple[]>('/accounts');
+
 // Events
 export interface Event {
     id: string;
