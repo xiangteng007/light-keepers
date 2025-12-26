@@ -135,6 +135,10 @@ export const createTask = (data: Partial<Task>) =>
 export const updateTask = (id: string, data: Partial<Task>) =>
     api.put<Task>(`/tasks/${id}`, data);
 
+// 刪除任務
+export const deleteTask = (id: string) =>
+    api.delete<{ success: boolean; message: string }>(`/tasks/${id}`);
+
 // ===== NCDR 災害示警 =====
 
 export interface NcdrAlert {
@@ -773,4 +777,3 @@ export const getMenuConfig = () =>
 // 更新選單設定 (僅限擁有者)
 export const updateMenuConfig = (items: MenuConfigItem[]) =>
     api.put<{ data: MenuConfigItem[]; message: string }>('/menu-config', { items });
-

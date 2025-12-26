@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getTaskKanban, createTask, updateTask } from '../api';
+import { getTaskKanban, createTask, updateTask, deleteTask } from '../api';
 import type { Task } from '../api';
 import { Button, Card, Tag, Badge } from '../design-system';
 
@@ -35,6 +35,15 @@ export default function TasksPage() {
         },
     });
 
+    // 刪除任務
+    const deleteTaskMutation = useMutation({
+        mutationFn: (id: string) => deleteTask(id),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['taskKanban'] });
+            queryClient.invalidateQueries({ queryKey: ['taskStats'] });
+        },
+    });
+
     const handleAddTask = () => {
         if (!newTask.title.trim()) return;
         addTaskMutation.mutate(newTask);
@@ -42,6 +51,10 @@ export default function TasksPage() {
 
     const handleStatusChange = (taskId: string, newStatus: string) => {
         updateTaskMutation.mutate({ id: taskId, status: newStatus });
+    };
+
+    const handleDeleteTask = (taskId: string) => {
+        deleteTaskMutation.mutate(taskId);
     };
 
     if (isLoading) {
@@ -68,6 +81,7 @@ export default function TasksPage() {
                     status="pending"
                     tasks={kanban?.pending || []}
                     onStatusChange={handleStatusChange}
+                    onDelete={handleDeleteTask}
                     color="warning"
                 />
                 <TaskColumn
@@ -75,6 +89,7 @@ export default function TasksPage() {
                     status="in_progress"
                     tasks={kanban?.inProgress || []}
                     onStatusChange={handleStatusChange}
+                    onDelete={handleDeleteTask}
                     color="info"
                 />
                 <TaskColumn
@@ -82,6 +97,7 @@ export default function TasksPage() {
                     status="completed"
                     tasks={kanban?.completed || []}
                     onStatusChange={handleStatusChange}
+                    onDelete={handleDeleteTask}
                     color="success"
                 />
             </div>
@@ -145,16 +161,23 @@ interface TaskColumnProps {
     status: string;
     tasks: Task[];
     onStatusChange: (id: string, status: string) => void;
+    onDelete: (id: string) => void;
     color: 'warning' | 'info' | 'success';
 }
 
-function TaskColumn({ title, status, tasks, onStatusChange, color }: TaskColumnProps) {
+function TaskColumn({ title, status, tasks, onStatusChange, onDelete, color }: TaskColumnProps) {
     const nextStatus = status === 'pending' ? 'in_progress' : status === 'in_progress' ? 'completed' : null;
 
     const getPriorityColor = (priority: number): 'danger' | 'warning' | 'success' | 'default' => {
         if (priority >= 4) return 'danger';
         if (priority === 3) return 'warning';
         return 'default';
+    };
+
+    const handleDelete = (taskId: string, taskTitle: string) => {
+        if (confirm(`確定要刪除任務「${taskTitle}」嗎？`)) {
+            onDelete(taskId);
+        }
     };
 
     return (
@@ -177,6 +200,13 @@ function TaskColumn({ title, status, tasks, onStatusChange, color }: TaskColumnP
                             <Tag color={getPriorityColor(task.priority)} size="sm">
                                 P{task.priority}
                             </Tag>
+                            <button
+                                className="task-delete-btn"
+                                onClick={() => handleDelete(task.id, task.title)}
+                                title="刪除任務"
+                            >
+                                ✕
+                            </button>
                         </div>
                         <div className="task-card-vi__title">{task.title}</div>
                         {task.description && (
