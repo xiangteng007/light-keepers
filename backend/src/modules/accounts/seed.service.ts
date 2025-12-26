@@ -40,6 +40,16 @@ export class SeedService implements OnModuleInit {
      * 初始化 6 個角色層級
      */
     async seedRoles() {
+        // 清理舊版本的無效角色
+        const legacyRolesToDelete = ['eoc', 'leader', 'admin'];
+        for (const legacyName of legacyRolesToDelete) {
+            const legacyRole = await this.roleRepository.findOne({ where: { name: legacyName } });
+            if (legacyRole) {
+                await this.roleRepository.delete(legacyRole.id);
+                this.logger.log(`Deleted legacy role: ${legacyName}`);
+            }
+        }
+
         const roles = [
             { name: 'public', displayName: '一般民眾', level: RoleLevel.PUBLIC, description: '未登入用戶' },
             { name: 'volunteer', displayName: '登記志工', level: RoleLevel.VOLUNTEER, description: '已註冊志工' },
