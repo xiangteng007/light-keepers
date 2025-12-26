@@ -1,41 +1,32 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import * as nodemailer from 'nodemailer';
+import { Resend } from 'resend';
 
 /**
  * Email 郵件服務
- * 支援 SMTP 和開發模式（console 輸出）
+ * 支援 Resend API 和開發模式（console 輸出）
  */
 @Injectable()
 export class EmailService {
     private readonly logger = new Logger(EmailService.name);
-    private transporter: nodemailer.Transporter | null = null;
+    private resend: Resend | null = null;
     private isConfigured = false;
+    private fromEmail: string;
 
     constructor(private configService: ConfigService) {
-        const smtpHost = this.configService.get('SMTP_HOST');
-        const smtpPort = this.configService.get('SMTP_PORT');
-        const smtpUser = this.configService.get('SMTP_USER');
-        const smtpPass = this.configService.get('SMTP_PASS');
+        const resendApiKey = this.configService.get('RESEND_API_KEY');
 
-        if (smtpHost && smtpUser && smtpPass) {
+        if (resendApiKey) {
             try {
-                this.transporter = nodemailer.createTransport({
-                    host: smtpHost,
-                    port: parseInt(smtpPort || '587', 10),
-                    secure: smtpPort === '465',
-                    auth: {
-                        user: smtpUser,
-                        pass: smtpPass,
-                    },
-                });
+                this.resend = new Resend(resendApiKey);
                 this.isConfigured = true;
-                this.logger.log('Email service initialized with SMTP');
+                this.fromEmail = this.configService.get('RESEND_FROM') || 'onboarding@resend.dev';
+                this.logger.log('Email service initialized with Resend API');
             } catch (error) {
-                this.logger.warn('Failed to initialize SMTP, emails will be logged to console');
+                this.logger.warn('Failed to initialize Resend, emails will be logged to console');
             }
         } else {
-            this.logger.warn('SMTP credentials not configured, emails will be logged to console');
+            this.logger.warn('RESEND_API_KEY not configured, emails will be logged to console');
         }
     }
 
@@ -59,20 +50,25 @@ export class EmailService {
             </div>
         `;
 
-        if (this.isConfigured && this.transporter) {
+        if (this.isConfigured && this.resend) {
             try {
-                const fromEmail = this.configService.get('SMTP_FROM') || this.configService.get('SMTP_USER');
-                await this.transporter.sendMail({
-                    from: `"曦望燈塔" <${fromEmail}>`,
+                const result = await this.resend.emails.send({
+                    from: `曦望燈塔 <${this.fromEmail}>`,
                     to: email,
                     subject,
                     html,
                 });
-                this.logger.log(`OTP email sent to ${this.maskEmail(email)}`);
+
+                if (result.error) {
+                    this.logger.error(`Failed to send email via Resend: ${result.error.message}`);
+                    this.logger.warn(`[DEV MODE] Email OTP for ${email}: ${code}`);
+                    return true;
+                }
+
+                this.logger.log(`OTP email sent to ${this.maskEmail(email)} via Resend`);
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send email: ${error.message}`);
-                // 開發模式：失敗時仍 log 到 console
                 this.logger.warn(`[DEV MODE] Email OTP for ${email}: ${code}`);
                 return true;
             }
@@ -102,16 +98,22 @@ export class EmailService {
             </div>
         `;
 
-        if (this.isConfigured && this.transporter) {
+        if (this.isConfigured && this.resend) {
             try {
-                const fromEmail = this.configService.get('SMTP_FROM') || this.configService.get('SMTP_USER');
-                await this.transporter.sendMail({
-                    from: `"曦望燈塔" <${fromEmail}>`,
+                const result = await this.resend.emails.send({
+                    from: `曦望燈塔 <${this.fromEmail}>`,
                     to: email,
                     subject,
                     html,
                 });
-                this.logger.log(`Password reset email sent to ${this.maskEmail(email)}`);
+
+                if (result.error) {
+                    this.logger.error(`Failed to send password reset email: ${result.error.message}`);
+                    this.logger.warn(`[DEV MODE] Password reset for ${email}: ${resetUrl}`);
+                    return true;
+                }
+
+                this.logger.log(`Password reset email sent to ${this.maskEmail(email)} via Resend`);
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send password reset email: ${error.message}`);
