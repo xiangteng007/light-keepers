@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getReports, createTask, getAccounts } from '../api/services';
+import { getReports, createTask, getAccounts, deleteReport } from '../api/services';
 import type { Report, ReportType, ReportSeverity } from '../api/services';
 import { Modal, Button, Card } from '../design-system';
+import { useAuth } from '../context/AuthContext';
 
 // 類型配置
 const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
@@ -44,6 +45,7 @@ function formatDateTime(dateStr: string): string {
 
 export default function EventsPage() {
     const queryClient = useQueryClient();
+    const { user } = useAuth();
     const [typeFilter, setTypeFilter] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
@@ -76,6 +78,22 @@ export default function EventsPage() {
             alert('建立任務失敗');
         },
     });
+
+    // 刪除報告
+    const deleteReportMutation = useMutation({
+        mutationFn: deleteReport,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['confirmedReports'] });
+            alert('已刪除事件');
+        },
+        onError: () => {
+            alert('刪除失敗');
+        },
+    });
+
+    // 權限檢查：幹部以上 (roleLevel >= 2) 才能分派任務
+    const canAssignTask = (user?.roleLevel ?? 0) >= 2;
+    const canDeleteEvent = (user?.roleLevel ?? 0) >= 3; // 常務理事以上才能刪除
 
     const reports = reportsData || [];
 
@@ -227,9 +245,23 @@ export default function EventsPage() {
                                         <button className="btn-small" onClick={() => openDetailModal(report)}>
                                             查看
                                         </button>
-                                        <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
-                                            分派任務
-                                        </button>
+                                        {canAssignTask && (
+                                            <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
+                                                分派任務
+                                            </button>
+                                        )}
+                                        {canDeleteEvent && (
+                                            <button
+                                                className="btn-small btn-danger-outline"
+                                                onClick={() => {
+                                                    if (confirm(`確定要刪除「${report.title}」嗎？`)) {
+                                                        deleteReportMutation.mutate(report.id);
+                                                    }
+                                                }}
+                                            >
+                                                刪除
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -295,9 +327,11 @@ export default function EventsPage() {
                             <Button onClick={() => window.open(`/map?lat=${selectedReport.latitude}&lng=${selectedReport.longitude}`, '_self')}>
                                 📍 在地圖查看
                             </Button>
-                            <Button variant="primary" onClick={() => { setShowDetailModal(false); openTaskModal(selectedReport); }}>
-                                分派任務
-                            </Button>
+                            {canAssignTask && (
+                                <Button variant="primary" onClick={() => { setShowDetailModal(false); openTaskModal(selectedReport); }}>
+                                    分派任務
+                                </Button>
+                            )}
                         </div>
                     </div>
                 </Modal>
