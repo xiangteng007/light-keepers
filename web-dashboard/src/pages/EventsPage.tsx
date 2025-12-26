@@ -115,6 +115,7 @@ export default function EventsPage() {
             description: taskForm.description,
             priority: priorityMap[taskForm.priority] || 2,
             dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
+            eventId: selectedReport?.id, // 關聯到原始事件
         });
     };
 

@@ -113,8 +113,10 @@ export interface Task {
     id: string;
     title: string;
     description?: string;
+    eventId?: string;
     priority: number;
     status: string;
+    assignedTo?: string;
     createdAt: string;
     dueAt?: string;
     completedAt?: string;
