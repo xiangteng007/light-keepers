@@ -4292,3 +4292,151 @@ button[aria-label="地圖相機控制"],
     font-size: 22px;
   }
 }
+
+/* ============================================
+   Event Detail Modal - 災情事件詳情彈窗
+   極簡中性風格設計
+============================================ */
+
+.event-detail {
+  padding: 8px 0;
+}
+
+/* 類型與嚴重度標籤區 */
+.event-detail__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.event-detail__type {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  color: white;
+}
+
+.event-detail__severity {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 4px 10px;
+  background: var(--bg-secondary, #f8fafc);
+  border-radius: 6px;
+}
+
+/* 標題與描述 */
+.event-detail h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--text-primary, #1e293b);
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.event-detail__desc {
+  font-size: 14px;
+  color: var(--text-secondary, #64748b);
+  line-height: 1.6;
+  margin: 0 0 24px 0;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+/* 資訊列表 - 更寬鬆的間距 */
+.event-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.event-detail__info .info-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.event-detail__info .info-label {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: var(--text-muted, #94a3b8);
+  min-width: 90px;
+}
+
+.event-detail__info .info-value {
+  font-size: 14px;
+  color: var(--text-primary, #1e293b);
+  word-break: break-word;
+  line-height: 1.5;
+}
+
+/* 操作按鈕區 - 極簡中性色 */
+.event-detail__actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border-color, #e2e8f0);
+}
+
+.event-detail__actions .lk-btn,
+.event-detail__actions button {
+  flex: 1;
+  padding: 12px 20px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 中性淺色按鈕樣式 */
+.event-detail__actions .btn-neutral,
+.event-detail__actions .lk-btn--secondary,
+.event-detail__actions button:not(.btn-primary):not(.lk-btn--primary) {
+  background: var(--bg-secondary, #f8fafc);
+  color: var(--text-primary, #1e293b);
+  border: 1px solid var(--border-color, #e2e8f0);
+}
+
+.event-detail__actions .btn-neutral:hover,
+.event-detail__actions .lk-btn--secondary:hover,
+.event-detail__actions button:not(.btn-primary):not(.lk-btn--primary):hover {
+  background: var(--bg-hover, #f1f5f9);
+  border-color: var(--slate-300, #cbd5e1);
+}
+
+/* 主要操作按鈕 - 淺灰強調 */
+.event-detail__actions .btn-primary,
+.event-detail__actions .lk-btn--primary {
+  background: var(--slate-700, #334155);
+  color: white;
+  border: 1px solid var(--slate-700, #334155);
+}
+
+.event-detail__actions .btn-primary:hover,
+.event-detail__actions .lk-btn--primary:hover {
+  background: var(--slate-800, #1e293b);
+  border-color: var(--slate-800, #1e293b);
+}
+
+/* 響應式調整 */
+@media (max-width: 480px) {
+  .event-detail__actions {
+    flex-direction: column;
+  }
+
+  .event-detail__header {
+    flex-wrap: wrap;
+  }
+}

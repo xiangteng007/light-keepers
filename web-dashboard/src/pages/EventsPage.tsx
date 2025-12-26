@@ -393,13 +393,19 @@ export default function EventsPage() {
                         </div>
 
                         <div className="event-detail__actions">
-                            <Button onClick={() => window.open(`/map?lat=${selectedReport.latitude}&lng=${selectedReport.longitude}`, '_self')}>
+                            <button
+                                className="btn-neutral"
+                                onClick={() => window.open(`/map?lat=${selectedReport.latitude}&lng=${selectedReport.longitude}`, '_self')}
+                            >
                                 📍 在地圖查看
-                            </Button>
+                            </button>
                             {canAssignTask && (
-                                <Button variant="primary" onClick={() => { setShowDetailModal(false); openTaskModal(selectedReport); }}>
+                                <button
+                                    className="btn-primary"
+                                    onClick={() => { setShowDetailModal(false); openTaskModal(selectedReport); }}
+                                >
                                     分派任務
-                                </Button>
+                                </button>
                             )}
                         </div>
                     </div>
