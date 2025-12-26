@@ -10,8 +10,21 @@ export interface AlertTypeDefinition {
     priority: 'core' | 'extended'; // 核心類別預設載入
 }
 
-// 預設核心類別 (避免流量爆掉)
-export const CORE_ALERT_TYPES: number[] = [33, 34, 5, 6, 37, 38, 53]; // 地震/海嘯/颱風/雷雨/降雨/土石流/火災
+// 預設核心類別 (每 10 分鐘自動同步)
+// 包含常見且重要的自然災害警報
+export const CORE_ALERT_TYPES: number[] = [
+    33, // 地震
+    34, // 海嘯
+    5,  // 颱風
+    6,  // 雷雨
+    37, // 降雨
+    38, // 土石流
+    53, // 火災
+    14, // 低溫 (寒流)
+    56, // 高溫 (熱浪)
+    32, // 強風
+    15, // 濃霧
+];
 
 // 自然災害類型 - 保留 7 天資料
 export const NATURAL_DISASTER_TYPES: number[] = [
