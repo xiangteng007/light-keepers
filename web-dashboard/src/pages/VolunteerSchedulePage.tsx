@@ -1,8 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Button, Badge } from '../design-system';
-import { getVolunteers } from '../api/services';
-import type { Volunteer } from '../api/services';
+import { getAccounts } from '../api/services';
 import './VolunteerSchedulePage.css';
 
 // ===== 類型定義 =====
@@ -20,6 +19,15 @@ interface ScheduleSlot {
     date: string;
     shiftId: string;
     volunteers: { id: string; name: string }[];
+}
+
+// 排班用志工介面
+interface ScheduleVolunteer {
+    id: string;
+    name: string;
+    email: string;
+    status: 'available' | 'busy';
+    region: string;
 }
 
 // 預設顏色池
@@ -108,13 +116,24 @@ export default function VolunteerSchedulePage() {
     const [editingShift, setEditingShift] = useState<string | null>(null);
     const [editingTime, setEditingTime] = useState<string | null>(null);
 
-    // 獲取志工列表
-    const { data: volunteersData, isLoading } = useQuery({
-        queryKey: ['volunteers'],
-        queryFn: () => getVolunteers().then(res => res.data.data),
+    // 獲取志工列表 (使用 accounts API，因為 volunteers 表可能為空)
+    const { data: accountsData, isLoading } = useQuery({
+        queryKey: ['accounts'],
+        queryFn: () => getAccounts().then(res => res.data),
     });
 
-    const volunteers = (volunteersData as Volunteer[]) || [];
+    // 轉換 accounts 為志工格式
+    const volunteers = useMemo(() => {
+        if (!accountsData) return [];
+        return accountsData.map(acc => ({
+            id: acc.id,
+            name: acc.displayName || acc.email,
+            email: acc.email,
+            status: 'available' as const,
+            region: '',
+        }));
+    }, [accountsData]);
+
     const dates = useMemo(() => getDates(viewRange), [viewRange]);
 
     // 初始化排班資料
@@ -144,7 +163,7 @@ export default function VolunteerSchedulePage() {
     };
 
     // 指派志工（新增到列表）
-    const assignVolunteer = (volunteer: Volunteer) => {
+    const assignVolunteer = (volunteer: ScheduleVolunteer) => {
         if (!selectedSlot) return;
         setSchedule(prev => prev.map(slot => {
             if (slot.date === selectedSlot.date && slot.shiftId === selectedSlot.shiftId) {
@@ -478,7 +497,7 @@ export default function VolunteerSchedulePage() {
                             <div className="loading-state">載入中...</div>
                         ) : (
                             <div className="volunteer-list">
-                                {volunteers.map((volunteer: Volunteer) => (
+                                {volunteers.map((volunteer) => (
                                     <div
                                         key={volunteer.id}
                                         className="volunteer-item"
@@ -487,10 +506,10 @@ export default function VolunteerSchedulePage() {
                                         <span className="volunteer-avatar">👤</span>
                                         <div className="volunteer-info">
                                             <span className="name">{volunteer.name}</span>
-                                            <span className="region">{volunteer.region}</span>
+                                            <span className="region">{volunteer.email}</span>
                                         </div>
-                                        <Badge variant={volunteer.status === 'available' ? 'success' : 'default'} size="sm">
-                                            {volunteer.status === 'available' ? '可用' : '忙碌'}
+                                        <Badge variant="success" size="sm">
+                                            可用
                                         </Badge>
                                     </div>
                                 ))}
