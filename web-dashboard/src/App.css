@@ -3836,6 +3836,17 @@ button[aria-label="地圖相機控制"],
     width: 100%;
   }
 
+  /* 地圖頁面篩選選項 - 行動裝置換行 */
+  .header-layer-toggles {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+  }
+
+  .header-layer-toggle {
+    white-space: nowrap;
+  }
+
   /* Modal 響應式 */
   .modal-content,
   .modal-content--lg {
