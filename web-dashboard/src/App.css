@@ -3959,90 +3959,217 @@ button[aria-label="地圖相機控制"],
     padding: 8px 16px;
   }
 
-  /* ===== Mobile Sidebar Fixes ===== */
-  /* 側邊欄編輯控制 - 確保水平排列 */
-  .nav-edit-controls {
+  /* ===== Mobile Sidebar Complete Fix ===== */
+  /* 側邊欄基礎修復 - 強制覆蓋所有衝突樣式 */
+  .sidebar {
+    width: 280px !important;
+    min-width: 280px !important;
+    max-width: 280px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .sidebar--open {
+    left: 0 !important;
+  }
+
+  /* Logo 完整顯示 */
+  .sidebar .logo {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    margin-bottom: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .sidebar .logo-icon {
+    width: 40px !important;
+    height: 40px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar .logo h1 {
+    display: block !important;
+    white-space: nowrap !important;
+    font-size: 16px !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  .sidebar .logo-subtitle {
+    display: block !important;
+    white-space: nowrap !important;
+    font-size: 11px !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  /* 編輯選單按鈕 - 強制水平排列 */
+  .sidebar .nav-edit-controls {
+    display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
-    padding: 8px;
-    margin: 0 8px 8px;
+    gap: 8px !important;
+    padding: 8px !important;
+    margin: 0 8px 12px !important;
+    width: calc(100% - 16px) !important;
+    box-sizing: border-box !important;
   }
 
-  .nav-edit-btn {
-    padding: 8px 10px;
-    font-size: 11px;
-    white-space: nowrap;
-    flex: 1;
-    min-width: 0;
+  .sidebar .nav-edit-btn {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    padding: 10px 12px !important;
+    font-size: 13px !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
 
-  /* 側邊欄底部版本資訊 - 確保水平顯示 */
-  .sidebar-footer {
-    white-space: nowrap;
-    padding: 12px;
-    margin: 12px 8px;
-    font-size: 11px;
+  /* 導航區域 */
+  .sidebar .nav {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 0 8px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
-  .sidebar-footer span {
-    display: inline-block;
-    white-space: nowrap;
-  }
-
-  /* 導航項目 - 確保文字水平 */
-  .nav-item {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .nav-label {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* 側邊欄用戶區域 */
-  .sidebar-user {
-    margin: 8px;
-    padding: 10px 12px;
-  }
-
-  .sidebar-user__details {
-    white-space: nowrap;
-    overflow: hidden;
-  }
-
-  .sidebar-user__name,
-  .sidebar-user__role {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* Logo 區域 */
-  .logo {
-    padding: 8px 12px 16px;
-    margin-bottom: 12px;
-  }
-
-  .logo h1 {
-    white-space: nowrap;
-    font-size: 15px;
-  }
-
-  .logo-subtitle {
-    white-space: nowrap;
-    font-size: 11px;
+  /* 導航項目包裝 - 確保水平布局 */
+  .sidebar .nav-item-wrapper {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 100% !important;
   }
 
   /* 拖曳手柄在移動端隱藏 */
-  .nav-item-drag-handle {
-    display: none;
+  .sidebar .nav-item-drag-handle {
+    display: none !important;
   }
 
-  .nav-item-wrapper .nav-item {
-    border-radius: 8px;
+  /* 導航項目 - 確保水平完整顯示 */
+  .sidebar .nav-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 12px !important;
+    padding: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    border-radius: 8px !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  .sidebar .nav-icon {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 24px !important;
+    height: 24px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar .nav-label {
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    font-size: 14px !important;
+    writing-mode: horizontal-tb !important;
+    flex: 1 !important;
+  }
+
+  /* 編輯模式下的導航項目 */
+  .sidebar .nav-item--editing {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 8px !important;
+    padding: 8px 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .sidebar .nav-label-input {
+    flex: 1 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  /* 用戶區域 */
+  .sidebar .sidebar-user {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    margin: auto 8px 8px !important;
+    width: calc(100% - 16px) !important;
+    box-sizing: border-box !important;
+  }
+
+  .sidebar .sidebar-user__info {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .sidebar .sidebar-user__avatar {
+    width: 36px !important;
+    height: 36px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .sidebar .sidebar-user__details {
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+  }
+
+  .sidebar .sidebar-user__name,
+  .sidebar .sidebar-user__role {
+    display: block !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    writing-mode: horizontal-tb !important;
+  }
+
+  .sidebar .sidebar-user__logout {
+    flex-shrink: 0 !important;
+  }
+
+  /* 側邊欄底部版本資訊 */
+  .sidebar .sidebar-footer {
+    display: block !important;
+    text-align: center !important;
+    padding: 12px !important;
+    margin: 8px !important;
+    font-size: 11px !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
+    width: calc(100% - 16px) !important;
+    box-sizing: border-box !important;
+  }
+
+  .sidebar .sidebar-footer span {
+    display: inline !important;
+    white-space: nowrap !important;
+    writing-mode: horizontal-tb !important;
   }
 }
 
