@@ -97,10 +97,10 @@ export interface Event {
 }
 
 export const getEvents = (params?: { status?: string; category?: string; limit?: number }) =>
-    api.get<{ data: Event[]; total: number }>('/events', { params });
+    api.get<{ success: boolean; data: Event[]; total: number }>('/events', { params });
 
 export const getEventStats = () =>
-    api.get<{ active: number; resolved: number; bySeverity: Array<{ severity: number; count: number }> }>('/events/stats');
+    api.get<{ success: boolean; data: { active: number; resolved: number; bySeverity: Array<{ severity: number; count: number }> } }>('/events/stats');
 
 export const createEvent = (data: Partial<Event>) =>
     api.post<Event>('/events', data);
@@ -124,10 +124,10 @@ export const getTasks = (params?: { status?: string; limit?: number }) =>
     api.get<{ data: Task[]; total: number }>('/tasks', { params });
 
 export const getTaskKanban = () =>
-    api.get<{ pending: Task[]; inProgress: Task[]; completed: Task[] }>('/tasks/kanban');
+    api.get<{ success: boolean; data: { pending: Task[]; inProgress: Task[]; completed: Task[] } }>('/tasks/kanban');
 
 export const getTaskStats = () =>
-    api.get<{ pending: number; inProgress: number; completed: number; overdue: number }>('/tasks/stats');
+    api.get<{ success: boolean; data: { pending: number; inProgress: number; completed: number; overdue: number } }>('/tasks/stats');
 
 export const createTask = (data: Partial<Task>) =>
     api.post<Task>('/tasks', data);
@@ -169,21 +169,23 @@ export const getNcdrAlertTypes = () =>
 
 // 獲取警報列表
 export const getNcdrAlerts = (params?: { types?: string; activeOnly?: boolean; limit?: number }) =>
-    api.get<{ data: NcdrAlert[]; total: number }>('/ncdr-alerts', { params });
+    api.get<{ success: boolean; data: NcdrAlert[]; total: number }>('/ncdr-alerts', { params });
 
 // 獲取地圖用警報 (有座標)
 export const getNcdrAlertsForMap = (types?: number[]) =>
-    api.get<{ data: NcdrAlert[]; total: number }>('/ncdr-alerts/map', {
+    api.get<{ success: boolean; data: NcdrAlert[]; total: number }>('/ncdr-alerts/map', {
         params: types ? { types: types.join(',') } : undefined,
     });
 
 // 獲取統計
 export const getNcdrAlertStats = () =>
     api.get<{
-        total: number;
-        active: number;
-        byType: { typeId: number; typeName: string; count: number }[];
-        lastSyncTime: string | null;
+        success: boolean; data: {
+            total: number;
+            active: number;
+            byType: { typeId: number; typeName: string; count: number }[];
+            lastSyncTime: string | null;
+        }
     }>('/ncdr-alerts/stats');
 
 // 手動觸發同步 (核心類別)
@@ -325,11 +327,13 @@ export const getReportsForMap = () => api.get<Report[]>('/reports/map');
 
 // 取得回報統計
 export const getReportStats = () => api.get<{
-    total: number;
-    pending: number;
-    confirmed: number;
-    rejected: number;
-    byType: Record<string, number>;
+    success: boolean; data: {
+        total: number;
+        pending: number;
+        confirmed: number;
+        rejected: number;
+        byType: Record<string, number>;
+    }
 }>('/reports/stats');
 
 // ===== 志工管理 Volunteers =====
@@ -383,7 +387,7 @@ export const getVolunteers = (params?: {
 }) => api.get<{ success: boolean; data: Volunteer[]; count: number }>('/volunteers', { params });
 
 // 取得單一志工 (完整資料，需 Admin)
-export const getVolunteer = (id: string) => api.get<Volunteer>(`/volunteers/${id}`);
+export const getVolunteer = (id: string) => api.get<{ success: boolean; data: Volunteer }>(`/volunteers/${id}`);
 
 // 建立志工
 export const createVolunteer = (data: CreateVolunteerDto) => api.post<Volunteer>('/volunteers', data);
@@ -484,7 +488,7 @@ export interface CreateResourceDto {
 
 // 取得物資列表
 export const getResources = (params?: { category?: ResourceCategory }) =>
-    api.get<Resource[]>('/resources', { params });
+    api.get<{ success: boolean; data: Resource[]; count: number }>('/resources', { params });
 
 // 取得單一物資
 export const getResource = (id: string) => api.get<Resource>(`/resources/${id}`);
@@ -543,10 +547,12 @@ export const recordDonation = (resourceId: string, data: {
 
 // 取得物資統計
 export const getResourceStats = () => api.get<{
-    total: number;
-    byCategory: Record<string, number>;
-    lowStock: number;
-    expiringSoon: number;
+    success: boolean; data: {
+        total: number;
+        byCategory: Record<string, number>;
+        lowStock: number;
+        expiringSoon: number;
+    }
 }>('/resources/stats');
 
 // 取得低庫存物資
@@ -722,7 +728,7 @@ export interface NcdrBroadcastResult {
 
 // 取得 LINE BOT 統計
 export const getLineBotStats = () =>
-    api.get<LineBotStats>('/line-bot/stats');
+    api.get<{ success: boolean; data: LineBotStats }>('/line-bot/stats');
 
 // 帳號綁定
 export const bindLineAccount = (accountId: string, lineUserId: string) =>
@@ -762,7 +768,7 @@ export interface MenuConfigItem {
 
 // 取得選單設定
 export const getMenuConfig = () =>
-    api.get<{ data: MenuConfigItem[] }>('/menu-config');
+    api.get<{ success: boolean; data: MenuConfigItem[] }>('/menu-config');
 
 // 更新選單設定 (僅限擁有者)
 export const updateMenuConfig = (items: MenuConfigItem[]) =>

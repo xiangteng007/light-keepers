@@ -230,8 +230,8 @@ export default function MapPage() {
 
     const events = eventsData || [];
     const ncdrAlerts = ncdrData || [];
-    const shelters = publicResourcesData?.data?.shelters || [];
-    const aedLocations = publicResourcesData?.data?.aed || [];
+    const shelters = publicResourcesData?.shelters || [];
+    const aedLocations = publicResourcesData?.aed || [];
 
     // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {

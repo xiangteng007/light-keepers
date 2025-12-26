@@ -175,13 +175,13 @@ export default function Layout() {
             try {
                 const response = await getMenuConfig();
                 if (response.data?.data && response.data.data.length > 0) {
-                    const configMap = new Map(
-                        response.data.data.map((c: { id: string; label: string; order: number }) => [c.id, c])
-                    );
+                    const configObj: Record<string, { id: string; label: string; order: number }> = {};
+                    response.data.data.forEach((c) => { configObj[c.id] = c; });
+                    const configMap = configObj;
 
                     // Apply config to nav items
                     const configuredItems = defaultNavItems.map(item => {
-                        const config = configMap.get(item.id);
+                        const config = configMap[item.id];
                         if (config) {
                             return { ...item, label: config.label };
                         }
@@ -190,8 +190,8 @@ export default function Layout() {
 
                     // Sort by order if available
                     configuredItems.sort((a, b) => {
-                        const orderA = (configMap.get(a.id) as { order: number } | undefined)?.order ?? 999;
-                        const orderB = (configMap.get(b.id) as { order: number } | undefined)?.order ?? 999;
+                        const orderA = configMap[a.id]?.order ?? 999;
+                        const orderB = configMap[b.id]?.order ?? 999;
                         return orderA - orderB;
                     });
 
