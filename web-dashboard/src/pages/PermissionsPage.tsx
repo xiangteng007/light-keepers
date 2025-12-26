@@ -250,7 +250,13 @@ export default function PermissionsPage() {
 
     // Render role badges
     const renderRoleBadges = (account: AdminAccount) => {
-        const availableRoles = roles.filter(r => r.level < (user?.roleLevel ?? 0));
+        // 先過濾出低於當前用戶權限的角色，再去除重複的角色名稱
+        const availableRoles = roles
+            .filter(r => r.level < (user?.roleLevel ?? 0))
+            .filter((role, index, self) =>
+                index === self.findIndex(r => r.name === role.name)
+            )
+            .sort((a, b) => a.level - b.level);
 
         return (
             <div className="role-badges">
