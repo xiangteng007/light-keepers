@@ -7,6 +7,7 @@ import { Badge, Card, Button } from '../design-system';
 
 // Google Maps API Key
 const GOOGLE_MAPS_API_KEY = 'AIzaSyDP3KEDizgPPNwXvS6LpcxsrF9_Lyt1bgA';
+const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
 
 // 台灣中心座標
 const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
@@ -198,7 +199,7 @@ export default function MapPage() {
     const { isLoaded, loadError } = useJsApiLoader({
         id: 'google-map-script',
         googleMapsApiKey: GOOGLE_MAPS_API_KEY,
-        libraries: ['places'],
+        libraries: GOOGLE_MAPS_LIBRARIES,
     });
 
     // 獲取所有事件
