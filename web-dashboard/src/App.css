@@ -937,6 +937,25 @@ font-size: var(--font-size-base);
 
 .task-card-vi__header {
   margin-bottom: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.task-delete-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 14px;
+  opacity: 0.6;
+  transition: all 0.2s ease;
+}
+
+.task-delete-btn:hover {
+  color: #F44336;
+  opacity: 1;
 }
 
 .task-card-vi__title {
