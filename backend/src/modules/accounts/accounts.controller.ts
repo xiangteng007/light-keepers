@@ -1,15 +1,23 @@
 import { Controller, Get, Param, Patch, Body, UseGuards, Request } from '@nestjs/common';
+import { IsArray, IsString, IsNumber, IsBoolean, IsOptional } from 'class-validator';
 import { AccountsService } from './accounts.service';
 import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
 import { RoleLevel } from './entities/role.entity';
 
 // DTOs
 class SetRolesDto {
+    @IsArray()
+    @IsString({ each: true })
     roleNames: string[];
 }
 
 class UpdatePagePermissionDto {
+    @IsOptional()
+    @IsNumber()
     requiredLevel?: number;
+
+    @IsOptional()
+    @IsBoolean()
     isVisible?: boolean;
 }
 

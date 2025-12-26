@@ -499,11 +499,18 @@ export default function PermissionsPage() {
                                                 }
                                                 disabled={(user?.roleLevel ?? 0) < 5}
                                             >
-                                                {roles.map(role => (
-                                                    <option key={role.level} value={role.level}>
-                                                        {role.displayName}
-                                                    </option>
-                                                ))}
+                                                {/* 只顯示唯一的 level，避免重複選項 */}
+                                                {roles
+                                                    .filter((role, index, self) =>
+                                                        index === self.findIndex(r => r.level === role.level)
+                                                    )
+                                                    .sort((a, b) => a.level - b.level)
+                                                    .map(role => (
+                                                        <option key={role.level} value={role.level}>
+                                                            {role.displayName}
+                                                        </option>
+                                                    ))
+                                                }
                                             </select>
                                         </div>
                                         <div className="page-card__visible">
