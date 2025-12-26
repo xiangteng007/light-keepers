@@ -305,7 +305,7 @@ export const getReports = (params?: {
     severity?: ReportSeverity;
     limit?: number;
     offset?: number
-}) => api.get<Report[]>('/reports', { params });
+}) => api.get<{ success: boolean; data: Report[]; count: number }>('/reports', { params });
 
 // 取得單一回報
 export const getReport = (id: string) => api.get<Report>(`/reports/${id}`);
@@ -380,7 +380,7 @@ export const getVolunteers = (params?: {
     skill?: string;
     limit?: number;
     offset?: number;
-}) => api.get<Volunteer[]>('/volunteers', { params });
+}) => api.get<{ success: boolean; data: Volunteer[]; count: number }>('/volunteers', { params });
 
 // 取得單一志工 (完整資料，需 Admin)
 export const getVolunteer = (id: string) => api.get<Volunteer>(`/volunteers/${id}`);
@@ -405,11 +405,13 @@ export const getAvailableVolunteers = (region?: string, skill?: string) =>
 
 // 取得志工統計
 export const getVolunteerStats = () => api.get<{
-    total: number;
-    available: number;
-    busy: number;
-    offline: number;
-    totalServiceHours: number;
+    success: boolean; data: {
+        total: number;
+        available: number;
+        busy: number;
+        offline: number;
+        totalServiceHours: number;
+    }
 }>('/volunteers/stats');
 
 // ===== 物資管理 Resources =====
@@ -585,11 +587,11 @@ export interface ScrapedCourse {
 
 // 取得爬取的課程
 export const getScrapedCourses = (params?: { sourceId?: string; category?: ScrapedCourseCategory }) =>
-    api.get<ScrapedCourse[]>('/training/scraper/courses', { params });
+    api.get<{ success: boolean; data: ScrapedCourse[]; count: number }>('/training/scraper/courses', { params });
 
 // 手動觸發爬取
 export const triggerScrape = (sourceId?: string) =>
-    api.post<{ success: number; failed: number }>('/training/scraper/trigger', { sourceId });
+    api.post<{ success: boolean; data: { success: number; failed: number }; message: string }>('/training/scraper/scrape', { sourceId });
 
 // 取得爬蟲來源
 export const getScrapingSources = () => api.get<ScrapingSource[]>('/training/scraper/sources');
@@ -749,3 +751,20 @@ export const broadcastNcdrAlertToRegion = (data: {
 // 廣播訊息
 export const broadcastLineMessage = (message: string) =>
     api.post<{ success: boolean; message: string }>('/line-bot/broadcast', { message });
+
+// ===== 選單設定 Menu Config =====
+
+export interface MenuConfigItem {
+    id: string;
+    label: string;
+    order: number;
+}
+
+// 取得選單設定
+export const getMenuConfig = () =>
+    api.get<{ data: MenuConfigItem[] }>('/menu-config');
+
+// 更新選單設定 (僅限擁有者)
+export const updateMenuConfig = (items: MenuConfigItem[]) =>
+    api.put<{ data: MenuConfigItem[]; message: string }>('/menu-config', { items });
+

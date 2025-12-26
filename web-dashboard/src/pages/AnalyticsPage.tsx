@@ -61,22 +61,22 @@ export default function AnalyticsPage() {
     // 獲取統計數據
     const { data: resourceStats } = useQuery({
         queryKey: ['resourceStats'],
-        queryFn: () => getResourceStats().then(res => res.data),
+        queryFn: () => getResourceStats().then(res => res.data.data),
     });
 
     const { data: reportStats } = useQuery({
         queryKey: ['reportStats'],
-        queryFn: () => getReportStats().then(res => res.data),
+        queryFn: () => getReportStats().then(res => res.data.data),
     });
 
     const { data: volunteerStats } = useQuery({
         queryKey: ['volunteerStats'],
-        queryFn: () => getVolunteerStats().then(res => res.data),
+        queryFn: () => getVolunteerStats().then(res => res.data.data),
     });
 
     const { data: alertsData } = useQuery({
         queryKey: ['ncdrAlerts'],
-        queryFn: () => getNcdrAlerts({ limit: 100 }).then(res => res.data),
+        queryFn: () => getNcdrAlerts({ limit: 100 }).then(res => res.data.data),
     });
 
     const dateLabels = getDateLabels(dateRange);
@@ -95,7 +95,7 @@ export default function AnalyticsPage() {
             },
             {
                 label: 'NCDR 警報',
-                data: generateTrendData(alertsData?.data?.length || 3, dateRange, 2),
+                data: generateTrendData(alertsData?.length || 3, dateRange, 2),
                 borderColor: 'rgb(239, 68, 68)',
                 backgroundColor: 'rgba(239, 68, 68, 0.1)',
                 fill: true,

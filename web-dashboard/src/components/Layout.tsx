@@ -39,10 +39,14 @@ import {
     LogOut,
     User,
     Shield,
+    Edit3,
+    Save,
+    XCircle,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
+import { getMenuConfig, updateMenuConfig } from '../api/services';
 
 interface NavItem {
     id: string;
@@ -72,7 +76,19 @@ const defaultNavItems: NavItem[] = [
 ];
 
 // Sortable Nav Item Component
-function SortableNavItem({ item, isActive, onClick }: { item: NavItem; isActive: boolean; onClick: () => void }) {
+function SortableNavItem({
+    item,
+    isActive,
+    onClick,
+    isEditMode,
+    onLabelChange,
+}: {
+    item: NavItem;
+    isActive: boolean;
+    onClick: () => void;
+    isEditMode: boolean;
+    onLabelChange?: (id: string, label: string) => void;
+}) {
     const {
         attributes,
         listeners,
@@ -104,21 +120,36 @@ function SortableNavItem({ item, isActive, onClick }: { item: NavItem; isActive:
             >
                 <GripVertical size={14} />
             </div>
-            <Link
-                to={item.path}
-                className={`nav-item ${isActive ? 'active' : ''}`}
-                onClick={onClick}
-            >
-                <span className="nav-icon">
-                    <IconComponent size={20} strokeWidth={1.5} />
-                </span>
-                <span className="nav-label">{item.label}</span>
-            </Link>
+            {isEditMode ? (
+                <div className={`nav-item nav-item--editing ${isActive ? 'active' : ''}`}>
+                    <span className="nav-icon">
+                        <IconComponent size={20} strokeWidth={1.5} />
+                    </span>
+                    <input
+                        type="text"
+                        className="nav-label-input"
+                        value={item.label}
+                        onChange={(e) => onLabelChange?.(item.id, e.target.value)}
+                        onClick={(e) => e.stopPropagation()}
+                    />
+                </div>
+            ) : (
+                <Link
+                    to={item.path}
+                    className={`nav-item ${isActive ? 'active' : ''}`}
+                    onClick={onClick}
+                >
+                    <span className="nav-icon">
+                        <IconComponent size={20} strokeWidth={1.5} />
+                    </span>
+                    <span className="nav-label">{item.label}</span>
+                </Link>
+            )}
         </div>
     );
 }
 
-// Storage key for nav order
+// Storage key for nav order (fallback for non-owners)
 const NAV_ORDER_KEY = 'light-keepers-nav-order';
 
 export default function Layout() {
@@ -127,40 +158,79 @@ export default function Layout() {
     const { user, logout } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [navItems, setNavItems] = useState<NavItem[]>(defaultNavItems);
+    const [isEditMode, setIsEditMode] = useState(false);
+    const [originalItems, setOriginalItems] = useState<NavItem[]>([]);
+    const [isSaving, setIsSaving] = useState(false);
 
     // Get user's role level (default to 1 for logged in users)
     const userLevel = user?.roleLevel ?? 1;
+    const isOwner = userLevel >= 5;
 
     // Filter nav items based on user's role level
     const visibleNavItems = navItems.filter(item => item.requiredLevel <= userLevel);
 
-    // Load saved order from localStorage
+    // Load menu config from backend
     useEffect(() => {
-        const savedOrder = localStorage.getItem(NAV_ORDER_KEY);
-        if (savedOrder) {
+        const loadMenuConfig = async () => {
             try {
-                const orderIds = JSON.parse(savedOrder) as string[];
-                // Rebuild navItems based on saved order
-                const orderedItems = orderIds
-                    .map(id => defaultNavItems.find(item => item.id === id))
-                    .filter((item): item is NavItem => item !== undefined);
+                const response = await getMenuConfig();
+                if (response.data?.data && response.data.data.length > 0) {
+                    const configMap = new Map(
+                        response.data.data.map((c: { id: string; label: string; order: number }) => [c.id, c])
+                    );
 
-                // Add any new items that weren't in the saved order
-                const newItems = defaultNavItems.filter(
-                    item => !orderIds.includes(item.id)
-                );
+                    // Apply config to nav items
+                    const configuredItems = defaultNavItems.map(item => {
+                        const config = configMap.get(item.id);
+                        if (config) {
+                            return { ...item, label: config.label };
+                        }
+                        return item;
+                    });
 
-                setNavItems([...orderedItems, ...newItems]);
-            } catch (e) {
-                console.error('Failed to parse nav order:', e);
+                    // Sort by order if available
+                    configuredItems.sort((a, b) => {
+                        const orderA = (configMap.get(a.id) as { order: number } | undefined)?.order ?? 999;
+                        const orderB = (configMap.get(b.id) as { order: number } | undefined)?.order ?? 999;
+                        return orderA - orderB;
+                    });
+
+                    setNavItems(configuredItems);
+                } else {
+                    // Fallback to localStorage
+                    loadFromLocalStorage();
+                }
+            } catch (error) {
+                console.error('Failed to load menu config:', error);
+                loadFromLocalStorage();
             }
-        }
+        };
+
+        const loadFromLocalStorage = () => {
+            const savedOrder = localStorage.getItem(NAV_ORDER_KEY);
+            if (savedOrder) {
+                try {
+                    const orderIds = JSON.parse(savedOrder) as string[];
+                    const orderedItems = orderIds
+                        .map(id => defaultNavItems.find(item => item.id === id))
+                        .filter((item): item is NavItem => item !== undefined);
+                    const newItems = defaultNavItems.filter(
+                        item => !orderIds.includes(item.id)
+                    );
+                    setNavItems([...orderedItems, ...newItems]);
+                } catch (e) {
+                    console.error('Failed to parse nav order:', e);
+                }
+            }
+        };
+
+        loadMenuConfig();
     }, []);
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
             activationConstraint: {
-                distance: 5, // 5px movement before drag starts
+                distance: 5,
             },
         }),
         useSensor(KeyboardSensor, {
@@ -175,15 +245,52 @@ export default function Layout() {
             setNavItems((items) => {
                 const oldIndex = items.findIndex((item) => item.id === active.id);
                 const newIndex = items.findIndex((item) => item.id === over.id);
-
                 const newOrder = arrayMove(items, oldIndex, newIndex);
 
-                // Save to localStorage
-                const orderIds = newOrder.map(item => item.id);
-                localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(orderIds));
+                // Only save to localStorage for non-owners or when not in edit mode
+                if (!isOwner || !isEditMode) {
+                    const orderIds = newOrder.map(item => item.id);
+                    localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(orderIds));
+                }
 
                 return newOrder;
             });
+        }
+    };
+
+    const handleLabelChange = (id: string, newLabel: string) => {
+        setNavItems(items =>
+            items.map(item =>
+                item.id === id ? { ...item, label: newLabel } : item
+            )
+        );
+    };
+
+    const handleStartEdit = () => {
+        setOriginalItems([...navItems]);
+        setIsEditMode(true);
+    };
+
+    const handleCancelEdit = () => {
+        setNavItems(originalItems);
+        setIsEditMode(false);
+    };
+
+    const handleSaveEdit = async () => {
+        setIsSaving(true);
+        try {
+            const configItems = navItems.map((item, index) => ({
+                id: item.id,
+                label: item.label,
+                order: index,
+            }));
+            await updateMenuConfig(configItems);
+            setIsEditMode(false);
+        } catch (error) {
+            console.error('Failed to save menu config:', error);
+            alert('儲存失敗，請稍後再試');
+        } finally {
+            setIsSaving(false);
         }
     };
 
@@ -238,6 +345,40 @@ export default function Layout() {
                     </div>
                 </div>
 
+                {/* Edit Mode Controls - Owner Only */}
+                {isOwner && (
+                    <div className="nav-edit-controls">
+                        {isEditMode ? (
+                            <>
+                                <button
+                                    className="nav-edit-btn nav-edit-btn--save"
+                                    onClick={handleSaveEdit}
+                                    disabled={isSaving}
+                                >
+                                    <Save size={16} />
+                                    {isSaving ? '儲存中...' : '儲存'}
+                                </button>
+                                <button
+                                    className="nav-edit-btn nav-edit-btn--cancel"
+                                    onClick={handleCancelEdit}
+                                    disabled={isSaving}
+                                >
+                                    <XCircle size={16} />
+                                    取消
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                className="nav-edit-btn nav-edit-btn--edit"
+                                onClick={handleStartEdit}
+                            >
+                                <Edit3 size={16} />
+                                編輯選單
+                            </button>
+                        )}
+                    </div>
+                )}
+
                 <nav className="nav">
                     <DndContext
                         sensors={sensors}
@@ -254,6 +395,8 @@ export default function Layout() {
                                     item={item}
                                     isActive={location.pathname === item.path}
                                     onClick={handleNavClick}
+                                    isEditMode={isEditMode}
+                                    onLabelChange={handleLabelChange}
                                 />
                             ))}
                         </SortableContext>
@@ -287,4 +430,3 @@ export default function Layout() {
         </div>
     );
 }
-

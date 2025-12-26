@@ -1,94 +1,160 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, Button, Badge } from '../design-system';
 import { getVolunteers } from '../api/services';
 import type { Volunteer } from '../api/services';
 import './VolunteerSchedulePage.css';
 
-// 班別類型
-type ShiftType = 'morning' | 'afternoon' | 'night';
+// ===== 類型定義 =====
+type ViewRange = 'week' | 'biweek' | 'month';
+
+interface ShiftConfig {
+    id: string;
+    label: string;
+    startTime: string;
+    endTime: string;
+    color: string;
+}
 
 interface ScheduleSlot {
     date: string;
-    shift: ShiftType;
+    shiftId: string;
     volunteerId?: string;
     volunteerName?: string;
 }
 
-// 班別設定
-const SHIFTS: Record<ShiftType, { label: string; time: string; color: string }> = {
-    morning: { label: '早班', time: '06:00 - 14:00', color: '#10b981' },
-    afternoon: { label: '午班', time: '14:00 - 22:00', color: '#f59e0b' },
-    night: { label: '夜班', time: '22:00 - 06:00', color: '#6366f1' },
-};
+// 預設顏色池
+const SHIFT_COLORS = [
+    '#10b981', // 綠
+    '#f59e0b', // 橙
+    '#6366f1', // 紫
+    '#ef4444', // 紅
+    '#06b6d4', // 青
+    '#8b5cf6', // 紫羅蘭
+    '#ec4899', // 粉
+    '#14b8a6', // 青綠
+];
 
-// 生成未來一週日期
-function getWeekDates(): string[] {
-    const dates = [];
+// ===== 工具函數 =====
+
+// 根據班別數量自動計算時間分配
+function calculateDefaultShifts(count: number): ShiftConfig[] {
+    if (count <= 0) return [];
+
+    const hoursPerShift = 24 / count;
+    const shifts: ShiftConfig[] = [];
+
+    // 預設班別名稱
+    const defaultLabels: Record<number, string[]> = {
+        1: ['全天'],
+        2: ['早班', '晚班'],
+        3: ['早班', '午班', '夜班'],
+        4: ['早班', '午班', '晚班', '夜班'],
+    };
+
+    const labels = defaultLabels[count] || Array.from({ length: count }, (_, i) => `班別 ${i + 1}`);
+
+    for (let i = 0; i < count; i++) {
+        const startHour = Math.round(i * hoursPerShift);
+        const endHour = Math.round((i + 1) * hoursPerShift);
+
+        shifts.push({
+            id: `shift-${i}`,
+            label: labels[i],
+            startTime: `${String(startHour).padStart(2, '0')}:00`,
+            endTime: endHour === 24 ? '24:00' : `${String(endHour).padStart(2, '0')}:00`,
+            color: SHIFT_COLORS[i % SHIFT_COLORS.length],
+        });
+    }
+
+    return shifts;
+}
+
+// 根據視圖範圍生成日期列表
+function getDates(range: ViewRange): string[] {
+    const dates: string[] = [];
     const today = new Date();
-    for (let i = 0; i < 7; i++) {
+    const days = range === 'week' ? 7 : range === 'biweek' ? 14 : 30;
+
+    for (let i = 0; i < days; i++) {
         const date = new Date(today);
         date.setDate(today.getDate() + i);
         dates.push(date.toISOString().split('T')[0]);
     }
+
     return dates;
 }
 
+// 格式化日期顯示
 function formatDate(dateStr: string): string {
     const date = new Date(dateStr);
     const weekdays = ['日', '一', '二', '三', '四', '五', '六'];
     return `${date.getMonth() + 1}/${date.getDate()} (${weekdays[date.getDay()]})`;
 }
 
+// 視圖範圍標籤
+const VIEW_RANGE_LABELS: Record<ViewRange, string> = {
+    week: '本週排班',
+    biweek: '雙週排班',
+    month: '月排班',
+};
+
+// ===== 主組件 =====
 export default function VolunteerSchedulePage() {
-    const [selectedSlot, setSelectedSlot] = useState<{ date: string; shift: ShiftType } | null>(null);
+    const [viewRange, setViewRange] = useState<ViewRange>('week');
+    const [shifts, setShifts] = useState<ShiftConfig[]>(() => calculateDefaultShifts(3));
     const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
+    const [selectedSlot, setSelectedSlot] = useState<{ date: string; shiftId: string } | null>(null);
+    const [editingShift, setEditingShift] = useState<string | null>(null);
+    const [editingTime, setEditingTime] = useState<string | null>(null);
 
     // 獲取志工列表
     const { data: volunteersData, isLoading } = useQuery({
         queryKey: ['volunteers'],
-        queryFn: () => getVolunteers().then(res => res.data),
+        queryFn: () => getVolunteers().then(res => res.data.data),
     });
 
     const volunteers = (volunteersData as Volunteer[]) || [];
-    const weekDates = getWeekDates();
+    const dates = useMemo(() => getDates(viewRange), [viewRange]);
 
-    // 初始化模擬排班
+    // 初始化排班資料
     useEffect(() => {
-        if (volunteers.length > 0 && schedule.length === 0) {
+        if (volunteers.length > 0) {
             const initialSchedule: ScheduleSlot[] = [];
-            weekDates.forEach(date => {
-                Object.keys(SHIFTS).forEach(shift => {
-                    const randomVolunteer = volunteers[Math.floor(Math.random() * volunteers.length)];
-                    if (Math.random() > 0.3) { // 70% 機率有排班
-                        initialSchedule.push({
-                            date,
-                            shift: shift as ShiftType,
-                            volunteerId: randomVolunteer.id,
-                            volunteerName: randomVolunteer.name,
-                        });
+            dates.forEach(date => {
+                shifts.forEach(shift => {
+                    const existing = schedule.find(s => s.date === date && s.shiftId === shift.id);
+                    if (existing) {
+                        initialSchedule.push(existing);
                     } else {
-                        initialSchedule.push({
-                            date,
-                            shift: shift as ShiftType,
-                        });
+                        const randomVolunteer = volunteers[Math.floor(Math.random() * volunteers.length)];
+                        if (Math.random() > 0.3) {
+                            initialSchedule.push({
+                                date,
+                                shiftId: shift.id,
+                                volunteerId: randomVolunteer.id,
+                                volunteerName: randomVolunteer.name,
+                            });
+                        } else {
+                            initialSchedule.push({ date, shiftId: shift.id });
+                        }
                     }
                 });
             });
             setSchedule(initialSchedule);
         }
-    }, [volunteers]);
+    }, [volunteers, shifts, dates]);
 
     // 取得某時段的排班
-    const getSlotSchedule = (date: string, shift: ShiftType): ScheduleSlot | undefined => {
-        return schedule.find(s => s.date === date && s.shift === shift);
+    const getSlotSchedule = (date: string, shiftId: string): ScheduleSlot | undefined => {
+        return schedule.find(s => s.date === date && s.shiftId === shiftId);
     };
 
     // 指派志工
     const assignVolunteer = (volunteer: Volunteer) => {
         if (!selectedSlot) return;
         setSchedule(prev => prev.map(slot => {
-            if (slot.date === selectedSlot.date && slot.shift === selectedSlot.shift) {
+            if (slot.date === selectedSlot.date && slot.shiftId === selectedSlot.shiftId) {
                 return { ...slot, volunteerId: volunteer.id, volunteerName: volunteer.name };
             }
             return slot;
@@ -97,14 +163,57 @@ export default function VolunteerSchedulePage() {
     };
 
     // 移除排班
-    const unassignVolunteer = (date: string, shift: ShiftType) => {
+    const unassignVolunteer = (date: string, shiftId: string) => {
         setSchedule(prev => prev.map(slot => {
-            if (slot.date === date && slot.shift === shift) {
+            if (slot.date === date && slot.shiftId === shiftId) {
                 return { ...slot, volunteerId: undefined, volunteerName: undefined };
             }
             return slot;
         }));
     };
+
+    // 新增班別
+    const addShift = () => {
+        const newShifts = calculateDefaultShifts(shifts.length + 1);
+        // 保留已編輯的名稱
+        setShifts(newShifts.map((s, i) => {
+            if (i < shifts.length && shifts[i].label !== calculateDefaultShifts(shifts.length)[i]?.label) {
+                return { ...s, label: shifts[i].label };
+            }
+            return s;
+        }));
+    };
+
+    // 移除班別
+    const removeShift = () => {
+        if (shifts.length <= 1) return;
+        const newShifts = calculateDefaultShifts(shifts.length - 1);
+        setShifts(newShifts.map((s, i) => {
+            if (i < shifts.length - 1 && shifts[i].label !== calculateDefaultShifts(shifts.length)[i]?.label) {
+                return { ...s, label: shifts[i].label };
+            }
+            return s;
+        }));
+    };
+
+    // 更新班別名稱
+    const updateShiftLabel = (shiftId: string, newLabel: string) => {
+        setShifts(prev => prev.map(s => s.id === shiftId ? { ...s, label: newLabel } : s));
+        setEditingShift(null);
+    };
+
+    // 更新班別時間
+    const updateShiftTime = (shiftId: string, field: 'startTime' | 'endTime', value: string) => {
+        setShifts(prev => prev.map(s => s.id === shiftId ? { ...s, [field]: value } : s));
+    };
+
+    // 格式化時間顯示
+    const formatTimeRange = (startTime: string, endTime: string) => {
+        return `${startTime} - ${endTime}`;
+    };
+
+    // 獲取當前選中班別的資訊
+    const selectedShift = selectedSlot ? shifts.find(s => s.id === selectedSlot.shiftId) : null;
 
     return (
         <div className="page volunteer-schedule-page">
@@ -113,16 +222,58 @@ export default function VolunteerSchedulePage() {
                     <h2>📅 志工排班</h2>
                     <p className="page-subtitle">班表管理與調度</p>
                 </div>
-                <Badge variant="info">本週排班</Badge>
+                <div className="page-header__right">
+                    {/* 日期範圍選擇器 */}
+                    <div className="view-range-selector">
+                        {(['week', 'biweek', 'month'] as ViewRange[]).map(range => (
+                            <button
+                                key={range}
+                                className={`view-range-btn ${viewRange === range ? 'active' : ''}`}
+                                onClick={() => setViewRange(range)}
+                            >
+                                {VIEW_RANGE_LABELS[range]}
+                            </button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {/* 排班表格 */}
             <Card padding="lg" className="schedule-card">
-                <div className="schedule-grid">
+                {/* 班別控制 */}
+                <div className="shift-controls-bar">
+                    <span className="shift-controls-label">班別設定</span>
+                    <div className="shift-controls">
+                        <button
+                            className="shift-control-btn"
+                            onClick={removeShift}
+                            disabled={shifts.length <= 1}
+                            title="減少班別"
+                        >
+                            −
+                        </button>
+                        <span className="shift-count">{shifts.length} 班</span>
+                        <button
+                            className="shift-control-btn"
+                            onClick={addShift}
+                            disabled={shifts.length >= 8}
+                            title="增加班別"
+                        >
+                            +
+                        </button>
+                    </div>
+                </div>
+
+                <div className="schedule-grid" style={{
+                    gridTemplateColumns: `140px repeat(${dates.length}, minmax(100px, 1fr))`
+                }}>
                     {/* 表頭 */}
-                    <div className="schedule-header">
+                    <div className="schedule-header" style={{
+                        gridColumn: `span ${dates.length + 1}`,
+                        display: 'contents'
+                    }}>
                         <div className="schedule-cell schedule-cell--header">班別 / 日期</div>
-                        {weekDates.map(date => (
+                        {dates.map(date => (
                             <div key={date} className="schedule-cell schedule-cell--header">
                                 {formatDate(date)}
                             </div>
@@ -130,19 +281,77 @@ export default function VolunteerSchedulePage() {
                     </div>
 
                     {/* 班別行 */}
-                    {Object.entries(SHIFTS).map(([shiftKey, shift]) => (
-                        <div key={shiftKey} className="schedule-row">
-                            <div className="schedule-cell schedule-cell--shift" style={{ borderLeftColor: shift.color }}>
-                                <div className="shift-name">{shift.label}</div>
-                                <div className="shift-time">{shift.time}</div>
+                    {shifts.map((shift) => (
+                        <div key={shift.id} className="schedule-row" style={{ display: 'contents' }}>
+                            <div
+                                className="schedule-cell schedule-cell--shift"
+                                style={{ borderLeftColor: shift.color }}
+                            >
+                                {/* 可編輯的班別名稱 */}
+                                {editingShift === shift.id ? (
+                                    <input
+                                        type="text"
+                                        className="shift-name-input"
+                                        defaultValue={shift.label}
+                                        autoFocus
+                                        onBlur={(e) => updateShiftLabel(shift.id, e.target.value)}
+                                        onKeyDown={(e) => {
+                                            if (e.key === 'Enter') {
+                                                updateShiftLabel(shift.id, e.currentTarget.value);
+                                            }
+                                        }}
+                                    />
+                                ) : (
+                                    <div
+                                        className="shift-name shift-name--editable"
+                                        onClick={() => setEditingShift(shift.id)}
+                                        title="點擊編輯班別名稱"
+                                    >
+                                        {shift.label}
+                                    </div>
+                                )}
+
+                                {/* 可編輯的時間 */}
+                                {editingTime === shift.id ? (
+                                    <div className="shift-time-edit">
+                                        <input
+                                            type="time"
+                                            className="shift-time-input"
+                                            value={shift.startTime}
+                                            onChange={(e) => updateShiftTime(shift.id, 'startTime', e.target.value)}
+                                        />
+                                        <span>-</span>
+                                        <input
+                                            type="time"
+                                            className="shift-time-input"
+                                            value={shift.endTime === '24:00' ? '00:00' : shift.endTime}
+                                            onChange={(e) => updateShiftTime(shift.id, 'endTime', e.target.value)}
+                                        />
+                                        <button
+                                            className="shift-time-done"
+                                            onClick={() => setEditingTime(null)}
+                                        >
+                                            ✓
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div
+                                        className="shift-time shift-time--editable"
+                                        onClick={() => setEditingTime(shift.id)}
+                                        title="點擊編輯時間"
+                                    >
+                                        {formatTimeRange(shift.startTime, shift.endTime)}
+                                    </div>
+                                )}
                             </div>
-                            {weekDates.map(date => {
-                                const slot = getSlotSchedule(date, shiftKey as ShiftType);
+
+                            {dates.map(date => {
+                                const slot = getSlotSchedule(date, shift.id);
                                 return (
                                     <div
-                                        key={`${date}-${shiftKey}`}
+                                        key={`${date}-${shift.id}`}
                                         className={`schedule-cell schedule-cell--slot ${slot?.volunteerId ? 'has-volunteer' : 'empty'}`}
-                                        onClick={() => setSelectedSlot({ date, shift: shiftKey as ShiftType })}
+                                        onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
                                     >
                                         {slot?.volunteerName ? (
                                             <div className="slot-content">
@@ -151,7 +360,7 @@ export default function VolunteerSchedulePage() {
                                                     className="remove-btn"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        unassignVolunteer(date, shiftKey as ShiftType);
+                                                        unassignVolunteer(date, shift.id);
                                                     }}
                                                 >
                                                     ✕
@@ -174,7 +383,7 @@ export default function VolunteerSchedulePage() {
                     <Card className="modal-content" padding="lg" onClick={e => e.stopPropagation()}>
                         <h3>指派志工</h3>
                         <p className="modal-subtitle">
-                            {formatDate(selectedSlot.date)} - {SHIFTS[selectedSlot.shift].label}
+                            {formatDate(selectedSlot.date)} - {selectedShift?.label}
                         </p>
 
                         {isLoading ? (

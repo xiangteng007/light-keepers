@@ -12,7 +12,7 @@ export default function TasksPage() {
     // 獲取看板資料
     const { data: kanban, isLoading } = useQuery({
         queryKey: ['taskKanban'],
-        queryFn: () => getTaskKanban().then(res => res.data),
+        queryFn: () => getTaskKanban().then(res => res.data.data),
     });
 
     // 新增任務

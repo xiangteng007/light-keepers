@@ -46,7 +46,7 @@ export default function VolunteerDetailPage() {
             setError(null);
             try {
                 const response = await getVolunteer(id);
-                setVolunteer(response.data);
+                setVolunteer(response.data.data);
                 setServiceRecords(MOCK_SERVICE_RECORDS); // 服務紀錄暫用 mock
             } catch (err) {
                 console.error('Failed to fetch volunteer:', err);

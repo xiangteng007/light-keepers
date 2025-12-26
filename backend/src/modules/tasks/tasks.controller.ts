@@ -7,37 +7,44 @@ export class TasksController {
     constructor(private readonly tasksService: TasksService) { }
 
     @Post()
-    create(@Body() dto: CreateTaskDto) {
-        return this.tasksService.create(dto);
+    async create(@Body() dto: CreateTaskDto) {
+        const task = await this.tasksService.create(dto);
+        return { success: true, data: task };
     }
 
     @Get()
-    findAll(@Query() query: TaskQueryDto) {
-        return this.tasksService.findAll(query);
+    async findAll(@Query() query: TaskQueryDto) {
+        const result = await this.tasksService.findAll(query);
+        return { success: true, data: result.data, count: result.total };
     }
 
     @Get('kanban')
-    getKanbanBoard() {
-        return this.tasksService.getKanbanBoard();
+    async getKanbanBoard() {
+        const data = await this.tasksService.getKanbanBoard();
+        return { success: true, data };
     }
 
     @Get('stats')
-    getStats() {
-        return this.tasksService.getStats();
+    async getStats() {
+        const data = await this.tasksService.getStats();
+        return { success: true, data };
     }
 
     @Get(':id')
-    findOne(@Param('id') id: string) {
-        return this.tasksService.findOne(id);
+    async findOne(@Param('id') id: string) {
+        const task = await this.tasksService.findOne(id);
+        return { success: true, data: task };
     }
 
     @Put(':id')
-    update(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
-        return this.tasksService.update(id, dto);
+    async update(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
+        const task = await this.tasksService.update(id, dto);
+        return { success: true, data: task };
     }
 
     @Delete(':id')
-    remove(@Param('id') id: string) {
-        return this.tasksService.remove(id);
+    async remove(@Param('id') id: string) {
+        await this.tasksService.remove(id);
+        return { success: true, message: '任務已刪除' };
     }
 }

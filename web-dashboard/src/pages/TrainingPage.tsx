@@ -64,7 +64,7 @@ export default function TrainingPage() {
             setError(null);
             try {
                 const response = await getScrapedCourses();
-                setScrapedCourses(response.data);
+                setScrapedCourses(response.data.data);
             } catch (err) {
                 console.error('Failed to fetch scraped courses:', err);
                 setError('載入外部課程失敗');
@@ -106,11 +106,11 @@ export default function TrainingPage() {
         setIsLoading(true);
         try {
             const response = await triggerScrape();
-            const result = response.data;
+            const result = response.data.data;
             alert(`✅ 課程資料已更新！\n成功: ${result.success} 個來源\n失敗: ${result.failed} 個來源`);
             // 重新載入課程
             const coursesResponse = await getScrapedCourses();
-            setScrapedCourses(coursesResponse.data);
+            setScrapedCourses(coursesResponse.data.data);
         } catch (err) {
             console.error('Scrape trigger failed:', err);
             alert('❌ 更新失敗，請稍後再試');

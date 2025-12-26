@@ -93,8 +93,8 @@ export default function VolunteersPage() {
                     getVolunteers({ status: filterStatus || undefined }),
                     getVolunteerStats(),
                 ]);
-                setVolunteers(volunteersRes.data);
-                setStats(statsRes.data);
+                setVolunteers(volunteersRes.data.data);
+                setStats(statsRes.data.data);
             } catch (err) {
                 console.error('Failed to fetch volunteers:', err);
                 setError('載入志工資料失敗');

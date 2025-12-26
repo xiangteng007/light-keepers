@@ -99,20 +99,20 @@ export default function NcdrAlertsPage() {
             types: selectedTypes.join(','),
             activeOnly: true,
             limit: 100,
-        }).then(res => res.data),
+        }).then(res => res.data.data),
         enabled: selectedTypes.length > 0,
     });
 
     // 獲取統計
     const { data: statsData } = useQuery({
         queryKey: ['ncdrStats'],
-        queryFn: () => getNcdrAlertStats().then(res => res.data),
+        queryFn: () => getNcdrAlertStats().then(res => res.data.data),
     });
 
     // 獲取 LINE BOT 統計
     const { data: lineBotStats } = useQuery({
         queryKey: ['lineBotStats'],
-        queryFn: () => getLineBotStats().then(res => res.data),
+        queryFn: () => getLineBotStats().then(res => res.data.data),
         enabled: isAdmin,
     });
 
@@ -143,7 +143,7 @@ export default function NcdrAlertsPage() {
         },
     });
 
-    const alerts = alertsData?.data || [];
+    const alerts = alertsData || [];
 
     // 類別分組
     const centralTypes = ALERT_TYPE_DEFINITIONS.filter(t => t.category === 'central');

@@ -204,13 +204,13 @@ export default function MapPage() {
     // 獲取所有事件
     const { data: eventsData, isLoading } = useQuery({
         queryKey: ['allEvents'],
-        queryFn: () => getEvents().then(res => res.data),
+        queryFn: () => getEvents().then(res => res.data.data),
     });
 
     // 獲取 NCDR 警報 (有座標的)
     const { data: ncdrData } = useQuery({
         queryKey: ['ncdrAlertsMap'],
-        queryFn: () => getNcdrAlertsForMap().then(res => res.data),
+        queryFn: () => getNcdrAlertsForMap().then(res => res.data.data),
         enabled: showNcdrAlerts,
     });
 
@@ -228,10 +228,10 @@ export default function MapPage() {
         staleTime: 1000 * 60 * 30, // 30 分鐘快取
     });
 
-    const events = eventsData?.data || [];
-    const ncdrAlerts = ncdrData?.data || [];
-    const shelters = publicResourcesData?.shelters || [];
-    const aedLocations = publicResourcesData?.aed || [];
+    const events = eventsData || [];
+    const ncdrAlerts = ncdrData || [];
+    const shelters = publicResourcesData?.data?.shelters || [];
+    const aedLocations = publicResourcesData?.data?.aed || [];
 
     // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {

@@ -47,7 +47,7 @@ export default function ReportsAdminPage() {
             const response = await getReports({
                 status: selectedStatus as ReportStatus || undefined,
             });
-            setReports(response.data);
+            setReports(response.data.data);
         } catch (err) {
             console.error('Failed to fetch reports:', err);
             setError('載入回報列表失敗');

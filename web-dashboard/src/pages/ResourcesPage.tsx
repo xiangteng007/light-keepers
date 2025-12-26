@@ -61,8 +61,8 @@ export default function ResourcesPage() {
                     getResources({ category: selectedCategory as ResourceCategory || undefined }),
                     getResourceStats(),
                 ]);
-                setResources(resourcesRes.data);
-                setStats(statsRes.data);
+                setResources(resourcesRes.data.data);
+                setStats(statsRes.data.data);
             } catch (err) {
                 console.error('Failed to fetch resources:', err);
                 setError('載入物資資料失敗');

@@ -670,6 +670,96 @@ select {
 }
 
 /* ============================================
+   Menu Edit Mode Styles (Owner Only)
+============================================ */
+
+.nav-edit-controls {
+  display: flex;
+  gap: 8px;
+  padding: 8px 12px;
+  margin: 0 12px 8px;
+  background: var(--bg-hover, rgba(255, 255, 255, 0.05));
+  border-radius: 8px;
+  border: 1px dashed var(--border-color, rgba(255, 255, 255, 0.15));
+}
+
+.nav-edit-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  flex: 1;
+  justify-content: center;
+}
+
+.nav-edit-btn--edit {
+  background: var(--primary, #4F46E5);
+  color: white;
+}
+
+.nav-edit-btn--edit:hover {
+  background: var(--primary-hover, #4338CA);
+  transform: translateY(-1px);
+}
+
+.nav-edit-btn--save {
+  background: #10B981;
+  color: white;
+}
+
+.nav-edit-btn--save:hover:not(:disabled) {
+  background: #059669;
+}
+
+.nav-edit-btn--cancel {
+  background: var(--bg-secondary, #F3F4F6);
+  color: var(--text-secondary, #6B7280);
+}
+
+.nav-edit-btn--cancel:hover:not(:disabled) {
+  background: var(--bg-hover, #E5E7EB);
+}
+
+.nav-edit-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nav-item--editing {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: transparent;
+  border-radius: 8px;
+  flex: 1;
+}
+
+.nav-label-input {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--bg-card, #ffffff);
+  border: 1px solid var(--border-color, #E5E7EB);
+  border-radius: 6px;
+  color: var(--text-primary, #1F2937);
+  min-width: 0;
+}
+
+.nav-label-input:focus {
+  outline: none;
+  border-color: var(--primary, #4F46E5);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* ============================================
    Sidebar User Profile Section
 ============================================ */
 

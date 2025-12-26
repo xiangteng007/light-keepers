@@ -6,16 +6,105 @@
     overflow-x: auto;
 }
 
-/* 排班網格 */
-.schedule-grid {
-    min-width: 900px;
+/* 頁面標題右側 */
+.page-header__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
-.schedule-header,
-.schedule-row {
+/* ===== 日期範圍選擇器 ===== */
+.view-range-selector {
+    display: flex;
+    background: #f1f5f9;
+    border-radius: 8px;
+    padding: 4px;
+}
+
+.view-range-btn {
+    padding: 0.5rem 1rem;
+    border: none;
+    background: transparent;
+    color: #64748b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-range-btn:hover {
+    color: #1e293b;
+}
+
+.view-range-btn.active {
+    background: white;
+    color: #3b82f6;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== 班別控制列 ===== */
+.shift-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background: #f8fafc;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.shift-controls-label {
+    font-weight: 600;
+    color: #475569;
+    font-size: 0.9rem;
+}
+
+.shift-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.shift-control-btn {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #e2e8f0;
+    background: white;
+    border-radius: 8px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.shift-control-btn:hover:not(:disabled) {
+    background: #3b82f6;
+    color: white;
+    border-color: #3b82f6;
+}
+
+.shift-control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.shift-count {
+    font-weight: 600;
+    color: #1e293b;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* ===== 排班網格 ===== */
+.schedule-grid {
     display: grid;
-    grid-template-columns: 120px repeat(7, 1fr);
     gap: 2px;
+    min-width: fit-content;
 }
 
 .schedule-cell {
@@ -33,6 +122,9 @@
     font-weight: 600;
     color: #475569;
     font-size: 0.85rem;
+    position: sticky;
+    top: 0;
+    z-index: 1;
 }
 
 .schedule-cell--shift {
@@ -40,21 +132,93 @@
     gap: 0.25rem;
     border-left: 4px solid;
     justify-content: center;
+    min-width: 140px;
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: white;
 }
 
+/* 可編輯的班別名稱 */
 .shift-name {
     font-weight: 600;
     color: #1e293b;
 }
 
+.shift-name--editable {
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.shift-name--editable:hover {
+    background: #e2e8f0;
+}
+
+.shift-name-input {
+    font-weight: 600;
+    color: #1e293b;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    padding: 2px 6px;
+    font-size: inherit;
+    text-align: center;
+    width: 80px;
+    outline: none;
+}
+
+/* 可編輯的時間 */
 .shift-time {
     font-size: 0.75rem;
     color: #94a3b8;
 }
 
+.shift-time--editable {
+    cursor: pointer;
+    padding: 2px 4px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.shift-time--editable:hover {
+    background: #e2e8f0;
+}
+
+.shift-time-edit {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.shift-time-input {
+    width: 70px;
+    padding: 2px 4px;
+    border: 1px solid #3b82f6;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    outline: none;
+}
+
+.shift-time-done {
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* ===== 排班格子 ===== */
 .schedule-cell--slot {
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 100px;
 }
 
 .schedule-cell--slot:hover {
@@ -86,6 +250,10 @@
     font-size: 0.85rem;
     font-weight: 500;
     color: #1e293b;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 80px;
 }
 
 .remove-btn {
@@ -96,13 +264,14 @@
     padding: 2px 4px;
     font-size: 0.75rem;
     border-radius: 4px;
+    flex-shrink: 0;
 }
 
 .remove-btn:hover {
     background: #fecaca;
 }
 
-/* Modal */
+/* ===== Modal ===== */
 .modal-subtitle {
     color: #64748b;
     margin-bottom: 1rem;
@@ -147,14 +316,35 @@
     color: #94a3b8;
 }
 
-/* 響應式 */
-@media (max-width: 1024px) {
-    .schedule-grid {
-        min-width: 700px;
+/* ===== 響應式 ===== */
+@media (max-width: 768px) {
+    .view-range-selector {
+        flex-wrap: wrap;
     }
 
-    .schedule-header,
-    .schedule-row {
-        grid-template-columns: 100px repeat(7, 1fr);
+    .view-range-btn {
+        padding: 0.4rem 0.75rem;
+        font-size: 0.8rem;
+    }
+
+    .shift-controls-bar {
+        flex-direction: column;
+        gap: 0.75rem;
+        align-items: flex-start;
+    }
+
+    .schedule-cell--header,
+    .schedule-cell--slot {
+        min-width: 80px;
+        padding: 0.5rem;
+        font-size: 0.75rem;
+    }
+
+    .schedule-cell--shift {
+        min-width: 100px;
+    }
+
+    .volunteer-name {
+        max-width: 60px;
     }
 }

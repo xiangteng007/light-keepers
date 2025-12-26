@@ -64,44 +64,44 @@ export default function DashboardPage() {
     // 獲取事件統計
     const { data: eventStats, isLoading: eventsLoading } = useQuery({
         queryKey: ['eventStats'],
-        queryFn: () => getEventStats().then(res => res.data),
+        queryFn: () => getEventStats().then(res => res.data.data),
     });
 
     // 獲取任務統計
     const { data: taskStats, isLoading: tasksLoading } = useQuery({
         queryKey: ['taskStats'],
-        queryFn: () => getTaskStats().then(res => res.data),
+        queryFn: () => getTaskStats().then(res => res.data.data),
     });
 
     // 獲取最新事件
     const { data: eventsData } = useQuery({
         queryKey: ['recentEvents'],
-        queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data),
+        queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data.data),
     });
 
     // 獲取 NCDR 警報
     const { data: alertsData } = useQuery({
         queryKey: ['recentAlerts'],
-        queryFn: () => getNcdrAlerts({ limit: 5 }).then(res => res.data),
+        queryFn: () => getNcdrAlerts({ limit: 5 }).then(res => res.data.data),
         refetchInterval: 60000, // 每分鐘刷新
     });
 
     // 獲取志工統計 (真實 API)
     const { data: volunteerStats } = useQuery({
         queryKey: ['volunteerStats'],
-        queryFn: () => getVolunteerStats().then(res => res.data),
+        queryFn: () => getVolunteerStats().then(res => res.data.data),
     });
 
     // 獲取回報統計 (真實 API)
     const { data: reportStats } = useQuery({
         queryKey: ['reportStats'],
-        queryFn: () => getReportStats().then(res => res.data),
+        queryFn: () => getReportStats().then(res => res.data.data),
     });
 
     // 獲取物資統計 (真實 API)
     const { data: resourceStats } = useQuery({
         queryKey: ['resourceStats'],
-        queryFn: () => getResourceStats().then(res => res.data),
+        queryFn: () => getResourceStats().then(res => res.data.data),
     });
 
     // 計算完成率
@@ -137,7 +137,7 @@ export default function DashboardPage() {
                 />
                 <StatCard
                     icon="⚠️"
-                    value={alertsData?.data?.length || 0}
+                    value={alertsData?.length || 0}
                     label="NCDR 警報"
                     variant="warning"
                 />
@@ -182,7 +182,7 @@ export default function DashboardPage() {
                 {/* 最新 NCDR 警報 */}
                 <Card title="即時警報" icon="⚠️" padding="md">
                     <div className="alert-list">
-                        {alertsData?.data?.slice(0, 4).map((alert: any) => (
+                        {alertsData?.slice(0, 4).map((alert: any) => (
                             <div key={alert.id} className="alert-item">
                                 <Badge
                                     variant={alert.severity === 'extreme' ? 'danger' : alert.severity === 'severe' ? 'warning' : 'default'}
@@ -203,10 +203,10 @@ export default function DashboardPage() {
                 <Card title="最新事件" icon="📢" padding="md">
                     <div className="event-list">
                         {isLoading && <div className="loading">載入中...</div>}
-                        {!isLoading && eventsData?.data?.length === 0 && (
+                        {!isLoading && eventsData?.length === 0 && (
                             <div className="empty-state-mini">目前沒有進行中的事件</div>
                         )}
-                        {eventsData?.data?.slice(0, 4).map((event) => (
+                        {eventsData?.slice(0, 4).map((event) => (
                             <div
                                 key={event.id}
                                 className={`event-item priority-${event.severity && event.severity >= 4 ? 'high' : event.severity === 3 ? 'medium' : 'low'}`}
