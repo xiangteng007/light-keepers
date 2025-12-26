@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, type NcdrAlert, type Shelter, type AedLocation } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getReportsForMap, type NcdrAlert, type Shelter, type AedLocation, type Report } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -207,6 +207,13 @@ export default function MapPage() {
         queryFn: () => getEvents().then(res => res.data.data),
     });
 
+    // 獲取已確認的回報 (顯示為災情事件)
+    const { data: reportsData } = useQuery({
+        queryKey: ['confirmedReportsMap'],
+        queryFn: () => getReportsForMap().then(res => res.data),
+        enabled: showEvents,
+    });
+
     // 獲取 NCDR 警報 (有座標的)
     const { data: ncdrData } = useQuery({
         queryKey: ['ncdrAlertsMap'],
@@ -229,6 +236,7 @@ export default function MapPage() {
     });
 
     const events = eventsData || [];
+    const confirmedReports = reportsData || [];
     const ncdrAlerts = ncdrData || [];
     const shelters = publicResourcesData?.shelters || [];
     const aedLocations = publicResourcesData?.aed || [];
@@ -472,6 +480,31 @@ export default function MapPage() {
                                     title={event.title}
                                 />
                             ))}
+
+                            {/* 已確認回報標記 (顯示為災情事件) */}
+                            {showEvents && confirmedReports.filter((r: Report) => r.latitude && r.longitude).map((report: Report) => {
+                                const severityMap: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 };
+                                return (
+                                    <MarkerF
+                                        key={`report-${report.id}`}
+                                        position={{ lat: Number(report.latitude), lng: Number(report.longitude) }}
+                                        icon={createMarkerIcon(severityMap[report.severity] || 2)}
+                                        onClick={() => {
+                                            // 將報告轉換為事件格式顯示
+                                            const eventLike = {
+                                                ...report,
+                                                severity: severityMap[report.severity] || 2,
+                                                latitude: Number(report.latitude),
+                                                longitude: Number(report.longitude),
+                                            } as unknown as Event;
+                                            setInfoWindowEvent(eventLike);
+                                            setSelectedEvent(null);
+                                            setSelectedNcdrAlert(null);
+                                        }}
+                                        title={report.title}
+                                    />
+                                );
+                            })}
 
                             {/* NCDR 警報標記 - 按類型過濾 */}
                             {filteredNcdrAlerts.filter(a => a.latitude && a.longitude).map((alert) => (
