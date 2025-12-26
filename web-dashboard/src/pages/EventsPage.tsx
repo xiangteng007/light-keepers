@@ -114,7 +114,7 @@ export default function EventsPage() {
             title: taskForm.title,
             description: taskForm.description,
             priority: priorityMap[taskForm.priority] || 2,
-            status: 'pending',
+            dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
         });
     };
 
