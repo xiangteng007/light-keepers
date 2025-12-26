@@ -19,8 +19,7 @@ interface ShiftConfig {
 interface ScheduleSlot {
     date: string;
     shiftId: string;
-    volunteerId?: string;
-    volunteerName?: string;
+    volunteers: { id: string; name: string }[];
 }
 
 // 預設顏色池
@@ -105,6 +104,7 @@ export default function VolunteerSchedulePage() {
     const [shifts, setShifts] = useState<ShiftConfig[]>(() => calculateDefaultShifts(3));
     const [schedule, setSchedule] = useState<ScheduleSlot[]>([]);
     const [selectedSlot, setSelectedSlot] = useState<{ date: string; shiftId: string } | null>(null);
+    const [expandedSlot, setExpandedSlot] = useState<string | null>(null); // 展開的時段
     const [editingShift, setEditingShift] = useState<string | null>(null);
     const [editingTime, setEditingTime] = useState<string | null>(null);
 
@@ -119,26 +119,19 @@ export default function VolunteerSchedulePage() {
 
     // 初始化排班資料
     useEffect(() => {
-        if (volunteers.length > 0) {
+        if (volunteers.length > 0 && schedule.length === 0) {
             const initialSchedule: ScheduleSlot[] = [];
             dates.forEach(date => {
                 shifts.forEach(shift => {
-                    const existing = schedule.find(s => s.date === date && s.shiftId === shift.id);
-                    if (existing) {
-                        initialSchedule.push(existing);
-                    } else {
-                        const randomVolunteer = volunteers[Math.floor(Math.random() * volunteers.length)];
-                        if (Math.random() > 0.3) {
-                            initialSchedule.push({
-                                date,
-                                shiftId: shift.id,
-                                volunteerId: randomVolunteer.id,
-                                volunteerName: randomVolunteer.name,
-                            });
-                        } else {
-                            initialSchedule.push({ date, shiftId: shift.id });
-                        }
-                    }
+                    // 隨機指派 0-3 個志工
+                    const count = Math.floor(Math.random() * 4);
+                    const shuffled = [...volunteers].sort(() => Math.random() - 0.5);
+                    const assigned = shuffled.slice(0, count).map(v => ({ id: v.id, name: v.name }));
+                    initialSchedule.push({
+                        date,
+                        shiftId: shift.id,
+                        volunteers: assigned,
+                    });
                 });
             });
             setSchedule(initialSchedule);
@@ -150,26 +143,32 @@ export default function VolunteerSchedulePage() {
         return schedule.find(s => s.date === date && s.shiftId === shiftId);
     };
 
-    // 指派志工
+    // 指派志工（新增到列表）
     const assignVolunteer = (volunteer: Volunteer) => {
         if (!selectedSlot) return;
         setSchedule(prev => prev.map(slot => {
             if (slot.date === selectedSlot.date && slot.shiftId === selectedSlot.shiftId) {
-                return { ...slot, volunteerId: volunteer.id, volunteerName: volunteer.name };
+                // 檢查是否已指派
+                if (slot.volunteers.some(v => v.id === volunteer.id)) return slot;
+                return { ...slot, volunteers: [...slot.volunteers, { id: volunteer.id, name: volunteer.name }] };
             }
             return slot;
         }));
-        setSelectedSlot(null);
     };
 
-    // 移除排班
-    const unassignVolunteer = (date: string, shiftId: string) => {
+    // 移除單一志工
+    const removeVolunteerFromSlot = (date: string, shiftId: string, volunteerId: string) => {
         setSchedule(prev => prev.map(slot => {
             if (slot.date === date && slot.shiftId === shiftId) {
-                return { ...slot, volunteerId: undefined, volunteerName: undefined };
+                return { ...slot, volunteers: slot.volunteers.filter(v => v.id !== volunteerId) };
             }
             return slot;
         }));
+    };
+
+    // 切換展開狀態
+    const toggleExpand = (slotKey: string) => {
+        setExpandedSlot(prev => prev === slotKey ? null : slotKey);
     };
 
     // 新增班別
@@ -347,27 +346,78 @@ export default function VolunteerSchedulePage() {
 
                             {dates.map(date => {
                                 const slot = getSlotSchedule(date, shift.id);
+                                const slotKey = `${date}-${shift.id}`;
+                                const isExpanded = expandedSlot === slotKey;
+                                const volunteerCount = slot?.volunteers.length || 0;
+
                                 return (
                                     <div
-                                        key={`${date}-${shift.id}`}
-                                        className={`schedule-cell schedule-cell--slot ${slot?.volunteerId ? 'has-volunteer' : 'empty'}`}
-                                        onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
+                                        key={slotKey}
+                                        className={`schedule-cell schedule-cell--slot ${volunteerCount > 0 ? 'has-volunteer' : 'empty'}`}
                                     >
-                                        {slot?.volunteerName ? (
+                                        {volunteerCount === 0 ? (
+                                            <span
+                                                className="empty-slot"
+                                                onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
+                                            >
+                                                + 指派
+                                            </span>
+                                        ) : volunteerCount === 1 ? (
                                             <div className="slot-content">
-                                                <span className="volunteer-name">{slot.volunteerName}</span>
+                                                <span
+                                                    className="volunteer-name"
+                                                    onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
+                                                >
+                                                    {slot!.volunteers[0].name}
+                                                </span>
                                                 <button
                                                     className="remove-btn"
                                                     onClick={(e) => {
                                                         e.stopPropagation();
-                                                        unassignVolunteer(date, shift.id);
+                                                        removeVolunteerFromSlot(date, shift.id, slot!.volunteers[0].id);
                                                     }}
                                                 >
                                                     ✕
                                                 </button>
                                             </div>
                                         ) : (
-                                            <span className="empty-slot">+ 指派</span>
+                                            <div className="slot-multi">
+                                                <div
+                                                    className="slot-multi__header"
+                                                    onClick={() => toggleExpand(slotKey)}
+                                                >
+                                                    <span className="slot-multi__count">
+                                                        👥 {volunteerCount} 人
+                                                    </span>
+                                                    <span className="slot-multi__toggle">
+                                                        {isExpanded ? '▼' : '▶'}
+                                                    </span>
+                                                </div>
+                                                {isExpanded && (
+                                                    <div className="slot-multi__list">
+                                                        {slot!.volunteers.map(v => (
+                                                            <div key={v.id} className="slot-multi__item">
+                                                                <span>{v.name}</span>
+                                                                <button
+                                                                    className="remove-btn-sm"
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        removeVolunteerFromSlot(date, shift.id, v.id);
+                                                                    }}
+                                                                >
+                                                                    ✕
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                        <button
+                                                            className="slot-multi__add"
+                                                            onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
+                                                        >
+                                                            + 新增
+                                                        </button>
+                                                    </div>
+                                                )}
+                                            </div>
                                         )}
                                     </div>
                                 );
