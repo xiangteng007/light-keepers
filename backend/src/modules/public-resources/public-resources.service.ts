@@ -118,19 +118,26 @@ export class PublicResourcesService {
                 skipEmptyLines: true,
             });
 
-            this.aedCache = (parsed.data as any[]).map((r: any, index: number) => ({
-                id: `aed-${index}`,
-                name: r['場所名稱'] || r['name'] || '未命名',
-                address: r['地址'] || r['address'] || '',
-                city: r['縣市'] || r['city'] || '',
-                district: r['鄉鎮市區'] || r['district'] || '',
-                latitude: parseFloat(r['緯度'] || r['lat'] || 0),
-                longitude: parseFloat(r['經度'] || r['lng'] || 0),
-                placeName: r['放置地點'] || r['place'] || '',
-                floor: r['樓層'] || '',
-                openHours: r['開放時間'] || '',
-                phone: r['聯絡電話'] || '',
-            })).filter((a: AedLocation) => a.latitude && a.longitude);
+            // MOHW CSV 欄位對應：
+            // 場所名稱, 場所縣市, 場所區域, 場所地址, AED放置地點, 地點LAT, 地點LNG, 開放時間緊急連絡電話
+            this.aedCache = (parsed.data as any[]).map((r: any, index: number) => {
+                const lat = parseFloat(r['地點LAT'] || r['緯度'] || 0);
+                const lng = parseFloat(r['地點LNG'] || r['經度'] || 0);
+
+                return {
+                    id: `aed-${r['AEDID'] || index}`,
+                    name: r['場所名稱'] || r['name'] || '未命名',
+                    address: r['場所地址'] || r['地址'] || '',
+                    city: r['場所縣市'] || r['縣市'] || '',
+                    district: r['場所區域'] || r['鄉鎮市區'] || '',
+                    latitude: lat,
+                    longitude: lng,
+                    placeName: r['AED放置地點'] || r['放置地點'] || '',
+                    floor: r['AED地點描述'] || r['樓層'] || '',
+                    openHours: this.formatAedOpenHours(r),
+                    phone: r['開放時間緊急連絡電話'] || r['聯絡電話'] || '',
+                };
+            }).filter((a: AedLocation) => a.latitude && a.longitude && a.latitude !== 0 && a.longitude !== 0);
 
             this.aedCacheTime = new Date();
             this.logger.log(`Loaded ${this.aedCache.length} AED locations`);
@@ -139,6 +146,37 @@ export class PublicResourcesService {
             this.logger.error(`Failed to fetch AED locations: ${error.message}`);
             return this.getStaticAedLocations();
         }
+    }
+
+    /**
+     * 格式化 AED 開放時間
+     */
+    private formatAedOpenHours(row: any): string {
+        const weekdayStart = row['周一至周五起'];
+        const weekdayEnd = row['周一至周五迄'];
+        const satStart = row['周六起'];
+        const satEnd = row['周六迄'];
+        const sunStart = row['周日起'];
+        const sunEnd = row['周日迄'];
+        const notes = row['開放使用時間備註'];
+
+        const parts: string[] = [];
+
+        if (weekdayStart && weekdayEnd && weekdayStart !== weekdayEnd) {
+            parts.push(`週一至週五 ${weekdayStart.substring(0, 5)}-${weekdayEnd.substring(0, 5)}`);
+        }
+        if (satStart && satEnd && satStart !== satEnd) {
+            parts.push(`週六 ${satStart.substring(0, 5)}-${satEnd.substring(0, 5)}`);
+        }
+        if (sunStart && sunEnd && sunStart !== sunEnd) {
+            parts.push(`週日 ${sunStart.substring(0, 5)}-${sunEnd.substring(0, 5)}`);
+        }
+
+        if (parts.length === 0 && notes) {
+            return notes;
+        }
+
+        return parts.length > 0 ? parts.join(', ') + (notes ? ` (${notes})` : '') : '';
     }
 
     /**
