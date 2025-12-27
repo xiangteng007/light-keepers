@@ -1934,14 +1934,15 @@ button[aria-label="地圖相機控制"],
 }
 
 .sidebar-tab--active {
-  background: var(--accent-primary);
-  color: var(--brown-900);
+  background: rgba(128, 128, 128, 0.3);
+  /* 30% gray */
+  color: var(--text-primary);
   font-weight: 600;
 }
 
 .sidebar-tab--active:hover {
-  background: var(--accent-primary);
-  color: var(--brown-900);
+  background: rgba(128, 128, 128, 0.4);
+  color: var(--text-primary);
 }
 
 .sidebar-tab__count {
