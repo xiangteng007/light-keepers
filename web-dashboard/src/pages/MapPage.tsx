@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getReportsForMap, type NcdrAlert, type Shelter, type AedLocation, type Report } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, type NcdrAlert, type Shelter, type AedLocation, type Report } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -12,6 +12,7 @@ const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
 // 台灣中心座標
 const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
 const DEFAULT_ZOOM = 7;
+const AED_MIN_ZOOM = 18; // AED 最低顯示縮放等級 (約 20m 比例尺)
 const EVENT_ZOOM_LEVEL = 16;
 
 // NCDR 核心示警類型定義（含圖標與顏色）
@@ -189,6 +190,9 @@ export default function MapPage() {
     const [ncdrSidebarTypeFilter, setNcdrSidebarTypeFilter] = useState<string>('all');
     const [ncdrSidebarSeverityFilter, setNcdrSidebarSeverityFilter] = useState<string>('all');
 
+    // 當前縮放等級追蹤 (用於 AED 顯示判斷)
+    const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
+
     // 定位當前位置狀態
     const [isLocating, setIsLocating] = useState(false);
     const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
@@ -222,25 +226,37 @@ export default function MapPage() {
         enabled: showNcdrAlerts,
     });
 
-    // 獲取公共資源（避難所/AED）
-    const { data: publicResourcesData } = useQuery({
-        queryKey: ['publicResourcesMap', showShelters, showAed],
+    // 獲取避難所資源
+    const { data: sheltersData } = useQuery({
+        queryKey: ['sheltersMap'],
         queryFn: async () => {
-            const types: ('shelters' | 'aed')[] = [];
-            if (showShelters) types.push('shelters');
-            if (showAed) types.push('aed');
-            const res = await getPublicResourcesForMap(types);
-            return res.data;
+            const res = await getPublicResourcesForMap(['shelters']);
+            return res.data.shelters || [];
         },
-        enabled: showShelters || showAed,
+        enabled: showShelters,
         staleTime: 1000 * 60 * 30, // 30 分鐘快取
+    });
+
+    // 獲取附近 AED（僅在高縮放等級時，基於地圖中心查詢）
+    const { data: nearbyAedData } = useQuery({
+        queryKey: ['nearbyAed', mapCenter.lat, mapCenter.lng, currentZoom >= AED_MIN_ZOOM],
+        queryFn: async () => {
+            if (currentZoom < AED_MIN_ZOOM) return [];
+            const res = await getNearbyAed(mapCenter.lat, mapCenter.lng, 2); // 2km 半徑
+            return res.data.data || [];
+        },
+        enabled: showAed && currentZoom >= AED_MIN_ZOOM,
+        staleTime: 1000 * 60 * 5, // 5 分鐘快取
     });
 
     const events = Array.isArray(eventsData) ? eventsData : [];
     const confirmedReports = Array.isArray(reportsData) ? reportsData : [];
     const ncdrAlerts = Array.isArray(ncdrData) ? ncdrData : [];
-    const shelters = Array.isArray(publicResourcesData?.shelters) ? publicResourcesData.shelters : [];
-    const aedLocations = Array.isArray(publicResourcesData?.aed) ? publicResourcesData.aed : [];
+    const shelters = Array.isArray(sheltersData) ? sheltersData : [];
+    const aedLocations = Array.isArray(nearbyAedData) ? nearbyAedData : [];
+
+    // 計算是否應顯示 AED (縮放夠高)
+    const shouldShowAed = showAed && currentZoom >= AED_MIN_ZOOM;
 
     // 根據類型過濾 NCDR 警報 (地圖用)
     const filteredNcdrAlerts = useMemo(() => {
@@ -319,6 +335,25 @@ export default function MapPage() {
         // 點擊地圖空白處關閉 InfoWindow
         setInfoWindowEvent(null);
     }, []);
+
+    // 地圖閒置時更新縮放等級和中心點（用於 AED 查詢）
+    const onMapIdle = useCallback(() => {
+        if (mapRef.current) {
+            const zoom = mapRef.current.getZoom();
+            const center = mapRef.current.getCenter();
+            if (zoom !== undefined && zoom !== currentZoom) {
+                setCurrentZoom(zoom);
+            }
+            if (center) {
+                const newCenter = { lat: center.lat(), lng: center.lng() };
+                // 只在中心點變化較大時更新（避免頻繁查詢）
+                const dist = Math.abs(newCenter.lat - mapCenter.lat) + Math.abs(newCenter.lng - mapCenter.lng);
+                if (dist > 0.01) { // 約 1km 變化
+                    setMapCenter(newCenter);
+                }
+            }
+        }
+    }, [currentZoom, mapCenter]);
 
     // 定位當前位置
     const handleLocateMe = useCallback(() => {
@@ -420,13 +455,13 @@ export default function MapPage() {
                             />
                             <span>🏠 避難所</span>
                         </label>
-                        <label className="header-layer-toggle">
+                        <label className="header-layer-toggle" title="需放大至 20m 比例尺才會顯示">
                             <input
                                 type="checkbox"
                                 checked={showAed}
                                 onChange={(e) => setShowAed(e.target.checked)}
                             />
-                            <span>❤️ AED</span>
+                            <span>❤️ AED {showAed && currentZoom < AED_MIN_ZOOM && '(請放大)'}</span>
                         </label>
                     </div>
                 </div>
@@ -462,6 +497,7 @@ export default function MapPage() {
                             zoom={mapZoom}
                             onLoad={onMapLoad}
                             onClick={onMapClick}
+                            onIdle={onMapIdle}
                             options={{
                                 ...mapOptions,
                                 mapTypeId: MAP_TYPES[mapType].id,
@@ -539,8 +575,8 @@ export default function MapPage() {
                                 />
                             ))}
 
-                            {/* AED 位置標記 */}
-                            {showAed && aedLocations.map((aed) => (
+                            {/* AED 位置標記 - 僅在縮放 ≥ 18 時顯示 */}
+                            {shouldShowAed && aedLocations.map((aed) => (
                                 <MarkerF
                                     key={aed.id}
                                     position={{ lat: aed.latitude, lng: aed.longitude }}
