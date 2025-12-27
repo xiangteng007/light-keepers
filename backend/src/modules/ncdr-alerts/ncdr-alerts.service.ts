@@ -579,7 +579,7 @@ export class NcdrAlertsService {
                     // 建立警報記錄
                     const alert: Partial<NcdrAlert> = {
                         alertId,
-                        alertTypeId: 33, // 地震
+                        alertTypeId: 6, // 地震 (NCDR AlertType ID)
                         alertTypeName: '地震',
                         title: `${location} 發生規模 ${magValue} 地震`,
                         description: reportContent || `震央位於 ${location}，震源深度 ${depth} 公里，地震規模 ${magValue}`,
