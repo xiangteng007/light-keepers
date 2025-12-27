@@ -410,8 +410,8 @@ export class NcdrAlertsService {
                 sourceUnit: typeInfo?.sourceUnit || '未知',
                 publishedAt: new Date(updated),
                 sourceLink: String(link).substring(0, 1000),
-                latitude,
-                longitude,
+                latitude: latitude ?? undefined,
+                longitude: longitude ?? undefined,
                 isActive: true,
             };
         } catch (error) {
