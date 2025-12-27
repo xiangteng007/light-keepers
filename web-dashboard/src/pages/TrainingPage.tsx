@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Badge } from '../design-system';
+import { Card, Button, Badge, Modal, InputField } from '../design-system';
 import { getScrapedCourses, triggerScrape } from '../api/services';
 import type { ScrapedCourse } from '../api/services';
+import { useAuth } from '../context/AuthContext';
+import { Plus } from 'lucide-react';
 import './TrainingPage.css';
 
 // 🏷️ 爬取課程分類
@@ -18,7 +20,7 @@ const SCRAPED_CATEGORY_CONFIG = {
 };
 
 // 內部課程分類
-const CATEGORY_CONFIG = {
+const INTERNAL_CATEGORY_CONFIG = {
     disaster_basics: { label: '災害基礎', icon: '📚', color: '#2196F3' },
     first_aid: { label: '急救技能', icon: '🏥', color: '#4CAF50' },
     rescue: { label: '搜救技術', icon: '🚒', color: '#FF5722' },
@@ -33,29 +35,41 @@ const LEVEL_CONFIG = {
     advanced: { label: '高級', color: '#F44336' },
 };
 
-// 模擬內部課程 (未來可改為真實 API)
-const MOCK_COURSES = [
-    { id: '1', title: '地震應變基礎', category: 'disaster_basics', level: 'beginner', durationMinutes: 30, isRequired: true, description: '學習地震發生時的基本應變措施' },
-    { id: '2', title: '急救技能入門', category: 'first_aid', level: 'beginner', durationMinutes: 45, isRequired: true, description: 'CPR、止血、包紮等基本急救技能' },
-    { id: '3', title: '搜救裝備操作', category: 'rescue', level: 'intermediate', durationMinutes: 60, isRequired: false, description: '搜救裝備的正確使用方式' },
-    { id: '4', title: '物資管理實務', category: 'logistics', level: 'beginner', durationMinutes: 40, isRequired: false, description: '物資點收、存放、發放流程' },
-];
-
-// 模擬進度
-const MOCK_PROGRESS: Record<string, { status: string; progress: number }> = {
-    '1': { status: 'completed', progress: 100 },
-    '2': { status: 'in_progress', progress: 60 },
-};
+// 內部課程類型
+interface InternalCourse {
+    id: string;
+    title: string;
+    category: string;
+    level: string;
+    durationMinutes: number;
+    isRequired: boolean;
+    description: string;
+    externalUrl?: string;
+}
 
 export default function TrainingPage() {
-    const [activeTab, setActiveTab] = useState<'internal' | 'external'>('external');
-    const [selectedCategory, setSelectedCategory] = useState<string>('');
+    const { user } = useAuth();
+    const userLevel = user?.roleLevel ?? 1;
+    const canManageCourses = userLevel >= 3; // 常務理事及以上
+
+    const [activeTab, setActiveTab] = useState<'external' | 'internal'>('external');
     const [scrapedCategory, setScrapedCategory] = useState<string>('all');
-    const [showCourseDetail, setShowCourseDetail] = useState<string | null>(null);
     const [scrapedCourses, setScrapedCourses] = useState<ScrapedCourse[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [isLoadingCourses, setIsLoadingCourses] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // 新增課程 Modal 狀態
+    const [showAddCourseModal, setShowAddCourseModal] = useState(false);
+    const [newCourse, setNewCourse] = useState<Partial<InternalCourse>>({
+        category: 'disaster_basics',
+        level: 'beginner',
+        isRequired: false,
+        durationMinutes: 30,
+    });
+
+    // 內部課程列表 (未來從 API 載入)
+    const [internalCourses] = useState<InternalCourse[]>([]);
 
     // 載入爬取的課程
     useEffect(() => {
@@ -77,29 +91,14 @@ export default function TrainingPage() {
 
     // 統計
     const stats = {
-        total: MOCK_COURSES.length,
+        internal: internalCourses.length,
         external: scrapedCourses.length,
-        completed: Object.values(MOCK_PROGRESS).filter(p => p.status === 'completed').length,
-        inProgress: Object.values(MOCK_PROGRESS).filter(p => p.status === 'in_progress').length,
     };
-
-    // 篩選內部課程
-    const filteredCourses = selectedCategory
-        ? MOCK_COURSES.filter(c => c.category === selectedCategory)
-        : MOCK_COURSES;
 
     // 篩選外部課程
     const filteredScrapedCourses = scrapedCategory === 'all'
         ? scrapedCourses
         : scrapedCourses.filter(c => c.category === scrapedCategory);
-
-    const getCourseProgress = (courseId: string) => {
-        return MOCK_PROGRESS[courseId] || { status: 'not_started', progress: 0 };
-    };
-
-    const selectedCourse = showCourseDetail
-        ? MOCK_COURSES.find(c => c.id === showCourseDetail)
-        : null;
 
     // 手動觸發爬取 (連接後端 API)
     const handleRefreshCourses = async () => {
@@ -119,6 +118,23 @@ export default function TrainingPage() {
         }
     };
 
+    // 新增課程處理
+    const handleAddCourse = async () => {
+        if (!newCourse.title) {
+            alert('請輸入課程標題');
+            return;
+        }
+        // TODO: 連接後端 API 新增課程
+        console.log('New course:', newCourse);
+        alert('📚 課程功能開發中，敬請期待！');
+        setShowAddCourseModal(false);
+        setNewCourse({
+            category: 'disaster_basics',
+            level: 'beginner',
+            isRequired: false,
+            durationMinutes: 30,
+        });
+    };
 
     return (
         <div className="page training-page">
@@ -128,6 +144,14 @@ export default function TrainingPage() {
                     <p className="page-subtitle">線上課程與外部培訓資源</p>
                 </div>
                 <div className="page-header__right">
+                    {canManageCourses && (
+                        <Button
+                            variant="primary"
+                            onClick={() => setShowAddCourseModal(true)}
+                        >
+                            <Plus size={18} /> 新增課程
+                        </Button>
+                    )}
                     <Button
                         variant="secondary"
                         onClick={handleRefreshCourses}
@@ -141,20 +165,12 @@ export default function TrainingPage() {
             {/* 統計卡片 */}
             <div className="training-stats">
                 <Card className="stat-card" padding="md">
-                    <div className="stat-card__value">{stats.total}</div>
+                    <div className="stat-card__value">{stats.internal}</div>
                     <div className="stat-card__label">內部課程</div>
                 </Card>
                 <Card className="stat-card stat-card--info" padding="md">
                     <div className="stat-card__value">{stats.external}</div>
                     <div className="stat-card__label">外部課程</div>
-                </Card>
-                <Card className="stat-card stat-card--success" padding="md">
-                    <div className="stat-card__value">{stats.completed}</div>
-                    <div className="stat-card__label">已完成</div>
-                </Card>
-                <Card className="stat-card stat-card--warning" padding="md">
-                    <div className="stat-card__value">{stats.inProgress}</div>
-                    <div className="stat-card__label">進行中</div>
                 </Card>
             </div>
 
@@ -254,106 +270,147 @@ export default function TrainingPage() {
 
             {/* ====== 內部課程區塊 ====== */}
             {activeTab === 'internal' && (
-                <>
-                    {/* 分類篩選 */}
-                    <div className="training-categories">
-                        <button
-                            className={`category-btn ${selectedCategory === '' ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory('')}
-                        >
-                            全部
-                        </button>
-                        {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                            <button
-                                key={key}
-                                className={`category-btn ${selectedCategory === key ? 'active' : ''}`}
-                                onClick={() => setSelectedCategory(key)}
-                            >
-                                {config.icon} {config.label}
-                            </button>
-                        ))}
-                    </div>
+                <div className="internal-courses-section">
+                    {internalCourses.length === 0 ? (
+                        <div className="empty-state empty-state--large">
+                            <span className="empty-icon">📚</span>
+                            <h3>內部課程籌備中</h3>
+                            <p>我們正在努力準備內部培訓課程，敬請期待！</p>
+                            {canManageCourses && (
+                                <Button
+                                    variant="primary"
+                                    onClick={() => setShowAddCourseModal(true)}
+                                    style={{ marginTop: '1rem' }}
+                                >
+                                    <Plus size={18} /> 新增第一堂課程
+                                </Button>
+                            )}
+                        </div>
+                    ) : (
+                        <div className="courses-grid">
+                            {internalCourses.map(course => {
+                                const category = INTERNAL_CATEGORY_CONFIG[course.category as keyof typeof INTERNAL_CATEGORY_CONFIG];
+                                const level = LEVEL_CONFIG[course.level as keyof typeof LEVEL_CONFIG];
 
-                    {/* 課程列表 */}
-                    <div className="courses-grid">
-                        {filteredCourses.map(course => {
-                            const progress = getCourseProgress(course.id);
-                            const category = CATEGORY_CONFIG[course.category as keyof typeof CATEGORY_CONFIG];
-                            const level = LEVEL_CONFIG[course.level as keyof typeof LEVEL_CONFIG];
-
-                            return (
-                                <Card key={course.id} className="course-card" padding="md">
-                                    <div className="course-card__header">
-                                        <span className="course-card__icon" style={{ background: category.color }}>
-                                            {category.icon}
-                                        </span>
-                                        {course.isRequired && (
-                                            <Badge variant="danger" size="sm">必修</Badge>
-                                        )}
-                                    </div>
-
-                                    <h4 className="course-card__title">{course.title}</h4>
-                                    <p className="course-card__desc">{course.description}</p>
-
-                                    <div className="course-card__meta">
-                                        <span style={{ color: level.color }}>{level.label}</span>
-                                        <span>⏱️ {course.durationMinutes} 分鐘</span>
-                                    </div>
-
-                                    {/* 進度條 */}
-                                    <div className="progress-bar">
-                                        <div
-                                            className="progress-bar__fill"
-                                            style={{
-                                                width: `${progress.progress}%`,
-                                                background: progress.status === 'completed' ? '#4CAF50' : '#2196F3',
-                                            }}
-                                        />
-                                    </div>
-
-                                    <div className="course-card__actions">
-                                        <span className="progress-text">
-                                            {progress.status === 'completed' ? '✅ 已完成' :
-                                                progress.status === 'in_progress' ? `${progress.progress}%` : '未開始'}
-                                        </span>
-                                        <Button
-                                            size="sm"
-                                            variant={progress.status === 'completed' ? 'secondary' : 'primary'}
-                                            onClick={() => setShowCourseDetail(course.id)}
-                                        >
-                                            {progress.status === 'completed' ? '複習' :
-                                                progress.status === 'in_progress' ? '繼續' : '開始'}
-                                        </Button>
-                                    </div>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                </>
+                                return (
+                                    <Card key={course.id} className="course-card" padding="md">
+                                        <div className="course-card__header">
+                                            <span className="course-card__icon" style={{ background: category?.color }}>
+                                                {category?.icon}
+                                            </span>
+                                            {course.isRequired && (
+                                                <Badge variant="danger" size="sm">必修</Badge>
+                                            )}
+                                        </div>
+                                        <h4 className="course-card__title">{course.title}</h4>
+                                        <p className="course-card__desc">{course.description}</p>
+                                        <div className="course-card__meta">
+                                            <span style={{ color: level?.color }}>{level?.label}</span>
+                                            <span>⏱️ {course.durationMinutes} 分鐘</span>
+                                        </div>
+                                        <div className="course-card__actions">
+                                            <Button
+                                                size="sm"
+                                                onClick={() => course.externalUrl && window.open(course.externalUrl, '_blank')}
+                                            >
+                                                開始學習
+                                            </Button>
+                                        </div>
+                                    </Card>
+                                );
+                            })}
+                        </div>
+                    )}
+                </div>
             )}
 
-            {/* 課程詳情 Modal */}
-            {selectedCourse && (
-                <div className="modal-overlay" onClick={() => setShowCourseDetail(null)}>
-                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>{selectedCourse.title}</h3>
-                        <p className="modal-desc">{selectedCourse.description}</p>
+            {/* 新增課程 Modal */}
+            {showAddCourseModal && (
+                <Modal
+                    isOpen={showAddCourseModal}
+                    onClose={() => setShowAddCourseModal(false)}
+                    title="新增內部課程"
+                >
+                    <div className="add-course-form">
+                        <InputField
+                            label="課程標題"
+                            value={newCourse.title || ''}
+                            onChange={(e) => setNewCourse(prev => ({ ...prev, title: e.target.value }))}
+                            placeholder="輸入課程名稱"
+                        />
 
-                        <div className="course-content">
-                            <h4>課程內容</h4>
-                            <p>課程內容載入中... (實際整合後從 API 載入)</p>
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>分類</label>
+                                <select
+                                    value={newCourse.category}
+                                    onChange={(e) => setNewCourse(prev => ({ ...prev, category: e.target.value }))}
+                                >
+                                    {Object.entries(INTERNAL_CATEGORY_CONFIG).map(([key, config]) => (
+                                        <option key={key} value={key}>{config.icon} {config.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="form-group">
+                                <label>難度</label>
+                                <select
+                                    value={newCourse.level}
+                                    onChange={(e) => setNewCourse(prev => ({ ...prev, level: e.target.value }))}
+                                >
+                                    {Object.entries(LEVEL_CONFIG).map(([key, config]) => (
+                                        <option key={key} value={key}>{config.label}</option>
+                                    ))}
+                                </select>
+                            </div>
                         </div>
+
+                        <div className="form-row">
+                            <div className="form-group">
+                                <label>時長 (分鐘)</label>
+                                <input
+                                    type="number"
+                                    value={newCourse.durationMinutes}
+                                    onChange={(e) => setNewCourse(prev => ({ ...prev, durationMinutes: parseInt(e.target.value) || 30 }))}
+                                    min={5}
+                                    max={480}
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="checkbox-label">
+                                    <input
+                                        type="checkbox"
+                                        checked={newCourse.isRequired}
+                                        onChange={(e) => setNewCourse(prev => ({ ...prev, isRequired: e.target.checked }))}
+                                    />
+                                    必修課程
+                                </label>
+                            </div>
+                        </div>
+
+                        <InputField
+                            label="課程描述"
+                            value={newCourse.description || ''}
+                            onChange={(e) => setNewCourse(prev => ({ ...prev, description: e.target.value }))}
+                            placeholder="簡短描述課程內容"
+                        />
+
+                        <InputField
+                            label="外部連結 (選填)"
+                            value={newCourse.externalUrl || ''}
+                            onChange={(e) => setNewCourse(prev => ({ ...prev, externalUrl: e.target.value }))}
+                            placeholder="https://..."
+                        />
 
                         <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => setShowCourseDetail(null)}>
-                                關閉
+                            <Button variant="secondary" onClick={() => setShowAddCourseModal(false)}>
+                                取消
                             </Button>
-                            <Button>
-                                ▶️ 開始學習
+                            <Button variant="primary" onClick={handleAddCourse}>
+                                新增課程
                             </Button>
                         </div>
-                    </Card>
-                </div>
+                    </div>
+                </Modal>
             )}
         </div>
     );
