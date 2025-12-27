@@ -121,7 +121,8 @@ export class NcdrAlertsService {
 
             const feed = result.feed;
             if (!feed || !feed.entry) {
-                this.logger.warn(`AlertType ${alertTypeId}: No entries in feed (response length: ${response.data?.length || 0}, has feed: ${!!feed})`);
+                const preview = String(response.data).substring(0, 200);
+                this.logger.warn(`AlertType ${alertTypeId}: No entries in feed (len: ${response.data?.length || 0}, has feed: ${!!feed}, preview: ${preview})`);
                 return [];
             }
 
