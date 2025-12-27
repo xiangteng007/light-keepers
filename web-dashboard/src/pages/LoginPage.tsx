@@ -323,6 +323,7 @@ export default function LoginPage() {
                                 type="email"
                                 id="email"
                                 name="email"
+                                autoComplete="email"
                                 placeholder="請輸入電子郵件"
                                 value={formData.email}
                                 onChange={handleChange}
@@ -362,6 +363,7 @@ export default function LoginPage() {
                             type="password"
                             id="password"
                             name="password"
+                            autoComplete="current-password"
                             placeholder="請輸入密碼"
                             value={formData.password}
                             onChange={handleChange}
