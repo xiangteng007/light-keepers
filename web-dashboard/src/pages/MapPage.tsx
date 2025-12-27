@@ -12,7 +12,7 @@ const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
 // 台灣中心座標
 const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
 const DEFAULT_ZOOM = 7;
-const AED_MIN_ZOOM = 18; // AED 最低顯示縮放等級 (約 20m 比例尺)
+const AED_MIN_ZOOM = 16; // AED 最低顯示縮放等級 (約 100m 比例尺)
 const EVENT_ZOOM_LEVEL = 16;
 
 // NCDR 核心示警類型定義（含圖標與顏色）
@@ -455,7 +455,7 @@ export default function MapPage() {
                             />
                             <span>🏠 避難所</span>
                         </label>
-                        <label className="header-layer-toggle" title="需放大至 20m 比例尺才會顯示">
+                        <label className="header-layer-toggle" title="需放大至 100m 比例尺才會顯示">
                             <input
                                 type="checkbox"
                                 checked={showAed}
