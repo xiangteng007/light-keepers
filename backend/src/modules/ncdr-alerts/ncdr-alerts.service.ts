@@ -21,8 +21,10 @@ import {
 import { LineBotService } from '../line-bot/line-bot.service';
 
 // NCDR API 端點
+// 注意：使用單數 RssAtomFeed.ashx 才能按 AlertType 過濾
+// 複數 RssAtomFeeds.ashx 會忽略 AlertType 參數返回所有活動警報
 const NCDR_BASE_URL = 'https://alerts.ncdr.nat.gov.tw';
-const NCDR_ATOM_FEED = `${NCDR_BASE_URL}/RssAtomFeeds.ashx`;
+const NCDR_ATOM_FEED = `${NCDR_BASE_URL}/RssAtomFeed.ashx`;
 
 // CWA (中央氣象署) OpenData API
 const CWA_BASE_URL = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore';
