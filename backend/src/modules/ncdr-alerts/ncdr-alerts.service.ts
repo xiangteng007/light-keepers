@@ -900,4 +900,14 @@ export class NcdrAlertsService {
         this.logger.log(`Coordinate update completed: ${updated} updated, ${skipped} skipped, ${errors} errors`);
         return { updated, errors, skipped };
     }
+
+    /**
+     * 清除所有 NCDR 警報（用於重置資料）
+     */
+    async clearAllAlerts(): Promise<{ deleted: number }> {
+        const result = await this.ncdrAlertRepository.delete({});
+        this.lastSyncTime = null;
+        this.logger.log(`Cleared all NCDR alerts: ${result.affected} deleted`);
+        return { deleted: result.affected || 0 };
+    }
 }

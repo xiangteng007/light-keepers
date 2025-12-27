@@ -132,4 +132,18 @@ export class NcdrAlertsController {
             ...result,
         };
     }
+
+    /**
+     * 清除所有 NCDR 警報資料（用於重置）
+     * DELETE /ncdr-alerts/clear-all
+     */
+    @Post('clear-all')
+    @HttpCode(HttpStatus.OK)
+    async clearAll() {
+        const result = await this.ncdrAlertsService.clearAllAlerts();
+        return {
+            message: 'All NCDR alerts cleared',
+            ...result,
+        };
+    }
 }
