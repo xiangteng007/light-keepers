@@ -1934,15 +1934,17 @@ button[aria-label="地圖相機控制"],
 }
 
 .sidebar-tab--active {
-  background: rgba(128, 128, 128, 0.3);
-  /* 30% gray */
-  color: var(--text-primary);
+  background: #2d3748;
+  /* 深色背景 */
+  color: #ffffff;
+  /* 白色文字 */
   font-weight: 600;
 }
 
 .sidebar-tab--active:hover {
-  background: rgba(128, 128, 128, 0.4);
-  color: var(--text-primary);
+  background: #1a202c;
+  /* 更深的 hover 背景 */
+  color: #ffffff;
 }
 
 .sidebar-tab__count {
