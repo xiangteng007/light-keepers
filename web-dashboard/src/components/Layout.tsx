@@ -60,7 +60,7 @@ const defaultNavItems: NavItem[] = [
     { id: 'dashboard', path: '/dashboard', label: '儀表板', icon: LayoutDashboard, requiredLevel: 1 },
     { id: 'analytics', path: '/analytics', label: '數據分析', icon: BarChart3, requiredLevel: 3 },
     { id: 'ncdr-alerts', path: '/ncdr-alerts', label: '災害示警', icon: AlertTriangle, requiredLevel: 0 },
-    { id: 'events', path: '/events', label: '災情事件', icon: Siren, requiredLevel: 1 },
+    { id: 'events', path: '/events', label: '災害回報', icon: Siren, requiredLevel: 1 },
     { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList, requiredLevel: 2 },
     { id: 'map', path: '/map', label: '地圖總覽', icon: Map, requiredLevel: 0 },
     { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen, requiredLevel: 0 },

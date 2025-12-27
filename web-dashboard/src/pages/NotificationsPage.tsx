@@ -2,16 +2,20 @@ import { useState } from 'react';
 import { Card, Button, Badge } from '../design-system';
 import { useAuth } from '../context/AuthContext';
 
-// LINE Bot 官方帳號連結
-const LINE_BOT_URL = 'https://line.me/R/ti/p/@lightkeepers';
+// LINE Bot 官方帳號連結 (曦望燈塔)
+// Basic ID 來自 LINE Developers Console
+const LINE_BOT_URL = 'https://line.me/R/ti/p/@871ugllc';
 
-// 模擬通知資料
-const MOCK_NOTIFICATIONS = [
-    { id: '1', type: 'alert', title: '⚠️ 地震警報', message: '芮氏規模5.2地震', time: '10分鐘前', read: false },
-    { id: '2', type: 'assignment', title: '📋 新任務指派', message: '物資運送 - 板橋區', time: '30分鐘前', read: false },
-    { id: '3', type: 'training', title: '📚 培訓提醒', message: '急救技能入門課程已更新', time: '2小時前', read: true },
-    { id: '4', type: 'system', title: '🔔 系統通知', message: '本月服務時數已更新', time: '昨天', read: true },
-];
+// 通知資料 - 從 API 讀取，目前為空
+// 實際通知將來自後端 /notifications API
+const EMPTY_NOTIFICATIONS: Array<{
+    id: string;
+    type: string;
+    title: string;
+    message: string;
+    time: string;
+    read: boolean;
+}> = [];
 
 const TYPE_CONFIG = {
     alert: { label: '警報', color: '#F44336' },
@@ -24,7 +28,7 @@ type NotificationType = keyof typeof TYPE_CONFIG;
 
 export default function NotificationsPage() {
     const { user } = useAuth();
-    const [notifications, setNotifications] = useState(MOCK_NOTIFICATIONS);
+    const [notifications, setNotifications] = useState(EMPTY_NOTIFICATIONS);
     const [filter, setFilter] = useState<string>('');
 
     const unreadCount = notifications.filter(n => !n.read).length;
@@ -134,30 +138,21 @@ export default function NotificationsPage() {
                 {isLineBound ? (
                     <p className="line-bound-msg">✅ 您已綁定 LINE 帳號，可接收任務指派與災害警報通知</p>
                 ) : (
-                    <Button onClick={handleBindLine}>
-                        綁定 LINE 帳號
-                    </Button>
-                )}
+                    <>
+                        <Button onClick={handleBindLine} disabled={!LINE_BOT_URL}>
+                            📱 加入 LINE 好友並綁定
+                        </Button>
 
-                <div className="line-qr">
-                    <p>或掃描 QR Code 加入官方帳號：</p>
-                    <div className="qr-placeholder">
-                        <a href={LINE_BOT_URL} target="_blank" rel="noopener noreferrer">
-                            點擊加入 LINE 官方帳號
-                        </a>
-                    </div>
-                </div>
-
-                {!isLineBound && (
-                    <div className="line-instructions">
-                        <p><strong>綁定步驟：</strong></p>
-                        <ol>
-                            <li>點擊上方按鈕加入 LINE 官方帳號好友</li>
-                            <li>在 LINE 聊天室中傳送「<strong>綁定</strong>」</li>
-                            <li>點擊 LINE 回覆的綁定連結</li>
-                            <li>完成帳號綁定！</li>
-                        </ol>
-                    </div>
+                        <div className="line-instructions">
+                            <p><strong>綁定步驟：</strong></p>
+                            <ol>
+                                <li>點擊上方按鈕，將自動開啟 LINE 加入好友頁面</li>
+                                <li>加入好友後，在 LINE 聊天室中傳送「<strong>綁定</strong>」</li>
+                                <li>點擊 LINE 回覆的綁定連結</li>
+                                <li>完成帳號綁定！</li>
+                            </ol>
+                        </div>
+                    </>
                 )}
             </Card>
         </div>

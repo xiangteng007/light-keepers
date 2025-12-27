@@ -12,12 +12,17 @@ import {
     NATURAL_DISASTER_TYPES,
     ALERT_TYPE_DEFINITIONS,
     AlertTypeDefinition,
+    CENTRAL_ALERT_TYPES,
+    ENTERPRISE_ALERT_TYPES,
+    LOCAL_ALERT_TYPES,
+    ALL_ALERT_TYPES,
+    getAlertCategory,
 } from './dto';
 import { LineBotService } from '../line-bot/line-bot.service';
 
 // NCDR API 端點
 const NCDR_BASE_URL = 'https://alerts.ncdr.nat.gov.tw';
-const NCDR_ATOM_FEED = `${NCDR_BASE_URL}/RssAtomFeed.ashx`;
+const NCDR_ATOM_FEED = `${NCDR_BASE_URL}/RssAtomFeeds.ashx`;
 
 // CWA (中央氣象署) OpenData API
 const CWA_BASE_URL = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore';
@@ -84,11 +89,12 @@ export class NcdrAlertsService {
     }
 
     /**
-     * 從 CAP 檔案中擷取 HTML 網頁連結
+     * 從 CAP 檔案中擷取 HTML 網頁連結和座標
      * CAP 檔案中的 <web> 元素包含政府公告的實際網頁連結
+     * CAP 檔案中的 <area><circle> 或 <polygon> 或 EventLatLon 包含座標
      * @param capUrl CAP 檔案的 URL
      */
-    async fetchWebLinkFromCap(capUrl: string): Promise<string | null> {
+    async fetchCapData(capUrl: string): Promise<{ webLink: string | null; latitude: number | null; longitude: number | null }> {
         try {
             const response = await axios.get(capUrl, { timeout: 8000 });
             const result = await parseStringPromise(response.data, {
@@ -96,26 +102,89 @@ export class NcdrAlertsService {
                 ignoreAttrs: true,
             });
 
-            // CAP 結構：alert > info > web
+            // CAP 結構：alert > info > web, alert > info > area
             const alert = result.alert;
             if (!alert || !alert.info) {
-                return null;
+                return { webLink: null, latitude: null, longitude: null };
             }
 
             // info 可能是陣列或單一物件
             const info = Array.isArray(alert.info) ? alert.info[0] : alert.info;
-            const webLink = info?.web;
 
-            if (webLink && typeof webLink === 'string' && webLink.startsWith('http')) {
-                return webLink;
+            // 擷取 web link
+            let webLink: string | null = null;
+            if (info?.web && typeof info.web === 'string' && info.web.startsWith('http')) {
+                webLink = info.web;
             }
 
-            return null;
+            // 擷取座標
+            let latitude: number | null = null;
+            let longitude: number | null = null;
+
+            // 方法 1: 從 <area><circle> 擷取 (格式: "lat,lon radius")
+            const area = info?.area;
+            if (area) {
+                const areas = Array.isArray(area) ? area : [area];
+                for (const a of areas) {
+                    if (a.circle && !latitude) {
+                        // 格式: "22.881,121.078 0.000" (lat,lon radius)
+                        const circleStr = String(a.circle);
+                        const match = circleStr.match(/([0-9.]+),([0-9.]+)/);
+                        if (match) {
+                            latitude = parseFloat(match[1]);
+                            longitude = parseFloat(match[2]);
+                        }
+                    }
+                    if (a.polygon && !latitude) {
+                        // 格式: "lat1,lon1 lat2,lon2 ..." - 取中心點
+                        const polygonStr = String(a.polygon);
+                        const coords = polygonStr.trim().split(/\s+/);
+                        const lats: number[] = [];
+                        const lngs: number[] = [];
+                        for (const coord of coords) {
+                            const parts = coord.split(',');
+                            if (parts.length === 2) {
+                                lats.push(parseFloat(parts[0]));
+                                lngs.push(parseFloat(parts[1]));
+                            }
+                        }
+                        if (lats.length > 0) {
+                            latitude = lats.reduce((a, b) => a + b, 0) / lats.length;
+                            longitude = lngs.reduce((a, b) => a + b, 0) / lngs.length;
+                        }
+                    }
+                }
+            }
+
+            // 方法 2: 從 EventLatLon parameter 擷取
+            if (!latitude && info?.parameter) {
+                const params = Array.isArray(info.parameter) ? info.parameter : [info.parameter];
+                for (const p of params) {
+                    if (p.valueName === 'EventLatLon' && p.value) {
+                        // 格式: "22.881,121.078 0.000"
+                        const match = String(p.value).match(/([0-9.]+),([0-9.]+)/);
+                        if (match) {
+                            latitude = parseFloat(match[1]);
+                            longitude = parseFloat(match[2]);
+                        }
+                    }
+                }
+            }
+
+            return { webLink, latitude, longitude };
         } catch (error) {
             // CAP 擷取失敗不影響主流程，只記錄警告
-            this.logger.warn(`Failed to fetch web link from CAP: ${capUrl} - ${error.message}`);
-            return null;
+            this.logger.warn(`Failed to fetch CAP data: ${capUrl} - ${error.message}`);
+            return { webLink: null, latitude: null, longitude: null };
         }
+    }
+
+    /**
+     * 從 CAP 檔案中擷取 HTML 網頁連結 (相容舊版呼叫)
+     */
+    async fetchWebLinkFromCap(capUrl: string): Promise<string | null> {
+        const result = await this.fetchCapData(capUrl);
+        return result.webLink;
     }
 
     /**
@@ -282,17 +351,20 @@ export class NcdrAlertsService {
 
     /**
      * 同步指定類別的警報到資料庫
+     * 以 RSS Feed 為唯一來源，不在 Feed 中的警報將被標記為非活動
      * @param typeIds 要同步的類別 IDs
      */
-    async syncAlertTypes(typeIds: number[]): Promise<{ synced: number; errors: number }> {
+    async syncAlertTypes(typeIds: number[]): Promise<{ synced: number; errors: number; deactivated: number }> {
         if (this.syncInProgress) {
             this.logger.warn('Sync already in progress, skipping...');
-            return { synced: 0, errors: 0 };
+            return { synced: 0, errors: 0, deactivated: 0 };
         }
 
         this.syncInProgress = true;
         let synced = 0;
         let errors = 0;
+        let deactivated = 0;
+        const activeAlertIds: string[] = []; // 收集 RSS Feed 中的所有 alertId
 
         try {
             for (const typeId of typeIds) {
@@ -305,6 +377,9 @@ export class NcdrAlertsService {
                     const parsed = this.parseAtomEntry(entry, typeId);
                     if (!parsed || !parsed.alertId) continue;
 
+                    // 記錄此 alert 仍在 RSS Feed 中
+                    activeAlertIds.push(parsed.alertId);
+
                     try {
                         // 檢查是否已存在
                         const existing = await this.ncdrAlertRepository.findOne({
@@ -312,11 +387,17 @@ export class NcdrAlertsService {
                         });
 
                         if (!existing) {
-                            // 嘗試從 CAP 擷取真正的 HTML 網頁連結
+                            // 從 CAP 擷取真正的 HTML 網頁連結和座標
                             if (parsed.sourceLink && parsed.sourceLink.endsWith('.cap')) {
-                                const webLink = await this.fetchWebLinkFromCap(parsed.sourceLink);
-                                if (webLink) {
-                                    parsed.sourceLink = webLink;
+                                const capData = await this.fetchCapData(parsed.sourceLink);
+                                if (capData.webLink) {
+                                    parsed.sourceLink = capData.webLink;
+                                }
+                                // 使用 CAP 中的座標（如果有的話）
+                                if (capData.latitude && capData.longitude) {
+                                    parsed.latitude = capData.latitude;
+                                    parsed.longitude = capData.longitude;
+                                    this.logger.debug(`Got coords from CAP: ${capData.latitude}, ${capData.longitude}`);
                                 }
                             }
                             await this.ncdrAlertRepository.save(parsed);
@@ -333,7 +414,28 @@ export class NcdrAlertsService {
                                 }
                             }
                         } else {
+                            // 確保已存在的警報是活動的
+                            if (!existing.isActive) {
+                                await this.ncdrAlertRepository.update(existing.id, { isActive: true });
+                                synced++;
+                            }
+
                             // 檢查是否需要更新分類或座標
+                            // 如果現有座標是預設座標（台灣中心附近），嘗試從 CAP 獲取精確座標
+                            const isDefaultCoord = Math.abs(existing.latitude - 23.6978) < 0.1 && Math.abs(existing.longitude - 120.9605) < 0.1;
+
+                            if (isDefaultCoord && parsed.sourceLink && parsed.sourceLink.endsWith('.cap')) {
+                                const capData = await this.fetchCapData(parsed.sourceLink);
+                                if (capData.latitude && capData.longitude) {
+                                    await this.ncdrAlertRepository.update(existing.id, {
+                                        latitude: capData.latitude,
+                                        longitude: capData.longitude,
+                                    });
+                                    this.logger.log(`Updated coords for ${existing.alertId}: ${capData.latitude}, ${capData.longitude}`);
+                                    synced++;
+                                }
+                            }
+
                             const coordsDiffer =
                                 Math.abs((existing.latitude || 0) - (parsed.latitude || 0)) > 0.001 ||
                                 Math.abs((existing.longitude || 0) - (parsed.longitude || 0)) > 0.001;
@@ -341,7 +443,7 @@ export class NcdrAlertsService {
                             const needsUpdate =
                                 existing.alertTypeId !== parsed.alertTypeId ||
                                 existing.alertTypeName !== parsed.alertTypeName ||
-                                coordsDiffer;
+                                (coordsDiffer && !isDefaultCoord);
 
                             if (needsUpdate) {
                                 await this.ncdrAlertRepository.update(existing.id, {
@@ -359,18 +461,36 @@ export class NcdrAlertsService {
                 }
             }
 
+            // 標記不在 RSS Feed 中的警報為非活動
+            if (activeAlertIds.length > 0) {
+                const deactivateResult = await this.ncdrAlertRepository
+                    .createQueryBuilder()
+                    .update(NcdrAlert)
+                    .set({ isActive: false })
+                    .where('alertTypeId IN (:...typeIds)', { typeIds })
+                    .andWhere('isActive = :isActive', { isActive: true })
+                    .andWhere('alertId NOT IN (:...activeAlertIds)', { activeAlertIds })
+                    // 排除 CWA 地震資料 (由獨立同步管理)
+                    .andWhere('alertId NOT LIKE :cwaPrefix', { cwaPrefix: 'CWA-%' })
+                    .execute();
+
+                deactivated = deactivateResult.affected || 0;
+                if (deactivated > 0) {
+                    this.logger.log(`Deactivated ${deactivated} alerts no longer in RSS feed`);
+                }
+            }
+
             this.lastSyncTime = new Date();
-            this.logger.log(`Sync completed: ${synced} new alerts, ${errors} errors`);
+            this.logger.log(`Sync completed: ${synced} new/updated, ${deactivated} deactivated, ${errors} errors`);
         } finally {
             this.syncInProgress = false;
         }
 
-        return { synced, errors };
+        return { synced, errors, deactivated };
     }
 
     /**
      * 排程任務：每 10 分鐘同步核心類別
-     * 只同步核心類別以避免流量爆掉
      */
     @Cron(CronExpression.EVERY_10_MINUTES)
     async scheduledSync(): Promise<void> {
@@ -506,10 +626,10 @@ export class NcdrAlertsService {
 
     /**
      * 查詢警報列表
-     * 自然災害保留 7 天，非自然災害保留 24 小時
+     * 自然災害保留 7 天，非自然災害保留 72 小時
      */
     async findAll(query: NcdrAlertQueryDto): Promise<{ data: NcdrAlert[]; total: number }> {
-        const { types, county, activeOnly, withLocation, limit = 50, offset = 0 } = query;
+        const { types, category, county, activeOnly, withLocation, limit = 50, offset = 0 } = query;
 
         const qb = this.ncdrAlertRepository.createQueryBuilder('alert');
 
@@ -518,7 +638,26 @@ export class NcdrAlertsService {
             qb.andWhere('alert.alertTypeId IN (:...types)', { types });
         }
 
-        // 僅有效警報
+        // 分類篩選 (中央部會/事業單位/地方政府)
+        if (category) {
+            let categoryTypes: number[];
+            switch (category) {
+                case 'central':
+                    categoryTypes = CENTRAL_ALERT_TYPES;
+                    break;
+                case 'enterprise':
+                    categoryTypes = ENTERPRISE_ALERT_TYPES;
+                    break;
+                case 'local':
+                    categoryTypes = LOCAL_ALERT_TYPES;
+                    break;
+                default:
+                    categoryTypes = ALL_ALERT_TYPES;
+            }
+            qb.andWhere('alert.alertTypeId IN (:...categoryTypes)', { categoryTypes });
+        }
+
+        // 僅有效警報 (依據 RSS Feed 生效狀態)
         if (activeOnly) {
             qb.andWhere('alert.isActive = :isActive', { isActive: true });
         }
@@ -534,22 +673,22 @@ export class NcdrAlertsService {
             qb.andWhere('alert.affectedAreas LIKE :county', { county: `%${county}%` });
         }
 
-        // 時間範圍過濾：自然災害 7 天，非自然災害 24 小時
+        // 時間範圍過濾：自然災害 7 天，非自然災害 72 小時
         const now = new Date();
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const threeDaysAgo = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
-        // 使用 OR 條件：(自然災害 AND 7天內) OR (非自然災害 AND 24小時內)
+        // 使用 OR 條件：(自然災害 AND 7天內) OR (非自然災害 AND 72小時內)
         qb.andWhere(
             `(
                 (alert.alertTypeId IN (:...naturalTypes) AND alert.publishedAt >= :sevenDaysAgo)
                 OR
-                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :oneDayAgo)
+                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :threeDaysAgo)
             )`,
             {
                 naturalTypes: NATURAL_DISASTER_TYPES,
                 sevenDaysAgo,
-                oneDayAgo,
+                threeDaysAgo,
             }
         );
 
@@ -563,7 +702,7 @@ export class NcdrAlertsService {
 
     /**
      * 獲取有座標的警報 (地圖用)
-     * 自然災害保留 7 天，非自然災害保留 24 小時
+     * 自然災害保留 7 天，非自然災害保留 72 小時
      */
     async findWithLocation(types?: number[]): Promise<NcdrAlert[]> {
         const qb = this.ncdrAlertRepository.createQueryBuilder('alert')
@@ -575,21 +714,21 @@ export class NcdrAlertsService {
             qb.andWhere('alert.alertTypeId IN (:...types)', { types });
         }
 
-        // 時間範圍過濾：自然災害 7 天，非自然災害 24 小時
+        // 時間範圍過濾：自然災害 7 天，非自然災害 72 小時
         const now = new Date();
         const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-        const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+        const threeDaysAgo = new Date(now.getTime() - 72 * 60 * 60 * 1000);
 
         qb.andWhere(
             `(
                 (alert.alertTypeId IN (:...naturalTypes) AND alert.publishedAt >= :sevenDaysAgo)
                 OR
-                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :oneDayAgo)
+                (alert.alertTypeId NOT IN (:...naturalTypes) AND alert.publishedAt >= :threeDaysAgo)
             )`,
             {
                 naturalTypes: NATURAL_DISASTER_TYPES,
                 sevenDaysAgo,
-                oneDayAgo,
+                threeDaysAgo,
             }
         );
 
@@ -674,5 +813,88 @@ export class NcdrAlertsService {
 
         this.logger.log(`Source link update completed: ${updated} updated, ${errors} errors`);
         return { updated, errors };
+    }
+
+    /**
+     * 批次更新現有警報的座標
+     * 從 CAP 檔案擷取真實座標，更新使用預設座標的警報
+     */
+    async updateExistingCoordinates(): Promise<{ updated: number; errors: number; skipped: number }> {
+        let updated = 0;
+        let errors = 0;
+        let skipped = 0;
+
+        // 預設座標中心點（台灣中心）
+        const defaultLat = 23.6978;
+        const defaultLng = 120.9605;
+        const defaultEarthquakeLat = 23.9;
+        const defaultEarthquakeLng = 121.6;
+
+        // 找出所有活動警報
+        const alerts = await this.ncdrAlertRepository.find({
+            where: { isActive: true },
+        });
+
+        this.logger.log(`Checking ${alerts.length} alerts for coordinate updates...`);
+
+        for (const alert of alerts) {
+            try {
+                // 檢查是否使用預設座標
+                const lat = parseFloat(String(alert.latitude));
+                const lng = parseFloat(String(alert.longitude));
+
+                const isDefaultCoord =
+                    (Math.abs(lat - defaultLat) < 0.1 && Math.abs(lng - defaultLng) < 0.1) ||
+                    (Math.abs(lat - defaultEarthquakeLat) < 0.1 && Math.abs(lng - defaultEarthquakeLng) < 0.1);
+
+                if (!isDefaultCoord) {
+                    skipped++;
+                    continue;
+                }
+
+                // 尋找 CAP 連結 - 可能在 sourceLink 或需要構建
+                let capUrl: string | null = null;
+
+                if (alert.sourceLink && alert.sourceLink.endsWith('.cap')) {
+                    capUrl = alert.sourceLink;
+                } else if (alert.alertId) {
+                    // 嘗試構建 CAP URL (例如 CWA 地震格式)
+                    if (alert.alertId.startsWith('CWA-EQ')) {
+                        // CWA-EQ114155-2025-1225-044030 → 構建 CAP URL
+                        const parts = alert.alertId.split('-');
+                        if (parts.length >= 4) {
+                            const year = parts[2];
+                            capUrl = `https://alerts.ncdr.nat.gov.tw/Capstorage/CWA/${year}/Earthquake/${alert.alertId}.cap`;
+                        }
+                    }
+                }
+
+                if (!capUrl) {
+                    skipped++;
+                    continue;
+                }
+
+                // 限制請求頻率
+                await new Promise(resolve => setTimeout(resolve, 500));
+
+                const capData = await this.fetchCapData(capUrl);
+                if (capData.latitude && capData.longitude) {
+                    await this.ncdrAlertRepository.update(alert.id, {
+                        latitude: capData.latitude,
+                        longitude: capData.longitude,
+                    });
+                    updated++;
+                    this.logger.log(`Updated coords for ${alert.alertId}: ${capData.latitude}, ${capData.longitude}`);
+                } else {
+                    skipped++;
+                }
+            } catch (err) {
+                errors++;
+                this.logger.error(`Failed to update coords for ${alert.alertId}: ${err.message}`);
+            }
+        }
+
+        this.logger.log(`Coordinate update completed: ${updated} updated, ${skipped} skipped, ${errors} errors`);
+        return { updated, errors, skipped };
     }
 }

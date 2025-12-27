@@ -106,6 +106,20 @@ export class NcdrAlertsController {
     }
 
     /**
+     * 批次更新現有警報的座標
+     * POST /ncdr-alerts/update-coordinates
+     */
+    @Post('update-coordinates')
+    @HttpCode(HttpStatus.OK)
+    async updateCoordinates() {
+        const result = await this.ncdrAlertsService.updateExistingCoordinates();
+        return {
+            message: 'Coordinates update completed',
+            ...result,
+        };
+    }
+
+    /**
      * 手動觸發 CWA 地震同步
      * POST /ncdr-alerts/sync-cwa-earthquakes
      */

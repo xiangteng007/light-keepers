@@ -2,6 +2,7 @@ import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportStatus, ReportType, ReportSeverity } from './reports.entity';
+import { Task } from '../tasks/entities';
 
 export interface CreateReportDto {
     type: ReportType;
@@ -37,6 +38,8 @@ export class ReportsService {
     constructor(
         @InjectRepository(Report)
         private reportsRepository: Repository<Report>,
+        @InjectRepository(Task)
+        private taskRepository: Repository<Task>,
     ) { }
 
     // 建立新回報
@@ -145,8 +148,15 @@ export class ReportsService {
         };
     }
 
-    // 刪除回報
+    // 刪除回報及關聯任務
     async delete(id: string): Promise<void> {
+        // 先刪除關聯的任務 (以 eventId 關聯)
+        const deletedTasks = await this.taskRepository.delete({ eventId: id });
+        if (deletedTasks.affected && deletedTasks.affected > 0) {
+            this.logger.log(`Deleted ${deletedTasks.affected} orphaned tasks for report ${id}`);
+        }
+
+        // 然後刪除回報本身
         const result = await this.reportsRepository.delete(id);
         if (result.affected === 0) {
             throw new NotFoundException(`Report ${id} not found`);

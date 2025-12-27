@@ -72,7 +72,7 @@ const getSeverityLabel = (severity: number) => {
     return '一般';
 };
 
-// 自訂標記圖標 - 災情事件 (PIN 形狀)
+// 自訂標記圖標 - 災害回報 (PIN 形狀)
 const createMarkerIcon = (severity: number) => {
     const color = getSeverityColor(severity);
     return {
@@ -208,7 +208,7 @@ export default function MapPage() {
         queryFn: () => getEvents().then(res => res.data.data),
     });
 
-    // 獲取已確認的回報 (顯示為災情事件)
+    // 獲取已確認的回報 (顯示為災害回報)
     const { data: reportsData } = useQuery({
         queryKey: ['confirmedReportsMap'],
         queryFn: () => getReportsForMap().then(res => res.data),
@@ -402,7 +402,7 @@ export default function MapPage() {
                                 checked={showEvents}
                                 onChange={(e) => setShowEvents(e.target.checked)}
                             />
-                            <span>📍 災情事件</span>
+                            <span>📍 災害回報</span>
                         </label>
                         <label className="header-layer-toggle">
                             <input
@@ -467,7 +467,7 @@ export default function MapPage() {
                                 mapTypeId: MAP_TYPES[mapType].id,
                             }}
                         >
-                            {/* 災情事件標記 */}
+                            {/* 災害回報標記 */}
                             {showEvents && eventsWithLocation.map((event) => (
                                 <MarkerF
                                     key={event.id}
@@ -482,7 +482,7 @@ export default function MapPage() {
                                 />
                             ))}
 
-                            {/* 已確認回報標記 (顯示為災情事件) */}
+                            {/* 已確認回報標記 (顯示為災害回報) */}
                             {showEvents && confirmedReports.filter((r: Report) => r.latitude && r.longitude).map((report: Report) => {
                                 const severityMap: Record<string, number> = { low: 1, medium: 2, high: 3, critical: 4 };
                                 return (
@@ -833,7 +833,7 @@ export default function MapPage() {
                                 className={`sidebar-tab ${sidebarTab === 'events' ? 'sidebar-tab--active' : ''}`}
                                 onClick={() => setSidebarTab('events')}
                             >
-                                📍 災情事件 <span className="sidebar-tab__count">{filteredEvents.length}</span>
+                                📍 災害回報 <span className="sidebar-tab__count">{filteredEvents.length}</span>
                             </button>
                             <button
                                 className={`sidebar-tab ${sidebarTab === 'ncdr' ? 'sidebar-tab--active' : ''}`}

@@ -1,0 +1,1655 @@
+﻿
+
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" /><link href="images/capbear.ico" rel="shortcut icon" type="image/ico" /><meta name="description" content=" " /><meta name="keywords" content="示警,公開資料,開放資料,opendata,介接,推送,cap,alert,atom" /><meta name="author" content="NCDR" /><meta name="copyright" content="NCDR" /><meta id="IMAGE" property="og:image" /><title>
+	示警介接
+</title>
+
+
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="CSS/bootstrap.min.css" /><link rel="stylesheet" href="CSS/font-awesome.min.css" /><link href="CSS/basic.css" rel="stylesheet" type="text/css" /><link href="CSS/layout.css" rel="stylesheet" type="text/css" /><link href="CSS/main.css" rel="stylesheet" type="text/css" />
+
+    <!-- 寬度小於768 -->
+    <link rel="stylesheet" media="screen and  (max-width: 768px)" href="CSS/Mobile.css" />
+
+
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script type="text/javascript" src="scripts/jquery.slim.min.js"></script>
+    <script type="text/javascript" src="scripts/jquery-migrate.min.js"></script>
+    <script src="Scripts/popper.min.js"></script>
+    <!--Dropdowns , Tooltips用-->
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script type="text/javascript" src="Scripts/basic.js"></script>
+
+    <script type="text/javascript" src="scripts/jquery.fancybox-2.1.5/jquery.mousewheel-3.0.6.pack.js"></script>
+    <script type="text/javascript" src="scripts/jquery.fancybox-2.1.5/jquery.fancybox.js"></script>
+    <link rel="stylesheet" type="text/css" href="scripts/jquery.fancybox-2.1.5/jquery.fancybox.css" media="screen" />
+
+    <script type="text/javascript">
+        $(document).ready(function () {
+
+
+            //選單
+            $(".phone_menu").click(function () {
+                $(".phone_menu_close").show();
+                $(".CAP_memuBar").fadeIn(300);
+                //$("body").css({'overflow':'hidden'});  必殺技 沒事不要用
+
+            });
+
+            $(".phone_menu_close").click(function () {
+                $(".phone_menu").show();
+                $(".CAP_memuBar").fadeOut(300);
+                //$("body").css({'overflow':'auto'}); 必殺技 沒事不要用
+            });
+
+            //修正螢幕被拉大時menu不顯示的bug，使用$(window).width()取得目前遊覽器視窗寬度。
+            $(window).resize(function () {
+                wdth = $(window).width();
+                if (wdth > 760) { $(".CAP_memuBar").show(); } else if (wdth < 759) { $(".CAP_memuBar").hide(); }
+            });
+
+            //選單下拉
+            $(".CAP_memuBar  li").mouseover(function () {
+                $(this).find(".CAP_menu_sub").show();
+            }).mouseleave(function () {
+                $(this).find(".CAP_menu_sub").hide();
+            });
+            //用tab鍵開下拉
+            $(".CAP_memuBar ul  li >a").focus(function () {
+                $(".CAP_menu_sub").hide();
+                $(this).siblings(".CAP_menu_sub").show();
+            });
+            $(".accesskeyStyleCon").focus(function () {
+                $(".CAP_menu_sub").hide();
+            });
+
+
+            //文字大小切換	
+            $('.txtchange_S').click(function () {
+                $('.fontchange .txtchange').removeClass("sel");
+                $(this).addClass("sel");
+                $("body").css({ 'fontSize': '70%' });
+            });
+            $('.txtchange_M').click(function () {
+                $('.fontchange .txtchange').removeClass("sel");
+                $(this).addClass("sel");
+                $("body").css({ 'fontSize': '100%' });
+            });
+            $('.txtchange_L').click(function () {
+                $('.fontchange .txtchange').removeClass("sel");
+                $(this).addClass("sel");
+                $("body").css({ 'fontSize': '130%' });
+            });	
+
+            //  fancybox
+            $(".fancyIn").fancybox();
+            $(".fancyiframePage").fancybox({
+                padding: '0',
+                //margin: '0 , 20',
+                type: 'iframe',
+                autoSize: false,
+                width: '95%',
+                maxWidth:'650px',
+                height: 'auto',
+                minHeight: '400px'
+                // helpers: { overlay: { closeClick: false } }
+            });
+            $(".fancyiframePageMovie").fancybox({
+                padding: '0',
+                //margin: '0 , 20',
+                type: 'iframe',
+                autoSize: false,
+                width: '95%',
+                maxWidth:'580px',
+                height: 'auto',
+                minHeight: '355px',
+                scrolling: 'no'
+                // helpers: { overlay: { closeClick: false } }
+            });
+
+
+
+            $("#radioType_1").on("click", function () {
+                 setShow();
+            });
+            $("#radioType_0").on("click", function () {
+                 setDisable();
+            });           
+
+            //依照當前頁面來決定是否要顯示示警資料內容問題管理radio  -star
+           let PageVal =  $("#PageMangerType").val();
+            if (PageVal == "1") {
+                setDisable();
+            }
+            else {
+                setShow();
+            }
+            
+            //依照當前頁面來決定是否要顯示示警資料內容問題管理radio  -end
+
+
+            setDisable();
+
+            //註冊function -star
+            $("#dropType").change(function () { setCategoryVal(); });
+            $("#ddlCategory").change(saveddlCategoryVal());
+            //註冊function -end
+
+
+
+            //處理超連結沒有給tabindex的
+            $("a , input , select").each(function () {
+                if ($(this).attr("tabindex") == undefined) {
+                    $(this).attr("tabindex", 500);
+                }
+            })
+
+            $('a[target="_blank"]').each(function () {
+                var existingRel = $(this).attr('rel');
+
+                if (existingRel) {
+                    if (!existingRel.includes('noopener')) existingRel += ' noopener';
+                    if (!existingRel.includes('noreferrer')) existingRel += ' noreferrer';
+                } else {
+                    existingRel = 'noopener noreferrer';
+                }
+
+                $(this).attr('rel', existingRel);
+            });
+
+        });
+
+    </script>
+
+
+
+    <!-- Google Analytics -->
+    <script type="text/javascript">
+        (function (i, s, o, g, r, a, m) {
+            i['GoogleAnalyticsObject'] = r; i[r] = i[r] || function () {
+                (i[r].q = i[r].q || []).push(arguments)
+            }, i[r].l = 1 * new Date(); a = s.createElement(o),
+                m = s.getElementsByTagName(o)[0]; a.async = 1; a.src = g; m.parentNode.insertBefore(a, m)
+        })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
+
+        ga('create', 'UA-71835214-1', 'auto');  // Replace with your property ID.
+        ga('send', 'pageview');
+
+    </script>
+    <!-- End Google Analytics -->
+    <!-- Google Tag Manager -->
+    <script>
+        (function (w, d, s, l, i) {
+            w[l] = w[l] || []; w[l].push({
+                'gtm.start':new Date().getTime(), event: 'gtm.js'
+            }); var f = d.getElementsByTagName(s)[0],
+            j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+                'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-5J9RJSTG');</script>
+    <!-- End Google Tag Manager -->
+
+    <script type="text/javascript">     
+
+        $(document).ready(function () {
+
+            $("#mastertbemail").blur(function () {
+                emailvers();
+            });
+        });
+        var remail = "/^" + $("#tbreg").val() + "/i";
+        function emailvers() {
+            var d = $("#mastertbemail").val();
+            if (d != "") {
+                if (remail.exec(d)) {
+                    return true;
+                } else {
+
+                    return false;
+                }
+            }
+            else {
+
+                return false;
+            }
+        }
+        function pwver() {
+            if ($("#mastertbpw").val() != "") {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        function VerData() {
+            if (pwver()) {
+                if (emailvers()) {
+                    return true;
+                } else {
+                    return false;
+                }
+            }
+            return false;
+        }
+        function ShowProgressBar() {
+            displayProgress();
+            displayMaskFrame();
+        }
+
+
+        function HideProgressBar() {
+            var progress = $('#dvhide');
+            var maskFrame = $("#dvmask");
+            progress.hide();
+            maskFrame.hide();
+        }
+
+        function displayProgress() {
+            var w = $(document).width();
+            var h = $(window).height();
+            var progress = $('#dvhide');
+            progress.css({ "z-index": 999999, "top": (h / 2) - (progress.height() / 2), "left": (w / 2) - (progress.width() / 2) });
+            progress.show();
+
+        }
+
+        function displayMaskFrame() {
+            var w = $(window).width();
+            var h = $(document).height();
+            var maskFrame = $("#dvmask");
+            maskFrame.css({ "z-index": 999998, "opacity": 0.7, "width": w, "height": h });
+            maskFrame.show();
+
+        }
+
+
+        //設定示警名稱下拉式選單是否出現-star
+        function setDisable() {
+            $("#h4ID").hide();
+            $("#pID").hide();
+            $("#h4ID2").hide();
+            $("#pID2").hide();
+        }
+
+        function setShow() {
+            $("#h4ID").show();
+            $("#pID").show();
+            $("#h4ID2").show();
+            $("#pID2").show();
+        }
+        //設定示警名稱下拉式選單是否出現-end
+
+        //依照使用者選擇示警類別來更新下拉式選單的內容
+        function setCategoryVal() {
+           var obj = {};
+            obj.LiveCategoryId = $("#dropType").val();
+            $("#hfdTblcapreciveInfoSuid").val($("#dropType").val());
+           $.ajax({
+                type: "GET",
+                url: "webService/ForMasterPage.ashx?LiveCategoryId="+obj.LiveCategoryId,           
+                async: false,                
+                contentType: "application/json; charset=utf-8",
+                dataType: 'json',
+                success: function (SuccessJson) {                    
+                    $("#ddlCategory").html("");
+                    $.each(SuccessJson, function (index, obj) {
+                        let opt = document.createElement('option');
+                        opt.innerText = obj.Name+"("+obj.IssueName+")";
+                        opt.value = obj.AlertTypeId;
+                        $("#ddlCategory").append(opt);
+                    });
+                    BindEvents();
+                    saveddlCategoryVal();
+                 },
+                 error: function (xhr, ajaxOtions, thrownError) {
+                     $("body").append(xhr.status);
+                     $("body").append(xhr.responseText);
+
+                     alert(thrownError);
+                 },
+                 complete: function () {
+                    
+                 }
+             });
+        }
+
+
+        function saveddlCategoryVal() {
+            let selectVal = $("#ddlCategory").val();
+            $("#hfdAlertType").val(selectVal); 
+        }
+
+        function BindEvents() {
+            $("#ddlCategory").change(function () { saveddlCategoryVal();});
+        }
+
+        function setMailText(pageName) {
+            $("#setMailText").text(pageName+"意見回饋");
+        }
+    </script>
+
+
+
+    <script type="text/javascript"> 
+        $(document).ready(function () {
+
+            //文字大小切換	手機用		
+            wdth = $(window).width();
+            if (wdth < 760) {
+
+                $('.fontchange .fontTitle').click(function () {
+                    $('.fontchange ul').css({ 'display': 'block' });
+                    $('.fontchange .fontclose').css({ 'display': 'block' });
+                });
+                $('.fontchange .fontclose').click(function () {
+                    $('.fontchange ul').css({ 'display': 'none' });
+                    $('.fontchange .fontclose').css({ 'display': 'none' });
+                });
+
+            }
+
+            //文字大小切換	修正螢幕被拉時的bug			
+            $(window).resize(function () {
+                wdth = $(window).width();
+                if (wdth > 760) {
+
+                    $('.fontchange ul').css({ 'display': 'inline-block' });
+                    $('.fontchange .fontclose').css({ 'display': 'none' });
+
+                    $('.fontchange .fontTitle').click(function () {
+                        $('.fontchange ul').css({ 'display': 'inline-block' });
+                        $('.fontchange .fontclose').css({ 'display': 'none' });
+                    });
+
+                } else if (wdth < 759) {
+
+                    $('.fontchange ul').css({ 'display': 'none' });
+                    $('.fontchange .fontclose').css({ 'display': 'none' });
+
+                    $('.fontchange .fontTitle').click(function () {
+                        $('.fontchange ul').css({ 'display': 'block' });
+                        $('.fontchange .fontclose').css({ 'display': 'block' });
+                    });
+                    $('.fontchange .fontclose').click(function () {
+                        $('.fontchange ul').css({ 'display': 'none' });
+                        $('.fontchange .fontclose').css({ 'display': 'none' });
+                    });
+
+
+                }
+
+ 
+            });
+
+ 
+
+        });    
+</script>
+
+    
+
+    <!--Atom Feed-->
+
+    <style>
+        .feedbox {
+            border-radius: 10px;
+            padding: 10px;
+            margin: 10px;
+        }
+
+            .feedbox:nth-child(even) {
+                background-color: #fff9c6;
+                border: solid 1px #fbec6e;
+            }
+
+            .feedbox:nth-child(odd) {
+                background-color: #fff;
+                border: solid 1px rgb(8, 165, 241);
+            }
+
+            .feedbox h4 {
+                font-size: 1.1em;
+                font-weight: 600;
+                color: #1043ab;
+            }
+
+        ul.feedList {
+            margin-left: 30px;
+        }
+
+        ul.feedList::after{display: block;content: "";clear: both;}
+		ul.rankclean li{width: 33%;float: left;margin: 0px;}
+        /*評分系統*/
+        ul.alertTitleBOC li {
+            background-color: aliceblue;
+            border-radius: 5px;
+            max-width: 32%;
+            background-position: 5px 5px;
+            padding: 5px;
+            line-height: normal;
+        }
+
+            ul.alertTitleBOC li a.title {
+                font-weight: 600;
+                margin-left: 35px;
+            }
+
+            ul.alertTitleBOC li p {
+                padding: 5px 10px;
+                margin: 0px;
+            }
+
+            ul.alertTitleBOC li .star {
+                display: inline-block;
+                border: solid 1px #0CF;
+                background-color: #fff;
+                padding-right: 10px;
+                margin-left: 10px;
+                position: relative;
+                width: 95px;
+            }
+
+                ul.alertTitleBOC li .star i {
+                    font-size: 1.5em;
+                    padding: 5px;
+                    background-color: #FFF500;
+                    color: #0C3383;
+                    vertical-align: middle;
+                    border-right: solid 1px #0CF;
+                }
+
+                ul.alertTitleBOC li .star .goodnum {
+                    display: inline-block;
+                    font-weight: 600;
+                    color: #0040e3;
+                    font-size: 1.5em;
+                    vertical-align: middle;
+                    margin-left: 5px;
+                }
+
+                ul.alertTitleBOC li .star small {
+                    position: absolute;
+                    bottom: 3px;
+                    right: 3px;
+                    color: #666;
+                }
+
+        .starArea {
+            background-color: aliceblue;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .starBOX {
+            display: inline-block;
+        }
+
+        .starlist i {
+            font-size: 1.2em;
+            color: #666;
+        }
+
+        .starlist input {
+            display: none;
+        }
+
+        .starlist i.selected {
+            color: #ff2c36;
+        }
+
+
+
+        @media only screen and (max-width: 768px) {
+            ul.tab_peoplelive li a {
+                font-size: 0.8em;
+                padding: 2px;
+            }
+
+            ul.feedList {
+                margin-left: 10px;
+            }
+
+            ul.rankclean li {
+                width: 100%;
+            }
+
+            ul.alertTitleBOC li {
+                max-width: 100%;
+            }
+        }
+    </style>
+    
+    <script type="text/javascript">
+        //tab     
+        function SetTab(idx) {
+
+            $(".main_tab a").removeClass("selected");
+            $(".main_tab_pane").hide();
+
+            if (idx == 1) {
+                $(".tab01").addClass("selected"); $(".tabpane01").fadeIn(300);
+                $('#CategoryAllATOM').click();
+            }
+            if (idx == 2) {
+                $(".tab02").addClass("selected"); $(".tabpane02").fadeIn(300);
+                $('#CategoryAllJSON').click();
+            }
+
+        }
+
+
+        //評分 系統   
+        function Setstar(idx) {
+
+            $(".starlist i").removeClass('selected');
+
+            if (idx == 1) {
+                $(".starlist:nth-child(1) i ").addClass('selected');
+                $(".starlist:nth-child(1) input").attr('checked', true);
+            }
+            if (idx == 2) {
+                $(".starlist:nth-child(1) i , .starlist:nth-child(2) i").addClass('selected');
+                $(".starlist:nth-child(2) input").attr('checked', true);
+            }
+            if (idx == 3) {
+                $(".starlist:nth-child(1) i , .starlist:nth-child(2) i , .starlist:nth-child(3) i").addClass('selected');
+                $(".starlist:nth-child(3) input").attr('checked', true);
+            }
+            if (idx == 4) {
+                $(".starlist:nth-child(1) i , .starlist:nth-child(2) i , .starlist:nth-child(3) i  , .starlist:nth-child(4) i").addClass('selected');
+                $(".starlist:nth-child(4) input").attr('checked', true);
+            }
+            if (idx == 5) {
+                $(".starlist i ").addClass('selected');
+                $(".starlist:nth-child(5) input").attr('checked', true);
+            }
+
+
+        }
+
+
+
+    </script>
+    <script type="text/javascript">
+        var rawData = 1;
+        var logined = false;
+        var AlertThemeList = [];
+         
+        
+        $(document).ready(function () {
+            
+            //示警類別
+            $.ajax({
+                type: "POST",
+                url: "RSS.aspx/GetInformationDocument",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                success: function (data) {
+
+                    if (data.d !== null) {
+                        var tabindex = 1100;
+                        var tabmap = {};
+
+                        rawData = data.d;
+
+                        //分類的資料集
+                        var categoryName = [];
+
+                        var templateCategory = $('#templateCategory').html();
+                        var templateCategoryContenstAtom = '';
+                        var templateCategoryContenstJson = '';
+                        var templateCapATOM = $('#templateCapATOM').html();
+                        var templateCapsContenstATOM = '';
+                        var templateCapJSON = $('#templateCapJSON').html();
+                        var templateCapsContenstJSON = '';
+
+                        $.each(data.d, function (i, capInfo) {
+                            //處理有多少分類
+                            if (categoryName.indexOf(capInfo.LiveName) < 0) {
+                                categoryName.push(capInfo.LiveName);
+                            }
+                        });
+
+                        //設定TAB頁籤
+                        $.each(categoryName, function (i, categoryName) {
+                            tabindex += 100;
+                            tabmap[categoryName] = tabindex;
+                            templateCategoryContenstAtom = templateCategoryContenstAtom + templateCategory.replace("{{CategoryName}}", categoryName).replace("{{tabindex}}", tabindex);
+                            templateCategoryContenstJson = templateCategoryContenstJson + templateCategory.replace("{{CategoryName}}", categoryName).replace("{{tabindex}}", 1000 + tabindex);
+
+                            //加入內容區
+                            $(".CatagoryContentATOM").append('<ul id="ulMenuATOM' + tabindex + '" class="feedList RSS rankclean"></ul>');
+                            $(".CatagoryContentJSON").append('<ul id="ulMenuJSON' + (1000 + tabindex) + '" class="feedList JSON rankclean"></ul>');
+                        });
+
+                        //加入分類清單
+                        $('#CategoryMenuATOM').append(templateCategoryContenstAtom);
+                        $('#CategoryMenuJSON').append(templateCategoryContenstJson);
+
+
+                        //依照SecquenceNoForView數字小到大依序寫入示警DOM
+                        var sortIndex = 1;
+                        for (var i = 0; i <= data.d.length; i++) {
+                            $.each(data.d, function (index, capInfo) {
+                                if (sortIndex === capInfo.SecquenceNoForView) {
+                                    //建構示警DOM
+                                    var newtemplateCapATOM = templateCapATOM.replace(/{{id}}/g, capInfo.AlertTypeID)
+                                        .replace("{{name}}", capInfo.AlertTypeName)
+                                        .replace("{{IssueName}}", capInfo.IssueName)
+                                        .replace("{{tabindex}}", tabmap[capInfo.LiveName] + sortIndex);
+                                    $('#ulMenuATOM' + tabmap[capInfo.LiveName]).append(newtemplateCapATOM);
+
+                                    var templateCapATOM100 = templateCapATOM.replace(/{{id}}/g, capInfo.AlertTypeID)
+                                        .replace("{{name}}", capInfo.AlertTypeName)
+                                        .replace("{{IssueName}}", capInfo.IssueName)
+                                        .replace("{{tabindex}}", 1100 + sortIndex);
+                                    $('#ulMenuATOM1100').append(templateCapATOM100);
+
+                                    var newtemplateCapJSON = templateCapJSON.replace(/{{id}}/g, capInfo.AlertTypeID)
+                                        .replace("{{name}}", capInfo.AlertTypeName)
+                                        .replace("{{IssueName}}", capInfo.IssueName)
+                                        .replace("{{tabindex}}", 1000 + tabmap[capInfo.LiveName] + sortIndex);
+                                    $('#ulMenuJSON' + (1000 + tabmap[capInfo.LiveName])).append(newtemplateCapJSON);
+
+                                    var templateCapJSON100 = templateCapJSON.replace(/{{id}}/g, capInfo.AlertTypeID)
+                                        .replace("{{name}}", capInfo.AlertTypeName)
+                                        .replace("{{IssueName}}", capInfo.IssueName)
+                                        .replace("{{tabindex}}", 2100 + sortIndex);
+                                    $('#ulMenuJSON2100').append(templateCapJSON100);
+
+                                }
+                            });
+                            sortIndex++;
+                        }
+
+                        //加入示警清單
+                        bindCategoryATOMEvent();
+                        bindCategoryJSONEvent();
+                        //預設ATOM分類用全部
+                        SetTab(1);
+                    }
+                }
+            });
+
+            //綁定ATOM示警名稱按鈕分類
+            function bindCategoryATOMEvent() {
+                $('[name="cateGoryName"]').click(function () {
+                    $('[name="cateGoryName"]').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    var tabindex = $(this).attr("tabindex");
+                    //內容區塊先全隱藏
+                    for (var i = 1100; i < 2000; i = i + 100) {
+                        $("#ulMenuATOM" + i).hide();
+                    }
+                    $("#ulMenuATOM" + tabindex).show();
+
+
+                    //var thisCategoryName = $(this).text();
+                    //$.each(rawData, function (i, capInfo) {
+                    //    if (thisCategoryName !== '全部') {
+                    //        if (capInfo.LiveName.indexOf(thisCategoryName) < 0) {
+                    //            $('#a_CapATOM_' + capInfo.AlertTypeID + '').parent().hide();
+                    //        } else {
+                    //            $('#a_CapATOM_' + capInfo.AlertTypeID + '').parent().show();
+                    //        }
+                    //    } else {
+                    //        $('[name="li_CapsATOM"]').show();
+                    //    }
+                    //});
+                });
+            };
+
+            //綁定JSON示警名稱按鈕分類
+            function bindCategoryJSONEvent() {
+                $('[name="cateGoryName"]').click(function () {
+
+                    $('[name="cateGoryName"]').removeClass('selected');
+                    $(this).addClass('selected');
+
+                    var tabindex = $(this).attr("tabindex");
+                    //內容區塊先全隱藏
+                    for (var i = 2100; i < 3000; i = i + 100) {
+                        $("#ulMenuJSON" + i).hide();
+                    }
+                    $("#ulMenuJSON" + tabindex).show();
+
+
+                    //var thisCategoryName = $(this).text();
+                    //$.each(rawData, function (i, capInfo) {
+                    //    if (thisCategoryName !== '全部') {
+                    //        if (capInfo.LiveName.indexOf(thisCategoryName) < 0) {
+                    //            $('#a_CapJSON_' + capInfo.AlertTypeID + '').parent().hide();
+                    //        } else {
+                    //            $('#a_CapJSON_' + capInfo.AlertTypeID + '').parent().show();
+                    //        }
+                    //    } else {
+                    //        $('[name="li_CapsJSON"]').show();
+                    //    }
+                    //});
+                });
+            };
+
+            //民生類型標籤切換
+            //$("#ATOM_tab.tab_peoplelive li a").click(function () {
+            //    $("#ATOM_tab.tab_peoplelive li a").removeClass("selected");
+            //    $(this).addClass("selected");
+            //});
+
+            //$("#JSON_tab.tab_peoplelive li a").click(function () {
+            //    $("#JSON_tab.tab_peoplelive li a").removeClass("selected");
+            //    $(this).addClass("selected");
+            //});
+
+        });
+
+        function TriggerFilter(categoryid, tab) {
+            $("#hiddenCategoryID").val(categoryid);
+            $("#hiddenField_tab").val(tab);
+            $("#btnOK").click();
+        }
+        
+    </script >
+
+    
+    <script id="templateCategory" type="text/template">
+        <li><a href="javascript:void(0)" name="cateGoryName" name="cateGoryGroup" tabindex="{{tabindex}}" title="另開新視窗">{{CategoryName}}</a></li>
+    </script>
+    
+    <script id="templateCapATOM" type="text/template">
+        <li name="li_CapsATOM">
+            <a id="a_CapATOM_{{id}}" href="RssAtomFeed.ashx?AlertType={{id}}" target="_blank" tabindex="{{tabindex}}" title="另開新視窗">{{name}}({{IssueName}})</a>
+        </li>
+    </script>
+    
+    <script id="templateCapJSON" type="text/template">
+        <li name="li_CapsJSON">
+            <a id="a_CapJSON_{{id}}" href="JSONAtomFeed.ashx?AlertType={{id}}" target="_blank" tabindex="{{tabindex}}" title="另開新視窗">{{name}}({{IssueName}})</a>
+        </li>
+
+    </script>
+    
+    
+    
+
+
+       <NOSCRIPT>
+   『您的瀏覽器不支援JavaScript功能，若網頁功能無法正常使用時，請開啟瀏覽器JavaScript狀態』
+   </NOSCRIPT>
+
+</head>
+<body>
+    <!-- Google Tag Manager (noscript) -->
+    <noscript>XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX;visibility:hidden"></iframe></noscript>
+    <!-- End Google Tag Manager (noscript) -->
+    <form method="post" action="./RSS.aspx" id="form1">
+<div class="aspNetHidden">
+<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="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" />
+</div>
+
+<div class="aspNetHidden">
+
+	<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="39067D5E" />
+	<input type="hidden" name="__EVENTVALIDATION" id="__EVENTVALIDATION" value="/FGSid8a2t7f4T8KDtEq3PHzaGmyB0cLl06BDfWlW5Gj4EjjeYdtw4j1zB2HapkWrCcGUuXOlRLSIsqHyftcjvAMleQOE0H33kTR6x0fx0we7RrKPtjA3TgguSHa+P3ydQtCgBlFzyc/UILaFAdKAeFN54FnimvfcfZa6b9gUqirTZLp9/GYdX41qesvERHCg0mJDjxK81vZOqAKQhPu4hPC6C8AfNpVhwcFC7uCpzyAz12GvBKeaYDndc5UjwIei8WkpwASzRXAr4xN31s+08u90PmdcDGINWeSVwNqm8ct/Ph1v8DWJApu5WNP5/HGKUT9CkxWYe8uiFlFg4GvviGUo3CoX3+ddbDnJlj2hDI5m7+LAlR2sRKzkBAIs5768R7xxy5ZigQ+1SB7uL3EL54IlO1B/LQ0fmV1gRJw1hYlV/OMxJ4jCxvgC4KAQBPi" />
+</div>
+        
+        <input type="hidden" name="ctl00$PageMangerType" id="PageMangerType" value="1" />
+ 
+        <div style="position: absolute; top: -220px;">
+            <img id="imgevent" itemprop="image" alt="imgevent" />
+            <p id="pdes" itemprop="description">
+            </p>
+        </div>
+
+        
+
+        <div class="header">
+              <a href="#goC" id="gotocenter" title="跳到主要內容區塊" tabindex="1" class="sr-only sr-only-focusable">跳到主要內容區塊</a>
+            <a  id="goU" href="#goU" title="上方選單區" class="accesskeyStyleTop" accesskey="U" tabindex="2">:::</a>
+
+            <h1>
+            <a href="indexHome.aspx" class="titleLogo" title="" tabindex="3">
+                <img src="../Images/headTitle.png" alt="民生示警資訊介接應用平台"> </a>
+              </h1>
+            <a class="phone_menu">
+                <i class="fa fa-bars" ></i>
+            </a>
+
+
+ <div class="menuArea">
+<div class="topArea" > 
+      <div class="fontchange ">
+<NOSCRIPT>本Script功能提供瀏覽字級大小的變更，若您的瀏覽器不支援此項功能，IE6請利用鍵盤按住Alt鍵 + V → X → (G)最大(L)較大(M)中(S)較小(A)小，來選擇適合您的文字大小，而IE7或Firefox瀏覽器則可利用鍵盤Ctrl + (+)放大(-)縮小來改變字型大小。</NOSCRIPT>
+  
+   <a href="javascript:void(0)" class="fontTitle" title=" ">字級</a><span class="fontclose">X</span>
+  <ul>
+  <li><a href="javascript:void(0)" class="txtchange txtchange_S" title=" " tabindex="4">小</a></li>
+  <li><a href="javascript:void(0)" class="txtchange txtchange_M sel" title="" tabindex="5">中</a></li>
+  <li><a href="javascript:void(0)" class="txtchange txtchange_L" title="" tabindex="6">大</a></li>
+   </ul> 
+   <a href="sitemap2019.aspx" class="btn_sitemap mobile_hide" tabindex="7"   title="" >網站導覽</a>
+  </div>
+   
+
+     <a href="onlineServict.aspx"  class="serviceononlineBox" title="" tabindex="8"  ><i class="fa fa-volume-control-phone"></i><span>線上客服</span></a>   
+	<a href="#" data-bs-toggle="modal" data-bs-target="#messageBox" class="messageBox" title="" tabindex="9"><i class="fa fa-envelope"></i> <span>意見信箱</span></a>
+	<!--<a href="MemberCalendar.aspx" class="calendarBox"><i class="fa fa-calendar" ></i> <span>訂閱示警行事曆</span></a>-->
+    
+</div><!--END topArea-->
+
+
+            <div class="CAP_memuBar">
+                <a class="phone_menu_close" tabindex="50"><i class="fa fa-times" aria-hidden="true"></i></a>
+                <ul>
+                    <a id="goM" href="#goM" title="主要選單區" class="accesskeyStyle" accesskey="M" tabindex="50">:::</a>
+                    <li>
+                        <a href="#" class="CAP_menu_title" title="" tabindex="50"><i class="fa fa-search" aria-hidden="true"></i>查詢示警</a>
+                        <div class="CAP_menu_sub">
+                            <a href="calamityAlertSearch_immediately.aspx" title="" tabindex="50">即時示警查詢</a>
+                            <a href="calamityAlertSearch_history.aspx" title="" tabindex="50">歷史示警查詢</a>
+                            <a href="platformInfo.aspx?SelectedCap=5" title="" tabindex="50">示警簡介</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#"  class="CAP_menu_title" title="" tabindex="50"><i class="fa fa-cloud-download" aria-hidden="true"></i>資料下載  </a>
+                        <div class="CAP_menu_sub">
+                            <a href="RSS.aspx" tabindex="50">示警介接</a>
+                            <a href="applywarndata_step01.aspx" tabindex="50">資料推送</a>
+                            <a href="assistData.aspx" tabindex="50">輔助資料</a>
+                          
+                            <a href="AlertdataDownload.aspx" title="" tabindex="50">CAP下載</a>
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="CAP_menu_title" title="" tabindex="50"><i class="fa fa-cogs" aria-hidden="true"></i>開發專區  </a>
+                        <div class="CAP_menu_sub">
+                            <a href="CAPfiledownload.aspx" title="" tabindex="50">CAP相關文件</a>
+                            <a href="CAP_develope.aspx" title="" tabindex="50">CAP軟體工具箱</a>
+                            <a href="alertMessageAPI.aspx" title="" tabindex="50">示警查詢API</a>
+                            <!--<a href="iconDownload.aspx" title="">示警圖示</a>-->
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#"  class="CAP_menu_title" title="" tabindex="50"><i class="fa fa-cubes" aria-hidden="true"></i>示警應用</a>
+                        <div class="CAP_menu_sub">
+                            <a href="alertWebElement2.aspx" title="" tabindex="50">示警元件</a>
+                            <a href="dataProvide.aspx"  title="" tabindex="50">示警資料提供</a> 
+                            
+                            
+                            
+                            
+                              
+                        </div>
+                    </li>
+                    <li>
+                        <a href="#" class="CAP_menu_title" title="" tabindex="50"><i class="fa fa-window-maximize" aria-hidden="true"></i>認識平台 </a>
+                        <div class="CAP_menu_sub"> 
+                            <a href="history.aspx" title="" tabindex="50">重要事蹟</a>
+                            <a href="usestandard.aspx"  title="" tabindex="50">使用規範</a>
+                            <a href="Document/民生示警公開資料平台.pdf" title="平台簡介.pdf" tabindex="50">平台簡介</a>
+                            <a href="Document/民生示警公開資料平台操作手冊.pdf" title="操作手冊.pdf" tabindex="50">操作手冊</a>
+                            <a href="FAQ.aspx" title="" tabindex="50">常見問題</a>
+                            <!--以下NEW -->
+                            
+                           
+                            
+                            
+                           
+                           
+                        </div>
+                    </li>
+                   
+                     
+                    <li>
+                        <a href="#" id="MemberArea" class="CAP_menu_title" tabindex="50"><i class="fa fa-user-o" aria-hidden="true"></i>會員專區 </a>
+                        <div class="CAP_menu_sub memArea">
+                            <a href="memberSignIn.aspx" id="signIn" tabindex="50">登入</a>
+                            <a href="memberRegister.aspx" id="register" tabindex="50">註冊</a>
+                            
+                            
+                           
+                            
+                            <!---->
+                            
+                            
+                        </div>
+                    </li>
+                   
+                </ul>
+                
+            </div>
+            <!-- end .memuBar -->
+
+
+        </div><!--END menuArea-->
+        </div> <!-- end .header -->
+        <div class="CAP_body ">
+              
+            
+    <a id="goC" href="#goC" title="主要內容區" class="accesskeyStyleCon" accesskey="C">:::</a>
+    <h2 class="title">示警介接
+        <span class="goRight ">
+            <a href="News/systemNEWSatomfeed.xml" target="_blank" class="sub" title="另開新視窗">
+                <i class="fa fa-rss-square" aria-hidden="true"></i>系統最新消息</a>
+        </span>
+    </h2>
+    
+    <div class="bg-white padding10">
+        <ul class="main_tab">
+            <li><a href="#" id="ContentPlaceHolder1_href_tabAtom" onclick="SetTab(1)" class="tab01 selected" title="ATOM" tabindex="1000">ATOM</a></li>
+            <li><a href="#" id="ContentPlaceHolder1_href_tabJson" onclick="SetTab(2)" class="tab02" title="JSON" tabindex="2000">JSON</a></li>
+            <input type="hidden" name="ctl00$ContentPlaceHolder1$hiddenField_tab" id="hiddenField_tab" />
+        </ul>
+        <div id="" class="tabpane01 main_tab_pane" style="display: block;" title="ATOM">
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                何謂ATOM feed？
+            </div>
+            <div class="QAList_A">
+                ATOM feed是以XML表示CAP檔案下載位置的目錄。每個<img src="Images/icon_rss.png" alt="rss_icon" style="margin: -4px 4px;" />後面的連結網址是一個ATOM feed，各代表一種CAP分類。
+     
+            </div>
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                顯示的時間規則為？
+            </div>
+
+            <div class="QAList_A">
+                每個ATOM feed顯示最新一則CAP時間起回溯七天內的所有CAP連結，如最新一筆資料是在2015年9月9日發布，在ATOM feed連結中即會顯示自9月3日至9月9日這段期間的所發布的所有示警。<a href="Document/CAPATOMfeedRules.pdf" target="_blank" title="詳細規則圖例說明.pdf" tabindex="1001">詳細規則圖例說明</a>
+            </div>
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                如何選擇適合的取得方式？
+            </div>
+            <div class="QAList_A">
+                <ul class=" mainUL">
+                    <li>若您使用的目的是希望下載到最新的cap檔案，可以撰寫程式藉由ATOM feed中所提供的固定連結依時間序取得每一個CAP檔案的連結，本站每分鐘會更新ATOM feed資料, 因此可以持續取得新的CAP檔。程式亦可參考：<a href="Document/GetCapFromAtom.zip" target="_blank" title="程式讀取atomfeed下載示警資料範例.zip" tabindex="1002">程式讀取atomfeed下載示警資料範例</a> </li>
+                    <li>若您只希望取得最新的示警相關訊息，也可以使用RSS閱讀器，直接讀取ATOM feed連結網址(請使用<span class="colorR">所有示警</span>的連結)，如此可以接收最新CAP示警訊息。 </li>
+                    <li>若是網站希望引用示警的資料，建議使用<span class="colorR">生效中的示警</span>，並週期性抓取連結的更新，如此可不必自行解析每個示警中的生效期間。
+                         
+                         <li>RSS閱讀器：
+                                  <ul style="list-style: disc; padding-left: 15px;">
+                                      <li>電腦推薦使用Internet Expore(IE)或 Firefox 瀏覽器開啟Atom feed 連結。</li>
+                                      <li>手機則建議於 APP Store 搜尋「RSS Reader」挑選合適之APP使用。<a href="https://goo.gl/s8QeIu" target="_blank" class="main_btn bg_blue" title="另開新視窗"  tabindex="1003">網路上之RSS推薦訂閱工具</a></li>
+                                  </ul>
+                         </li>
+                </ul>
+
+            </div>
+            <h3>ATOM feed  </h3>
+
+            <div class="feedbox">
+
+
+                <ul class="feedList RSS">
+                    <li><a id="lViewData_hLinkView_0" href="RssAtomFeed.ashx" target="_blank" title="另開視窗" tabindex="1004">所有示警(一般訂閱)</a> </li>
+
+                    <li><a id="A1" href="RssAtomFeeds.ashx" target="_blank" title="另開視窗" tabindex="1005">生效中的示警(適合web引用)</a></li>
+                </ul>
+
+            </div>
+            <!-- END feedbox-->
+
+
+
+            
+
+            <div class="feedbox">
+                <h4>示警類別</h4>
+                <ul id="CategoryMenuATOM" class="tab_peoplelive">
+                    <li><a href="javascript:void(0)" id="CategoryAllATOM" name="cateGoryName" class="selected" tabindex="1100">全部</a></li>
+                </ul>
+                <div class="tab_peoplelivePane CatagoryContentATOM">
+                    <ul id="ulMenuATOM1100" class="feedList RSS rankclean">
+                    </ul>
+                </div>
+
+            </div>
+            <!-- END feedbox-->
+
+
+
+            
+            <!-- END feedbox-->
+
+
+
+            <div class="feedbox">
+                <h4>影響區域</h4>
+
+                
+                        <ul class="feedList RSS">
+                            
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_0">宜蘭縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_0" title="另開視窗" tabindex="1901" href="RssAtomFeed.ashx?County=%e5%ae%9c%e8%98%ad%e7%b8%a3" target="_blank">&#23452;&#34349;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_1">基隆市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_1" title="另開視窗" tabindex="1902" href="RssAtomFeed.ashx?County=%e5%9f%ba%e9%9a%86%e5%b8%82" target="_blank">&#22522;&#38534;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_2">臺北市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_2" title="另開視窗" tabindex="1903" href="RssAtomFeed.ashx?County=%e8%87%ba%e5%8c%97%e5%b8%82" target="_blank">&#33274;&#21271;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_3">新北市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_3" title="另開視窗" tabindex="1904" href="RssAtomFeed.ashx?County=%e6%96%b0%e5%8c%97%e5%b8%82" target="_blank">&#26032;&#21271;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_4">桃園市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_4" title="另開視窗" tabindex="1905" href="RssAtomFeed.ashx?County=%e6%a1%83%e5%9c%92%e5%b8%82" target="_blank">&#26691;&#22290;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_5">新竹市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_5" title="另開視窗" tabindex="1906" href="RssAtomFeed.ashx?County=%e6%96%b0%e7%ab%b9%e5%b8%82" target="_blank">&#26032;&#31481;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_6">新竹縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_6" title="另開視窗" tabindex="1907" href="RssAtomFeed.ashx?County=%e6%96%b0%e7%ab%b9%e7%b8%a3" target="_blank">&#26032;&#31481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_7">苗栗縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_7" title="另開視窗" tabindex="1908" href="RssAtomFeed.ashx?County=%e8%8b%97%e6%a0%97%e7%b8%a3" target="_blank">&#33495;&#26647;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_8">臺中市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_8" title="另開視窗" tabindex="1909" href="RssAtomFeed.ashx?County=%e8%87%ba%e4%b8%ad%e5%b8%82" target="_blank">&#33274;&#20013;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_9">彰化縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_9" title="另開視窗" tabindex="1910" href="RssAtomFeed.ashx?County=%e5%bd%b0%e5%8c%96%e7%b8%a3" target="_blank">&#24432;&#21270;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_10">南投縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_10" title="另開視窗" tabindex="1911" href="RssAtomFeed.ashx?County=%e5%8d%97%e6%8a%95%e7%b8%a3" target="_blank">&#21335;&#25237;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_11">雲林縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_11" title="另開視窗" tabindex="1912" href="RssAtomFeed.ashx?County=%e9%9b%b2%e6%9e%97%e7%b8%a3" target="_blank">&#38642;&#26519;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_12">嘉義縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_12" title="另開視窗" tabindex="1913" href="RssAtomFeed.ashx?County=%e5%98%89%e7%be%a9%e7%b8%a3" target="_blank">&#22025;&#32681;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_13">嘉義市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_13" title="另開視窗" tabindex="1914" href="RssAtomFeed.ashx?County=%e5%98%89%e7%be%a9%e5%b8%82" target="_blank">&#22025;&#32681;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_14">臺南市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_14" title="另開視窗" tabindex="1915" href="RssAtomFeed.ashx?County=%e8%87%ba%e5%8d%97%e5%b8%82" target="_blank">&#33274;&#21335;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_15">高雄市</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_15" title="另開視窗" tabindex="1916" href="RssAtomFeed.ashx?County=%e9%ab%98%e9%9b%84%e5%b8%82" target="_blank">&#39640;&#38596;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_16">屏東縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_16" title="另開視窗" tabindex="1917" href="RssAtomFeed.ashx?County=%e5%b1%8f%e6%9d%b1%e7%b8%a3" target="_blank">&#23631;&#26481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_17">臺東縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_17" title="另開視窗" tabindex="1918" href="RssAtomFeed.ashx?County=%e8%87%ba%e6%9d%b1%e7%b8%a3" target="_blank">&#33274;&#26481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_18">花蓮縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_18" title="另開視窗" tabindex="1919" href="RssAtomFeed.ashx?County=%e8%8a%b1%e8%93%ae%e7%b8%a3" target="_blank">&#33457;&#34030;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_19">連江縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_19" title="另開視窗" tabindex="1920" href="RssAtomFeed.ashx?County=%e9%80%a3%e6%b1%9f%e7%b8%a3" target="_blank">&#36899;&#27743;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_20">澎湖縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_20" title="另開視窗" tabindex="1921" href="RssAtomFeed.ashx?County=%e6%be%8e%e6%b9%96%e7%b8%a3" target="_blank">&#28558;&#28246;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <div style="display: none">
+                                <span id="ContentPlaceHolder1_lViewDataRegion_lbcode_21">金門縣</span>
+                            </div>
+                            <a id="ContentPlaceHolder1_lViewDataRegion_hLinkView_21" title="另開視窗" tabindex="1922" href="RssAtomFeed.ashx?County=%e9%87%91%e9%96%80%e7%b8%a3" target="_blank">&#37329;&#38272;&#32291;</a>
+                        </li>
+                    
+                        </ul>
+                    
+            </div>
+            <!-- END feedbox-->
+
+            
+
+            <!-- END ATOM-->
+
+        </div>
+
+        <div id="" class="tabpane02 main_tab_pane" style="display: none;" title="JSON">
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                何謂JSON？
+            </div>
+            <div class="QAList_A">
+
+                <ul class=" mainUL">
+                    <li>JSON（JavaScript Object Notation）是一種由道格拉斯·克羅克福特構想設計、輕量級的資料交換語言，以文字為基礎，且易於讓人閱讀。儘管JSON是Javascript的一個子集，但JSON是獨立於語言的文字格式，並且採用了類似於C語言家族的一些習慣。</li>
+                    <li>JSON 資料格式與語言無關，脫胎於 JavaScript，但目前很多程式語言都支援 JSON 格式資料的生成和解析。JSON 的官方 MIME 類型是 application/json，副檔名是 .json。(Reference :<a href="https://zh.wikipedia.org/wiki/JSON"  tabindex="2001" title="另開新視窗">WIKI</a>)
+                    </li>
+                </ul>
+
+            </div>
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                顯示的時間規則為？
+            </div>
+            <div class="QAList_A">
+                每個JSON顯示最新一則CAP時間起回溯七天內的所有CAP連結，如最新一筆資料是在2015年9月9日發布，在JSON 連結中即會顯示自9月3日至9月9日這段期間的所發布的所有示警。 
+            </div>
+            <div class="QAList_Q">
+                <label><i class="fa fa-question" aria-hidden="true"></i></label>
+                如何選擇適合的取得方式？
+            </div>
+            <div class="QAList_A">
+
+                <ul class=" mainUL">
+                    <li>若您使用的目的是希望下載到最新的cap檔案，可以撰寫程式藉由JSON 中所提供的固定連結依時間序取得每一個CAP檔案的連結，本站每分鐘會更新JSON 資料, 因此可以持續取得新的CAP檔 </li>
+                    <li>若是網站希望引用示警的資料，建議使用<span class="colorR">生效中的示警</span>，並週期性抓取連結的更新，如此可不必自行解析每個示警中的生效期間。
+                                <br />
+                        https://alerts.ncdr.nat.gov.tw/JSONAtomFeeds.ashx </li>
+                </ul>
+
+            </div>
+            <h3>JSON  </h3>
+
+            <div class="feedbox">
+                <ul class="feedList JSON">
+                    <li><a id="lViewDataJson_hLinkView_0" href="JSONAtomFeed.ashx" target="_blank" title="另開新視窗"  tabindex="2002">所有示警(一般訂閱)</a> </li>
+                    <li><a id="lViewDataJson_hLinkView_1" href="JSONAtomFeeds.ashx" target="_blank" title="另開新視窗" tabindex="2003">生效中的示警(適合web引用)</a></li>
+                </ul>
+            </div>
+            <!-- END feedbox-->
+
+
+
+            <div class="feedbox">
+                <h4>示警類別</h4>
+                <ul id="CategoryMenuJSON" class="tab_peoplelive">
+                    <li><a id="CategoryAllJSON" name="cateGoryName" class="selected" tabindex="2100">全部</a></li>
+                </ul>
+                <div class="tab_peoplelivePane CatagoryContentJSON">
+                    <ul id="ulMenuJSON2100" class="feedList JSON rankclean">
+                    </ul>
+                </div>
+
+            </div>
+            <!-- END feedbox-->
+
+
+            
+            <!-- END feedbox-->
+
+
+            <div class="feedbox">
+                <h4>影響區域</h4>
+                
+                        <ul class="feedList JSON">
+                            
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_0" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%ae%9c%e8%98%ad%e7%b8%a3" target="_blank">&#23452;&#34349;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_1" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%9f%ba%e9%9a%86%e5%b8%82" target="_blank">&#22522;&#38534;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_2" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%87%ba%e5%8c%97%e5%b8%82" target="_blank">&#33274;&#21271;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_3" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e6%96%b0%e5%8c%97%e5%b8%82" target="_blank">&#26032;&#21271;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_4" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e6%a1%83%e5%9c%92%e5%b8%82" target="_blank">&#26691;&#22290;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_5" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e6%96%b0%e7%ab%b9%e5%b8%82" target="_blank">&#26032;&#31481;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_6" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e6%96%b0%e7%ab%b9%e7%b8%a3" target="_blank">&#26032;&#31481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_7" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%8b%97%e6%a0%97%e7%b8%a3" target="_blank">&#33495;&#26647;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_8" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%87%ba%e4%b8%ad%e5%b8%82" target="_blank">&#33274;&#20013;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_9" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%bd%b0%e5%8c%96%e7%b8%a3" target="_blank">&#24432;&#21270;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_10" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%8d%97%e6%8a%95%e7%b8%a3" target="_blank">&#21335;&#25237;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_11" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e9%9b%b2%e6%9e%97%e7%b8%a3" target="_blank">&#38642;&#26519;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_12" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%98%89%e7%be%a9%e7%b8%a3" target="_blank">&#22025;&#32681;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_13" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%98%89%e7%be%a9%e5%b8%82" target="_blank">&#22025;&#32681;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_14" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%87%ba%e5%8d%97%e5%b8%82" target="_blank">&#33274;&#21335;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_15" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e9%ab%98%e9%9b%84%e5%b8%82" target="_blank">&#39640;&#38596;&#24066;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_16" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e5%b1%8f%e6%9d%b1%e7%b8%a3" target="_blank">&#23631;&#26481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_17" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%87%ba%e6%9d%b1%e7%b8%a3" target="_blank">&#33274;&#26481;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_18" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e8%8a%b1%e8%93%ae%e7%b8%a3" target="_blank">&#33457;&#34030;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_19" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e9%80%a3%e6%b1%9f%e7%b8%a3" target="_blank">&#36899;&#27743;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_20" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e6%be%8e%e6%b9%96%e7%b8%a3" target="_blank">&#28558;&#28246;&#32291;</a>
+                        </li>
+                    
+                        <li>
+                            <a id="ContentPlaceHolder1_lViewDataRegionJson_hLinkView_21" title="另開新視窗" tabindex="2901" href="JSONAtomFeed.ashx?County=%e9%87%91%e9%96%80%e7%b8%a3" target="_blank">&#37329;&#38272;&#32291;</a>
+                        </li>
+                    
+                        </ul>
+                    
+
+            </div>
+            <!-- END feedbox-->
+            
+
+
+
+        </div>
+        <!-- END JSON-->
+    </div>
+    <!-- end .bg-white -->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <!-- 我要評分 modal -->
+
+    <div class="modal fade" id="numbox" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><span id="ATNAME"></span> - 評分</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+
+
+                    <div class="starArea ">
+                        <h4>您給的分數：
+
+	 <div class="starBOX ">
+         <a href="javascript:void(0)" class="starlist" onclick="Setstar(1)" title="1分">
+             <input id="star01" type="radio" name="star">
+             <label for="star01"><i class="fa fa-star " aria-hidden="true"></i></label>
+         </a>
+         <a href="javascript:void(0)" class="starlist" onclick="Setstar(2)" title="2分">
+             <input id="star02" type="radio" name="star"><label for="star02"> <i class="fa fa-star" aria-hidden="true"></i></label>
+         </a>
+         <a href="javascript:void(0)" class="starlist" onclick="Setstar(3)" title="3分">
+             <input id="star03" type="radio" name="star">
+             <label for="star03"><i class="fa fa-star" aria-hidden="true"></i></label>
+         </a>
+         <a href="javascript:void(0)" class="starlist" onclick="Setstar(4)" title="4分">
+             <input id="star04" type="radio" name="star">
+             <label for="star04"><i class="fa fa-star" aria-hidden="true"></i></label>
+         </a>
+         <a href="javascript:void(0)" class="starlist" onclick="Setstar(5)" title="5分">
+             <input id="star05" type="radio" name="star">
+             <label for="star05"><i class="fa fa-star" aria-hidden="true"></i></label>
+         </a>
+     </div>
+                            <!-- END starBOX-->
+
+                        </h4>
+
+                        <h4>
+                            <label for="startextarea">歡迎對這主題提供寶貴的意見：</label></h4>
+
+                        <textarea id="startextarea" style="width: 100%; height: 80px;"></textarea>
+
+                        <input type="hidden" id="atsuid" />
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="rating_cancel" class="btn btn-danger" data-dismiss="modal">取消</button>
+                    <button type="button" id="rating_send" class="btn btn-dark" onclick="sendScore()">送出</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END  我要評分 modal -->
+
+
+
+
+
+
+        </div>
+        <!-- end .CAP_body-->
+        
+        
+        <div class="footer ">
+            <div class="footer_pixel">
+                <div class="footercon">
+                   
+                    <div class="footer_memuBar">
+                           <a id="goT"  href="#goT" title="下方導覽區" class="accesskeyStyle" accesskey="T" tabindex="50000">:::</a> 
+                        <ul> 
+                            <li>
+                                <h3>查詢示警</h3>
+                                <ul class="menu_sub">
+                                    <li><a href="calamityAlertSearch_immediately.aspx" title="" tabindex="50000">》即時示警查詢</a>  </li>
+                                    <li><a href="calamityAlertSearch_history.aspx" title=""  tabindex="50000">》歷史示警查詢</a>   </li>
+                                    <li><a href="platformInfo.aspx?SelectedCap=5" title=""  tabindex="50000">》示警簡介</a> </li>
+                                </ul>
+                            </li>
+                            <li>
+                                <h3>資料下載  </h3>
+                                <ul class="menu_sub">
+                                    <li><a href="RSS.aspx" title="" tabindex="50000">》示警介接</a>  </li>
+                                    <li><a href="applywarndata_step01.aspx" title="" tabindex="50000">》資料推送</a>  </li>
+                                    <li><a href="assistData.aspx" title="" tabindex="50000">》輔助資料</a>   </li>
+                                     
+                                    <li><a href="AlertdataDownload.aspx" title="" tabindex="50000">》CAP下載</a>  </li>
+                                </ul>  
+                       
+                            </li>
+                            <li>
+                                <h3>開發專區  </h3>
+                                <ul class="menu_sub">
+                                    <li><a href="CAPfiledownload.aspx" title="" tabindex="50000">》CAP相關文件</a>  </li> 
+                                    <li><a href="CAP_develope.aspx"  title="" tabindex="50000">》CAP軟體工具箱</a>  </li>
+                                    <li><a href="alertMessageAPI.aspx" title="" tabindex="50000">》示警查詢API</a> </li>
+                                    <!--<li><a href="iconDownload.aspx" title="">》示警圖示</a> </li>-->
+                               </ul>
+                            </li>
+                            <li>
+                                <h3>示警應用  </h3>
+                                <ul class="menu_sub">
+                                    <li><a href="alertWebElement2.aspx" title=""  tabindex="50000">》示警元件</a>  </li>
+                                    <li><a href="dataProvide.aspx"  title=""  tabindex="50000">》示警資料提供</a> </li>
+                                    
+                                    
+                                    
+                                     
+                               </ul>
+                            </li>
+                            <li>
+                                <h3>認識平台 </h3>
+                                <ul class="menu_sub">
+                                    
+                                    <li><a href="history.aspx" title="" tabindex="50000">》重要事蹟</a> </li>
+                                    <li ><a href="usestandard.aspx"  title=""  tabindex="50000">》使用規範</a>  </li>
+                                    <li><a href="Document/民生示警公開資料平台.pdf" title="平台簡介.pdf" tabindex="50000">》平台簡介</a>  </li>
+                                    <li><a href="Document/民生示警公開資料平台操作手冊.pdf" title="操作手冊.pdf" tabindex="50000">》操作手冊</a>  </li>
+                                    <li><a href="FAQ.aspx" title="" tabindex="50000">》常見問題</a> </li>
+                                   
+                                   
+                                    
+                                   
+                                    
+                                </ul>
+
+                            </li>
+                           
+                            <li>
+                                <h3>會員專區  </h3>
+                                <ul class="menu_sub">
+                                    <li><a href="MemberArea.aspx" title="" tabindex="50000">》會員基本資料管理</a>  </li>
+                                    <li><a href="CapApplyLog.aspx" title="" tabindex="50000">》資料推送管理</a>  </li>
+                                    <li><a href="dataSupplyMG.aspx" title="" style="display:none" tabindex="50000">》資料提供管理</a> </li>
+                                    <!--<li><a href="MemberCalendar.aspx">》訂閱示警行事曆</a> </li>-->
+                                </ul>
+                                
+                            </li>
+
+                            <li>
+                                <h3><a href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#messageBox"  title="" tabindex="50000">意見信箱  </a></h3>
+                                 <h3><a href="onlineServict.aspx"  title="" tabindex="50000">線上客服  </a></h3>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- end .memuBar -->
+                    <div class="foot_copyright">
+                         <div class="mailArea "> 
+        
+          <span class="mobile_hide">線上客服：</span>
+                              
+             <a href="onlineServict.aspx"  class="main_btn bg_Line"  title="" tabindex="50000"><img src="../Images/icon_line2.png" alt="線上客服Line" style="height: 20px;"> Line</a>  
+
+          <a href="https://goo.gl/forms/svNL2QtzBAQz0hDB2" target="_blank" class="main_btn bg_green"  title="另開視窗，連結到問券填寫頁面" tabindex="50000"><i class="fa fa-pencil-square-o" aria-hidden="true"></i> 填寫問卷</a>
+           <a  href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#messageBox" class="main_btn bg_blue"  title="" style="color:#000;" tabindex="50000">
+           <i class="fa fa-envelope" aria-hidden="true"></i>
+			   意見信箱</a>
+    	
+    </div>
+                        <a href="https://www.ncdr.nat.gov.tw/" target="_blank" class="footer_logo"  title="另開新視窗，連結到國家災害防救科技中心" tabindex="50000">
+                            <img src="Images/NCDRLOGO.png" alt="NCDR LOGO"></a>
+                        <ul>
+                            <li>民生示警公開資料平台 &copy; 國家災害防救科技中心 版權所有　　</li>
+                            <li>23143 新北市新店區北新路三段200號9樓</li>
+                            <li>9F., No.200, Sec. 3, Beisin Rd., Xindian District, New Taipei City 23143, Taiwan (R.O.C.)</li>
+                            <li>Email：<a href="mailto:alert@ncdr.nat.gov.tw" title="" tabindex="50000">alert@ncdr.nat.gov.tw</a></li>
+                            <li class="count">瀏覽人數：5,485,788</li>
+                     
+                            </ul>
+                    </div>
+
+                     <a href="javascript:void(0)" id="goTop" title="goTop回到最上端"  tabindex="60000"><i class="fa fa-angle-double-up"></i></a>
+
+                </div>
+                <!-- end .footercon -->
+            </div>
+            <!-- end .footer_pixel -->
+        </div>
+        <!-- end .footer -->
+
+
+
+
+
+  <!-- 意見信箱 modal -->
+ <input type="hidden" name="ctl00$hfdType" id="hfdType" value="1" />
+ <input type="hidden" name="ctl00$hfdTblcapreciveInfoSuid" id="hfdTblcapreciveInfoSuid" />
+ <input type="hidden" name="ctl00$hfdAlertType" id="hfdAlertType" />
+<div class="modal fade" id="messageBox" tabindex="-1" role="dialog"  aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">意見信箱</h5>
+        <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        
+		  
+	  
+ <h3 id="setMailText">意見回饋</h3>
+ 
+  <div class="message">
+	  <h4>	
+       <label for="tbxName">姓名：</label></h4>
+	  <p><input name="ctl00$tbxName" type="text" maxlength="15" id="tbxName" /></p>
+   
+  	<h4>  <label for="tbxMail">電子郵件：</label></h4>
+  	<p>
+          <input name="ctl00$tbxMail" type="text" maxlength="50" id="tbxMail" />
+  	</p>
+ 
+  	<h4> <label for="radioType"> 問題類型：</label></h4>
+  	
+       <table id="radioType">
+	<tr>
+		<td><input id="radioType_0" type="radio" name="ctl00$radioType" value="1" checked="checked" /><label for="radioType_0">系統使用問題</label></td>
+	</tr>
+</table>   
+
+    <p></p>
+
+    <h4 id="h4ID2">示警類別：</h4>
+  	<p id="pID2">
+       <select name="ctl00$dropType" id="dropType">
+	<option value="">請選擇</option>
+	<option value="5ECC219B-4880-404D-8DE8-534C14AE11D2">中央部會</option>
+	<option value="7CC91687-40BA-44ED-8F2B-15A4C0CFA076">事業單位</option>
+	<option value="EB6F9477-22DA-4F6A-9A49-72F197944861">地方政府</option>
+
+</select>
+        
+  	</p>
+
+  	<h4 id="h4ID">示警名稱：</h4>
+  	<p id="pID">
+       <select id="ddlCategory"></select>
+    </p>
+ 
+  	<h4>回饋意見：</h4>
+  	<p> 
+          <textarea name="ctl00$Description" rows="2" cols="20" id="Description">
+</textarea>
+    </p>
+ 
+  	<h4>回饋網址：</h4>
+  	<p class="colorRed txt11"><span id="lbApplicationPath">/RSS.aspx</span></p>
+ 
+    <h4>驗證碼：</h4> 
+    
+    
+    <div class="input-group mb-3">
+        <img id="captcha2" src="Captcha.aspx" class="codeimg" alt="圖片驗證碼，移到下一個項目可讀取驗證碼" />   <button type="button" class="btn_code btn bg_gray " onclick="captcha2.src = 'Captcha.aspx?r=' + (new Date()).getTime()" tabindex="500"><i class="fa fa-refresh" aria-hidden="true"></i> 重新產生驗證碼</button>
+        <input name="ctl00$txtValidate2" type="text" id="txtValidate2" class="codeinput" onkeypress="return KeyPress(this, event);" />
+        
+    </div>
+ </div>
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" data-dismiss="modal">取消</button>
+        <input type="submit" name="ctl00$sendBtn" value="送出" id="sendBtn" class="btn btn-danger" />       
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+    </form>
+</body>
+</html>
+

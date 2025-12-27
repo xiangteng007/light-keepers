@@ -53,7 +53,7 @@ export default function EventsPage() {
     const [showTaskModal, setShowTaskModal] = useState(false);
     const [taskForm, setTaskForm] = useState({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '' });
 
-    // 獲取已確認的回報作為災情事件
+    // 獲取已確認的回報作為災害回報
     const { data: reportsData, isLoading, error } = useQuery({
         queryKey: ['confirmedReports'],
         queryFn: () => getReports({ status: 'confirmed' }).then(res => res.data.data),
@@ -145,7 +145,7 @@ export default function EventsPage() {
 
         setTaskForm({
             title: `處理：${report.title}`,
-            description: `【災情事件】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
+            description: `【災害回報】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
             priority: report.severity === 'critical' ? 'high' : report.severity === 'high' ? 'high' : 'medium',
             dueDate: dueStr,
             assignedTo: '',
@@ -186,7 +186,7 @@ export default function EventsPage() {
 
         createTaskMutation.mutate({
             title: `處理：${report.title}`,
-            description: `【災情事件】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
+            description: `【災害回報】${report.description}\n\n【位置】${report.address || `${report.latitude}, ${report.longitude}`}\n【回報人】${report.contactName || '未提供'}\n【聯絡電話】${report.contactPhone || '未提供'}`,
             priority: priorityMap[report.severity] || 2,
             dueAt: defaultDue.toISOString(),
             assignedTo: user.id,
@@ -198,7 +198,7 @@ export default function EventsPage() {
         return (
             <div className="page events-page">
                 <div className="page-header">
-                    <h2>災情事件</h2>
+                    <h2>災害回報</h2>
                 </div>
                 <div className="loading-state">載入中...</div>
             </div>
@@ -209,7 +209,7 @@ export default function EventsPage() {
         return (
             <div className="page events-page">
                 <div className="page-header">
-                    <h2>災情事件</h2>
+                    <h2>災害回報</h2>
                 </div>
                 <div className="error-state">載入失敗，請重試</div>
             </div>
@@ -219,8 +219,11 @@ export default function EventsPage() {
     return (
         <div className="page events-page">
             <div className="page-header">
-                <h2>災情事件</h2>
+                <h2>災害回報</h2>
                 <span className="header-badge">{filteredReports.length} 件</span>
+                <Button variant="primary" onClick={() => window.location.href = '/report'}>
+                    📝 狀況回報
+                </Button>
             </div>
 
             <div className="filter-bar">
@@ -246,7 +249,7 @@ export default function EventsPage() {
             {filteredReports.length === 0 ? (
                 <div className="empty-state">
                     <span>📋</span>
-                    <p>目前沒有已確認的災情事件</p>
+                    <p>目前沒有已確認的災害回報</p>
                 </div>
             ) : (
                 <div className="events-table">
@@ -344,7 +347,7 @@ export default function EventsPage() {
                 <Modal
                     isOpen={showDetailModal}
                     onClose={() => setShowDetailModal(false)}
-                    title="災情事件詳情"
+                    title="災害回報詳情"
                 >
                     <div className="event-detail">
                         <div className="event-detail__header">
