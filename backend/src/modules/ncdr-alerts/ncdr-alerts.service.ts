@@ -445,6 +445,7 @@ export class NcdrAlertsService {
                 await new Promise(resolve => setTimeout(resolve, 500));
 
                 const entries = await this.fetchAlertsByType(typeId);
+                this.logger.log(`AlertType ${typeId}: fetched ${entries.length} entries`);
 
                 for (const entry of entries) {
                     const parsed = this.parseAtomEntry(entry, typeId);
