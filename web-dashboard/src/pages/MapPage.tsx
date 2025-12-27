@@ -154,11 +154,11 @@ const mapOptions: google.maps.MapOptions = {
     ],
 };
 
-// 初始化核心類型為全選
+// 初始化所有類型為全選
 const initNcdrFilters = (): Record<number, boolean> => {
     const filters: Record<number, boolean> = {};
     NCDR_CORE_TYPES.forEach(t => { filters[t.id] = true; });
-    NCDR_EXTENDED_TYPES.forEach(t => { filters[t.id] = false; });
+    NCDR_EXTENDED_TYPES.forEach(t => { filters[t.id] = true; }); // 全部預設開啟
     return filters;
 };
 
@@ -260,11 +260,13 @@ export default function MapPage() {
     const shouldShowAed = showAed && currentZoom >= AED_MIN_ZOOM;
 
     // 根據類型過濾 NCDR 警報 (地圖用)
+    // 未知類型預設顯示
     const filteredNcdrAlerts = useMemo(() => {
         if (!showNcdrAlerts) return [];
         return ncdrAlerts.filter(alert => {
             const typeId = alert.alertTypeId;
-            return ncdrTypeFilters[typeId] === true;
+            // 如果類型不在過濾器中，預設顯示；否則依據過濾器設定
+            return ncdrTypeFilters[typeId] !== false;
         });
     }, [ncdrAlerts, ncdrTypeFilters, showNcdrAlerts]);
 
