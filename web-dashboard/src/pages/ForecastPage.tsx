@@ -300,47 +300,48 @@ export default function ForecastPage() {
                     </div>
 
                     {generalForecast.length > 0 && generalForecast[0] && (
-                        <div className="weather-cards">
-                            <div className="weather-card main-card">
-                                <h2>{generalForecast[0].locationName}</h2>
-                                <div className="weather-icon-large">
-                                    {getWeatherIcon('')}
-                                </div>
-                                <div className="weather-details">
-                                    {(() => {
-                                        const elements = parseWeatherElements(generalForecast[0].weatherElements);
-                                        return (
-                                            <>
-                                                {elements.Wx && elements.Wx[0] && (
-                                                    <div className="detail-item">
-                                                        <span className="label">天氣</span>
-                                                        <span className="value">{elements.Wx[0].value}</span>
-                                                    </div>
+                        <>
+                            <h2>📍 {generalForecast[0].locationName} 一週天氣預報</h2>
+                            <div className="weekly-forecast">
+                                {(() => {
+                                    const elements = parseWeatherElements(generalForecast[0].weatherElements);
+                                    const days = [];
+                                    const maxLen = Math.max(
+                                        elements.Wx?.length || 0,
+                                        elements.MinT?.length || 0,
+                                        elements.MaxT?.length || 0
+                                    );
+
+                                    for (let i = 0; i < Math.min(maxLen, 7); i++) {
+                                        const date = new Date();
+                                        date.setHours(date.getHours() + (i * 12));
+                                        const dayName = i === 0 ? '今天' : i === 1 ? '今晚' :
+                                            date.toLocaleDateString('zh-TW', { weekday: 'short', month: 'numeric', day: 'numeric' });
+
+                                        const wx = elements.Wx?.[i]?.value || '多雲';
+                                        const minT = elements.MinT?.[i]?.value || '--';
+                                        const maxT = elements.MaxT?.[i]?.value || '--';
+                                        const pop = elements.PoP?.[i]?.value || '--';
+
+                                        days.push(
+                                            <div key={i} className="day-card">
+                                                <div className="day-name">{dayName}</div>
+                                                <div className="day-icon">{getWeatherIcon(wx)}</div>
+                                                <div className="day-weather">{wx}</div>
+                                                <div className="day-temp">
+                                                    <span className="temp-high">{maxT}°</span>
+                                                    <span className="temp-low">{minT}°</span>
+                                                </div>
+                                                {pop !== '--' && (
+                                                    <div className="day-pop">💧 {pop}%</div>
                                                 )}
-                                                {elements.MinT && elements.MinT[0] && elements.MaxT && elements.MaxT[0] && (
-                                                    <div className="detail-item">
-                                                        <span className="label">溫度</span>
-                                                        <span className="value">{elements.MinT[0].value}°C ~ {elements.MaxT[0].value}°C</span>
-                                                    </div>
-                                                )}
-                                                {elements.PoP && elements.PoP[0] && (
-                                                    <div className="detail-item">
-                                                        <span className="label">降雨機率</span>
-                                                        <span className="value">{elements.PoP[0].value}%</span>
-                                                    </div>
-                                                )}
-                                                {elements.CI && elements.CI[0] && (
-                                                    <div className="detail-item">
-                                                        <span className="label">舒適度</span>
-                                                        <span className="value">{elements.CI[0].value}</span>
-                                                    </div>
-                                                )}
-                                            </>
+                                            </div>
                                         );
-                                    })()}
-                                </div>
+                                    }
+                                    return days;
+                                })()}
                             </div>
-                        </div>
+                        </>
                     )}
                 </div>
             )}

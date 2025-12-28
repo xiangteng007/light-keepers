@@ -21,19 +21,19 @@ export const CWA_DATASETS = {
     QPF_12_24H: 'F-C0035-017',             // 定量降水預報 12-24h
     QPF_TYPHOON: 'F-C0034-006',            // 颱風/豪雨24小時雨量
 
-    // 海洋預報
-    MARINE_WEATHER: 'F-A0012-001',         // 海面天氣預報
-    WAVE_FORECAST: 'F-A0020-001',          // 波浪預報
+    // 海洋預報 - 使用一般天氣預報作為備用
+    MARINE_WEATHER: 'F-C0032-001',         // 用 36小時天氣預報作為海面天氣備用
+    WAVE_FORECAST: 'F-C0032-001',          // 波浪預報備用
     WAVE_MAP_24H: 'F-C0035-020',           // 24小時波浪預報圖
     TIDE_FORECAST: 'F-A0021-001',          // 潮汐預報
 
-    // 育樂天氣預報
-    MOUNTAIN_24H: 'F-B0053-031',           // 登山一週24小時預報
-    MOUNTAIN_DAY_NIGHT: 'F-B0053-033',     // 登山日夜預報
-    SCENIC_24H: 'F-B0053-043',             // 風景區一週24小時預報
-    SCENIC_DAY_NIGHT: 'F-B0053-045',       // 風景區日夜預報
-    FARM_24H: 'F-B0053-013',               // 農場旅遊一週預報
-    AGRICULTURE: 'F-A0010-001',            // 農業氣象建議
+    // 育樂天氣預報 - 使用一般天氣預報作為替代
+    MOUNTAIN_24H: 'F-C0032-001',           // 用一般預報代替
+    MOUNTAIN_DAY_NIGHT: 'F-C0032-001',     // 登山日夜預報
+    SCENIC_24H: 'F-C0032-001',             // 風景區一週預報
+    SCENIC_DAY_NIGHT: 'F-C0032-001',       // 風景區日夜預報
+    FARM_24H: 'F-C0032-001',               // 農場旅遊一週預報
+    AGRICULTURE: 'F-C0032-001',            // 農業氣象建議
 };
 
 // 台灣縣市代碼

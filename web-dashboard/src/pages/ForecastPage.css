@@ -179,6 +179,89 @@
     color: #111;
 }
 
+/* 一週天氣預報卡片 */
+.weekly-forecast {
+    display: flex;
+    gap: 0.75rem;
+    overflow-x: auto;
+    padding: 0.5rem 0;
+}
+
+.day-card {
+    flex: 0 0 auto;
+    min-width: 100px;
+    background: #f9f9f9;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem 0.75rem;
+    text-align: center;
+    transition: box-shadow 0.2s;
+}
+
+.day-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.day-card:first-child {
+    background: #111;
+    color: #fff;
+    border-color: #111;
+}
+
+.day-card:first-child .day-weather,
+.day-card:first-child .temp-low {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.day-name {
+    font-size: 0.8rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.day-icon {
+    font-size: 2rem;
+    margin: 0.5rem 0;
+}
+
+.day-weather {
+    font-size: 0.75rem;
+    color: #666;
+    margin-bottom: 0.5rem;
+    height: 2.5em;
+    overflow: hidden;
+}
+
+.day-temp {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.temp-high {
+    font-weight: 600;
+    color: #c53030;
+}
+
+.day-card:first-child .temp-high {
+    color: #fff;
+}
+
+.temp-low {
+    color: #666;
+}
+
+.day-pop {
+    font-size: 0.75rem;
+    color: #2b6cb0;
+    margin-top: 0.4rem;
+}
+
+.day-card:first-child .day-pop {
+    color: rgba(255, 255, 255, 0.8);
+}
+
 /* 海面天氣 */
 .marine-grid {
     display: grid;
