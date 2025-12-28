@@ -1,7 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import './ForecastPage.css';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app';
+
+// 類型定義
+interface WeatherElement {
+    elementName: string;
+    time: Array<{
+        startTime: string;
+        endTime: string;
+        parameter: {
+            parameterName?: string;
+            parameterValue?: string;
+        };
+    }>;
+}
+
+interface WeatherForecast {
+    locationName: string;
+    weatherElements: WeatherElement[];
+}
+
+interface MarineRegion {
+    region: string;
+    wind: string;
+    windSpeed: string;
+    seaCondition: string;
+    waveHeight: string;
+}
+
+interface TideEvent {
+    time: string;
+    type: 'high' | 'low';
+    height: number;
+}
+
+interface TideForecast {
+    date: string;
+    tides: TideEvent[];
+}
+
+interface TideStation {
+    station: string;
+    forecasts: TideForecast[];
+}
+
+interface DailyForecast {
+    date: string;
+    weather: string;
+    minTemp: number;
+    maxTemp: number;
+}
+
+interface RecreationalLocation {
+    locationName: string;
+    forecasts: DailyForecast[];
+}
+
+interface ParsedWeatherElements {
+    Wx?: Array<{ value: string }>;
+    MinT?: Array<{ value: string }>;
+    MaxT?: Array<{ value: string }>;
+    PoP?: Array<{ value: string }>;
+    CI?: Array<{ value: string }>;
+}
 
 // 縣市資料
 const COUNTIES = [
@@ -30,7 +92,7 @@ const COUNTIES = [
 ];
 
 // 天氣圖標對應
-const getWeatherIcon = (description) => {
+const getWeatherIcon = (description: string): string => {
     if (!description) return '🌤️';
     if (description.includes('雨')) return '🌧️';
     if (description.includes('雷')) return '⛈️';
@@ -44,15 +106,15 @@ export default function ForecastPage() {
     const [selectedCounty, setSelectedCounty] = useState('臺北市');
     const [activeTab, setActiveTab] = useState('general');
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
+    const [error, setError] = useState<string | null>(null);
 
     // 資料狀態
-    const [generalForecast, setGeneralForecast] = useState(null);
-    const [marineForecast, setMarineForecast] = useState(null);
-    const [tideForecast, setTideForecast] = useState(null);
-    const [mountainForecast, setMountainForecast] = useState(null);
-    const [scenicForecast, setScenicForecast] = useState(null);
-    const [farmForecast, setFarmForecast] = useState(null);
+    const [generalForecast, setGeneralForecast] = useState<WeatherForecast[]>([]);
+    const [marineForecast, setMarineForecast] = useState<MarineRegion[]>([]);
+    const [tideForecast, setTideForecast] = useState<TideStation[]>([]);
+    const [mountainForecast, setMountainForecast] = useState<RecreationalLocation[]>([]);
+    const [scenicForecast, setScenicForecast] = useState<RecreationalLocation[]>([]);
+    const [farmForecast, setFarmForecast] = useState<RecreationalLocation[]>([]);
 
     // 載入一般天氣預報
     useEffect(() => {
@@ -77,9 +139,9 @@ export default function ForecastPage() {
             const res = await fetch(`${API_BASE}/api/v1/weather/general?county=${encodeURIComponent(selectedCounty)}`);
             const data = await res.json();
             if (data.success) {
-                setGeneralForecast(data.data);
+                setGeneralForecast(data.data || []);
             }
-        } catch (err) {
+        } catch {
             setError('無法載入天氣預報');
         } finally {
             setLoading(false);
@@ -91,8 +153,8 @@ export default function ForecastPage() {
         try {
             const res = await fetch(`${API_BASE}/api/v1/weather/marine`);
             const data = await res.json();
-            if (data.success) setMarineForecast(data.data);
-        } catch (err) {
+            if (data.success) setMarineForecast(data.data || []);
+        } catch {
             setError('無法載入海面天氣');
         } finally {
             setLoading(false);
@@ -104,8 +166,8 @@ export default function ForecastPage() {
         try {
             const res = await fetch(`${API_BASE}/api/v1/weather/tide`);
             const data = await res.json();
-            if (data.success) setTideForecast(data.data);
-        } catch (err) {
+            if (data.success) setTideForecast(data.data || []);
+        } catch {
             setError('無法載入潮汐預報');
         } finally {
             setLoading(false);
@@ -117,8 +179,8 @@ export default function ForecastPage() {
         try {
             const res = await fetch(`${API_BASE}/api/v1/weather/mountain`);
             const data = await res.json();
-            if (data.success) setMountainForecast(data.data);
-        } catch (err) {
+            if (data.success) setMountainForecast(data.data || []);
+        } catch {
             setError('無法載入登山天氣');
         } finally {
             setLoading(false);
@@ -130,8 +192,8 @@ export default function ForecastPage() {
         try {
             const res = await fetch(`${API_BASE}/api/v1/weather/scenic`);
             const data = await res.json();
-            if (data.success) setScenicForecast(data.data);
-        } catch (err) {
+            if (data.success) setScenicForecast(data.data || []);
+        } catch {
             setError('無法載入風景區預報');
         } finally {
             setLoading(false);
@@ -143,8 +205,8 @@ export default function ForecastPage() {
         try {
             const res = await fetch(`${API_BASE}/api/v1/weather/farm`);
             const data = await res.json();
-            if (data.success) setFarmForecast(data.data);
-        } catch (err) {
+            if (data.success) setFarmForecast(data.data || []);
+        } catch {
             setError('無法載入農場旅遊');
         } finally {
             setLoading(false);
@@ -152,12 +214,13 @@ export default function ForecastPage() {
     };
 
     // 解析天氣資料
-    const parseWeatherElements = (elements) => {
+    const parseWeatherElements = (elements: WeatherElement[]): ParsedWeatherElements => {
         if (!elements) return {};
-        const result = {};
-        elements.forEach(el => {
+        const result: ParsedWeatherElements = {};
+        elements.forEach((el: WeatherElement) => {
             if (el.time && el.time.length > 0) {
-                result[el.elementName] = el.time.map(t => ({
+                const key = el.elementName as keyof ParsedWeatherElements;
+                (result as Record<string, Array<{ value: string }>>)[key] = el.time.map((t) => ({
                     startTime: t.startTime,
                     endTime: t.endTime,
                     value: t.parameter?.parameterName || t.parameter?.parameterValue || '',
@@ -236,7 +299,7 @@ export default function ForecastPage() {
                         </select>
                     </div>
 
-                    {generalForecast && generalForecast[0] && (
+                    {generalForecast.length > 0 && generalForecast[0] && (
                         <div className="weather-cards">
                             <div className="weather-card main-card">
                                 <h2>{generalForecast[0].locationName}</h2>
@@ -283,11 +346,11 @@ export default function ForecastPage() {
             )}
 
             {/* 海面天氣 */}
-            {activeTab === 'marine' && marineForecast && (
+            {activeTab === 'marine' && marineForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌊 海面天氣預報</h2>
                     <div className="marine-grid">
-                        {marineForecast.map((region, idx) => (
+                        {marineForecast.map((region: MarineRegion, idx: number) => (
                             <div key={idx} className="marine-card">
                                 <h3>{region.region}</h3>
                                 <div className="marine-details">
@@ -315,18 +378,18 @@ export default function ForecastPage() {
             )}
 
             {/* 潮汐預報 */}
-            {activeTab === 'tide' && tideForecast && (
+            {activeTab === 'tide' && tideForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌙 潮汐預報（未來一個月）</h2>
                     <div className="tide-grid">
-                        {tideForecast.slice(0, 6).map((station, idx) => (
+                        {tideForecast.slice(0, 6).map((station: TideStation, idx: number) => (
                             <div key={idx} className="tide-card">
                                 <h3>📍 {station.station}</h3>
-                                {station.forecasts && station.forecasts.slice(0, 3).map((day, dIdx) => (
+                                {station.forecasts && station.forecasts.slice(0, 3).map((day: TideForecast, dIdx: number) => (
                                     <div key={dIdx} className="tide-day">
                                         <div className="tide-date">{day.date}</div>
                                         <div className="tide-events">
-                                            {day.tides && day.tides.map((tide, tIdx) => (
+                                            {day.tides && day.tides.map((tide: TideEvent, tIdx: number) => (
                                                 <span key={tIdx} className={`tide-event ${tide.type}`}>
                                                     {tide.type === 'high' ? '🔺' : '🔻'}
                                                     {new Date(tide.time).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
@@ -343,15 +406,15 @@ export default function ForecastPage() {
             )}
 
             {/* 登山天氣 */}
-            {activeTab === 'mountain' && mountainForecast && (
+            {activeTab === 'mountain' && mountainForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>⛰️ 登山天氣預報（一週）</h2>
                     <div className="recreational-grid">
-                        {mountainForecast.slice(0, 12).map((location, idx) => (
+                        {mountainForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
                                 <h3>{location.locationName}</h3>
                                 <div className="forecast-list">
-                                    {location.forecasts && location.forecasts.slice(0, 3).map((f, fIdx) => (
+                                    {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
                                             <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
@@ -366,15 +429,15 @@ export default function ForecastPage() {
             )}
 
             {/* 風景區預報 */}
-            {activeTab === 'scenic' && scenicForecast && (
+            {activeTab === 'scenic' && scenicForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🏞️ 國家風景區預報（一週）</h2>
                     <div className="recreational-grid">
-                        {scenicForecast.slice(0, 12).map((location, idx) => (
+                        {scenicForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
                                 <h3>{location.locationName}</h3>
                                 <div className="forecast-list">
-                                    {location.forecasts && location.forecasts.slice(0, 3).map((f, fIdx) => (
+                                    {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
                                             <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
@@ -389,15 +452,15 @@ export default function ForecastPage() {
             )}
 
             {/* 農場旅遊預報 */}
-            {activeTab === 'farm' && farmForecast && (
+            {activeTab === 'farm' && farmForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌾 農場旅遊預報（一週）</h2>
                     <div className="recreational-grid">
-                        {farmForecast.slice(0, 12).map((location, idx) => (
+                        {farmForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
                                 <h3>{location.locationName}</h3>
                                 <div className="forecast-list">
-                                    {location.forecasts && location.forecasts.slice(0, 3).map((f, fIdx) => (
+                                    {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
                                             <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
