@@ -109,6 +109,12 @@ export class ResourcesController {
         return { success: true, data: transactions, count: transactions.length };
     }
 
+    @Delete('transactions/:transactionId')
+    async deleteTransaction(@Param('transactionId') transactionId: string) {
+        await this.resourcesService.deleteTransaction(transactionId);
+        return { success: true, message: '紀錄已刪除' };
+    }
+
     // ==================== 🔄 調撥功能 (功能3) ====================
 
     @Post(':id/transfer')

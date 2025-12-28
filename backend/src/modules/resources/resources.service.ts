@@ -175,6 +175,18 @@ export class ResourcesService {
         });
     }
 
+    /**
+     * 刪除交易紀錄 (僅系統擁有者)
+     */
+    async deleteTransaction(transactionId: string): Promise<void> {
+        const transaction = await this.transactionRepository.findOne({ where: { id: transactionId } });
+        if (!transaction) {
+            throw new NotFoundException(`Transaction ${transactionId} not found`);
+        }
+        await this.transactionRepository.delete(transactionId);
+        this.logger.log(`🗑️ Deleted transaction: ${transactionId}`);
+    }
+
     // ==================== 🎁 捐贈來源管理 (功能2) ====================
 
     async createDonationSource(dto: CreateDonationSourceDto): Promise<DonationSource> {

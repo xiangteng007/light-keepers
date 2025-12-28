@@ -44,6 +44,7 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-9552
 export default function ResourcesPage() {
     const { user } = useAuth();
     const canManage = user && user.roleLevel >= 3; // 幹部以上權限
+    const isOwner = user && user.roleLevel >= 5; // 系統擁有者權限
 
     const [activeTab, setActiveTab] = useState<'manage' | 'logs'>('manage');
     const [resources, setResources] = useState<Resource[]>([]);
@@ -227,6 +228,20 @@ export default function ResourcesPage() {
         }
     };
 
+    // 刪除紀錄 (僅系統擁有者)
+    const handleDeleteLog = async (logId: string) => {
+        if (!confirm('確定要刪除此紀錄嗎？此操作無法還原。')) return;
+        try {
+            await fetch(`${API_BASE}/resources/transactions/${logId}`, {
+                method: 'DELETE',
+            });
+            setLogs(logs.filter(log => log.id !== logId));
+        } catch (err) {
+            console.error('Failed to delete log:', err);
+            alert('刪除失敗');
+        }
+    };
+
     return (
         <div className="page resources-page">
             <div className="page-header">
@@ -397,18 +412,19 @@ export default function ResourcesPage() {
                                 <th>數量變更</th>
                                 <th>操作人</th>
                                 <th>備註</th>
+                                {isOwner && <th>操作</th>}
                             </tr>
                         </thead>
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <td colSpan={isOwner ? 7 : 6} style={{ textAlign: 'center', padding: '2rem' }}>
                                         ⏳ 載入紀錄中...
                                     </td>
                                 </tr>
                             ) : logs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                    <td colSpan={isOwner ? 7 : 6} style={{ textAlign: 'center', padding: '2rem' }}>
                                         📜 尚無物資紀錄
                                     </td>
                                 </tr>
@@ -432,6 +448,16 @@ export default function ResourcesPage() {
                                             </td>
                                             <td>{log.operatorName}</td>
                                             <td>{log.notes || '-'}</td>
+                                            {isOwner && (
+                                                <td>
+                                                    <button
+                                                        className="btn-delete"
+                                                        onClick={() => handleDeleteLog(log.id)}
+                                                    >
+                                                        刪除
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     );
                                 })
