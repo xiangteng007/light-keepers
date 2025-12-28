@@ -15,7 +15,16 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
 import { Card, Button } from '../design-system';
-import { getResourceStats, getReportStats, getVolunteerStats, getNcdrAlerts } from '../api';
+import {
+    getResourceStats,
+    getReportStats,
+    getVolunteerStats,
+    getNcdrAlerts,
+    getEventStats,
+    getTaskStats,
+    getAllTransactions,
+    getReports
+} from '../api';
 import './AnalyticsPage.css';
 
 // 註冊 Chart.js 組件
@@ -54,6 +63,17 @@ const NCDR_CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
     other: { label: '其他', color: 'rgba(156, 163, 175, 0.8)' },
 };
 
+// 物資類別配置
+const RESOURCE_CATEGORY_CONFIG: Record<string, { label: string; icon: string }> = {
+    food: { label: '食品', icon: '🍎' },
+    water: { label: '飲水', icon: '💧' },
+    medical: { label: '醫療', icon: '🏥' },
+    shelter: { label: '收容', icon: '🏠' },
+    clothing: { label: '衣物', icon: '👕' },
+    equipment: { label: '設備', icon: '🔧' },
+    other: { label: '其他', icon: '📦' },
+};
+
 export default function AnalyticsPage() {
     const [dateRange, setDateRange] = useState(14);
 
@@ -78,6 +98,27 @@ export default function AnalyticsPage() {
         queryFn: () => getNcdrAlerts({ limit: 100 }).then(res => res.data.data),
     });
 
+    const { data: eventStats } = useQuery({
+        queryKey: ['eventStats'],
+        queryFn: () => getEventStats().then(res => res.data.data).catch(() => ({ active: 0, resolved: 0 })),
+    });
+
+    const { data: taskStats } = useQuery({
+        queryKey: ['taskStats'],
+        queryFn: () => getTaskStats().then(res => res.data.data).catch(() => ({ pending: 0, inProgress: 0, completed: 0 })),
+    });
+
+    // 獲取最近活動
+    const { data: recentTransactions } = useQuery({
+        queryKey: ['recentTransactions'],
+        queryFn: () => getAllTransactions().then(res => res.data).catch(() => []),
+    });
+
+    const { data: recentReports } = useQuery({
+        queryKey: ['recentReports'],
+        queryFn: () => getReports({ limit: 5 }).then(res => res.data.data).catch(() => []),
+    });
+
     const dateLabels = getDateLabels(dateRange);
 
     // 計算 NCDR 警報分類統計
@@ -91,12 +132,10 @@ export default function AnalyticsPage() {
         return stats;
     }, [alertsData]);
 
-    // 事件趨勢圖數據 - 使用真實 NCDR 數據按日期分組
+    // 事件趨勢圖數據
     const eventTrendData = useMemo(() => {
-        const reportCounts = new Array(dateRange).fill(0);
         const alertCounts = new Array(dateRange).fill(0);
 
-        // 如果有真實警報數據，按日期分組
         if (alertsData && Array.isArray(alertsData)) {
             alertsData.forEach((alert) => {
                 const createdAt = (alert as { createdAt?: string }).createdAt;
@@ -115,14 +154,6 @@ export default function AnalyticsPage() {
             labels: dateLabels,
             datasets: [
                 {
-                    label: '回報數量',
-                    data: reportCounts.map(() => Math.floor(Math.random() * 5) + (reportStats?.total ? 1 : 0)),
-                    borderColor: 'rgb(59, 130, 246)',
-                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                    fill: true,
-                    tension: 0.4,
-                },
-                {
                     label: 'NCDR 警報',
                     data: alertCounts,
                     borderColor: 'rgb(239, 68, 68)',
@@ -132,20 +163,23 @@ export default function AnalyticsPage() {
                 },
             ],
         };
-    }, [alertsData, dateLabels, dateRange, reportStats]);
+    }, [alertsData, dateLabels, dateRange]);
 
     // 物資類別分布圖
     const resourceCategoryData = {
-        labels: resourceStats?.byCategory ? Object.keys(resourceStats.byCategory) : ['食品', '醫療', '設備', '其他'],
+        labels: resourceStats?.byCategory
+            ? Object.keys(resourceStats.byCategory).map(k => RESOURCE_CATEGORY_CONFIG[k]?.label || k)
+            : [],
         datasets: [{
-            data: resourceStats?.byCategory ? Object.values(resourceStats.byCategory) : [0, 0, 0, 0],
+            data: resourceStats?.byCategory ? Object.values(resourceStats.byCategory) : [],
             backgroundColor: [
-                'rgba(59, 130, 246, 0.8)',
-                'rgba(16, 185, 129, 0.8)',
-                'rgba(245, 158, 11, 0.8)',
-                'rgba(139, 92, 246, 0.8)',
-                'rgba(236, 72, 153, 0.8)',
-                'rgba(99, 102, 241, 0.8)',
+                'rgba(239, 68, 68, 0.8)',   // red
+                'rgba(59, 130, 246, 0.8)',  // blue
+                'rgba(16, 185, 129, 0.8)',  // green
+                'rgba(245, 158, 11, 0.8)',  // amber
+                'rgba(139, 92, 246, 0.8)',  // purple
+                'rgba(236, 72, 153, 0.8)',  // pink
+                'rgba(99, 102, 241, 0.8)',  // indigo
             ],
             borderWidth: 0,
         }],
@@ -169,13 +203,21 @@ export default function AnalyticsPage() {
         }],
     };
 
-    // 回報類型分布
-    const reportTypeData = {
-        labels: reportStats?.byType ? Object.keys(reportStats.byType) : ['淹水', '道路', '建物', '其他'],
+    // 回報狀態分布
+    const reportStatusData = {
+        labels: ['待處理', '已確認', '已駁回'],
         datasets: [{
-            label: '回報數量',
-            data: reportStats?.byType ? Object.values(reportStats.byType) : [0, 0, 0, 0],
-            backgroundColor: 'rgba(139, 92, 246, 0.8)',
+            data: [
+                reportStats?.pending || 0,
+                reportStats?.confirmed || 0,
+                reportStats?.rejected || 0,
+            ],
+            backgroundColor: [
+                'rgba(245, 158, 11, 0.8)',
+                'rgba(16, 185, 129, 0.8)',
+                'rgba(239, 68, 68, 0.8)',
+            ],
+            borderWidth: 0,
         }],
     };
 
@@ -199,18 +241,43 @@ export default function AnalyticsPage() {
         },
     };
 
-    // 計算總計數據
+    // 計算 KPI 數據
     const totalResources = resourceStats?.total || 0;
+    const lowStockCount = resourceStats?.lowStock || 0;
     const totalVolunteers = (volunteerStats?.available || 0) + (volunteerStats?.busy || 0) + (volunteerStats?.offline || 0);
+    const busyVolunteers = volunteerStats?.busy || 0;
     const totalAlerts = alertsData?.length || 0;
     const totalReports = reportStats?.total || 0;
+    const pendingReports = reportStats?.pending || 0;
+    const activeEvents = eventStats?.active || 0;
+    const taskCompleted = taskStats?.completed || 0;
+    const taskTotal = (taskStats?.pending || 0) + (taskStats?.inProgress || 0) + (taskStats?.completed || 0);
+    const taskCompletionRate = taskTotal > 0 ? Math.round((taskCompleted / taskTotal) * 100) : 0;
+
+    // 格式化時間
+    const formatTime = (dateStr: string) => {
+        const date = new Date(dateStr);
+        return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+    };
+
+    // 交易類型標籤
+    const getTransactionLabel = (type: string) => {
+        const labels: Record<string, { text: string; class: string }> = {
+            in: { text: '入庫', class: 'badge-success' },
+            out: { text: '出庫', class: 'badge-danger' },
+            transfer: { text: '調撥', class: 'badge-info' },
+            donation: { text: '捐贈', class: 'badge-primary' },
+            adjustment: { text: '調整', class: 'badge-warning' },
+        };
+        return labels[type] || { text: type, class: 'badge-secondary' };
+    };
 
     return (
         <div className="page analytics-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📈 數據分析</h2>
-                    <p className="page-subtitle">歷史趨勢與統計圖表</p>
+                    <h2>📊 數據分析儀表板</h2>
+                    <p className="page-subtitle">系統整體運作狀態總覽</p>
                 </div>
                 <div className="date-range-selector">
                     <Button
@@ -237,40 +304,91 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* 統計摘要卡片 */}
-            <div className="stats-summary">
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__icon">📦</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{totalResources}</div>
-                        <div className="stat-card__label">物資種類</div>
+            {/* 6 個 KPI 摘要卡片 */}
+            <div className="kpi-grid">
+                <Card className="kpi-card kpi-card--resources" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">📦</span>
+                        <span className="kpi-card__title">物資管理</span>
+                    </div>
+                    <div className="kpi-card__value">{totalResources}</div>
+                    <div className="kpi-card__subtitle">物資種類</div>
+                    <div className="kpi-card__detail">
+                        {lowStockCount > 0 ? (
+                            <span className="kpi-detail--warning">⚠️ {lowStockCount} 項低庫存</span>
+                        ) : (
+                            <span className="kpi-detail--success">✓ 庫存充足</span>
+                        )}
                     </div>
                 </Card>
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__icon">👥</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{totalVolunteers}</div>
-                        <div className="stat-card__label">志工總數</div>
+
+                <Card className="kpi-card kpi-card--volunteers" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">👥</span>
+                        <span className="kpi-card__title">志工團隊</span>
+                    </div>
+                    <div className="kpi-card__value">{totalVolunteers}</div>
+                    <div className="kpi-card__subtitle">志工人數</div>
+                    <div className="kpi-card__detail">
+                        <span className="kpi-detail--info">🟢 {busyVolunteers} 人執勤中</span>
                     </div>
                 </Card>
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__icon">⚠️</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{totalAlerts}</div>
-                        <div className="stat-card__label">NCDR 警報</div>
+
+                <Card className="kpi-card kpi-card--alerts" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">🚨</span>
+                        <span className="kpi-card__title">NCDR 警報</span>
+                    </div>
+                    <div className="kpi-card__value">{totalAlerts}</div>
+                    <div className="kpi-card__subtitle">即時警報</div>
+                    <div className="kpi-card__detail">
+                        <span className="kpi-detail--neutral">過去 {dateRange} 天</span>
                     </div>
                 </Card>
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__icon">📢</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{totalReports}</div>
-                        <div className="stat-card__label">災情回報</div>
+
+                <Card className="kpi-card kpi-card--reports" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">📢</span>
+                        <span className="kpi-card__title">災情回報</span>
+                    </div>
+                    <div className="kpi-card__value">{totalReports}</div>
+                    <div className="kpi-card__subtitle">回報總數</div>
+                    <div className="kpi-card__detail">
+                        {pendingReports > 0 ? (
+                            <span className="kpi-detail--warning">⏳ {pendingReports} 件待處理</span>
+                        ) : (
+                            <span className="kpi-detail--success">✓ 全部處理完成</span>
+                        )}
+                    </div>
+                </Card>
+
+                <Card className="kpi-card kpi-card--events" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">📋</span>
+                        <span className="kpi-card__title">事件管理</span>
+                    </div>
+                    <div className="kpi-card__value">{activeEvents}</div>
+                    <div className="kpi-card__subtitle">進行中事件</div>
+                    <div className="kpi-card__detail">
+                        <span className="kpi-detail--neutral">需持續關注</span>
+                    </div>
+                </Card>
+
+                <Card className="kpi-card kpi-card--tasks" padding="md">
+                    <div className="kpi-card__header">
+                        <span className="kpi-card__icon">✅</span>
+                        <span className="kpi-card__title">任務進度</span>
+                    </div>
+                    <div className="kpi-card__value">{taskCompletionRate}%</div>
+                    <div className="kpi-card__subtitle">完成率</div>
+                    <div className="kpi-card__detail">
+                        <span className="kpi-detail--info">{taskCompleted}/{taskTotal} 已完成</span>
                     </div>
                 </Card>
             </div>
 
             {/* 趨勢圖 */}
-            <Card title="📊 事件趨勢" padding="lg" className="chart-card">
+            <Card title="📈 NCDR 警報趨勢" padding="lg" className="chart-card">
                 <div className="chart-container chart-container--lg">
                     <Line data={eventTrendData} options={{
                         ...chartOptions,
@@ -285,25 +403,14 @@ export default function AnalyticsPage() {
             <div className="charts-grid">
                 <Card title="📦 物資類別分布" padding="lg" className="chart-card">
                     <div className="chart-container">
-                        <Doughnut data={resourceCategoryData} options={chartOptions} />
-                    </div>
-                </Card>
-
-                <Card title="👥 志工狀態" padding="lg" className="chart-card">
-                    <div className="chart-container">
-                        <Bar data={volunteerStatusData} options={{
-                            ...chartOptions,
-                            indexAxis: 'y' as const,
-                        }} />
-                    </div>
-                </Card>
-            </div>
-
-            {/* 回報類型和 NCDR 分布 */}
-            <div className="charts-grid">
-                <Card title="📢 回報類型分布" padding="lg" className="chart-card">
-                    <div className="chart-container">
-                        <Bar data={reportTypeData} options={chartOptions} />
+                        {Object.keys(resourceStats?.byCategory || {}).length > 0 ? (
+                            <Doughnut data={resourceCategoryData} options={chartOptions} />
+                        ) : (
+                            <div className="no-data-placeholder">
+                                <span>📭</span>
+                                <p>尚無物資資料</p>
+                            </div>
+                        )}
                     </div>
                 </Card>
 
@@ -319,6 +426,99 @@ export default function AnalyticsPage() {
                         )}
                     </div>
                 </Card>
+            </div>
+
+            {/* 第二排雙欄圖表 */}
+            <div className="charts-grid">
+                <Card title="👥 志工狀態分布" padding="lg" className="chart-card">
+                    <div className="chart-container">
+                        <Bar data={volunteerStatusData} options={{
+                            ...chartOptions,
+                            indexAxis: 'y' as const,
+                        }} />
+                    </div>
+                </Card>
+
+                <Card title="📢 回報處理狀態" padding="lg" className="chart-card">
+                    <div className="chart-container">
+                        {totalReports > 0 ? (
+                            <Doughnut data={reportStatusData} options={chartOptions} />
+                        ) : (
+                            <div className="no-data-placeholder">
+                                <span>📭</span>
+                                <p>尚無回報資料</p>
+                            </div>
+                        )}
+                    </div>
+                </Card>
+            </div>
+
+            {/* 即時活動摘要 */}
+            <div className="activity-section">
+                <div className="activity-grid">
+                    <Card title="📦 最近物資異動" padding="md" className="activity-card">
+                        <div className="activity-list">
+                            {recentTransactions && recentTransactions.length > 0 ? (
+                                recentTransactions.slice(0, 5).map((tx: { id: string; type: string; operatorName: string; createdAt: string; quantity: number }) => {
+                                    const label = getTransactionLabel(tx.type);
+                                    return (
+                                        <div key={tx.id} className="activity-item">
+                                            <span className={`activity-badge ${label.class}`}>{label.text}</span>
+                                            <span className="activity-text">{tx.operatorName}</span>
+                                            <span className="activity-meta">
+                                                {tx.quantity > 0 ? '+' : ''}{tx.quantity} · {formatTime(tx.createdAt)}
+                                            </span>
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="activity-empty">暫無異動紀錄</div>
+                            )}
+                        </div>
+                    </Card>
+
+                    <Card title="🚨 最新 NCDR 警報" padding="md" className="activity-card">
+                        <div className="activity-list">
+                            {alertsData && alertsData.length > 0 ? (
+                                alertsData.slice(0, 5).map((alert: { id: string; title: string; severity?: string; createdAt?: string }) => (
+                                    <div key={alert.id} className="activity-item">
+                                        <span className={`activity-badge badge-${alert.severity || 'info'}`}>
+                                            {alert.severity === 'critical' ? '緊急' : alert.severity === 'warning' ? '警告' : '資訊'}
+                                        </span>
+                                        <span className="activity-text" title={alert.title}>
+                                            {alert.title.length > 20 ? alert.title.substring(0, 20) + '...' : alert.title}
+                                        </span>
+                                        <span className="activity-meta">
+                                            {alert.createdAt ? formatTime(alert.createdAt) : ''}
+                                        </span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="activity-empty">目前無警報</div>
+                            )}
+                        </div>
+                    </Card>
+
+                    <Card title="📢 最新災情回報" padding="md" className="activity-card">
+                        <div className="activity-list">
+                            {recentReports && recentReports.length > 0 ? (
+                                recentReports.slice(0, 5).map((report: { id: string; title: string; status: string; createdAt: string }) => (
+                                    <div key={report.id} className="activity-item">
+                                        <span className={`activity-badge badge-${report.status === 'pending' ? 'warning' : report.status === 'confirmed' ? 'success' : 'danger'}`}>
+                                            {report.status === 'pending' ? '待處理' : report.status === 'confirmed' ? '已確認' : '已駁回'}
+                                        </span>
+                                        <span className="activity-text" title={report.title}>
+                                            {report.title.length > 20 ? report.title.substring(0, 20) + '...' : report.title}
+                                        </span>
+                                        <span className="activity-meta">{formatTime(report.createdAt)}</span>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="activity-empty">暫無回報</div>
+                            )}
+                        </div>
+                    </Card>
+                </div>
             </div>
         </div>
     );
