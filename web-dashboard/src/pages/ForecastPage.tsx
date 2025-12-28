@@ -214,13 +214,34 @@ export default function ForecastPage() {
         }
     };
 
+    // 元素名稱對照表（CWA 中文名稱 -> 前端使用的 key）
+    const ELEMENT_NAME_MAP: Record<string, string> = {
+        '天氣現象': 'Wx',
+        '天氣預報綜合描述': 'Wx',
+        'Wx': 'Wx',
+        '最低溫度': 'MinT',
+        'MinT': 'MinT',
+        '最高溫度': 'MaxT',
+        'MaxT': 'MaxT',
+        '平均溫度': 'T',
+        'T': 'T',
+        '降雨機率': 'PoP',
+        '12小時降雨機率': 'PoP',
+        'PoP12h': 'PoP',
+        '舒適度': 'CI',
+        '舒適度指數': 'CI',
+        'CI': 'CI',
+    };
+
     // 解析天氣資料
     const parseWeatherElements = (elements: WeatherElement[]): ParsedWeatherElements => {
         if (!elements) return {};
         const result: ParsedWeatherElements = {};
         elements.forEach((el: WeatherElement) => {
             if (el.time && el.time.length > 0) {
-                const key = el.elementName as keyof ParsedWeatherElements;
+                // 使用對照表將中文名稱轉換為標準 key
+                const mappedKey = ELEMENT_NAME_MAP[el.elementName] || el.elementName;
+                const key = mappedKey as keyof ParsedWeatherElements;
                 (result as Record<string, Array<{ value: string }>>)[key] = el.time.map((t) => ({
                     startTime: t.startTime,
                     endTime: t.endTime,
@@ -303,43 +324,100 @@ export default function ForecastPage() {
                     {generalForecast.length > 0 && generalForecast[0] && (
                         <>
                             <h2>📍 {generalForecast[0].locationName} 一週天氣預報</h2>
-                            <div className="weekly-forecast">
+                            <div className="weekly-table-container">
                                 {(() => {
                                     const elements = parseWeatherElements(generalForecast[0].weatherElements);
-                                    const days = [];
-                                    const maxLen = Math.max(
-                                        elements.Wx?.length || 0,
-                                        elements.MinT?.length || 0,
-                                        elements.MaxT?.length || 0
-                                    );
 
-                                    for (let i = 0; i < Math.min(maxLen, 7); i++) {
+                                    // 生成 7 天的資料（每天白天/晚上各一筆，所以 i 每次 +2）
+                                    const days: Array<{
+                                        dateStr: string;
+                                        weekday: string;
+                                        isWeekend: boolean;
+                                        dayWx: string;
+                                        dayMinT: string;
+                                        dayMaxT: string;
+                                        dayPop: string;
+                                        nightWx: string;
+                                        nightMinT: string;
+                                        nightMaxT: string;
+                                        nightPop: string;
+                                    }> = [];
+
+                                    for (let dayIdx = 0; dayIdx < 7; dayIdx++) {
                                         const date = new Date();
-                                        date.setHours(date.getHours() + (i * 12));
-                                        const dayName = i === 0 ? '今天' : i === 1 ? '今晚' :
-                                            date.toLocaleDateString('zh-TW', { weekday: 'short', month: 'numeric', day: 'numeric' });
+                                        date.setDate(date.getDate() + dayIdx);
+                                        const dayOfWeek = date.getDay();
+                                        const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                                        const weekdayNames = ['日', '一', '二', '三', '四', '五', '六'];
 
-                                        const wx = elements.Wx?.[i]?.value || '多雲';
-                                        const minT = elements.MinT?.[i]?.value || '--';
-                                        const maxT = elements.MaxT?.[i]?.value || '--';
-                                        const pop = elements.PoP?.[i]?.value || '--';
+                                        // 白天索引 = dayIdx * 2, 晚上索引 = dayIdx * 2 + 1
+                                        const dayDataIdx = dayIdx * 2;
+                                        const nightDataIdx = dayIdx * 2 + 1;
 
-                                        days.push(
-                                            <div key={i} className="day-card">
-                                                <div className="day-name">{dayName}</div>
-                                                <div className="day-icon">{getWeatherIcon(wx)}</div>
-                                                <div className="day-weather">{wx}</div>
-                                                <div className="day-temp">
-                                                    <span className="temp-high">{maxT}°</span>
-                                                    <span className="temp-low">{minT}°</span>
-                                                </div>
-                                                {pop !== '--' && (
-                                                    <div className="day-pop">💧 {pop}%</div>
-                                                )}
-                                            </div>
-                                        );
+                                        days.push({
+                                            dateStr: `${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`,
+                                            weekday: `星期${weekdayNames[dayOfWeek]}`,
+                                            isWeekend,
+                                            dayWx: elements.Wx?.[dayDataIdx]?.value || '多雲',
+                                            dayMinT: elements.MinT?.[dayDataIdx]?.value || '--',
+                                            dayMaxT: elements.MaxT?.[dayDataIdx]?.value || '--',
+                                            dayPop: elements.PoP?.[dayDataIdx]?.value || '--',
+                                            nightWx: elements.Wx?.[nightDataIdx]?.value || elements.Wx?.[dayDataIdx]?.value || '多雲',
+                                            nightMinT: elements.MinT?.[nightDataIdx]?.value || elements.MinT?.[dayDataIdx]?.value || '--',
+                                            nightMaxT: elements.MaxT?.[nightDataIdx]?.value || elements.MaxT?.[dayDataIdx]?.value || '--',
+                                            nightPop: elements.PoP?.[nightDataIdx]?.value || elements.PoP?.[dayDataIdx]?.value || '--',
+                                        });
                                     }
-                                    return days;
+
+                                    return (
+                                        <table className="weekly-table">
+                                            <thead>
+                                                <tr>
+                                                    <th className="row-header"></th>
+                                                    {days.map((day, idx) => (
+                                                        <th key={idx} className={day.isWeekend ? 'weekend' : ''}>
+                                                            <div className="date-header">{day.dateStr}</div>
+                                                            <div className="weekday-header">{day.weekday}</div>
+                                                        </th>
+                                                    ))}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td className="row-label">白天</td>
+                                                    {days.map((day, idx) => (
+                                                        <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
+                                                            <div className="weather-cell">
+                                                                <span className="cell-icon">{getWeatherIcon(day.dayWx)}</span>
+                                                                <span className="cell-temp">{day.dayMinT} - {day.dayMaxT}°C</span>
+                                                            </div>
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                                <tr>
+                                                    <td className="row-label">晚上</td>
+                                                    {days.map((day, idx) => (
+                                                        <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
+                                                            <div className="weather-cell">
+                                                                <span className="cell-icon">{getWeatherIcon(day.nightWx)}</span>
+                                                                <span className="cell-temp">{day.nightMinT} - {day.nightMaxT}°C</span>
+                                                            </div>
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                                <tr>
+                                                    <td className="row-label">降雨機率</td>
+                                                    {days.map((day, idx) => (
+                                                        <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
+                                                            <div className="weather-cell pop-cell">
+                                                                <span className="cell-pop">💧 {day.dayPop}%</span>
+                                                            </div>
+                                                        </td>
+                                                    ))}
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    );
                                 })()}
                             </div>
                         </>

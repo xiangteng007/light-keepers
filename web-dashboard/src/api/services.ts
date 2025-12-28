@@ -79,6 +79,14 @@ export const approveAccount = (accountId: string) =>
 export const rejectAccount = (accountId: string, reason?: string) =>
     api.patch<{ success: boolean; message: string }>(`/accounts/${accountId}/reject`, { reason });
 
+// 刪除帳號 (僅限 level 0)
+export const deleteAccount = (accountId: string) =>
+    api.delete<{ success: boolean; message: string }>(`/accounts/${accountId}`);
+
+// 加入黑名單 (僅限 level 0)
+export const blacklistAccount = (accountId: string, reason?: string) =>
+    api.patch<{ success: boolean; message: string }>(`/accounts/${accountId}/blacklist`, { reason });
+
 // Accounts
 export const getRoles = () => api.get('/accounts/roles');
 
@@ -389,6 +397,7 @@ export interface CreateVolunteerDto {
     emergencyPhone?: string;
     notes?: string;
     photoUrl?: string;
+    accountId?: string; // 關聯的帳號 ID
 }
 
 export interface UpdateVolunteerDto extends Partial<CreateVolunteerDto> {
@@ -435,6 +444,39 @@ export const getVolunteerStats = () => api.get<{
         totalServiceHours: number;
     }
 }>('/volunteers/stats');
+
+// ===== 志工審核 =====
+
+// 取得待審核志工列表
+export const getPendingVolunteers = () =>
+    api.get<{ success: boolean; data: Volunteer[]; count: number }>('/volunteers/pending');
+
+// 取得待審核志工數量
+export const getPendingVolunteerCount = () =>
+    api.get<{ success: boolean; data: { count: number } }>('/volunteers/pending/count');
+
+// 取得已審核通過的志工列表
+export const getApprovedVolunteers = (params?: {
+    status?: VolunteerStatus;
+    region?: string;
+    skill?: string;
+    limit?: number;
+    offset?: number;
+}) => api.get<{ success: boolean; data: Volunteer[]; count: number }>('/volunteers/approved', { params });
+
+// 審核通過志工
+export const approveVolunteer = (id: string, approvedBy: string, note?: string) =>
+    api.post<{ success: boolean; message: string; data: Volunteer }>(
+        `/volunteers/${id}/approve`,
+        { approvedBy, note }
+    );
+
+// 拒絕志工申請
+export const rejectVolunteer = (id: string, rejectedBy: string, note?: string) =>
+    api.post<{ success: boolean; message: string; data: Volunteer }>(
+        `/volunteers/${id}/reject`,
+        { rejectedBy, note }
+    );
 
 // ===== 物資管理 Resources =====
 

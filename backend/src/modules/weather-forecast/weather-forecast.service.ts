@@ -100,14 +100,26 @@ export class WeatherForecastService {
             weatherElements: (loc.WeatherElement || loc.weatherElement || []).map((el: any) => ({
                 elementName: el.ElementName || el.elementName,
                 description: el.Description || el.description,
-                time: (el.Time || el.time || []).map((t: any) => ({
-                    startTime: t.StartTime || t.startTime,
-                    endTime: t.EndTime || t.endTime,
-                    parameter: {
-                        parameterName: t.ElementValue?.[0]?.Value || t.elementValue?.[0]?.value,
-                        parameterValue: t.ElementValue?.[1]?.Value || t.elementValue?.[1]?.value,
-                    },
-                })),
+                time: (el.Time || el.time || []).map((t: any) => {
+                    // CWA API 的 ElementValue 是一個物件陣列，每個物件的 key 是動態的
+                    // 例如 { Temperature: "18" } 或 { Weather: "多雲" }
+                    const elementValues = t.ElementValue || t.elementValue || [];
+                    const firstValue = elementValues[0] || {};
+                    const secondValue = elementValues[1] || {};
+
+                    // 取得第一個物件的第一個值
+                    const firstValueKey = Object.keys(firstValue)[0];
+                    const secondValueKey = Object.keys(secondValue)[0];
+
+                    return {
+                        startTime: t.StartTime || t.startTime,
+                        endTime: t.EndTime || t.endTime,
+                        parameter: {
+                            parameterName: firstValue[firstValueKey] || '',
+                            parameterValue: secondValue[secondValueKey] || '',
+                        },
+                    };
+                }),
             })),
         }));
     }

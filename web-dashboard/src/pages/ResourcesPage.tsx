@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
 import { getResources, getResourceStats } from '../api/services';
 import type { Resource, ResourceCategory } from '../api/services';
+import { useAuth } from '../context/AuthContext';
+import './ResourcesPage.css';
 
 // 物資分類
 const CATEGORY_CONFIG = {
@@ -22,8 +24,30 @@ const STATUS_CONFIG = {
 
 type ResourceStatus = keyof typeof STATUS_CONFIG;
 
+interface ResourceLog {
+    id: string;
+    resourceId: string;
+    type: string;
+    quantity: number;
+    beforeQuantity: number;
+    afterQuantity: number;
+    operatorName: string;
+    notes?: string;
+    createdAt: string;
+    resource?: {
+        name: string;
+    };
+}
+
+const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+
 export default function ResourcesPage() {
+    const { user } = useAuth();
+    const canManage = user && user.roleLevel >= 3; // 幹部以上權限
+
+    const [activeTab, setActiveTab] = useState<'manage' | 'logs'>('manage');
     const [resources, setResources] = useState<Resource[]>([]);
+    const [logs, setLogs] = useState<ResourceLog[]>([]);
     const [stats, setStats] = useState({
         total: 0,
         byCategory: {} as Record<string, number>,
@@ -34,6 +58,7 @@ export default function ResourcesPage() {
     const [error, setError] = useState<string | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string>('');
     const [showAddModal, setShowAddModal] = useState(false);
+    const [editModal, setEditModal] = useState<Resource | null>(null);
     const [stockModal, setStockModal] = useState<{
         resource: Resource | null;
         type: 'add' | 'deduct';
@@ -57,23 +82,29 @@ export default function ResourcesPage() {
             setIsLoading(true);
             setError(null);
             try {
-                const [resourcesRes, statsRes] = await Promise.all([
-                    getResources({ category: selectedCategory as ResourceCategory || undefined }),
-                    getResourceStats(),
-                ]);
-                setResources(resourcesRes.data.data);
-                setStats(statsRes.data.data);
+                if (activeTab === 'manage') {
+                    const [resourcesRes, statsRes] = await Promise.all([
+                        getResources({ category: selectedCategory as ResourceCategory || undefined }),
+                        getResourceStats(),
+                    ]);
+                    setResources(resourcesRes.data.data);
+                    setStats(statsRes.data.data);
+                } else {
+                    // 載入物資紀錄
+                    const res = await fetch(`${API_BASE}/resources/transactions/all`);
+                    const data = await res.json();
+                    setLogs(data.data || []);
+                }
             } catch (err) {
                 console.error('Failed to fetch resources:', err);
-                setError('載入物資資料失敗');
+                setError('載入資料失敗');
             } finally {
                 setIsLoading(false);
             }
         };
         fetchData();
-    }, [selectedCategory]);
+    }, [selectedCategory, activeTab]);
 
-    // 篩選 (已由 API 處理，這裡保留以防前端需要)
     const filteredResources = resources;
 
     // 新增物資
@@ -84,10 +115,13 @@ export default function ResourcesPage() {
         }
         setIsSubmitting(true);
         try {
-            await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/resources`, {
+            await fetch(`${API_BASE}/resources`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(resourceForm),
+                body: JSON.stringify({
+                    ...resourceForm,
+                    operatorName: user?.displayName || 'Admin',
+                }),
             });
             setShowAddModal(false);
             setResourceForm({ name: '', category: 'food', quantity: 0, unit: '件', minQuantity: 10, location: '', description: '' });
@@ -100,6 +134,61 @@ export default function ResourcesPage() {
         }
     };
 
+    // 編輯物資
+    const handleEditResource = async () => {
+        if (!editModal) return;
+        setIsSubmitting(true);
+        try {
+            await fetch(`${API_BASE}/resources/${editModal.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: resourceForm.name,
+                    category: resourceForm.category,
+                    unit: resourceForm.unit,
+                    minQuantity: resourceForm.minQuantity,
+                    location: resourceForm.location,
+                    description: resourceForm.description,
+                }),
+            });
+            setEditModal(null);
+            window.location.reload();
+        } catch (err) {
+            console.error('Failed to edit resource:', err);
+            alert('編輯失敗');
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    // 刪除物資
+    const handleDeleteResource = async (resource: Resource) => {
+        if (!confirm(`確定要刪除「${resource.name}」嗎？此操作無法還原。`)) return;
+        try {
+            await fetch(`${API_BASE}/resources/${resource.id}`, {
+                method: 'DELETE',
+            });
+            window.location.reload();
+        } catch (err) {
+            console.error('Failed to delete resource:', err);
+            alert('刪除失敗');
+        }
+    };
+
+    // 開啟編輯 Modal
+    const openEditModal = (resource: Resource) => {
+        setResourceForm({
+            name: resource.name,
+            category: resource.category,
+            quantity: resource.quantity,
+            unit: resource.unit || '件',
+            minQuantity: resource.minQuantity || 10,
+            location: resource.location || '',
+            description: resource.description || '',
+        });
+        setEditModal(resource);
+    };
+
     // 入庫/出庫
     const handleStockChange = async () => {
         if (!stockModal?.resource || stockModal.quantity <= 0) {
@@ -109,10 +198,14 @@ export default function ResourcesPage() {
         setIsSubmitting(true);
         try {
             const endpoint = stockModal.type === 'add' ? 'add' : 'deduct';
-            await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/resources/${stockModal.resource.id}/${endpoint}`, {
+            await fetch(`${API_BASE}/resources/${stockModal.resource.id}/${endpoint}`, {
                 method: 'PATCH',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount: stockModal.quantity, operatorName: 'Admin', notes: stockModal.notes }),
+                body: JSON.stringify({
+                    amount: stockModal.quantity,
+                    operatorName: user?.displayName || 'Admin',
+                    notes: stockModal.notes,
+                }),
             });
             setStockModal(null);
             window.location.reload();
@@ -124,6 +217,16 @@ export default function ResourcesPage() {
         }
     };
 
+    const getLogTypeLabel = (type: string) => {
+        switch (type) {
+            case 'in': return { label: '入庫', className: 'log-type--in' };
+            case 'out': return { label: '出庫', className: 'log-type--out' };
+            case 'transfer': return { label: '調撥', className: 'log-type--transfer' };
+            case 'donate': return { label: '捐贈', className: 'log-type--in' };
+            default: return { label: type, className: '' };
+        }
+    };
+
     return (
         <div className="page resources-page">
             <div className="page-header">
@@ -132,132 +235,211 @@ export default function ResourcesPage() {
                     <p className="page-subtitle">庫存管理與調度</p>
                 </div>
                 <div className="page-header__right">
-                    <Button onClick={() => setShowAddModal(true)}>
-                        ➕ 新增物資
-                    </Button>
+                    {canManage && (
+                        <Button onClick={() => setShowAddModal(true)}>
+                            ➕ 新增物資
+                        </Button>
+                    )}
                 </div>
             </div>
 
-            {/* 統計卡片 */}
-            <div className="resources-stats">
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__value">{stats.total}</div>
-                    <div className="stat-card__label">物資種類</div>
-                </Card>
-                <Card className="stat-card stat-card--success" padding="md">
-                    <div className="stat-card__value">{resources.filter(r => r.status === 'available').length}</div>
-                    <div className="stat-card__label">充足</div>
-                </Card>
-                <Card className="stat-card stat-card--warning" padding="md">
-                    <div className="stat-card__value">{stats.lowStock}</div>
-                    <div className="stat-card__label">低庫存</div>
-                </Card>
-                <Card className="stat-card stat-card--danger" padding="md">
-                    <div className="stat-card__value">{stats.expiringSoon}</div>
-                    <div className="stat-card__label">即期</div>
-                </Card>
-            </div>
-
-            {/* 分類篩選 */}
-            <div className="resources-categories">
+            {/* Tab 切換 */}
+            <div className="resources-tabs">
                 <button
-                    className={`category-btn ${selectedCategory === '' ? 'active' : ''}`}
-                    onClick={() => setSelectedCategory('')}
+                    className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('manage')}
                 >
-                    全部
+                    📋 物資管理
                 </button>
-                {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                    <button
-                        key={key}
-                        className={`category-btn ${selectedCategory === key ? 'active' : ''}`}
-                        onClick={() => setSelectedCategory(key)}
-                    >
-                        {config.icon} {config.label}
-                    </button>
-                ))}
+                <button
+                    className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('logs')}
+                >
+                    📜 物資紀錄
+                </button>
             </div>
 
-            {/* 物資列表 */}
-            <div className="resources-list">
-                <table className="resources-table">
-                    <thead>
-                        <tr>
-                            <th>物資名稱</th>
-                            <th>分類</th>
-                            <th>數量</th>
-                            <th>狀態</th>
-                            <th>位置</th>
-                            <th>操作</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {isLoading ? (
-                            <tr>
-                                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                    ⏳ 載入物資資料中...
-                                </td>
-                            </tr>
-                        ) : error ? (
-                            <tr>
-                                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#F44336' }}>
-                                    ⚠️ {error}
-                                </td>
-                            </tr>
-                        ) : filteredResources.length === 0 ? (
-                            <tr>
-                                <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                    📦 尚無物資資料
-                                </td>
-                            </tr>
-                        ) : (
-                            filteredResources.map(resource => {
-                                const category = CATEGORY_CONFIG[resource.category as ResourceCategory];
-                                const status = STATUS_CONFIG[resource.status as ResourceStatus];
-                                return (
-                                    <tr key={resource.id}>
-                                        <td>
-                                            <span className="resource-name">
-                                                {category.icon} {resource.name}
-                                            </span>
-                                        </td>
-                                        <td>{category.label}</td>
-                                        <td>
-                                            <strong>{resource.quantity}</strong> {resource.unit}
-                                        </td>
-                                        <td>
-                                            <Badge
-                                                variant={resource.status === 'available' ? 'success' :
-                                                    resource.status === 'low' ? 'warning' : 'danger'}
-                                            >
-                                                {status.label}
-                                            </Badge>
-                                        </td>
-                                        <td>{resource.location}</td>
-                                        <td>
-                                            <div className="resource-actions">
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    onClick={() => setStockModal({ resource, type: 'add', quantity: 0, notes: '' })}
-                                                >
-                                                    入庫
-                                                </Button>
-                                                <Button
-                                                    variant="secondary"
-                                                    size="sm"
-                                                    onClick={() => setStockModal({ resource, type: 'deduct', quantity: 0, notes: '' })}
-                                                >
-                                                    出庫
-                                                </Button>
-                                            </div>
+            {activeTab === 'manage' && (
+                <>
+                    {/* 統計卡片 */}
+                    <div className="resources-stats">
+                        <Card className="stat-card" padding="md">
+                            <div className="stat-card__value">{stats.total}</div>
+                            <div className="stat-card__label">物資種類</div>
+                        </Card>
+                        <Card className="stat-card stat-card--success" padding="md">
+                            <div className="stat-card__value">{resources.filter(r => r.status === 'available').length}</div>
+                            <div className="stat-card__label">充足</div>
+                        </Card>
+                        <Card className="stat-card stat-card--warning" padding="md">
+                            <div className="stat-card__value">{stats.lowStock}</div>
+                            <div className="stat-card__label">低庫存</div>
+                        </Card>
+                        <Card className="stat-card stat-card--danger" padding="md">
+                            <div className="stat-card__value">{stats.expiringSoon}</div>
+                            <div className="stat-card__label">即期</div>
+                        </Card>
+                    </div>
+
+                    {/* 分類篩選 */}
+                    <div className="resources-categories">
+                        <button
+                            className={`category-btn ${selectedCategory === '' ? 'active' : ''}`}
+                            onClick={() => setSelectedCategory('')}
+                        >
+                            全部
+                        </button>
+                        {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
+                            <button
+                                key={key}
+                                className={`category-btn ${selectedCategory === key ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory(key)}
+                            >
+                                {config.icon} {config.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* 物資列表 */}
+                    <div className="resources-list">
+                        <table className="resources-table">
+                            <thead>
+                                <tr>
+                                    <th>物資名稱</th>
+                                    <th>分類</th>
+                                    <th>數量</th>
+                                    <th>狀態</th>
+                                    <th>位置</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <tr>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                            ⏳ 載入物資資料中...
                                         </td>
                                     </tr>
-                                );
-                            })
-                        )}
-                    </tbody>
-                </table>
-            </div>
+                                ) : error ? (
+                                    <tr>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#F44336' }}>
+                                            ⚠️ {error}
+                                        </td>
+                                    </tr>
+                                ) : filteredResources.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                            📦 尚無物資資料
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    filteredResources.map(resource => {
+                                        const category = CATEGORY_CONFIG[resource.category as ResourceCategory];
+                                        const status = STATUS_CONFIG[resource.status as ResourceStatus];
+                                        return (
+                                            <tr key={resource.id}>
+                                                <td>
+                                                    <span className="resource-name">
+                                                        {category.icon} {resource.name}
+                                                    </span>
+                                                </td>
+                                                <td>{category.label}</td>
+                                                <td>
+                                                    <strong>{resource.quantity}</strong> {resource.unit}
+                                                </td>
+                                                <td>
+                                                    <Badge
+                                                        variant={resource.status === 'available' ? 'success' :
+                                                            resource.status === 'low' ? 'warning' : 'danger'}
+                                                    >
+                                                        {status.label}
+                                                    </Badge>
+                                                </td>
+                                                <td>{resource.location}</td>
+                                                <td>
+                                                    <div className="resource-actions">
+                                                        <button onClick={() => setStockModal({ resource, type: 'add', quantity: 0, notes: '' })}>
+                                                            入庫
+                                                        </button>
+                                                        <button onClick={() => setStockModal({ resource, type: 'deduct', quantity: 0, notes: '' })}>
+                                                            出庫
+                                                        </button>
+                                                        {canManage && (
+                                                            <>
+                                                                <button className="btn-edit" onClick={() => openEditModal(resource)}>
+                                                                    編輯
+                                                                </button>
+                                                                <button className="btn-delete" onClick={() => handleDeleteResource(resource)}>
+                                                                    刪除
+                                                                </button>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
+                </>
+            )}
+
+            {activeTab === 'logs' && (
+                <div className="resources-list">
+                    <table className="logs-table">
+                        <thead>
+                            <tr>
+                                <th>時間</th>
+                                <th>物資名稱</th>
+                                <th>類型</th>
+                                <th>數量變更</th>
+                                <th>操作人</th>
+                                <th>備註</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {isLoading ? (
+                                <tr>
+                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                        ⏳ 載入紀錄中...
+                                    </td>
+                                </tr>
+                            ) : logs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
+                                        📜 尚無物資紀錄
+                                    </td>
+                                </tr>
+                            ) : (
+                                logs.map(log => {
+                                    const typeInfo = getLogTypeLabel(log.type);
+                                    return (
+                                        <tr key={log.id}>
+                                            <td>{new Date(log.createdAt).toLocaleString('zh-TW')}</td>
+                                            <td>{log.resource?.name || '-'}</td>
+                                            <td>
+                                                <span className={`log-type ${typeInfo.className}`}>
+                                                    {typeInfo.label}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {log.beforeQuantity} → {log.afterQuantity}
+                                                <span style={{ color: log.quantity > 0 ? '#22c55e' : '#ef4444', marginLeft: '0.5rem' }}>
+                                                    ({log.quantity > 0 ? '+' : ''}{log.quantity})
+                                                </span>
+                                            </td>
+                                            <td>{log.operatorName}</td>
+                                            <td>{log.notes || '-'}</td>
+                                        </tr>
+                                    );
+                                })
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            )}
 
             {/* 新增物資 Modal */}
             {showAddModal && (
@@ -353,6 +535,90 @@ export default function ResourcesPage() {
                             </Button>
                             <Button onClick={handleAddResource} disabled={isSubmitting}>
                                 {isSubmitting ? '新增中...' : '✅ 確認新增'}
+                            </Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {/* 編輯物資 Modal */}
+            {editModal && (
+                <div className="modal-overlay" onClick={() => setEditModal(null)}>
+                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
+                        <h3>✏️ 編輯物資</h3>
+
+                        <div className="form-row">
+                            <div className="form-section">
+                                <label className="form-label">物資名稱 *</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={resourceForm.name}
+                                    onChange={e => setResourceForm({ ...resourceForm, name: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-section">
+                                <label className="form-label">分類</label>
+                                <select
+                                    className="form-input"
+                                    value={resourceForm.category}
+                                    onChange={e => setResourceForm({ ...resourceForm, category: e.target.value as ResourceCategory })}
+                                >
+                                    {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
+                                        <option key={key} value={key}>{config.icon} {config.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="form-row">
+                            <div className="form-section">
+                                <label className="form-label">單位</label>
+                                <input
+                                    type="text"
+                                    className="form-input"
+                                    value={resourceForm.unit}
+                                    onChange={e => setResourceForm({ ...resourceForm, unit: e.target.value })}
+                                />
+                            </div>
+                            <div className="form-section">
+                                <label className="form-label">最低庫存警示</label>
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    min="0"
+                                    value={resourceForm.minQuantity}
+                                    onChange={e => setResourceForm({ ...resourceForm, minQuantity: Number(e.target.value) })}
+                                />
+                            </div>
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">存放位置</label>
+                            <input
+                                type="text"
+                                className="form-input"
+                                value={resourceForm.location}
+                                onChange={e => setResourceForm({ ...resourceForm, location: e.target.value })}
+                            />
+                        </div>
+
+                        <div className="form-section">
+                            <label className="form-label">說明</label>
+                            <textarea
+                                className="form-textarea"
+                                value={resourceForm.description}
+                                onChange={e => setResourceForm({ ...resourceForm, description: e.target.value })}
+                                rows={2}
+                            />
+                        </div>
+
+                        <div className="modal-actions">
+                            <Button variant="secondary" onClick={() => setEditModal(null)}>
+                                取消
+                            </Button>
+                            <Button onClick={handleEditResource} disabled={isSubmitting}>
+                                {isSubmitting ? '儲存中...' : '✅ 儲存變更'}
                             </Button>
                         </div>
                     </Card>

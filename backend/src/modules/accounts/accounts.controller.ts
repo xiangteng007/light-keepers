@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Patch, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Delete, Body, UseGuards, Request } from '@nestjs/common';
 import { IsArray, IsString, IsNumber, IsBoolean, IsOptional } from 'class-validator';
 import { AccountsService } from './accounts.service';
 import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
@@ -144,5 +144,32 @@ export class AccountsController {
         @Request() req: { user: { id: string } }
     ) {
         return this.accountsService.rejectAccount(id, req.user.id, body.reason);
+    }
+
+    /**
+     * 刪除帳號 - 僅限一般民眾 (level 0)
+     */
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @MinLevel(RoleLevel.CHAIRMAN)
+    async deleteAccount(
+        @Param('id') id: string,
+        @Request() req: { user: { roleLevel: number } }
+    ) {
+        return this.accountsService.deleteAccount(id, req.user.roleLevel);
+    }
+
+    /**
+     * 加入黑名單 - 僅限一般民眾 (level 0)
+     */
+    @Patch(':id/blacklist')
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @MinLevel(RoleLevel.CHAIRMAN)
+    async blacklistAccount(
+        @Param('id') id: string,
+        @Body() body: { reason?: string },
+        @Request() req: { user: { roleLevel: number } }
+    ) {
+        return this.accountsService.blacklistAccount(id, req.user.roleLevel, body.reason);
     }
 }

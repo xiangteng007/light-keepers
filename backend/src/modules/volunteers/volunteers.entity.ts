@@ -82,6 +82,31 @@ export class Volunteer {
     @Column({ type: 'varchar', length: 500, nullable: true })
     photoUrl?: string;
 
+    // 關聯帳號 ID
+    @Column({ name: 'account_id', type: 'uuid', nullable: true })
+    accountId?: string;
+
+    // 審核狀態
+    @Column({
+        name: 'approval_status',
+        type: 'varchar',
+        length: 20,
+        default: 'pending'
+    })
+    approvalStatus: 'pending' | 'approved' | 'rejected';
+
+    // 審核備註
+    @Column({ name: 'approval_note', type: 'text', nullable: true })
+    approvalNote?: string;
+
+    // 審核人
+    @Column({ name: 'approved_by', type: 'uuid', nullable: true })
+    approvedBy?: string;
+
+    // 審核時間
+    @Column({ name: 'approved_at', type: 'timestamp', nullable: true })
+    approvedAt?: Date;
+
     // 時間戳記
     @CreateDateColumn()
     createdAt: Date;

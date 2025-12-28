@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Card, Button, Badge } from '../design-system';
-import { getVolunteers, getVolunteerStats } from '../api/services';
+import { getApprovedVolunteers, getVolunteerStats, getPendingVolunteers, approveVolunteer, rejectVolunteer } from '../api/services';
+import { useAuth } from '../context/AuthContext';
 import type { Volunteer as VolunteerType, VolunteerStatus } from '../api/services';
 
 // 技能選項
@@ -31,32 +32,11 @@ interface AssignmentForm {
     scheduledStart: string;
 }
 
-interface VolunteerForm {
-    name: string;
-    phone: string;
-    email: string;
-    region: string;
-    address: string;
-    skills: string[];
-    emergencyContact: string;
-    emergencyPhone: string;
-    notes: string;
-}
-
-const INITIAL_VOLUNTEER_FORM: VolunteerForm = {
-    name: '',
-    phone: '',
-    email: '',
-    region: '',
-    address: '',
-    skills: [],
-    emergencyContact: '',
-    emergencyPhone: '',
-    notes: '',
-};
-
 export default function VolunteersPage() {
+    const { user } = useAuth();
+    const [activeTab, setActiveTab] = useState<'pending' | 'list'>('list');
     const [volunteers, setVolunteers] = useState<VolunteerType[]>([]);
+    const [pendingVolunteers, setPendingVolunteers] = useState<VolunteerType[]>([]);
     const [stats, setStats] = useState({
         total: 0,
         available: 0,
@@ -67,10 +47,10 @@ export default function VolunteersPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    const [showRegisterForm, setShowRegisterForm] = useState(false);
     const [showAssignModal, setShowAssignModal] = useState(false);
     const [filterStatus, setFilterStatus] = useState<VolunteerStatus | ''>('');
     const [searchQuery, setSearchQuery] = useState('');
+    const [processingId, setProcessingId] = useState<string | null>(null);
     const [assignmentForm, setAssignmentForm] = useState<AssignmentForm>({
         volunteerId: '',
         volunteerName: '',
@@ -79,8 +59,6 @@ export default function VolunteersPage() {
         location: '',
         scheduledStart: '',
     });
-    const [volunteerForm, setVolunteerForm] = useState<VolunteerForm>(INITIAL_VOLUNTEER_FORM);
-    const [isSubmitting, setIsSubmitting] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
 
     // 載入志工資料
@@ -89,12 +67,14 @@ export default function VolunteersPage() {
             setIsLoading(true);
             setError(null);
             try {
-                const [volunteersRes, statsRes] = await Promise.all([
-                    getVolunteers({ status: filterStatus || undefined }),
+                const [volunteersRes, statsRes, pendingRes] = await Promise.all([
+                    getApprovedVolunteers({ status: filterStatus || undefined }),
                     getVolunteerStats(),
+                    getPendingVolunteers(),
                 ]);
                 setVolunteers(volunteersRes.data.data);
                 setStats(statsRes.data.data);
+                setPendingVolunteers(pendingRes.data.data || []);
             } catch (err) {
                 console.error('Failed to fetch volunteers:', err);
                 setError('載入志工資料失敗');
@@ -145,58 +125,40 @@ export default function VolunteersPage() {
         setTimeout(() => setSuccessMessage(''), 3000);
     };
 
-    // 提交志工註冊
-    const handleRegisterVolunteer = async () => {
-        if (!volunteerForm.name || !volunteerForm.phone || !volunteerForm.region || !volunteerForm.emergencyContact || !volunteerForm.emergencyPhone) {
-            alert('請填寫必填欄位：姓名、電話、所在地區、緊急聯絡人、緊急聯絡電話');
-            return;
-        }
-
-        setIsSubmitting(true);
+    // 審核通過
+    const handleApprove = async (id: string) => {
+        setProcessingId(id);
         try {
-            // 取得認證 token
-            const token = localStorage.getItem('accessToken');
-
-            // 呼叫後端 API 建立志工
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/volunteers`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': token ? `Bearer ${token}` : '',
-                },
-                body: JSON.stringify({
-                    ...volunteerForm,
-                    status: 'available',
-                    serviceHours: 0,
-                    taskCount: 0,
-                }),
-            });
-
-            if (!response.ok) throw new Error('Failed to create volunteer');
-
-            setShowRegisterForm(false);
-            setVolunteerForm(INITIAL_VOLUNTEER_FORM);
-            setSuccessMessage(`志工 ${volunteerForm.name} 已成功註冊！`);
+            await approveVolunteer(id, user?.id || '', '管理員核准');
+            setPendingVolunteers(prev => prev.filter(v => v.id !== id));
+            setSuccessMessage('志工已核准');
             setTimeout(() => setSuccessMessage(''), 3000);
-
-            // 重新載入資料
-            window.location.reload();
+            // 重新載入列表
+            const res = await getApprovedVolunteers({});
+            setVolunteers(res.data.data);
         } catch (err) {
-            console.error('Failed to register volunteer:', err);
-            alert('註冊失敗，請稍後再試');
+            console.error('Failed to approve volunteer:', err);
+            setError('核准失敗');
         } finally {
-            setIsSubmitting(false);
+            setProcessingId(null);
         }
     };
 
-    // 技能選擇切換
-    const toggleSkill = (skillValue: string) => {
-        setVolunteerForm(prev => ({
-            ...prev,
-            skills: prev.skills.includes(skillValue)
-                ? prev.skills.filter(s => s !== skillValue)
-                : [...prev.skills, skillValue]
-        }));
+    // 拒絕申請
+    const handleReject = async (id: string) => {
+        const note = prompt('請輸入拒絕原因（選填）');
+        setProcessingId(id);
+        try {
+            await rejectVolunteer(id, user?.id || '', note || '');
+            setPendingVolunteers(prev => prev.filter(v => v.id !== id));
+            setSuccessMessage('志工申請已拒絕');
+            setTimeout(() => setSuccessMessage(''), 3000);
+        } catch (err) {
+            console.error('Failed to reject volunteer:', err);
+            setError('拒絕失敗');
+        } finally {
+            setProcessingId(null);
+        }
     };
 
     return (
@@ -206,11 +168,22 @@ export default function VolunteersPage() {
                     <h2>👥 志工管理</h2>
                     <p className="page-subtitle">志工動員與調度系統</p>
                 </div>
-                <div className="page-header__right">
-                    <Button onClick={() => setShowRegisterForm(true)}>
-                        ➕ 新增志工
-                    </Button>
-                </div>
+            </div>
+
+            {/* Tab 切換 */}
+            <div className="volunteers-tabs">
+                <button
+                    className={`tab-btn ${activeTab === 'pending' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('pending')}
+                >
+                    ⏳ 待審核 {pendingVolunteers.length > 0 && <Badge variant="warning" size="sm">{pendingVolunteers.length}</Badge>}
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('list')}
+                >
+                    👥 志工名單
+                </button>
             </div>
 
             {/* 成功訊息 */}
@@ -244,40 +217,92 @@ export default function VolunteersPage() {
                 </Card>
             </div>
 
-            {/* 搜尋與篩選 */}
-            <div className="volunteers-filters">
-                <input
-                    type="text"
-                    className="form-input volunteers-search"
-                    placeholder="搜尋姓名或地區..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <div className="volunteers-status-filters">
-                    <button
-                        className={`status-filter-btn ${filterStatus === '' ? 'active' : ''}`}
-                        onClick={() => setFilterStatus('')}
-                    >
-                        全部
-                    </button>
-                    {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+            {/* 搜尋與篩選 - 只在志工名單 Tab 顯示 */}
+            {activeTab === 'list' && (
+                <div className="volunteers-filters">
+                    <input
+                        type="text"
+                        className="form-input volunteers-search"
+                        placeholder="搜尋姓名或地區..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                    <div className="volunteers-status-filters">
                         <button
-                            key={key}
-                            className={`status-filter-btn ${filterStatus === key ? 'active' : ''}`}
-                            style={{
-                                borderColor: filterStatus === key ? config.color : undefined,
-                                backgroundColor: filterStatus === key ? config.bgColor : undefined,
-                            }}
-                            onClick={() => setFilterStatus(key as VolunteerStatus)}
+                            className={`status-filter-btn ${filterStatus === '' ? 'active' : ''}`}
+                            onClick={() => setFilterStatus('')}
                         >
-                            {config.label}
+                            全部
                         </button>
-                    ))}
+                        {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                            <button
+                                key={key}
+                                className={`status-filter-btn ${filterStatus === key ? 'active' : ''}`}
+                                style={{
+                                    borderColor: filterStatus === key ? config.color : undefined,
+                                    backgroundColor: filterStatus === key ? config.bgColor : undefined,
+                                }}
+                                onClick={() => setFilterStatus(key as VolunteerStatus)}
+                            >
+                                {config.label}
+                            </button>
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
-            {/* 志工列表 */}
-            <div className="volunteers-list">
+            {/* 待審核志工列表 */}
+            {activeTab === 'pending' && (
+                <div className="pending-volunteers-list">
+                    {pendingVolunteers.length === 0 ? (
+                        <div className="volunteers-empty">
+                            <span>✅</span>
+                            <p>沒有待審核的志工申請</p>
+                        </div>
+                    ) : (
+                        pendingVolunteers.map(volunteer => (
+                            <Card key={volunteer.id} className="pending-volunteer-card" padding="md">
+                                <div className="pending-volunteer-info">
+                                    <div className="pending-volunteer-avatar">
+                                        {volunteer.name.charAt(0)}
+                                    </div>
+                                    <div className="pending-volunteer-details">
+                                        <h4>{volunteer.name}</h4>
+                                        <p>📍 {volunteer.region}</p>
+                                        <p>📞 {volunteer.phone}</p>
+                                        <p className="pending-volunteer-skills">
+                                            {volunteer.skills.map(skill => (
+                                                <span key={skill} className="skill-tag">{getSkillLabel(skill)}</span>
+                                            ))}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="pending-volunteer-actions">
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        onClick={() => handleApprove(volunteer.id)}
+                                        disabled={processingId === volunteer.id}
+                                    >
+                                        {processingId === volunteer.id ? '處理中...' : '✅ 核准'}
+                                    </Button>
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => handleReject(volunteer.id)}
+                                        disabled={processingId === volunteer.id}
+                                    >
+                                        ❌ 拒絕
+                                    </Button>
+                                </div>
+                            </Card>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {/* 志工列表 - 只在志工名單 Tab 顯示 */}
+            {activeTab === 'list' && (<div className="volunteers-list">
                 {isLoading ? (
                     <div className="volunteers-empty">
                         <span>⏳</span>
@@ -349,7 +374,7 @@ export default function VolunteersPage() {
                         <p>沒有符合條件的志工</p>
                     </div>
                 )}
-            </div>
+            </div>)}
 
             {/* 指派任務 Modal */}
             {showAssignModal && (
@@ -411,149 +436,7 @@ export default function VolunteersPage() {
                     </Card>
                 </div>
             )}
-
-            {/* 新增志工表單 Modal */}
-            {showRegisterForm && (
-                <div className="modal-overlay" onClick={() => setShowRegisterForm(false)}>
-                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>➕ 新增志工</h3>
-
-                        <div className="form-row">
-                            <div className="form-section">
-                                <label className="form-label">姓名 *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    placeholder="請輸入姓名"
-                                    value={volunteerForm.name}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-section">
-                                <label className="form-label">電話 *</label>
-                                <input
-                                    type="tel"
-                                    className="form-input"
-                                    placeholder="09XX-XXX-XXX"
-                                    value={volunteerForm.phone}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, phone: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-section">
-                                <label className="form-label">Email</label>
-                                <input
-                                    type="email"
-                                    className="form-input"
-                                    placeholder="volunteer@email.com"
-                                    value={volunteerForm.email}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-section">
-                                <label className="form-label">所在地區 *</label>
-                                <input
-                                    type="text"
-                                    className="form-input"
-                                    placeholder="例如：台北市中山區"
-                                    value={volunteerForm.region}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, region: e.target.value })}
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">
-                                詳細地址
-                                <span className="admin-only-badge">🔒 僅管理員可見</span>
-                            </label>
-                            <input
-                                type="text"
-                                className="form-input form-input--private"
-                                placeholder="詳細地址（選填）"
-                                value={volunteerForm.address}
-                                onChange={e => setVolunteerForm({ ...volunteerForm, address: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">專長技能</label>
-                            <div className="skills-grid skills-grid--improved">
-                                {SKILL_OPTIONS.map(skill => (
-                                    <button
-                                        key={skill.value}
-                                        type="button"
-                                        className={`skill-btn skill-btn--toggle ${volunteerForm.skills.includes(skill.value) ? 'skill-btn--selected' : ''}`}
-                                        onClick={() => toggleSkill(skill.value)}
-                                    >
-                                        <span className="skill-btn__icon">{skill.icon}</span>
-                                        <span className="skill-btn__label">{skill.label}</span>
-                                        {volunteerForm.skills.includes(skill.value) && (
-                                            <span className="skill-btn__check">✓</span>
-                                        )}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="form-row">
-                            <div className="form-section">
-                                <label className="form-label">
-                                    緊急聯絡人 *
-                                    <span className="admin-only-badge">🔒 僅管理員可見</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    className="form-input form-input--private"
-                                    placeholder="聯絡人姓名"
-                                    value={volunteerForm.emergencyContact}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, emergencyContact: e.target.value })}
-                                    required
-                                />
-                            </div>
-                            <div className="form-section">
-                                <label className="form-label">
-                                    緊急聯絡電話 *
-                                    <span className="admin-only-badge">🔒 僅管理員可見</span>
-                                </label>
-                                <input
-                                    type="tel"
-                                    className="form-input form-input--private"
-                                    placeholder="緊急聯絡電話"
-                                    value={volunteerForm.emergencyPhone}
-                                    onChange={e => setVolunteerForm({ ...volunteerForm, emergencyPhone: e.target.value })}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">備註事項（過敏原或慢性疾病等等需特別註記事項）</label>
-                            <textarea
-                                className="form-textarea"
-                                placeholder="請填寫過敏原、慢性疾病或其他需要特別注意的事項..."
-                                value={volunteerForm.notes}
-                                onChange={e => setVolunteerForm({ ...volunteerForm, notes: e.target.value })}
-                                rows={3}
-                            />
-                        </div>
-
-                        <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => {
-                                setShowRegisterForm(false);
-                                setVolunteerForm(INITIAL_VOLUNTEER_FORM);
-                            }}>
-                                取消
-                            </Button>
-                            <Button onClick={handleRegisterVolunteer} disabled={isSubmitting}>
-                                {isSubmitting ? '註冊中...' : '✅ 確認註冊'}
-                            </Button>
-                        </div>
-                    </Card>
-                </div>
-            )}
         </div>
     );
 }
+

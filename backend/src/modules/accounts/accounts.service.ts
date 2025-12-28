@@ -318,4 +318,71 @@ export class AccountsService {
             message: '帳號已被拒絕',
         };
     }
+
+    /**
+     * 刪除帳號 - 僅限 level 0 的帳號
+     */
+    async deleteAccount(accountId: string, operatorLevel: number): Promise<{ success: boolean; message: string }> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            relations: ['roles'],
+        });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        // 計算被刪除帳號的權限等級
+        const targetLevel = account.roles?.length > 0
+            ? Math.max(...account.roles.map(r => r.level))
+            : 0;
+
+        // 只能刪除 level 0 的帳號
+        if (targetLevel > 0) {
+            throw new ForbiddenException('只能刪除一般民眾帳號 (level 0)');
+        }
+
+        // 刪除帳號
+        await this.accountRepository.remove(account);
+
+        return {
+            success: true,
+            message: '帳號已刪除',
+        };
+    }
+
+    /**
+     * 加入黑名單 (標記帳號狀態)
+     */
+    async blacklistAccount(accountId: string, operatorLevel: number, reason?: string): Promise<{ success: boolean; message: string }> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            relations: ['roles'],
+        });
+
+        if (!account) {
+            throw new NotFoundException('帳號不存在');
+        }
+
+        // 計算被操作帳號的權限等級
+        const targetLevel = account.roles?.length > 0
+            ? Math.max(...account.roles.map(r => r.level))
+            : 0;
+
+        // 只能黑名單 level 0 的帳號
+        if (targetLevel > 0) {
+            throw new ForbiddenException('只能將一般民眾加入黑名單');
+        }
+
+        // 將帳號標記為停用
+        account.isActive = false;
+        account.approvalNote = reason ? `黑名單：${reason}` : '已加入黑名單';
+
+        await this.accountRepository.save(account);
+
+        return {
+            success: true,
+            message: '帳號已加入黑名單',
+        };
+    }
 }

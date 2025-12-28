@@ -179,88 +179,117 @@
     color: #111;
 }
 
-/* 一週天氣預報卡片 */
-.weekly-forecast {
-    display: flex;
-    gap: 0.75rem;
+/* 一週天氣預報表格 */
+.weekly-table-container {
     overflow-x: auto;
-    padding: 0.5rem 0;
+    margin: 0 -0.5rem;
+    padding: 0 0.5rem;
 }
 
-.day-card {
-    flex: 0 0 auto;
-    min-width: 100px;
-    background: #f9f9f9;
+.weekly-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.85rem;
+    background: #fff;
     border: 1px solid #e5e5e5;
     border-radius: 8px;
-    padding: 1rem 0.75rem;
-    text-align: center;
-    transition: box-shadow 0.2s;
-}
-
-.day-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.day-card:first-child {
-    background: #111;
-    color: #fff;
-    border-color: #111;
-}
-
-.day-card:first-child .day-weather,
-.day-card:first-child .temp-low {
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.day-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 0.5rem;
-}
-
-.day-icon {
-    font-size: 2rem;
-    margin: 0.5rem 0;
-}
-
-.day-weather {
-    font-size: 0.75rem;
-    color: #666;
-    margin-bottom: 0.5rem;
-    height: 2.5em;
     overflow: hidden;
 }
 
-.day-temp {
-    display: flex;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
+.weekly-table thead {
+    background: #f5f5f5;
 }
 
-.temp-high {
-    font-weight: 600;
-    color: #c53030;
+.weekly-table th {
+    padding: 0.6rem 0.4rem;
+    text-align: center;
+    border-bottom: 1px solid #e5e5e5;
+    font-weight: 500;
+    color: #333;
+    min-width: 80px;
 }
 
-.day-card:first-child .temp-high {
-    color: #fff;
+.weekly-table th.row-header {
+    width: 60px;
+    background: #f0f0f0;
 }
 
-.temp-low {
+.weekly-table th.weekend {
+    background: #fafafa;
     color: #666;
 }
 
-.day-pop {
-    font-size: 0.75rem;
-    color: #2b6cb0;
-    margin-top: 0.4rem;
+.date-header {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #111;
 }
 
-.day-card:first-child .day-pop {
-    color: rgba(255, 255, 255, 0.8);
+.weekday-header {
+    font-size: 0.75rem;
+    color: #666;
+    margin-top: 2px;
 }
+
+.weekly-table th.weekend .date-header,
+.weekly-table th.weekend .weekday-header {
+    color: #888;
+}
+
+.weekly-table tbody tr {
+    border-bottom: 1px solid #eee;
+}
+
+.weekly-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.weekly-table td {
+    padding: 0.5rem 0.4rem;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.weekly-table td.row-label {
+    background: #f9f9f9;
+    font-weight: 500;
+    color: #555;
+    text-align: center;
+    border-right: 1px solid #eee;
+}
+
+.weekly-table td.weekend {
+    background: #fcfcfc;
+}
+
+.weather-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.cell-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+
+.cell-temp {
+    font-size: 0.8rem;
+    color: #333;
+    white-space: nowrap;
+}
+
+.cell-pop {
+    font-size: 0.85rem;
+    color: #2b6cb0;
+    font-weight: 500;
+}
+
+.pop-cell {
+    padding: 0.25rem 0;
+}
+
 
 /* 海面天氣 */
 .marine-grid {

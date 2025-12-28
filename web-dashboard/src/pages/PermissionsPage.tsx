@@ -9,12 +9,12 @@ import {
     ChevronUp,
     RefreshCw,
     AlertTriangle,
-    UserCheck,
-    UserX,
-    Clock,
+    Trash2,
+    Ban,
+    X,
+    ArrowUpDown,
 } from 'lucide-react';
-import { getPendingAccounts, approveAccount, rejectAccount } from '../api/services';
-import type { PendingAccount } from '../api/services';
+import { deleteAccount, blacklistAccount } from '../api/services';
 import './PermissionsPage.css';
 
 // Types
@@ -27,6 +27,7 @@ interface AdminAccount {
     roleDisplayName: string;
     isActive: boolean;
     lastLoginAt: string | null;
+    createdAt: string;
 }
 
 interface Role {
@@ -52,9 +53,8 @@ const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-9552
 
 export default function PermissionsPage() {
     const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'pending' | 'users' | 'pages'>('pending');
+    const [activeTab, setActiveTab] = useState<'users' | 'general' | 'pages'>('users');
     const [accounts, setAccounts] = useState<AdminAccount[]>([]);
-    const [pendingAccounts, setPendingAccounts] = useState<PendingAccount[]>([]);
     const [roles, setRoles] = useState<Role[]>([]);
     const [pagePermissions, setPagePermissions] = useState<PagePermission[]>([]);
     const [isLoading, setIsLoading] = useState(true);
@@ -62,8 +62,10 @@ export default function PermissionsPage() {
     const [searchTerm, setSearchTerm] = useState('');
     const [expandedUser, setExpandedUser] = useState<string | null>(null);
     const [savingUser, setSavingUser] = useState<string | null>(null);
-    const [processingApproval, setProcessingApproval] = useState<string | null>(null);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [sortBy, setSortBy] = useState<'date' | 'name'>('date');
+    const [selectedAccount, setSelectedAccount] = useState<AdminAccount | null>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
 
     // 獲取 token
     const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
@@ -84,11 +86,10 @@ export default function PermissionsPage() {
                 'Authorization': `Bearer ${token}`,
             };
 
-            const [accountsRes, rolesRes, permissionsRes, pendingRes] = await Promise.all([
+            const [accountsRes, rolesRes, permissionsRes] = await Promise.all([
                 fetch(`${API_BASE}/accounts/admin`, { headers }),
                 fetch(`${API_BASE}/accounts/roles`, { headers }),
                 fetch(`${API_BASE}/accounts/page-permissions`, { headers }),
-                getPendingAccounts().catch(() => ({ data: [] })),
             ]);
 
             if (!accountsRes.ok || !rolesRes.ok || !permissionsRes.ok) {
@@ -104,7 +105,6 @@ export default function PermissionsPage() {
             setAccounts(accountsData);
             setRoles(rolesData);
             setPagePermissions(permissionsData);
-            setPendingAccounts(pendingRes.data || []);
         } catch (err) {
             setError('載入資料失敗，請稍後再試');
             console.error('Failed to fetch data:', err);
@@ -196,45 +196,6 @@ export default function PermissionsPage() {
         }
     };
 
-    // Handle approve account
-    const handleApprove = async (accountId: string) => {
-        setProcessingApproval(accountId);
-        try {
-            await approveAccount(accountId);
-            setPendingAccounts(prev => prev.filter(acc => acc.id !== accountId));
-            setMessage({ type: 'success', text: '帳號已核准' });
-            setTimeout(() => setMessage(null), 3000);
-            // Refresh data to update user list
-            fetchData();
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setMessage({ type: 'error', text: error.response?.data?.message || '核准失敗' });
-            setTimeout(() => setMessage(null), 5000);
-        } finally {
-            setProcessingApproval(null);
-        }
-    };
-
-    // Handle reject account
-    const handleReject = async (accountId: string) => {
-        const reason = window.prompt('請輸入拒絕原因（可選）：');
-        if (reason === null) return; // User cancelled
-
-        setProcessingApproval(accountId);
-        try {
-            await rejectAccount(accountId, reason || undefined);
-            setPendingAccounts(prev => prev.filter(acc => acc.id !== accountId));
-            setMessage({ type: 'success', text: '帳號已拒絕' });
-            setTimeout(() => setMessage(null), 3000);
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setMessage({ type: 'error', text: error.response?.data?.message || '拒絕失敗' });
-            setTimeout(() => setMessage(null), 5000);
-        } finally {
-            setProcessingApproval(null);
-        }
-    };
-
     // Filter accounts by search term
     const filteredAccounts = accounts.filter(
         acc =>
@@ -247,6 +208,61 @@ export default function PermissionsPage() {
         const operatorLevel = user?.roleLevel ?? 0;
         return operatorLevel > targetLevel;
     };
+
+    // 刪除帳號
+    const handleDeleteAccount = async (accountId: string, accountName: string) => {
+        if (!confirm(`確定要刪除帳號「${accountName}」嗎？此操作不可復原。`)) return;
+
+        setProcessingId(accountId);
+        try {
+            await deleteAccount(accountId);
+            setAccounts(prev => prev.filter(acc => acc.id !== accountId));
+            setMessage({ type: 'success', text: '帳號已刪除' });
+            setTimeout(() => setMessage(null), 3000);
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setMessage({ type: 'error', text: error.response?.data?.message || '刪除失敗' });
+            setTimeout(() => setMessage(null), 5000);
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    // 加入黑名單
+    const handleBlacklistAccount = async (accountId: string, accountName: string) => {
+        const reason = prompt(`請輸入將「${accountName}」加入黑名單的原因：`);
+        if (reason === null) return;
+
+        setProcessingId(accountId);
+        try {
+            await blacklistAccount(accountId, reason);
+            setAccounts(prev => prev.map(acc =>
+                acc.id === accountId ? { ...acc, isActive: false } : acc
+            ));
+            setMessage({ type: 'success', text: '帳號已加入黑名單' });
+            setTimeout(() => setMessage(null), 3000);
+        } catch (err: unknown) {
+            const error = err as { response?: { data?: { message?: string } } };
+            setMessage({ type: 'error', text: error.response?.data?.message || '操作失敗' });
+            setTimeout(() => setMessage(null), 5000);
+        } finally {
+            setProcessingId(null);
+        }
+    };
+
+    // 排序一般民眾帳號
+    const sortedGeneralAccounts = accounts
+        .filter(acc => acc.roleLevel === 0)
+        .filter(acc =>
+            acc.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            acc.displayName.toLowerCase().includes(searchTerm.toLowerCase())
+        )
+        .sort((a, b) => {
+            if (sortBy === 'date') {
+                return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+            }
+            return (a.displayName || a.email).localeCompare(b.displayName || b.email);
+        });
 
     // Render role badges (single select - only one role allowed)
     const renderRoleBadges = (account: AdminAccount) => {
@@ -324,21 +340,18 @@ export default function PermissionsPage() {
 
             <div className="permissions-tabs">
                 <button
-                    className={`permissions-tab ${activeTab === 'pending' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('pending')}
-                >
-                    <Clock size={18} />
-                    待審核
-                    {pendingAccounts.length > 0 && (
-                        <span className="permissions-tab__badge">{pendingAccounts.length}</span>
-                    )}
-                </button>
-                <button
                     className={`permissions-tab ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                 >
                     <Users size={18} />
                     用戶角色管理
+                </button>
+                <button
+                    className={`permissions-tab ${activeTab === 'general' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('general')}
+                >
+                    <Users size={18} />
+                    一般民眾
                 </button>
                 <button
                     className={`permissions-tab ${activeTab === 'pages' ? 'active' : ''}`}
@@ -350,57 +363,114 @@ export default function PermissionsPage() {
             </div>
 
             <div className="permissions-content">
-                {activeTab === 'pending' && (
-                    <div className="pending-section">
-                        {pendingAccounts.length === 0 ? (
-                            <div className="pending-empty">
-                                <UserCheck size={48} />
-                                <h3>沒有待審核的帳號</h3>
-                                <p>所有註冊申請都已處理完成</p>
+                {/* 一般民眾 Tab - 顯示 level 0 的帳號 */}
+                {activeTab === 'general' && (
+                    <div className="general-section">
+                        <div className="general-toolbar">
+                            <div className="users-search">
+                                <Search size={18} />
+                                <input
+                                    type="text"
+                                    placeholder="搜尋一般民眾..."
+                                    value={searchTerm}
+                                    onChange={e => setSearchTerm(e.target.value)}
+                                />
                             </div>
-                        ) : (
-                            <div className="pending-list">
-                                {pendingAccounts.map(account => (
-                                    <div key={account.id} className="pending-card">
-                                        <div className="pending-card__info">
-                                            <div className="pending-card__avatar">
+                            <div className="sort-dropdown">
+                                <ArrowUpDown size={16} />
+                                <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'name')}>
+                                    <option value="date">註冊時間</option>
+                                    <option value="name">名稱</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="users-list">
+                            {sortedGeneralAccounts.length === 0 ? (
+                                <div className="users-empty">沒有一般民眾帳號</div>
+                            ) : (
+                                sortedGeneralAccounts.map(account => (
+                                    <div
+                                        key={account.id}
+                                        className={`user-card user-card--general ${!account.isActive ? 'user-card--blacklisted' : ''}`}
+                                        onClick={() => setSelectedAccount(account)}
+                                    >
+                                        <div className="user-card__info">
+                                            <div className="user-card__avatar">
                                                 {account.displayName?.charAt(0) || account.email?.charAt(0) || '?'}
                                             </div>
-                                            <div className="pending-card__details">
-                                                <span className="pending-card__name">
+                                            <div className="user-card__details">
+                                                <span className="user-card__name">
                                                     {account.displayName || '未設定名稱'}
+                                                    {!account.isActive && <span className="user-card__badge--blacklisted">🚫 黑名單</span>}
                                                 </span>
-                                                <span className="pending-card__email">{account.email}</span>
-                                                {account.phone && (
-                                                    <span className="pending-card__phone">{account.phone}</span>
-                                                )}
-                                                <span className="pending-card__date">
-                                                    申請時間：{new Date(account.createdAt).toLocaleString('zh-TW')}
+                                                <span className="user-card__email">{account.email}</span>
+                                                <span className="user-card__date">
+                                                    註冊：{new Date(account.createdAt).toLocaleDateString('zh-TW')}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="pending-card__actions">
+                                        <div className="user-card__actions">
+                                            {account.isActive && (
+                                                <button
+                                                    className="action-btn action-btn--warning"
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        handleBlacklistAccount(account.id, account.displayName || account.email);
+                                                    }}
+                                                    disabled={processingId === account.id}
+                                                    title="加入黑名單"
+                                                >
+                                                    <Ban size={16} />
+                                                </button>
+                                            )}
                                             <button
-                                                className="lk-btn lk-btn--success"
-                                                onClick={() => handleApprove(account.id)}
-                                                disabled={processingApproval === account.id}
+                                                className="action-btn action-btn--danger"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleDeleteAccount(account.id, account.displayName || account.email);
+                                                }}
+                                                disabled={processingId === account.id}
+                                                title="刪除帳號"
                                             >
-                                                <UserCheck size={16} />
-                                                {processingApproval === account.id ? '處理中...' : '核准'}
-                                            </button>
-                                            <button
-                                                className="lk-btn lk-btn--danger"
-                                                onClick={() => handleReject(account.id)}
-                                                disabled={processingApproval === account.id}
-                                            >
-                                                <UserX size={16} />
-                                                拒絕
+                                                <Trash2 size={16} />
                                             </button>
                                         </div>
                                     </div>
-                                ))}
+                                ))
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {/* 帳號詳情彈窗 */}
+                {selectedAccount && (
+                    <div className="modal-overlay" onClick={() => setSelectedAccount(null)}>
+                        <div className="modal-content" onClick={e => e.stopPropagation()}>
+                            <div className="modal-header">
+                                <h3>帳號詳情</h3>
+                                <button className="modal-close" onClick={() => setSelectedAccount(null)}>
+                                    <X size={20} />
+                                </button>
                             </div>
-                        )}
+                            <div className="modal-body">
+                                <div className="account-detail">
+                                    <div className="account-detail__avatar">
+                                        {selectedAccount.displayName?.charAt(0) || selectedAccount.email?.charAt(0) || '?'}
+                                    </div>
+                                    <div className="account-detail__info">
+                                        <p><strong>名稱：</strong>{selectedAccount.displayName || '未設定'}</p>
+                                        <p><strong>Email：</strong>{selectedAccount.email}</p>
+                                        <p><strong>角色：</strong>{selectedAccount.roleDisplayName}</p>
+                                        <p><strong>狀態：</strong>{selectedAccount.isActive ? '正常' : '🚫 黑名單'}</p>
+                                        <p><strong>註冊時間：</strong>{new Date(selectedAccount.createdAt).toLocaleString('zh-TW')}</p>
+                                        {selectedAccount.lastLoginAt && (
+                                            <p><strong>最後登入：</strong>{new Date(selectedAccount.lastLoginAt).toLocaleString('zh-TW')}</p>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 )}
 

@@ -79,6 +79,87 @@ export class VolunteersController {
         };
     }
 
+    // ===== 審核相關端點 =====
+
+    // 取得待審核志工列表
+    @Get('pending')
+    @Roles(['admin'])
+    async findPending() {
+        const volunteers = await this.volunteersService.findPending();
+        return {
+            success: true,
+            data: volunteers,
+            count: volunteers.length,
+        };
+    }
+
+    // 取得待審核數量
+    @Get('pending/count')
+    async getPendingCount() {
+        const count = await this.volunteersService.getPendingCount();
+        return {
+            success: true,
+            data: { count },
+        };
+    }
+
+    // 取得已審核通過的志工（主志工列表）
+    @Get('approved')
+    async findApproved(
+        @Query('status') status?: VolunteerStatus,
+        @Query('region') region?: string,
+        @Query('skill') skill?: string,
+        @Query('limit') limit?: string,
+        @Query('offset') offset?: string,
+    ) {
+        const filter: VolunteerFilter = {
+            status,
+            region,
+            skill,
+            limit: limit ? parseInt(limit, 10) : undefined,
+            offset: offset ? parseInt(offset, 10) : undefined,
+        };
+
+        const volunteers = await this.volunteersService.findApproved(filter);
+        return {
+            success: true,
+            data: volunteers,
+            count: volunteers.length,
+        };
+    }
+
+    // 審核通過
+    @Post(':id/approve')
+    @Roles(['admin'])
+    async approve(
+        @Param('id') id: string,
+        @Body('approvedBy') approvedBy: string,
+        @Body('note') note?: string,
+    ) {
+        const volunteer = await this.volunteersService.approve(id, approvedBy, note);
+        return {
+            success: true,
+            message: '志工申請已核准',
+            data: volunteer,
+        };
+    }
+
+    // 拒絕申請
+    @Post(':id/reject')
+    @Roles(['admin'])
+    async reject(
+        @Param('id') id: string,
+        @Body('rejectedBy') rejectedBy: string,
+        @Body('note') note?: string,
+    ) {
+        const volunteer = await this.volunteersService.reject(id, rejectedBy, note);
+        return {
+            success: true,
+            message: '志工申請已拒絕',
+            data: volunteer,
+        };
+    }
+
     // 🔐 取得單一志工完整資料 - 僅管理員
     @Get(':id')
     @Roles(['admin'])

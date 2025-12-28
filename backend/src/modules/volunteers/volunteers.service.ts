@@ -15,7 +15,8 @@ export interface CreateVolunteerDto {
     emergencyContact?: string;
     emergencyPhone?: string;
     notes?: string;
-    photoUrl?: string; // 📷 志工照片
+    photoUrl?: string;
+    accountId?: string; // 關聯的帳號 ID
 }
 
 export interface UpdateVolunteerDto {
@@ -28,7 +29,7 @@ export interface UpdateVolunteerDto {
     emergencyContact?: string;
     emergencyPhone?: string;
     notes?: string;
-    photoUrl?: string; // 📷 志工照片
+    photoUrl?: string;
 }
 
 export interface VolunteerFilter {
@@ -37,6 +38,7 @@ export interface VolunteerFilter {
     skill?: string;
     limit?: number;
     offset?: number;
+    approvalStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 @Injectable()
@@ -46,20 +48,21 @@ export class VolunteersService {
     constructor(
         @InjectRepository(Volunteer)
         private volunteersRepository: Repository<Volunteer>,
-        private accessLogService: AccessLogService, // 🔐 存取日誌
+        private accessLogService: AccessLogService,
     ) { }
 
-    // 註冊志工
+    // 註冊志工（預設為待審核狀態）
     async create(dto: CreateVolunteerDto): Promise<Volunteer> {
         const volunteer = this.volunteersRepository.create({
             ...dto,
-            status: 'available',
+            status: 'offline', // 未審核前為離線狀態
+            approvalStatus: 'pending',
             serviceHours: 0,
             taskCount: 0,
         });
 
         const saved = await this.volunteersRepository.save(volunteer);
-        this.logger.log(`New volunteer registered: ${saved.id} - ${saved.name}`);
+        this.logger.log(`New volunteer registered (pending): ${saved.id} - ${saved.name}`);
         return saved;
     }
 
@@ -207,4 +210,79 @@ export class VolunteersService {
         }
         this.logger.log(`Volunteer ${id} deleted`);
     }
+
+    // ===== 審核相關方法 =====
+
+    // 取得待審核志工列表
+    async findPending(): Promise<Volunteer[]> {
+        return this.volunteersRepository.find({
+            where: { approvalStatus: 'pending' },
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    // 取得已審核通過的志工（用於志工管理列表）
+    async findApproved(filter: VolunteerFilter = {}): Promise<Volunteer[]> {
+        const query = this.volunteersRepository.createQueryBuilder('volunteer');
+        query.andWhere('volunteer.approvalStatus = :approvalStatus', { approvalStatus: 'approved' });
+
+        if (filter.status) {
+            query.andWhere('volunteer.status = :status', { status: filter.status });
+        }
+
+        if (filter.region) {
+            query.andWhere('volunteer.region LIKE :region', { region: `%${filter.region}%` });
+        }
+
+        if (filter.skill) {
+            query.andWhere('volunteer.skills LIKE :skill', { skill: `%${filter.skill}%` });
+        }
+
+        query.orderBy('volunteer.createdAt', 'DESC');
+
+        if (filter.limit) {
+            query.take(filter.limit);
+        }
+
+        if (filter.offset) {
+            query.skip(filter.offset);
+        }
+
+        return query.getMany();
+    }
+
+    // 審核通過
+    async approve(id: string, approvedBy: string, note?: string): Promise<Volunteer> {
+        const volunteer = await this.findOne(id);
+        volunteer.approvalStatus = 'approved';
+        volunteer.approvedBy = approvedBy;
+        volunteer.approvedAt = new Date();
+        volunteer.approvalNote = note || '';
+        volunteer.status = 'available'; // 審核通過後設為可用
+
+        const updated = await this.volunteersRepository.save(volunteer);
+        this.logger.log(`Volunteer ${id} approved by ${approvedBy}`);
+        return updated;
+    }
+
+    // 拒絕申請
+    async reject(id: string, rejectedBy: string, note?: string): Promise<Volunteer> {
+        const volunteer = await this.findOne(id);
+        volunteer.approvalStatus = 'rejected';
+        volunteer.approvedBy = rejectedBy;
+        volunteer.approvedAt = new Date();
+        volunteer.approvalNote = note || '';
+
+        const updated = await this.volunteersRepository.save(volunteer);
+        this.logger.log(`Volunteer ${id} rejected by ${rejectedBy}`);
+        return updated;
+    }
+
+    // 取得待審核數量
+    async getPendingCount(): Promise<number> {
+        return this.volunteersRepository.count({
+            where: { approvalStatus: 'pending' },
+        });
+    }
 }
+
