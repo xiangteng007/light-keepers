@@ -44,6 +44,7 @@ import {
     Save,
     XCircle,
     CloudSun,
+    Wallet,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
@@ -77,6 +78,7 @@ const defaultNavItems: NavItem[] = [
     { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2 },
     { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1 },
     { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4 },
+    { id: 'donations', path: '/donations', label: '捐款管理', icon: Wallet, requiredLevel: 5 },
 ];
 
 // Sortable Nav Item Component
