@@ -2,7 +2,7 @@ import { Controller, Get, Query } from '@nestjs/common';
 import { WeatherForecastService } from './weather-forecast.service';
 import { TAIWAN_COUNTIES, TIDE_STATIONS, MARINE_REGIONS } from './dto/weather-forecast.dto';
 
-@Controller('api/v1/weather')
+@Controller('weather')
 export class WeatherForecastController {
     constructor(private readonly weatherService: WeatherForecastService) { }
 
