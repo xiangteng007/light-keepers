@@ -42,6 +42,7 @@ import {
     Edit3,
     Save,
     XCircle,
+    CloudSun,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
@@ -63,6 +64,7 @@ const defaultNavItems: NavItem[] = [
     { id: 'events', path: '/events', label: '災害回報', icon: Siren, requiredLevel: 1 },
     { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList, requiredLevel: 2 },
     { id: 'map', path: '/map', label: '地圖總覽', icon: Map, requiredLevel: 0 },
+    { id: 'forecast', path: '/forecast', label: '氣象預報', icon: CloudSun, requiredLevel: 0 },
     { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen, requiredLevel: 0 },
     { id: 'report', path: '/report', label: '回報系統', icon: MessageSquareWarning, requiredLevel: 1 },
     { id: 'reports-admin', path: '/reports/admin', label: '回報審核', icon: CheckSquare, requiredLevel: 2 },
