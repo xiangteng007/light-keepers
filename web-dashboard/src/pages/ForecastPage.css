@@ -1,9 +1,9 @@
-/* 氣象預報頁面樣式 */
+/* 氣象預報頁面樣式 - Minimal Monochrome */
 .forecast-page {
     padding: 1.5rem;
     max-width: 1400px;
     margin: 0 auto;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #fafafa;
     min-height: 100vh;
 }
 
@@ -11,19 +11,19 @@
 .forecast-header {
     text-align: center;
     margin-bottom: 2rem;
-    color: white;
+    color: #1a1a1a;
 }
 
 .forecast-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
+    font-size: 1.75rem;
+    font-weight: 600;
     margin-bottom: 0.5rem;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: #111;
 }
 
 .forecast-subtitle {
-    font-size: 1rem;
-    opacity: 0.9;
+    font-size: 0.9rem;
+    color: #666;
 }
 
 /* 標籤列 */
@@ -32,34 +32,34 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.15);
-    backdrop-filter: blur(10px);
-    border-radius: 12px;
+    padding: 0.5rem;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
 }
 
 .tab-btn {
-    padding: 0.75rem 1.25rem;
-    border: none;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border-radius: 8px;
+    padding: 0.6rem 1rem;
+    border: 1px solid #e5e5e5;
+    background: #fff;
+    color: #333;
+    border-radius: 6px;
     cursor: pointer;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     font-weight: 500;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     white-space: nowrap;
 }
 
 .tab-btn:hover {
-    background: rgba(255, 255, 255, 0.35);
-    transform: translateY(-2px);
+    background: #f5f5f5;
+    border-color: #ccc;
 }
 
 .tab-btn.active {
-    background: white;
-    color: #667eea;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    background: #111;
+    color: #fff;
+    border-color: #111;
 }
 
 /* 縣市選擇器 */
@@ -69,263 +69,262 @@
     gap: 1rem;
     margin-bottom: 1.5rem;
     padding: 1rem;
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
 }
 
 .county-selector label {
-    font-weight: 600;
+    font-weight: 500;
     color: #333;
+    font-size: 0.9rem;
 }
 
 .county-selector select {
-    padding: 0.75rem 1rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
-    background: white;
+    padding: 0.6rem 1rem;
+    border: 1px solid #d4d4d4;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    background: #fff;
     cursor: pointer;
     min-width: 150px;
-    transition: border-color 0.3s;
+    transition: border-color 0.2s;
 }
 
 .county-selector select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #111;
 }
 
 /* 預報區塊 */
 .forecast-section {
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    padding: 1.5rem;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.25rem;
     margin-bottom: 1.5rem;
 }
 
 .forecast-section h2 {
-    font-size: 1.5rem;
-    color: #333;
-    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    color: #111;
+    margin-bottom: 1.25rem;
     padding-bottom: 0.75rem;
-    border-bottom: 2px solid #e2e8f0;
+    border-bottom: 1px solid #e5e5e5;
+    font-weight: 600;
 }
 
 /* 天氣卡片 */
 .weather-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 1.5rem;
+    gap: 1rem;
 }
 
 .weather-card {
-    background: linear-gradient(135deg, #74b9ff 0%, #0984e3 100%);
-    border-radius: 16px;
-    padding: 2rem;
-    color: white;
-    box-shadow: 0 8px 24px rgba(9, 132, 227, 0.3);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1.5rem;
+    color: #333;
 }
 
 .weather-card.main-card {
     grid-column: 1 / -1;
-    max-width: 500px;
+    max-width: 450px;
     margin: 0 auto;
     text-align: center;
+    background: #f9f9f9;
 }
 
 .weather-card h2 {
-    font-size: 1.75rem;
-    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
     border-bottom: none;
-    color: white;
+    color: #111;
+    font-weight: 600;
 }
 
 .weather-icon-large {
-    font-size: 5rem;
-    margin: 1rem 0;
-    animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
+    font-size: 3.5rem;
+    margin: 0.75rem 0;
 }
 
 .weather-details {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
-    margin-top: 1.5rem;
+    gap: 0.75rem;
+    margin-top: 1rem;
 }
 
 .detail-item {
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    padding: 1rem;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 6px;
+    padding: 0.75rem;
     text-align: center;
 }
 
 .detail-item .label {
     display: block;
-    font-size: 0.85rem;
-    opacity: 0.9;
+    font-size: 0.75rem;
+    color: #888;
     margin-bottom: 0.25rem;
 }
 
 .detail-item .value {
     display: block;
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-weight: 600;
+    color: #111;
 }
 
 /* 海面天氣 */
 .marine-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1rem;
 }
 
 .marine-card {
-    background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-    border-radius: 12px;
-    padding: 1.25rem;
-    color: white;
-    box-shadow: 0 4px 16px rgba(0, 184, 148, 0.3);
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem;
 }
 
 .marine-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+    border-bottom: 1px solid #eee;
+    color: #111;
 }
 
 .marine-details {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .detail-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: #333;
 }
 
 .detail-row span:first-child {
-    opacity: 0.9;
+    color: #666;
 }
 
 /* 潮汐預報 */
 .tide-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
 }
 
 .tide-card {
-    background: linear-gradient(135deg, #2d3436 0%, #636e72 100%);
-    border-radius: 12px;
-    padding: 1.25rem;
-    color: white;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem;
 }
 
 .tide-card h3 {
-    font-size: 1.1rem;
-    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: #111;
 }
 
 .tide-day {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
+    background: #f9f9f9;
+    border-radius: 6px;
+    padding: 0.6rem;
+    margin-bottom: 0.4rem;
 }
 
 .tide-date {
     font-weight: 600;
-    margin-bottom: 0.5rem;
-    color: #ffeaa7;
+    font-size: 0.85rem;
+    margin-bottom: 0.4rem;
+    color: #111;
 }
 
 .tide-events {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .tide-event {
-    font-size: 0.85rem;
-    padding: 0.25rem 0.5rem;
-    background: rgba(255, 255, 255, 0.1);
+    font-size: 0.8rem;
+    padding: 0.2rem 0.5rem;
+    background: #fff;
+    border: 1px solid #e5e5e5;
     border-radius: 4px;
+    color: #333;
 }
 
 .tide-event.high {
-    color: #ff7675;
+    color: #c53030;
 }
 
 .tide-event.low {
-    color: #74b9ff;
+    color: #2b6cb0;
 }
 
 /* 育樂天氣 (登山/風景區/農場) */
 .recreational-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
     gap: 1rem;
 }
 
 .recreational-card {
-    background: white;
-    border-radius: 12px;
-    padding: 1.25rem;
-    border: 1px solid #e2e8f0;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    transition: transform 0.3s, box-shadow 0.3s;
+    background: #fff;
+    border: 1px solid #e5e5e5;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: box-shadow 0.2s;
 }
 
 .recreational-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .recreational-card h3 {
-    font-size: 1.1rem;
-    color: #333;
-    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #111;
+    margin-bottom: 0.75rem;
     padding-bottom: 0.5rem;
-    border-bottom: 2px solid #667eea;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .forecast-list {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .forecast-item {
     display: grid;
-    grid-template-columns: 80px 1fr 80px;
+    grid-template-columns: 80px 1fr 70px;
     gap: 0.5rem;
     align-items: center;
-    padding: 0.5rem;
-    background: #f8f9fa;
-    border-radius: 6px;
-    font-size: 0.9rem;
+    padding: 0.4rem 0.5rem;
+    background: #f9f9f9;
+    border-radius: 4px;
+    font-size: 0.85rem;
 }
 
 .forecast-item .date {
-    color: #667eea;
-    font-weight: 600;
+    color: #111;
+    font-weight: 500;
 }
 
 .forecast-item .weather {
@@ -334,39 +333,41 @@
 
 .forecast-item .temp {
     text-align: right;
-    color: #e74c3c;
+    color: #c53030;
     font-weight: 500;
 }
 
 /* 錯誤與載入 */
 .forecast-error {
-    background: #ff7675;
-    color: white;
-    padding: 1rem;
-    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    padding: 0.75rem 1rem;
+    border-radius: 6px;
     text-align: center;
     margin-bottom: 1rem;
+    font-size: 0.9rem;
 }
 
 .forecast-loading {
     text-align: center;
-    padding: 3rem;
-    color: white;
-    font-size: 1.2rem;
+    padding: 2rem;
+    color: #666;
+    font-size: 1rem;
 }
 
 /* 頁尾 */
 .forecast-footer {
     text-align: center;
-    color: rgba(255, 255, 255, 0.8);
+    color: #999;
     margin-top: 2rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    border-top: 1px solid #e5e5e5;
 }
 
 .forecast-footer p {
-    margin: 0.25rem 0;
-    font-size: 0.9rem;
+    margin: 0.2rem 0;
+    font-size: 0.8rem;
 }
 
 /* 響應式設計 */
@@ -376,7 +377,7 @@
     }
 
     .forecast-header h1 {
-        font-size: 1.5rem;
+        font-size: 1.35rem;
     }
 
     .forecast-tabs {
@@ -384,8 +385,8 @@
     }
 
     .tab-btn {
-        padding: 0.6rem 1rem;
-        font-size: 0.85rem;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
     }
 
     .weather-details {
