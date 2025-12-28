@@ -120,7 +120,7 @@ export default function ResourcesPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...resourceForm,
-                    operatorName: user?.displayName || 'Admin',
+                    operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
                 }),
             });
             setShowAddModal(false);
@@ -203,7 +203,7 @@ export default function ResourcesPage() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     amount: stockModal.quantity,
-                    operatorName: user?.displayName || 'Admin',
+                    operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
                     notes: stockModal.notes,
                 }),
             });
