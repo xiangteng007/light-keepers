@@ -310,31 +310,39 @@ export class WeatherForecastService {
      * 取得潮汐預報
      */
     async getTideForecast(stationName?: string): Promise<TideForecastDto[]> {
-        const params: Record<string, string> = {};
-        if (stationName) {
-            params.StationName = stationName;
+        try {
+            const data = await this.fetchCwaData(CWA_DATASETS.TIDE_FORECAST);
+            const tideForecasts = data?.records?.TideForecast || [];
+
+            const results = tideForecasts.map((forecast: any) => {
+                const location = forecast.Location || {};
+                const timePeriods = location.TimePeriods?.Daily || [];
+
+                return {
+                    station: location.LocationName || '',
+                    forecasts: timePeriods.slice(0, 30).map((day: any) => ({
+                        date: day.Date,
+                        lunarDate: day.LunarDate,
+                        tides: (day.Time || []).map((t: any) => ({
+                            time: t.DateTime,
+                            type: t.Tide === '滿潮' ? 'high' as const : 'low' as const,
+                            height: parseFloat(t.TideHeights?.AboveLocalMSL) || 0,
+                        })),
+                    })),
+                };
+            });
+
+            // 過濾有效資料和可選的站點名稱過濾
+            let filtered = results.filter((r: any) => r.station && r.forecasts.length > 0);
+            if (stationName) {
+                filtered = filtered.filter((r: any) => r.station.includes(stationName));
+            }
+
+            return filtered.slice(0, 20); // 限制回傳數量
+        } catch (error) {
+            this.logger.error(`Failed to get tide forecast: ${error.message}`);
+            return [];
         }
-
-        const data = await this.fetchCwaData(CWA_DATASETS.TIDE_FORECAST, params);
-        const tideForecasts = data?.records?.TideForecasts?.TideForecast || [];
-
-        return tideForecasts.map((forecast: any) => {
-            const location = forecast.Location || {};
-            const dailyTides = forecast.DailyForecast || [];
-
-            return {
-                station: location.StationName || '',
-                forecasts: dailyTides.slice(0, 30).map((day: any) => ({ // 取前 30 天
-                    date: day.Date,
-                    lunarDate: day.LunarDate,
-                    tides: day.Time?.map((t: any) => ({
-                        time: t.DateTime,
-                        type: t.Tide === '滿潮' ? 'high' : 'low',
-                        height: parseFloat(t.TideHeights?.AboveLocalMSL) || 0,
-                    })) || [],
-                })),
-            };
-        });
     }
 
     // ==================== 育樂天氣預報 ====================
