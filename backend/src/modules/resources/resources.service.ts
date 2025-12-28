@@ -326,7 +326,7 @@ export class ResourcesService {
 
     private calculateStatus(quantity: number, minQuantity: number): ResourceStatus {
         if (quantity === 0) return 'depleted';
-        if (quantity <= minQuantity) return 'low';
+        if (quantity < minQuantity) return 'low';
         return 'available';
     }
 }
