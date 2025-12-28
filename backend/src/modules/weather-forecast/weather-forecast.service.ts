@@ -87,7 +87,8 @@ export class WeatherForecastService {
     async getWeeklyForecast(countyName?: string): Promise<WeatherForecastDto[]> {
         const params: Record<string, string> = {};
         if (countyName) {
-            params.locationName = countyName;
+            // CWA API 使用大寫 LocationName 作為過濾參數
+            params.LocationName = countyName;
         }
 
         const data = await this.fetchCwaData(CWA_DATASETS.FORECAST_WEEK, params);
