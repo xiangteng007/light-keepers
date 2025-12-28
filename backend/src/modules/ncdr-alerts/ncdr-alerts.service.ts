@@ -621,16 +621,23 @@ export class NcdrAlertsService {
             for (const eq of earthquakes) {
                 try {
                     const eqNo = eq.EarthquakeNo?.toString() || '';
-                    const alertId = `CWA-EQ-${eqNo}`;
+                    const cwaAlertId = `CWA-EQ-${eqNo}`;
 
-                    // 檢查是否已存在
-                    const existing = await this.ncdrAlertRepository.findOne({
-                        where: { alertId },
+                    // 檢查 CWA 格式的記錄是否已存在
+                    const existingCwa = await this.ncdrAlertRepository.findOne({
+                        where: { alertId: cwaAlertId },
                     });
 
-                    if (existing) {
-                        continue; // 已存在，跳過
+                    if (existingCwa) {
+                        continue; // CWA 記錄已存在，跳過
                     }
+
+                    // 檢查 NCDR RSS 格式的記錄是否已存在 (格式: CWA-EQ114156-2025-1227-230555)
+                    const ncdrPattern = `CWA-EQ${eqNo}-%`;
+                    const existingNcdr = await this.ncdrAlertRepository
+                        .createQueryBuilder('alert')
+                        .where('alert.alertId LIKE :pattern', { pattern: ncdrPattern })
+                        .getOne();
 
                     // 解析地震資料
                     const info = eq.EarthquakeInfo || {};
@@ -644,6 +651,10 @@ export class NcdrAlertsService {
                     const magValue = magnitude.MagnitudeValue || 0;
                     const reportContent = eq.ReportContent || '';
 
+                    // CWA 連結
+                    const cwaDetailLink = `https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${eqNo}`;
+                    const cwaImageLink = eq.ReportImageURI || '';
+
                     // 決定嚴重程度
                     let severity: 'critical' | 'warning' | 'info' = 'info';
                     if (magValue >= 6.0) {
@@ -652,32 +663,58 @@ export class NcdrAlertsService {
                         severity = 'warning';
                     }
 
-                    // 建立警報記錄
-                    const alert: Partial<NcdrAlert> = {
-                        alertId,
-                        alertTypeId: 6, // 地震 (NCDR AlertType ID)
-                        alertTypeName: '地震',
-                        title: `${location} 發生規模 ${magValue} 地震`,
-                        description: reportContent || `震央位於 ${location}，震源深度 ${depth} 公里，地震規模 ${magValue}`,
-                        severity,
-                        sourceUnit: '中央氣象署',
-                        publishedAt: new Date(originTime),
-                        sourceLink: eq.ReportImageURI || `https://www.cwa.gov.tw/V8/C/E/EQ/EQ${eqNo}.html`,
-                        latitude: parseFloat(epicenter.EpicenterLatitude) || 23.9,
-                        longitude: parseFloat(epicenter.EpicenterLongitude) || 121.6,
-                        isActive: true,
-                    };
+                    // 建立描述（包含附註連結）
+                    const description = [
+                        reportContent || `震央位於 ${location}，震源深度 ${depth} 公里，地震規模 ${magValue}`,
+                        '',
+                        '📎 相關連結：',
+                        `• 地震詳情：${cwaDetailLink}`,
+                        cwaImageLink ? `• 地震報告圖：${cwaImageLink}` : '',
+                    ].filter(Boolean).join('\n');
 
-                    await this.ncdrAlertRepository.save(alert);
-                    synced++;
-                    this.logger.log(`Synced CWA earthquake: ${alert.title}`);
+                    if (existingNcdr) {
+                        // 更新現有 NCDR 記錄，合併資訊
+                        await this.ncdrAlertRepository.update(existingNcdr.id, {
+                            alertId: cwaAlertId, // 使用 CWA 格式的 ID
+                            title: `${location} 發生規模 ${magValue} 地震`,
+                            description,
+                            severity,
+                            publishedAt: new Date(originTime),
+                            sourceLink: cwaDetailLink, // 使用詳情頁面作為主連結
+                            latitude: parseFloat(epicenter.EpicenterLatitude) || existingNcdr.latitude,
+                            longitude: parseFloat(epicenter.EpicenterLongitude) || existingNcdr.longitude,
+                        });
+                        synced++;
+                        this.logger.log(`Updated existing NCDR earthquake with CWA data: ${eqNo}`);
+                    } else {
+                        // 創建新記錄
+                        const alert: Partial<NcdrAlert> = {
+                            alertId: cwaAlertId,
+                            alertTypeId: 6,
+                            alertTypeName: '地震',
+                            title: `${location} 發生規模 ${magValue} 地震`,
+                            description,
+                            severity,
+                            sourceUnit: '中央氣象署',
+                            publishedAt: new Date(originTime),
+                            sourceLink: cwaDetailLink,
+                            latitude: parseFloat(epicenter.EpicenterLatitude) || 23.9,
+                            longitude: parseFloat(epicenter.EpicenterLongitude) || 121.6,
+                            isActive: true,
+                        };
+
+                        await this.ncdrAlertRepository.save(alert);
+                        synced++;
+                        this.logger.log(`Synced new CWA earthquake: ${alert.title}`);
+                    }
 
                     // 🔔 LINE 推播：規模 5.0 以上自動廣播
+                    const alertTitle = `${location} 發生規模 ${magValue} 地震`;
                     if (magValue >= 5.0 && this.lineBotService.isEnabled()) {
                         try {
-                            const alertMsg = `🚨 地震警報\n\n${alert.title}\n\n${alert.description?.substring(0, 150) || ''}`;
+                            const alertMsg = `🚨 地震警報\n\n${alertTitle}\n\n${description.substring(0, 150)}`;
                             await this.lineBotService.broadcast(alertMsg);
-                            this.logger.log(`LINE broadcast sent for earthquake: ${alert.title}`);
+                            this.logger.log(`LINE broadcast sent for earthquake: ${alertTitle}`);
                         } catch (lineErr) {
                             this.logger.warn(`Failed to send LINE broadcast: ${lineErr.message}`);
                         }
