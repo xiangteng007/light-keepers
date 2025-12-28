@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import './ForecastPage.css';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app';
+const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
 
 // 類型定義
 interface WeatherElement {
@@ -136,7 +136,7 @@ export default function ForecastPage() {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/general?county=${encodeURIComponent(selectedCounty)}`);
+            const res = await fetch(`${API_BASE}/weather/general?county=${encodeURIComponent(selectedCounty)}`);
             const data = await res.json();
             if (data.success) {
                 setGeneralForecast(data.data || []);
@@ -151,7 +151,7 @@ export default function ForecastPage() {
     const fetchMarineForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/marine`);
+            const res = await fetch(`${API_BASE}/weather/marine`);
             const data = await res.json();
             if (data.success) setMarineForecast(data.data || []);
         } catch {
@@ -164,7 +164,7 @@ export default function ForecastPage() {
     const fetchTideForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/tide`);
+            const res = await fetch(`${API_BASE}/weather/tide`);
             const data = await res.json();
             if (data.success) setTideForecast(data.data || []);
         } catch {
@@ -177,7 +177,7 @@ export default function ForecastPage() {
     const fetchMountainForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/mountain`);
+            const res = await fetch(`${API_BASE}/weather/mountain`);
             const data = await res.json();
             if (data.success) setMountainForecast(data.data || []);
         } catch {
@@ -190,7 +190,7 @@ export default function ForecastPage() {
     const fetchScenicForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/scenic`);
+            const res = await fetch(`${API_BASE}/weather/scenic`);
             const data = await res.json();
             if (data.success) setScenicForecast(data.data || []);
         } catch {
@@ -203,7 +203,7 @@ export default function ForecastPage() {
     const fetchFarmForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/api/v1/weather/farm`);
+            const res = await fetch(`${API_BASE}/weather/farm`);
             const data = await res.json();
             if (data.success) setFarmForecast(data.data || []);
         } catch {
