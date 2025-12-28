@@ -424,11 +424,18 @@ font-size: var(--font-size-base);
   border-radius: 12px;
   color: var(--text-muted);
   border: 2px dashed var(--border-color);
+  gap: 8px;
 }
 
 .map-placeholder span {
-  font-size: 48px;
-  margin-bottom: 8px;
+  font-size: 36px;
+  margin-bottom: 4px;
+}
+
+.map-placeholder p {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
 }
 
 /* ============================================
