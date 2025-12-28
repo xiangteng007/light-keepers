@@ -674,18 +674,22 @@ export class NcdrAlertsService {
 
                     if (existingNcdr) {
                         // 更新現有 NCDR 記錄，合併資訊
+                        // 保留最早的發布時間
+                        const cwaTime = new Date(originTime);
+                        const earliestTime = existingNcdr.publishedAt < cwaTime ? existingNcdr.publishedAt : cwaTime;
+
                         await this.ncdrAlertRepository.update(existingNcdr.id, {
                             alertId: cwaAlertId, // 使用 CWA 格式的 ID
                             title: `${location} 發生規模 ${magValue} 地震`,
                             description,
                             severity,
-                            publishedAt: new Date(originTime),
+                            publishedAt: earliestTime, // 使用最早的發布時間
                             sourceLink: cwaDetailLink, // 使用詳情頁面作為主連結
                             latitude: parseFloat(epicenter.EpicenterLatitude) || existingNcdr.latitude,
                             longitude: parseFloat(epicenter.EpicenterLongitude) || existingNcdr.longitude,
                         });
                         synced++;
-                        this.logger.log(`Updated existing NCDR earthquake with CWA data: ${eqNo}`);
+                        this.logger.log(`Updated existing NCDR earthquake with CWA data: ${eqNo}, kept earliest time: ${earliestTime.toISOString()}`);
                     } else {
                         // 創建新記錄
                         const alert: Partial<NcdrAlert> = {
