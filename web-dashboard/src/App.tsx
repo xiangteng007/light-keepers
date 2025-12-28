@@ -28,6 +28,7 @@ import ProfilePage from './pages/ProfilePage'
 import PermissionsPage from './pages/PermissionsPage'
 import BindLinePage from './pages/BindLinePage'
 import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
+import ForecastPage from './pages/ForecastPage'
 import './App.css'
 
 
@@ -97,6 +98,7 @@ function App() {
             {/* 公開頁面 (0) - 但已在 Layout 內，不用另外設 */}
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
+            <Route path="forecast" element={<ForecastPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:id" element={<ManualDetailPage />} />
             {/* 幹部等級 (2) */}
