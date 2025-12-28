@@ -22,6 +22,7 @@ import { AccessLogModule } from './modules/access-log/access-log.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { MenuConfigModule } from './modules/menu-config/menu-config.module';
 import { WeatherForecastModule } from './modules/weather-forecast/weather-forecast.module';
+import { DonationsModule } from './modules/donations/donations.module';
 
 @Module({
     imports: [
@@ -84,6 +85,7 @@ import { WeatherForecastModule } from './modules/weather-forecast/weather-foreca
         UploadsModule,   // 📁 檔案上傳
         MenuConfigModule, // 📋 選單設定
         WeatherForecastModule, // ☁️ 氣象預報
+        DonationsModule, // 💰 捐款系統
     ],
 })
 export class AppModule { }

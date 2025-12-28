@@ -30,6 +30,7 @@ import BindLinePage from './pages/BindLinePage'
 import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
 import VolunteerRegisterPage from './pages/VolunteerRegisterPage'
 import ForecastPage from './pages/ForecastPage'
+import DonationsPage from './pages/DonationsPage'
 import './App.css'
 
 
@@ -116,6 +117,8 @@ function App() {
             <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
             {/* 理事長等級 (4) */}
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
+            {/* 系統擁有者等級 (5) */}
+            <Route path="donations" element={<ProtectedRoute requiredLevel={5}><DonationsPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>
