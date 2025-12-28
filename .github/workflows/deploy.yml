@@ -37,8 +37,8 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --add-cloudsql-instances=${{ env.PROJECT_ID }}:${{ env.REGION }}:light-keepers-db \
-            --set-env-vars="NODE_ENV=production,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:${{ env.REGION }}:light-keepers-db" \
-            --set-secrets="DB_PASSWORD=db-password:latest" \
+            --set-env-vars="NODE_ENV=production,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:${{ env.REGION }}:light-keepers-db,LINE_CLIENT_ID=2008769727" \
+            --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest" \
             --quiet
 
   deploy-dashboard:
