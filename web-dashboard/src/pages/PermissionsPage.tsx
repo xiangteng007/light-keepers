@@ -248,7 +248,7 @@ export default function PermissionsPage() {
         return operatorLevel > targetLevel;
     };
 
-    // Render role badges
+    // Render role badges (single select - only one role allowed)
     const renderRoleBadges = (account: AdminAccount) => {
         // 先過濾出低於當前用戶權限的角色，再去除重複的角色名稱
         const availableRoles = roles
@@ -258,24 +258,27 @@ export default function PermissionsPage() {
             )
             .sort((a, b) => a.level - b.level);
 
+        // 找出用戶當前的最高角色
+        const currentRole = account.roles[0] || '';
+
         return (
             <div className="role-badges">
                 {availableRoles.map(role => {
-                    const hasRole = account.roles.includes(role.name);
+                    const isSelected = currentRole === role.name;
                     return (
                         <button
                             key={role.name}
-                            className={`role-badge ${hasRole ? 'role-badge--active' : ''}`}
+                            className={`role-badge ${isSelected ? 'role-badge--active' : ''}`}
                             onClick={() => {
-                                const newRoles = hasRole
-                                    ? account.roles.filter(r => r !== role.name)
-                                    : [...account.roles, role.name];
-                                handleRoleChange(account.id, newRoles);
+                                // 單選模式 - 只設定這一個角色
+                                if (!isSelected) {
+                                    handleRoleChange(account.id, [role.name]);
+                                }
                             }}
-                            disabled={savingUser === account.id || !canModify(account.roleLevel)}
+                            disabled={savingUser === account.id || !canModify(account.roleLevel) || isSelected}
                         >
                             {role.displayName}
-                            {hasRole && <span className="role-badge__check">✓</span>}
+                            {isSelected && <span className="role-badge__check">✓</span>}
                         </button>
                     );
                 })}
