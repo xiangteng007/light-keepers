@@ -91,23 +91,23 @@ export class WeatherForecastService {
         }
 
         const data = await this.fetchCwaData(CWA_DATASETS.FORECAST_WEEK, params);
-        // CWA API 使用大寫 Locations
-        const locations = data?.records?.Locations?.[0]?.Location || data?.records?.locations?.[0]?.location || [];
+        // CWA API 使用大寫開頭的屬性名稱
+        const locations = data?.records?.Locations?.[0]?.Location || [];
 
         return locations.map((loc: any) => ({
-            locationName: loc.locationName,
-            weatherElements: loc.weatherElement?.map((el: any) => ({
-                elementName: el.elementName,
-                description: el.description,
-                time: el.time?.map((t: any) => ({
-                    startTime: t.startTime,
-                    endTime: t.endTime,
+            locationName: loc.LocationName || loc.locationName,
+            weatherElements: (loc.WeatherElement || loc.weatherElement || []).map((el: any) => ({
+                elementName: el.ElementName || el.elementName,
+                description: el.Description || el.description,
+                time: (el.Time || el.time || []).map((t: any) => ({
+                    startTime: t.StartTime || t.startTime,
+                    endTime: t.EndTime || t.endTime,
                     parameter: {
-                        parameterName: t.elementValue?.[0]?.value,
-                        parameterValue: t.elementValue?.[1]?.value,
+                        parameterName: t.ElementValue?.[0]?.Value || t.elementValue?.[0]?.value,
+                        parameterValue: t.ElementValue?.[1]?.Value || t.elementValue?.[1]?.value,
                     },
-                })) || [],
-            })) || [],
+                })),
+            })),
         }));
     }
 
