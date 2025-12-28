@@ -651,8 +651,8 @@ export class NcdrAlertsService {
                     const magValue = magnitude.MagnitudeValue || 0;
                     const reportContent = eq.ReportContent || '';
 
-                    // CWA 連結
-                    const cwaDetailLink = `https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${eqNo}`;
+                    // CWA 連結（使用 API 返回的正確 URL）
+                    const cwaDetailLink = eq.Web || `https://scweb.cwa.gov.tw/zh-tw/earthquake/details/${eqNo}`;
                     const cwaImageLink = eq.ReportImageURI || '';
 
                     // 決定嚴重程度
