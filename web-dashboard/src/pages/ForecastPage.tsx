@@ -136,7 +136,8 @@ export default function ForecastPage() {
         setLoading(true);
         setError(null);
         try {
-            const res = await fetch(`${API_BASE}/weather/general?county=${encodeURIComponent(selectedCounty)}`);
+            // 使用一週預報 API 取得 7 天資料
+            const res = await fetch(`${API_BASE}/weather/weekly?county=${encodeURIComponent(selectedCounty)}`);
             const data = await res.json();
             if (data.success) {
                 setGeneralForecast(data.data || []);

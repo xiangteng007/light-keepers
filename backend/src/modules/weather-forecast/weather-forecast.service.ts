@@ -312,7 +312,7 @@ export class WeatherForecastService {
     async getTideForecast(stationName?: string): Promise<TideForecastDto[]> {
         try {
             const data = await this.fetchCwaData(CWA_DATASETS.TIDE_FORECAST);
-            const tideForecasts = data?.records?.TideForecast || [];
+            const tideForecasts = data?.records?.TideForecasts || [];
 
             const results = tideForecasts.map((forecast: any) => {
                 const location = forecast.Location || {};
