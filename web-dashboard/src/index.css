@@ -680,6 +680,14 @@ select {
   border: 1px dashed var(--border-color, rgba(255, 255, 255, 0.15));
 }
 
+/* Bottom position for edit controls */
+.nav-edit-controls--bottom {
+  margin: auto 12px 8px;
+  border: none;
+  background: transparent;
+  padding: 4px 0;
+}
+
 .nav-edit-btn {
   display: flex;
   align-items: center;
@@ -703,6 +711,33 @@ select {
 .nav-edit-btn--edit:hover {
   background: var(--primary-hover, #4338CA);
   transform: translateY(-1px);
+}
+
+/* Minimal edit button - matches nav-item style */
+.nav-edit-btn--edit-minimal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 13px;
+  font-weight: 500;
+  background: transparent;
+  color: var(--text-secondary, #6B7280);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  justify-content: flex-start;
+}
+
+.nav-edit-btn--edit-minimal:hover {
+  background: var(--bg-hover, rgba(255, 255, 255, 0.08));
+  color: var(--text-primary, #1F2937);
+}
+
+.nav-edit-btn--edit-minimal span {
+  white-space: nowrap;
 }
 
 .nav-edit-btn--save {

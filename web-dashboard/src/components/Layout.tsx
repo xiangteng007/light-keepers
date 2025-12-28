@@ -377,40 +377,6 @@ export default function Layout() {
                     </div>
                 </div>
 
-                {/* Edit Mode Controls - Owner Only */}
-                {isOwner && (
-                    <div className="nav-edit-controls">
-                        {isEditMode ? (
-                            <>
-                                <button
-                                    className="nav-edit-btn nav-edit-btn--save"
-                                    onClick={handleSaveEdit}
-                                    disabled={isSaving}
-                                >
-                                    <Save size={16} />
-                                    {isSaving ? '儲存中...' : '儲存'}
-                                </button>
-                                <button
-                                    className="nav-edit-btn nav-edit-btn--cancel"
-                                    onClick={handleCancelEdit}
-                                    disabled={isSaving}
-                                >
-                                    <XCircle size={16} />
-                                    取消
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                className="nav-edit-btn nav-edit-btn--edit"
-                                onClick={handleStartEdit}
-                            >
-                                <Edit3 size={16} />
-                                編輯選單
-                            </button>
-                        )}
-                    </div>
-                )}
-
                 <nav className="nav">
                     <DndContext
                         sensors={sensors}
@@ -434,6 +400,40 @@ export default function Layout() {
                         </SortableContext>
                     </DndContext>
                 </nav>
+
+                {/* Edit Mode Controls - Owner Only (Bottom Position) */}
+                {isOwner && (
+                    <div className="nav-edit-controls nav-edit-controls--bottom">
+                        {isEditMode ? (
+                            <>
+                                <button
+                                    className="nav-edit-btn nav-edit-btn--save"
+                                    onClick={handleSaveEdit}
+                                    disabled={isSaving}
+                                >
+                                    <Save size={16} />
+                                    {isSaving ? '儲存中...' : '儲存'}
+                                </button>
+                                <button
+                                    className="nav-edit-btn nav-edit-btn--cancel"
+                                    onClick={handleCancelEdit}
+                                    disabled={isSaving}
+                                >
+                                    <XCircle size={16} />
+                                    取消
+                                </button>
+                            </>
+                        ) : (
+                            <button
+                                className="nav-edit-btn nav-edit-btn--edit-minimal"
+                                onClick={handleStartEdit}
+                            >
+                                <Edit3 size={18} />
+                                <span>編輯選單</span>
+                            </button>
+                        )}
+                    </div>
+                )}
 
                 {/* User Profile Section */}
                 <div className="sidebar-user">
