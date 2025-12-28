@@ -121,12 +121,37 @@ export default function AnalyticsPage() {
 
     const dateLabels = getDateLabels(dateRange);
 
-    // 計算 NCDR 警報分類統計
+    // 計算 NCDR 警報分類統計 - 使用 alertTypeName 來分類
     const ncdrCategoryStats = useMemo(() => {
         if (!alertsData || !Array.isArray(alertsData)) return {};
         const stats: Record<string, number> = {};
+
+        // 根據 alertTypeName 映射到分類
+        const getCategory = (typeName: string): string => {
+            const name = typeName.toLowerCase();
+            if (name.includes('颱風') || name.includes('低溫') || name.includes('高溫') ||
+                name.includes('雷雨') || name.includes('強風') || name.includes('濃霧') || name.includes('降雨')) {
+                return 'weather';
+            }
+            if (name.includes('地震') || name.includes('海嘯') || name.includes('火山')) {
+                return 'earthquake';
+            }
+            if (name.includes('淹水') || name.includes('河川') || name.includes('水庫') ||
+                name.includes('土石流') || name.includes('崩塌') || name.includes('分洪')) {
+                return 'flood';
+            }
+            if (name.includes('道路') || name.includes('交通') || name.includes('高速公路') || name.includes('鐵路')) {
+                return 'traffic';
+            }
+            if (name.includes('火災') || name.includes('林火')) {
+                return 'fire';
+            }
+            return 'other';
+        };
+
         alertsData.forEach((alert) => {
-            const category = (alert as { category?: string }).category || 'other';
+            const typeName = (alert as { alertTypeName?: string }).alertTypeName || '';
+            const category = getCategory(typeName);
             stats[category] = (stats[category] || 0) + 1;
         });
         return stats;
