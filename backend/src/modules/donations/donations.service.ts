@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Between } from 'typeorm';
 import { Donor, DonorType } from './donor.entity';
 import { Donation, PaymentMethod, DonationStatus, DonationType } from './donation.entity';
 import { Receipt, ReceiptStatus } from './receipt.entity';
@@ -288,6 +288,81 @@ export class DonationsService {
             monthAmount,
             byPaymentMethod,
         };
+    }
+
+    // ==================== CSV 匯出 ====================
+
+    async exportDonationsCsv(year: number): Promise<string> {
+        const startDate = new Date(year, 0, 1);
+        const endDate = new Date(year + 1, 0, 1);
+
+        const donations = await this.donationRepository.find({
+            where: {
+                status: 'paid',
+                paidAt: Between(startDate, endDate),
+            },
+            relations: ['donor', 'receipt'],
+            order: { paidAt: 'ASC' },
+        });
+
+        // CSV header
+        const headers = ['收據編號', '捐款日期', '捐款人', '類型', 'Email', '電話', '金額', '付款方式', '用途'];
+        const rows = donations.map(d => [
+            d.receipt?.receiptNo || '-',
+            d.paidAt ? new Date(d.paidAt).toLocaleDateString('zh-TW') : '-',
+            d.donor?.isAnonymous ? '善心人士' : d.donor?.name || '-',
+            d.donor?.type === 'corporate' ? '企業' : '個人',
+            d.donor?.email || '-',
+            d.donor?.phone || '-',
+            d.amount.toString(),
+            this.getPaymentMethodLabel(d.paymentMethod),
+            d.purpose || '公益用途',
+        ]);
+
+        const csvContent = [headers, ...rows]
+            .map(row => row.map(cell => `"${cell}"`).join(','))
+            .join('\n');
+
+        this.logger.log(`📊 CSV 報表匯出: ${year} 年, ${donations.length} 筆`);
+        return csvContent;
+    }
+
+    private getPaymentMethodLabel(method: string): string {
+        const labels: Record<string, string> = {
+            credit_card: '信用卡',
+            atm: 'ATM 轉帳',
+            bank_transfer: '銀行匯款',
+            cvs: '超商代碼',
+            line_pay: 'LINE Pay',
+            cash: '現金',
+            other: '其他',
+        };
+        return labels[method] || method;
+    }
+
+    // ==================== 捐款人 CRUD ====================
+
+    async updateDonor(id: string, data: { name?: string; email?: string; phone?: string; address?: string }): Promise<Donor> {
+        const donor = await this.findDonorById(id);
+
+        if (data.name) donor.name = data.name;
+        if (data.email !== undefined) donor.email = data.email;
+        if (data.phone !== undefined) donor.phone = data.phone;
+        if (data.address !== undefined) donor.address = data.address;
+
+        this.logger.log(`✏️ 捐款人更新: ${donor.name}`);
+        return this.donorRepository.save(donor);
+    }
+
+    async deleteDonor(id: string): Promise<void> {
+        const donor = await this.findDonorById(id);
+
+        // Soft delete - just mark as deleted instead of removing
+        donor.notes = `[已刪除] ${new Date().toISOString()} - ${donor.notes || ''}`;
+        donor.name = `[已刪除] ${donor.name}`;
+        await this.donorRepository.save(donor);
+
+        this.logger.log(`🗑️ 捐款人刪除: ${id}`);
     }
 
     // ==================== 私有方法 ====================

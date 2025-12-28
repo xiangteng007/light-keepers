@@ -7,6 +7,7 @@ import {
     getDonors,
     createDonation,
     confirmPayment,
+    getExportCsvUrl,
 } from '../api';
 import type {
     Donation,
@@ -162,9 +163,18 @@ export default function DonationsPage() {
                     <h2>💰 捐款管理</h2>
                     <p className="page-subtitle">公益捐款收支管理</p>
                 </div>
-                <Button variant="primary" onClick={() => setShowDonationModal(true)}>
-                    ➕ 新增捐款
-                </Button>
+                <div className="page-header__actions">
+                    <a
+                        href={getExportCsvUrl()}
+                        className="export-btn"
+                        download
+                    >
+                        📊 匯出報表
+                    </a>
+                    <Button variant="primary" onClick={() => setShowDonationModal(true)}>
+                        ➕ 新增捐款
+                    </Button>
+                </div>
             </div>
 
             {/* 標籤切換 */}

@@ -136,5 +136,41 @@ export class DonationsController {
 
         res.end(pdfBuffer);
     }
+
+    // ==================== CSV 報表匯出 ====================
+
+    @Get('export/csv')
+    async exportDonationsCsv(
+        @Query('year') year: string,
+        @Res() res: Response,
+    ) {
+        const targetYear = year ? parseInt(year) : new Date().getFullYear();
+        const csvData = await this.donationsService.exportDonationsCsv(targetYear);
+
+        res.set({
+            'Content-Type': 'text/csv; charset=utf-8',
+            'Content-Disposition': `attachment; filename="donations-${targetYear}.csv"`,
+        });
+
+        // Add BOM for Excel UTF-8 compatibility
+        res.send('\uFEFF' + csvData);
+    }
+
+    // ==================== 捐款人 CRUD ====================
+
+    @Patch('donors/:id')
+    async updateDonor(
+        @Param('id') id: string,
+        @Body() body: { name?: string; email?: string; phone?: string; address?: string },
+    ) {
+        const donor = await this.donationsService.updateDonor(id, body);
+        return { success: true, message: '捐款人已更新', data: donor };
+    }
+
+    @Patch('donors/:id/delete')
+    async deleteDonor(@Param('id') id: string) {
+        await this.donationsService.deleteDonor(id);
+        return { success: true, message: '捐款人已刪除' };
+    }
 }
 

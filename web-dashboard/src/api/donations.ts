@@ -132,3 +132,18 @@ export const cancelReceipt = (receiptId: string, reason: string) =>
 // 取得年度收據
 export const getReceiptsByYear = (year: number) =>
     api.get<{ success: boolean; data: Receipt[]; count: number }>(`/donations/receipts/year/${year}`);
+
+// 更新捐款人
+export const updateDonor = (id: string, data: { name?: string; email?: string; phone?: string; address?: string }) =>
+    api.patch<{ success: boolean; message: string; data: Donor }>(`/donations/donors/${id}`, data);
+
+// 刪除捐款人
+export const deleteDonor = (id: string) =>
+    api.patch<{ success: boolean; message: string }>(`/donations/donors/${id}/delete`);
+
+// 取得 CSV 匯出 URL
+export const getExportCsvUrl = (year?: number) => {
+    const baseUrl = import.meta.env.VITE_API_URL || 'https://light-keepers-api-890013751803.asia-east1.run.app';
+    const targetYear = year || new Date().getFullYear();
+    return `${baseUrl}/donations/export/csv?year=${targetYear}`;
+};
