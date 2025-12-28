@@ -91,7 +91,8 @@ export class WeatherForecastService {
         }
 
         const data = await this.fetchCwaData(CWA_DATASETS.FORECAST_WEEK, params);
-        const locations = data?.records?.locations?.[0]?.location || [];
+        // CWA API 使用大寫 Locations
+        const locations = data?.records?.Locations?.[0]?.Location || data?.records?.locations?.[0]?.location || [];
 
         return locations.map((loc: any) => ({
             locationName: loc.locationName,
