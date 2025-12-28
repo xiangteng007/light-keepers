@@ -26,6 +26,16 @@ export class ResourcesController {
         return { success: true, data: stats };
     }
 
+    @Post('recalculate-status')
+    async recalculateStatus() {
+        const result = await this.resourcesService.recalculateAllStatus();
+        return {
+            success: true,
+            message: `已重新計算 ${result.updated} 個物資的狀態`,
+            data: result
+        };
+    }
+
     @Get('low-stock')
     async getLowStock() {
         const resources = await this.resourcesService.getLowStock();

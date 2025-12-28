@@ -329,4 +329,24 @@ export class ResourcesService {
         if (quantity < minQuantity) return 'low';
         return 'available';
     }
+
+    /**
+     * 批量重新計算所有物資狀態
+     */
+    async recalculateAllStatus(): Promise<{ updated: number }> {
+        const all = await this.resourcesRepository.find();
+        let updated = 0;
+
+        for (const resource of all) {
+            const newStatus = this.calculateStatus(resource.quantity, resource.minQuantity);
+            if (resource.status !== newStatus) {
+                resource.status = newStatus;
+                await this.resourcesRepository.save(resource);
+                updated++;
+                this.logger.log(`🔄 Recalculated: ${resource.name} → ${newStatus}`);
+            }
+        }
+
+        return { updated };
+    }
 }
