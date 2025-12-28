@@ -245,6 +245,10 @@ export class DonationsService {
         });
     }
 
+    async getReceiptById(receiptId: string): Promise<Receipt | null> {
+        return this.receiptRepository.findOne({ where: { id: receiptId } });
+    }
+
     // ==================== 統計 ====================
 
     async getStats(): Promise<{

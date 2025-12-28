@@ -5,13 +5,15 @@ import { Donation } from './donation.entity';
 import { Receipt } from './receipt.entity';
 import { DonationsService } from './donations.service';
 import { DonationsController } from './donations.controller';
+import { ReceiptPdfService } from './receipt-pdf.service';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([Donor, Donation, Receipt]),
     ],
     controllers: [DonationsController],
-    providers: [DonationsService],
-    exports: [DonationsService],
+    providers: [DonationsService, ReceiptPdfService],
+    exports: [DonationsService, ReceiptPdfService],
 })
 export class DonationsModule { }
+

@@ -1,10 +1,15 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, Res, NotFoundException } from '@nestjs/common';
+import { Response } from 'express';
 import { DonationsService, CreateDonorDto, CreateDonationDto } from './donations.service';
+import { ReceiptPdfService } from './receipt-pdf.service';
 import { DonationStatus } from './donation.entity';
 
 @Controller('donations')
 export class DonationsController {
-    constructor(private readonly donationsService: DonationsService) { }
+    constructor(
+        private readonly donationsService: DonationsService,
+        private readonly receiptPdfService: ReceiptPdfService,
+    ) { }
 
     // ==================== 捐款統計 (公開) ====================
 
@@ -108,4 +113,28 @@ export class DonationsController {
         const receipts = await this.donationsService.getReceiptsByYear(parseInt(year));
         return { success: true, data: receipts, count: receipts.length };
     }
+
+    // ==================== PDF 收據下載 ====================
+
+    @Get('receipts/:receiptId/pdf')
+    async downloadReceiptPdf(
+        @Param('receiptId') receiptId: string,
+        @Res() res: Response,
+    ) {
+        const receipt = await this.donationsService.getReceiptById(receiptId);
+        if (!receipt) {
+            throw new NotFoundException(`收據 ${receiptId} 不存在`);
+        }
+
+        const pdfBuffer = await this.receiptPdfService.generateReceiptPdf(receipt);
+
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename="${receipt.receiptNo}.pdf"`,
+            'Content-Length': pdfBuffer.length,
+        });
+
+        res.end(pdfBuffer);
+    }
 }
+

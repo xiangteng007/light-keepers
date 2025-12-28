@@ -266,7 +266,14 @@ export default function DonationsPage() {
                                         </td>
                                         <td>
                                             {donation.receipt ? (
-                                                <Badge variant="success">{donation.receipt.receiptNo}</Badge>
+                                                <a
+                                                    href={`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-890013751803.asia-east1.run.app'}/donations/receipts/${donation.receipt.id}/pdf`}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="receipt-download-link"
+                                                >
+                                                    📄 {donation.receipt.receiptNo}
+                                                </a>
                                             ) : '-'}
                                         </td>
                                         <td>
