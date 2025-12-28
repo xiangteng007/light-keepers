@@ -87,7 +87,7 @@ export class NcdrAlertsService {
         private readonly configService: ConfigService,
     ) {
         // CWA API Key (需到 opendata.cwa.gov.tw 申請)
-        this.cwaApiKey = this.configService.get<string>('CWA_API_KEY', 'CWA-423AE96E-5E49-46E3-AD03-08A3A71E9034');
+        this.cwaApiKey = this.configService.get<string>('CWA_API_KEY', 'CWA-EC93167D-6AFA-4E5D-ABF2-3A2C0C4BD4C6');
     }
 
     /**
