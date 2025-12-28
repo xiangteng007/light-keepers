@@ -21,6 +21,7 @@ import { LineBotModule } from './modules/line-bot/line-bot.module';
 import { AccessLogModule } from './modules/access-log/access-log.module';
 import { UploadsModule } from './modules/uploads/uploads.module';
 import { MenuConfigModule } from './modules/menu-config/menu-config.module';
+import { WeatherForecastModule } from './modules/weather-forecast/weather-forecast.module';
 
 @Module({
     imports: [
@@ -82,6 +83,7 @@ import { MenuConfigModule } from './modules/menu-config/menu-config.module';
         AccessLogModule, // 🔐 存取日誌
         UploadsModule,   // 📁 檔案上傳
         MenuConfigModule, // 📋 選單設定
+        WeatherForecastModule, // ☁️ 氣象預報
     ],
 })
 export class AppModule { }
