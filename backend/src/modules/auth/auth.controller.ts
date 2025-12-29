@@ -247,6 +247,15 @@ export class AuthController {
         return this.authService.verifyEmailOtp(body.email, body.code);
     }
 
+    /**
+     * 檢查 Email 驗證狀態
+     * 用於 Firebase 驗證連結後的狀態同步
+     */
+    @Get('check-email-verification')
+    async checkEmailVerification(@Body() body: { email: string }) {
+        return this.authService.checkEmailVerificationStatus(body.email);
+    }
+
     // =========================================
     // 密碼重設端點
     // =========================================

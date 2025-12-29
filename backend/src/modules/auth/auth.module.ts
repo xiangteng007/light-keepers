@@ -7,7 +7,7 @@ import { AuthController } from './auth.controller';
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
-import { SmsService, OtpService, PasswordResetService, EmailService } from './services';
+import { SmsService, OtpService, PasswordResetService, EmailService, FirebaseAdminService } from './services';
 import { LineBotModule } from '../line-bot/line-bot.module';
 
 @Module({
@@ -37,7 +37,9 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         OtpService,
         PasswordResetService,
         EmailService,
+        FirebaseAdminService,
     ],
-    exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService],
+    exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService],
 })
 export class AuthModule { }
+

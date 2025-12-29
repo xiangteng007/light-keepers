@@ -36,6 +36,7 @@
         "cheerio": "^1.1.2",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.0",
+        "firebase-admin": "^13.6.0",
         "nodemailer": "^7.0.12",
         "papaparse": "^5.5.3",
         "passport": "^0.7.0",

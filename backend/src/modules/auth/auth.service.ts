@@ -9,6 +9,7 @@ import { OtpService } from './services/otp.service';
 import { SmsService } from './services/sms.service';
 import { PasswordResetService } from './services/password-reset.service';
 import { EmailService } from './services/email.service';
+import { FirebaseAdminService } from './services/firebase-admin.service';
 import { LineBotService } from '../line-bot/line-bot.service';
 
 @Injectable()
@@ -25,6 +26,7 @@ export class AuthService {
         private readonly smsService: SmsService,
         private readonly passwordResetService: PasswordResetService,
         private readonly emailService: EmailService,
+        private readonly firebaseAdminService: FirebaseAdminService,
         private readonly lineBotService: LineBotService,
     ) { }
 
@@ -629,17 +631,28 @@ export class AuthService {
     }
 
     /**
-     * 發送 Email OTP 驗證碼
+     * 發送 Email 驗證信
+     * 使用 Firebase Authentication 的內建郵件功能
      */
-    async sendEmailOtp(email: string): Promise<{ success: boolean; message: string }> {
+    async sendEmailOtp(email: string): Promise<{ success: boolean; message: string; verificationLink?: string }> {
         if (!email) {
             throw new BadRequestException('請提供 Email');
         }
 
-        // 生成 OTP
-        const code = await this.otpService.generateOtp(email, 'email');
+        // 優先使用 Firebase 發送驗證信
+        if (this.firebaseAdminService.isConfigured()) {
+            const result = await this.firebaseAdminService.sendEmailVerification(email);
+            if (result.success && result.link) {
+                return {
+                    success: true,
+                    message: '驗證連結已發送至您的 Email，請點擊連結完成驗證',
+                    verificationLink: result.link,
+                };
+            }
+        }
 
-        // 發送郵件
+        // Fallback: 使用 Resend 發送 OTP 驗證碼
+        const code = await this.otpService.generateOtp(email, 'email');
         await this.emailService.sendOtp(email, code);
 
         return {
@@ -649,9 +662,25 @@ export class AuthService {
     }
 
     /**
-     * 驗證 Email OTP
+     * 驗證 Email OTP（保留向後兼容）
+     * 注意：Firebase 驗證連結會自動處理驗證狀態
      */
     async verifyEmailOtp(email: string, code: string): Promise<{ success: boolean; verified: boolean }> {
+        // 先檢查 Firebase 是否已驗證
+        if (this.firebaseAdminService.isConfigured()) {
+            const isVerified = await this.firebaseAdminService.isEmailVerified(email);
+            if (isVerified) {
+                // 同步更新本地帳號的驗證狀態
+                const account = await this.accountRepository.findOne({ where: { email } });
+                if (account && !account.emailVerified) {
+                    account.emailVerified = true;
+                    await this.accountRepository.save(account);
+                }
+                return { success: true, verified: true };
+            }
+        }
+
+        // Fallback: 使用 OTP 驗證
         const verified = await this.otpService.verifyOtp(email, 'email', code);
 
         if (verified) {
@@ -661,9 +690,38 @@ export class AuthService {
                 account.emailVerified = true;
                 await this.accountRepository.save(account);
             }
+
+            // 同步更新 Firebase 的驗證狀態
+            if (this.firebaseAdminService.isConfigured()) {
+                await this.firebaseAdminService.setEmailVerified(email, true);
+            }
         }
 
         return { success: true, verified };
+    }
+
+    /**
+     * 檢查 Email 驗證狀態
+     * 優先從 Firebase 獲取，同步更新本地狀態
+     */
+    async checkEmailVerificationStatus(email: string): Promise<{ verified: boolean }> {
+        // 先檢查 Firebase
+        if (this.firebaseAdminService.isConfigured()) {
+            const isVerified = await this.firebaseAdminService.isEmailVerified(email);
+            if (isVerified) {
+                // 同步更新本地帳號
+                const account = await this.accountRepository.findOne({ where: { email } });
+                if (account && !account.emailVerified) {
+                    account.emailVerified = true;
+                    await this.accountRepository.save(account);
+                }
+                return { verified: true };
+            }
+        }
+
+        // Fallback: 檢查本地狀態
+        const account = await this.accountRepository.findOne({ where: { email } });
+        return { verified: account?.emailVerified ?? false };
     }
 
     // =========================================
@@ -689,13 +747,29 @@ export class AuthService {
             };
         }
 
-        // 建立重設 Token
+        // 優先使用 Firebase 發送密碼重設信
+        if (email && account.email && this.firebaseAdminService.isConfigured()) {
+            const result = await this.firebaseAdminService.sendPasswordReset(account.email);
+            if (result.success) {
+                return {
+                    success: true,
+                    message: '密碼重設連結已發送至您的 Email',
+                };
+            }
+        }
+
+        // Fallback: 使用傳統方式
         const token = await this.passwordResetService.createResetToken(account.id);
         const resetUrl = this.passwordResetService.generateResetUrl(token);
 
         // 發送重設通知（簡訊或 Email）
         if (phone && account.phone) {
             await this.smsService.sendPasswordResetSms(account.phone, resetUrl);
+        }
+
+        // 使用 Resend 發送 Email
+        if (email && account.email) {
+            await this.emailService.sendPasswordReset(account.email, resetUrl);
         }
         // TODO: 未來可加入 Email 發送
 
