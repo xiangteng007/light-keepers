@@ -11,13 +11,17 @@ import {
 import { Response } from 'express';
 import * as crypto from 'crypto';
 import { LineBotService } from './line-bot.service';
-import { WebhookEvent } from '@line/bot-sdk';
+import { DisasterReportService } from './disaster-report';
+import { WebhookEvent, MessageEvent, TextEventMessage, ImageEventMessage, LocationEventMessage } from '@line/bot-sdk';
 
 @Controller('line-bot')
 export class LineBotController {
     private readonly logger = new Logger(LineBotController.name);
 
-    constructor(private readonly lineBotService: LineBotService) { }
+    constructor(
+        private readonly lineBotService: LineBotService,
+        private readonly disasterReportService: DisasterReportService,
+    ) { }
 
     // Webhook 端點 - LINE 會發送事件到這裡
     @Post('webhook')
@@ -56,18 +60,31 @@ export class LineBotController {
     private async handleEvent(event: WebhookEvent) {
         this.logger.log(`Received event: ${event.type}`);
 
-        if (event.type === 'message' && event.message.type === 'text') {
-            const text = event.message.text.trim();
+        if (event.type === 'message') {
             const replyToken = event.replyToken;
             const userId = event.source.userId;
 
-            await this.handleTextMessage(text, replyToken, userId);
+            if (event.message.type === 'text') {
+                const text = event.message.text.trim();
+                await this.handleTextMessage(text, replyToken, userId);
+            } else if (event.message.type === 'image') {
+                await this.handleImageMessage(event.message.id, replyToken, userId);
+            } else if (event.message.type === 'location') {
+                await this.handleLocationMessage(
+                    event.message.latitude,
+                    event.message.longitude,
+                    event.message.address,
+                    replyToken,
+                    userId,
+                );
+            }
         } else if (event.type === 'follow') {
             // 新追蹤者
             await this.lineBotService.replyMessage(
                 event.replyToken,
                 '歡迎加入 Light Keepers 災害救援小秘書！🙌\n\n' +
                 '您可以使用以下指令：\n' +
+                '🚨 「回報」回報災情\n' +
                 '📋 「任務」查看待辦任務\n' +
                 '⏱️ 「時數」查看服務時數\n' +
                 '✅ 「簽到」開始執勤\n' +
@@ -76,9 +93,58 @@ export class LineBotController {
         }
     }
 
+    // 處理圖片訊息
+    private async handleImageMessage(messageId: string, replyToken: string, userId?: string) {
+        if (!userId) return;
+
+        const result = await this.disasterReportService.handleImageMessage(userId, messageId);
+
+        if (result.shouldReply && result.replyMessage) {
+            await this.lineBotService.replyMessage(replyToken, result.replyMessage);
+        }
+    }
+
+    // 處理位置訊息
+    private async handleLocationMessage(
+        latitude: number,
+        longitude: number,
+        address: string | undefined,
+        replyToken: string,
+        userId?: string,
+    ) {
+        if (!userId) return;
+
+        const result = await this.disasterReportService.handleLocationMessage(
+            userId,
+            latitude,
+            longitude,
+            address,
+        );
+
+        if (result.shouldReply && result.replyMessage) {
+            await this.lineBotService.replyMessage(replyToken, result.replyMessage);
+        }
+    }
+
+
     // 處理文字訊息
     private async handleTextMessage(text: string, replyToken: string, userId?: string) {
         const lowerText = text.toLowerCase();
+
+        // === 災情回報流程（優先處理） ===
+        if (userId) {
+            // 檢查是否在回報流程中，或是觸發回報的關鍵字
+            const isInFlow = await this.disasterReportService.isUserInReportFlow(userId);
+            const isTrigger = this.disasterReportService.isReportTrigger(text);
+
+            if (isInFlow || isTrigger) {
+                const result = await this.disasterReportService.handleTextMessage(userId, text);
+                if (result.shouldReply && result.replyMessage) {
+                    await this.lineBotService.replyMessage(replyToken, result.replyMessage);
+                    return;
+                }
+            }
+        }
 
         // 綁定帳號
         if (lowerText.includes('綁定')) {
@@ -191,6 +257,7 @@ export class LineBotController {
             replyToken,
             '🤖 Light Keepers 小秘書\n\n' +
             '可用指令：\n' +
+            '🚨 「回報」- 回報災情\n' +
             '📋 「任務」- 查看待辦任務\n' +
             '⏱️ 「時數」- 查看服務時數\n' +
             '✅ 「簽到」- 開始執勤\n' +
