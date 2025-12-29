@@ -22,6 +22,8 @@ export default function LoginPage() {
     // Email 驗證狀態
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
     const [waitingForVerification, setWaitingForVerification] = useState(false);
+    const [verificationCode, setVerificationCode] = useState('');
+    const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -214,6 +216,45 @@ export default function LoginPage() {
             setError('發送失敗，請稍後再試');
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    // 驗證驗證碼
+    const handleVerifyCode = async () => {
+        if (!verificationCode || verificationCode.length < 6) {
+            setError('請輸入完整的6位驗證碼');
+            return;
+        }
+
+        setIsVerifyingCode(true);
+        setError(null);
+
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+            const response = await fetch(`${API_URL}/auth/verify-email-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: formData.email,
+                    code: verificationCode
+                }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setSuccessMessage('Email 驗證成功！請登入您的帳號');
+                setEmailVerificationSent(false);
+                setWaitingForVerification(false);
+                setIsLogin(true);
+                setVerificationCode('');
+            } else {
+                setError(data.message || '驗證碼錯誤，請重新輸入');
+            }
+        } catch (err) {
+            setError('驗證失敗，請稍後再試');
+        } finally {
+            setIsVerifyingCode(false);
         }
     };
 
@@ -445,16 +486,38 @@ export default function LoginPage() {
                                 </div>
                             )}
 
-                            {/* 等待 Email 驗證時顯示重新發送按鈕 */}
+                            {/* 等待 Email 驗證時顯示驗證碼輸入 */}
                             {waitingForVerification && (
-                                <button
-                                    type="button"
-                                    className="login-resend-btn"
-                                    onClick={handleResendVerification}
-                                    disabled={isLoading}
-                                >
-                                    📧 重新發送驗證信
-                                </button>
+                                <div className="verification-section">
+                                    <div className="form-group">
+                                        <label htmlFor="verificationCode">驗證碼</label>
+                                        <input
+                                            type="text"
+                                            id="verificationCode"
+                                            placeholder="請輸入 6 位驗證碼"
+                                            value={verificationCode}
+                                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            maxLength={6}
+                                            className="verification-input"
+                                        />
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="login-submit"
+                                        onClick={handleVerifyCode}
+                                        disabled={isVerifyingCode || verificationCode.length < 6}
+                                    >
+                                        {isVerifyingCode ? '驗證中...' : '驗證'}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="login-resend-btn"
+                                        onClick={handleResendVerification}
+                                        disabled={isLoading}
+                                    >
+                                        📧 重新發送驗證碼
+                                    </button>
+                                </div>
                             )}
 
                             {!emailVerificationSent && (
