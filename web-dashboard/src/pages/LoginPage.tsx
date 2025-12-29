@@ -20,7 +20,8 @@ export default function LoginPage() {
     const [rememberMe, setRememberMe] = useState(true);
 
     // Email 驗證狀態
-    const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);            // OTP 已發送
+    const [emailVerified, setEmailVerified] = useState(false); // OTP 已驗證
     const [verificationCode, setVerificationCode] = useState('');
     const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
@@ -94,10 +95,17 @@ export default function LoginPage() {
         setSuccessMessage(null);
     };
 
-    // Firebase Email 註冊
+    // Email 註冊 (OTP 驗證後)
     const handleFirebaseRegister = async () => {
         setError(null);
         setIsLoading(true);
+
+        // 確認 Email 已驗證
+        if (!emailVerified) {
+            setError('請先驗證您的 Email');
+            setIsLoading(false);
+            return;
+        }
 
         // 驗證密碼
         if (formData.password !== formData.confirmPassword) {
@@ -121,13 +129,33 @@ export default function LoginPage() {
             );
 
             if (result.success) {
-                setEmailVerificationSent(true);
-                setSuccessMessage('註冊成功！驗證信已發送至您的 Email，請點擊連結完成驗證');
+                // 註冊成功，取得 Token 並自動登入
+                const idToken = await firebaseAuthService.getIdToken();
+                if (idToken) {
+                    const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+                    const response = await fetch(`${API_URL}/auth/firebase/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken }),
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        await login(data.accessToken, rememberMe);
+                        navigate(from, { replace: true });
+                        return;
+                    }
+                }
+                // 如果自動登入失敗，提示用戶手動登入
+                setSuccessMessage('註冊成功！請使用您的帳號登入');
+                setIsLogin(true);
+                setEmailVerified(false);
+                setOtpSent(false);
             } else {
                 setError(result.message);
             }
         } catch (err) {
-            console.error('Firebase registration failed:', err);
+            console.error('Registration failed:', err);
             setError('註冊失敗，請稍後再試');
         } finally {
             setIsLoading(false);
@@ -218,7 +246,7 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                setEmailVerificationSent(true);
+                setOtpSent(true);
                 setSuccessMessage('驗證碼已發送至您的 Email，請查收');
             } else {
                 setError(data.message || '發送失敗，請稍後再試');
@@ -254,8 +282,9 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                // 驗證成功，但不自動跳轉，讓用戶點擊「註冊」完成註冊
-                setSuccessMessage('✓ Email 驗證成功！請點擊「註冊」完成帳號建立');
+                // 驗證成功，標記 Email 已驗證
+                setEmailVerified(true);
+                setSuccessMessage('✓ Email 驗證成功！請填寫以下資料完成註冊');
                 setVerificationCode('');
             } else {
                 setError(data.message || '驗證碼錯誤，請重新輸入');
@@ -395,7 +424,8 @@ export default function LoginPage() {
                         </div>
 
                         <form className="login-form" onSubmit={handleSubmit}>
-                            {!isLogin && (
+                            {/* 註冊模式且 Email 已驗證後才顯示顯示名稱 */}
+                            {!isLogin && emailVerified && (
                                 <div className="form-group">
                                     <label htmlFor="displayName">顯示名稱</label>
                                     <input
@@ -430,7 +460,7 @@ export default function LoginPage() {
                                             onClick={handleResendVerification}
                                             disabled={isLoading || !formData.email}
                                         >
-                                            {emailVerificationSent ? '重發' : '發送'}
+                                            {otpSent ? '重發' : '發送'}
                                         </button>
                                     </div>
                                 ) : (
@@ -472,22 +502,26 @@ export default function LoginPage() {
                                 </div>
                             )}
 
-                            <div className="form-group">
-                                <label htmlFor="password">密碼</label>
-                                <input
-                                    type="password"
-                                    id="password"
-                                    name="password"
-                                    autoComplete={isLogin ? 'current-password' : 'new-password'}
-                                    placeholder="請輸入密碼"
-                                    value={formData.password}
-                                    onChange={handleChange}
-                                    required
-                                    minLength={6}
-                                />
-                            </div>
+                            {/* 密碼欄位 - 登入模式或 Email 已驗證後顯示 */}
+                            {(isLogin || emailVerified) && (
+                                <div className="form-group">
+                                    <label htmlFor="password">密碼</label>
+                                    <input
+                                        type="password"
+                                        id="password"
+                                        name="password"
+                                        autoComplete={isLogin ? 'current-password' : 'new-password'}
+                                        placeholder="請輸入密碼"
+                                        value={formData.password}
+                                        onChange={handleChange}
+                                        required
+                                        minLength={6}
+                                    />
+                                </div>
+                            )}
 
-                            {!isLogin && (
+                            {/* 確認密碼 - 註冊模式且 Email 已驗證後顯示 */}
+                            {!isLogin && emailVerified && (
                                 <div className="form-group">
                                     <label htmlFor="confirmPassword">確認密碼</label>
                                     <input
@@ -498,7 +532,7 @@ export default function LoginPage() {
                                         placeholder="請再次輸入密碼"
                                         value={formData.confirmPassword}
                                         onChange={handleChange}
-                                        required={!isLogin}
+                                        required={!isLogin && emailVerified}
                                         minLength={6}
                                     />
                                 </div>
@@ -539,7 +573,8 @@ export default function LoginPage() {
                                 </div>
                             )}
 
-                            {!emailVerificationSent && (
+                            {/* 登入模式或已驗證 Email 後顯示註冊按鈕 */}
+                            {(isLogin || emailVerified) && (
                                 <button
                                     type="submit"
                                     className="login-submit"
@@ -549,18 +584,11 @@ export default function LoginPage() {
                                 </button>
                             )}
 
-                            {emailVerificationSent && (
-                                <button
-                                    type="button"
-                                    className="login-submit"
-                                    onClick={() => {
-                                        setEmailVerificationSent(false);
-                                        setIsLogin(true);
-                                        setSuccessMessage(null);
-                                    }}
-                                >
-                                    前往登入
-                                </button>
+                            {/* 註冊模式但尚未驗證 Email - 顯示提示 */}
+                            {!isLogin && !emailVerified && otpSent && (
+                                <div className="login-hint">
+                                    請輸入驗證碼並點擊「驗證」
+                                </div>
                             )}
                         </form>
 
