@@ -177,13 +177,14 @@
     width: 48px;
     height: 48px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+    background: #E8E4DF;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #6B5B4F;
     font-weight: 600;
     font-size: 18px;
+    border: 1px solid #D9CCC0;
 }
 
 .pending-card__details {
@@ -336,13 +337,14 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
+    background: #E8E4DF;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--brown-900);
+    color: #6B5B4F;
     font-weight: 600;
     font-size: 16px;
+    border: 1px solid #D9CCC0;
 }
 
 .user-card__details {
@@ -813,14 +815,15 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
+    background: #E8E4DF;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--brown-900);
+    color: #6B5B4F;
     font-weight: 600;
     font-size: 24px;
     flex-shrink: 0;
+    border: 1px solid #D9CCC0;
 }
 
 .account-detail__info {
