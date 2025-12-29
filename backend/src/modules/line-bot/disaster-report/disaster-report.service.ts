@@ -279,7 +279,7 @@ export class DisasterReportService {
             // 判斷災情類型
             const disasterType = detectDisasterType(session.data.text);
 
-            // 建立回報
+            // 建立回報（來自 LINE Bot）
             const report = await this.reportsService.create({
                 type: disasterType as any,
                 severity: 'medium',
@@ -290,6 +290,10 @@ export class DisasterReportService {
                 address: session.data.location.address,
                 photos: session.data.imageUrls,
                 contactName: session.displayName,
+                // LINE 來源追蹤
+                source: 'line',
+                reporterLineUserId: lineUserId,
+                reporterLineDisplayName: session.displayName,
             });
 
             this.logger.log(`Report created: ${report.id} by ${lineUserId}`);

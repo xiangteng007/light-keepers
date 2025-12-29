@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Report, ReportStatus, ReportType, ReportSeverity } from './reports.entity';
+import { Report, ReportStatus, ReportType, ReportSeverity, ReportSource } from './reports.entity';
 import { Task } from '../tasks/entities';
 
 export interface CreateReportDto {
@@ -15,6 +15,10 @@ export interface CreateReportDto {
     photos?: string[];
     contactName?: string;
     contactPhone?: string;
+    // 來源追蹤
+    source?: ReportSource;
+    reporterLineUserId?: string;
+    reporterLineDisplayName?: string;
 }
 
 export interface ReviewReportDto {
@@ -48,10 +52,11 @@ export class ReportsService {
             ...dto,
             status: 'pending',
             severity: dto.severity || 'medium',
+            source: dto.source || 'web',
         });
 
         const saved = await this.reportsRepository.save(report);
-        this.logger.log(`New report created: ${saved.id} - ${saved.title}`);
+        this.logger.log(`New report created: ${saved.id} - ${saved.title} [source: ${saved.source}]`);
         return saved;
     }
 

@@ -286,6 +286,7 @@ export const getPublicResourcesForMap = (types?: ('shelters' | 'aed')[]) =>
 export type ReportType = 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other';
 export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ReportStatus = 'pending' | 'confirmed' | 'rejected';
+export type ReportSource = 'web' | 'line';
 
 export interface Report {
     id: string;
@@ -303,6 +304,10 @@ export interface Report {
     reviewedBy?: string;
     reviewedAt?: string;
     reviewNote?: string;
+    // 來源追蹤
+    source?: ReportSource;
+    reporterLineUserId?: string;
+    reporterLineDisplayName?: string;
     createdAt: string;
     updatedAt: string;
 }

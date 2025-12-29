@@ -3,6 +3,7 @@ import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateCol
 export type ReportType = 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other';
 export type ReportStatus = 'pending' | 'confirmed' | 'rejected';
 export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
+export type ReportSource = 'web' | 'line';
 
 @Entity('reports')
 export class Report {
@@ -60,6 +61,18 @@ export class Report {
 
     @Column({ type: 'text', nullable: true })
     reviewNote?: string;
+
+    // 回報來源
+    @Column({ type: 'varchar', length: 20, default: 'web' })
+    source: ReportSource;
+
+    // LINE 使用者資訊（若來自 LINE Bot）
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    reporterLineUserId?: string;
+
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    reporterLineDisplayName?: string;
+
 
     // 時間戳記
     @CreateDateColumn()

@@ -1,9 +1,10 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { getReports, createTask, getAccounts, deleteReport, getTasks } from '../api/services';
-import type { Report, ReportType, ReportSeverity, Task } from '../api/services';
+import { getReports, createTask, getAccounts, deleteReport, getTasks, getReportStats } from '../api/services';
+import type { Report, ReportType, ReportSeverity, ReportSource, Task } from '../api/services';
 import { Modal, Button, Card } from '../design-system';
 import { useAuth } from '../context/AuthContext';
+import './EventsPage.css';
 
 // 類型配置
 const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
@@ -22,6 +23,11 @@ const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; co
     medium: { label: '中等', stars: 2, color: '#FF9800' },
     high: { label: '嚴重', stars: 3, color: '#F44336' },
     critical: { label: '緊急', stars: 4, color: '#9C27B0' },
+};
+
+const SOURCE_CONFIG: Record<ReportSource, { label: string; icon: string; color: string }> = {
+    line: { label: 'LINE', icon: '💬', color: '#00B900' },
+    web: { label: '網頁', icon: '🌐', color: '#1976D2' },
 };
 
 // 格式化時間
@@ -43,10 +49,14 @@ function formatDateTime(dateStr: string): string {
     return new Date(dateStr).toLocaleString('zh-TW');
 }
 
+type ViewMode = 'card' | 'table';
+
 export default function EventsPage() {
     const queryClient = useQueryClient();
     const { user } = useAuth();
+    const [viewMode, setViewMode] = useState<ViewMode>('card');
     const [typeFilter, setTypeFilter] = useState<string>('');
+    const [sourceFilter, setSourceFilter] = useState<string>('');
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [showDetailModal, setShowDetailModal] = useState(false);
@@ -57,6 +67,12 @@ export default function EventsPage() {
     const { data: reportsData, isLoading, error } = useQuery({
         queryKey: ['confirmedReports'],
         queryFn: () => getReports({ status: 'confirmed' }).then(res => res.data.data),
+    });
+
+    // 獲取統計
+    const { data: statsData } = useQuery({
+        queryKey: ['reportStats'],
+        queryFn: () => getReportStats().then(res => res.data.data),
     });
 
     // 獲取志工列表
@@ -78,7 +94,7 @@ export default function EventsPage() {
         mutationFn: createTask,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['tasks'] });
-            queryClient.invalidateQueries({ queryKey: ['allTasks'] }); // 刷新事件任務狀態
+            queryClient.invalidateQueries({ queryKey: ['allTasks'] });
             setShowTaskModal(false);
             setTaskForm({ title: '', description: '', priority: 'medium', dueDate: '', assignedTo: '' });
             alert('任務已建立！');
@@ -100,9 +116,9 @@ export default function EventsPage() {
         },
     });
 
-    // 權限檢查：幹部以上 (roleLevel >= 2) 才能分派任務
+    // 權限檢查
     const canAssignTask = (user?.roleLevel ?? 0) >= 2;
-    const canDeleteEvent = (user?.roleLevel ?? 0) >= 3; // 常務理事以上才能刪除
+    const canDeleteEvent = (user?.roleLevel ?? 0) >= 3;
 
     const reports = reportsData || [];
 
@@ -122,9 +138,20 @@ export default function EventsPage() {
         return (reportId: string) => statusMap.get(reportId) || null;
     }, [tasks]);
 
+    // 計算來源統計
+    const sourceStats = useMemo(() => {
+        const stats = { line: 0, web: 0 };
+        reports.forEach(report => {
+            const source = report.source || 'web';
+            stats[source] = (stats[source] || 0) + 1;
+        });
+        return stats;
+    }, [reports]);
+
     // 過濾
     const filteredReports = reports.filter(report => {
         if (typeFilter && report.type !== typeFilter) return false;
+        if (sourceFilter && (report.source || 'web') !== sourceFilter) return false;
         if (searchQuery && !report.title.includes(searchQuery) && !report.description.includes(searchQuery)) return false;
         return true;
     });
@@ -138,7 +165,6 @@ export default function EventsPage() {
     // 開啟分派任務彈窗
     const openTaskModal = (report: Report) => {
         setSelectedReport(report);
-        // 預設截止日期為 3 天後
         const defaultDue = new Date();
         defaultDue.setDate(defaultDue.getDate() + 3);
         const dueStr = defaultDue.toISOString().split('T')[0];
@@ -170,7 +196,7 @@ export default function EventsPage() {
             priority: priorityMap[taskForm.priority] || 2,
             dueAt: taskForm.dueDate ? new Date(taskForm.dueDate).toISOString() : undefined,
             assignedTo: taskForm.assignedTo,
-            eventId: selectedReport?.id, // 關聯事件ID以顯示任務狀態
+            eventId: selectedReport?.id,
         });
     };
 
@@ -218,32 +244,99 @@ export default function EventsPage() {
 
     return (
         <div className="page events-page">
+            {/* 頁面標題區 */}
             <div className="page-header">
-                <h2>災害回報</h2>
-                <span className="header-badge">{filteredReports.length} 件</span>
-                <Button variant="primary" onClick={() => window.location.href = '/report'}>
-                    📝 狀況回報
-                </Button>
+                <div className="page-header__left">
+                    <h2>🚨 災害回報</h2>
+                    <span className="header-badge">{filteredReports.length} 件</span>
+                </div>
+                <div className="page-header__right">
+                    <Button variant="primary" onClick={() => window.location.href = '/report'}>
+                        📝 新增回報
+                    </Button>
+                </div>
             </div>
 
+            {/* 統計儀表板 */}
+            <div className="events-stats">
+                <div className="stat-card stat-card--total">
+                    <div className="stat-card__icon">📊</div>
+                    <div className="stat-card__content">
+                        <div className="stat-card__value">{statsData?.confirmed || filteredReports.length}</div>
+                        <div className="stat-card__label">已確認回報</div>
+                    </div>
+                </div>
+                <div className="stat-card stat-card--line">
+                    <div className="stat-card__icon">💬</div>
+                    <div className="stat-card__content">
+                        <div className="stat-card__value">{sourceStats.line}</div>
+                        <div className="stat-card__label">LINE 回報</div>
+                    </div>
+                </div>
+                <div className="stat-card stat-card--web">
+                    <div className="stat-card__icon">🌐</div>
+                    <div className="stat-card__content">
+                        <div className="stat-card__value">{sourceStats.web}</div>
+                        <div className="stat-card__label">網頁回報</div>
+                    </div>
+                </div>
+                <div className="stat-card stat-card--pending">
+                    <div className="stat-card__icon">⏳</div>
+                    <div className="stat-card__content">
+                        <div className="stat-card__value">{statsData?.pending || 0}</div>
+                        <div className="stat-card__label">待審核</div>
+                    </div>
+                </div>
+            </div>
+
+            {/* 篩選器 */}
             <div className="filter-bar">
-                <select
-                    className="filter-select"
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value)}
-                >
-                    <option value="">所有類別</option>
-                    {Object.entries(TYPE_CONFIG).map(([key, config]) => (
-                        <option key={key} value={key}>{config.icon} {config.label}</option>
-                    ))}
-                </select>
-                <input
-                    type="text"
-                    className="filter-search"
-                    placeholder="搜尋事件..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                />
+                <div className="filter-bar__left">
+                    <select
+                        className="filter-select"
+                        value={typeFilter}
+                        onChange={(e) => setTypeFilter(e.target.value)}
+                    >
+                        <option value="">所有類別</option>
+                        {Object.entries(TYPE_CONFIG).map(([key, config]) => (
+                            <option key={key} value={key}>{config.icon} {config.label}</option>
+                        ))}
+                    </select>
+                    <select
+                        className="filter-select"
+                        value={sourceFilter}
+                        onChange={(e) => setSourceFilter(e.target.value)}
+                    >
+                        <option value="">所有來源</option>
+                        <option value="line">💬 LINE</option>
+                        <option value="web">🌐 網頁</option>
+                    </select>
+                    <input
+                        type="text"
+                        className="filter-search"
+                        placeholder="搜尋事件..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                </div>
+                <div className="filter-bar__right">
+                    <div className="view-toggle">
+                        <button
+                            className={`view-toggle__btn ${viewMode === 'card' ? 'active' : ''}`}
+                            onClick={() => setViewMode('card')}
+                            title="卡片視圖"
+                        >
+                            ▦
+                        </button>
+                        <button
+                            className={`view-toggle__btn ${viewMode === 'table' ? 'active' : ''}`}
+                            onClick={() => setViewMode('table')}
+                            title="表格視圖"
+                        >
+                            ☰
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {filteredReports.length === 0 ? (
@@ -251,11 +344,106 @@ export default function EventsPage() {
                     <span>📋</span>
                     <p>目前沒有已確認的災害回報</p>
                 </div>
+            ) : viewMode === 'card' ? (
+                /* 卡片視圖 */
+                <div className="events-grid">
+                    {filteredReports.map((report) => {
+                        const taskStatus = getEventTaskStatus(report.id);
+                        const source = report.source || 'web';
+                        return (
+                            <Card key={report.id} className="event-card" padding="md">
+                                {/* 卡片標題列 */}
+                                <div className="event-card__header">
+                                    <span
+                                        className="event-card__type"
+                                        style={{ backgroundColor: `${TYPE_CONFIG[report.type]?.color}20`, color: TYPE_CONFIG[report.type]?.color }}
+                                    >
+                                        {TYPE_CONFIG[report.type]?.icon} {TYPE_CONFIG[report.type]?.label}
+                                    </span>
+                                    <span
+                                        className="event-card__source"
+                                        style={{ backgroundColor: `${SOURCE_CONFIG[source]?.color}20`, color: SOURCE_CONFIG[source]?.color }}
+                                    >
+                                        {SOURCE_CONFIG[source]?.icon} {SOURCE_CONFIG[source]?.label}
+                                    </span>
+                                </div>
+
+                                {/* 照片預覽 */}
+                                {report.photos && report.photos.length > 0 && (
+                                    <div className="event-card__photo">
+                                        <img src={report.photos[0]} alt="災情照片" />
+                                        {report.photos.length > 1 && (
+                                            <span className="event-card__photo-count">+{report.photos.length - 1}</span>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* 標題與描述 */}
+                                <h3 className="event-card__title">{report.title}</h3>
+                                <p className="event-card__desc">{report.description.substring(0, 80)}...</p>
+
+                                {/* 嚴重程度 */}
+                                <div className="event-card__severity">
+                                    <span style={{ color: SEVERITY_CONFIG[report.severity]?.color }}>
+                                        {'★'.repeat(SEVERITY_CONFIG[report.severity]?.stars || 2)}
+                                        {'☆'.repeat(4 - (SEVERITY_CONFIG[report.severity]?.stars || 2))}
+                                    </span>
+                                    <span className="severity-label">{SEVERITY_CONFIG[report.severity]?.label}</span>
+                                </div>
+
+                                {/* 位置與時間 */}
+                                <div className="event-card__meta">
+                                    <span>📍 {report.address || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}</span>
+                                    <span>🕐 {formatTimeAgo(report.createdAt)}</span>
+                                </div>
+
+                                {/* 任務狀態 */}
+                                <div className="event-card__status">
+                                    {!taskStatus ? (
+                                        <span className="status status-pending">⚪ 未派發</span>
+                                    ) : taskStatus.completed === taskStatus.pending + taskStatus.inProgress + taskStatus.completed ? (
+                                        <span className="status status-completed">✅ 已完成</span>
+                                    ) : taskStatus.inProgress > 0 ? (
+                                        <span className="status status-active">🟡 處理中</span>
+                                    ) : (
+                                        <span className="status status-pending">🔵 已派發</span>
+                                    )}
+                                </div>
+
+                                {/* 操作按鈕 */}
+                                <div className="event-card__actions">
+                                    <button className="btn-small" onClick={() => openDetailModal(report)}>
+                                        查看
+                                    </button>
+                                    {user && (
+                                        <button
+                                            className="btn-small btn-success-outline"
+                                            onClick={() => {
+                                                if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
+                                                    handleClaimTask(report);
+                                                }
+                                            }}
+                                        >
+                                            領取
+                                        </button>
+                                    )}
+                                    {canAssignTask && (
+                                        <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
+                                            分派
+                                        </button>
+                                    )}
+                                </div>
+                            </Card>
+                        );
+                    })}
+                </div>
             ) : (
+                /* 表格視圖 */
                 <div className="events-table">
                     <table>
                         <thead>
                             <tr>
+                                <th>來源</th>
                                 <th>嚴重度</th>
                                 <th>事件標題</th>
                                 <th>類別</th>
@@ -265,78 +453,85 @@ export default function EventsPage() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredReports.map((report) => (
-                                <tr key={report.id}>
-                                    <td>
-                                        <span
-                                            className="severity-badge"
-                                            style={{ color: SEVERITY_CONFIG[report.severity]?.color }}
-                                        >
-                                            {'★'.repeat(SEVERITY_CONFIG[report.severity]?.stars || 2)}
-                                        </span>
-                                    </td>
-                                    <td>{report.title}</td>
-                                    <td>
-                                        <span
-                                            className="category-tag"
-                                            style={{ backgroundColor: `${TYPE_CONFIG[report.type]?.color}20`, color: TYPE_CONFIG[report.type]?.color }}
-                                        >
-                                            {TYPE_CONFIG[report.type]?.icon} {TYPE_CONFIG[report.type]?.label || report.type}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {(() => {
-                                            const taskStatus = getEventTaskStatus(report.id);
-                                            if (!taskStatus) {
-                                                return <span className="status status-pending">⚪ 未派發</span>;
-                                            }
-                                            const total = taskStatus.pending + taskStatus.inProgress + taskStatus.completed;
-                                            if (taskStatus.completed === total) {
-                                                return <span className="status status-completed">✅ 已完成</span>;
-                                            }
-                                            if (taskStatus.inProgress > 0) {
-                                                return <span className="status status-active">🟡 處理中 ({taskStatus.inProgress}/{total})</span>;
-                                            }
-                                            return <span className="status status-pending">🔵 已派發 ({total})</span>;
-                                        })()}
-                                    </td>
-                                    <td>{formatTimeAgo(report.createdAt)}</td>
-                                    <td className="actions-cell">
-                                        <button className="btn-small" onClick={() => openDetailModal(report)}>
-                                            查看
-                                        </button>
-                                        {user && (
-                                            <button
-                                                className="btn-small btn-success-outline"
-                                                onClick={() => {
-                                                    if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
-                                                        handleClaimTask(report);
-                                                    }
-                                                }}
+                            {filteredReports.map((report) => {
+                                const taskStatus = getEventTaskStatus(report.id);
+                                const source = report.source || 'web';
+                                return (
+                                    <tr key={report.id}>
+                                        <td>
+                                            <span
+                                                className="source-badge"
+                                                style={{ backgroundColor: `${SOURCE_CONFIG[source]?.color}20`, color: SOURCE_CONFIG[source]?.color }}
                                             >
-                                                領取任務
-                                            </button>
-                                        )}
-                                        {canAssignTask && (
-                                            <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
-                                                分派任務
-                                            </button>
-                                        )}
-                                        {canDeleteEvent && (
-                                            <button
-                                                className="btn-small btn-danger-outline"
-                                                onClick={() => {
-                                                    if (confirm(`確定要刪除「${report.title}」嗎？`)) {
-                                                        deleteReportMutation.mutate(report.id);
-                                                    }
-                                                }}
+                                                {SOURCE_CONFIG[source]?.icon}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span
+                                                className="severity-badge"
+                                                style={{ color: SEVERITY_CONFIG[report.severity]?.color }}
                                             >
-                                                刪除
+                                                {'★'.repeat(SEVERITY_CONFIG[report.severity]?.stars || 2)}
+                                            </span>
+                                        </td>
+                                        <td>{report.title}</td>
+                                        <td>
+                                            <span
+                                                className="category-tag"
+                                                style={{ backgroundColor: `${TYPE_CONFIG[report.type]?.color}20`, color: TYPE_CONFIG[report.type]?.color }}
+                                            >
+                                                {TYPE_CONFIG[report.type]?.icon} {TYPE_CONFIG[report.type]?.label || report.type}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {!taskStatus ? (
+                                                <span className="status status-pending">⚪ 未派發</span>
+                                            ) : taskStatus.completed === taskStatus.pending + taskStatus.inProgress + taskStatus.completed ? (
+                                                <span className="status status-completed">✅ 已完成</span>
+                                            ) : taskStatus.inProgress > 0 ? (
+                                                <span className="status status-active">🟡 處理中</span>
+                                            ) : (
+                                                <span className="status status-pending">🔵 已派發</span>
+                                            )}
+                                        </td>
+                                        <td>{formatTimeAgo(report.createdAt)}</td>
+                                        <td className="actions-cell">
+                                            <button className="btn-small" onClick={() => openDetailModal(report)}>
+                                                查看
                                             </button>
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
+                                            {user && (
+                                                <button
+                                                    className="btn-small btn-success-outline"
+                                                    onClick={() => {
+                                                        if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
+                                                            handleClaimTask(report);
+                                                        }
+                                                    }}
+                                                >
+                                                    領取
+                                                </button>
+                                            )}
+                                            {canAssignTask && (
+                                                <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
+                                                    分派
+                                                </button>
+                                            )}
+                                            {canDeleteEvent && (
+                                                <button
+                                                    className="btn-small btn-danger-outline"
+                                                    onClick={() => {
+                                                        if (confirm(`確定要刪除「${report.title}」嗎？`)) {
+                                                            deleteReportMutation.mutate(report.id);
+                                                        }
+                                                    }}
+                                                >
+                                                    刪除
+                                                </button>
+                                            )}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
@@ -358,6 +553,12 @@ export default function EventsPage() {
                                 {TYPE_CONFIG[selectedReport.type]?.icon} {TYPE_CONFIG[selectedReport.type]?.label}
                             </span>
                             <span
+                                className="event-detail__source"
+                                style={{ backgroundColor: SOURCE_CONFIG[selectedReport.source || 'web']?.color }}
+                            >
+                                {SOURCE_CONFIG[selectedReport.source || 'web']?.icon} {SOURCE_CONFIG[selectedReport.source || 'web']?.label}
+                            </span>
+                            <span
                                 className="event-detail__severity"
                                 style={{ color: SEVERITY_CONFIG[selectedReport.severity]?.color }}
                             >
@@ -367,6 +568,15 @@ export default function EventsPage() {
 
                         <h3>{selectedReport.title}</h3>
                         <p className="event-detail__desc">{selectedReport.description}</p>
+
+                        {/* 照片展示 */}
+                        {selectedReport.photos && selectedReport.photos.length > 0 && (
+                            <div className="event-detail__photos">
+                                {selectedReport.photos.map((photo, idx) => (
+                                    <img key={idx} src={photo} alt={`照片 ${idx + 1}`} />
+                                ))}
+                            </div>
+                        )}
 
                         <div className="event-detail__info">
                             <div className="info-row">
@@ -381,7 +591,9 @@ export default function EventsPage() {
                             </div>
                             <div className="info-row">
                                 <span className="info-label">👤 回報人</span>
-                                <span className="info-value">{selectedReport.contactName || '(未提供)'}</span>
+                                <span className="info-value">
+                                    {selectedReport.reporterLineDisplayName || selectedReport.contactName || '(未提供)'}
+                                </span>
                             </div>
                             {selectedReport.contactPhone && (
                                 <div className="info-row">
