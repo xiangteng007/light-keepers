@@ -136,6 +136,20 @@ export class AuthController {
     }
 
     // =========================================
+    // Firebase Token 登入端點
+    // =========================================
+
+    /**
+     * Firebase Token 登入
+     * 前端透過 Firebase SDK 取得 ID Token 後呼叫此 API
+     * 用於 Email/Password 和 Google Popup 登入方式
+     */
+    @Post('firebase/login')
+    async loginWithFirebaseToken(@Body() body: { idToken: string }) {
+        return this.authService.loginWithFirebaseToken(body.idToken);
+    }
+
+    // =========================================
     // 個人資料管理端點
     // =========================================
 

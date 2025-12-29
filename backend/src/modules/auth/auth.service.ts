@@ -418,6 +418,67 @@ export class AuthService {
         return this.generateTokenResponse(account);
     }
 
+    /**
+     * Firebase Token 登入
+     * 驗證 Firebase ID Token 並尋找或建立對應帳號
+     */
+    async loginWithFirebaseToken(idToken: string): Promise<TokenResponseDto> {
+        if (!this.firebaseAdminService.isConfigured()) {
+            throw new UnauthorizedException('Firebase 尚未設定');
+        }
+
+        // 驗證 Firebase ID Token
+        const decodedToken = await this.firebaseAdminService.verifyIdToken(idToken);
+        if (!decodedToken) {
+            throw new UnauthorizedException('Firebase Token 驗證失敗');
+        }
+
+        const { email, email_verified, name, picture, uid } = decodedToken;
+
+        if (!email) {
+            throw new UnauthorizedException('無法取得 Email 資訊');
+        }
+
+        // 尋找現有帳號（優先使用 Firebase UID，其次使用 email）
+        let account = await this.accountRepository.findOne({
+            where: [
+                { firebaseUid: uid },
+                { email },
+            ],
+            relations: ['roles'],
+        });
+
+        if (account) {
+            // 更新 Firebase UID（如果之前沒有）
+            if (!account.firebaseUid) {
+                account.firebaseUid = uid;
+            }
+            // 如果 Firebase 已驗證 Email，同步本地狀態
+            if (email_verified && !account.emailVerified) {
+                account.emailVerified = true;
+            }
+            account.lastLoginAt = new Date();
+            await this.accountRepository.save(account);
+            return this.generateTokenResponse(account);
+        }
+
+        // 建立新帳號
+        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
+
+        account = this.accountRepository.create({
+            email,
+            passwordHash: '', // Firebase 登入不需要密碼
+            displayName: name || email.split('@')[0],
+            avatarUrl: picture || undefined,
+            firebaseUid: uid,
+            emailVerified: email_verified || false,
+            roles: volunteerRole ? [volunteerRole] : [],
+        });
+
+        await this.accountRepository.save(account);
+        return this.generateTokenResponse(account);
+    }
+
     private generateTokenResponse(account: Account): TokenResponseDto {
         const roles = account.roles || [];
         const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => (r as any).level || 0)) : 0;

@@ -1,16 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login as loginApi, register, sendEmailOtp, verifyEmailOtp } from '../api/services';
+import { login as backendLoginApi } from '../api/services';
+import { firebaseAuthService } from '../services/firebase-auth.service';
 import './LoginPage.css';
 
-// LINE Login Config - 需要在 LINE Developers Console 設定
+// LINE Login Config
 const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID || '';
 const LINE_REDIRECT_URI = `${window.location.origin}/login`;
-
-// Google Login Config - 需要在 Google Cloud Console 設定
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
-const GOOGLE_REDIRECT_URI = `${window.location.origin}/login`;
 
 export default function LoginPage() {
     const navigate = useNavigate();
@@ -22,12 +19,9 @@ export default function LoginPage() {
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
     const [rememberMe, setRememberMe] = useState(true);
 
-    // Email OTP 驗證狀態
-    const [otpSent, setOtpSent] = useState(false);
-    const [otpVerified, setOtpVerified] = useState(false);
-    const [otpCode, setOtpCode] = useState('');
-    const [countdown, setCountdown] = useState(0);
-    const [isSendingOtp, setIsSendingOtp] = useState(false);
+    // Email 驗證狀態
+    const [emailVerificationSent, setEmailVerificationSent] = useState(false);
+    const [waitingForVerification, setWaitingForVerification] = useState(false);
 
     const [formData, setFormData] = useState({
         email: '',
@@ -36,7 +30,7 @@ export default function LoginPage() {
         displayName: '',
     });
 
-    // 取得重定向目標 (登入後跳轉回原頁面)
+    // 取得重定向目標
     const from = (location.state as { from?: string })?.from || '/dashboard';
 
     // 已登入則跳轉
@@ -46,26 +40,24 @@ export default function LoginPage() {
         }
     }, [isAuthenticated, navigate, from]);
 
-    // 處理 LINE/Google OAuth callback
+    // 處理 LINE OAuth callback
     useEffect(() => {
         const urlParams = new URLSearchParams(window.location.search);
         const code = urlParams.get('code');
         const state = urlParams.get('state');
+        const verified = urlParams.get('verified');
 
         if (code && state === 'line-login') {
             handleLineCallback(code);
-        } else if (code && state === 'google-login') {
-            handleGoogleCallback(code);
+        }
+
+        // 從 Email 驗證連結返回
+        if (verified === 'true') {
+            setSuccessMessage('Email 已驗證成功！請登入您的帳號');
+            setIsLogin(true);
+            window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, []);
-
-    // OTP 倒計時
-    useEffect(() => {
-        if (countdown > 0) {
-            const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
-            return () => clearTimeout(timer);
-        }
-    }, [countdown]);
 
     const handleLineCallback = async (code: string) => {
         setIsLoading(true);
@@ -94,143 +86,194 @@ export default function LoginPage() {
         }
     };
 
-    const handleGoogleCallback = async (code: string) => {
-        setIsLoading(true);
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({ ...prev, [name]: value }));
         setError(null);
+        setSuccessMessage(null);
+    };
+
+    // Firebase Email 註冊
+    const handleFirebaseRegister = async () => {
+        setError(null);
+        setIsLoading(true);
+
+        // 驗證密碼
+        if (formData.password !== formData.confirmPassword) {
+            setError('密碼不一致');
+            setIsLoading(false);
+            return;
+        }
+
+        if (formData.password.length < 6) {
+            setError('密碼至少需要 6 個字元');
+            setIsLoading(false);
+            return;
+        }
+
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/google/callback`, {
+            // 使用 Firebase 註冊
+            const result = await firebaseAuthService.registerWithEmail(
+                formData.email,
+                formData.password,
+                formData.displayName
+            );
+
+            if (result.success) {
+                setEmailVerificationSent(true);
+                setSuccessMessage('註冊成功！驗證信已發送至您的 Email，請點擊連結完成驗證');
+                setWaitingForVerification(true);
+            } else {
+                setError(result.message);
+            }
+        } catch (err) {
+            console.error('Firebase registration failed:', err);
+            setError('註冊失敗，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // Firebase Email 登入
+    const handleFirebaseLogin = async () => {
+        setError(null);
+        setIsLoading(true);
+
+        try {
+            // 使用 Firebase 登入
+            const firebaseResult = await firebaseAuthService.loginWithEmail(
+                formData.email,
+                formData.password
+            );
+
+            if (!firebaseResult.success) {
+                setError(firebaseResult.message);
+                setIsLoading(false);
+                return;
+            }
+
+            // 檢查 Email 是否已驗證
+            const isVerified = await firebaseAuthService.isEmailVerified();
+            if (!isVerified) {
+                setError('請先驗證您的 Email。點擊下方按鈕重新發送驗證信');
+                setWaitingForVerification(true);
+                setIsLoading(false);
+                return;
+            }
+
+            // 取得 Firebase ID Token
+            const idToken = await firebaseAuthService.getIdToken();
+            if (!idToken) {
+                setError('無法取得認證 Token');
+                setIsLoading(false);
+                return;
+            }
+
+            // 使用 Firebase ID Token 向後端換取系統 JWT
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/firebase/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code, redirectUri: GOOGLE_REDIRECT_URI }),
+                body: JSON.stringify({ idToken }),
             });
 
-            const data = await response.json();
-
-            if (data.accessToken) {
-                await login(data.accessToken);
+            if (response.ok) {
+                const data = await response.json();
+                await login(data.accessToken, rememberMe);
                 navigate(from, { replace: true });
-            } else if (data.needsRegistration) {
-                const registerResponse = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/google/register`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ accessToken: data.googleProfile?.id }),
-                });
-
-                if (registerResponse.ok) {
-                    const regData = await registerResponse.json();
-                    await login(regData.accessToken);
+            } else {
+                // 如果後端還未實作 Firebase 登入，使用傳統方式
+                try {
+                    const backendResponse = await backendLoginApi(formData.email, formData.password);
+                    await login(backendResponse.data.accessToken, rememberMe);
                     navigate(from, { replace: true });
-                } else {
-                    setError('Google 帳號註冊失敗，請稍後再試');
+                } catch (backendError) {
+                    setError('登入失敗，請稍後再試');
                 }
+            }
+        } catch (err) {
+            console.error('Firebase login failed:', err);
+            setError('登入失敗，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 重新發送驗證信
+    const handleResendVerification = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const result = await firebaseAuthService.resendVerificationEmail();
+            if (result.success) {
+                setSuccessMessage(result.message);
+            } else {
+                setError(result.message);
+            }
+        } catch (err) {
+            setError('發送失敗，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    // 表單提交
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (isLogin) {
+            await handleFirebaseLogin();
+        } else {
+            await handleFirebaseRegister();
+        }
+    };
+
+    // Google 登入（使用 Firebase）
+    const handleGoogleLogin = async () => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+            const result = await firebaseAuthService.loginWithGoogle();
+
+            if (!result.success) {
+                setError(result.message);
+                setIsLoading(false);
+                return;
+            }
+
+            // 取得 Firebase ID Token
+            const idToken = await firebaseAuthService.getIdToken();
+            if (!idToken) {
+                setError('無法取得認證 Token');
+                setIsLoading(false);
+                return;
+            }
+
+            // 嘗試使用 Firebase Token 登入後端
+            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/firebase/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken }),
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                await login(data.accessToken, true);
+                navigate(from, { replace: true });
+            } else {
+                // Fallback: 嘗試 Google OAuth 流程
+                setError('Google 登入設定進行中，請使用 Email 登入');
             }
         } catch (err) {
             console.error('Google login failed:', err);
             setError('Google 登入失敗，請稍後再試');
         } finally {
             setIsLoading(false);
-            window.history.replaceState({}, document.title, window.location.pathname);
         }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setError(null);
-        setSuccessMessage(null);
-        // 如果修改 Email，重置 OTP 狀態
-        if (name === 'email') {
-            setOtpSent(false);
-            setOtpVerified(false);
-            setOtpCode('');
-        }
-    };
-
-    // 發送 Email OTP
-    const handleSendOtp = useCallback(async () => {
-        if (!formData.email || !formData.email.includes('@')) {
-            setError('請輸入有效的 Email 地址');
-            return;
-        }
-        setIsSendingOtp(true);
-        setError(null);
-        try {
-            await sendEmailOtp(formData.email);
-            setOtpSent(true);
-            setCountdown(60);
-            setSuccessMessage('驗證碼已發送至您的 Email');
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '發送驗證碼失敗，請稍後再試');
-        } finally {
-            setIsSendingOtp(false);
-        }
-    }, [formData.email]);
-
-    // 驗證 Email OTP
-    const handleVerifyOtp = useCallback(async () => {
-        if (otpCode.length !== 6) {
-            setError('請輸入 6 位數驗證碼');
-            return;
-        }
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await verifyEmailOtp(formData.email, otpCode);
-            if (response.data.verified) {
-                setOtpVerified(true);
-                setSuccessMessage('Email 驗證成功！');
-            } else {
-                setError('驗證碼錯誤');
-            }
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '驗證失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    }, [formData.email, otpCode]);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setError(null);
-        setIsLoading(true);
-
-        try {
-            if (isLogin) {
-                const response = await loginApi(formData.email, formData.password);
-                await login(response.data.accessToken, rememberMe);
-                navigate(from, { replace: true });
-            } else {
-                if (formData.password !== formData.confirmPassword) {
-                    setError('密碼不一致');
-                    setIsLoading(false);
-                    return;
-                }
-                // 必須先完成 Email 驗證
-                if (!otpVerified) {
-                    setError('請先完成 Email 驗證');
-                    setIsLoading(false);
-                    return;
-                }
-                await register({
-                    email: formData.email,
-                    password: formData.password,
-                    displayName: formData.displayName,
-                });
-                // Auto login after registration
-                const loginResponse = await loginApi(formData.email, formData.password);
-                await login(loginResponse.data.accessToken, true);
-                navigate(from, { replace: true });
-            }
-        } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || '發生錯誤，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
+    // LINE 登入
     const handleLineLogin = () => {
         if (!LINE_CLIENT_ID) {
             setError('LINE 登入尚未設定，請聯繫系統管理員');
@@ -240,13 +283,30 @@ export default function LoginPage() {
         window.location.href = lineAuthUrl;
     };
 
-    const handleGoogleLogin = () => {
-        if (!GOOGLE_CLIENT_ID) {
-            setError('Google 登入尚未設定，請聯繫系統管理員');
+    // 忘記密碼
+    const [showForgotPassword, setShowForgotPassword] = useState(false);
+    const [forgotEmail, setForgotEmail] = useState('');
+
+    const handleForgotPassword = async () => {
+        if (!forgotEmail) {
+            setError('請輸入 Email');
             return;
         }
-        const googleAuthUrl = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(GOOGLE_REDIRECT_URI)}&state=google-login&scope=openid%20email%20profile&access_type=offline&prompt=consent`;
-        window.location.href = googleAuthUrl;
+
+        setIsLoading(true);
+        try {
+            const result = await firebaseAuthService.sendPasswordReset(forgotEmail);
+            if (result.success) {
+                setSuccessMessage('密碼重設信已發送至您的 Email');
+                setShowForgotPassword(false);
+            } else {
+                setError(result.message);
+            }
+        } catch (err) {
+            setError('發送失敗，請稍後再試');
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
@@ -259,208 +319,258 @@ export default function LoginPage() {
                     </div>
                 </div>
 
-                <div className="login-tabs">
-                    <button
-                        className={`login-tab ${isLogin ? 'active' : ''}`}
-                        onClick={() => setIsLogin(true)}
-                    >
-                        登入
-                    </button>
-                    <button
-                        className={`login-tab ${!isLogin ? 'active' : ''}`}
-                        onClick={() => setIsLogin(false)}
-                    >
-                        註冊
-                    </button>
-                </div>
-
-                <form className="login-form" onSubmit={handleSubmit}>
-                    {!isLogin && (
-                        <div className="form-group">
-                            <label htmlFor="displayName">顯示名稱</label>
-                            <input
-                                type="text"
-                                id="displayName"
-                                name="displayName"
-                                placeholder="請輸入您的名稱"
-                                value={formData.displayName}
-                                onChange={handleChange}
-                                required={!isLogin}
-                            />
+                {!showForgotPassword ? (
+                    <>
+                        <div className="login-tabs">
+                            <button
+                                className={`login-tab ${isLogin ? 'active' : ''}`}
+                                onClick={() => {
+                                    setIsLogin(true);
+                                    setError(null);
+                                    setSuccessMessage(null);
+                                    setWaitingForVerification(false);
+                                }}
+                            >
+                                登入
+                            </button>
+                            <button
+                                className={`login-tab ${!isLogin ? 'active' : ''}`}
+                                onClick={() => {
+                                    setIsLogin(false);
+                                    setError(null);
+                                    setSuccessMessage(null);
+                                }}
+                            >
+                                註冊
+                            </button>
                         </div>
-                    )}
 
-                    <div className="form-group">
-                        <label htmlFor="email">電子郵件</label>
-                        {!isLogin ? (
-                            <div className="email-input-group">
+                        <form className="login-form" onSubmit={handleSubmit}>
+                            {!isLogin && (
+                                <div className="form-group">
+                                    <label htmlFor="displayName">顯示名稱</label>
+                                    <input
+                                        type="text"
+                                        id="displayName"
+                                        name="displayName"
+                                        placeholder="請輸入您的名稱"
+                                        value={formData.displayName}
+                                        onChange={handleChange}
+                                        required={!isLogin}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="form-group">
+                                <label htmlFor="email">電子郵件</label>
                                 <input
                                     type="email"
                                     id="email"
                                     name="email"
+                                    autoComplete="email"
                                     placeholder="請輸入電子郵件"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    disabled={otpVerified}
                                     required
+                                    disabled={emailVerificationSent}
                                 />
-                                {!otpVerified && (
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="password">密碼</label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    autoComplete={isLogin ? 'current-password' : 'new-password'}
+                                    placeholder="請輸入密碼"
+                                    value={formData.password}
+                                    onChange={handleChange}
+                                    required
+                                    minLength={6}
+                                    disabled={emailVerificationSent}
+                                />
+                            </div>
+
+                            {!isLogin && (
+                                <div className="form-group">
+                                    <label htmlFor="confirmPassword">確認密碼</label>
+                                    <input
+                                        type="password"
+                                        id="confirmPassword"
+                                        name="confirmPassword"
+                                        autoComplete="new-password"
+                                        placeholder="請再次輸入密碼"
+                                        value={formData.confirmPassword}
+                                        onChange={handleChange}
+                                        required={!isLogin}
+                                        minLength={6}
+                                        disabled={emailVerificationSent}
+                                    />
+                                </div>
+                            )}
+
+                            {isLogin && (
+                                <div className="form-group form-group--checkbox">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={rememberMe}
+                                            onChange={(e) => setRememberMe(e.target.checked)}
+                                        />
+                                        <span className="checkbox-text">記住我</span>
+                                    </label>
                                     <button
                                         type="button"
-                                        className="otp-send-btn"
-                                        onClick={handleSendOtp}
-                                        disabled={isSendingOtp || countdown > 0 || !formData.email}
+                                        className="forgot-password-link"
+                                        onClick={() => {
+                                            setShowForgotPassword(true);
+                                            setForgotEmail(formData.email);
+                                        }}
                                     >
-                                        {isSendingOtp ? '發送中...' : countdown > 0 ? `${countdown}s` : (otpSent ? '重發' : '發送驗證碼')}
+                                        忘記密碼？
                                     </button>
-                                )}
-                                {otpVerified && (
-                                    <span className="otp-verified-badge">✓ 已驗證</span>
-                                )}
-                            </div>
-                        ) : (
-                            <input
-                                type="email"
-                                id="email"
-                                name="email"
-                                autoComplete="email"
-                                placeholder="請輸入電子郵件"
-                                value={formData.email}
-                                onChange={handleChange}
-                                required
-                            />
-                        )}
-                    </div>
+                                </div>
+                            )}
 
-                    {/* Email OTP 驗證 (僅註冊模式) */}
-                    {!isLogin && otpSent && !otpVerified && (
-                        <div className="form-group">
-                            <label htmlFor="otpCode">驗證碼</label>
-                            <div className="otp-input-group">
-                                <input
-                                    type="text"
-                                    id="otpCode"
-                                    placeholder="請輸入 6 位數驗證碼"
-                                    value={otpCode}
-                                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                    maxLength={6}
-                                />
+                            {error && (
+                                <div className="login-error">
+                                    ⚠️ {error}
+                                </div>
+                            )}
+
+                            {successMessage && (
+                                <div className="login-success">
+                                    ✅ {successMessage}
+                                </div>
+                            )}
+
+                            {/* 等待 Email 驗證時顯示重新發送按鈕 */}
+                            {waitingForVerification && (
                                 <button
                                     type="button"
-                                    className="otp-verify-btn"
-                                    onClick={handleVerifyOtp}
-                                    disabled={isLoading || otpCode.length !== 6}
+                                    className="login-resend-btn"
+                                    onClick={handleResendVerification}
+                                    disabled={isLoading}
                                 >
-                                    驗證
+                                    📧 重新發送驗證信
                                 </button>
-                            </div>
+                            )}
+
+                            {!emailVerificationSent && (
+                                <button
+                                    type="submit"
+                                    className="login-submit"
+                                    disabled={isLoading}
+                                >
+                                    {isLoading ? '處理中...' : (isLogin ? '登入' : '註冊')}
+                                </button>
+                            )}
+
+                            {emailVerificationSent && (
+                                <button
+                                    type="button"
+                                    className="login-submit"
+                                    onClick={() => {
+                                        setEmailVerificationSent(false);
+                                        setIsLogin(true);
+                                        setSuccessMessage(null);
+                                        setWaitingForVerification(false);
+                                    }}
+                                >
+                                    前往登入
+                                </button>
+                            )}
+                        </form>
+
+                        {/* 社群登入 */}
+                        <div className="login-divider">
+                            <span>或使用其他方式</span>
                         </div>
-                    )}
 
-                    <div className="form-group">
-                        <label htmlFor="password">密碼</label>
-                        <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            autoComplete="current-password"
-                            placeholder="請輸入密碼"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            minLength={6}
-                        />
-                    </div>
+                        <button
+                            type="button"
+                            className="login-line-btn"
+                            onClick={handleLineLogin}
+                            disabled={isLoading}
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                                <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.629.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
+                            </svg>
+                            使用 LINE 登入
+                        </button>
 
-                    {!isLogin && (
+                        <button
+                            type="button"
+                            className="login-google-btn"
+                            onClick={handleGoogleLogin}
+                            disabled={isLoading}
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
+                            </svg>
+                            使用 Google 登入
+                        </button>
+
+                        <div className="login-footer">
+                            <p>© 2026 曦望燈塔救援協會</p>
+                        </div>
+                    </>
+                ) : (
+                    /* 忘記密碼表單 */
+                    <div className="forgot-password-form">
+                        <h3>忘記密碼</h3>
+                        <p>請輸入您的 Email，我們將發送密碼重設連結</p>
+
                         <div className="form-group">
-                            <label htmlFor="confirmPassword">確認密碼</label>
+                            <label htmlFor="forgotEmail">電子郵件</label>
                             <input
-                                type="password"
-                                id="confirmPassword"
-                                name="confirmPassword"
-                                placeholder="請再次輸入密碼"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required={!isLogin}
-                                minLength={6}
+                                type="email"
+                                id="forgotEmail"
+                                placeholder="請輸入電子郵件"
+                                value={forgotEmail}
+                                onChange={(e) => setForgotEmail(e.target.value)}
+                                required
                             />
                         </div>
-                    )}
 
-                    {isLogin && (
-                        <div className="form-group form-group--checkbox">
-                            <label className="checkbox-label">
-                                <input
-                                    type="checkbox"
-                                    checked={rememberMe}
-                                    onChange={(e) => setRememberMe(e.target.checked)}
-                                />
-                                <span className="checkbox-text">記住我</span>
-                            </label>
-                            <Link to="/forgot-password" className="forgot-password-link">
-                                忘記密碼？
-                            </Link>
-                        </div>
-                    )}
+                        {error && (
+                            <div className="login-error">
+                                ⚠️ {error}
+                            </div>
+                        )}
 
-                    {error && (
-                        <div className="login-error">
-                            ⚠️ {error}
-                        </div>
-                    )}
+                        {successMessage && (
+                            <div className="login-success">
+                                ✅ {successMessage}
+                            </div>
+                        )}
 
-                    {successMessage && (
-                        <div className="login-success">
-                            ✅ {successMessage}
-                        </div>
-                    )}
+                        <button
+                            type="button"
+                            className="login-submit"
+                            onClick={handleForgotPassword}
+                            disabled={isLoading}
+                        >
+                            {isLoading ? '發送中...' : '發送重設連結'}
+                        </button>
 
-                    <button
-                        type="submit"
-                        className="login-submit"
-                        disabled={isLoading || (!isLogin && !otpVerified)}
-                    >
-                        {isLoading ? '處理中...' : (isLogin ? '登入' : '註冊')}
-                    </button>
-                </form>
-
-                {/* LINE 快速登入 */}
-                <div className="login-divider">
-                    <span>或使用其他方式</span>
-                </div>
-
-                <button
-                    type="button"
-                    className="login-line-btn"
-                    onClick={handleLineLogin}
-                    disabled={isLoading}
-                >
-                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                        <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.629.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
-                    </svg>
-                    使用 LINE 登入
-                </button>
-
-                {/* Google 快速登入 */}
-                <button
-                    type="button"
-                    className="login-google-btn"
-                    onClick={handleGoogleLogin}
-                    disabled={isLoading}
-                >
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                    </svg>
-                    使用 Google 登入
-                </button>
-
-                <div className="login-footer">
-                    <p>© 2026 曦望燈塔救援協會</p>
-                </div>
+                        <button
+                            type="button"
+                            className="login-back-btn"
+                            onClick={() => {
+                                setShowForgotPassword(false);
+                                setError(null);
+                                setSuccessMessage(null);
+                            }}
+                        >
+                            ← 返回登入
+                        </button>
+                    </div>
+                )}
             </div>
         </div>
     );

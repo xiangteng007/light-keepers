@@ -35,6 +35,10 @@ export class Account {
     @Column({ name: 'google_email', nullable: true, length: 255 })
     googleEmail: string;
 
+    // Firebase Authentication UID
+    @Column({ name: 'firebase_uid', unique: true, nullable: true, length: 128 })
+    firebaseUid: string;
+
     @Column({ name: 'is_active', default: true })
     isActive: boolean;
 
