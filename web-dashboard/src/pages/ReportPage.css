@@ -1,16 +1,20 @@
-/* 📣 回報系統頁面樣式 - 優化版 */
+/* 📣 回報系統頁面樣式 - Wizard 版本 */
 
 .report-page {
     padding: 1rem;
-    max-width: 640px;
+    max-width: 720px;
     margin: 0 auto;
     min-height: 100vh;
     background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
 }
 
+.report-page--wizard {
+    max-width: 800px;
+}
+
 /* 頁首標題 */
 .report-page .page-header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .report-page .page-header h2 {
@@ -28,12 +32,88 @@
     font-size: 0.9rem;
 }
 
-/* 表單卡片 - 玻璃態 */
-.report-form {
+/* =====================================
+   Wizard 進度指示器
+   ===================================== */
+.wizard-progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+    padding: 0 0.5rem;
+}
+
+.wizard-progress__step {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
-    background: rgba(255, 255, 255, 0.9);
+    align-items: center;
+    position: relative;
+    flex: 1;
+}
+
+.wizard-progress__circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1rem;
+    background: #e2e8f0;
+    color: #94a3b8;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.wizard-progress__step.active .wizard-progress__circle {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+.wizard-progress__step.completed .wizard-progress__circle {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.wizard-progress__label {
+    margin-top: 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #94a3b8;
+    text-align: center;
+}
+
+.wizard-progress__step.active .wizard-progress__label {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.wizard-progress__step.completed .wizard-progress__label {
+    color: #059669;
+}
+
+.wizard-progress__line {
+    position: absolute;
+    top: 20px;
+    left: calc(50% + 25px);
+    width: calc(100% - 50px);
+    height: 3px;
+    background: #e2e8f0;
+    z-index: 0;
+}
+
+.wizard-progress__step.completed .wizard-progress__line {
+    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+}
+
+/* =====================================
+   Wizard 內容區
+   ===================================== */
+.wizard-content {
+    background: rgba(255, 255, 255, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.5);
     box-shadow:
@@ -42,78 +122,351 @@
     border-radius: 20px !important;
 }
 
-.report-error {
-    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: #DC2626;
-    padding: 0.875rem 1rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border-left: 4px solid #DC2626;
+.wizard-step {
+    animation: fadeIn 0.3s ease;
 }
 
-/* 成功畫面 */
-.report-success {
-    text-align: center;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 24px !important;
-}
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
 
-.report-success__icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    animation: bounce 0.6s ease-out;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
+    to {
+        opacity: 1;
         transform: translateY(0);
     }
-
-    50% {
-        transform: translateY(-10px);
-    }
 }
 
-.report-success h2 {
+.wizard-step__title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #059669;
+    color: #1e293b;
+    margin-bottom: 0.25rem;
+}
+
+.wizard-step__subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+    margin-bottom: 1.5rem;
+}
+
+/* =====================================
+   導航按鈕
+   ===================================== */
+.wizard-navigation {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.wizard-navigation__spacer {
+    flex: 1;
+}
+
+/* =====================================
+   災害類型卡片（Wizard 版本）
+   ===================================== */
+.disaster-type-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.disaster-type-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.25rem 0.75rem;
+    border: 2px solid transparent;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+}
+
+.disaster-type-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+.disaster-type-card.active {
+    border-color: #667eea;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+    box-shadow: 0 8px 20px -3px rgba(102, 126, 234, 0.3);
+}
+
+.disaster-type-card__icon {
+    font-size: 2.5rem;
     margin-bottom: 0.5rem;
 }
 
-.report-success p {
-    color: #64748b;
-    margin-bottom: 0;
+.disaster-type-card__label {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 0.25rem;
 }
 
-.report-success__buttons {
+.disaster-type-card.active .disaster-type-card__label {
+    color: #667eea;
+}
+
+.disaster-type-card__desc {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+/* =====================================
+   嚴重程度（含描述）
+   ===================================== */
+.severity-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.75rem;
+}
+
+.severity-btn {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1.5rem;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 1rem 0.5rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    text-align: center;
 }
 
-/* 表單區塊標籤 */
+.severity-btn:hover {
+    background: #f8fafc;
+    transform: scale(1.02);
+}
+
+.severity-btn.active {
+    transform: scale(1.03);
+}
+
+.severity-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    box-shadow: 0 0 10px currentColor;
+}
+
+.severity-label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #334155;
+}
+
+.severity-desc {
+    font-size: 0.7rem;
+    color: #94a3b8;
+}
+
+/* =====================================
+   位置狀態卡片
+   ===================================== */
+.location-status-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.location-status-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+}
+
+.location-status-icon.success {
+    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+}
+
+.location-status-icon.warning {
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+}
+
+.location-status-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.location-status-label {
+    font-weight: 600;
+    color: #334155;
+}
+
+.location-status-coords {
+    font-size: 0.85rem;
+    color: #64748b;
+    font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.location-status-hint {
+    font-size: 0.85rem;
+    color: #94a3b8;
+}
+
+.location-refresh-btn {
+    padding: 0.625rem 1rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.location-refresh-btn:hover {
+    background: #f8fafc;
+    border-color: #667eea;
+    color: #667eea;
+}
+
+.location-refresh-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.location-map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 200px;
+    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+    border-radius: 16px;
+    border: 2px dashed #cbd5e1;
+    color: #94a3b8;
+    margin-top: 1rem;
+}
+
+.location-map-icon {
+    font-size: 2.5rem;
+}
+
+/* =====================================
+   確認頁面
+   ===================================== */
+.confirm-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    background: #f8fafc;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 1.5rem;
+}
+
+.confirm-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.confirm-item--full {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.confirm-label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #64748b;
+    min-width: 80px;
+}
+
+.confirm-value {
+    font-weight: 600;
+    color: #334155;
+}
+
+.confirm-description {
+    background: white;
+    padding: 1rem;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+    width: 100%;
+    margin: 0;
+    color: #475569;
+    line-height: 1.6;
+}
+
+.confirm-photos {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.confirm-photos img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+}
+
+.severity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.375rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.contact-section {
+    background: #f8fafc;
+    padding: 1.25rem;
+    border-radius: 14px;
+}
+
+.contact-section h4 {
+    margin: 0 0 1rem 0;
+    font-size: 0.95rem;
+    color: #64748b;
+}
+
+/* =====================================
+   通用表單樣式
+   ===================================== */
 .form-section {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
+    margin-bottom: 1.25rem;
 }
 
 .form-label {
     font-weight: 600;
     color: #1e293b;
     font-size: 0.95rem;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
 }
 
-/* 輸入框 - 現代風格 */
 .form-input,
 .form-textarea {
     padding: 0.875rem 1rem;
@@ -137,105 +490,20 @@
     color: #94a3b8;
 }
 
-/* 災害類型選擇 - 圖示卡片 */
-.disaster-type-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
-}
-
-.disaster-type-btn {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 1rem 0.5rem;
-    border: 2px solid transparent;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    position: relative;
-    overflow: hidden;
-}
-
-.disaster-type-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.disaster-type-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1);
-}
-
-.disaster-type-btn.active {
-    border-color: #667eea;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    box-shadow: 0 4px 15px -3px rgba(102, 126, 234, 0.3);
-}
-
-.disaster-type-btn__icon {
-    font-size: 2rem;
-    position: relative;
-    z-index: 1;
-}
-
-.disaster-type-btn__label {
-    font-size: 0.75rem;
-    font-weight: 500;
-    margin-top: 0.5rem;
-    position: relative;
-    z-index: 1;
-    color: #475569;
-}
-
-.disaster-type-btn.active .disaster-type-btn__label {
-    color: #667eea;
-    font-weight: 600;
-}
-
-/* 嚴重程度 - 膠囊按鈕 */
-.severity-grid {
-    display: flex;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.severity-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1.25rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 25px;
-    background: white;
-    cursor: pointer;
-    transition: all 0.3s;
-    font-weight: 500;
+.report-error {
+    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
+    color: #DC2626;
+    padding: 0.875rem 1rem;
+    border-radius: 12px;
     font-size: 0.9rem;
+    font-weight: 500;
+    border-left: 4px solid #DC2626;
+    margin-bottom: 1rem;
 }
 
-.severity-btn:hover {
-    background: #f8fafc;
-    transform: scale(1.02);
-}
-
-.severity-btn.active {
-    transform: scale(1.05);
-}
-
-.severity-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    box-shadow: 0 0 8px currentColor;
-}
-
-/* 📷 照片上傳區塊 */
+/* =====================================
+   照片上傳
+   ===================================== */
 .photo-upload-section {
     display: flex;
     flex-direction: column;
@@ -332,103 +600,128 @@
     border-left: 3px solid #667eea;
 }
 
-/* 位置區塊 */
-.location-section {
+/* =====================================
+   成功畫面
+   ===================================== */
+.report-success {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 24px !important;
+}
+
+.report-success__icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    animation: bounce 0.6s ease-out;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+.report-success h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #059669;
+    margin-bottom: 0.5rem;
+}
+
+.report-success p {
+    color: #64748b;
+    margin-bottom: 0;
+}
+
+.report-success__buttons {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 1.5rem;
 }
 
-.location-coords {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    flex-wrap: wrap;
-}
-
-.location-btn {
-    padding: 0.5rem 1rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 25px;
-    background: white;
-    font-size: 0.85rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.location-btn:hover {
-    background: #f8fafc;
-    border-color: #667eea;
-    color: #667eea;
-}
-
-.location-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-/* 聯絡資訊 */
+/* =====================================
+   聯絡資訊
+   ===================================== */
 .contact-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
 }
 
-/* 提交按鈕 - 漸層動畫 */
-.report-submit-btn {
-    width: 100%;
-    padding: 1rem 1.5rem;
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-top: 0.5rem;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border: none;
-    border-radius: 14px;
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
+/* =====================================
+   RWD 響應式
+   ===================================== */
+@media (max-width: 768px) {
+    .wizard-progress__label {
+        font-size: 0.65rem;
+    }
+
+    .wizard-progress__circle {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .wizard-progress__line {
+        top: 17px;
+        left: calc(50% + 20px);
+        width: calc(100% - 40px);
+    }
+
+    .disaster-type-grid {
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.75rem;
+    }
+
+    .disaster-type-card {
+        padding: 1rem 0.5rem;
+    }
+
+    .disaster-type-card__icon {
+        font-size: 2rem;
+    }
+
+    .disaster-type-card__desc {
+        display: none;
+    }
+
+    .severity-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
-.report-submit-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
-    opacity: 0;
-    transition: opacity 0.3s;
-}
-
-.report-submit-btn:hover::before {
-    opacity: 1;
-}
-
-.report-submit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px -5px rgba(102, 126, 234, 0.4);
-}
-
-.report-submit-btn:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* RWD 響應式 */
 @media (max-width: 540px) {
+    .report-page {
+        padding: 0.75rem;
+    }
+
     .disaster-type-grid {
         grid-template-columns: repeat(4, 1fr);
         gap: 0.5rem;
     }
 
-    .disaster-type-btn {
+    .disaster-type-card {
         padding: 0.75rem 0.25rem;
     }
 
-    .disaster-type-btn__icon {
+    .disaster-type-card__icon {
         font-size: 1.5rem;
+    }
+
+    .disaster-type-card__label {
+        font-size: 0.75rem;
+    }
+
+    .wizard-step__title {
+        font-size: 1.25rem;
     }
 
     .contact-grid {
@@ -439,12 +732,24 @@
         grid-template-columns: repeat(4, 1fr);
     }
 
-    .severity-grid {
-        gap: 0.5rem;
+    .location-status-card {
+        flex-wrap: wrap;
     }
 
-    .severity-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
+    .location-refresh-btn {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .wizard-navigation {
+        flex-wrap: wrap;
+    }
+
+    .wizard-navigation button {
+        flex: 1;
+    }
+
+    .wizard-navigation__spacer {
+        display: none;
     }
 }
