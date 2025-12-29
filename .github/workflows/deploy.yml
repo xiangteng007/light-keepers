@@ -64,6 +64,14 @@ jobs:
 
       - name: Build
         working-directory: web-dashboard
+        env:
+          VITE_API_URL: https://light-keepers-api-955234851806.asia-east1.run.app/api/v1
+          VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
+          VITE_FIREBASE_AUTH_DOMAIN: light-keepers-mvp.firebaseapp.com
+          VITE_FIREBASE_PROJECT_ID: light-keepers-mvp
+          VITE_FIREBASE_STORAGE_BUCKET: light-keepers-mvp.firebasestorage.app
+          VITE_FIREBASE_MESSAGING_SENDER_ID: "955234851806"
+          VITE_FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
         run: npm run build
 
       - name: Deploy to Firebase Hosting
