@@ -88,22 +88,22 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
-          <Route path="/" element={<ProtectedRoute requiredLevel={1}><Layout /></ProtectedRoute>}>
+          <Route path="/" element={<ProtectedRoute requiredLevel={0}><Layout /></ProtectedRoute>}>
             <Route index element={<Navigate to="/dashboard" replace />} />
-            {/* 志工等級 (1) */}
+            {/* 一般民眾可見 (0) */}
             <Route path="dashboard" element={<DashboardPage />} />
-            <Route path="events" element={<EventsPage />} />
-            <Route path="report" element={<ReportPage />} />
-            <Route path="training" element={<TrainingPage />} />
-            <Route path="notifications" element={<NotificationsPage />} />
-            <Route path="profile" element={<ProfilePage />} />
-            <Route path="volunteer-register" element={<VolunteerRegisterPage />} />
-            {/* 公開頁面 (0) - 但已在 Layout 內，不用另外設 */}
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="forecast" element={<ForecastPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:id" element={<ManualDetailPage />} />
+            {/* 志工等級 (1) */}
+            <Route path="events" element={<ProtectedRoute requiredLevel={1}><EventsPage /></ProtectedRoute>} />
+            <Route path="report" element={<ProtectedRoute requiredLevel={1}><ReportPage /></ProtectedRoute>} />
+            <Route path="training" element={<ProtectedRoute requiredLevel={1}><TrainingPage /></ProtectedRoute>} />
+            <Route path="notifications" element={<ProtectedRoute requiredLevel={1}><NotificationsPage /></ProtectedRoute>} />
+            <Route path="profile" element={<ProtectedRoute requiredLevel={1}><ProfilePage /></ProtectedRoute>} />
+            <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={1}><VolunteerRegisterPage /></ProtectedRoute>} />
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
