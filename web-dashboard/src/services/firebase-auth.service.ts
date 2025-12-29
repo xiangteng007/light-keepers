@@ -1,7 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import {
     getAuth,
-    sendEmailVerification,
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
@@ -57,17 +56,16 @@ export const firebaseAuthService = {
             if (userCredential.user) {
                 const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
                 try {
-                    await fetch(`${API_URL}/auth/send-custom-verification`, {
+                    const response = await fetch(`${API_URL}/auth/send-custom-verification`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ email, displayName }),
                     });
+                    if (!response.ok) {
+                        console.warn('Backend verification email failed, user registered but may need manual verification');
+                    }
                 } catch (e) {
-                    // 如果後端失敗，仍使用 Firebase 預設驗證
-                    await sendEmailVerification(userCredential.user, {
-                        url: `${window.location.origin}/login?verified=true`,
-                        handleCodeInApp: true,
-                    });
+                    console.error('Failed to send verification email:', e);
                 }
             }
 
@@ -181,17 +179,10 @@ export const firebaseAuthService = {
                 return { success: true, message: '驗證信已重新發送' };
             }
 
-            // Fallback to Firebase if backend fails
-            await sendEmailVerification(user, {
-                url: `${window.location.origin}/login?verified=true`,
-                handleCodeInApp: true,
-            });
-            return { success: true, message: '驗證信已重新發送' };
+            // 如果後端失敗，回傳錯誤而非使用 Firebase fallback
+            return { success: false, message: '發送失敗，請稍後再試' };
         } catch (error: any) {
-            if (error.code === 'auth/too-many-requests') {
-                return { success: false, message: '發送過於頻繁，請稍後再試' };
-            }
-            return { success: false, message: '發送失敗' };
+            return { success: false, message: '發送失敗，請檢查網路連線' };
         }
     },
 

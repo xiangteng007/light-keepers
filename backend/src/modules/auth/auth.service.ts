@@ -693,33 +693,15 @@ export class AuthService {
 
     /**
      * 發送 Email 驗證信
-     * 使用 Firebase Authentication 的內建郵件功能
+     * 使用自訂 Resend 服務（已棄用 Firebase 內建郵件）
      */
     async sendEmailOtp(email: string): Promise<{ success: boolean; message: string; verificationLink?: string }> {
         if (!email) {
             throw new BadRequestException('請提供 Email');
         }
 
-        // 優先使用 Firebase 發送驗證信
-        if (this.firebaseAdminService.isConfigured()) {
-            const result = await this.firebaseAdminService.sendEmailVerification(email);
-            if (result.success && result.link) {
-                return {
-                    success: true,
-                    message: '驗證連結已發送至您的 Email，請點擊連結完成驗證',
-                    verificationLink: result.link,
-                };
-            }
-        }
-
-        // Fallback: 使用 Resend 發送 OTP 驗證碼
-        const code = await this.otpService.generateOtp(email, 'email');
-        await this.emailService.sendOtp(email, code);
-
-        return {
-            success: true,
-            message: '驗證碼已發送至您的 Email',
-        };
+        // 使用自訂 Resend 發送驗證信（統一使用新系統）
+        return this.sendCustomVerificationEmail(email);
     }
 
     /**
