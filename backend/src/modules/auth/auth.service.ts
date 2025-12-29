@@ -680,16 +680,39 @@ export class AuthService {
     }
 
     /**
-     * 發送 Email 驗證信
-     * 使用自訂 Resend 服務（已棄用 Firebase 內建郵件）
+     * 發送 Email 驗證碼 (6 位數 OTP)
+     * 使用 OtpService 生成驗證碼，EmailService 發送郵件
      */
-    async sendEmailOtp(email: string): Promise<{ success: boolean; message: string; verificationLink?: string }> {
+    async sendEmailOtp(email: string): Promise<{ success: boolean; message: string }> {
         if (!email) {
             throw new BadRequestException('請提供 Email');
         }
 
-        // 使用自訂 Resend 發送驗證信（統一使用新系統）
-        return this.sendCustomVerificationEmail(email);
+        try {
+            // 生成 6 位數 OTP 驗證碼
+            const code = await this.otpService.generateOtp(email, 'email');
+
+            // 使用 Resend 發送驗證碼郵件
+            const sent = await this.emailService.sendOtp(email, code);
+
+            if (sent) {
+                return {
+                    success: true,
+                    message: '驗證碼已發送至您的 Email，請查收',
+                };
+            }
+
+            return {
+                success: false,
+                message: '發送失敗，請稍後再試',
+            };
+        } catch (error) {
+            // 如果是冷卻期錯誤，直接返回錯誤訊息
+            if (error instanceof BadRequestException) {
+                throw error;
+            }
+            throw new BadRequestException('發送驗證碼失敗，請稍後再試');
+        }
     }
 
     /**
