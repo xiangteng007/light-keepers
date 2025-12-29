@@ -51,6 +51,8 @@ import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 import { getMenuConfig, updateMenuConfig, getTasks } from '../api/services';
 
+const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+
 interface NavItem {
     id: string;
     path: string;
@@ -209,19 +211,33 @@ export default function Layout() {
     useEffect(() => {
         const loadMenuConfig = async () => {
             try {
-                const response = await getMenuConfig();
-                if (response.data?.data && response.data.data.length > 0) {
+                // 同時獲取選單配置和頁面權限
+                const [menuResponse, permissionsResponse] = await Promise.all([
+                    getMenuConfig(),
+                    fetch(`${API_BASE}/accounts/page-permissions`).then(r => r.ok ? r.json() : []).catch(() => []),
+                ]);
+
+                // 建立權限映射: pageKey -> requiredLevel
+                const permissionMap: Record<string, number> = {};
+                if (Array.isArray(permissionsResponse)) {
+                    permissionsResponse.forEach((p: { pageKey: string; requiredLevel: number }) => {
+                        permissionMap[p.pageKey] = p.requiredLevel;
+                    });
+                }
+
+                if (menuResponse.data?.data && menuResponse.data.data.length > 0) {
                     const configObj: Record<string, { id: string; label: string; order: number }> = {};
-                    response.data.data.forEach((c) => { configObj[c.id] = c; });
+                    menuResponse.data.data.forEach((c) => { configObj[c.id] = c; });
                     const configMap = configObj;
 
-                    // Apply config to nav items
+                    // Apply config to nav items, 同時更新 requiredLevel
                     const configuredItems = defaultNavItems.map(item => {
                         const config = configMap[item.id];
+                        const newLevel = permissionMap[item.id] !== undefined ? permissionMap[item.id] : item.requiredLevel;
                         if (config) {
-                            return { ...item, label: config.label };
+                            return { ...item, label: config.label, requiredLevel: newLevel };
                         }
-                        return item;
+                        return { ...item, requiredLevel: newLevel };
                     });
 
                     // Sort by order if available
@@ -233,7 +249,14 @@ export default function Layout() {
 
                     setNavItems(configuredItems);
                 } else {
-                    // Fallback to localStorage
+                    // Fallback: 只應用權限更新
+                    const updatedItems = defaultNavItems.map(item => ({
+                        ...item,
+                        requiredLevel: permissionMap[item.id] !== undefined ? permissionMap[item.id] : item.requiredLevel,
+                    }));
+                    setNavItems(updatedItems);
+
+                    // 嘗試從 localStorage 載入順序
                     loadFromLocalStorage();
                 }
             } catch (error) {
