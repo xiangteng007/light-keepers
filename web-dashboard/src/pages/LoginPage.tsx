@@ -21,7 +21,6 @@ export default function LoginPage() {
 
     // Email 驗證狀態
     const [emailVerificationSent, setEmailVerificationSent] = useState(false);
-    const [waitingForVerification, setWaitingForVerification] = useState(false);
     const [verificationCode, setVerificationCode] = useState('');
     const [isVerifyingCode, setIsVerifyingCode] = useState(false);
 
@@ -124,7 +123,6 @@ export default function LoginPage() {
             if (result.success) {
                 setEmailVerificationSent(true);
                 setSuccessMessage('註冊成功！驗證信已發送至您的 Email，請點擊連結完成驗證');
-                setWaitingForVerification(true);
             } else {
                 setError(result.message);
             }
@@ -158,7 +156,6 @@ export default function LoginPage() {
             const isVerified = await firebaseAuthService.isEmailVerified();
             if (!isVerified) {
                 setError('請先驗證您的 Email。點擊下方按鈕重新發送驗證信');
-                setWaitingForVerification(true);
                 setIsLoading(false);
                 return;
             }
@@ -245,7 +242,6 @@ export default function LoginPage() {
             if (response.ok && data.success) {
                 setSuccessMessage('Email 驗證成功！請登入您的帳號');
                 setEmailVerificationSent(false);
-                setWaitingForVerification(false);
                 setIsLogin(true);
                 setVerificationCode('');
             } else {
@@ -369,7 +365,6 @@ export default function LoginPage() {
                                     setIsLogin(true);
                                     setError(null);
                                     setSuccessMessage(null);
-                                    setWaitingForVerification(false);
                                 }}
                             >
                                 登入
@@ -549,7 +544,6 @@ export default function LoginPage() {
                                         setEmailVerificationSent(false);
                                         setIsLogin(true);
                                         setSuccessMessage(null);
-                                        setWaitingForVerification(false);
                                     }}
                                 >
                                     前往登入
