@@ -49,16 +49,26 @@ export const firebaseAuthService = {
     /**
      * 使用 Email/Password 註冊
      */
-    registerWithEmail: async (email: string, password: string, _displayName?: string) => {
+    registerWithEmail: async (email: string, password: string, displayName?: string) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // 發送驗證信
+            // 使用後端 API 發送自訂驗證信
             if (userCredential.user) {
-                await sendEmailVerification(userCredential.user, {
-                    url: `${window.location.origin}/login?verified=true`,
-                    handleCodeInApp: true,
-                });
+                const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+                try {
+                    await fetch(`${API_URL}/auth/send-custom-verification`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, displayName }),
+                    });
+                } catch (e) {
+                    // 如果後端失敗，仍使用 Firebase 預設驗證
+                    await sendEmailVerification(userCredential.user, {
+                        url: `${window.location.origin}/login?verified=true`,
+                        handleCodeInApp: true,
+                    });
+                }
             }
 
             return {
@@ -159,6 +169,19 @@ export const firebaseAuthService = {
         }
 
         try {
+            // 使用後端 API 發送自訂驗證信
+            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+            const response = await fetch(`${API_URL}/auth/resend-verification`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: user.email, displayName: user.displayName }),
+            });
+
+            if (response.ok) {
+                return { success: true, message: '驗證信已重新發送' };
+            }
+
+            // Fallback to Firebase if backend fails
             await sendEmailVerification(user, {
                 url: `${window.location.origin}/login?verified=true`,
                 handleCodeInApp: true,

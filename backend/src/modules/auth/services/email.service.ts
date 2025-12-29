@@ -127,6 +127,142 @@ export class EmailService {
     }
 
     /**
+     * 發送 Email 驗證信（自訂連結）
+     */
+    async sendVerificationEmail(
+        email: string,
+        displayName: string,
+        verificationLink: string,
+    ): Promise<{ success: boolean; message: string }> {
+        const subject = '【曦望燈塔】請驗證您的電子郵件地址';
+        const html = this.getVerificationEmailTemplate(displayName, verificationLink);
+
+        if (this.isConfigured && this.resend) {
+            try {
+                const result = await this.resend.emails.send({
+                    from: `曦望燈塔 <${this.fromEmail}>`,
+                    to: email,
+                    subject,
+                    html,
+                });
+
+                if (result.error) {
+                    this.logger.error(`Failed to send verification email: ${result.error.message}`);
+                    return {
+                        success: false,
+                        message: result.error.message,
+                    };
+                }
+
+                this.logger.log(`Verification email sent to ${this.maskEmail(email)} via Resend`);
+                return {
+                    success: true,
+                    message: '驗證信已發送',
+                };
+            } catch (error) {
+                this.logger.error(`Failed to send verification email: ${error.message}`);
+                return {
+                    success: false,
+                    message: `發送失敗: ${error.message}`,
+                };
+            }
+        }
+
+        // 開發模式：僅 log 到 console
+        this.logger.warn(`[DEV MODE] Verification email for ${email}: ${verificationLink}`);
+        return {
+            success: true,
+            message: '驗證信已發送（開發模式）',
+        };
+    }
+
+    /**
+     * 驗證信 HTML 模板
+     */
+    private getVerificationEmailTemplate(displayName: string, link: string): string {
+        return `
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Noto Sans TC', 'Segoe UI', Arial, sans-serif; background-color: #FAF8F5;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+        <tr>
+            <td>
+                <!-- Header -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-bottom: 32px;">
+                    <tr>
+                        <td align="center">
+                            <h1 style="color: #3D2E24; font-size: 24px; font-weight: 600; margin: 0;">
+                                🏠 曦望燈塔
+                            </h1>
+                            <p style="color: #6B5B4F; font-size: 14px; margin: 8px 0 0 0;">
+                                Light Keepers 資訊管理平台
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Content Card -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="background: #FFFFFF; border-radius: 16px; border: 1px solid #E8E4DF; overflow: hidden;">
+                    <tr>
+                        <td style="padding: 32px;">
+                            <h2 style="color: #3D2E24; font-size: 20px; font-weight: 600; margin: 0 0 16px 0;">
+                                您好，${displayName || '用戶'}！
+                            </h2>
+                            <p style="color: #6B5B4F; font-size: 15px; line-height: 1.6; margin: 0 0 24px 0;">
+                                感謝您註冊曦望燈塔平台。請點擊下方按鈕驗證您的電子郵件地址：
+                            </p>
+                            
+                            <!-- Button -->
+                            <table cellpadding="0" cellspacing="0" border="0" width="100%">
+                                <tr>
+                                    <td align="center">
+                                        <a href="${link}" 
+                                           style="display: inline-block; background: linear-gradient(135deg, #C4A77D 0%, #A68660 100%); 
+                                                  color: #FFFFFF; text-decoration: none; padding: 14px 32px; 
+                                                  border-radius: 8px; font-size: 15px; font-weight: 600;">
+                                            ✓ 驗證我的電子郵件
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <p style="color: #9CA3AF; font-size: 13px; line-height: 1.5; margin: 24px 0 0 0;">
+                                如果您沒有註冊此帳號，請忽略此郵件。<br>
+                                如果按鈕無法點擊，請複製以下連結到瀏覽器：
+                            </p>
+                            <p style="color: #6B5B4F; font-size: 12px; word-break: break-all; background: #F5EDE4; padding: 12px; border-radius: 6px; margin: 12px 0 0 0;">
+                                ${link}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+
+                <!-- Footer -->
+                <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top: 32px;">
+                    <tr>
+                        <td align="center">
+                            <p style="color: #9CA3AF; font-size: 12px; margin: 0;">
+                                © 2024 曦望燈塔救援協會
+                            </p>
+                            <p style="color: #9CA3AF; font-size: 12px; margin: 8px 0 0 0;">
+                                <a href="https://lightkeepers.ngo" style="color: #C4A77D; text-decoration: none;">lightkeepers.ngo</a>
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+        `.trim();
+    }
+
+    /**
      * 遮蔽 Email 用於 log
      */
     private maskEmail(email: string): string {

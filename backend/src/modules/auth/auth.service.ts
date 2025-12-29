@@ -762,6 +762,46 @@ export class AuthService {
     }
 
     /**
+     * 發送自訂 Email 驗證信（使用 Resend）
+     * 生成 Firebase 驗證連結，然後使用自訂模板發送
+     */
+    async sendCustomVerificationEmail(
+        email: string,
+        displayName?: string,
+    ): Promise<{ success: boolean; message: string }> {
+        if (!email) {
+            throw new BadRequestException('請提供 Email');
+        }
+
+        // 確保 Firebase 中有此用戶
+        if (this.firebaseAdminService.isConfigured()) {
+            await this.firebaseAdminService.createFirebaseUser(email);
+        }
+
+        // 生成 Firebase 驗證連結
+        const verificationLink = await this.firebaseAdminService.generateEmailVerificationLink(email, {
+            url: 'https://lightkeepers.ngo/login?verified=true',
+            handleCodeInApp: true,
+        });
+
+        if (!verificationLink) {
+            return {
+                success: false,
+                message: 'Firebase 尚未設定，無法生成驗證連結',
+            };
+        }
+
+        // 使用自訂模板發送郵件
+        const result = await this.emailService.sendVerificationEmail(
+            email,
+            displayName || email.split('@')[0],
+            verificationLink,
+        );
+
+        return result;
+    }
+
+    /**
      * 檢查 Email 驗證狀態
      * 優先從 Firebase 獲取，同步更新本地狀態
      */

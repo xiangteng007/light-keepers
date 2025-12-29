@@ -262,6 +262,23 @@ export class AuthController {
     }
 
     /**
+     * 發送自訂 Email 驗證信（使用 Resend）
+     * 連結將使用 lightkeepers.ngo 網域
+     */
+    @Post('send-custom-verification')
+    async sendCustomVerificationEmail(@Body() body: { email: string; displayName?: string }) {
+        return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
+    }
+
+    /**
+     * 重新發送驗證信
+     */
+    @Post('resend-verification')
+    async resendVerificationEmail(@Body() body: { email: string; displayName?: string }) {
+        return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
+    }
+
+    /**
      * 檢查 Email 驗證狀態
      * 用於 Firebase 驗證連結後的狀態同步
      */
