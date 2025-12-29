@@ -586,6 +586,68 @@
     cursor: not-allowed;
 }
 
+/* Page Card Name Row */
+.page-card__name-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.page-card__name-input {
+    padding: 8px 12px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-weight: 500;
+    width: 200px;
+    transition: border-color 0.2s ease;
+}
+
+.page-card__name-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.page-card__name-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Page Card Sort Order */
+.page-card__sort {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.page-card__sort label {
+    font-size: 13px;
+    color: var(--text-secondary);
+}
+
+.page-card__sort-input {
+    width: 60px;
+    padding: 6px 8px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font-size: 13px;
+    text-align: center;
+}
+
+.page-card__sort-input:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+}
+
+.page-card__sort-input:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* Spin animation */
 .spin {
     animation: spin 1s linear infinite;

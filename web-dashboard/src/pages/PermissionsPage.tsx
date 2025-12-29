@@ -162,7 +162,7 @@ export default function PermissionsPage() {
     // Update page permission
     const handlePagePermissionChange = async (
         pageKey: string,
-        updates: { requiredLevel?: number; isVisible?: boolean }
+        updates: { requiredLevel?: number; isVisible?: boolean; pageName?: string; sortOrder?: number }
     ) => {
         try {
             const token = getToken();
@@ -583,56 +583,107 @@ export default function PermissionsPage() {
                         </div>
 
                         <div className="pages-list">
-                            {pagePermissions.map(page => (
-                                <div key={page.pageKey} className="page-card">
-                                    <div className="page-card__info">
-                                        <span className="page-card__name">{page.pageName}</span>
-                                        <span className="page-card__path">{page.pagePath}</span>
-                                    </div>
-                                    <div className="page-card__controls">
-                                        <div className="page-card__level">
-                                            <label>最低權限</label>
-                                            <select
-                                                value={page.requiredLevel}
-                                                onChange={e =>
-                                                    handlePagePermissionChange(page.pageKey, {
-                                                        requiredLevel: parseInt(e.target.value),
-                                                    })
-                                                }
-                                                disabled={(user?.roleLevel ?? 0) < 5}
-                                            >
-                                                {/* 只顯示唯一的 level，避免重複選項 */}
-                                                {roles
-                                                    .filter((role, index, self) =>
-                                                        index === self.findIndex(r => r.level === role.level)
-                                                    )
-                                                    .sort((a, b) => a.level - b.level)
-                                                    .map(role => (
-                                                        <option key={role.level} value={role.level}>
-                                                            {role.displayName}
-                                                        </option>
-                                                    ))
-                                                }
-                                            </select>
-                                        </div>
-                                        <div className="page-card__visible">
-                                            <label>
+                            {pagePermissions
+                                .sort((a, b) => a.sortOrder - b.sortOrder)
+                                .map(page => (
+                                    <div key={page.pageKey} className="page-card">
+                                        <div className="page-card__info">
+                                            <div className="page-card__name-row">
                                                 <input
-                                                    type="checkbox"
-                                                    checked={page.isVisible}
-                                                    onChange={e =>
+                                                    type="text"
+                                                    className="page-card__name-input"
+                                                    value={page.pageName}
+                                                    onChange={e => {
+                                                        // Update local state immediately
+                                                        setPagePermissions(prev =>
+                                                            prev.map(p =>
+                                                                p.pageKey === page.pageKey
+                                                                    ? { ...p, pageName: e.target.value }
+                                                                    : p
+                                                            )
+                                                        );
+                                                    }}
+                                                    onBlur={e =>
                                                         handlePagePermissionChange(page.pageKey, {
-                                                            isVisible: e.target.checked,
+                                                            pageName: e.target.value,
+                                                        })
+                                                    }
+                                                    disabled={(user?.roleLevel ?? 0) < 5}
+                                                    placeholder="頁面名稱"
+                                                />
+                                                <span className="page-card__path">{page.pagePath}</span>
+                                            </div>
+                                        </div>
+                                        <div className="page-card__controls">
+                                            <div className="page-card__sort">
+                                                <label>排序</label>
+                                                <input
+                                                    type="number"
+                                                    className="page-card__sort-input"
+                                                    value={page.sortOrder}
+                                                    min={1}
+                                                    max={99}
+                                                    onChange={e => {
+                                                        const newOrder = parseInt(e.target.value) || 1;
+                                                        setPagePermissions(prev =>
+                                                            prev.map(p =>
+                                                                p.pageKey === page.pageKey
+                                                                    ? { ...p, sortOrder: newOrder }
+                                                                    : p
+                                                            )
+                                                        );
+                                                    }}
+                                                    onBlur={e =>
+                                                        handlePagePermissionChange(page.pageKey, {
+                                                            sortOrder: parseInt(e.target.value) || 1,
                                                         })
                                                     }
                                                     disabled={(user?.roleLevel ?? 0) < 5}
                                                 />
-                                                顯示在導航
-                                            </label>
+                                            </div>
+                                            <div className="page-card__level">
+                                                <label>最低權限</label>
+                                                <select
+                                                    value={page.requiredLevel}
+                                                    onChange={e =>
+                                                        handlePagePermissionChange(page.pageKey, {
+                                                            requiredLevel: parseInt(e.target.value),
+                                                        })
+                                                    }
+                                                    disabled={(user?.roleLevel ?? 0) < 5}
+                                                >
+                                                    {/* 只顯示唯一的 level，避免重複選項 */}
+                                                    {roles
+                                                        .filter((role, index, self) =>
+                                                            index === self.findIndex(r => r.level === role.level)
+                                                        )
+                                                        .sort((a, b) => a.level - b.level)
+                                                        .map(role => (
+                                                            <option key={role.level} value={role.level}>
+                                                                {role.displayName}
+                                                            </option>
+                                                        ))
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div className="page-card__visible">
+                                                <label>
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={page.isVisible}
+                                                        onChange={e =>
+                                                            handlePagePermissionChange(page.pageKey, {
+                                                                isVisible: e.target.checked,
+                                                            })
+                                                        }
+                                                        disabled={(user?.roleLevel ?? 0) < 5}
+                                                    />
+                                                    顯示
+                                                </label>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
                         </div>
                     </div>
                 )}

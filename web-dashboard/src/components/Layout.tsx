@@ -1,23 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
-    DndContext,
-    closestCenter,
-    KeyboardSensor,
-    PointerSensor,
-    useSensor,
-    useSensors,
-} from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
-import {
-    arrayMove,
-    SortableContext,
-    sortableKeyboardCoordinates,
-    useSortable,
-    verticalListSortingStrategy,
-} from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-import {
     LayoutDashboard,
     BarChart3,
     AlertTriangle,
@@ -36,20 +19,16 @@ import {
     Bell,
     Menu,
     X,
-    GripVertical,
     LogOut,
     User,
     Shield,
-    Edit3,
-    Save,
-    XCircle,
     CloudSun,
     Wallet,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
-import { getMenuConfig, updateMenuConfig, getTasks } from '../api/services';
+import { getTasks } from '../api/services';
 
 const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
 
@@ -58,107 +37,81 @@ interface NavItem {
     path: string;
     label: string;
     icon: LucideIcon;
-    requiredLevel: number; // 0=公開, 1=志工, 2=幹部, 3=常務理事, 4=理事長, 5=系統擁有者
+    requiredLevel: number;
+    sortOrder: number;
 }
 
+// Icon mapping for dynamic icon resolution
+const iconMap: Record<string, LucideIcon> = {
+    LayoutDashboard,
+    BarChart3,
+    AlertTriangle,
+    Siren,
+    ClipboardList,
+    ClipboardCheck,
+    Map,
+    BookOpen,
+    MessageSquareWarning,
+    CheckSquare,
+    FileDown,
+    Users,
+    CalendarDays,
+    GraduationCap,
+    Package,
+    Bell,
+    Shield,
+    CloudSun,
+    Wallet,
+};
+
+// Default nav items as fallback
 const defaultNavItems: NavItem[] = [
-    { id: 'dashboard', path: '/dashboard', label: '儀表板', icon: LayoutDashboard, requiredLevel: 1 },
-    { id: 'analytics', path: '/analytics', label: '數據分析', icon: BarChart3, requiredLevel: 3 },
-    { id: 'ncdr-alerts', path: '/ncdr-alerts', label: '災害示警', icon: AlertTriangle, requiredLevel: 0 },
-    { id: 'events', path: '/events', label: '災害回報', icon: Siren, requiredLevel: 1 },
-    { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList, requiredLevel: 2 },
-    { id: 'map', path: '/map', label: '地圖總覽', icon: Map, requiredLevel: 0 },
-    { id: 'forecast', path: '/forecast', label: '氣象預報', icon: CloudSun, requiredLevel: 0 },
-    { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen, requiredLevel: 0 },
-    { id: 'report', path: '/report', label: '回報系統', icon: MessageSquareWarning, requiredLevel: 1 },
-    { id: 'reports-admin', path: '/reports/admin', label: '回報審核', icon: CheckSquare, requiredLevel: 2 },
-    { id: 'reports-export', path: '/reports/export', label: '報表匯出', icon: FileDown, requiredLevel: 3 },
-    { id: 'volunteers', path: '/volunteers', label: '志工管理', icon: Users, requiredLevel: 2 },
-    { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays, requiredLevel: 2 },
-    { id: 'volunteer-register', path: '/volunteer-register', label: '登記志工', icon: ClipboardCheck, requiredLevel: 1 },
-    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1 },
-    { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2 },
-    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1 },
-    { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4 },
-    { id: 'donations', path: '/donations', label: '捐款管理', icon: Wallet, requiredLevel: 5 },
+    { id: 'dashboard', path: '/dashboard', label: '儀表板', icon: LayoutDashboard, requiredLevel: 0, sortOrder: 1 },
+    { id: 'analytics', path: '/analytics', label: '數據分析', icon: BarChart3, requiredLevel: 3, sortOrder: 2 },
+    { id: 'ncdr-alerts', path: '/ncdr-alerts', label: '災害示警', icon: AlertTriangle, requiredLevel: 0, sortOrder: 3 },
+    { id: 'events', path: '/events', label: '災情事件', icon: Siren, requiredLevel: 1, sortOrder: 4 },
+    { id: 'tasks', path: '/tasks', label: '任務管理', icon: ClipboardList, requiredLevel: 2, sortOrder: 5 },
+    { id: 'map', path: '/map', label: '地圖總覽', icon: Map, requiredLevel: 0, sortOrder: 6 },
+    { id: 'forecast', path: '/forecast', label: '氣象預報', icon: CloudSun, requiredLevel: 0, sortOrder: 7 },
+    { id: 'manuals', path: '/manuals', label: '實務手冊', icon: BookOpen, requiredLevel: 0, sortOrder: 8 },
+    { id: 'report', path: '/report', label: '回報系統', icon: MessageSquareWarning, requiredLevel: 1, sortOrder: 9 },
+    { id: 'reports-admin', path: '/reports/admin', label: '回報審核', icon: CheckSquare, requiredLevel: 2, sortOrder: 10 },
+    { id: 'reports-export', path: '/reports/export', label: '報表匯出', icon: FileDown, requiredLevel: 3, sortOrder: 11 },
+    { id: 'volunteers', path: '/volunteers', label: '志工管理', icon: Users, requiredLevel: 2, sortOrder: 12 },
+    { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays, requiredLevel: 2, sortOrder: 13 },
+    { id: 'volunteer-register', path: '/volunteer-register', label: '登記志工', icon: ClipboardCheck, requiredLevel: 1, sortOrder: 14 },
+    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1, sortOrder: 15 },
+    { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2, sortOrder: 16 },
+    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1, sortOrder: 17 },
+    { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4, sortOrder: 18 },
+    { id: 'donations', path: '/donations', label: '捐款管理', icon: Wallet, requiredLevel: 5, sortOrder: 19 },
 ];
 
-// Sortable Nav Item Component
-function SortableNavItem({
+// Simple Nav Item Component (no drag/edit)
+function NavItemComponent({
     item,
     isActive,
     onClick,
-    isEditMode,
-    onLabelChange,
 }: {
     item: NavItem;
     isActive: boolean;
     onClick: () => void;
-    isEditMode: boolean;
-    onLabelChange?: (id: string, label: string) => void;
 }) {
-    const {
-        attributes,
-        listeners,
-        setNodeRef,
-        transform,
-        transition,
-        isDragging,
-    } = useSortable({ id: item.id });
-
-    const style = {
-        transform: CSS.Transform.toString(transform),
-        transition,
-        opacity: isDragging ? 0.7 : 1,
-        zIndex: isDragging ? 1000 : 'auto',
-    };
-
     const IconComponent = item.icon;
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            className={`nav-item-wrapper ${isDragging ? 'dragging' : ''}`}
+        <Link
+            to={item.path}
+            className={`nav-item ${isActive ? 'active' : ''}`}
+            onClick={onClick}
         >
-            <div
-                className="nav-item-drag-handle"
-                {...attributes}
-                {...listeners}
-            >
-                <GripVertical size={14} />
-            </div>
-            {isEditMode ? (
-                <div className={`nav-item nav-item--editing ${isActive ? 'active' : ''}`}>
-                    <span className="nav-icon">
-                        <IconComponent size={20} strokeWidth={1.5} />
-                    </span>
-                    <input
-                        type="text"
-                        className="nav-label-input"
-                        value={item.label}
-                        onChange={(e) => onLabelChange?.(item.id, e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                    />
-                </div>
-            ) : (
-                <Link
-                    to={item.path}
-                    className={`nav-item ${isActive ? 'active' : ''}`}
-                    onClick={onClick}
-                >
-                    <span className="nav-icon">
-                        <IconComponent size={20} strokeWidth={1.5} />
-                    </span>
-                    <span className="nav-label">{item.label}</span>
-                </Link>
-            )}
-        </div>
+            <span className="nav-icon">
+                <IconComponent size={20} strokeWidth={1.5} />
+            </span>
+            <span className="nav-label">{item.label}</span>
+        </Link>
     );
 }
-
-// Storage key for nav order (fallback for non-owners)
-const NAV_ORDER_KEY = 'light-keepers-nav-order';
 
 export default function Layout() {
     const location = useLocation();
@@ -166,192 +119,66 @@ export default function Layout() {
     const { user, logout } = useAuth();
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const [navItems, setNavItems] = useState<NavItem[]>(defaultNavItems);
-    const [isEditMode, setIsEditMode] = useState(false);
-    const [originalItems, setOriginalItems] = useState<NavItem[]>([]);
-    const [isSaving, setIsSaving] = useState(false);
 
-    // Get user's role level (default to 1 for logged in users)
-    const userLevel = user?.roleLevel ?? 1;
-    const isOwner = userLevel >= 5;
+    // Get user's role level (default to 0 for not logged in)
+    const userLevel = user?.roleLevel ?? 0;
 
-    // Filter nav items based on user's role level
-    const visibleNavItems = navItems.filter(item => item.requiredLevel <= userLevel);
+    // Filter nav items based on user's role level and sort by sortOrder
+    const visibleNavItems = navItems
+        .filter(item => item.requiredLevel <= userLevel)
+        .sort((a, b) => a.sortOrder - b.sortOrder);
 
     // 登入任務提醒 - 顯示用戶待處理的任務數量
+    const [pendingTaskCount, setPendingTaskCount] = useState(0);
+
     useEffect(() => {
-        const checkPendingTasks = async () => {
-            if (!user?.id) return;
-
-            try {
-                const response = await getTasks({ status: 'pending', limit: 50 });
-                const allPendingTasks = response.data?.data || [];
-                // 過濾出分配給當前用戶的任務
-                const myTasks = allPendingTasks.filter(t => t.assignedTo === user.id);
-
-                if (myTasks.length > 0) {
-                    // 使用 setTimeout 避免太快顯示
-                    setTimeout(() => {
-                        alert(`📋 您有 ${myTasks.length} 個待處理的任務！請前往「任務管理」查看。`);
-                    }, 1000);
-                }
-            } catch (error) {
-                console.error('Failed to check pending tasks:', error);
-            }
-        };
-
-        // 只在首次登入時檢查
-        const hasChecked = sessionStorage.getItem(`task-reminder-${user?.id}`);
-        if (!hasChecked && user?.id) {
-            checkPendingTasks();
-            sessionStorage.setItem(`task-reminder-${user?.id}`, 'true');
+        if (user && userLevel >= 2) {
+            getTasks({ status: 'pending', limit: 100 })
+                .then(res => {
+                    setPendingTaskCount(res.data?.data?.length || 0);
+                })
+                .catch(() => setPendingTaskCount(0));
         }
-    }, [user?.id]);
+    }, [user, userLevel]);
 
-    // Load menu config from backend
+    // Load nav config from backend page-permissions API
     useEffect(() => {
-        const loadMenuConfig = async () => {
+        const loadPagePermissions = async () => {
             try {
-                // 同時獲取選單配置和頁面權限
-                const [menuResponse, permissionsResponse] = await Promise.all([
-                    getMenuConfig(),
-                    fetch(`${API_BASE}/accounts/page-permissions`).then(r => r.ok ? r.json() : []).catch(() => []),
-                ]);
+                const response = await fetch(`${API_BASE}/accounts/page-permissions`);
+                if (!response.ok) return;
 
-                // 建立權限映射: pageKey -> requiredLevel
-                const permissionMap: Record<string, number> = {};
-                if (Array.isArray(permissionsResponse)) {
-                    permissionsResponse.forEach((p: { pageKey: string; requiredLevel: number }) => {
-                        permissionMap[p.pageKey] = p.requiredLevel;
-                    });
-                }
+                const permissions = await response.json();
+                if (!Array.isArray(permissions) || permissions.length === 0) return;
 
-                if (menuResponse.data?.data && menuResponse.data.data.length > 0) {
-                    const configObj: Record<string, { id: string; label: string; order: number }> = {};
-                    menuResponse.data.data.forEach((c) => { configObj[c.id] = c; });
-                    const configMap = configObj;
+                // Build updated nav items from backend data
+                const updatedItems = defaultNavItems.map(item => {
+                    const perm = permissions.find((p: any) => p.pageKey === item.id);
+                    if (perm) {
+                        // Get icon from iconMap or use default
+                        const icon = perm.icon && iconMap[perm.icon] ? iconMap[perm.icon] : item.icon;
+                        return {
+                            ...item,
+                            label: perm.pageName || item.label,
+                            requiredLevel: perm.requiredLevel ?? item.requiredLevel,
+                            sortOrder: perm.sortOrder ?? item.sortOrder,
+                            icon,
+                        };
+                    }
+                    return item;
+                });
 
-                    // Apply config to nav items, 同時更新 requiredLevel
-                    const configuredItems = defaultNavItems.map(item => {
-                        const config = configMap[item.id];
-                        const newLevel = permissionMap[item.id] !== undefined ? permissionMap[item.id] : item.requiredLevel;
-                        if (config) {
-                            return { ...item, label: config.label, requiredLevel: newLevel };
-                        }
-                        return { ...item, requiredLevel: newLevel };
-                    });
-
-                    // Sort by order if available
-                    configuredItems.sort((a, b) => {
-                        const orderA = configMap[a.id]?.order ?? 999;
-                        const orderB = configMap[b.id]?.order ?? 999;
-                        return orderA - orderB;
-                    });
-
-                    setNavItems(configuredItems);
-                } else {
-                    // Fallback: 只應用權限更新
-                    const updatedItems = defaultNavItems.map(item => ({
-                        ...item,
-                        requiredLevel: permissionMap[item.id] !== undefined ? permissionMap[item.id] : item.requiredLevel,
-                    }));
-                    setNavItems(updatedItems);
-
-                    // 嘗試從 localStorage 載入順序
-                    loadFromLocalStorage();
-                }
+                // Sort by sortOrder from backend
+                updatedItems.sort((a, b) => a.sortOrder - b.sortOrder);
+                setNavItems(updatedItems);
             } catch (error) {
-                console.error('Failed to load menu config:', error);
-                loadFromLocalStorage();
+                console.error('Failed to load page permissions:', error);
+                // Keep default items on error
             }
         };
 
-        const loadFromLocalStorage = () => {
-            const savedOrder = localStorage.getItem(NAV_ORDER_KEY);
-            if (savedOrder) {
-                try {
-                    const orderIds = JSON.parse(savedOrder) as string[];
-                    const orderedItems = orderIds
-                        .map(id => defaultNavItems.find(item => item.id === id))
-                        .filter((item): item is NavItem => item !== undefined);
-                    const newItems = defaultNavItems.filter(
-                        item => !orderIds.includes(item.id)
-                    );
-                    setNavItems([...orderedItems, ...newItems]);
-                } catch (e) {
-                    console.error('Failed to parse nav order:', e);
-                }
-            }
-        };
-
-        loadMenuConfig();
+        loadPagePermissions();
     }, []);
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 5,
-            },
-        }),
-        useSensor(KeyboardSensor, {
-            coordinateGetter: sortableKeyboardCoordinates,
-        })
-    );
-
-    const handleDragEnd = (event: DragEndEvent) => {
-        const { active, over } = event;
-
-        if (over && active.id !== over.id) {
-            setNavItems((items) => {
-                const oldIndex = items.findIndex((item) => item.id === active.id);
-                const newIndex = items.findIndex((item) => item.id === over.id);
-                const newOrder = arrayMove(items, oldIndex, newIndex);
-
-                // Only save to localStorage for non-owners or when not in edit mode
-                if (!isOwner || !isEditMode) {
-                    const orderIds = newOrder.map(item => item.id);
-                    localStorage.setItem(NAV_ORDER_KEY, JSON.stringify(orderIds));
-                }
-
-                return newOrder;
-            });
-        }
-    };
-
-    const handleLabelChange = (id: string, newLabel: string) => {
-        setNavItems(items =>
-            items.map(item =>
-                item.id === id ? { ...item, label: newLabel } : item
-            )
-        );
-    };
-
-    const handleStartEdit = () => {
-        setOriginalItems([...navItems]);
-        setIsEditMode(true);
-    };
-
-    const handleCancelEdit = () => {
-        setNavItems(originalItems);
-        setIsEditMode(false);
-    };
-
-    const handleSaveEdit = async () => {
-        setIsSaving(true);
-        try {
-            const configItems = navItems.map((item, index) => ({
-                id: item.id,
-                label: item.label,
-                order: index,
-            }));
-            await updateMenuConfig(configItems);
-            setIsEditMode(false);
-        } catch (error) {
-            console.error('Failed to save menu config:', error);
-            alert('儲存失敗，請稍後再試');
-        } finally {
-            setIsSaving(false);
-        }
-    };
 
     const handleNavClick = () => {
         if (window.innerWidth <= 768) {
@@ -405,60 +232,22 @@ export default function Layout() {
                 </div>
 
                 <nav className="nav">
-                    <DndContext
-                        sensors={sensors}
-                        collisionDetection={closestCenter}
-                        onDragEnd={handleDragEnd}
-                    >
-                        <SortableContext
-                            items={visibleNavItems.map(item => item.id)}
-                            strategy={verticalListSortingStrategy}
-                        >
-                            {visibleNavItems.map((item) => (
-                                <SortableNavItem
-                                    key={item.id}
-                                    item={item}
-                                    isActive={location.pathname === item.path}
-                                    onClick={handleNavClick}
-                                    isEditMode={isEditMode}
-                                    onLabelChange={handleLabelChange}
-                                />
-                            ))}
-                        </SortableContext>
-                    </DndContext>
+                    {visibleNavItems.map((item) => (
+                        <NavItemComponent
+                            key={item.id}
+                            item={item}
+                            isActive={location.pathname === item.path}
+                            onClick={handleNavClick}
+                        />
+                    ))}
                 </nav>
 
-                {/* Edit Mode Controls - Owner Only (Bottom Position) */}
-                {isOwner && (
-                    <div className="nav-edit-controls nav-edit-controls--bottom">
-                        {isEditMode ? (
-                            <>
-                                <button
-                                    className="nav-edit-btn nav-edit-btn--save"
-                                    onClick={handleSaveEdit}
-                                    disabled={isSaving}
-                                >
-                                    <Save size={16} />
-                                    {isSaving ? '儲存中...' : '儲存'}
-                                </button>
-                                <button
-                                    className="nav-edit-btn nav-edit-btn--cancel"
-                                    onClick={handleCancelEdit}
-                                    disabled={isSaving}
-                                >
-                                    <XCircle size={16} />
-                                    取消
-                                </button>
-                            </>
-                        ) : (
-                            <button
-                                className="nav-edit-btn nav-edit-btn--edit-minimal"
-                                onClick={handleStartEdit}
-                            >
-                                <Edit3 size={18} />
-                                <span>編輯選單</span>
-                            </button>
-                        )}
+                {/* Task Reminder for Officers */}
+                {userLevel >= 2 && pendingTaskCount > 0 && (
+                    <div className="sidebar-reminder">
+                        <Link to="/tasks" className="sidebar-reminder__link">
+                            📋 您有 {pendingTaskCount} 個待處理任務
+                        </Link>
                     </div>
                 )}
 
@@ -470,7 +259,7 @@ export default function Layout() {
                         </div>
                         <div className="sidebar-user__details">
                             <span className="sidebar-user__name">{user?.displayName || user?.email || '用戶'}</span>
-                            <span className="sidebar-user__role">{user?.roleDisplayName || '登記志工'}</span>
+                            <span className="sidebar-user__role">{user?.roleDisplayName || '一般民眾'}</span>
                         </div>
                     </Link>
                     <button className="sidebar-user__logout" onClick={handleLogout} title="登出">

@@ -19,6 +19,14 @@ class UpdatePagePermissionDto {
     @IsOptional()
     @IsBoolean()
     isVisible?: boolean;
+
+    @IsOptional()
+    @IsString()
+    pageName?: string;
+
+    @IsOptional()
+    @IsNumber()
+    sortOrder?: number;
 }
 
 @Controller('accounts')
