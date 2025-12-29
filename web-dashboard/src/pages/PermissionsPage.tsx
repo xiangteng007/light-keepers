@@ -196,6 +196,61 @@ export default function PermissionsPage() {
         }
     };
 
+    // Move page up or down in order
+    const movePageOrder = async (pageKey: string, direction: 'up' | 'down') => {
+        const sortedPages = [...pagePermissions].sort((a, b) => a.sortOrder - b.sortOrder);
+        const currentIndex = sortedPages.findIndex(p => p.pageKey === pageKey);
+
+        if (currentIndex === -1) return;
+        if (direction === 'up' && currentIndex === 0) return;
+        if (direction === 'down' && currentIndex === sortedPages.length - 1) return;
+
+        const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+        const currentPage = sortedPages[currentIndex];
+        const swapPage = sortedPages[swapIndex];
+
+        // Swap sortOrder values
+        const tempOrder = currentPage.sortOrder;
+        const newCurrentOrder = swapPage.sortOrder;
+        const newSwapOrder = tempOrder;
+
+        // Update local state immediately for responsiveness
+        setPagePermissions(prev =>
+            prev.map(p => {
+                if (p.pageKey === currentPage.pageKey) return { ...p, sortOrder: newCurrentOrder };
+                if (p.pageKey === swapPage.pageKey) return { ...p, sortOrder: newSwapOrder };
+                return p;
+            })
+        );
+
+        // Update backend
+        try {
+            const token = getToken();
+            await Promise.all([
+                fetch(`${API_BASE}/accounts/page-permissions/${currentPage.pageKey}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ sortOrder: newCurrentOrder }),
+                }),
+                fetch(`${API_BASE}/accounts/page-permissions/${swapPage.pageKey}`, {
+                    method: 'PATCH',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ sortOrder: newSwapOrder }),
+                }),
+            ]);
+        } catch (err) {
+            console.error('Failed to update sort order:', err);
+            // Revert on error
+            setPagePermissions(prev =>
+                prev.map(p => {
+                    if (p.pageKey === currentPage.pageKey) return { ...p, sortOrder: tempOrder };
+                    if (p.pageKey === swapPage.pageKey) return { ...p, sortOrder: swapPage.sortOrder };
+                    return p;
+                })
+            );
+        }
+    };
+
     // Filter accounts by search term
     const filteredAccounts = accounts.filter(
         acc =>
@@ -615,31 +670,24 @@ export default function PermissionsPage() {
                                             </div>
                                         </div>
                                         <div className="page-card__controls">
-                                            <div className="page-card__sort">
-                                                <label>排序</label>
-                                                <input
-                                                    type="number"
-                                                    className="page-card__sort-input"
-                                                    value={page.sortOrder}
-                                                    min={1}
-                                                    max={99}
-                                                    onChange={e => {
-                                                        const newOrder = parseInt(e.target.value) || 1;
-                                                        setPagePermissions(prev =>
-                                                            prev.map(p =>
-                                                                p.pageKey === page.pageKey
-                                                                    ? { ...p, sortOrder: newOrder }
-                                                                    : p
-                                                            )
-                                                        );
-                                                    }}
-                                                    onBlur={e =>
-                                                        handlePagePermissionChange(page.pageKey, {
-                                                            sortOrder: parseInt(e.target.value) || 1,
-                                                        })
-                                                    }
-                                                    disabled={(user?.roleLevel ?? 0) < 5}
-                                                />
+                                            <div className="page-card__sort-arrows">
+                                                <button
+                                                    className="sort-arrow-btn"
+                                                    onClick={() => movePageOrder(page.pageKey, 'up')}
+                                                    disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === 0}
+                                                    title="上移"
+                                                >
+                                                    <ChevronUp size={18} />
+                                                </button>
+                                                <span className="sort-order-display">{page.sortOrder}</span>
+                                                <button
+                                                    className="sort-arrow-btn"
+                                                    onClick={() => movePageOrder(page.pageKey, 'down')}
+                                                    disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === pagePermissions.length - 1}
+                                                    title="下移"
+                                                >
+                                                    <ChevronDown size={18} />
+                                                </button>
                                             </div>
                                             <div className="page-card__level">
                                                 <label>最低權限</label>
