@@ -197,17 +197,31 @@ export default function LoginPage() {
         }
     };
 
-    // 重新發送驗證信
+    // 發送 Email OTP 驗證碼
     const handleResendVerification = async () => {
+        if (!formData.email) {
+            setError('請先輸入電子郵件');
+            return;
+        }
+
         setIsLoading(true);
         setError(null);
 
         try {
-            const result = await firebaseAuthService.resendVerificationEmail();
-            if (result.success) {
-                setSuccessMessage(result.message);
+            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+            const response = await fetch(`${API_URL}/auth/send-email-otp`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: formData.email }),
+            });
+
+            const data = await response.json();
+
+            if (response.ok && data.success) {
+                setEmailVerificationSent(true);
+                setSuccessMessage('驗證碼已發送至您的 Email，請查收');
             } else {
-                setError(result.message);
+                setError(data.message || '發送失敗，請稍後再試');
             }
         } catch (err) {
             setError('發送失敗，請稍後再試');
