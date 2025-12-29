@@ -28,6 +28,7 @@ export class SeedService implements OnModuleInit {
         try {
             await this.seedRoles();
             await this.seedPagePermissions();
+            await this.fixDashboardPermission(); // 一次性修復
             await this.seedOwnerAccount();
             this.logger.log('Seed completed successfully');
         } catch (error) {
@@ -80,7 +81,7 @@ export class SeedService implements OnModuleInit {
      */
     async seedPagePermissions() {
         const pages = [
-            { pageKey: 'dashboard', pageName: '儀表板', pagePath: '/dashboard', requiredLevel: RoleLevel.VOLUNTEER, icon: 'LayoutDashboard', sortOrder: 1 },
+            { pageKey: 'dashboard', pageName: '儀表板', pagePath: '/dashboard', requiredLevel: RoleLevel.PUBLIC, icon: 'LayoutDashboard', sortOrder: 1 },
             { pageKey: 'analytics', pageName: '數據分析', pagePath: '/analytics', requiredLevel: RoleLevel.DIRECTOR, icon: 'BarChart3', sortOrder: 2 },
             { pageKey: 'ncdr-alerts', pageName: '災害示警', pagePath: '/ncdr-alerts', requiredLevel: RoleLevel.PUBLIC, icon: 'AlertTriangle', sortOrder: 3 },
             { pageKey: 'events', pageName: '災情事件', pagePath: '/events', requiredLevel: RoleLevel.VOLUNTEER, icon: 'Siren', sortOrder: 4 },
@@ -104,10 +105,19 @@ export class SeedService implements OnModuleInit {
             if (!existing) {
                 await this.pagePermissionRepository.save({ ...pageData, isVisible: true });
                 this.logger.log(`Created page permission: ${pageData.pageName}`);
-            } else {
-                // 更新現有設定
-                await this.pagePermissionRepository.update(existing.id, pageData);
             }
+            // 不再覆蓋現有設定 - 允許管理員透過 UI 修改
+        }
+    }
+
+    /**
+     * 一次性修復：將 dashboard 的權限設為 PUBLIC (0)
+     */
+    async fixDashboardPermission() {
+        const dashboard = await this.pagePermissionRepository.findOne({ where: { pageKey: 'dashboard' } });
+        if (dashboard && dashboard.requiredLevel !== RoleLevel.PUBLIC) {
+            await this.pagePermissionRepository.update(dashboard.id, { requiredLevel: RoleLevel.PUBLIC });
+            this.logger.log('🔧 Fixed dashboard permission to PUBLIC (0)');
         }
     }
 
