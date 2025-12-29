@@ -266,27 +266,11 @@ export default function DashboardPage() {
                 ) : (
                     <Card title="地圖概覽" icon="🗺️" padding="md">
                         <div className="map-preview-v2">
-                            <div className="map-preview-v2__stats">
-                                <div className="map-stat">
-                                    <span className="map-stat__icon">🚨</span>
-                                    <span className="map-stat__value">{eventStats?.active || 0}</span>
-                                    <span className="map-stat__label">進行中事件</span>
-                                </div>
-                                <div className="map-stat">
-                                    <span className="map-stat__icon">⚠️</span>
-                                    <span className="map-stat__value">{alertsData?.length || 0}</span>
-                                    <span className="map-stat__label">警報數量</span>
-                                </div>
-                                <div className="map-stat">
-                                    <span className="map-stat__icon">🏥</span>
-                                    <span className="map-stat__value">--</span>
-                                    <span className="map-stat__label">避難所</span>
-                                </div>
-                            </div>
                             <div className="map-preview-v2__visual">
                                 <div className="map-visual-placeholder">
                                     <span className="map-icon">🗺️</span>
                                     <span className="map-text">即時災情地圖</span>
+                                    <span className="map-text-sub">查看災情分布與避難所位置</span>
                                 </div>
                             </div>
                             <Link to="/map" className="map-preview-v2__btn">

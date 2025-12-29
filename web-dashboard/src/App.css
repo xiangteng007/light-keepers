@@ -3339,6 +3339,12 @@ button[aria-label="地圖相機控制"],
   font-weight: 500;
 }
 
+.map-visual-placeholder .map-text-sub {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
 .map-preview-v2__btn {
   display: block;
   text-decoration: none;
