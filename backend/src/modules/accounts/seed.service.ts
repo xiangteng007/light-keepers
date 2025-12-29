@@ -96,6 +96,7 @@ export class SeedService implements OnModuleInit {
             { pageKey: 'resources', pageName: '物資管理', pagePath: '/resources', requiredLevel: RoleLevel.OFFICER, icon: 'Package', sortOrder: 14 },
             { pageKey: 'notifications', pageName: '通知中心', pagePath: '/notifications', requiredLevel: RoleLevel.VOLUNTEER, icon: 'Bell', sortOrder: 15 },
             { pageKey: 'permissions', pageName: '權限管理', pagePath: '/permissions', requiredLevel: RoleLevel.OWNER, icon: 'Shield', sortOrder: 16 },
+            { pageKey: 'donations', pageName: '捐款管理', pagePath: '/donations', requiredLevel: RoleLevel.OWNER, icon: 'Heart', sortOrder: 17 },
         ];
 
         for (const pageData of pages) {
