@@ -80,16 +80,31 @@ export class FirebaseAdminService implements OnModuleInit {
         }
 
         try {
-            const link = await admin.auth().generateEmailVerificationLink(
+            let link = await admin.auth().generateEmailVerificationLink(
                 email,
                 actionCodeSettings || this.getDefaultActionCodeSettings(),
             );
+
+            // 將 Firebase 預設網域替換為自訂網域 lightkeepers.ngo
+            link = this.replaceFirebaseDomain(link);
+
             this.logger.log(`Generated email verification link for ${this.maskEmail(email)}`);
             return link;
         } catch (error) {
             this.logger.error(`Failed to generate email verification link: ${error.message}`);
             throw error;
         }
+    }
+
+    /**
+     * 將 Firebase 預設網域替換為自訂網域
+     * light-keepers-mvp.firebaseapp.com -> lightkeepers.ngo
+     */
+    private replaceFirebaseDomain(link: string): string {
+        return link.replace(
+            /https:\/\/light-keepers-mvp\.firebaseapp\.com\/__\/auth\/action/g,
+            'https://lightkeepers.ngo/__/auth/action'
+        );
     }
 
     /**
@@ -107,10 +122,14 @@ export class FirebaseAdminService implements OnModuleInit {
         }
 
         try {
-            const link = await admin.auth().generatePasswordResetLink(
+            let link = await admin.auth().generatePasswordResetLink(
                 email,
                 actionCodeSettings || this.getDefaultActionCodeSettings(),
             );
+
+            // 將 Firebase 預設網域替換為自訂網域 lightkeepers.ngo
+            link = this.replaceFirebaseDomain(link);
+
             this.logger.log(`Generated password reset link for ${this.maskEmail(email)}`);
             return link;
         } catch (error) {
