@@ -6,6 +6,7 @@ import { Account, Role, PagePermission } from './entities';
 import { AccountsService } from './accounts.service';
 import { AccountsController } from './accounts.controller';
 import { SeedService } from './seed.service';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
     imports: [
@@ -17,11 +18,10 @@ import { SeedService } from './seed.service';
                 signOptions: { expiresIn: '7d' },
             }),
         }),
+        forwardRef(() => AuthModule),
     ],
     controllers: [AccountsController],
     providers: [AccountsService, SeedService],
     exports: [AccountsService, TypeOrmModule],
 })
 export class AccountsModule { }
-
-

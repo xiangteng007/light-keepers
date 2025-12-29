@@ -1,7 +1,8 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Account, Role, PagePermission } from './entities';
+import { FirebaseAdminService } from '../auth/services/firebase-admin.service';
 
 @Injectable()
 export class AccountsService {
@@ -12,6 +13,8 @@ export class AccountsService {
         private readonly roleRepository: Repository<Role>,
         @InjectRepository(PagePermission)
         private readonly pagePermissionRepository: Repository<PagePermission>,
+        @Inject(forwardRef(() => FirebaseAdminService))
+        private readonly firebaseAdminService: FirebaseAdminService,
     ) { }
 
     async findAll(): Promise<Account[]> {
@@ -321,6 +324,7 @@ export class AccountsService {
 
     /**
      * 刪除帳號 - 僅限 level 0 的帳號
+     * 同時刪除 Firebase 中的用戶
      */
     async deleteAccount(accountId: string, operatorLevel: number): Promise<{ success: boolean; message: string }> {
         const account = await this.accountRepository.findOne({
@@ -342,12 +346,19 @@ export class AccountsService {
             throw new ForbiddenException('只能刪除一般民眾帳號 (level 0)');
         }
 
-        // 刪除帳號
+        // 刪除 Firebase 用戶（如果有 firebaseUid 或 email）
+        if (account.firebaseUid) {
+            await this.firebaseAdminService.deleteFirebaseUserByUid(account.firebaseUid);
+        } else if (account.email) {
+            await this.firebaseAdminService.deleteFirebaseUser(account.email);
+        }
+
+        // 刪除資料庫帳號
         await this.accountRepository.remove(account);
 
         return {
             success: true,
-            message: '帳號已刪除',
+            message: '帳號已刪除（含 Firebase 用戶）',
         };
     }
 

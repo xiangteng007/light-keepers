@@ -363,4 +363,74 @@ export class FirebaseAdminService implements OnModuleInit {
             return false;
         }
     }
+
+    /**
+     * 刪除 Firebase 用戶
+     * @param email 用戶 Email
+     */
+    async deleteFirebaseUser(email: string): Promise<{ success: boolean; message: string }> {
+        if (!this.isConfigured()) {
+            return {
+                success: false,
+                message: 'Firebase 尚未設定，無法刪除用戶',
+            };
+        }
+
+        try {
+            const user = await this.getFirebaseUser(email);
+            if (!user) {
+                return {
+                    success: true,
+                    message: 'Firebase 用戶不存在',
+                };
+            }
+
+            await admin.auth().deleteUser(user.uid);
+            this.logger.log(`Deleted Firebase user for ${this.maskEmail(email)}`);
+            return {
+                success: true,
+                message: 'Firebase 用戶已刪除',
+            };
+        } catch (error) {
+            this.logger.error(`Failed to delete Firebase user: ${error.message}`);
+            return {
+                success: false,
+                message: `刪除失敗: ${error.message}`,
+            };
+        }
+    }
+
+    /**
+     * 根據 UID 刪除 Firebase 用戶
+     * @param uid Firebase UID
+     */
+    async deleteFirebaseUserByUid(uid: string): Promise<{ success: boolean; message: string }> {
+        if (!this.isConfigured()) {
+            return {
+                success: false,
+                message: 'Firebase 尚未設定，無法刪除用戶',
+            };
+        }
+
+        try {
+            await admin.auth().deleteUser(uid);
+            this.logger.log(`Deleted Firebase user with UID: ${uid.substring(0, 8)}...`);
+            return {
+                success: true,
+                message: 'Firebase 用戶已刪除',
+            };
+        } catch (error: any) {
+            if (error.code === 'auth/user-not-found') {
+                return {
+                    success: true,
+                    message: 'Firebase 用戶不存在',
+                };
+            }
+            this.logger.error(`Failed to delete Firebase user by UID: ${error.message}`);
+            return {
+                success: false,
+                message: `刪除失敗: ${error.message}`,
+            };
+        }
+    }
 }
