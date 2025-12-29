@@ -66,6 +66,7 @@ jobs:
         working-directory: web-dashboard
         env:
           VITE_API_URL: https://light-keepers-api-955234851806.asia-east1.run.app/api/v1
+          VITE_LINE_CLIENT_ID: "2008769727"
           VITE_FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
           VITE_FIREBASE_AUTH_DOMAIN: light-keepers-mvp.firebaseapp.com
           VITE_FIREBASE_PROJECT_ID: light-keepers-mvp
