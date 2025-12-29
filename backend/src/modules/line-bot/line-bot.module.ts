@@ -9,6 +9,7 @@ import { ReportsService } from '../reports/reports.service';
 import {
     SessionStateService,
     ImageUploadService,
+    AiClassificationService,
     DisasterReportService,
 } from './disaster-report';
 
@@ -22,10 +23,12 @@ import {
         LineBotService,
         SessionStateService,
         ImageUploadService,
+        AiClassificationService,
         DisasterReportService,
         ReportsService,
     ],
     exports: [LineBotService, DisasterReportService],
 })
 export class LineBotModule { }
+
 

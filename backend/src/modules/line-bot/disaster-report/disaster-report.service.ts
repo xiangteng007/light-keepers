@@ -9,6 +9,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { SessionStateService } from './session-state.service';
 import { ImageUploadService } from './image-upload.service';
+import { AiClassificationService } from './ai-classification.service';
 import { ReportsService } from '../../reports/reports.service';
 import {
     ReportSession,
@@ -38,6 +39,7 @@ export class DisasterReportService {
         private readonly configService: ConfigService,
         private readonly sessionService: SessionStateService,
         private readonly imageUploadService: ImageUploadService,
+        private readonly aiClassificationService: AiClassificationService,
         private readonly reportsService: ReportsService,
     ) { }
 
@@ -276,12 +278,14 @@ export class DisasterReportService {
         }
 
         try {
-            // 判斷災情類型
-            const disasterType = detectDisasterType(session.data.text);
+            // 使用 AI 判斷災情類型
+            const classification = await this.aiClassificationService.classifyDisasterType(session.data.text);
+
+            this.logger.log(`AI classification result: ${classification.type} (confidence: ${classification.confidence})`);
 
             // 建立回報（來自 LINE Bot）
             const report = await this.reportsService.create({
-                type: disasterType as any,
+                type: classification.type,
                 severity: 'medium',
                 title: session.data.text.substring(0, 50),
                 description: session.data.text,
