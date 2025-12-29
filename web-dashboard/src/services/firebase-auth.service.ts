@@ -47,32 +47,19 @@ export const firebaseAuthService = {
 
     /**
      * 使用 Email/Password 註冊
+     * 注意：不再自動發送驗證信，由用戶點擊「發送」按鈕發送 OTP
      */
-    registerWithEmail: async (email: string, password: string, displayName?: string) => {
+    registerWithEmail: async (email: string, password: string, _displayName?: string) => {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
 
-            // 使用後端 API 發送自訂驗證信
-            if (userCredential.user) {
-                const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
-                try {
-                    const response = await fetch(`${API_URL}/auth/send-custom-verification`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email, displayName }),
-                    });
-                    if (!response.ok) {
-                        console.warn('Backend verification email failed, user registered but may need manual verification');
-                    }
-                } catch (e) {
-                    console.error('Failed to send verification email:', e);
-                }
-            }
+            // 不再自動發送驗證信，改用 6 位數 OTP 驗證碼流程
+            // 用戶需要點擊「發送」按鈕來發送驗證碼
 
             return {
                 success: true,
                 user: userCredential.user,
-                message: '註冊成功！驗證信已發送至您的 Email'
+                message: `註冊成功！請點擊「發送」按鈕取得驗證碼`
             };
         } catch (error: any) {
             let message = '註冊失敗';
