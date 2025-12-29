@@ -254,9 +254,8 @@ export default function LoginPage() {
             const data = await response.json();
 
             if (response.ok && data.success) {
-                setSuccessMessage('Email 驗證成功！請登入您的帳號');
-                setEmailVerificationSent(false);
-                setIsLogin(true);
+                // 驗證成功，但不自動跳轉，讓用戶點擊「註冊」完成註冊
+                setSuccessMessage('✓ Email 驗證成功！請點擊「註冊」完成帳號建立');
                 setVerificationCode('');
             } else {
                 setError(data.message || '驗證碼錯誤，請重新輸入');
