@@ -51,18 +51,14 @@ export class AuthService {
         // 密碼加密
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
-        // 取得預設角色（volunteer）
-        const volunteerRole = await this.roleRepository.findOne({
-            where: { name: 'volunteer' },
-        });
-
-        // 建立帳號
+        // 建立帳號（不分配角色，這樣 roleLevel = 0，顯示在一般民眾列表）
+        // 用戶需要別別登記成為志工才會獲得 volunteer 角色
         const account = this.accountRepository.create({
             email: dto.email,
             phone: dto.phone,
             passwordHash,
             displayName: dto.displayName,
-            roles: volunteerRole ? [volunteerRole] : [],
+            roles: [],  // 新帳號不分配角色
         });
 
         await this.accountRepository.save(account);
@@ -219,10 +215,7 @@ export class AuthService {
             throw new ConflictException('此 LINE 帳號已註冊');
         }
 
-        // 取得預設角色
-        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
-
-        // 建立帳號
+        // 建立帳號（不分配角色，roleLevel = 0）
         const account = this.accountRepository.create({
             email: email || undefined,
             phone: phone || undefined,
@@ -231,7 +224,7 @@ export class AuthService {
             avatarUrl: lineProfile.pictureUrl,
             lineUserId: lineProfile.userId,
             lineDisplayName: lineProfile.displayName,
-            roles: volunteerRole ? [volunteerRole] : [],
+            roles: [],  // 新帳號不分配角色
         });
 
         await this.accountRepository.save(account);
@@ -400,10 +393,7 @@ export class AuthService {
             }
         }
 
-        // 取得預設角色
-        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
-
-        // 建立帳號
+        // 建立帳號（不分配角色，roleLevel = 0）
         const account = this.accountRepository.create({
             email: googleProfile.email || undefined,
             passwordHash: '', // Google 登入不需要密碼
@@ -411,7 +401,7 @@ export class AuthService {
             avatarUrl: googleProfile.picture,
             googleId: googleProfile.id,
             googleEmail: googleProfile.email,
-            roles: volunteerRole ? [volunteerRole] : [],
+            roles: [],  // 新帳號不分配角色
         });
 
         await this.accountRepository.save(account);
@@ -462,9 +452,7 @@ export class AuthService {
             return this.generateTokenResponse(account);
         }
 
-        // 建立新帳號
-        const volunteerRole = await this.roleRepository.findOne({ where: { name: 'volunteer' } });
-
+        // 建立新帳號（不分配角色，roleLevel = 0）
         account = this.accountRepository.create({
             email,
             passwordHash: '', // Firebase 登入不需要密碼
@@ -472,7 +460,7 @@ export class AuthService {
             avatarUrl: picture || undefined,
             firebaseUid: uid,
             emailVerified: email_verified || false,
-            roles: volunteerRole ? [volunteerRole] : [],
+            roles: [],  // 新帳號不分配角色
         });
 
         await this.accountRepository.save(account);

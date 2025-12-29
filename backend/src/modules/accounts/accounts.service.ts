@@ -211,6 +211,7 @@ export class AccountsService {
         roleDisplayName: string;
         isActive: boolean;
         lastLoginAt: Date | null;
+        createdAt: Date;
     }[]> {
         const accounts = await this.accountRepository.find({
             relations: ['roles'],
@@ -233,6 +234,7 @@ export class AccountsService {
                 roleDisplayName: highestRole?.displayName || '一般民眾',
                 isActive: account.isActive,
                 lastLoginAt: account.lastLoginAt,
+                createdAt: account.createdAt,
             };
         });
     }
