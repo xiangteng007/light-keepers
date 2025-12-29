@@ -827,7 +827,7 @@ select {
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: var(--primary, #4F46E5);
+  background: #B8A99A;
   display: flex;
   align-items: center;
   justify-content: center;
