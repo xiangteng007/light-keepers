@@ -206,25 +206,39 @@ export default function DashboardPage() {
 
                 {/* 最新 NCDR 警報 - 公開 */}
                 <Card title="即時警報" icon="⚠️" padding="md">
-                    <div className="alert-list">
-                        {alertsData?.slice(0, 4).map((alert: any) => (
-                            <div key={alert.id} className="alert-item">
-                                <Badge
-                                    variant={alert.severity === 'extreme' ? 'danger' : alert.severity === 'severe' ? 'warning' : 'default'}
-                                    size="sm"
-                                >
-                                    {alert.type}
-                                </Badge>
-                                <span className="alert-title">{alert.title?.substring(0, 30)}...</span>
+                    <div className="alert-list-v2">
+                        {alertsData?.slice(0, 4).map((alert: any) => {
+                            const severityClass = alert.severity === 'critical' ? 'critical' :
+                                alert.severity === 'warning' ? 'warning' : 'info';
+                            const severityIcon = alert.severity === 'critical' ? '🔴' :
+                                alert.severity === 'warning' ? '🟠' : '🟡';
+                            return (
+                                <div key={alert.id} className={`alert-card-v2 alert-card-v2--${severityClass}`}>
+                                    <div className="alert-card-v2__header">
+                                        <span className="alert-card-v2__severity">{severityIcon}</span>
+                                        <span className="alert-card-v2__type">{alert.alertTypeName || alert.type || '警報'}</span>
+                                        <span className="alert-card-v2__time">{formatTime(alert.publishedAt || alert.createdAt)}</span>
+                                    </div>
+                                    <div className="alert-card-v2__title">{alert.title}</div>
+                                    {alert.sourceUnit && (
+                                        <div className="alert-card-v2__source">📡 {alert.sourceUnit}</div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                        {(!alertsData || alertsData.length === 0) && (
+                            <div className="empty-state-mini">
+                                <span className="empty-icon">✅</span>
+                                <span>目前無重大警報</span>
                             </div>
-                        )) || <div className="empty-state-mini">暫無警報</div>}
+                        )}
                     </div>
                     <Link to="/ncdr-alerts" className="view-more-link">
-                        查看全部 →
+                        查看全部警報 →
                     </Link>
                 </Card>
 
-                {/* 最新事件 - Level 1+ */}
+                {/* 地圖概覽 - 結合 Level 1+ 事件顯示 */}
                 {roleLevel >= 1 ? (
                     <Card title="最新事件" icon="📢" padding="md">
                         <div className="event-list">
@@ -251,11 +265,32 @@ export default function DashboardPage() {
                     </Card>
                 ) : (
                     <Card title="地圖概覽" icon="🗺️" padding="md">
-                        <div className="map-placeholder">
-                            <span>🗺️</span>
-                            <p>地圖顯示災情與資源分布</p>
-                            <Link to="/map">
-                                <Button variant="secondary" size="sm">開啟地圖</Button>
+                        <div className="map-preview-v2">
+                            <div className="map-preview-v2__stats">
+                                <div className="map-stat">
+                                    <span className="map-stat__icon">🚨</span>
+                                    <span className="map-stat__value">{eventStats?.active || 0}</span>
+                                    <span className="map-stat__label">進行中事件</span>
+                                </div>
+                                <div className="map-stat">
+                                    <span className="map-stat__icon">⚠️</span>
+                                    <span className="map-stat__value">{alertsData?.length || 0}</span>
+                                    <span className="map-stat__label">警報數量</span>
+                                </div>
+                                <div className="map-stat">
+                                    <span className="map-stat__icon">🏥</span>
+                                    <span className="map-stat__value">--</span>
+                                    <span className="map-stat__label">避難所</span>
+                                </div>
+                            </div>
+                            <div className="map-preview-v2__visual">
+                                <div className="map-visual-placeholder">
+                                    <span className="map-icon">🗺️</span>
+                                    <span className="map-text">即時災情地圖</span>
+                                </div>
+                            </div>
+                            <Link to="/map" className="map-preview-v2__btn">
+                                <Button variant="primary" size="md">開啟互動地圖</Button>
                             </Link>
                         </div>
                     </Card>
