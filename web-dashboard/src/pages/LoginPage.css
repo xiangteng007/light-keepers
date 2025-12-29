@@ -300,6 +300,42 @@
     margin-bottom: 0;
 }
 
+/* Inline Input with Button */
+.input-with-button {
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+}
+
+.input-with-button input {
+    flex: 1;
+}
+
+.inline-btn {
+    flex-shrink: 0;
+    padding: 16px 20px;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    background: white;
+    color: var(--luxury-dark);
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.inline-btn:hover:not(:disabled) {
+    background: var(--luxury-dark);
+    color: white;
+    border-color: var(--luxury-dark);
+}
+
+.inline-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
 /* Resend Verification Button */
 .login-resend-btn {
     width: 100%;

@@ -404,18 +404,65 @@ export default function LoginPage() {
 
                             <div className="form-group">
                                 <label htmlFor="email">電子郵件</label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    autoComplete="email"
-                                    placeholder="請輸入電子郵件"
-                                    value={formData.email}
-                                    onChange={handleChange}
-                                    required
-                                    disabled={emailVerificationSent}
-                                />
+                                {!isLogin ? (
+                                    <div className="input-with-button">
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            name="email"
+                                            autoComplete="email"
+                                            placeholder="請輸入電子郵件"
+                                            value={formData.email}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                        <button
+                                            type="button"
+                                            className="inline-btn"
+                                            onClick={handleResendVerification}
+                                            disabled={isLoading || !formData.email}
+                                        >
+                                            {emailVerificationSent ? '重發' : '發送'}
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <input
+                                        type="email"
+                                        id="email"
+                                        name="email"
+                                        autoComplete="email"
+                                        placeholder="請輸入電子郵件"
+                                        value={formData.email}
+                                        onChange={handleChange}
+                                        required
+                                    />
+                                )}
                             </div>
+
+                            {/* 註冊時顯示驗證碼欄位 */}
+                            {!isLogin && (
+                                <div className="form-group">
+                                    <label htmlFor="verificationCode">驗證碼</label>
+                                    <div className="input-with-button">
+                                        <input
+                                            type="text"
+                                            id="verificationCode"
+                                            placeholder="請輸入 6 位數驗證碼"
+                                            value={verificationCode}
+                                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                                            maxLength={6}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="inline-btn"
+                                            onClick={handleVerifyCode}
+                                            disabled={isVerifyingCode || verificationCode.length < 6}
+                                        >
+                                            {isVerifyingCode ? '...' : '驗證'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
 
                             <div className="form-group">
                                 <label htmlFor="password">密碼</label>
@@ -429,7 +476,6 @@ export default function LoginPage() {
                                     onChange={handleChange}
                                     required
                                     minLength={6}
-                                    disabled={emailVerificationSent}
                                 />
                             </div>
 
@@ -446,7 +492,6 @@ export default function LoginPage() {
                                         onChange={handleChange}
                                         required={!isLogin}
                                         minLength={6}
-                                        disabled={emailVerificationSent}
                                     />
                                 </div>
                             )}
@@ -483,40 +528,6 @@ export default function LoginPage() {
                             {successMessage && (
                                 <div className="login-success">
                                     ✅ {successMessage}
-                                </div>
-                            )}
-
-                            {/* 等待 Email 驗證時顯示驗證碼輸入 */}
-                            {waitingForVerification && (
-                                <div className="verification-section">
-                                    <div className="form-group">
-                                        <label htmlFor="verificationCode">驗證碼</label>
-                                        <input
-                                            type="text"
-                                            id="verificationCode"
-                                            placeholder="請輸入 6 位驗證碼"
-                                            value={verificationCode}
-                                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                            maxLength={6}
-                                            className="verification-input"
-                                        />
-                                    </div>
-                                    <button
-                                        type="button"
-                                        className="login-submit"
-                                        onClick={handleVerifyCode}
-                                        disabled={isVerifyingCode || verificationCode.length < 6}
-                                    >
-                                        {isVerifyingCode ? '驗證中...' : '驗證'}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        className="login-resend-btn"
-                                        onClick={handleResendVerification}
-                                        disabled={isLoading}
-                                    >
-                                        📧 重新發送驗證碼
-                                    </button>
                                 </div>
                             )}
 
