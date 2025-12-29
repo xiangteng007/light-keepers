@@ -344,7 +344,7 @@ export default function PermissionsPage() {
                     onClick={() => setActiveTab('users')}
                 >
                     <Users size={18} />
-                    用戶角色管理
+                    志工權限
                 </button>
                 <button
                     className={`permissions-tab ${activeTab === 'general' ? 'active' : ''}`}
@@ -516,6 +516,29 @@ export default function PermissionsPage() {
                                                 <span className={`user-card__level level-${account.roleLevel}`}>
                                                     {account.roleDisplayName}
                                                 </span>
+                                                {/* 理事長(level 4)以上可見刪除/黑名單按鈕 */}
+                                                {(user?.roleLevel ?? 0) >= 4 && canModify(account.roleLevel) && (
+                                                    <div className="user-card__actions" onClick={e => e.stopPropagation()}>
+                                                        {account.isActive && (
+                                                            <button
+                                                                className="action-btn action-btn--warning"
+                                                                onClick={() => handleBlacklistAccount(account.id, account.displayName || account.email)}
+                                                                disabled={processingId === account.id}
+                                                                title="加入黑名單"
+                                                            >
+                                                                <Ban size={16} />
+                                                            </button>
+                                                        )}
+                                                        <button
+                                                            className="action-btn action-btn--danger"
+                                                            onClick={() => handleDeleteAccount(account.id, account.displayName || account.email)}
+                                                            disabled={processingId === account.id}
+                                                            title="刪除帳號"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </div>
+                                                )}
                                                 {expandedUser === account.id ? (
                                                     <ChevronUp size={20} />
                                                 ) : (
