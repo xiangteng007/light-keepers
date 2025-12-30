@@ -50,7 +50,7 @@ import { DonationsModule } from './modules/donations/donations.module';
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_DATABASE', 'lightkeepers'),
                     autoLoadEntities: true,
-                    synchronize: false, // 生產環境必須關閉，使用 migration 管理 schema
+                    synchronize: false, // Phase 1-5 表已建立，關閉 sync 確保生產安全
                     logging: !isProduction,
                     retryAttempts: 10, // 增加重試次數給 Cloud SQL cold start
                     retryDelay: 5000,  // 增加重試間隔
