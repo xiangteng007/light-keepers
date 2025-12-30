@@ -6,6 +6,9 @@ dist/
 .env
 .env.local
 .env.*.local
+.env.credentials
+*.tmp
+.dbpass*
 
 # IDE
 .idea/
@@ -27,3 +30,7 @@ build/
 # Cache
 .cache/
 .npm/
+
+# Secrets
+**/serviceAccountKey.json
+**/firebase-adminsdk*.json

@@ -50,7 +50,7 @@ import { DonationsModule } from './modules/donations/donations.module';
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_DATABASE', 'lightkeepers'),
                     autoLoadEntities: true,
-                    synchronize: true, // 暫時啟用以建立 ncdr_alerts 表，之後需改回 false
+                    synchronize: false, // 生產環境必須關閉，使用 migration 管理 schema
                     logging: !isProduction,
                     retryAttempts: 10, // 增加重試次數給 Cloud SQL cold start
                     retryDelay: 5000,  // 增加重試間隔

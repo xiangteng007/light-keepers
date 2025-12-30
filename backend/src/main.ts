@@ -5,9 +5,13 @@ import { AppModule } from './app.module';
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
 
-    // 啟用 CORS
+    // 啟用 CORS - 限制允許的網域
     app.enableCors({
-        origin: process.env.CORS_ORIGIN || '*',
+        origin: process.env.CORS_ORIGIN?.split(',') || [
+            'https://lightkeepers.ngo',
+            'https://www.lightkeepers.ngo',
+            'http://localhost:5173'
+        ],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         credentials: true,
     });
