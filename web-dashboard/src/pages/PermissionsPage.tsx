@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { deleteAccount, blacklistAccount } from '../api/services';
 import './PermissionsPage.css';
+import api from '../utils/api';
 
 // Types
 interface AdminAccount {
@@ -49,8 +50,6 @@ interface PagePermission {
     isVisible: boolean;
 }
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
-
 export default function PermissionsPage() {
     const { user } = useAuth();
     const [activeTab, setActiveTab] = useState<'users' | 'general' | 'pages'>('users');
@@ -67,9 +66,6 @@ export default function PermissionsPage() {
     const [selectedAccount, setSelectedAccount] = useState<AdminAccount | null>(null);
     const [processingId, setProcessingId] = useState<string | null>(null);
 
-    // 獲取 token
-    const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-
     // Fetch all data
     useEffect(() => {
         fetchData();
@@ -80,31 +76,15 @@ export default function PermissionsPage() {
         setError(null);
 
         try {
-            const token = getToken();
-            const headers = {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`,
-            };
-
             const [accountsRes, rolesRes, permissionsRes] = await Promise.all([
-                fetch(`${API_BASE}/accounts/admin`, { headers }),
-                fetch(`${API_BASE}/accounts/roles`, { headers }),
-                fetch(`${API_BASE}/accounts/page-permissions`, { headers }),
+                api.get('/accounts/admin'),
+                api.get('/accounts/roles'),
+                api.get('/accounts/page-permissions'),
             ]);
 
-            if (!accountsRes.ok || !rolesRes.ok || !permissionsRes.ok) {
-                throw new Error('無法載入資料');
-            }
-
-            const [accountsData, rolesData, permissionsData] = await Promise.all([
-                accountsRes.json(),
-                rolesRes.json(),
-                permissionsRes.json(),
-            ]);
-
-            setAccounts(accountsData);
-            setRoles(rolesData);
-            setPagePermissions(permissionsData);
+            setAccounts(accountsRes.data);
+            setRoles(rolesRes.data);
+            setPagePermissions(permissionsRes.data);
         } catch (err) {
             setError('載入資料失敗，請稍後再試');
             console.error('Failed to fetch data:', err);
@@ -117,22 +97,8 @@ export default function PermissionsPage() {
     const handleRoleChange = async (accountId: string, roleNames: string[]) => {
         setSavingUser(accountId);
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/accounts/${accountId}/roles`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ roleNames }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || '更新失敗');
-            }
-
-            const updatedAccount = await response.json();
+            const response = await api.patch(`/accounts/${accountId}/roles`, { roleNames });
+            const updatedAccount = response.data;
 
             // Update local state
             setAccounts(prev =>
@@ -151,8 +117,8 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '角色已更新' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as Error;
-            setMessage({ type: 'error', text: error.message || '更新失敗' });
+            const error = err as { response?: { data?: { message?: string } }, message?: string };
+            setMessage({ type: 'error', text: error.response?.data?.message || error.message || '更新失敗' });
             setTimeout(() => setMessage(null), 5000);
         } finally {
             setSavingUser(null);
@@ -165,22 +131,8 @@ export default function PermissionsPage() {
         updates: { requiredLevel?: number; isVisible?: boolean; pageName?: string; sortOrder?: number }
     ) => {
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/accounts/page-permissions/${pageKey}`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify(updates),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.message || '更新失敗');
-            }
-
-            const updatedPermission = await response.json();
+            const response = await api.patch(`/accounts/page-permissions/${pageKey}`, updates);
+            const updatedPermission = response.data;
 
             // Update local state
             setPagePermissions(prev =>
@@ -190,8 +142,8 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '頁面權限已更新' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as Error;
-            setMessage({ type: 'error', text: error.message || '更新失敗' });
+            const error = err as { response?: { data?: { message?: string } }, message?: string };
+            setMessage({ type: 'error', text: error.response?.data?.message || error.message || '更新失敗' });
             setTimeout(() => setMessage(null), 5000);
         }
     };
@@ -225,18 +177,9 @@ export default function PermissionsPage() {
 
         // Update backend
         try {
-            const token = getToken();
             await Promise.all([
-                fetch(`${API_BASE}/accounts/page-permissions/${currentPage.pageKey}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ sortOrder: newCurrentOrder }),
-                }),
-                fetch(`${API_BASE}/accounts/page-permissions/${swapPage.pageKey}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-                    body: JSON.stringify({ sortOrder: newSwapOrder }),
-                }),
+                api.patch(`/accounts/page-permissions/${currentPage.pageKey}`, { sortOrder: newCurrentOrder }),
+                api.patch(`/accounts/page-permissions/${swapPage.pageKey}`, { sortOrder: newSwapOrder }),
             ]);
         } catch (err) {
             console.error('Failed to update sort order:', err);

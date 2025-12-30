@@ -29,8 +29,7 @@ import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 import { getTasks } from '../api/services';
-
-const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+import api from '../utils/api';
 
 interface NavItem {
     id: string;
@@ -145,10 +144,8 @@ export default function Layout() {
     useEffect(() => {
         const loadPagePermissions = async () => {
             try {
-                const response = await fetch(`${API_BASE}/accounts/page-permissions`);
-                if (!response.ok) return;
-
-                const permissions = await response.json();
+                const response = await api.get('/accounts/page-permissions');
+                const permissions = response.data;
                 if (!Array.isArray(permissions) || permissions.length === 0) return;
 
                 // Build updated nav items from backend data
