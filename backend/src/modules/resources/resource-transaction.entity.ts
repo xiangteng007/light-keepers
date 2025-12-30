@@ -68,6 +68,48 @@ export class ResourceTransaction {
     @Column({ type: 'varchar', length: 50, nullable: true })
     referenceNo?: string;
 
+    // 🔐 Phase 4: 覆核機制（controlled/medical 出庫）
+    // 覆核狀態
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    approvalStatus?: 'pending' | 'approved' | 'rejected';
+
+    // 覆核人 ID
+    @Column({ type: 'uuid', nullable: true })
+    approvedBy?: string;
+
+    // 覆核人姓名
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    approvedByName?: string;
+
+    // 覆核/拒絕時間
+    @Column({ type: 'timestamp', nullable: true })
+    approvedAt?: Date;
+
+    // 拒絕原因
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    rejectReason?: string;
+
+    // 🔐 領用人資訊（敏感，未來將遷移至獨立表）
+    // 領用人姓名（controlled/medical 必填）
+    @Column({ type: 'varchar', length: 100, nullable: true })
+    recipientName?: string;
+
+    // 領用人電話
+    @Column({ type: 'varchar', length: 20, nullable: true })
+    recipientPhone?: string;
+
+    // 領用人證件號
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    recipientIdNo?: string;
+
+    // 領用人單位
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    recipientOrg?: string;
+
+    // 用途說明（controlled/medical 必填）
+    @Column({ type: 'varchar', length: 500, nullable: true })
+    purpose?: string;
+
     // 異動時間
     @CreateDateColumn()
     createdAt: Date;

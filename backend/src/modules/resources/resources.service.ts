@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThanOrEqual } from 'typeorm';
 import { Resource, ResourceCategory, ResourceStatus } from './resources.entity';
@@ -29,6 +29,12 @@ export interface TransactionDto {
     toLocation?: string;
     notes?: string;
     referenceNo?: string;
+    // Phase 4: 領用人資訊 (controlled/medical 必填)
+    recipientName?: string;
+    recipientPhone?: string;
+    recipientIdNo?: string;
+    recipientOrg?: string;
+    purpose?: string;
 }
 
 export interface CreateDonationSourceDto {
@@ -94,27 +100,51 @@ export class ResourcesService {
     // ==================== 📊 異動紀錄 (功能1) ====================
 
     /**
-     * 記錄物資異動
+     * 記錄物資異動 (Phase 4: 增加 controlled/medical 驗證)
      */
     async recordTransaction(dto: TransactionDto): Promise<ResourceTransaction> {
         const resource = await this.findOne(dto.resourceId);
         const beforeQuantity = resource.quantity;
 
+        // Phase 4: controlled/medical 出庫驗證
+        const needsApproval = dto.type === 'out' &&
+            (resource.controlLevel === 'controlled' || resource.controlLevel === 'medical');
+
+        if (needsApproval) {
+            // 領用人信息必填檢查
+            if (!dto.recipientName || dto.recipientName.trim().length === 0) {
+                throw new BadRequestException(`${resource.controlLevel} 品項出庫必須填寫領用人姓名`);
+            }
+            if (!dto.purpose || dto.purpose.trim().length < 5) {
+                throw new BadRequestException(`${resource.controlLevel} 品項出庫必須填寫用途說明（至少 5 個字）`);
+            }
+        }
+
         // 計算新數量
         let afterQuantity = beforeQuantity;
         if (dto.type === 'in' || dto.type === 'donate') {
             afterQuantity = beforeQuantity + dto.quantity;
-        } else if (dto.type === 'out' || dto.type === 'expired') {
+        } else if (dto.type === 'out') {
+            // Phase 4: controlled/medical 不立即扣庫存，等待覆核
+            if (!needsApproval) {
+                afterQuantity = Math.max(0, beforeQuantity - dto.quantity);
+            } else {
+                // 待覆核，不改變 afterQuantity
+                afterQuantity = beforeQuantity;
+            }
+        } else if (dto.type === 'expired') {
             afterQuantity = Math.max(0, beforeQuantity - dto.quantity);
         } else if (dto.type === 'adjust') {
             afterQuantity = dto.quantity; // 直接設定
         }
 
-        // 更新物資數量
-        resource.quantity = afterQuantity;
-        resource.status = this.calculateStatus(afterQuantity, resource.minQuantity);
-        if (dto.toLocation) resource.location = dto.toLocation;
-        await this.resourcesRepository.save(resource);
+        // 更新物資數量（除非待覆核）
+        if (!needsApproval || dto.type !== 'out') {
+            resource.quantity = afterQuantity;
+            resource.status = this.calculateStatus(afterQuantity, resource.minQuantity);
+            if (dto.toLocation) resource.location = dto.toLocation;
+            await this.resourcesRepository.save(resource);
+        }
 
         // 建立異動紀錄
         const transaction = this.transactionRepository.create({
@@ -129,9 +159,19 @@ export class ResourcesService {
             toLocation: dto.toLocation,
             notes: dto.notes,
             referenceNo: dto.referenceNo,
+            // Phase 4: 領用人資訊
+            recipientName: dto.recipientName,
+            recipientPhone: dto.recipientPhone,
+            recipientIdNo: dto.recipientIdNo,
+            recipientOrg: dto.recipientOrg,
+            purpose: dto.purpose,
+            // Phase 4: 覆核狀態
+            approvalStatus: needsApproval ? 'pending' : undefined,
         });
 
-        this.logger.log(`📦 ${dto.type}: ${resource.name} ${beforeQuantity} → ${afterQuantity} by ${dto.operatorName}`);
+        const logAction = needsApproval ? '🕒 待覆核' : dto.type;
+        this.logger.log(`📦 ${logAction}: ${resource.name} ${beforeQuantity} → ${afterQuantity} by ${dto.operatorName}`);
+
         return this.transactionRepository.save(transaction);
     }
 
