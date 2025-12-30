@@ -34,6 +34,8 @@ import { SensitiveService } from './sensitive.service';
 import { LabelTemplatesController } from './label-templates.controller';
 import { LabelTemplatesService } from './label-templates.service';
 import { LotsService } from './lots.service';
+import { LabelPrintController } from './label-print.controller';
+import { LabelPrintService } from './label-print.service';
 
 @Module({
     imports: [
@@ -63,6 +65,7 @@ import { LotsService } from './lots.service';
         AuditController,
         SensitiveController,      // 📋 Phase 2: 敏感資料讀取 API
         LabelTemplatesController, // 📋 Phase 3: 貼紙模板管理
+        LabelPrintController,     // 📋 Phase 3: 貼紙列印 API
     ],
     providers: [
         ResourcesService,
@@ -77,7 +80,8 @@ import { LotsService } from './lots.service';
         // 📋 Phase 3: QR/貼紙系統
         LabelTemplatesService,
         LotsService,
+        LabelPrintService,
     ],
-    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService, QrCodeService, AuditLogService, SensitiveService, LabelTemplatesService, LotsService],
+    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService, QrCodeService, AuditLogService, SensitiveService, LabelTemplatesService, LotsService, LabelPrintService],
 })
 export class ResourcesModule { }

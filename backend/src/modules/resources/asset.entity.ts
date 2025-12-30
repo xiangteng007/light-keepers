@@ -33,6 +33,14 @@ export class Asset {
     @Column({ type: 'varchar', length: 100, nullable: true })
     barcode?: string;
 
+    // 🔐 QR Code 內容（ORG|ASSET|{assetId}|{checksum}）
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    qrValue?: string;
+
+    // 所在倉庫 ID
+    @Column({ type: 'uuid', nullable: true })
+    warehouseId?: string;
+
     // 狀態
     @Column({ type: 'varchar', length: 20, default: 'in_stock' })
     status: AssetStatus;
@@ -96,6 +104,14 @@ export class Asset {
     // 保固到期日
     @Column({ type: 'date', nullable: true })
     warrantyExpiry?: Date;
+
+    // 🏷️ 已列印貼紙數
+    @Column({ type: 'int', default: 0 })
+    labelsPrinted: number;
+
+    // 🏷️ 最後列印批次 ID
+    @Column({ type: 'uuid', nullable: true })
+    lastPrintBatchId?: string;
 
     @CreateDateColumn()
     createdAt: Date;
