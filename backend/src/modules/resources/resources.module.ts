@@ -25,6 +25,11 @@ import { DispatchController } from './dispatch.controller';
 import { DispatchService } from './dispatch.service';
 import { AuditController } from './audit.controller';
 import { AuditService } from './audit.service';
+// 📋 Phase 2: 核心服務
+import { QrCodeService } from './qr-code.service';
+import { AuditLogService } from './audit-log.service';
+import { SensitiveController } from './sensitive.controller';
+import { SensitiveService } from './sensitive.service';
 
 @Module({
     imports: [
@@ -52,6 +57,7 @@ import { AuditService } from './audit.service';
         AssetsController,
         DispatchController,
         AuditController,
+        SensitiveController,  // 📋 Phase 2: 敏感資料讀取 API
     ],
     providers: [
         ResourcesService,
@@ -59,7 +65,11 @@ import { AuditService } from './audit.service';
         AssetsService,
         DispatchService,
         AuditService,
+        // 📋 Phase 2: 核心服務
+        QrCodeService,
+        AuditLogService,
+        SensitiveService,
     ],
-    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService],
+    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService, QrCodeService, AuditLogService, SensitiveService],
 })
 export class ResourcesModule { }
