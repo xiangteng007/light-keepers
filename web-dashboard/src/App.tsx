@@ -31,6 +31,7 @@ import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
 import VolunteerRegisterPage from './pages/VolunteerRegisterPage'
 import ForecastPage from './pages/ForecastPage'
 import DonationsPage from './pages/DonationsPage'
+import ResourcesPublicPage from './pages/ResourcesPublicPage'
 import './App.css'
 
 
@@ -104,6 +105,7 @@ function App() {
             <Route path="notifications" element={<ProtectedRoute requiredLevel={1}><NotificationsPage /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute requiredLevel={1}><ProfilePage /></ProtectedRoute>} />
             <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={1}><VolunteerRegisterPage /></ProtectedRoute>} />
+            <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />

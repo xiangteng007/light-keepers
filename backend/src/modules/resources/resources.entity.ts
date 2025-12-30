@@ -52,6 +52,14 @@ export class Resource {
     @Column({ type: 'date', nullable: true })
     expiresAt?: Date;
 
+    // 是否資產化 (高單價需單件追蹤)
+    @Column({ type: 'boolean', default: false })
+    isAssetized: boolean;
+
+    // 關聯儲位 (可選)
+    @Column({ type: 'uuid', nullable: true })
+    storageLocationId?: string;
+
     // 時間戳記
     @CreateDateColumn()
     createdAt: Date;
