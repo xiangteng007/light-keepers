@@ -3,6 +3,8 @@ import { Card, Button, Badge } from '../design-system';
 import { getResources, getResourceStats } from '../api/services';
 import type { Resource, ResourceCategory } from '../api/services';
 import { useAuth } from '../context/AuthContext';
+import WarehousesTab from './resources/WarehousesTab';
+import AssetsTab from './resources/AssetsTab';
 import './ResourcesPage.css';
 
 // 物資分類
@@ -46,7 +48,7 @@ export default function ResourcesPage() {
     const canManage = user && user.roleLevel >= 3; // 幹部以上權限
     const isOwner = user && user.roleLevel >= 5; // 系統擁有者權限
 
-    const [activeTab, setActiveTab] = useState<'manage' | 'logs'>('manage');
+    const [activeTab, setActiveTab] = useState<'manage' | 'warehouses' | 'assets' | 'logs'>('manage');
     const [resources, setResources] = useState<Resource[]>([]);
     const [logs, setLogs] = useState<ResourceLog[]>([]);
     const [stats, setStats] = useState({
@@ -264,13 +266,25 @@ export default function ResourcesPage() {
                     className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
                     onClick={() => setActiveTab('manage')}
                 >
-                    📋 物資管理
+                    📋 耗材管理
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'warehouses' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('warehouses')}
+                >
+                    🏭 倉庫/儲位
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'assets' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('assets')}
+                >
+                    🔧 器材資產
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
                     onClick={() => setActiveTab('logs')}
                 >
-                    📜 物資紀錄
+                    📜 異動紀錄
                 </button>
             </div>
 
@@ -399,6 +413,14 @@ export default function ResourcesPage() {
                         </table>
                     </div>
                 </>
+            )}
+
+            {activeTab === 'warehouses' && (
+                <WarehousesTab canManage={!!canManage} />
+            )}
+
+            {activeTab === 'assets' && (
+                <AssetsTab canManage={!!canManage} userName={user?.displayName || '操作員'} />
             )}
 
             {activeTab === 'logs' && (
