@@ -43,7 +43,7 @@ export default function LabelManagementPage() {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.get('/api/label-templates');
+            const response = await api.get('/label-templates');
             setTemplates(response.data || []);
         } catch (err: any) {
             setError(err.response?.data?.message || '載入失敗');
@@ -60,7 +60,7 @@ export default function LabelManagementPage() {
 
         try {
             setLoading(true);
-            await api.post('/api/label-templates', {
+            await api.post('/label-templates', {
                 name: templateName,
                 description: templateDesc,
                 targetTypes: selectedTargetTypes,
@@ -97,7 +97,7 @@ export default function LabelManagementPage() {
 
     const handleToggleTemplate = async (templateId: string, isActive: boolean) => {
         try {
-            await api.patch(`/api/label-templates/${templateId}`, {
+            await api.patch(`/label-templates/${templateId}`, {
                 isActive: !isActive,
             });
             alert(`✅ 模板已${!isActive ? '啟用' : '停用'}`);

@@ -4,7 +4,7 @@ import { ApprovalService } from './approval.service';
 /**
  * 覆核管理 API (Phase 4)
  */
-@Controller('api/approvals')
+@Controller('approvals')
 export class ApprovalController {
     constructor(private readonly approvalService: ApprovalService) { }
 

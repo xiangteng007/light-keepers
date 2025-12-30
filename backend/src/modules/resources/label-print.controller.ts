@@ -4,7 +4,7 @@ import { LabelPrintService } from './label-print.service';
 /**
  * 貼紙列印 API
  */
-@Controller('api/labels')
+@Controller('labels')
 export class LabelPrintController {
     constructor(private readonly labelPrintService: LabelPrintService) { }
 

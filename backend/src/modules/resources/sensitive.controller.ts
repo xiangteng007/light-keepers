@@ -6,7 +6,7 @@ import { AuditTargetType } from './sensitive-read-log.entity';
  * 敏感資料讀取 API
  * 所有敏感資料必須透過此 API 讀取，不可前端直接存取
  */
-@Controller('api/sensitive')
+@Controller('sensitive')
 export class SensitiveController {
     constructor(private readonly sensitiveService: SensitiveService) { }
 

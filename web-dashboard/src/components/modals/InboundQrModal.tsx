@@ -48,7 +48,7 @@ export default function InboundQrModal({
             setLoading(true);
 
             // 呼叫批次創建 API
-            const response = await api.post('/api/lots', {
+            const response = await api.post('/lots', {
                 itemId: resourceId,
                 lotNumber: lotNumber || `LOT-${Date.now()}`,
                 expiryDate: expiryDate || null,

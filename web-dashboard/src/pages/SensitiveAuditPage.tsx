@@ -61,7 +61,7 @@ export default function SensitiveAuditPage() {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.post('/api/sensitive/audit-logs', {
+            const response = await api.post('/sensitive/audit-logs', {
                 dateFrom: dateFrom || undefined,
                 dateTo: dateTo || undefined,
                 actorUid: actorUid || undefined,
@@ -80,7 +80,7 @@ export default function SensitiveAuditPage() {
         try {
             setLoading(true);
             setError(null);
-            const response = await api.get('/api/labels/audit-logs', {
+            const response = await api.get('/labels/audit-logs', {
                 params: {
                     dateFrom: dateFrom || undefined,
                     dateTo: dateTo || undefined,

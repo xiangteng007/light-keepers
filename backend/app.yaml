@@ -1,0 +1,15 @@
+runtime: nodejs20
+env: standard
+
+env_variables:
+  NODE_ENV: production
+  PORT: "8080"
+  DB_PORT: "5432"
+  DB_DATABASE: lightkeepers
+  DB_USERNAME: postgres
+  DB_PASSWORD: "I5>>P5RR/bSdo%d8"
+  DB_HOST: "/cloudsql/light-keepers-mvp:asia-east1:light-keepers-db"
+  GEMINI_API_KEY: "AIzaSyC-5awXniFknpEngQJ-orCgaBMHkJE8qhI"
+
+beta_settings:
+  cloud_sql_instances: "light-keepers-mvp:asia-east1:light-keepers-db"

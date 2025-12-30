@@ -42,7 +42,7 @@ export default function ApprovalCenterPage() {
             setLoading(true);
             setError(null);
             const params = filter !== 'all' ? { controlLevel: filter } : {};
-            const response = await api.get('/api/approvals/pending', { params });
+            const response = await api.get('/approvals/pending', { params });
             setApprovals(response.data.transactions || []);
         } catch (err: any) {
             setError(err.response?.data?.message || '載入失敗');
@@ -57,7 +57,7 @@ export default function ApprovalCenterPage() {
 
         try {
             setActionLoading(true);
-            await api.post(`/api/approvals/${approvalId}/approve`);
+            await api.post(`/approvals/${approvalId}/approve`);
             alert('✅ 覆核通過！');
             fetchPendingApprovals();
             setShowDetailModal(false);
@@ -77,7 +77,7 @@ export default function ApprovalCenterPage() {
 
         try {
             setActionLoading(true);
-            await api.post(`/api/approvals/${selectedApproval.id}/reject`, {
+            await api.post(`/approvals/${selectedApproval.id}/reject`, {
                 rejectReason,
             });
             alert('✅ 已拒絕覆核');
@@ -95,7 +95,7 @@ export default function ApprovalCenterPage() {
     const handleViewSensitive = async (approvalId: string) => {
         try {
             // 透過敏感資料 API 讀取（會寫入稽核日誌）
-            const response = await api.post('/api/sensitive/read', {
+            const response = await api.post('/sensitive/read', {
                 targetType: 'transaction',
                 targetId: approvalId,
                 fieldsAccessed: ['recipientName', 'recipientPhone', 'recipientIdNo', 'recipientOrg'],

@@ -4,7 +4,7 @@ import { LabelTemplatesService } from './label-templates.service';
 /**
  * 貼紙模板管理 API（幹部專用）
  */
-@Controller('api/label-templates')
+@Controller('label-templates')
 export class LabelTemplatesController {
     constructor(private readonly templatesService: LabelTemplatesService) { }
 
