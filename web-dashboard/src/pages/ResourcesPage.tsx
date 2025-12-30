@@ -5,6 +5,8 @@ import type { Resource, ResourceCategory } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import WarehousesTab from './resources/WarehousesTab';
 import AssetsTab from './resources/AssetsTab';
+import DispatchTab from './resources/DispatchTab';
+import AuditTab from './resources/AuditTab';
 import './ResourcesPage.css';
 
 // 物資分類
@@ -48,7 +50,7 @@ export default function ResourcesPage() {
     const canManage = user && user.roleLevel >= 3; // 幹部以上權限
     const isOwner = user && user.roleLevel >= 5; // 系統擁有者權限
 
-    const [activeTab, setActiveTab] = useState<'manage' | 'warehouses' | 'assets' | 'logs'>('manage');
+    const [activeTab, setActiveTab] = useState<'manage' | 'warehouses' | 'assets' | 'dispatch' | 'audit' | 'logs'>('manage');
     const [resources, setResources] = useState<Resource[]>([]);
     const [logs, setLogs] = useState<ResourceLog[]>([]);
     const [stats, setStats] = useState({
@@ -281,6 +283,18 @@ export default function ResourcesPage() {
                     🔧 器材資產
                 </button>
                 <button
+                    className={`tab-btn ${activeTab === 'dispatch' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('dispatch')}
+                >
+                    🚚 調度
+                </button>
+                <button
+                    className={`tab-btn ${activeTab === 'audit' ? 'active' : ''}`}
+                    onClick={() => setActiveTab('audit')}
+                >
+                    📊 盤點
+                </button>
+                <button
                     className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
                     onClick={() => setActiveTab('logs')}
                 >
@@ -421,6 +435,14 @@ export default function ResourcesPage() {
 
             {activeTab === 'assets' && (
                 <AssetsTab canManage={!!canManage} userName={user?.displayName || '操作員'} />
+            )}
+
+            {activeTab === 'dispatch' && (
+                <DispatchTab canManage={!!canManage} userName={user?.displayName || '操作員'} />
+            )}
+
+            {activeTab === 'audit' && (
+                <AuditTab canManage={!!canManage} userName={user?.displayName || '操作員'} />
             )}
 
             {activeTab === 'logs' && (

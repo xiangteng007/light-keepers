@@ -16,6 +16,10 @@ import { WarehousesController } from './warehouses.controller';
 import { WarehousesService } from './warehouses.service';
 import { AssetsController } from './assets.controller';
 import { AssetsService } from './assets.service';
+import { DispatchController } from './dispatch.controller';
+import { DispatchService } from './dispatch.service';
+import { AuditController } from './audit.controller';
+import { AuditService } from './audit.service';
 
 @Module({
     imports: [
@@ -36,12 +40,16 @@ import { AssetsService } from './assets.service';
         ResourcesController,
         WarehousesController,
         AssetsController,
+        DispatchController,
+        AuditController,
     ],
     providers: [
         ResourcesService,
         WarehousesService,
         AssetsService,
+        DispatchService,
+        AuditService,
     ],
-    exports: [ResourcesService, WarehousesService, AssetsService],
+    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService],
 })
 export class ResourcesModule { }
