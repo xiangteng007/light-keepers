@@ -180,13 +180,8 @@ export default function LoginPage() {
                 return;
             }
 
-            // 檢查 Email 是否已驗證
-            const isVerified = await firebaseAuthService.isEmailVerified();
-            if (!isVerified) {
-                setError('請先驗證您的 Email。點擊下方按鈕重新發送驗證信');
-                setIsLoading(false);
-                return;
-            }
+            // 注意：登入時不檢查 Email 驗證狀態
+            // Email 驗證只在註冊時要求，登入可直接進行
 
             // 取得 Firebase ID Token
             const idToken = await firebaseAuthService.getIdToken();
