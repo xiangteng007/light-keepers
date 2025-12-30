@@ -15,6 +15,15 @@ import { VolunteerVehicle } from './entities/volunteer-vehicle.entity';
 import { VolunteerInsurance } from './entities/volunteer-insurance.entity';
 import { PointsRecord } from './entities/points-record.entity';
 
+// VMS Services
+import { SkillService } from './entities/skill.service';
+import { VehicleService } from './entities/vehicle.service';
+import { InsuranceService } from './entities/insurance.service';
+import { PointsService } from './entities/points.service';
+
+// VMS Controllers
+import { SkillsController, VehiclesController, InsuranceController, PointsController } from './vms.controller';
+
 @Module({
     imports: [
         TypeOrmModule.forFeature([
@@ -30,9 +39,33 @@ import { PointsRecord } from './entities/points-record.entity';
             PointsRecord,
         ]),
     ],
-    controllers: [VolunteersController, AssignmentsController],
-    providers: [VolunteersService, AssignmentsService],
-    exports: [VolunteersService, AssignmentsService],
+    controllers: [
+        VolunteersController,
+        AssignmentsController,
+        // VMS Controllers
+        SkillsController,
+        VehiclesController,
+        InsuranceController,
+        PointsController,
+    ],
+    providers: [
+        VolunteersService,
+        AssignmentsService,
+        // VMS Services
+        SkillService,
+        VehicleService,
+        InsuranceService,
+        PointsService,
+    ],
+    exports: [
+        VolunteersService,
+        AssignmentsService,
+        SkillService,
+        VehicleService,
+        InsuranceService,
+        PointsService,
+    ],
 })
 export class VolunteersModule { }
+
 
