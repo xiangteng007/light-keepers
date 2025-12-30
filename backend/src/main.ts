@@ -10,7 +10,10 @@ async function bootstrap() {
         origin: process.env.CORS_ORIGIN?.split(',') || [
             'https://lightkeepers.ngo',
             'https://www.lightkeepers.ngo',
-            'http://localhost:5173'
+            'https://light-keepers-dashboard.vercel.app',
+            'http://localhost:5173',
+            'http://localhost:5174',
+            'http://localhost:5175'
         ],
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         credentials: true,
