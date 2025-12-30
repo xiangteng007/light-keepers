@@ -33,6 +33,8 @@ import ForecastPage from './pages/ForecastPage'
 import DonationsPage from './pages/DonationsPage'
 import ResourcesPublicPage from './pages/ResourcesPublicPage'
 import ApprovalCenterPage from './pages/ApprovalCenterPage'
+import SensitiveAuditPage from './pages/SensitiveAuditPage'
+import LabelManagementPage from './pages/LabelManagementPage'
 import './App.css'
 
 
@@ -119,6 +121,8 @@ function App() {
             {/* 常務理事等級 (3) */}
             <Route path="reports/export" element={<ProtectedRoute requiredLevel={3}><ReportsExportPage /></ProtectedRoute>} />
             <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
+            <Route path="sensitive-audit" element={<ProtectedRoute requiredLevel={3}><SensitiveAuditPage /></ProtectedRoute>} />
+            <Route path="label-management" element={<ProtectedRoute requiredLevel={3}><LabelManagementPage /></ProtectedRoute>} />
             {/* 理事長等級 (4) */}
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
             {/* 系統擁有者等級 (5) */}
