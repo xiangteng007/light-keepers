@@ -11,6 +11,8 @@ async function bootstrap() {
             'https://lightkeepers.ngo',
             'https://www.lightkeepers.ngo',
             'https://light-keepers-dashboard.vercel.app',
+            'https://light-keepers-mvp.web.app',
+            'https://light-keepers-mvp.firebaseapp.com',
             'http://localhost:5173',
             'http://localhost:5174',
             'http://localhost:5175'
