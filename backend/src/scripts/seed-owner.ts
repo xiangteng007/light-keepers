@@ -79,10 +79,11 @@ async function bootstrap() {
             console.log('✅ Owner account created successfully!');
             console.log('');
             console.log('📧 Email:    ', ownerEmail);
-            console.log('🔑 Password: ', ownerPassword);
+            console.log('🔑 Password:  [PROVIDED VIA ENV VAR - NOT LOGGED]');
             console.log('👤 Role:     ', ownerRole.displayName);
             console.log('');
             console.log('⚠️  請登入後立即修改密碼！');
+            console.log('💡 如忘記密碼，請使用密碼重設功能或重新執行此腳本');
         }
     } catch (error) {
         console.error('❌ Error:', error.message);

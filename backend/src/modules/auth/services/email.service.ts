@@ -61,7 +61,10 @@ export class EmailService {
 
                 if (result.error) {
                     this.logger.error(`Failed to send email via Resend: ${result.error.message}`);
-                    this.logger.warn(`[DEV MODE] Email OTP for ${email}: ${code}`);
+                    // 僅在開發環境 log OTP（生產環境絕對禁止）
+                    if (process.env.NODE_ENV !== 'production') {
+                        this.logger.warn(`[DEV MODE] Email OTP for ${this.maskEmail(email)}: ${code}`);
+                    }
                     return true;
                 }
 
@@ -69,13 +72,19 @@ export class EmailService {
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send email: ${error.message}`);
-                this.logger.warn(`[DEV MODE] Email OTP for ${email}: ${code}`);
+                if (process.env.NODE_ENV !== 'production') {
+                    this.logger.warn(`[DEV MODE] Email OTP for ${this.maskEmail(email)}: ${code}`);
+                }
                 return true;
             }
         }
 
-        // 開發模式：僅 log 到 console
-        this.logger.warn(`[DEV MODE] Email OTP for ${email}: ${code}`);
+        // 開發模式：僅 log 到 console（遮蔽 email）
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.warn(`[DEV MODE] Email OTP for ${this.maskEmail(email)}: ${code}`);
+        } else {
+            this.logger.log(`OTP generated for ${this.maskEmail(email)} (Email not configured)`);
+        }
         return true;
     }
 
@@ -109,7 +118,10 @@ export class EmailService {
 
                 if (result.error) {
                     this.logger.error(`Failed to send password reset email: ${result.error.message}`);
-                    this.logger.warn(`[DEV MODE] Password reset for ${email}: ${resetUrl}`);
+                    // 僅在開發環境 log（生產環境絕對禁止）
+                    if (process.env.NODE_ENV !== 'production') {
+                        this.logger.warn(`[DEV MODE] Password reset for ${this.maskEmail(email)}: [URL_MASKED]`);
+                    }
                     return true;
                 }
 
@@ -117,12 +129,19 @@ export class EmailService {
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send password reset email: ${error.message}`);
-                this.logger.warn(`[DEV MODE] Password reset for ${email}: ${resetUrl}`);
+                if (process.env.NODE_ENV !== 'production') {
+                    this.logger.warn(`[DEV MODE] Password reset for ${this.maskEmail(email)}: [URL_MASKED]`);
+                }
                 return true;
             }
         }
 
-        this.logger.warn(`[DEV MODE] Password reset for ${email}: ${resetUrl}`);
+        // 開發模式：記錄但遮蔽敏感資訊
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.warn(`[DEV MODE] Password reset for ${this.maskEmail(email)}: [URL_MASKED]`);
+        } else {
+            this.logger.log(`Password reset requested for ${this.maskEmail(email)} (Email not configured)`);
+        }
         return true;
     }
 
@@ -168,8 +187,12 @@ export class EmailService {
             }
         }
 
-        // 開發模式：僅 log 到 console
-        this.logger.warn(`[DEV MODE] Verification email for ${email}: ${verificationLink}`);
+        // 開發模式：僅 log 到 console（遮蔽連結）
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.warn(`[DEV MODE] Verification email for ${this.maskEmail(email)}: [LINK_MASKED]`);
+        } else {
+            this.logger.log(`Verification email requested for ${this.maskEmail(email)} (Email not configured)`);
+        }
         return {
             success: true,
             message: '驗證信已發送（開發模式）',

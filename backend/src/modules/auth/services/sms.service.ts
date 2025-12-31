@@ -49,14 +49,20 @@ export class SmsService {
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send SMS: ${error.message}`);
-                // 開發模式：失敗時仍 log 到 console
-                this.logger.warn(`[DEV MODE] OTP for ${phone}: ${code}`);
+                // 僅在開發環境 log OTP（生產環境絕對禁止）
+                if (process.env.NODE_ENV !== 'production') {
+                    this.logger.warn(`[DEV MODE] OTP for ${this.maskPhone(phone)}: ${code}`);
+                }
                 return true;
             }
         }
 
-        // 開發模式：僅 log 到 console
-        this.logger.warn(`[DEV MODE] OTP for ${phone}: ${code}`);
+        // 開發模式：僅 log 到 console（遮蔽手機號碼）
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.warn(`[DEV MODE] OTP for ${this.maskPhone(phone)}: ${code}`);
+        } else {
+            this.logger.log(`OTP generated for ${this.maskPhone(phone)} (SMS not configured)`);
+        }
         return true;
     }
 
@@ -78,12 +84,20 @@ export class SmsService {
                 return true;
             } catch (error) {
                 this.logger.error(`Failed to send password reset SMS: ${error.message}`);
-                this.logger.warn(`[DEV MODE] Password reset for ${phone}: ${resetUrl}`);
+                // 僅在開發環境 log URL（生產環境絕對禁止）
+                if (process.env.NODE_ENV !== 'production') {
+                    this.logger.warn(`[DEV MODE] Password reset for ${this.maskPhone(phone)}: [URL_MASKED]`);
+                }
                 return true;
             }
         }
 
-        this.logger.warn(`[DEV MODE] Password reset for ${phone}: ${resetUrl}`);
+        // 開發模式：記錄但遮蔽敏感資訊
+        if (process.env.NODE_ENV !== 'production') {
+            this.logger.warn(`[DEV MODE] Password reset for ${this.maskPhone(phone)}: [URL_MASKED]`);
+        } else {
+            this.logger.log(`Password reset requested for ${this.maskPhone(phone)} (SMS not configured)`);
+        }
         return true;
     }
 
