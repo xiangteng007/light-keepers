@@ -188,6 +188,86 @@ export class AuthService {
     }
 
     /**
+     * LIFF Token 登入 - 使用 LIFF SDK 取得的 ID Token 進行認證
+     * 用於 LINE App 內的無縫 SSO 登入體驗
+     */
+    async loginWithLiffToken(idToken: string): Promise<TokenResponseDto | { needsRegistration: true; lineProfile: { userId: string; displayName: string; pictureUrl?: string } }> {
+        // 驗證 LIFF ID Token
+        const liffProfile = await this.verifyLiffIdToken(idToken);
+
+        // 查找已綁定的帳號
+        const account = await this.accountRepository.findOne({
+            where: { lineUserId: liffProfile.userId },
+            relations: ['roles'],
+        });
+
+        if (account) {
+            // 已綁定 - 直接登入
+            account.lastLoginAt = new Date();
+            // 更新頭像和顯示名稱（如果有變更）
+            if (liffProfile.pictureUrl && account.avatarUrl !== liffProfile.pictureUrl) {
+                account.avatarUrl = liffProfile.pictureUrl;
+            }
+            if (liffProfile.displayName && account.lineDisplayName !== liffProfile.displayName) {
+                account.lineDisplayName = liffProfile.displayName;
+            }
+            await this.accountRepository.save(account);
+            return this.generateTokenResponse(account);
+        }
+
+        // 未綁定 - 自動建立新帳號（LIFF 登入假設使用者信任 LINE 身份）
+        const newAccount = this.accountRepository.create({
+            passwordHash: '', // LIFF 登入不需要密碼
+            displayName: liffProfile.displayName,
+            avatarUrl: liffProfile.pictureUrl,
+            lineUserId: liffProfile.userId,
+            lineDisplayName: liffProfile.displayName,
+            roles: [],  // 新帳號不分配角色
+        });
+
+        await this.accountRepository.save(newAccount);
+        return this.generateTokenResponse(newAccount);
+    }
+
+    /**
+     * 驗證 LIFF ID Token
+     * 使用 LINE API 驗證 ID Token 的有效性並解碼用戶資訊
+     */
+    async verifyLiffIdToken(idToken: string): Promise<{ userId: string; displayName: string; pictureUrl?: string }> {
+        const clientId = process.env.LINE_CLIENT_ID;
+
+        if (!clientId) {
+            throw new UnauthorizedException('LINE Login 尚未設定');
+        }
+
+        // 使用 LINE Verify API 驗證 ID Token
+        const response = await fetch('https://api.line.me/oauth2/v2.1/verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({
+                id_token: idToken,
+                client_id: clientId,
+            }),
+        });
+
+        if (!response.ok) {
+            const error = await response.text();
+            console.error('LIFF ID Token verification failed:', error);
+            throw new UnauthorizedException('LIFF Token 驗證失敗');
+        }
+
+        const decodedToken = await response.json();
+
+        // 從解碼後的 Token 取得用戶資訊
+        // LIFF ID Token 包含：sub (userId), name, picture 等
+        return {
+            userId: decodedToken.sub,
+            displayName: decodedToken.name || 'LINE User',
+            pictureUrl: decodedToken.picture,
+        };
+    }
+
+    /**
      * 綁定 LINE 帳號到現有帳號
      */
     async bindLineAccount(accountId: string, lineUserId: string, lineDisplayName: string): Promise<void> {

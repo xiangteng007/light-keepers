@@ -92,6 +92,16 @@ export class AuthController {
         return { success: true, lineDisplayName: lineProfile.displayName };
     }
 
+    /**
+     * LIFF Token 登入
+     * 前端在 LINE App 內透過 LIFF SDK 取得 ID Token 後呼叫此 API
+     * 用於 SSO 無縫登入體驗
+     */
+    @Post('liff/login')
+    async loginWithLiffToken(@Body() body: { idToken: string }) {
+        return this.authService.loginWithLiffToken(body.idToken);
+    }
+
     // =========================================
     // Google OAuth 端點
     // =========================================

@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { login as backendLoginApi } from '../api/services';
 import { firebaseAuthService } from '../services/firebase-auth.service';
+import { liffService } from '../services/liff.service';
 import './LoginPage.css';
 
 // LINE Login Config
@@ -60,6 +61,72 @@ export default function LoginPage() {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     }, []);
+
+    // LIFF 初始化與自動登入
+    useEffect(() => {
+        const initLiffAndAutoLogin = async () => {
+            // 初始化 LIFF SDK
+            const initialized = await liffService.init();
+
+            if (!initialized) {
+                // LIFF 未設定或初始化失敗，使用一般登入流程
+                return;
+            }
+
+            // 檢查是否在 LINE App 內
+            if (liffService.isInLineApp()) {
+                setIsLoading(true);
+
+                // 如果未登入 LINE，觸發 LIFF 登入
+                if (!liffService.isLoggedIn) {
+                    liffService.login();
+                    return;
+                }
+
+                // 已登入 LINE，取得 ID Token 並與後端交換 JWT
+                const idToken = liffService.getIDToken();
+                if (idToken) {
+                    try {
+                        await handleLiffLogin(idToken);
+                    } catch (err) {
+                        console.error('LIFF auto-login failed:', err);
+                        setError('LINE SSO 登入失敗，請稍後再試');
+                        setIsLoading(false);
+                    }
+                }
+            }
+        };
+
+        initLiffAndAutoLogin();
+    }, []);
+
+    // LIFF Token 登入處理
+    const handleLiffLogin = async (idToken: string) => {
+        setError(null);
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-backend-955234851806.us-central1.run.app';
+            const response = await fetch(`${API_URL}/api/v1/auth/liff/login`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ idToken }),
+            });
+
+            const data = await response.json();
+
+            if (data.accessToken) {
+                await login(data.accessToken, true); // LIFF 登入預設記住
+                navigate(from, { replace: true });
+            } else if (data.needsRegistration) {
+                // LIFF 登入應該自動建立帳號，此處不應發生
+                setError('LIFF 登入發生錯誤，請使用其他方式登入');
+            }
+        } catch (err) {
+            console.error('LIFF login API failed:', err);
+            throw err;
+        } finally {
+            setIsLoading(false);
+        }
+    };
 
     const handleLineCallback = async (code: string) => {
         setIsLoading(true);
