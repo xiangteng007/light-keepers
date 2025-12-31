@@ -29,10 +29,12 @@ import {
     CheckInController, ExpiryNotificationController
 } from './vms.controller';
 
+// Shared JWT Module (breaks circular dependency with AuthModule)
+import { SharedJwtModule } from '../shared/shared-jwt.module';
+
 @Module({
     imports: [
-        // Note: AuthModule removed due to circular dependency (AccountRepository issue)
-        // JwtAuthGuard will be removed from VMS controllers temporarily
+        SharedJwtModule, // Provides JwtAuthGuard without full AuthModule dependencies
         TypeOrmModule.forFeature([
             // Core entities
             Volunteer,
