@@ -20,9 +20,14 @@ import { SkillService } from './entities/skill.service';
 import { VehicleService } from './entities/vehicle.service';
 import { InsuranceService } from './entities/insurance.service';
 import { PointsService } from './entities/points.service';
+import { CheckInService } from './entities/checkin.service';
+import { ExpiryNotificationService } from './entities/expiry-notification.service';
 
 // VMS Controllers
-import { SkillsController, VehiclesController, InsuranceController, PointsController } from './vms.controller';
+import {
+    SkillsController, VehiclesController, InsuranceController, PointsController,
+    CheckInController, ExpiryNotificationController
+} from './vms.controller';
 
 @Module({
     imports: [
@@ -47,6 +52,8 @@ import { SkillsController, VehiclesController, InsuranceController, PointsContro
         VehiclesController,
         InsuranceController,
         PointsController,
+        CheckInController,
+        ExpiryNotificationController,
     ],
     providers: [
         VolunteersService,
@@ -56,6 +63,8 @@ import { SkillsController, VehiclesController, InsuranceController, PointsContro
         VehicleService,
         InsuranceService,
         PointsService,
+        CheckInService,
+        ExpiryNotificationService,
     ],
     exports: [
         VolunteersService,

@@ -1,0 +1,74 @@
+.sensitive-field {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.sensitive-field--masked {
+    color: var(--color-text-muted);
+    font-family: monospace;
+    letter-spacing: 1px;
+}
+
+.sensitive-field__lock {
+    font-size: 0.75rem;
+    opacity: 0.6;
+    cursor: help;
+}
+
+/* Sensitive Label */
+.sensitive-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+}
+
+.sensitive-label__badge {
+    font-size: 0.625rem !important;
+    padding: 0 var(--spacing-xs) !important;
+}
+
+/* Sensitive Row */
+.sensitive-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--spacing-sm) 0;
+    border-bottom: 1px solid var(--color-border-light);
+}
+
+.sensitive-row:last-child {
+    border-bottom: none;
+}
+
+.sensitive-row__label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+}
+
+.sensitive-row__value {
+    font-weight: 500;
+    text-align: right;
+}
+
+/* Access Denied Placeholder */
+.access-denied-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-xl);
+    background: var(--color-surface-alt);
+    border-radius: var(--radius-md);
+    text-align: center;
+}
+
+.access-denied-placeholder__icon {
+    font-size: 2rem;
+    margin-bottom: var(--spacing-sm);
+}
+
+.access-denied-placeholder__text {
+    color: var(--color-text-secondary);
+    font-size: 0.875rem;
+}

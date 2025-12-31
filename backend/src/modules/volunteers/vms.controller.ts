@@ -235,3 +235,80 @@ export class PointsController {
         );
     }
 }
+
+// ========== Check-In Controller ==========
+import { CheckInService, CheckInDto, CheckOutDto } from './entities/checkin.service';
+
+@Controller('checkin')
+@UseGuards(JwtAuthGuard)
+export class CheckInController {
+    constructor(private readonly checkInService: CheckInService) { }
+
+    @Post()
+    async checkIn(@Body() dto: CheckInDto) {
+        return this.checkInService.checkIn(dto);
+    }
+
+    @Post('out')
+    async checkOut(@Body() dto: CheckOutDto) {
+        return this.checkInService.checkOut(dto);
+    }
+
+    @Get('status/:volunteerId')
+    async getStatus(
+        @Param('volunteerId') volunteerId: string,
+        @Query('taskId') taskId?: string,
+    ) {
+        return this.checkInService.getCheckInStatus(volunteerId, taskId);
+    }
+
+    @Get('active')
+    async getActiveCheckIns() {
+        return this.checkInService.getActiveCheckIns();
+    }
+
+    @Delete(':volunteerId')
+    async cancelCheckIn(
+        @Param('volunteerId') volunteerId: string,
+        @Query('taskId') taskId?: string,
+    ) {
+        await this.checkInService.cancelCheckIn(volunteerId, taskId);
+        return { success: true };
+    }
+}
+
+// ========== Expiry Notifications Controller ==========
+import { ExpiryNotificationService } from './entities/expiry-notification.service';
+
+@Controller('expiry-notifications')
+@UseGuards(JwtAuthGuard)
+export class ExpiryNotificationController {
+    constructor(private readonly expiryService: ExpiryNotificationService) { }
+
+    @Get()
+    async getExpiringItems(@Query('days') days?: string) {
+        return this.expiryService.getExpiringItems(days ? parseInt(days) : 30);
+    }
+
+    @Get('volunteer/:volunteerId')
+    async getExpiringItemsForVolunteer(
+        @Param('volunteerId') volunteerId: string,
+        @Query('days') days?: string,
+    ) {
+        return this.expiryService.getExpiringItemsForVolunteer(
+            volunteerId,
+            days ? parseInt(days) : 30,
+        );
+    }
+
+    @Get('today')
+    async getTodayNotifications() {
+        return this.expiryService.getTodayNotifications();
+    }
+
+    @Post('send-line')
+    async sendLineNotifications() {
+        return this.expiryService.sendLineNotifications();
+    }
+}
+
