@@ -105,4 +105,23 @@ export class ReportsController {
             message: '回報已刪除',
         };
     }
+
+    // 災情熱點分析
+    @Get('analysis/hotspots')
+    async getHotspots(
+        @Query('gridSizeKm') gridSizeKm?: string,
+        @Query('minCount') minCount?: string,
+        @Query('days') days?: string,
+    ) {
+        const result = await this.reportsService.getHotspots({
+            gridSizeKm: gridSizeKm ? parseFloat(gridSizeKm) : undefined,
+            minCount: minCount ? parseInt(minCount, 10) : undefined,
+            days: days ? parseInt(days, 10) : undefined,
+        });
+        return {
+            success: true,
+            data: result,
+        };
+    }
 }
+

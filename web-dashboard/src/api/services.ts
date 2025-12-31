@@ -386,6 +386,26 @@ export const getReportStats = () => api.get<{
     }
 }>('/reports/stats');
 
+// 災情熱點分析
+export interface HotspotData {
+    gridId: string;
+    centerLat: number;
+    centerLng: number;
+    count: number;
+    severity: 'low' | 'medium' | 'high' | 'critical';
+    types: Record<string, number>;
+    recentReports: Array<{ id: string; title: string; type: string; createdAt: string }>;
+}
+
+export interface HotspotsResponse {
+    hotspots: HotspotData[];
+    totalReports: number;
+    generatedAt: string;
+}
+
+export const getHotspots = (params?: { gridSizeKm?: number; minCount?: number; days?: number }) =>
+    api.get<{ success: boolean; data: HotspotsResponse }>('/reports/analysis/hotspots', { params });
+
 // ===== 志工管理 Volunteers =====
 
 export type VolunteerStatus = 'available' | 'busy' | 'offline';

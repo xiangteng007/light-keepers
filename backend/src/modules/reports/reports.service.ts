@@ -168,4 +168,131 @@ export class ReportsService {
         }
         this.logger.log(`Report ${id} deleted`);
     }
+
+    // 災情熱點分析 - 使用網格聚合
+    async getHotspots(options: {
+        gridSizeKm?: number;  // 網格大小（公里）
+        minCount?: number;    // 最小回報數
+        days?: number;        // 最近天數
+    } = {}): Promise<{
+        hotspots: Array<{
+            gridId: string;
+            centerLat: number;
+            centerLng: number;
+            count: number;
+            severity: 'low' | 'medium' | 'high' | 'critical';
+            types: Record<string, number>;
+            recentReports: Array<{ id: string; title: string; type: string; createdAt: Date }>;
+        }>;
+        totalReports: number;
+        generatedAt: Date;
+    }> {
+        const gridSizeKm = options.gridSizeKm || 2; // 預設 2km 網格
+        const minCount = options.minCount || 2;     // 最少 2 筆回報
+        const days = options.days || 7;             // 最近 7 天
+
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        // 獲取指定時間範圍內的回報
+        const reports = await this.reportsRepository
+            .createQueryBuilder('report')
+            .where('report.createdAt >= :since', { since })
+            .andWhere('report.latitude IS NOT NULL')
+            .andWhere('report.longitude IS NOT NULL')
+            .orderBy('report.createdAt', 'DESC')
+            .getMany();
+
+        // 網格聚合
+        // 1 度約 111 km，所以 gridSizeKm / 111 = 網格大小（度）
+        const gridSizeDeg = gridSizeKm / 111;
+
+        const grids: Map<string, {
+            reports: Report[];
+            minLat: number;
+            maxLat: number;
+            minLng: number;
+            maxLng: number;
+        }> = new Map();
+
+        for (const report of reports) {
+            const lat = Number(report.latitude);
+            const lng = Number(report.longitude);
+
+            // 計算網格 ID
+            const gridX = Math.floor(lng / gridSizeDeg);
+            const gridY = Math.floor(lat / gridSizeDeg);
+            const gridId = `${gridX}_${gridY}`;
+
+            if (!grids.has(gridId)) {
+                grids.set(gridId, {
+                    reports: [],
+                    minLat: gridY * gridSizeDeg,
+                    maxLat: (gridY + 1) * gridSizeDeg,
+                    minLng: gridX * gridSizeDeg,
+                    maxLng: (gridX + 1) * gridSizeDeg,
+                });
+            }
+
+            grids.get(gridId)!.reports.push(report);
+        }
+
+        // 過濾並轉換為熱點
+        const hotspots = Array.from(grids.entries())
+            .filter(([, data]) => data.reports.length >= minCount)
+            .map(([gridId, data]) => {
+                const count = data.reports.length;
+
+                // 計算中心點
+                const centerLat = (data.minLat + data.maxLat) / 2;
+                const centerLng = (data.minLng + data.maxLng) / 2;
+
+                // 統計類型
+                const types: Record<string, number> = {};
+                for (const r of data.reports) {
+                    types[r.type] = (types[r.type] || 0) + 1;
+                }
+
+                // 計算嚴重程度
+                let severity: 'low' | 'medium' | 'high' | 'critical';
+                const hasCritical = data.reports.some(r => r.severity === 'critical');
+                const hasHigh = data.reports.some(r => r.severity === 'high');
+
+                if (hasCritical || count >= 10) {
+                    severity = 'critical';
+                } else if (hasHigh || count >= 5) {
+                    severity = 'high';
+                } else if (count >= 3) {
+                    severity = 'medium';
+                } else {
+                    severity = 'low';
+                }
+
+                // 最近回報
+                const recentReports = data.reports.slice(0, 5).map(r => ({
+                    id: r.id,
+                    title: r.title,
+                    type: r.type,
+                    createdAt: r.createdAt,
+                }));
+
+                return {
+                    gridId,
+                    centerLat,
+                    centerLng,
+                    count,
+                    severity,
+                    types,
+                    recentReports,
+                };
+            })
+            .sort((a, b) => b.count - a.count); // 按數量排序
+
+        return {
+            hotspots,
+            totalReports: reports.length,
+            generatedAt: new Date(),
+        };
+    }
 }
+
