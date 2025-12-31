@@ -1,0 +1,171 @@
+.directions-panel {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 320px;
+    z-index: 100;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.directions-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, #e2e8f0);
+}
+
+.directions-panel-header h3 {
+    margin: 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.directions-panel-close {
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    color: var(--text-secondary, #64748b);
+    transition: color 0.2s;
+}
+
+.directions-panel-close:hover {
+    color: var(--text-primary, #1a1a2e);
+}
+
+.directions-panel-content {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.directions-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.directions-field label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--text-secondary, #64748b);
+}
+
+.directions-input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.directions-input-group input,
+.directions-field input {
+    flex: 1;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 0.5rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.directions-input-group input:focus,
+.directions-field input:focus {
+    outline: none;
+    border-color: var(--primary-color, #2196F3);
+    box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.15);
+}
+
+.directions-location-btn {
+    background: var(--bg-secondary, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 0.5rem;
+    padding: 0 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.directions-location-btn:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+}
+
+/* 交通模式 */
+.directions-travel-modes {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+}
+
+.directions-mode-btn {
+    flex: 1;
+    padding: 0.625rem 0.5rem;
+    background: var(--bg-secondary, #f8fafc);
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: 0.5rem;
+    font-size: 1.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.directions-mode-btn:hover {
+    background: var(--bg-tertiary, #e2e8f0);
+}
+
+.directions-mode-btn.active {
+    background: var(--primary-color, #2196F3);
+    border-color: var(--primary-color, #2196F3);
+    color: white;
+}
+
+/* 錯誤訊息 */
+.directions-error {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #dc2626;
+    padding: 0.625rem 0.875rem;
+    border-radius: 0.5rem;
+    font-size: 0.8125rem;
+}
+
+/* 路線資訊 */
+.directions-route-info {
+    display: flex;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    background: #f0fdf4;
+    border: 1px solid #86efac;
+    border-radius: 0.5rem;
+}
+
+.directions-route-stat {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.directions-route-label {
+    font-size: 0.75rem;
+    color: #16a34a;
+    font-weight: 500;
+}
+
+.directions-route-value {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #15803d;
+}
+
+/* 按鈕 */
+.directions-actions {
+    display: flex;
+    justify-content: center;
+    padding-top: 0.5rem;
+}
+
+.directions-actions button {
+    min-width: 140px;
+}
