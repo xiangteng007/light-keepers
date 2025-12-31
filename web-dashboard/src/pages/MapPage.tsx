@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, type NcdrAlert, type Shelter, type AedLocation, type Report } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, getWarehousesForMap, type NcdrAlert, type Shelter, type AedLocation, type Report, type Warehouse } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -130,6 +130,17 @@ const createAedMarkerIcon = () => ({
     anchor: new google.maps.Point(12, 21),
 });
 
+// 倉庫標記圖標 - 方形倉庫（藍色）
+const createWarehouseMarkerIcon = () => ({
+    path: 'M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z',
+    fillColor: '#2196F3',
+    fillOpacity: 1,
+    strokeColor: '#fff',
+    strokeWeight: 2,
+    scale: 1.4,
+    anchor: new google.maps.Point(12, 12),
+});
+
 // Map container style
 const containerStyle = {
     width: '100%',
@@ -178,11 +189,13 @@ export default function MapPage() {
     const [ncdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
-    // 公共資源圖層狀態（避難所/AED）
+    // 公共資源圖層狀態（避難所/AED/倉庫）
     const [showShelters, setShowShelters] = useState(false);
     const [showAed, setShowAed] = useState(false);
+    const [showWarehouses, setShowWarehouses] = useState(false);
     const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
     const [selectedAed, setSelectedAed] = useState<AedLocation | null>(null);
+    const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
 
     // 側邊欄 Tab 切換
     const [sidebarTab, setSidebarTab] = useState<'events' | 'ncdr'>('events');
@@ -250,11 +263,21 @@ export default function MapPage() {
         staleTime: 1000 * 60 * 5, // 5 分鐘快取
     });
 
+    // 獲取倉庫位置
+    const { data: warehousesData } = useQuery({
+        queryKey: ['warehousesMap'],
+        queryFn: () => getWarehousesForMap(),
+        enabled: showWarehouses,
+        staleTime: 1000 * 60 * 30, // 30 分鐘快取
+    });
+
     const events = Array.isArray(eventsData) ? eventsData : [];
     const confirmedReports = Array.isArray(reportsData) ? reportsData : [];
     const ncdrAlerts = Array.isArray(ncdrData) ? ncdrData : [];
     const shelters = Array.isArray(sheltersData) ? sheltersData : [];
     const aedLocations = Array.isArray(nearbyAedData) ? nearbyAedData : [];
+    const warehouses = Array.isArray(warehousesData) ? warehousesData : [];
+
 
     // 計算是否應顯示 AED (縮放夠高)
     const shouldShowAed = showAed && currentZoom >= AED_MIN_ZOOM;
@@ -466,6 +489,14 @@ export default function MapPage() {
                             />
                             <span>❤️ AED {showAed && currentZoom < AED_MIN_ZOOM && '(請放大)'}</span>
                         </label>
+                        <label className="header-layer-toggle">
+                            <input
+                                type="checkbox"
+                                checked={showWarehouses}
+                                onChange={(e) => setShowWarehouses(e.target.checked)}
+                            />
+                            <span>📦 倉庫</span>
+                        </label>
                     </div>
                 </div>
                 <div className="page-header__right">
@@ -591,6 +622,23 @@ export default function MapPage() {
                                         setInfoWindowEvent(null);
                                     }}
                                     title={aed.name}
+                                />
+                            ))}
+
+                            {/* 倉庫位置標記 */}
+                            {showWarehouses && warehouses.map((warehouse) => (
+                                <MarkerF
+                                    key={warehouse.id}
+                                    position={{ lat: Number(warehouse.latitude), lng: Number(warehouse.longitude) }}
+                                    icon={createWarehouseMarkerIcon()}
+                                    onClick={() => {
+                                        setSelectedWarehouse(warehouse);
+                                        setSelectedAed(null);
+                                        setSelectedShelter(null);
+                                        setSelectedNcdrAlert(null);
+                                        setInfoWindowEvent(null);
+                                    }}
+                                    title={warehouse.name}
                                 />
                             ))}
 
@@ -766,6 +814,55 @@ export default function MapPage() {
                                             <button
                                                 onClick={() => {
                                                     const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedAed.latitude},${selectedAed.longitude}`;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            >
+                                                🧭 導航
+                                            </button>
+                                        </div>
+                                    </div>
+                                </InfoWindowF>
+                            )}
+
+                            {/* 倉庫 InfoWindow */}
+                            {selectedWarehouse && (
+                                <InfoWindowF
+                                    position={{
+                                        lat: Number(selectedWarehouse.latitude),
+                                        lng: Number(selectedWarehouse.longitude),
+                                    }}
+                                    onCloseClick={() => setSelectedWarehouse(null)}
+                                    options={{
+                                        pixelOffset: new google.maps.Size(0, -25),
+                                    }}
+                                >
+                                    <div className="gmap-infowindow">
+                                        <div className="gmap-infowindow__header">
+                                            <span
+                                                className="gmap-infowindow__severity"
+                                                style={{ background: '#2196F3' }}
+                                            >
+                                                📦 倉庫
+                                            </span>
+                                            {selectedWarehouse.isPrimary && (
+                                                <span className="gmap-infowindow__category">
+                                                    主倉庫
+                                                </span>
+                                            )}
+                                        </div>
+                                        <h4 className="gmap-infowindow__title">{selectedWarehouse.name}</h4>
+                                        <p className="gmap-infowindow__desc">
+                                            📍 {selectedWarehouse.address || '無地址'}
+                                        </p>
+                                        {selectedWarehouse.contactPerson && (
+                                            <p className="gmap-infowindow__desc">
+                                                👤 {selectedWarehouse.contactPerson} {selectedWarehouse.contactPhone && `(${selectedWarehouse.contactPhone})`}
+                                            </p>
+                                        )}
+                                        <div className="gmap-infowindow__actions">
+                                            <button
+                                                onClick={() => {
+                                                    const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedWarehouse.latitude},${selectedWarehouse.longitude}`;
                                                     window.open(url, '_blank');
                                                 }}
                                             >
