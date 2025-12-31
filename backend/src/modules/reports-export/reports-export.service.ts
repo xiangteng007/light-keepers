@@ -4,6 +4,8 @@ import { Repository, Between } from 'typeorm';
 import { Volunteer } from '../volunteers/volunteers.entity';
 import { VolunteerAssignment } from '../volunteers/volunteer-assignments.entity';
 import { Report } from '../reports/reports.entity';
+import { Resource } from '../resources/resources.entity';
+import { ResourceTransaction } from '../resources/resource-transaction.entity';
 
 export interface ReportData {
     title: string;
@@ -23,6 +25,10 @@ export class ReportsExportService {
         private assignmentsRepo: Repository<VolunteerAssignment>,
         @InjectRepository(Report)
         private reportsRepo: Repository<Report>,
+        @InjectRepository(Resource)
+        private resourcesRepo: Repository<Resource>,
+        @InjectRepository(ResourceTransaction)
+        private transactionsRepo: Repository<ResourceTransaction>,
     ) { }
 
     // 志工時數報表
@@ -103,6 +109,113 @@ export class ReportsExportService {
         };
     }
 
+    // 庫存報表
+    async getInventoryReport(): Promise<ReportData> {
+        const resources = await this.resourcesRepo.find({
+            order: { category: 'ASC', name: 'ASC' },
+        });
+
+        // 按類別統計
+        const byCategory: Record<string, { count: number; totalQuantity: number; lowStock: number; depleted: number }> = {};
+        let totalLowStock = 0;
+        let totalDepleted = 0;
+        let totalExpiringSoon = 0;
+
+        const now = new Date();
+        const thirtyDaysLater = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+        for (const r of resources) {
+            if (!byCategory[r.category]) {
+                byCategory[r.category] = { count: 0, totalQuantity: 0, lowStock: 0, depleted: 0 };
+            }
+            byCategory[r.category].count++;
+            byCategory[r.category].totalQuantity += r.quantity;
+
+            if (r.status === 'low') {
+                byCategory[r.category].lowStock++;
+                totalLowStock++;
+            }
+            if (r.status === 'depleted') {
+                byCategory[r.category].depleted++;
+                totalDepleted++;
+            }
+            if (r.expiresAt && new Date(r.expiresAt) <= thirtyDaysLater) {
+                totalExpiringSoon++;
+            }
+        }
+
+        // 產生明細行
+        const rows = resources.map(r => ({
+            id: r.id,
+            name: r.name,
+            category: r.category,
+            quantity: r.quantity,
+            unit: r.unit,
+            minQuantity: r.minQuantity,
+            status: r.status,
+            location: r.location || '',
+            expiresAt: r.expiresAt ? new Date(r.expiresAt).toISOString().split('T')[0] : '',
+        }));
+
+        return {
+            title: '物資庫存報表',
+            generatedAt: new Date(),
+            period: { start: new Date(), end: new Date() },
+            data: {
+                total: resources.length,
+                totalLowStock,
+                totalDepleted,
+                totalExpiringSoon,
+                byCategory,
+                rows,
+            },
+        };
+    }
+
+    // 庫存異動報表
+    async getInventoryTransactionReport(startDate: Date, endDate: Date): Promise<ReportData> {
+        const transactions = await this.transactionsRepo.find({
+            where: {
+                createdAt: Between(startDate, endDate),
+            },
+            order: { createdAt: 'DESC' },
+        });
+
+        // 按類型統計
+        const byType: Record<string, { count: number; totalQuantity: number }> = {};
+
+        for (const t of transactions) {
+            if (!byType[t.type]) {
+                byType[t.type] = { count: 0, totalQuantity: 0 };
+            }
+            byType[t.type].count++;
+            byType[t.type].totalQuantity += t.quantity;
+        }
+
+        const rows = transactions.map(t => ({
+            id: t.id,
+            resourceId: t.resourceId,
+            type: t.type,
+            quantity: t.quantity,
+            beforeQuantity: t.beforeQuantity,
+            afterQuantity: t.afterQuantity,
+            operatorName: t.operatorName,
+            notes: t.notes || '',
+            createdAt: t.createdAt.toISOString(),
+        }));
+
+        return {
+            title: '物資異動報表',
+            generatedAt: new Date(),
+            period: { start: startDate, end: endDate },
+            data: {
+                total: transactions.length,
+                byType,
+                rows,
+            },
+        };
+    }
+
     // 產生 CSV 格式
     generateCSV(report: ReportData): string {
         const rows = report.data.rows || [];
@@ -119,3 +232,4 @@ export class ReportsExportService {
         return JSON.stringify(report, null, 2);
     }
 }
+

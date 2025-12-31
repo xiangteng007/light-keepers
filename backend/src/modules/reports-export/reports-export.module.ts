@@ -3,13 +3,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Volunteer } from '../volunteers/volunteers.entity';
 import { VolunteerAssignment } from '../volunteers/volunteer-assignments.entity';
 import { Report } from '../reports/reports.entity';
+import { Resource } from '../resources/resources.entity';
+import { ResourceTransaction } from '../resources/resource-transaction.entity';
 import { ReportsExportController } from './reports-export.controller';
 import { ReportsExportService } from './reports-export.service';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Volunteer, VolunteerAssignment, Report])],
+    imports: [TypeOrmModule.forFeature([Volunteer, VolunteerAssignment, Report, Resource, ResourceTransaction])],
     controllers: [ReportsExportController],
     providers: [ReportsExportService],
     exports: [ReportsExportService],
 })
 export class ReportsExportModule { }
+
