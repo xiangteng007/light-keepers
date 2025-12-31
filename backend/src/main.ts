@@ -31,10 +31,12 @@ async function bootstrap() {
     // API 前綴
     app.setGlobalPrefix(process.env.API_PREFIX || 'api/v1');
 
-    const port = process.env.PORT || 3000;
-    await app.listen(port);
+    // Cloud Run 需要監聽 0.0.0.0，預設 port 8080
+    const port = process.env.PORT || 8080;
+    const host = '0.0.0.0';
+    await app.listen(port, host);
 
-    console.log(`🚀 Light Keepers API 啟動於 http://localhost:${port}`);
+    console.log(`🚀 Light Keepers API 啟動於 http://${host}:${port}`);
 }
 
 bootstrap();
