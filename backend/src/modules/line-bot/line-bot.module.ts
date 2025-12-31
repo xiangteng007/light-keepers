@@ -12,13 +12,14 @@ import {
     AiClassificationService,
     DisasterReportService,
 } from './disaster-report';
+import { AiVisionController } from './disaster-report/ai-vision.controller';
 
 @Global()
 @Module({
     imports: [
         TypeOrmModule.forFeature([Account, Report, Task]),
     ],
-    controllers: [LineBotController],
+    controllers: [LineBotController, AiVisionController],
     providers: [
         LineBotService,
         SessionStateService,
@@ -27,7 +28,7 @@ import {
         DisasterReportService,
         ReportsService,
     ],
-    exports: [LineBotService, DisasterReportService],
+    exports: [LineBotService, DisasterReportService, AiClassificationService],
 })
 export class LineBotModule { }
 
