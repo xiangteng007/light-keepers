@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { SharedAuthModule } from './modules/shared/shared-auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
@@ -61,6 +62,9 @@ import { DonationsModule } from './modules/donations/donations.module';
             },
             inject: [ConfigService],
         }),
+
+        // 共用認證模組 (Global)
+        SharedAuthModule,
 
         // 功能模組
         HealthModule,
