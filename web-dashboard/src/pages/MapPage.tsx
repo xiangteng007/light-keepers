@@ -6,7 +6,7 @@ import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
 // Google Maps API Key
-const GOOGLE_MAPS_API_KEY = 'AIzaSyDP3KEDizgPPNwXvS6LpcxsrF9_Lyt1bgA';
+const GOOGLE_MAPS_API_KEY = 'AIzaSyBudn50h4ejV_hQuQRXMRDS_iVWviduKXg';
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
 
 // 台灣中心座標
