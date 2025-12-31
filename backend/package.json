@@ -15,6 +15,8 @@
         "seed:all": "npm run seed:volunteers && npm run seed:resources"
     },
     "dependencies": {
+        "@google-cloud/error-reporting": "^3.0.5",
+        "@google-cloud/logging-winston": "^6.0.1",
         "@google-cloud/storage": "^7.18.0",
         "@google/generative-ai": "^0.24.1",
         "@line/bot-sdk": "^10.5.0",
@@ -27,6 +29,7 @@
         "@nestjs/platform-express": "^10.3.0",
         "@nestjs/platform-socket.io": "^11.1.10",
         "@nestjs/schedule": "^6.1.0",
+        "@nestjs/throttler": "^6.5.0",
         "@nestjs/typeorm": "^10.0.1",
         "@nestjs/websockets": "^11.1.10",
         "@types/nodemailer": "^7.0.4",
@@ -50,6 +53,7 @@
         "socket.io": "^4.8.2",
         "typeorm": "^0.3.19",
         "uuid": "^9.0.0",
+        "winston": "^3.19.0",
         "xml2js": "^0.6.2"
     },
     "devDependencies": {

@@ -1,7 +1,9 @@
-import { Module } from '@nestjs/common';
+import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { SharedAuthModule } from './modules/shared/shared-auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -24,6 +26,9 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { MenuConfigModule } from './modules/menu-config/menu-config.module';
 import { WeatherForecastModule } from './modules/weather-forecast/weather-forecast.module';
 import { DonationsModule } from './modules/donations/donations.module';
+import { CloudLoggerService } from './common/services/cloud-logger.service';
+import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 
 @Module({
     imports: [
@@ -34,6 +39,20 @@ import { DonationsModule } from './modules/donations/donations.module';
 
         // 排程模組 (NCDR 自動同步)
         ScheduleModule.forRoot(),
+
+        // Rate Limiting (API Gateway)
+        ThrottlerModule.forRoot([
+            {
+                name: 'short',
+                ttl: 1000,   // 1秒
+                limit: 10,   // 最多10請求
+            },
+            {
+                name: 'long',
+                ttl: 60000,  // 1分鐘
+                limit: 100,  // 最多100請求
+            },
+        ]),
 
         // Cloud SQL 連線
         TypeOrmModule.forRootAsync({
@@ -89,6 +108,23 @@ import { DonationsModule } from './modules/donations/donations.module';
         WeatherForecastModule, // ☁️ 氣象預報
         DonationsModule, // 💰 捐款系統
     ],
+    providers: [
+        CloudLoggerService,
+        {
+            provide: APP_FILTER,
+            useClass: GlobalExceptionFilter,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: ThrottlerGuard,
+        },
+    ],
+    exports: [CloudLoggerService],
 })
-export class AppModule { }
-
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer
+            .apply(RequestLoggingMiddleware)
+            .forRoutes('*');
+    }
+}
