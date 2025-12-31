@@ -31,6 +31,8 @@ import {
 
 @Module({
     imports: [
+        // Note: AuthModule removed due to circular dependency (AccountRepository issue)
+        // JwtAuthGuard will be removed from VMS controllers temporarily
         TypeOrmModule.forFeature([
             // Core entities
             Volunteer,

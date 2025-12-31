@@ -42,9 +42,8 @@ import { DonationsModule } from './modules/donations/donations.module';
 
                 return {
                     type: 'postgres',
-                    host: isProduction
-                        ? `/cloudsql/${configService.get('CLOUD_SQL_CONNECTION_NAME')}`
-                        : configService.get('DB_HOST', 'localhost'),
+                    // Use DB_HOST directly - set to /cloudsql/PROJECT:REGION:INSTANCE for production
+                    host: configService.get('DB_HOST', 'localhost'),
                     port: isProduction ? undefined : configService.get('DB_PORT', 5432),
                     username: configService.get('DB_USERNAME', 'postgres'),
                     password: configService.get('DB_PASSWORD'),
@@ -55,10 +54,9 @@ import { DonationsModule } from './modules/donations/donations.module';
                     retryAttempts: 10, // 增加重試次數給 Cloud SQL cold start
                     retryDelay: 5000,  // 增加重試間隔
                     connectTimeoutMS: 60000, // 60秒連線超時
-                    extra: isProduction ? {
-                        socketPath: `/cloudsql/${configService.get('CLOUD_SQL_CONNECTION_NAME')}`,
+                    extra: {
                         connectionTimeoutMillis: 60000,
-                    } : {},
+                    },
                 };
             },
             inject: [ConfigService],
