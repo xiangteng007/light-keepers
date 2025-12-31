@@ -35,6 +35,9 @@ import ResourcesPublicPage from './pages/ResourcesPublicPage'
 import ApprovalCenterPage from './pages/ApprovalCenterPage'
 import SensitiveAuditPage from './pages/SensitiveAuditPage'
 import LabelManagementPage from './pages/LabelManagementPage'
+import VehicleManagementPage from './pages/VehicleManagementPage'
+import InsuranceManagementPage from './pages/InsuranceManagementPage'
+import PointsReportPage from './pages/PointsReportPage'
 import './App.css'
 
 
@@ -109,6 +112,10 @@ function App() {
             <Route path="profile" element={<ProtectedRoute requiredLevel={1}><ProfilePage /></ProtectedRoute>} />
             <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={1}><VolunteerRegisterPage /></ProtectedRoute>} />
             <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
+            {/* VMS 志工個人管理頁面 (1) */}
+            <Route path="my-vehicles" element={<ProtectedRoute requiredLevel={1}><VehicleManagementPage /></ProtectedRoute>} />
+            <Route path="my-insurance" element={<ProtectedRoute requiredLevel={1}><InsuranceManagementPage /></ProtectedRoute>} />
+            <Route path="my-points" element={<ProtectedRoute requiredLevel={1}><PointsReportPage /></ProtectedRoute>} />
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
