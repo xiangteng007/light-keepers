@@ -11,16 +11,17 @@ import {
 } from '@nestjs/common';
 import { VolunteersService, CreateVolunteerDto, UpdateVolunteerDto, VolunteerFilter } from './volunteers.service';
 import { VolunteerStatus } from './volunteers.entity';
-import { AdminGuard, Roles } from '../../common/guards/admin.guard';
+// Use unified guards from SharedAuthModule
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('volunteers')
-@UseGuards(AdminGuard) // 🔐 全域管理員權限守衛
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard) // 🔐 統一認證 + 權限守衛
+@RequiredLevel(ROLE_LEVELS.OFFICER) // 預設需要幹部以上等級
 export class VolunteersController {
     constructor(private readonly volunteersService: VolunteersService) { }
 
-    // 🔐 志工註冊 - 僅管理員
+    // 🔐 志工註冊 - 需要幹部以上權限（由 class-level decorator 設定）
     @Post()
-    @Roles(['admin'])
     async create(@Body() dto: CreateVolunteerDto) {
         const volunteer = await this.volunteersService.create(dto);
         return {
@@ -83,7 +84,6 @@ export class VolunteersController {
 
     // 取得待審核志工列表
     @Get('pending')
-    @Roles(['admin'])
     async findPending() {
         const volunteers = await this.volunteersService.findPending();
         return {
@@ -130,7 +130,6 @@ export class VolunteersController {
 
     // 審核通過
     @Post(':id/approve')
-    @Roles(['admin'])
     async approve(
         @Param('id') id: string,
         @Body('approvedBy') approvedBy: string,
@@ -146,7 +145,6 @@ export class VolunteersController {
 
     // 拒絕申請
     @Post(':id/reject')
-    @Roles(['admin'])
     async reject(
         @Param('id') id: string,
         @Body('rejectedBy') rejectedBy: string,
@@ -160,9 +158,8 @@ export class VolunteersController {
         };
     }
 
-    // 🔐 取得單一志工完整資料 - 僅管理員
+    // 🔐 取得單一志工完整資料 - 需要幹部以上權限
     @Get(':id')
-    @Roles(['admin'])
     async findOne(@Param('id') id: string) {
         const volunteer = await this.volunteersService.findOne(id);
         return {

@@ -7,8 +7,8 @@ import {
     ForbiddenException,
 } from '@nestjs/common';
 import { MenuConfigService, MenuConfigItem } from './menu-config.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
+// Use unified guards from SharedAuthModule
+import { CoreJwtGuard, CurrentUser as CurrentUserDecorator } from '../shared/guards';
 
 interface UpdateMenuConfigDto {
     items: MenuConfigItem[];
@@ -25,10 +25,10 @@ export class MenuConfigController {
     }
 
     @Put()
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard)
     async updateAll(
         @Body() dto: UpdateMenuConfigDto,
-        @CurrentUser() user: any,
+        @CurrentUserDecorator() user: any,
     ) {
         // Only owner (level 5) can update menu config
         if (!user || user.roleLevel < 5) {

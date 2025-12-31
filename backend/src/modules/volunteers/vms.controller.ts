@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
-// Use SimpleJwtGuard from SharedJwtModule - doesn't require AccountRepository
-import { SimpleJwtGuard } from '../shared/simple-jwt.guard';
+// Use CoreJwtGuard from SharedAuthModule - doesn't require AccountRepository
+import { CoreJwtGuard } from '../shared/guards';
 import { SkillService, CreateSkillDto, UpdateSkillDto } from './entities/skill.service';
 import { VehicleService, CreateVehicleDto, UpdateVehicleDto } from './entities/vehicle.service';
 import { InsuranceService, CreateInsuranceDto, UpdateInsuranceDto } from './entities/insurance.service';
@@ -8,7 +8,7 @@ import { PointsService, CreatePointsRecordDto } from './entities/points.service'
 
 // ========== Skills Controller ==========
 @Controller('skills')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class SkillsController {
     constructor(private readonly skillService: SkillService) { }
 
@@ -46,7 +46,7 @@ export class SkillsController {
 
 // ========== Vehicles Controller ==========
 @Controller('vehicles')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class VehiclesController {
     constructor(private readonly vehicleService: VehicleService) { }
 
@@ -93,7 +93,7 @@ export class VehiclesController {
 
 // ========== Insurance Controller ==========
 @Controller('insurance')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class InsuranceController {
     constructor(private readonly insuranceService: InsuranceService) { }
 
@@ -145,7 +145,7 @@ export class InsuranceController {
 
 // ========== Points Controller ==========
 @Controller('points')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class PointsController {
     constructor(private readonly pointsService: PointsService) { }
 
@@ -241,7 +241,7 @@ export class PointsController {
 import { CheckInService, CheckInDto, CheckOutDto } from './entities/checkin.service';
 
 @Controller('checkin')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class CheckInController {
     constructor(private readonly checkInService: CheckInService) { }
 
@@ -282,7 +282,7 @@ export class CheckInController {
 import { ExpiryNotificationService } from './entities/expiry-notification.service';
 
 @Controller('expiry-notifications')
-@UseGuards(SimpleJwtGuard)
+@UseGuards(CoreJwtGuard)
 export class ExpiryNotificationController {
     constructor(private readonly expiryService: ExpiryNotificationService) { }
 
