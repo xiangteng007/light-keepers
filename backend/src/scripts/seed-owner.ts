@@ -19,10 +19,18 @@ async function bootstrap() {
     const accountRepository: Repository<Account> = app.get(getRepositoryToken(Account));
     const roleRepository: Repository<Role> = app.get(getRepositoryToken(Role));
 
-    // 擁有者帳號配置
-    const ownerEmail = 'xiangteng007@gmail.com';
-    const ownerPassword = 'Birthday@1007';
-    const ownerDisplayName = '系統擁有者';
+    // 擁有者帳號配置 - 從環境變數讀取密碼
+    const ownerEmail = process.env.OWNER_EMAIL || 'xiangteng007@gmail.com';
+    const ownerPassword = process.env.OWNER_PASSWORD;
+    const ownerDisplayName = process.env.OWNER_DISPLAY_NAME || '系統擁有者';
+
+    // 安全檢查：禁止使用硬編碼密碼
+    if (!ownerPassword) {
+        console.error('❌ OWNER_PASSWORD environment variable is required.');
+        console.error('   Usage: OWNER_PASSWORD=YourSecurePassword npx ts-node src/scripts/seed-owner.ts');
+        await app.close();
+        process.exit(1);
+    }
 
     try {
         // 檢查是否已存在

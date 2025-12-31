@@ -5,8 +5,8 @@ import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed,
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
-// Google Maps API Key
-const GOOGLE_MAPS_API_KEY = 'AIzaSyBudn50h4ejV_hQuQRXMRDS_iVWviduKXg';
+// Google Maps API Key - from environment variable
+const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
 const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
 
 // 台灣中心座標
