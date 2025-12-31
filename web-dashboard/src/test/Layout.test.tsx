@@ -14,13 +14,13 @@ describe('Layout Component', () => {
             </BrowserRouter>
         );
 
-        // Check for navigation items visible at default role level (1 = 志工)
-        // Only items with requiredLevel <= 1 are visible to default logged-in users
-        expect(screen.getByText('儀表板')).toBeInTheDocument(); // requiredLevel: 1
+        // Check for navigation items visible at default role level (0 = not logged in)
+        // Only items with requiredLevel <= 0 are visible to non-authenticated users
+        expect(screen.getByText('儀表板')).toBeInTheDocument(); // requiredLevel: 0
         expect(screen.getByText('災害示警')).toBeInTheDocument(); // requiredLevel: 0
         expect(screen.getByText('地圖總覽')).toBeInTheDocument(); // requiredLevel: 0
         expect(screen.getByText('實務手冊')).toBeInTheDocument(); // requiredLevel: 0
-        expect(screen.getByText('回報系統')).toBeInTheDocument(); // requiredLevel: 1
+        expect(screen.getByText('氣象預報')).toBeInTheDocument(); // requiredLevel: 0
     });
 
     it('renders the Light Keepers logo', () => {
