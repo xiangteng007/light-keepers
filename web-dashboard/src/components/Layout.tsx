@@ -24,6 +24,9 @@ import {
     Shield,
     CloudSun,
     Wallet,
+    Car,
+    ShieldCheck,
+    Award,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
@@ -61,6 +64,9 @@ const iconMap: Record<string, LucideIcon> = {
     Shield,
     CloudSun,
     Wallet,
+    Car,
+    ShieldCheck,
+    Award,
 };
 
 // Default nav items as fallback
@@ -79,11 +85,14 @@ const defaultNavItems: NavItem[] = [
     { id: 'volunteers', path: '/volunteers', label: '志工管理', icon: Users, requiredLevel: 2, sortOrder: 12 },
     { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays, requiredLevel: 2, sortOrder: 13 },
     { id: 'volunteer-register', path: '/volunteer-register', label: '登記志工', icon: ClipboardCheck, requiredLevel: 1, sortOrder: 14 },
-    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1, sortOrder: 15 },
-    { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2, sortOrder: 16 },
-    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1, sortOrder: 17 },
-    { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4, sortOrder: 18 },
-    { id: 'donations', path: '/donations', label: '捐款管理', icon: Wallet, requiredLevel: 5, sortOrder: 19 },
+    { id: 'my-vehicles', path: '/my-vehicles', label: '我的車輛', icon: Car, requiredLevel: 1, sortOrder: 15 },
+    { id: 'my-insurance', path: '/my-insurance', label: '我的保險', icon: ShieldCheck, requiredLevel: 1, sortOrder: 16 },
+    { id: 'my-points', path: '/my-points', label: '我的積分', icon: Award, requiredLevel: 1, sortOrder: 17 },
+    { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1, sortOrder: 18 },
+    { id: 'resources', path: '/resources', label: '物資管理', icon: Package, requiredLevel: 2, sortOrder: 19 },
+    { id: 'notifications', path: '/notifications', label: '通知中心', icon: Bell, requiredLevel: 1, sortOrder: 20 },
+    { id: 'permissions', path: '/permissions', label: '權限管理', icon: Shield, requiredLevel: 4, sortOrder: 21 },
+    { id: 'donations', path: '/donations', label: '捐款管理', icon: Wallet, requiredLevel: 5, sortOrder: 22 },
 ];
 
 // Simple Nav Item Component (no drag/edit)
