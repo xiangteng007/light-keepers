@@ -90,6 +90,25 @@ export const blacklistAccount = (accountId: string, reason?: string) =>
 // Accounts
 export const getRoles = () => api.get('/accounts/roles');
 
+// Page Permissions (RBAC Single Source of Truth)
+export interface PagePermission {
+    id: string;
+    pageKey: string;
+    pageName: string;
+    pagePath: string;
+    requiredLevel: number;
+    icon?: string;
+    sortOrder: number;
+    isVisible: boolean;
+}
+
+export const getPagePermissions = () =>
+    api.get<PagePermission[]>('/accounts/page-permissions');
+
+export const updatePagePermission = (pageKey: string, data: Partial<PagePermission>) =>
+    api.patch<PagePermission>(`/accounts/page-permissions/${pageKey}`, data);
+
+
 // 志工/帳號列表 (用於選擇指派對象)
 export interface AccountSimple {
     id: string;
