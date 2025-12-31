@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { getEvents, getTaskStats, getEventStats, getNcdrAlerts, getVolunteerStats, getReportStats, getResourceStats } from '../api';
+import { getEvents, getTaskStats, getEventStats, getNcdrAlerts, getVolunteerStats, getReportStats } from '../api';
 import { Card, Badge, Alert, Button } from '../design-system';
 import { useRealtime } from '../context/RealtimeContext';
 import { useAuth } from '../context/AuthContext';
+import { LowStockWidget } from '../components/widgets/LowStockWidget';
 
 // 統計卡片組件
 interface StatCardProps {
@@ -112,12 +113,6 @@ export default function DashboardPage() {
     const { data: reportStats } = useQuery({
         queryKey: ['reportStats'],
         queryFn: () => getReportStats().then(res => res.data.data),
-    });
-
-    // 獲取物資統計 (真實 API)
-    const { data: resourceStats } = useQuery({
-        queryKey: ['resourceStats'],
-        queryFn: () => getResourceStats().then(res => res.data.data),
     });
 
     // 計算完成率
@@ -318,25 +313,7 @@ export default function DashboardPage() {
                         </div>
                     </Card>
 
-                    <Card title="物資庫存" icon="📦" padding="md">
-                        <div className="resource-grid">
-                            <div className="resource-item">
-                                <span className="resource-label">物資種類</span>
-                                <span className="resource-value">{resourceStats?.total || 0}</span>
-                            </div>
-                            <div className="resource-item">
-                                <span className="resource-label">低庫存</span>
-                                <span className="resource-value resource-value--warning">{resourceStats?.lowStock || 0}</span>
-                            </div>
-                            <div className="resource-item">
-                                <span className="resource-label">即期品</span>
-                                <span className="resource-value resource-value--danger">{resourceStats?.expiringSoon || 0}</span>
-                            </div>
-                        </div>
-                        <Link to="/resources" className="view-more-link">
-                            前往物資管理 →
-                        </Link>
-                    </Card>
+                    <LowStockWidget />
                 </div>
             )}
         </div>
