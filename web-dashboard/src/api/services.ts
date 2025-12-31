@@ -857,3 +857,40 @@ export const getMenuConfig = () =>
 // 更新選單設定 (僅限擁有者)
 export const updateMenuConfig = (items: MenuConfigItem[]) =>
     api.put<{ data: MenuConfigItem[]; message: string }>('/menu-config', { items });
+
+// ===== 倉庫管理 Warehouses =====
+
+export interface Warehouse {
+    id: string;
+    name: string;
+    code: string;
+    address?: string;
+    contactPerson?: string;
+    contactPhone?: string;
+    isPrimary: boolean;
+    isActive: boolean;
+    notes?: string;
+    latitude?: number;
+    longitude?: number;
+    createdAt: string;
+    updatedAt: string;
+}
+
+// 取得所有倉庫
+export const getWarehouses = () =>
+    api.get<{ data: Warehouse[]; total: number }>('/warehouses');
+
+// 取得主倉庫
+export const getPrimaryWarehouse = () =>
+    api.get<{ data: Warehouse | null }>('/warehouses/primary');
+
+// 取得單一倉庫
+export const getWarehouse = (id: string) =>
+    api.get<{ data: Warehouse }>(`/warehouses/${id}`);
+
+// 取得倉庫 (地圖用，有座標)
+export const getWarehousesForMap = async () => {
+    const res = await getWarehouses();
+    // 過濾出有座標且啟用的倉庫
+    return res.data.data.filter(w => w.isActive && w.latitude && w.longitude);
+};
