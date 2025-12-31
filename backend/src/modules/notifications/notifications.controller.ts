@@ -100,4 +100,48 @@ export class NotificationsController {
             data: { count },
         };
     }
+
+    // =========================================
+    // FCM Push Notification API
+    // =========================================
+
+    // 註冊 FCM Token
+    @Post('fcm/register')
+    async registerFcmToken(
+        @Body('accountId') accountId: string,
+        @Body('fcmToken') fcmToken: string,
+    ) {
+        const success = await this.notificationsService.registerFcmToken(accountId, fcmToken);
+        return {
+            success,
+            message: success ? 'FCM Token 已註冊' : 'FCM Token 註冊失敗',
+        };
+    }
+
+    // 取消註冊 FCM Token
+    @Post('fcm/unregister')
+    async unregisterFcmToken(
+        @Body('accountId') accountId: string,
+        @Body('fcmToken') fcmToken: string,
+    ) {
+        const success = await this.notificationsService.unregisterFcmToken(accountId, fcmToken);
+        return {
+            success,
+            message: success ? 'FCM Token 已取消註冊' : 'FCM Token 取消註冊失敗',
+        };
+    }
+
+    // 發送廣播推播 (含 FCM)
+    @Post('broadcast/push')
+    async broadcastWithPush(
+        @Body('title') title: string,
+        @Body('message') message: string,
+        @Body('actionUrl') actionUrl?: string,
+    ) {
+        await this.notificationsService.broadcastWithPush(title, message, actionUrl);
+        return {
+            success: true,
+            message: '廣播已發送 (含 FCM 推播)',
+        };
+    }
 }

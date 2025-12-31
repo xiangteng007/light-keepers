@@ -452,4 +452,201 @@ export class FirebaseAdminService implements OnModuleInit {
             };
         }
     }
+
+    // =========================================
+    // FCM Push Notification Methods
+    // =========================================
+
+    /**
+     * 發送 FCM 推播通知到單一裝置
+     */
+    async sendPushNotification(
+        fcmToken: string,
+        title: string,
+        body: string,
+        data?: Record<string, string>,
+        imageUrl?: string,
+    ): Promise<{ success: boolean; messageId?: string; error?: string }> {
+        if (!this.isConfigured()) {
+            this.logger.warn('Firebase not configured - cannot send push notification');
+            return { success: false, error: 'Firebase not configured' };
+        }
+
+        try {
+            const message: admin.messaging.Message = {
+                token: fcmToken,
+                notification: {
+                    title,
+                    body,
+                    imageUrl,
+                },
+                data: data || {},
+                android: {
+                    priority: 'high',
+                    notification: {
+                        channelId: 'lightkeepers_alerts',
+                        priority: 'max',
+                        defaultSound: true,
+                        defaultVibrateTimings: true,
+                    },
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            sound: 'default',
+                            badge: 1,
+                        },
+                    },
+                },
+                webpush: {
+                    notification: {
+                        icon: '/icons/icon-192x192.png',
+                        badge: '/icons/icon-72x72.png',
+                    },
+                },
+            };
+
+            const messageId = await admin.messaging().send(message);
+            this.logger.log(`FCM push sent: ${messageId}`);
+            return { success: true, messageId };
+        } catch (error: any) {
+            this.logger.error(`FCM push failed: ${error.message}`);
+
+            // 處理無效 Token 錯誤
+            if (error.code === 'messaging/invalid-registration-token' ||
+                error.code === 'messaging/registration-token-not-registered') {
+                return { success: false, error: 'invalid_token' };
+            }
+
+            return { success: false, error: error.message };
+        }
+    }
+
+    /**
+     * 發送 FCM 推播通知到多個裝置
+     */
+    async sendMulticastPush(
+        fcmTokens: string[],
+        title: string,
+        body: string,
+        data?: Record<string, string>,
+    ): Promise<{ successCount: number; failureCount: number; invalidTokens: string[] }> {
+        if (!this.isConfigured() || fcmTokens.length === 0) {
+            return { successCount: 0, failureCount: 0, invalidTokens: [] };
+        }
+
+        try {
+            const message: admin.messaging.MulticastMessage = {
+                tokens: fcmTokens,
+                notification: {
+                    title,
+                    body,
+                },
+                data: data || {},
+                android: {
+                    priority: 'high',
+                },
+                apns: {
+                    payload: {
+                        aps: {
+                            sound: 'default',
+                        },
+                    },
+                },
+            };
+
+            const response = await admin.messaging().sendEachForMulticast(message);
+
+            // 收集無效的 Token
+            const invalidTokens: string[] = [];
+            response.responses.forEach((resp, idx) => {
+                if (!resp.success && resp.error) {
+                    const errorCode = resp.error.code;
+                    if (errorCode === 'messaging/invalid-registration-token' ||
+                        errorCode === 'messaging/registration-token-not-registered') {
+                        invalidTokens.push(fcmTokens[idx]);
+                    }
+                }
+            });
+
+            this.logger.log(`FCM multicast: ${response.successCount} success, ${response.failureCount} failed`);
+
+            return {
+                successCount: response.successCount,
+                failureCount: response.failureCount,
+                invalidTokens,
+            };
+        } catch (error: any) {
+            this.logger.error(`FCM multicast failed: ${error.message}`);
+            return { successCount: 0, failureCount: fcmTokens.length, invalidTokens: [] };
+        }
+    }
+
+    /**
+     * 發送 FCM 推播到訂閱主題的所有裝置
+     */
+    async sendTopicPush(
+        topic: string,
+        title: string,
+        body: string,
+        data?: Record<string, string>,
+    ): Promise<{ success: boolean; messageId?: string }> {
+        if (!this.isConfigured()) {
+            return { success: false };
+        }
+
+        try {
+            const message: admin.messaging.Message = {
+                topic,
+                notification: {
+                    title,
+                    body,
+                },
+                data: data || {},
+            };
+
+            const messageId = await admin.messaging().send(message);
+            this.logger.log(`FCM topic push sent to '${topic}': ${messageId}`);
+            return { success: true, messageId };
+        } catch (error: any) {
+            this.logger.error(`FCM topic push failed: ${error.message}`);
+            return { success: false };
+        }
+    }
+
+    /**
+     * 訂閱使用者裝置到主題
+     */
+    async subscribeToTopic(fcmTokens: string[], topic: string): Promise<boolean> {
+        if (!this.isConfigured() || fcmTokens.length === 0) {
+            return false;
+        }
+
+        try {
+            await admin.messaging().subscribeToTopic(fcmTokens, topic);
+            this.logger.log(`Subscribed ${fcmTokens.length} tokens to topic '${topic}'`);
+            return true;
+        } catch (error: any) {
+            this.logger.error(`Failed to subscribe to topic: ${error.message}`);
+            return false;
+        }
+    }
+
+    /**
+     * 取消訂閱主題
+     */
+    async unsubscribeFromTopic(fcmTokens: string[], topic: string): Promise<boolean> {
+        if (!this.isConfigured() || fcmTokens.length === 0) {
+            return false;
+        }
+
+        try {
+            await admin.messaging().unsubscribeFromTopic(fcmTokens, topic);
+            this.logger.log(`Unsubscribed ${fcmTokens.length} tokens from topic '${topic}'`);
+            return true;
+        } catch (error: any) {
+            this.logger.error(`Failed to unsubscribe from topic: ${error.message}`);
+            return false;
+        }
+    }
 }

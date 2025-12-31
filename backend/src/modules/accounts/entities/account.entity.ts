@@ -90,6 +90,10 @@ export class Account {
     @Column({ name: 'volunteer_profile_completed', default: false })
     volunteerProfileCompleted: boolean;
 
+    // FCM Push Notification Tokens (支援多裝置)
+    @Column({ name: 'fcm_tokens', type: 'text', array: true, nullable: true, default: '{}' })
+    fcmTokens: string[];
+
     @ManyToMany(() => Role)
     @JoinTable({
         name: 'account_roles',
