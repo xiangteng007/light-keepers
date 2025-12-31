@@ -37,7 +37,7 @@ jobs:
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
             --add-cloudsql-instances=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db \
-            --set-env-vars="NODE_ENV=production,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo" \
+            --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo" \
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
             --quiet
 
