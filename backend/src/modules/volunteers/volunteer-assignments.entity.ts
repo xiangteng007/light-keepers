@@ -88,4 +88,18 @@ export class VolunteerAssignment {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    // ===== 即時位置追蹤（任務期間）=====
+
+    // 最後回報位置
+    @Column({ name: 'last_location_lat', type: 'decimal', precision: 10, scale: 7, nullable: true })
+    lastLocationLat?: number;
+
+    @Column({ name: 'last_location_lng', type: 'decimal', precision: 10, scale: 7, nullable: true })
+    lastLocationLng?: number;
+
+    // 最後回報時間
+    @Column({ name: 'last_location_at', type: 'timestamp', nullable: true })
+    lastLocationAt?: Date;
 }
+

@@ -29,6 +29,9 @@ import {
     CheckInController, ExpiryNotificationController
 } from './vms.controller';
 
+// Location tracking
+import { VolunteerLocationController } from './volunteer-location.controller';
+
 // Shared JWT Module (breaks circular dependency with AuthModule)
 import { SharedJwtModule } from '../shared/shared-jwt.module';
 
@@ -58,6 +61,8 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
         PointsController,
         CheckInController,
         ExpiryNotificationController,
+        // Location tracking
+        VolunteerLocationController,
     ],
     providers: [
         VolunteersService,

@@ -478,6 +478,33 @@ export const updateVolunteerStatus = (id: string, status: VolunteerStatus) =>
 export const getAvailableVolunteers = (region?: string, skill?: string) =>
     api.get<Volunteer[]>('/volunteers/available', { params: { region, skill } });
 
+// ===== 志工位置追蹤 =====
+
+export interface ActiveVolunteerLocation {
+    assignmentId: string;
+    volunteerId: string;
+    volunteerName: string;
+    taskTitle: string;
+    status: string;
+    lat: number;
+    lng: number;
+    lastLocationAt: string;
+    checkInAt?: string;
+}
+
+// 取得進行中任務的志工位置
+export const getActiveVolunteerLocations = () =>
+    api.get<{ success: boolean; data: ActiveVolunteerLocation[]; count: number }>('/volunteer-locations/active');
+
+// 更新志工位置（任務期間）
+export const updateVolunteerLocation = (assignmentId: string, lat: number, lng: number) =>
+    api.post<{ success: boolean; message: string }>(`/volunteer-locations/${assignmentId}/update`, { lat, lng });
+
+// 取得志工位置歷史
+export const getVolunteerLocationHistory = (volunteerId: string, limit?: number) =>
+    api.get<{ success: boolean; data: any[] }>(`/volunteer-locations/volunteer/${volunteerId}`, { params: { limit } });
+
+
 // 取得志工統計
 export const getVolunteerStats = () => api.get<{
     success: boolean; data: {
