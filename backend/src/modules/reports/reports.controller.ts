@@ -123,5 +123,41 @@ export class ReportsController {
             data: result,
         };
     }
+
+    // 回報趨勢數據
+    @Get('analysis/trend')
+    async getTrend(@Query('days') days?: string) {
+        const result = await this.reportsService.getTrendData(
+            days ? parseInt(days, 10) : 7
+        );
+        return {
+            success: true,
+            data: result,
+        };
+    }
+
+    // 區域分佈統計
+    @Get('analysis/regions')
+    async getRegions(@Query('days') days?: string) {
+        const result = await this.reportsService.getRegionStats(
+            days ? parseInt(days, 10) : 30
+        );
+        return {
+            success: true,
+            data: result,
+        };
+    }
+
+    // 時段分佈統計
+    @Get('analysis/hourly')
+    async getHourly(@Query('days') days?: string) {
+        const result = await this.reportsService.getHourlyStats(
+            days ? parseInt(days, 10) : 7
+        );
+        return {
+            success: true,
+            data: result,
+        };
+    }
 }
 

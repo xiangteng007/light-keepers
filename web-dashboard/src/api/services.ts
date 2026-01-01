@@ -406,6 +406,33 @@ export interface HotspotsResponse {
 export const getHotspots = (params?: { gridSizeKm?: number; minCount?: number; days?: number }) =>
     api.get<{ success: boolean; data: HotspotsResponse }>('/reports/analysis/hotspots', { params });
 
+// 回報趨勢數據
+export interface TrendData {
+    labels: string[];
+    datasets: { label: string; data: number[] }[];
+}
+
+export const getReportTrend = (days?: number) =>
+    api.get<{ success: boolean; data: TrendData }>('/reports/analysis/trend', { params: { days } });
+
+// 區域分佈統計
+export interface RegionData {
+    regions: string[];
+    values: number[];
+}
+
+export const getRegionStats = (days?: number) =>
+    api.get<{ success: boolean; data: RegionData }>('/reports/analysis/regions', { params: { days } });
+
+// 時段分佈統計
+export interface HourlyData {
+    hours: number[];
+    values: number[];
+}
+
+export const getHourlyStats = (days?: number) =>
+    api.get<{ success: boolean; data: HourlyData }>('/reports/analysis/hourly', { params: { days } });
+
 // ===== 志工管理 Volunteers =====
 
 export type VolunteerStatus = 'available' | 'busy' | 'offline';

@@ -294,5 +294,116 @@ export class ReportsService {
             generatedAt: new Date(),
         };
     }
+
+    // 回報趨勢數據（按天統計）
+    async getTrendData(days: number = 7): Promise<{
+        labels: string[];
+        datasets: { label: string; data: number[] }[];
+    }> {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        const reports = await this.reportsRepository
+            .createQueryBuilder('report')
+            .where('report.createdAt >= :since', { since })
+            .orderBy('report.createdAt', 'ASC')
+            .getMany();
+
+        // 生成日期標籤
+        const labels: string[] = [];
+        const dateMap = new Map<string, { total: number; byType: Record<string, number> }>();
+
+        for (let i = 0; i < days; i++) {
+            const date = new Date(since);
+            date.setDate(since.getDate() + i);
+            const dateStr = date.toISOString().split('T')[0];
+            labels.push(dateStr.slice(5)); // MM-DD
+            dateMap.set(dateStr, { total: 0, byType: {} });
+        }
+
+        // 統計每日回報
+        for (const report of reports) {
+            const dateStr = report.createdAt.toISOString().split('T')[0];
+            const entry = dateMap.get(dateStr);
+            if (entry) {
+                entry.total++;
+                entry.byType[report.type] = (entry.byType[report.type] || 0) + 1;
+            }
+        }
+
+        // 組合數據集
+        const totals = Array.from(dateMap.values()).map(e => e.total);
+
+        return {
+            labels,
+            datasets: [
+                { label: '回報數量', data: totals },
+            ],
+        };
+    }
+
+    // 區域分佈統計
+    async getRegionStats(days: number = 30): Promise<{
+        regions: string[];
+        values: number[];
+    }> {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        const results = await this.reportsRepository
+            .createQueryBuilder('report')
+            .select('report.address', 'region')
+            .addSelect('COUNT(*)', 'count')
+            .where('report.createdAt >= :since', { since })
+            .andWhere('report.address IS NOT NULL')
+            .groupBy('report.address')
+            .orderBy('count', 'DESC')
+            .limit(10)
+            .getRawMany();
+
+        // 簡化區域名稱（取縣市）
+        const regionMap = new Map<string, number>();
+        for (const r of results) {
+            // 提取縣市名稱
+            const match = r.region?.match(/(.*?[市縣])/);
+            const region = match ? match[1] : r.region?.substring(0, 6) || '未知';
+            regionMap.set(region, (regionMap.get(region) || 0) + parseInt(r.count, 10));
+        }
+
+        const sorted = Array.from(regionMap.entries())
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 8);
+
+        return {
+            regions: sorted.map(([r]) => r),
+            values: sorted.map(([, v]) => v),
+        };
+    }
+
+    // 時段分佈統計
+    async getHourlyStats(days: number = 7): Promise<{
+        hours: number[];
+        values: number[];
+    }> {
+        const since = new Date();
+        since.setDate(since.getDate() - days);
+
+        const reports = await this.reportsRepository
+            .createQueryBuilder('report')
+            .where('report.createdAt >= :since', { since })
+            .getMany();
+
+        // 統計每小時回報數
+        const hourCounts = new Array(24).fill(0);
+        for (const report of reports) {
+            const hour = new Date(report.createdAt).getHours();
+            hourCounts[hour]++;
+        }
+
+        return {
+            hours: Array.from({ length: 24 }, (_, i) => i),
+            values: hourCounts,
+        };
+    }
 }
 
