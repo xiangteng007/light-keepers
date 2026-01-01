@@ -547,6 +547,22 @@ export class AuthService {
         return this.generateTokenResponse(account);
     }
 
+    /**
+     * Generate token response for a given account (used by refresh token flow)
+     */
+    async generateTokenForAccountId(accountId: string): Promise<TokenResponseDto> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            relations: ['roles'],
+        });
+
+        if (!account) {
+            throw new UnauthorizedException('Account not found');
+        }
+
+        return this.generateTokenResponse(account);
+    }
+
     private generateTokenResponse(account: Account): TokenResponseDto {
         const roles = account.roles || [];
         const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => (r as any).level || 0)) : 0;
@@ -558,11 +574,12 @@ export class AuthService {
             roleLevel,
         };
 
-        const accessToken = this.jwtService.sign(payload, { expiresIn: '7d' });
+        // Token expires in 15 minutes (refresh token handles long-term sessions)
+        const accessToken = this.jwtService.sign(payload, { expiresIn: '15m' });
 
         return {
             accessToken,
-            expiresIn: 7 * 24 * 60 * 60, // 7 days in seconds
+            expiresIn: 15 * 60, // 15 minutes in seconds
             user: {
                 id: account.id,
                 email: account.email,
@@ -574,6 +591,7 @@ export class AuthService {
             },
         };
     }
+
 
     // =========================================
     // 個人資料管理

@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 // Cloud Run startup timestamp - log immediately
@@ -25,6 +26,9 @@ async function bootstrap() {
         console.log(`[STARTUP] NestJS created in ${Date.now() - bootstrapStart}ms`);
 
         const isProduction = process.env.NODE_ENV === 'production';
+
+        // ===== Cookie Parser (for httpOnly refresh tokens) =====
+        app.use(cookieParser());
 
         // ===== 安全 Headers (Helmet) =====
         app.use(helmet({

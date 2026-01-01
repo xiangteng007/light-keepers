@@ -1,11 +1,16 @@
-import { Controller, Post, Body, Get, Patch, UseGuards, Request, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Delete, Param, UseGuards, Request, Res, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
+import { RefreshTokenService } from './services/refresh-token.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthController {
-    constructor(private readonly authService: AuthService) { }
+    constructor(
+        private readonly authService: AuthService,
+        private readonly refreshTokenService: RefreshTokenService,
+    ) { }
 
     @Post('register')
     async register(@Body() dto: RegisterDto) {
@@ -337,5 +342,130 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     async markVolunteerProfileCompleted(@Request() req: { user: { id: string } }) {
         return this.authService.markVolunteerProfileCompleted(req.user.id);
+    }
+
+    // =========================================
+    // Refresh Token Endpoints
+    // =========================================
+
+    /**
+     * Refresh access token using httpOnly cookie
+     * POST /auth/refresh
+     * 
+     * Cookie: refresh_token=<token>
+     * Returns: new accessToken
+     */
+    @Post('refresh')
+    async refreshToken(
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        // Get refresh token from cookie
+        const refreshToken = req.cookies?.refresh_token;
+
+        if (!refreshToken) {
+            throw new UnauthorizedException('No refresh token provided');
+        }
+
+        // Validate and get account ID
+        const accountId = await this.refreshTokenService.validateRefreshToken(refreshToken);
+
+        if (!accountId) {
+            // Clear invalid cookie
+            res.clearCookie('refresh_token', this.getCookieOptions());
+            throw new UnauthorizedException('Invalid or expired refresh token');
+        }
+
+        // Generate new access token
+        const tokenResponse = await this.authService.generateTokenForAccountId(accountId);
+
+        return {
+            accessToken: tokenResponse.accessToken,
+            expiresIn: tokenResponse.expiresIn,
+            user: tokenResponse.user,
+        };
+    }
+
+    /**
+     * Logout - revoke refresh token and clear cookie
+     * POST /auth/logout
+     */
+    @Post('logout')
+    async logout(
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const refreshToken = req.cookies?.refresh_token;
+
+        if (refreshToken) {
+            await this.refreshTokenService.revokeToken(refreshToken);
+        }
+
+        // Clear the cookie
+        res.clearCookie('refresh_token', this.getCookieOptions());
+
+        return { success: true, message: 'Logged out successfully' };
+    }
+
+    /**
+     * Get active sessions for current user
+     * GET /auth/sessions
+     */
+    @Get('sessions')
+    @UseGuards(JwtAuthGuard)
+    async getSessions(@Request() req: { user: { id: string } }) {
+        const sessions = await this.refreshTokenService.getActiveSessions(req.user.id);
+        return { success: true, data: sessions };
+    }
+
+    /**
+     * Revoke a specific session
+     * DELETE /auth/sessions/:id
+     */
+    @Delete('sessions/:id')
+    @UseGuards(JwtAuthGuard)
+    async revokeSession(
+        @Request() req: { user: { id: string } },
+        @Param('id') sessionId: string,
+    ) {
+        const revoked = await this.refreshTokenService.revokeSession(req.user.id, sessionId);
+
+        if (!revoked) {
+            throw new BadRequestException('Session not found or already revoked');
+        }
+
+        return { success: true, message: 'Session revoked' };
+    }
+
+    /**
+     * Logout from all devices (revoke all refresh tokens)
+     * POST /auth/logout-all
+     */
+    @Post('logout-all')
+    @UseGuards(JwtAuthGuard)
+    async logoutAll(
+        @Request() req: { user: { id: string } },
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const count = await this.refreshTokenService.revokeAllTokens(req.user.id);
+
+        // Clear current session cookie
+        res.clearCookie('refresh_token', this.getCookieOptions());
+
+        return { success: true, message: `Logged out from ${count} devices` };
+    }
+
+    /**
+     * Helper method to get consistent cookie options
+     */
+    private getCookieOptions() {
+        const isProduction = process.env.NODE_ENV === 'production';
+        return {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'strict' as const : 'lax' as const,
+            path: '/api/v1/auth',
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
+        };
     }
 }
