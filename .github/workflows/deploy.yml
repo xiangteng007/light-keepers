@@ -7,8 +7,8 @@ on:
 
 env:
   PROJECT_ID: light-keepers-mvp
-  REGION: us-central1
-  API_SERVICE: light-keepers-backend
+  REGION: asia-east1
+  API_SERVICE: light-keepers-api
   DASHBOARD_SERVICE: light-keepers-dashboard
 
 jobs:
@@ -65,7 +65,7 @@ jobs:
       - name: Build
         working-directory: web-dashboard
         env:
-          VITE_API_URL: https://light-keepers-backend-955234851806.us-central1.run.app
+          VITE_API_URL: https://light-keepers-api-bsf4y44tja-de.a.run.app/api/v1
           VITE_LINE_CLIENT_ID: "2008769727"
           VITE_LIFF_ID: ${{ secrets.LIFF_ID }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
