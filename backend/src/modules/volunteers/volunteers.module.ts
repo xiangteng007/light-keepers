@@ -15,6 +15,9 @@ import { VolunteerVehicle } from './entities/volunteer-vehicle.entity';
 import { VolunteerInsurance } from './entities/volunteer-insurance.entity';
 import { PointsRecord } from './entities/points-record.entity';
 
+// Recognition Entities
+import { VolunteerBadge, VolunteerEarnedBadge, VolunteerRecognition } from './entities/recognition.entity';
+
 // VMS Services
 import { SkillService } from './entities/skill.service';
 import { VehicleService } from './entities/vehicle.service';
@@ -22,12 +25,16 @@ import { InsuranceService } from './entities/insurance.service';
 import { PointsService } from './entities/points.service';
 import { CheckInService } from './entities/checkin.service';
 import { ExpiryNotificationService } from './entities/expiry-notification.service';
+import { RecognitionService } from './entities/recognition.service';
 
 // VMS Controllers
 import {
     SkillsController, VehiclesController, InsuranceController, PointsController,
     CheckInController, ExpiryNotificationController
 } from './vms.controller';
+
+// Recognition Controller
+import { RecognitionController } from './recognition.controller';
 
 // Location tracking
 import { VolunteerLocationController } from './volunteer-location.controller';
@@ -49,6 +56,10 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
             VolunteerVehicle,
             VolunteerInsurance,
             PointsRecord,
+            // Recognition entities
+            VolunteerBadge,
+            VolunteerEarnedBadge,
+            VolunteerRecognition,
         ]),
     ],
     controllers: [
@@ -61,6 +72,8 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
         PointsController,
         CheckInController,
         ExpiryNotificationController,
+        // Recognition Controller
+        RecognitionController,
         // Location tracking
         VolunteerLocationController,
     ],
@@ -74,6 +87,8 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
         PointsService,
         CheckInService,
         ExpiryNotificationService,
+        // Recognition Service
+        RecognitionService,
     ],
     exports: [
         VolunteersService,
@@ -82,8 +97,8 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
         VehicleService,
         InsuranceService,
         PointsService,
+        RecognitionService,
     ],
 })
 export class VolunteersModule { }
-
 
