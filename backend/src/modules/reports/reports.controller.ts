@@ -13,8 +13,7 @@ import {
 import { Throttle } from '@nestjs/throttler';
 import { ReportsService, CreateReportDto, ReviewReportDto, ReportFilter } from './reports.service';
 import { ReportStatus, ReportType, ReportSeverity } from './reports.entity';
-import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
-import { RoleLevel } from '../accounts/entities/role.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('reports')
 export class ReportsController {
@@ -73,8 +72,8 @@ export class ReportsController {
     /**
      * 取得所有回報 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get()
     async findAll(
         @Query('status') status?: ReportStatus,
@@ -102,8 +101,8 @@ export class ReportsController {
     /**
      * 取得單一回報 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get(':id')
     async findOne(@Param('id') id: string) {
         const report = await this.reportsService.findOne(id);
@@ -116,8 +115,8 @@ export class ReportsController {
     /**
      * 審核回報 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Patch(':id/review')
     async review(
         @Param('id') id: string,
@@ -137,8 +136,8 @@ export class ReportsController {
     /**
      * 刪除回報 (需要總幹事權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.DIRECTOR)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     @Delete(':id')
     async delete(@Param('id') id: string) {
         await this.reportsService.delete(id);
@@ -155,8 +154,8 @@ export class ReportsController {
     /**
      * 災情熱點分析 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get('analysis/hotspots')
     async getHotspots(
         @Query('gridSizeKm') gridSizeKm?: string,
@@ -177,8 +176,8 @@ export class ReportsController {
     /**
      * 回報趨勢數據 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get('analysis/trend')
     async getTrend(@Query('days') days?: string) {
         const result = await this.reportsService.getTrendData(
@@ -193,8 +192,8 @@ export class ReportsController {
     /**
      * 區域分佈統計 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get('analysis/regions')
     async getRegions(@Query('days') days?: string) {
         const result = await this.reportsService.getRegionStats(
@@ -209,8 +208,8 @@ export class ReportsController {
     /**
      * 時段分佈統計 (需要幹部權限)
      */
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @Get('analysis/hourly')
     async getHourly(@Query('days') days?: string) {
         const result = await this.reportsService.getHourlyStats(

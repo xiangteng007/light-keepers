@@ -1,9 +1,9 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ResourcesAnalyticsService } from './resources-analytics.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard } from '../shared/guards';
 
 @Controller('resources/analytics')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard)
 export class ResourcesAnalyticsController {
     constructor(private readonly analyticsService: ResourcesAnalyticsService) { }
 
