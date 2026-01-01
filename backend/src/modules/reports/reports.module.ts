@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ReportsController } from './reports.controller';
 import { ReportsService } from './reports.service';
@@ -13,7 +13,7 @@ import { LineBotModule } from '../line-bot/line-bot.module';
 @Module({
     imports: [
         TypeOrmModule.forFeature([Report, Task, Account]),
-        LineBotModule,
+        forwardRef(() => LineBotModule), // forwardRef to break circular dependency
     ],
     controllers: [ReportsController, AdvancedFilterController],
     providers: [ReportsService, AdvancedFilterService, ReportDispatcherService],
