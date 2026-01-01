@@ -32,6 +32,7 @@ import { CommunityModule } from './modules/community/community.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { BackupModule } from './modules/backup/backup.module';
+import { TenantModule } from './modules/tenants/tenant.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -119,6 +120,7 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         AnalyticsModule, // 📊 AI 趨勢預測
         IntegrationsModule, // 🔗 外部 API 整合
         BackupModule, // 💾 數據備份
+        TenantModule, // 🏢 多租戶
     ],
     providers: [
         CloudLoggerService,
