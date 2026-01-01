@@ -138,9 +138,21 @@ async function bootstrap() {
     // Cloud Run 需要監聽 0.0.0.0，預設 port 8080
     const port = process.env.PORT || 8080;
     const host = '0.0.0.0';
+
+    console.log('='.repeat(60));
+    console.log('🚀 Light Keepers API - Starting...');
+    console.log(`📦 Version: 0.1.0`);
+    console.log(`🌍 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+    console.log(`🔌 Listening on: http://${host}:${port}`);
+    console.log(`📅 Started at: ${new Date().toISOString()}`);
+    console.log('='.repeat(60));
+
     await app.listen(port, host);
 
-    console.log(`🚀 Light Keepers API 啟動於 http://${host}:${port}`);
+    console.log(`✅ Server is ready to accept connections`);
 }
 
-bootstrap();
+bootstrap().catch(err => {
+    console.error('❌ Failed to start application:', err);
+    process.exit(1);
+});

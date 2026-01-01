@@ -61,12 +61,16 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
             },
         ]),
 
-        // Cloud SQL 連線
+        // Cloud SQL 連線 - 非阻塞延遲初始化
         TypeOrmModule.forRootAsync({
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => {
                 const isProduction = configService.get('NODE_ENV') === 'production';
                 const dbHost = configService.get('DB_HOST', 'localhost');
+
+                console.log(`[TypeORM] Configuring database connection...`);
+                console.log(`[TypeORM] Environment: ${isProduction ? 'production' : 'development'}`);
+                console.log(`[TypeORM] DB Host: ${dbHost}`);
 
                 const config: any = {
                     type: 'postgres',
@@ -75,18 +79,20 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_DATABASE', 'lightkeepers'),
                     autoLoadEntities: true,
-                    synchronize: false, // VMS 表已建立，關閉 sync 確保生產安全
-                    logging: !isProduction,
-                    retryAttempts: 10, // 增加重試次數給 Cloud SQL cold start
-                    retryDelay: 5000,  // 增加重試間隔
-                    connectTimeoutMS: 60000, // 60秒連線超時
+                    synchronize: false,
+                    logging: !isProduction ? ['error', 'warn', 'query'] : ['error'],
+                    // Cloud Run 優化：減少重試次數，避免啟動超時
+                    retryAttempts: 3,
+                    retryDelay: 3000,
+                    // 連線池設定
                     extra: {
-                        connectionTimeoutMillis: 60000,
+                        max: 10, // 最大連線數
+                        connectionTimeoutMillis: 30000, // 30秒連線超時
+                        idleTimeoutMillis: 30000,
                     },
                 };
 
                 // Only set port for non-production (local development)
-                // For production Cloud SQL Unix socket, do not set port at all
                 if (!isProduction) {
                     config.port = configService.get('DB_PORT', 5432);
                 }
