@@ -1420,3 +1420,37 @@ export const checkPostLiked = (postId: string, userId: string) =>
 // 社群統計
 export const getCommunityStats = () =>
     api.get<{ success: boolean; data: { totalPosts: number; totalComments: number; todayPosts: number; topContributors: { authorId: string; authorName: string; postCount: number }[] } }>('/community/stats');
+
+// ===== 志工排行榜與表揚 API =====
+
+export interface VolunteerLeaderboardEntry {
+    volunteerId: string;
+    volunteerName: string;
+    avatar?: string;
+    totalHours: number;
+    eventCount: number;
+    lastActivityDate?: string;
+}
+
+export interface VolunteerRecognition {
+    id: string;
+    volunteerId: string;
+    volunteerName: string;
+    title: string;
+    reason: string;
+    badgeType: 'gold' | 'silver' | 'bronze' | 'special';
+    awardedAt: string;
+    awardedBy?: string;
+}
+
+// 取得志工排行榜
+export const getVolunteerLeaderboard = (params?: { period?: string; limit?: number }) =>
+    api.get<{ success: boolean; data: VolunteerLeaderboardEntry[] }>('/volunteers/leaderboard', { params });
+
+// 取得表揚記錄
+export const getVolunteerRecognitions = (params?: { limit?: number }) =>
+    api.get<{ success: boolean; data: VolunteerRecognition[] }>('/volunteers/recognitions', { params });
+
+// 頒發表揚（管理員）
+export const createRecognition = (data: { volunteerId: string; title: string; reason: string; badgeType: string; awardedBy?: string }) =>
+    api.post<{ success: boolean; data: VolunteerRecognition }>('/volunteers/recognitions', data);
