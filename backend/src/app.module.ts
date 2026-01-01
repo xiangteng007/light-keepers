@@ -26,6 +26,7 @@ import { UploadsModule } from './modules/uploads/uploads.module';
 import { MenuConfigModule } from './modules/menu-config/menu-config.module';
 import { WeatherForecastModule } from './modules/weather-forecast/weather-forecast.module';
 import { DonationsModule } from './modules/donations/donations.module';
+import { AnnouncementsModule } from './modules/announcements/announcements.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -107,6 +108,7 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         MenuConfigModule, // 📋 選單設定
         WeatherForecastModule, // ☁️ 氣象預報
         DonationsModule, // 💰 捐款系統
+        AnnouncementsModule, // 📢 公告系統
     ],
     providers: [
         CloudLoggerService,
