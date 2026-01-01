@@ -206,6 +206,113 @@ body {
   font-size: 14px;
 }
 
+/* ===== Navigation Groups - 分組導航 ===== */
+.nav-group {
+  margin-bottom: 4px;
+}
+
+.nav-group__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: all 0.15s ease;
+}
+
+.nav-group__header:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.nav-group.has-active>.nav-group__header {
+  color: var(--accent-primary);
+}
+
+.nav-group__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.nav-group__label {
+  flex: 1;
+  text-align: left;
+}
+
+.nav-group__arrow {
+  display: flex;
+  align-items: center;
+  opacity: 0.5;
+  transition: transform 0.2s ease;
+}
+
+.nav-group.open .nav-group__arrow {
+  transform: rotate(0deg);
+}
+
+.nav-group__items {
+  margin-left: 12px;
+  padding-left: 12px;
+  border-left: 1px solid var(--border-color);
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.nav-group__items .nav-item {
+  padding: 8px 12px;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.nav-group__items .nav-item__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  margin-right: 10px;
+}
+
+.nav-group__items .nav-item__label {
+  font-size: 13px;
+}
+
+/* Sidebar Reminder */
+.sidebar-reminder {
+  padding: 12px;
+  margin: 8px 0;
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
+  border-radius: 8px;
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.sidebar-reminder__link {
+  color: var(--warning);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  display: block;
+}
+
+.sidebar-reminder__link:hover {
+  text-decoration: underline;
+}
+
 /* ===== Sidebar Footer ===== */
 .sidebar-footer {
   padding: 16px 12px;
@@ -224,8 +331,6 @@ body {
   background: var(--bg-primary);
 }
 
-font-size: var(--font-size-base);
-}
 
 /* ===== Sidebar Footer ===== */
 .sidebar-footer {
