@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, Res, NotFoundException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, Res, NotFoundException, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { DonationsService, CreateDonorDto, CreateDonationDto } from './donations.service';
 import { ReceiptPdfService } from './receipt-pdf.service';
 import { DonationStatus } from './donation.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('donations')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class DonationsController {
     constructor(
         private readonly donationsService: DonationsService,

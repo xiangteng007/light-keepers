@@ -6,10 +6,14 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { AssignmentsService, CreateAssignmentDto, CheckInDto, CheckOutDto } from './assignments.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('volunteer-assignments')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class AssignmentsController {
     constructor(private readonly assignmentsService: AssignmentsService) { }
 

@@ -6,10 +6,14 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { RecognitionService, AwardBadgeDto, CreateRecognitionDto } from './entities/recognition.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('volunteers/recognition')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class RecognitionController {
     constructor(private readonly recognitionService: RecognitionService) { }
 

@@ -4,10 +4,14 @@ import {
     Post,
     Body,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { ExternalApiService, NotificationPayload } from './external-api.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('integrations')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OWNER)
 export class IntegrationsController {
     constructor(private readonly externalApiService: ExternalApiService) { }
 

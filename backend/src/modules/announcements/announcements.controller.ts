@@ -7,6 +7,7 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import {
     AnnouncementsService,
@@ -15,8 +16,11 @@ import {
     AnnouncementFilter,
 } from './announcements.service';
 import { AnnouncementCategory, AnnouncementStatus, AnnouncementPriority } from './announcements.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('announcements')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class AnnouncementsController {
     constructor(private readonly announcementsService: AnnouncementsService) { }
 

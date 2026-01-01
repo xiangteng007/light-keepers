@@ -7,11 +7,15 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { CommunityService, CreatePostDto, CreateCommentDto, PostFilter } from './community.service';
 import { PostCategory } from './community.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('community')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class CommunityController {
     constructor(private readonly communityService: CommunityService) { }
 

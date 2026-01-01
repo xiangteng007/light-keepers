@@ -5,8 +5,10 @@ import {
     HttpCode,
     HttpStatus,
     BadRequestException,
+    UseGuards,
 } from '@nestjs/common';
 import { UploadsService, UploadResult } from './uploads.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 interface UploadDto {
     file: string; // Base64 data URL
@@ -19,6 +21,8 @@ interface BulkUploadDto {
 }
 
 @Controller('uploads')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class UploadsController {
     constructor(private readonly uploadsService: UploadsService) { }
 

@@ -7,6 +7,7 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import {
     ActivitiesService,
@@ -15,8 +16,11 @@ import {
     ActivityFilter,
 } from './activities.service';
 import { ActivityCategory, ActivityStatus } from './activities.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('activities')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class ActivitiesController {
     constructor(private readonly activitiesService: ActivitiesService) { }
 
