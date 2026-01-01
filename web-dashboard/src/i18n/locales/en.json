@@ -1,0 +1,197 @@
+{
+    "common": {
+        "appName": "Light Keepers Disaster Platform",
+        "loading": "Loading...",
+        "error": "An error occurred",
+        "success": "Success",
+        "save": "Save",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "delete": "Delete",
+        "edit": "Edit",
+        "add": "Add",
+        "search": "Search",
+        "filter": "Filter",
+        "refresh": "Refresh",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "close": "Close",
+        "yes": "Yes",
+        "no": "No",
+        "all": "All",
+        "none": "None",
+        "required": "Required",
+        "optional": "Optional"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "map": "Disaster Map",
+        "reports": "Reports",
+        "volunteers": "Volunteers",
+        "resources": "Resources",
+        "events": "Events",
+        "activities": "Activities",
+        "announcements": "Announcements",
+        "settings": "Settings",
+        "permissions": "Permissions",
+        "profile": "Profile",
+        "logout": "Logout"
+    },
+    "auth": {
+        "login": "Login",
+        "logout": "Logout",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "forgotPassword": "Forgot Password?",
+        "rememberMe": "Remember Me",
+        "loginWithGoogle": "Login with Google",
+        "loginWithLine": "Login with LINE",
+        "loginSuccess": "Login successful",
+        "loginFailed": "Login failed",
+        "logoutSuccess": "Logged out"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Welcome back",
+        "overview": "Overview",
+        "todayReports": "Today's Reports",
+        "activeVolunteers": "Active Volunteers",
+        "totalResources": "Total Resources",
+        "pendingTasks": "Pending Tasks",
+        "recentActivity": "Recent Activity",
+        "quickActions": "Quick Actions",
+        "newReport": "New Report",
+        "viewMap": "View Map"
+    },
+    "reports": {
+        "title": "Disaster Reports",
+        "new": "New Report",
+        "list": "Report List",
+        "status": {
+            "pending": "Pending",
+            "confirmed": "Confirmed",
+            "rejected": "Rejected",
+            "resolved": "Resolved"
+        },
+        "type": {
+            "flood": "Flood",
+            "debris": "Debris Flow",
+            "fire": "Fire",
+            "accident": "Accident",
+            "other": "Other"
+        },
+        "severity": {
+            "low": "Low",
+            "medium": "Medium",
+            "high": "High",
+            "critical": "Critical"
+        },
+        "fields": {
+            "title": "Title",
+            "description": "Description",
+            "location": "Location",
+            "photos": "Photos",
+            "contact": "Contact Info"
+        }
+    },
+    "volunteers": {
+        "title": "Volunteer Management",
+        "list": "Volunteer List",
+        "add": "Add Volunteer",
+        "status": {
+            "available": "Available",
+            "busy": "Busy",
+            "offline": "Offline"
+        },
+        "fields": {
+            "name": "Name",
+            "phone": "Phone",
+            "region": "Service Region",
+            "skills": "Skills",
+            "hours": "Service Hours",
+            "points": "Points"
+        },
+        "recognition": {
+            "badges": "Badges",
+            "awards": "Awards",
+            "milestones": "Milestones",
+            "leaderboard": "Leaderboard"
+        }
+    },
+    "resources": {
+        "title": "Resource Management",
+        "list": "Resource List",
+        "add": "Add Resource",
+        "status": {
+            "available": "Available",
+            "low": "Low Stock",
+            "depleted": "Depleted"
+        },
+        "fields": {
+            "name": "Name",
+            "category": "Category",
+            "quantity": "Quantity",
+            "unit": "Unit",
+            "location": "Location",
+            "expiresAt": "Expires At"
+        }
+    },
+    "activities": {
+        "title": "Activity Registration",
+        "list": "Activity List",
+        "create": "Create Activity",
+        "register": "Register",
+        "status": {
+            "draft": "Draft",
+            "open": "Open",
+            "closed": "Closed",
+            "cancelled": "Cancelled",
+            "completed": "Completed"
+        },
+        "fields": {
+            "title": "Activity Name",
+            "description": "Description",
+            "date": "Date",
+            "location": "Location",
+            "participants": "Participants"
+        }
+    },
+    "settings": {
+        "title": "Settings",
+        "theme": {
+            "title": "Theme",
+            "light": "Light Mode",
+            "dark": "Dark Mode",
+            "system": "System"
+        },
+        "language": {
+            "title": "Language",
+            "zh": "繁體中文",
+            "en": "English",
+            "ja": "日本語"
+        },
+        "notifications": {
+            "title": "Notifications",
+            "push": "Push Notifications",
+            "email": "Email Notifications"
+        }
+    },
+    "errors": {
+        "notFound": "Page Not Found",
+        "unauthorized": "Unauthorized",
+        "forbidden": "Forbidden",
+        "serverError": "Server Error",
+        "networkError": "Network Error",
+        "timeout": "Request Timeout"
+    },
+    "offline": {
+        "title": "Offline Mode",
+        "message": "You are currently offline. Some features may be limited.",
+        "pending": "pending sync",
+        "sync": "Sync"
+    }
+}
