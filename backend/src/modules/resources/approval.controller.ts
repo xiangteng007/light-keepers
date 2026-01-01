@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Patch, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
 import { ApprovalService } from './approval.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 /**
  * 覆核管理 API (Phase 4)
  */
 @Controller('approvals')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class ApprovalController {
     constructor(private readonly approvalService: ApprovalService) { }
 

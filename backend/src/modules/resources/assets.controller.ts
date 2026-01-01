@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { AssetsService, CreateAssetDto, BorrowAssetDto, ReturnAssetDto } from './assets.service';
 import { Asset, AssetStatus } from './asset.entity';
 import { AssetTransaction } from './asset-transaction.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('assets')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class AssetsController {
     constructor(private readonly assetsService: AssetsService) { }
 

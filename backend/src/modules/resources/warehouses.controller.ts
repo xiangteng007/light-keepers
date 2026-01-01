@@ -1,9 +1,12 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { WarehousesService } from './warehouses.service';
 import { Warehouse } from './warehouse.entity';
 import { StorageLocation } from './storage-location.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('warehouses')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class WarehousesController {
     constructor(private readonly warehousesService: WarehousesService) { }
 

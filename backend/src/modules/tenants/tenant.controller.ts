@@ -7,10 +7,14 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { TenantService, CreateTenantDto, TenantConfig } from './tenant.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('admin/tenants')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OWNER)
 export class TenantController {
     constructor(private readonly tenantService: TenantService) { }
 

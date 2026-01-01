@@ -1,8 +1,11 @@
-import { Controller, Get, Query, Res } from '@nestjs/common';
+import { Controller, Get, Query, Res, UseGuards } from '@nestjs/common';
 import { Response } from 'express';
 import { ReportsExportService } from './reports-export.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('reports-export')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class ReportsExportController {
     constructor(private readonly exportService: ReportsExportService) { }
 

@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { DispatchService, CreateDispatchDto } from './dispatch.service';
 import { DispatchOrder, DispatchStatus } from './dispatch-order.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('dispatch')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class DispatchController {
     constructor(private readonly dispatchService: DispatchService) { }
 

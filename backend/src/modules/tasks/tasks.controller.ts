@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto, UpdateTaskDto, TaskQueryDto } from './dto/task.dto';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('tasks')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class TasksController {
     constructor(private readonly tasksService: TasksService) { }
 

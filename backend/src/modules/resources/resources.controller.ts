@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ResourcesService, CreateResourceDto, TransactionDto, CreateDonationSourceDto } from './resources.service';
 import { ResourceCategory } from './resources.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('resources')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class ResourcesController {
     constructor(private readonly resourcesService: ResourcesService) { }
 

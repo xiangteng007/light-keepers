@@ -7,11 +7,15 @@ import {
     Param,
     Query,
     Res,
+    UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
 import { BackupService } from './backup.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('admin/backup')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.DIRECTOR)
 export class BackupController {
     constructor(private readonly backupService: BackupService) { }
 

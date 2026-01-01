@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Patch, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { AuditService } from './audit.service';
 import { InventoryAudit, AuditStatus } from './inventory-audit.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('audits')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class AuditController {
     constructor(private readonly auditService: AuditService) { }
 
