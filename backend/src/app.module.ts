@@ -29,6 +29,7 @@ import { DonationsModule } from './modules/donations/donations.module';
 import { AnnouncementsModule } from './modules/announcements/announcements.module';
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { CommunityModule } from './modules/community/community.module';
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -113,6 +114,7 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         AnnouncementsModule, // 📢 公告系統
         ActivitiesModule, // 📅 活動報名
         CommunityModule, // 💬 社群牆
+        AnalyticsModule, // 📊 AI 趨勢預測
     ],
     providers: [
         CloudLoggerService,
