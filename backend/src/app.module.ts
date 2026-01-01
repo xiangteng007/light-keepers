@@ -1,9 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { DatabaseModule } from './modules/database/database.module';
 import { SharedAuthModule } from './modules/shared/shared-auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
@@ -61,75 +61,9 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
             },
         ]),
 
-        // Cloud SQL 連線 - 支援可選的 DB 初始化
-        // 當 DB_REQUIRED=false 時，允許容器在沒有 DB 的情況下啟動（用於 CI/health check）
-        TypeOrmModule.forRootAsync({
-            imports: [ConfigModule],
-            useFactory: (configService: ConfigService) => {
-                const isProduction = configService.get('NODE_ENV') === 'production';
-                const dbRequired = configService.get('DB_REQUIRED', 'true') !== 'false';
-                const dbHost = configService.get('DB_HOST');
-
-                console.log(`[TypeORM] Database required: ${dbRequired}`);
-                console.log(`[TypeORM] Environment: ${isProduction ? 'production' : 'development'}`);
-                console.log(`[TypeORM] DB Host: ${dbHost || '(not configured)'}`);
-
-                // 如果 DB_REQUIRED=false，返回一個 dummy 配置（不會實際連線）
-                if (!dbRequired) {
-                    console.log('[TypeORM] Skipping database initialization (DB_REQUIRED=false)');
-                    return {
-                        type: 'postgres' as const,
-                        host: 'localhost',
-                        username: 'dummy',
-                        password: 'dummy',
-                        database: 'dummy',
-                        autoLoadEntities: false,
-                        synchronize: false,
-                        // 設定極短的超時和 0 重試，確保快速跳過
-                        retryAttempts: 0,
-                        extra: {
-                            connectionTimeoutMillis: 100,
-                        },
-                    };
-                }
-
-                // Production 環境必須明確提供 DB_HOST（不允許預設 localhost）
-                if (isProduction && !dbHost) {
-                    console.error('[TypeORM] CRITICAL: DB_HOST not configured in production!');
-                    console.error('[TypeORM] Please set DB_HOST to Cloud SQL Unix socket path:');
-                    console.error('[TypeORM] Example: /cloudsql/PROJECT_ID:REGION:INSTANCE_NAME');
-                    // 不 throw，讓容器啟動但 /ready 會回 503
-                }
-
-                const config: any = {
-                    type: 'postgres',
-                    host: dbHost || 'localhost', // fallback for development
-                    username: configService.get('DB_USERNAME', 'postgres'),
-                    password: configService.get('DB_PASSWORD'),
-                    database: configService.get('DB_DATABASE', 'lightkeepers'),
-                    autoLoadEntities: true,
-                    synchronize: false,
-                    logging: !isProduction ? ['error', 'warn', 'query'] : ['error'],
-                    // Cloud Run 優化：允許更多重試，但不阻塞啟動
-                    retryAttempts: isProduction ? 5 : 3,
-                    retryDelay: isProduction ? 5000 : 3000,
-                    // 連線池設定
-                    extra: {
-                        max: 10, // 最大連線數
-                        connectionTimeoutMillis: 30000, // 30秒連線超時
-                        idleTimeoutMillis: 30000,
-                    },
-                };
-
-                // Only set port for non-production (local development)
-                if (!isProduction) {
-                    config.port = configService.get('DB_PORT', 5432);
-                }
-
-                return config;
-            },
-            inject: [ConfigService],
-        }),
+        // Cloud SQL 連線 - 條件式初始化
+        // 當 DB_REQUIRED=false 時，完全跳過 TypeORM 和 database 依賴
+        DatabaseModule.forRoot(),
 
         // 共用認證模組 (Global)
         SharedAuthModule,
