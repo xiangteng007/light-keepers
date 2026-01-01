@@ -30,6 +30,7 @@ import { AnnouncementsModule } from './modules/announcements/announcements.modul
 import { ActivitiesModule } from './modules/activities/activities.module';
 import { CommunityModule } from './modules/community/community.module';
 import { AnalyticsModule } from './modules/analytics/analytics.module';
+import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -115,6 +116,7 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         ActivitiesModule, // 📅 活動報名
         CommunityModule, // 💬 社群牆
         AnalyticsModule, // 📊 AI 趨勢預測
+        IntegrationsModule, // 🔗 外部 API 整合
     ],
     providers: [
         CloudLoggerService,
