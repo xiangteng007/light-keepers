@@ -38,6 +38,7 @@ import LabelManagementPage from './pages/LabelManagementPage'
 import VehicleManagementPage from './pages/VehicleManagementPage'
 import InsuranceManagementPage from './pages/InsuranceManagementPage'
 import PointsReportPage from './pages/PointsReportPage'
+import CommunityPage from './pages/CommunityPage'
 import './App.css'
 
 
@@ -112,6 +113,7 @@ function App() {
             <Route path="profile" element={<ProtectedRoute requiredLevel={1}><ProfilePage /></ProtectedRoute>} />
             <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={1}><VolunteerRegisterPage /></ProtectedRoute>} />
             <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
+            <Route path="community" element={<ProtectedRoute requiredLevel={1}><CommunityPage /></ProtectedRoute>} />
             {/* VMS 志工個人管理頁面 (1) */}
             <Route path="my-vehicles" element={<ProtectedRoute requiredLevel={1}><VehicleManagementPage /></ProtectedRoute>} />
             <Route path="my-insurance" element={<ProtectedRoute requiredLevel={1}><InsuranceManagementPage /></ProtectedRoute>} />
