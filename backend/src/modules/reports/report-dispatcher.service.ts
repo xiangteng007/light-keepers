@@ -41,6 +41,7 @@ export class ReportDispatcherService {
         private readonly taskRepository: Repository<Task>,
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
+        @Inject(forwardRef(() => LineBotService))
         private readonly lineBotService: LineBotService,
     ) { }
 
