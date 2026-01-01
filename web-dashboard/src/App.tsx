@@ -42,6 +42,7 @@ import CommunityPage from './pages/CommunityPage'
 import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
+import BackupPage from './pages/BackupPage'
 import './App.css'
 
 
@@ -138,6 +139,7 @@ function App() {
             <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
             <Route path="sensitive-audit" element={<ProtectedRoute requiredLevel={3}><SensitiveAuditPage /></ProtectedRoute>} />
             <Route path="label-management" element={<ProtectedRoute requiredLevel={3}><LabelManagementPage /></ProtectedRoute>} />
+            <Route path="backups" element={<ProtectedRoute requiredLevel={3}><BackupPage /></ProtectedRoute>} />
             {/* 理事長等級 (4) */}
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
             {/* 系統擁有者等級 (5) */}

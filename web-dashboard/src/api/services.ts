@@ -1454,3 +1454,34 @@ export const getVolunteerRecognitions = (params?: { limit?: number }) =>
 // 頒發表揚（管理員）
 export const createRecognition = (data: { volunteerId: string; title: string; reason: string; badgeType: string; awardedBy?: string }) =>
     api.post<{ success: boolean; data: VolunteerRecognition }>('/volunteers/recognitions', data);
+
+// ===== 備份管理 API =====
+
+export interface BackupInfo {
+    id: string;
+    description?: string;
+    modules: string[];
+    size?: number;
+    createdBy?: string;
+    createdAt: string;
+}
+
+// 取得備份列表
+export const getBackups = () =>
+    api.get<{ success: boolean; data: BackupInfo[] }>('/backups');
+
+// 建立備份
+export const createBackup = (data: { modules: string[]; description?: string }) =>
+    api.post<{ success: boolean; data: BackupInfo }>('/backups', data);
+
+// 下載備份
+export const downloadBackup = (id: string) =>
+    api.get<any>(`/backups/${id}/download`);
+
+// 還原備份
+export const restoreBackup = (id: string) =>
+    api.post<{ success: boolean; message: string }>(`/backups/${id}/restore`);
+
+// 刪除備份
+export const deleteBackup = (id: string) =>
+    api.delete(`/backups/${id}`);
