@@ -66,12 +66,11 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
             imports: [ConfigModule],
             useFactory: (configService: ConfigService) => {
                 const isProduction = configService.get('NODE_ENV') === 'production';
+                const dbHost = configService.get('DB_HOST', 'localhost');
 
-                return {
+                const config: any = {
                     type: 'postgres',
-                    // Use DB_HOST directly - set to /cloudsql/PROJECT:REGION:INSTANCE for production
-                    host: configService.get('DB_HOST', 'localhost'),
-                    port: isProduction ? undefined : configService.get('DB_PORT', 5432),
+                    host: dbHost,
                     username: configService.get('DB_USERNAME', 'postgres'),
                     password: configService.get('DB_PASSWORD'),
                     database: configService.get('DB_DATABASE', 'lightkeepers'),
@@ -85,6 +84,14 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
                         connectionTimeoutMillis: 60000,
                     },
                 };
+
+                // Only set port for non-production (local development)
+                // For production Cloud SQL Unix socket, do not set port at all
+                if (!isProduction) {
+                    config.port = configService.get('DB_PORT', 5432);
+                }
+
+                return config;
             },
             inject: [ConfigService],
         }),
