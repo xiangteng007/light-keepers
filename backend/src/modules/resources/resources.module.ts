@@ -39,6 +39,9 @@ import { LabelPrintService } from './label-print.service';
 // 📋 Phase 4: 覆核系統
 import { ApprovalController } from './approval.controller';
 import { ApprovalService } from './approval.service';
+// 📋 Phase 5.3: 庫存分析
+import { ResourcesAnalyticsController } from './resources-analytics.controller';
+import { ResourcesAnalyticsService } from './resources-analytics.service';
 
 @Module({
     imports: [
@@ -70,6 +73,7 @@ import { ApprovalService } from './approval.service';
         LabelTemplatesController, // 📋 Phase 3: 貼紙模板管理
         LabelPrintController,     // 📋 Phase 3: 貼紙列印 API
         ApprovalController,       // 📋 Phase 4: 覆核管理 API
+        ResourcesAnalyticsController, // 📋 Phase 5.3: 庫存分析 API
     ],
     providers: [
         ResourcesService,
@@ -87,7 +91,9 @@ import { ApprovalService } from './approval.service';
         LabelPrintService,
         // 📋 Phase 4: 覆核系統
         ApprovalService,
+        // 📋 Phase 5.3: 庫存分析
+        ResourcesAnalyticsService,
     ],
-    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService, QrCodeService, AuditLogService, SensitiveService, LabelTemplatesService, LotsService, LabelPrintService, ApprovalService],
+    exports: [ResourcesService, WarehousesService, AssetsService, DispatchService, AuditService, QrCodeService, AuditLogService, SensitiveService, LabelTemplatesService, LotsService, LabelPrintService, ApprovalService, ResourcesAnalyticsService],
 })
 export class ResourcesModule { }

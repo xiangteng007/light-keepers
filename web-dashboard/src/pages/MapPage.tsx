@@ -1,13 +1,13 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
-import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF } from '@react-google-maps/api';
+import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF, HeatmapLayerF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, getWarehousesForMap, type NcdrAlert, type Shelter, type AedLocation, type Report, type Warehouse } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, getWarehousesForMap, getHotspots, type NcdrAlert, type Shelter, type AedLocation, type Report, type Warehouse, type HotspotData } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
 // Google Maps API Key - from environment variable
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-const GOOGLE_MAPS_LIBRARIES: ("places")[] = ['places'];
+const GOOGLE_MAPS_LIBRARIES: ("places" | "visualization")[] = ['places', 'visualization'];
 
 // 台灣中心座標
 const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
@@ -197,6 +197,9 @@ export default function MapPage() {
     const [selectedAed, setSelectedAed] = useState<AedLocation | null>(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
 
+    // Phase 5.2: 熱點分析圖層
+    const [showHotspots, setShowHotspots] = useState(false);
+
     // 側邊欄 Tab 切換
     const [sidebarTab, setSidebarTab] = useState<'events' | 'ncdr'>('events');
 
@@ -278,6 +281,34 @@ export default function MapPage() {
     const aedLocations = Array.isArray(nearbyAedData) ? nearbyAedData : [];
     const warehouses = Array.isArray(warehousesData) ? warehousesData : [];
 
+    // Phase 5.2: 獲取熱點分析數據
+    const { data: hotspotsResponse } = useQuery({
+        queryKey: ['reportHotspots'],
+        queryFn: () => getHotspots({ gridSizeKm: 2, minCount: 1, days: 7 }).then(res => res.data.data),
+        enabled: showHotspots,
+        staleTime: 1000 * 60 * 5, // 5 分鐘快取
+    });
+
+    // 將熱點數據轉換為 Google Maps HeatmapLayer 格式
+    const heatmapData = useMemo(() => {
+        if (!hotspotsResponse?.hotspots || !isLoaded) return [];
+
+        return hotspotsResponse.hotspots.flatMap((hotspot: HotspotData) => {
+            // 根據嚴重度設定權重
+            const severityWeight: Record<string, number> = {
+                critical: 4,
+                high: 3,
+                medium: 2,
+                low: 1,
+            };
+            const weight = (severityWeight[hotspot.severity] || 1) * hotspot.count;
+
+            return {
+                location: new google.maps.LatLng(hotspot.centerLat, hotspot.centerLng),
+                weight: weight,
+            };
+        });
+    }, [hotspotsResponse, isLoaded]);
 
     // 計算是否應顯示 AED (縮放夠高)
     const shouldShowAed = showAed && currentZoom >= AED_MIN_ZOOM;
@@ -497,6 +528,14 @@ export default function MapPage() {
                             />
                             <span>📦 倉庫</span>
                         </label>
+                        <label className="header-layer-toggle" title="顯示災情回報熱點分析">
+                            <input
+                                type="checkbox"
+                                checked={showHotspots}
+                                onChange={(e) => setShowHotspots(e.target.checked)}
+                            />
+                            <span>🔥 熱點分析</span>
+                        </label>
                     </div>
                 </div>
                 <div className="page-header__right">
@@ -641,6 +680,24 @@ export default function MapPage() {
                                     title={warehouse.name}
                                 />
                             ))}
+
+                            {/* Phase 5.2: 熱點分析圖層 */}
+                            {showHotspots && heatmapData.length > 0 && (
+                                <HeatmapLayerF
+                                    data={heatmapData}
+                                    options={{
+                                        radius: 30,
+                                        opacity: 0.7,
+                                        gradient: [
+                                            'rgba(0, 255, 0, 0)',
+                                            'rgba(0, 255, 0, 0.6)',
+                                            'rgba(255, 255, 0, 0.8)',
+                                            'rgba(255, 165, 0, 0.9)',
+                                            'rgba(255, 0, 0, 1)',
+                                        ],
+                                    }}
+                                />
+                            )}
 
                             {/* 事件 InfoWindow */}
                             {infoWindowEvent && infoWindowEvent.latitude && infoWindowEvent.longitude && (

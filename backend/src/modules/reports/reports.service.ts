@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportStatus, ReportType, ReportSeverity, ReportSource } from './reports.entity';
 import { Task } from '../tasks/entities';
+import { ReportDispatcherService } from './report-dispatcher.service';
 
 export interface CreateReportDto {
     type: ReportType;
@@ -44,6 +45,8 @@ export class ReportsService {
         private reportsRepository: Repository<Report>,
         @InjectRepository(Task)
         private taskRepository: Repository<Task>,
+        @Inject(forwardRef(() => ReportDispatcherService))
+        private reportDispatcher: ReportDispatcherService,
     ) { }
 
     // 建立新回報
@@ -121,6 +124,19 @@ export class ReportsService {
 
         const updated = await this.reportsRepository.save(report);
         this.logger.log(`Report ${id} reviewed: ${dto.status} by ${dto.reviewedBy}`);
+
+        // Phase 5.1: 當回報被確認時，自動觸發調度
+        if (dto.status === 'confirmed') {
+            try {
+                const task = await this.reportDispatcher.autoDispatch(id);
+                if (task) {
+                    this.logger.log(`Auto-dispatched task ${task.id} for confirmed report ${id}`);
+                }
+            } catch (error) {
+                this.logger.warn(`Failed to auto-dispatch for report ${id}: ${error.message}`);
+            }
+        }
+
         return updated;
     }
 

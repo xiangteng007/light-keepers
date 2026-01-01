@@ -30,6 +30,10 @@ export class Task {
     @Column({ name: 'due_at', type: 'timestamp', nullable: true })
     dueAt: Date;
 
+    // 來源回報 ID (自動調度時填入)
+    @Column({ name: 'source_report_id', type: 'uuid', nullable: true })
+    sourceReportId?: string;
+
     @Column({ name: 'completed_at', type: 'timestamp', nullable: true })
     completedAt: Date;
 
