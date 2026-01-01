@@ -7,3 +7,10 @@ export {
     ROLE_LEVELS,
     RoleLevelType,
 } from './unified-roles.guard';
+export {
+    ResourceOwnerGuard,
+    ResourceOwner,
+    ResourceOwnerConfig,
+    RESOURCE_OWNER_KEY,
+} from './resource-owner.guard';
+
