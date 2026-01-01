@@ -20,6 +20,25 @@ async function bootstrap() {
 
     try {
         console.log('[STARTUP] Creating NestJS application...');
+
+        // 初始化 Cloud Error Reporting（僅 production，且優雅降級）
+        let cloudErrorReporting = null;
+        const isProd = process.env.NODE_ENV === 'production';
+
+        if (isProd) {
+            try {
+                const { ErrorReporting } = await import('@google-cloud/error-reporting');
+                cloudErrorReporting = new ErrorReporting({
+                    projectId: process.env.GCP_PROJECT_ID || 'light-keepers-mvp',
+                    reportMode: 'production',
+                });
+                console.log('[STARTUP] Cloud Error Reporting enabled');
+            } catch (err) {
+                console.warn('[STARTUP] Cloud Error Reporting initialization failed (will continue without it):', err.message);
+                // 繼續執行，不讓 error reporting 阻塞啟動
+            }
+        }
+
         const app = await NestFactory.create(AppModule, {
             logger: ['error', 'warn', 'log'],
         });

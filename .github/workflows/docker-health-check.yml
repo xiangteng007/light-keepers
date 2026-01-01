@@ -30,6 +30,7 @@ jobs:
             --name test-container \
             -e PORT=8080 \
             -e NODE_ENV=production \
+            -e DB_REQUIRED=false \
             -p 8080:8080 \
             light-keepers-api:test
 
