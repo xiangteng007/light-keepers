@@ -1,0 +1,224 @@
+/* ============================================
+   無障礙 (Accessibility) 樣式
+============================================ */
+
+/* ===== 跳過導航連結 ===== */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 0;
+    z-index: 9999;
+    padding: 12px 24px;
+    background: var(--primary-color, #3b82f6);
+    color: #ffffff;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 0 0 8px 0;
+    transition: top 0.2s ease;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--color-gold-400, #d4a373);
+    outline-offset: 2px;
+}
+
+/* ===== 視覺隱藏但螢幕閱讀器可見 ===== */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* 可聚焦時顯示 */
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+    position: static;
+    width: auto;
+    height: auto;
+    margin: 0;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* ===== 焦點樣式增強 ===== */
+:focus-visible {
+    outline: 3px solid var(--primary-color, #3b82f6);
+    outline-offset: 2px;
+}
+
+/* 按鈕焦點 */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible {
+    outline: 3px solid var(--primary-color, #3b82f6);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+/* 輸入框焦點 */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 3px solid var(--primary-color, #3b82f6);
+    outline-offset: 0;
+    border-color: var(--primary-color, #3b82f6);
+}
+
+/* 深色模式焦點 */
+.dark :focus-visible {
+    outline-color: var(--primary-color, #60a5fa);
+}
+
+.dark button:focus-visible,
+.dark a:focus-visible {
+    outline-color: var(--primary-color, #60a5fa);
+    box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.3);
+}
+
+/* ===== 高對比模式 ===== */
+@media (prefers-contrast: more) {
+    :root {
+        --text-primary: #000000;
+        --text-secondary: #333333;
+        --bg-primary: #ffffff;
+        --bg-secondary: #f0f0f0;
+        --border-color: #000000;
+    }
+
+    .dark {
+        --text-primary: #ffffff;
+        --text-secondary: #e0e0e0;
+        --bg-primary: #000000;
+        --bg-secondary: #1a1a1a;
+        --border-color: #ffffff;
+    }
+
+    button,
+    a,
+    [role="button"] {
+        border: 2px solid currentColor !important;
+    }
+
+    :focus-visible {
+        outline-width: 4px;
+    }
+}
+
+/* ===== 減少動態模式 ===== */
+@media (prefers-reduced-motion: reduce) {
+
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* ===== 鍵盤導航指示器 ===== */
+.nav-item:focus-visible,
+.sidebar-user__info:focus-visible {
+    background: var(--bg-hover, #f1f5f9);
+    outline: 3px solid var(--primary-color, #3b82f6);
+    outline-offset: -3px;
+}
+
+.dark .nav-item:focus-visible {
+    background: var(--bg-hover);
+}
+
+/* ===== ARIA 擴展指示器 ===== */
+[aria-expanded="true"]::after {
+    content: "";
+}
+
+/* ===== 錯誤/必填欄位無障礙標記 ===== */
+[aria-invalid="true"] {
+    border-color: var(--danger-color, #ef4444) !important;
+}
+
+[aria-required="true"]::after {
+    content: " *";
+    color: var(--danger-color, #ef4444);
+}
+
+/* ===== 角色標記 ===== */
+[role="alert"] {
+    border-left: 4px solid var(--danger-color, #ef4444);
+    padding-left: 12px;
+}
+
+[role="status"] {
+    border-left: 4px solid var(--info-color, #3b82f6);
+    padding-left: 12px;
+}
+
+/* ===== 表格無障礙 ===== */
+table {
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    font-weight: 600;
+}
+
+th[scope="col"] {
+    vertical-align: bottom;
+}
+
+th[scope="row"] {
+    vertical-align: top;
+}
+
+/* ===== 表單群組標籤 ===== */
+fieldset {
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    padding: 16px;
+    margin: 0 0 16px 0;
+}
+
+legend {
+    font-weight: 600;
+    padding: 0 8px;
+}
+
+/* ===== 最小觸控目標大小 (44x44px) ===== */
+@media (pointer: coarse) {
+
+    button,
+    a,
+    [role="button"],
+    input[type="checkbox"],
+    input[type="radio"] {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .nav-item {
+        min-height: 48px;
+    }
+}
+
+/* ===== 文字大小保證可讀性 ===== */
+body {
+    font-size: max(16px, 1rem);
+    line-height: 1.5;
+}
+
+/* 小文字最小大小 */
+small,
+.text-sm {
+    font-size: max(14px, 0.875rem);
+}
