@@ -1,0 +1,82 @@
+name: Docker Health Check
+
+on:
+  pull_request:
+    paths:
+      - 'backend/**'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'backend/**'
+
+jobs:
+  docker-health-check:
+    name: Validate Container Startup
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker Image
+        run: docker build -t light-keepers-api:test .
+
+      - name: Start Container
+        run: |
+          docker run -d \
+            --name test-container \
+            -e PORT=8080 \
+            -e NODE_ENV=production \
+            -p 8080:8080 \
+            light-keepers-api:test
+
+      - name: Wait for Health Check (Max 10 seconds)
+        run: |
+          echo "Waiting for container to become healthy..."
+          MAX_ATTEMPTS=10
+          ATTEMPT=0
+          
+          while [ $ATTEMPT -lt $MAX_ATTEMPTS ]; do
+            ATTEMPT=$((ATTEMPT + 1))
+            echo "Attempt $ATTEMPT/$MAX_ATTEMPTS..."
+            
+            if curl -f -s http://localhost:8080/api/v1/health > /dev/null 2>&1; then
+              echo "✅ Health check passed on attempt $ATTEMPT"
+              curl -s http://localhost:8080/api/v1/health
+              exit 0
+            fi
+            
+            if [ $ATTEMPT -lt $MAX_ATTEMPTS ]; then
+              sleep 1
+            fi
+          done
+          
+          echo "❌ Health check failed after $MAX_ATTEMPTS seconds"
+          echo "Container logs:"
+          docker logs test-container
+          exit 1
+
+      - name: Cleanup
+        if: always()
+        run: docker rm -f test-container || true
+
+      - name: Static Code Check - No Hardcoded Ports
+        run: |
+          echo "Checking for hardcoded ports..."
+          
+          # Check for common port hardcoding patterns (excluding comments and tests)
+          if grep -r --exclude-dir=node_modules --exclude-dir=dist --exclude="*.test.ts" -E "listen\s*\(\s*[0-9]{4}" src/ 2>/dev/null; then
+            echo "❌ Found hardcoded ports in source code"
+            exit 1
+          fi
+          
+          # Check for localhost/127.0.0.1 binding
+          if grep -r --exclude-dir=node_modules --exclude-dir=dist --exclude="*.test.ts" -E "(listen|bind).*('localhost'|\"localhost\"|'127\.0\.0\.1\"|\"127\.0\.0\.1\")" src/ 2>/dev/null; then
+            echo "❌ Found localhost/127.0.0.1 binding in source code"
+            exit 1
+          fi
+          
+          echo "✅ No hardcoded ports or localhost binding found"

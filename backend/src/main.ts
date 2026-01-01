@@ -162,6 +162,8 @@ async function bootstrap() {
         const port = parseInt(process.env.PORT || '8080', 10);
         const host = '0.0.0.0';
 
+        console.log(`[STARTUP] ✓ Port from ENV: ${process.env.PORT || '(using default 8080)'}`);
+        console.log(`[STARTUP] ✓ Binding to: ${host}:${port}`);
         console.log('[STARTUP] Starting HTTP server...');
         await app.listen(port, host);
 

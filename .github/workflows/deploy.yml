@@ -43,11 +43,13 @@ jobs:
             --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }}" \
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
             --timeout=300 \
+            --startup-cpu-boost \
             --cpu-boost \
             --memory=512Mi \
             --min-instances=0 \
             --max-instances=10 \
             --concurrency=80 \
+            --port=8080 \
             --quiet
       
       # IAM Policy 備註：
