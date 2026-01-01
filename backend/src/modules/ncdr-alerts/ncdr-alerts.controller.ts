@@ -6,11 +6,20 @@ import {
     Body,
     HttpCode,
     HttpStatus,
+    UseGuards,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { NcdrAlertsService } from './ncdr-alerts.service';
 import { NcdrAlertQueryDto, SyncAlertTypesDto, CORE_ALERT_TYPES } from './dto';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
+/**
+ * NCDR 警報 Controller
+ * - GET endpoints: 公開（有 rate limiting）
+ * - POST endpoints: 需要 OFFICER 以上權限
+ */
 @Controller('ncdr-alerts')
+@Throttle({ default: { limit: 30, ttl: 60000 } }) // 預設：每分鐘 30 次
 export class NcdrAlertsController {
     constructor(private readonly ncdrAlertsService: NcdrAlertsService) { }
 
@@ -60,10 +69,12 @@ export class NcdrAlertsController {
     }
 
     /**
-     * 手動觸發同步 (僅核心類別)
+     * 手動觸發同步 (僅核心類別) - 🔐 需要 OFFICER 權限
      * POST /ncdr-alerts/sync
      */
     @Post('sync')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @HttpCode(HttpStatus.OK)
     async syncCore() {
         const result = await this.ncdrAlertsService.syncAlertTypes(CORE_ALERT_TYPES);
@@ -79,6 +90,8 @@ export class NcdrAlertsController {
      * Body: { typeIds: [33, 34, 5] }
      */
     @Post('sync-types')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @HttpCode(HttpStatus.OK)
     async syncTypes(@Body() dto: SyncAlertTypesDto) {
         // 限制一次最多同步 10 個類別，避免濫用
@@ -96,6 +109,8 @@ export class NcdrAlertsController {
      * POST /ncdr-alerts/update-source-links
      */
     @Post('update-source-links')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @HttpCode(HttpStatus.OK)
     async updateSourceLinks() {
         const result = await this.ncdrAlertsService.updateExistingSourceLinks();
@@ -110,6 +125,8 @@ export class NcdrAlertsController {
      * POST /ncdr-alerts/update-coordinates
      */
     @Post('update-coordinates')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @HttpCode(HttpStatus.OK)
     async updateCoordinates() {
         const result = await this.ncdrAlertsService.updateExistingCoordinates();
@@ -124,6 +141,8 @@ export class NcdrAlertsController {
      * POST /ncdr-alerts/sync-cwa-earthquakes
      */
     @Post('sync-cwa-earthquakes')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @HttpCode(HttpStatus.OK)
     async syncCwaEarthquakes() {
         const result = await this.ncdrAlertsService.syncCwaEarthquakes();
@@ -135,9 +154,11 @@ export class NcdrAlertsController {
 
     /**
      * 清除所有 NCDR 警報資料（用於重置）
-     * DELETE /ncdr-alerts/clear-all
+     * DELETE /ncdr-alerts/clear-all - 🔐 需要 DIRECTOR 權限
      */
     @Post('clear-all')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 清除所有資料需要主任級別
     @HttpCode(HttpStatus.OK)
     async clearAll() {
         const result = await this.ncdrAlertsService.clearAllAlerts();

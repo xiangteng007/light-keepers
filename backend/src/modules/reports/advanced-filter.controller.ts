@@ -4,14 +4,18 @@ import {
     Post,
     Body,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import {
     AdvancedFilterService,
     AdvancedReportFilter,
 } from './advanced-filter.service';
 import { ReportStatus, ReportType, ReportSeverity } from './reports.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('reports/advanced')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class AdvancedFilterController {
     constructor(private readonly filterService: AdvancedFilterService) { }
 

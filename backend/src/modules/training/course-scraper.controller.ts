@@ -7,14 +7,18 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { CourseScraperService } from './course-scraper.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 /**
  * 課程爬蟲 API
  * 管理爬蟲來源和觸發爬取
  */
 @Controller('training/scraper')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.DIRECTOR) // 爬蟲管理需要主任級別
 export class CourseScraperController {
     constructor(private readonly scraperService: CourseScraperService) { }
 

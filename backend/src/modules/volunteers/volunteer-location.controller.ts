@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { VolunteerAssignment } from './volunteer-assignments.entity';
 import { Volunteer } from './volunteers.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 // DTO for location update
 export interface UpdateLocationDto {
@@ -24,6 +25,8 @@ export interface ActiveVolunteerLocation {
 }
 
 @Controller('volunteer-locations')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class VolunteerLocationController {
     constructor(
         @InjectRepository(VolunteerAssignment)

@@ -2,11 +2,15 @@ import {
     Controller,
     Get,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { TrendPredictionService } from './trend-prediction.service';
 import { ReportType } from '../reports/reports.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('analytics/prediction')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class TrendPredictionController {
     constructor(private readonly predictionService: TrendPredictionService) { }
 

@@ -7,10 +7,14 @@ import {
     Body,
     Param,
     Query,
+    UseGuards,
 } from '@nestjs/common';
 import { ReportScheduleService, CreateScheduleDto } from './report-schedule.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('report-schedules')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class ReportScheduleController {
     constructor(private readonly scheduleService: ReportScheduleService) { }
 
