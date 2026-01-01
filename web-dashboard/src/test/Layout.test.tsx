@@ -5,7 +5,7 @@ import Layout from '../components/Layout';
 import { AuthProvider } from '../context/AuthContext';
 
 describe('Layout Component', () => {
-    it('renders the sidebar with navigation items', () => {
+    it('renders the sidebar with navigation groups', () => {
         render(
             <BrowserRouter>
                 <AuthProvider>
@@ -14,13 +14,11 @@ describe('Layout Component', () => {
             </BrowserRouter>
         );
 
-        // Check for navigation items visible at default role level (0 = not logged in)
-        // Only items with requiredLevel <= 0 are visible to non-authenticated users
-        expect(screen.getByText('儀表板')).toBeInTheDocument(); // requiredLevel: 0
-        expect(screen.getByText('災害示警')).toBeInTheDocument(); // requiredLevel: 0
-        expect(screen.getByText('地圖總覽')).toBeInTheDocument(); // requiredLevel: 0
-        expect(screen.getByText('實務手冊')).toBeInTheDocument(); // requiredLevel: 0
-        expect(screen.getByText('氣象預報')).toBeInTheDocument(); // requiredLevel: 0
+        // Check for navigation group labels visible at default role level (0 = not logged in)
+        // Groups with minLevel <= 0 are visible to non-authenticated users
+        expect(screen.getByText('總覽')).toBeInTheDocument(); // minLevel: 0
+        expect(screen.getByText('災情中心')).toBeInTheDocument(); // minLevel: 0
+        expect(screen.getByText('知識庫')).toBeInTheDocument(); // minLevel: 0
     });
 
     it('renders the Light Keepers logo', () => {
