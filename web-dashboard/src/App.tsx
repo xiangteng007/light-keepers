@@ -41,6 +41,7 @@ import PointsReportPage from './pages/PointsReportPage'
 import CommunityPage from './pages/CommunityPage'
 import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
+import ReportSchedulePage from './pages/ReportSchedulePage'
 import './App.css'
 
 
@@ -129,6 +130,7 @@ function App() {
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
             <Route path="resources" element={<ProtectedRoute requiredLevel={2}><ResourcesPage /></ProtectedRoute>} />
             <Route path="approvals" element={<ProtectedRoute requiredLevel={2}><ApprovalCenterPage /></ProtectedRoute>} />
+            <Route path="report-schedules" element={<ProtectedRoute requiredLevel={2}><ReportSchedulePage /></ProtectedRoute>} />
             <Route path="reports" element={<Navigate to="/reports/admin" replace />} />
             <Route path="reports/admin" element={<ProtectedRoute requiredLevel={2}><ReportsAdminPage /></ProtectedRoute>} />
             {/* 常務理事等級 (3) */}
