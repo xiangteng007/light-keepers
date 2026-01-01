@@ -3,16 +3,19 @@ import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
-import { AppModule } from './app.module';
 
 // Cloud Run startup timestamp - log immediately
 const START_TIME = Date.now();
 const GIT_COMMIT = process.env.GIT_COMMIT || process.env.GITHUB_SHA || 'unknown';
+const DB_REQUIRED = process.env.DB_REQUIRED !== 'false';
+
 console.log('='.repeat(60));
 console.log('[STARTUP] Light Keepers API bootstrapping...');
 console.log(`[STARTUP] Time: ${new Date().toISOString()}`);
 console.log(`[STARTUP] Node: ${process.version}`);
 console.log(`[STARTUP] Commit: ${GIT_COMMIT.substring(0, 7)}`);
+console.log(`[STARTUP] DB_REQUIRED: ${DB_REQUIRED}`);
+console.log(`[STARTUP] Mode: ${DB_REQUIRED ? 'FULL' : 'HEALTH-ONLY'}`);
 console.log('='.repeat(60));
 
 async function bootstrap() {
@@ -21,11 +24,25 @@ async function bootstrap() {
     try {
         console.log('[STARTUP] Creating NestJS application...');
 
+        // 根據 DB_REQUIRED 決定載入哪個模組
+        // DB_REQUIRED=false → 載入 HealthOnlyModule（用於 CI health check）
+        // DB_REQUIRED=true → 載入 AppModule（完整功能）
+        let AppModuleToLoad;
+        if (DB_REQUIRED) {
+            console.log('[STARTUP] Loading full AppModule with database support...');
+            const { AppModule } = await import('./app.module');
+            AppModuleToLoad = AppModule;
+        } else {
+            console.log('[STARTUP] Loading HealthOnlyModule (no database)...');
+            const { HealthOnlyModule } = await import('./health-only.module');
+            AppModuleToLoad = HealthOnlyModule;
+        }
+
         // 初始化 Cloud Error Reporting（僅 production，且優雅降級）
         let cloudErrorReporting = null;
         const isProd = process.env.NODE_ENV === 'production';
 
-        if (isProd) {
+        if (isProd && DB_REQUIRED) {
             try {
                 const { ErrorReporting } = await import('@google-cloud/error-reporting');
                 cloudErrorReporting = new ErrorReporting({
@@ -39,7 +56,7 @@ async function bootstrap() {
             }
         }
 
-        const app = await NestFactory.create(AppModule, {
+        const app = await NestFactory.create(AppModuleToLoad, {
             logger: ['error', 'warn', 'log'],
         });
         console.log(`[STARTUP] NestJS created in ${Date.now() - bootstrapStart}ms`);
