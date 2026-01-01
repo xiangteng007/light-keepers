@@ -1,25 +1,66 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import helmet from 'helmet';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule);
+    const isProduction = process.env.NODE_ENV === 'production';
 
-    // 啟用 CORS - 限制允許的網域
-    app.enableCors({
-        origin: process.env.CORS_ORIGIN?.split(',') || [
-            'https://lightkeepers.ngo',
-            'https://www.lightkeepers.ngo',
-            'https://light-keepers-dashboard.vercel.app',
-            'https://light-keepers-mvp.web.app',
-            'https://light-keepers-mvp.firebaseapp.com',
+    // ===== 安全 Headers (Helmet) =====
+    app.use(helmet({
+        contentSecurityPolicy: isProduction ? {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'"],
+                styleSrc: ["'self'", "'unsafe-inline'"],
+                imgSrc: ["'self'", "data:", "https:"],
+                connectSrc: [
+                    "'self'",
+                    "https://light-keepers-api-bsf4y44tja-de.a.run.app",
+                ],
+                fontSrc: ["'self'", "https://fonts.gstatic.com"],
+                objectSrc: ["'none'"],
+                frameAncestors: ["'none'"],
+                baseUri: ["'self'"],
+                formAction: ["'self'"],
+            },
+        } : false, // 開發環境禁用 CSP
+        crossOriginEmbedderPolicy: false,
+        hsts: {
+            maxAge: 31536000, // 1 年
+            includeSubDomains: true,
+            preload: true,
+        },
+    }));
+
+    // ===== CORS 配置 =====
+    const allowedOrigins = [
+        'https://lightkeepers.ngo',
+        'https://www.lightkeepers.ngo',
+        'https://light-keepers-mvp.web.app',
+        'https://light-keepers-mvp.firebaseapp.com',
+        // 開發環境才允許 localhost
+        ...(!isProduction ? [
             'http://localhost:5173',
             'http://localhost:5174',
             'http://localhost:5175'
-        ],
+        ] : []),
+    ];
+
+    app.enableCors({
+        origin: process.env.CORS_ORIGIN?.split(',') || allowedOrigins,
         methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
         credentials: true,
+        allowedHeaders: [
+            'Content-Type',
+            'Authorization',
+            'X-Requested-With',
+            'Accept',
+        ],
+        exposedHeaders: ['X-Total-Count', 'X-Page-Count'],
+        maxAge: 86400, // 24 小時
     });
 
     // 全域驗證管道
@@ -78,20 +119,21 @@ async function bootstrap() {
         .addTag('integrations', '外部服務整合')
         .addTag('backup', '數據備份與還原')
         .build();
-
-    const document = SwaggerModule.createDocument(app, swaggerConfig);
-    SwaggerModule.setup('api/docs', app, document, {
-        swaggerOptions: {
-            persistAuthorization: true,
-            docExpansion: 'none',
-            filter: true,
-            showRequestDuration: true,
-        },
-        customSiteTitle: 'Light Keepers API 文檔',
-        customCss: '.swagger-ui .topbar { display: none }',
-    });
-
-    console.log(`📚 Swagger 文檔：/${apiPrefix.replace('api/v1', 'api/docs')}`);
+    // ===== Swagger/OpenAPI 文檔配置（僅開發環境）=====
+    if (!isProduction) {
+        const document = SwaggerModule.createDocument(app, swaggerConfig);
+        SwaggerModule.setup('api/docs', app, document, {
+            swaggerOptions: {
+                persistAuthorization: true,
+                docExpansion: 'none',
+                filter: true,
+                showRequestDuration: true,
+            },
+            customSiteTitle: 'Light Keepers API 文檔',
+            customCss: '.swagger-ui .topbar { display: none }',
+        });
+        console.log(`📚 Swagger 文檔：/${apiPrefix.replace('api/v1', 'api/docs')}`);
+    }
 
     // Cloud Run 需要監聽 0.0.0.0，預設 port 8080
     const port = process.env.PORT || 8080;
