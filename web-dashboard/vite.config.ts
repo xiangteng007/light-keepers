@@ -72,6 +72,18 @@ export default defineConfig({
             }
           },
           {
+            // Cache Google Maps tiles (mt0, mt1, etc.)
+            urlPattern: /^https:\/\/.*\.google\.com\/.*\/(vt|kh)\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-maps-tiles-cache',
+              expiration: {
+                maxEntries: 1000,
+                maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          },
+          {
             // Cache images
             urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp)$/i,
             handler: 'CacheFirst',
@@ -80,6 +92,18 @@ export default defineConfig({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          },
+          {
+            // Cache Google Fonts
+            urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'google-fonts-cache',
+              expiration: {
+                maxEntries: 30,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
               }
             }
           }
