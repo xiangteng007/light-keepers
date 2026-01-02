@@ -114,8 +114,8 @@ function App() {
             <Route path="report" element={<ProtectedRoute requiredLevel={1}><ReportPage /></ProtectedRoute>} />
             <Route path="training" element={<ProtectedRoute requiredLevel={1}><TrainingPage /></ProtectedRoute>} />
             <Route path="notifications" element={<ProtectedRoute requiredLevel={1}><NotificationsPage /></ProtectedRoute>} />
-            <Route path="profile" element={<ProtectedRoute requiredLevel={1}><ProfilePage /></ProtectedRoute>} />
-            <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={1}><VolunteerRegisterPage /></ProtectedRoute>} />
+            <Route path="profile" element={<ProtectedRoute requiredLevel={0}><ProfilePage /></ProtectedRoute>} />
+            <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={0}><VolunteerRegisterPage /></ProtectedRoute>} />
             <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
             <Route path="community" element={<ProtectedRoute requiredLevel={1}><CommunityPage /></ProtectedRoute>} />
             <Route path="activities" element={<ProtectedRoute requiredLevel={1}><ActivitiesPage /></ProtectedRoute>} />
