@@ -743,6 +743,45 @@ export class AuthService {
     }
 
     /**
+     * 重建系統擁有者帳號
+     * 刪除現有帳號並建立新的
+     */
+    async recreateOwnerAccount(email: string, password: string): Promise<{ success: boolean; message: string; accountId?: string }> {
+        // 1. 刪除現有帳號
+        const existingAccount = await this.accountRepository.findOne({ where: { email } });
+        if (existingAccount) {
+            await this.accountRepository.delete({ id: existingAccount.id });
+            console.log(`Deleted existing account: ${email}`);
+        }
+
+        // 2. 找到系統擁有者角色
+        const ownerRole = await this.roleRepository.findOne({ where: { name: 'owner' } });
+        if (!ownerRole) {
+            throw new NotFoundException('系統擁有者角色不存在，請先執行 seed');
+        }
+
+        // 3. 建立新帳號
+        const passwordHash = await bcrypt.hash(password, 10);
+        const newAccount = this.accountRepository.create({
+            email,
+            passwordHash,
+            displayName: '系統擁有者',
+            isActive: true,
+            emailVerified: true,
+            roles: [ownerRole],
+        });
+
+        await this.accountRepository.save(newAccount);
+        console.log(`Created new owner account: ${email} with id: ${newAccount.id}`);
+
+        return {
+            success: true,
+            message: `系統擁有者帳號已重建: ${email}`,
+            accountId: newAccount.id,
+        };
+    }
+
+    /**
      * 檢查帳號是否已設定密碼
      */
     async hasPassword(accountId: string): Promise<{ hasPassword: boolean }> {

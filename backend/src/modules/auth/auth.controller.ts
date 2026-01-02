@@ -85,6 +85,18 @@ export class AuthController {
     }
 
     /**
+     * 管理員刪除並重建帳號（臨時 API）
+     * 使用密鑰保護，用於重建系統擁有者帳號
+     */
+    @Post('admin/recreate-owner')
+    async adminRecreateOwner(@Body() body: { email: string; password: string; adminKey: string }) {
+        if (body.adminKey !== 'LK_ADMIN_2026_RESET') {
+            throw new UnauthorizedException('Invalid admin key');
+        }
+        return this.authService.recreateOwnerAccount(body.email, body.password);
+    }
+
+    /**
      * LINE OAuth Callback
      * 前端重導向回來時，用 authorization code 換取 access token
      */
