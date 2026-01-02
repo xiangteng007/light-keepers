@@ -239,8 +239,9 @@ export class CommunityService {
             .addSelect('p.authorName', 'authorName')
             .addSelect('COUNT(*)', 'postCount')
             .where('p.status = :status', { status: 'active' })
-            .groupBy('p.authorId, p.authorName')
-            .orderBy('postCount', 'DESC')
+            .groupBy('p.authorId')
+            .addGroupBy('p.authorName')
+            .orderBy('"postCount"', 'DESC')
             .limit(5)
             .getRawMany();
 

@@ -1,10 +1,13 @@
 import { Controller, Get, Query, Param, UseGuards } from '@nestjs/common';
 import { ManualsService, AiSearchResponse } from './manuals.service';
-import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { OptionalJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
+/**
+ * 實務手冊 Controller
+ * 公開存取（Level 0）- 匿名訪客可瀏覽
+ */
 @Controller('manuals')
-@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
+@UseGuards(OptionalJwtGuard) // 可選認證，支援匿名存取
 export class ManualsController {
     constructor(private readonly manualsService: ManualsService) { }
 

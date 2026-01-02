@@ -8,11 +8,12 @@ interface ProtectedRouteProps {
 
 /**
  * 受保護路由元件
- * - 未登入用戶會被導向登入頁
- * - 權限不足會顯示錯誤
+ * - Level 0 頁面允許匿名訪客存取
+ * - Level 1+ 頁面未登入者導向登入頁
+ * - 已登入但權限不足者顯示錯誤
  * 
  * requiredLevel 對應：
- * 0 = 公開 (不用登入)
+ * 0 = 公開 (匿名訪客可存取)
  * 1 = 登記志工
  * 2 = 幹部
  * 3 = 常務理事
@@ -33,18 +34,18 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
         );
     }
 
-    // 公開頁面不需要登入
+    // 公開頁面 (Level 0) - 匿名訪客也可存取，不需要登入
     if (requiredLevel === 0) {
         return <>{children}</>;
     }
 
-    // 未登入導向登入頁
+    // Level 1+ 頁面：未登入導向登入頁
     if (!isAuthenticated) {
         return <Navigate to="/login" state={{ from: location }} replace />;
     }
 
-    // 檢查權限等級
-    const userLevel = user?.roleLevel ?? 1;
+    // 檢查權限等級（匿名用戶 = Level 0）
+    const userLevel = user?.roleLevel ?? 0;
     if (userLevel < requiredLevel) {
         return (
             <div className="access-denied">
@@ -53,7 +54,7 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
                     <h2>權限不足</h2>
                     <p>您的權限等級不足以訪問此頁面</p>
                     <p className="access-denied__info">
-                        您的身份：<strong>{user?.roleDisplayName || '登記志工'}</strong>
+                        您的身份：<strong>{user?.roleDisplayName || '訪客'}</strong>
                     </p>
                     <a href="/dashboard" className="lk-btn lk-btn--primary">
                         返回儀表板
@@ -65,3 +66,4 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
 
     return <>{children}</>;
 }
+

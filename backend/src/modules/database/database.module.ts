@@ -49,25 +49,42 @@ export class DatabaseModule {
                             // Don't throw - allow container to start but /ready will return degraded status
                         }
 
+                        // Check if DB_HOST is a Unix socket path (Cloud SQL)
+                        const isUnixSocket = dbHost && dbHost.startsWith('/');
+
                         const config: any = {
                             type: 'postgres',
-                            host: dbHost || 'localhost', // fallback for development
                             username: configService.get('DB_USERNAME', 'postgres'),
                             password: configService.get('DB_PASSWORD'),
                             database: configService.get('DB_DATABASE', 'lightkeepers'),
                             autoLoadEntities: true,
-                            synchronize: false,
+                            // Only sync tables when explicitly requested via SYNC_TABLES=true
+                            synchronize: process.env.SYNC_TABLES === 'true',
                             logging: !isProduction ? ['error', 'warn', 'query'] : ['error'],
                             // Cloud Run optimization: more retries but don't block startup
                             retryAttempts: isProduction ? 5 : 3,
                             retryDelay: isProduction ? 5000 : 3000,
-                            // Connection pool settings
-                            extra: {
-                                max: 10, // max connections
-                                connectionTimeoutMillis: 30000, // 30s connection timeout
-                                idleTimeoutMillis: 30000,
-                            },
                         };
+
+                        // Configure connection based on host type
+                        if (isUnixSocket) {
+                            // Cloud SQL Unix socket connection
+                            console.log(`[TypeORM] Using Unix socket: ${dbHost}`);
+                            config.extra = {
+                                host: dbHost, // Unix socket path goes in extra.host for pg library
+                                max: 10,
+                                connectionTimeoutMillis: 30000,
+                                idleTimeoutMillis: 30000,
+                            };
+                        } else {
+                            // TCP connection (development or direct IP)
+                            config.host = dbHost || 'localhost';
+                            config.extra = {
+                                max: 10,
+                                connectionTimeoutMillis: 30000,
+                                idleTimeoutMillis: 30000,
+                            };
+                        }
 
                         // Only set port for non-production (local development)
                         if (!isProduction) {

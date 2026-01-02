@@ -83,16 +83,26 @@ export class UnifiedRolesGuard implements CanActivate {
             return true;
         }
 
-        const request = context.switchToHttp().getRequest();
-        const user: JwtPayload = request.user;
+        // Level 0 = 公開端點，允許匿名存取（不需要檢查 user）
+        if (requiredLevel === 0 && (!requiredRoles || requiredRoles.length === 0)) {
+            return true;
+        }
 
-        // 沒有 user 資訊（CoreJwtGuard 未先執行）
-        if (!user) {
+        const request = context.switchToHttp().getRequest();
+        const user = request.user;
+
+        // 需要 Level 1+ 但沒有 user 資訊
+        if (!user && requiredLevel !== undefined && requiredLevel > 0) {
             throw new ForbiddenException('需要登入才能存取此資源');
         }
 
-        const userLevel = user.roleLevel ?? 0;
-        const userRoles = user.roles ?? [];
+        // 匿名用戶嘗試存取需要登入的資源 (Level 1+)
+        if (user?.isAnonymous && requiredLevel !== undefined && requiredLevel > 0) {
+            throw new ForbiddenException('需要登入才能存取此資源');
+        }
+
+        const userLevel = user?.roleLevel ?? 0;
+        const userRoles = user?.roles ?? [];
 
         // 檢查等級
         if (requiredLevel !== undefined && userLevel < requiredLevel) {

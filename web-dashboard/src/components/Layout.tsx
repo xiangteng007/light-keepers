@@ -374,21 +374,32 @@ export default function Layout() {
                     </div>
                 )}
 
-                {/* User Profile Section */}
-                <div className="sidebar-user">
-                    <Link to="/profile" className="sidebar-user__info" onClick={handleNavClick}>
-                        <div className="sidebar-user__avatar">
-                            <User size={18} />
-                        </div>
-                        <div className="sidebar-user__details">
-                            <span className="sidebar-user__name">{user?.displayName || user?.email || '用戶'}</span>
-                            <span className="sidebar-user__role">{user?.roleDisplayName || '一般民眾'}</span>
-                        </div>
-                    </Link>
-                    <button className="sidebar-user__logout" onClick={handleLogout} title="登出">
-                        <LogOut size={18} />
-                    </button>
-                </div>
+                {/* User Profile Section / Login Buttons */}
+                {user && !user.isAnonymous ? (
+                    <div className="sidebar-user">
+                        <Link to="/profile" className="sidebar-user__info" onClick={handleNavClick}>
+                            <div className="sidebar-user__avatar">
+                                <User size={18} />
+                            </div>
+                            <div className="sidebar-user__details">
+                                <span className="sidebar-user__name">{user.displayName || user.email || '用戶'}</span>
+                                <span className="sidebar-user__role">{user.roleDisplayName || '志工'}</span>
+                            </div>
+                        </Link>
+                        <button className="sidebar-user__logout" onClick={handleLogout} title="登出">
+                            <LogOut size={18} />
+                        </button>
+                    </div>
+                ) : (
+                    <div className="sidebar-auth">
+                        <Link to="/login" className="sidebar-auth__btn sidebar-auth__btn--login" onClick={handleNavClick}>
+                            登入
+                        </Link>
+                        <Link to="/login?tab=register" className="sidebar-auth__btn sidebar-auth__btn--register" onClick={handleNavClick}>
+                            註冊
+                        </Link>
+                    </div>
+                )}
 
                 <div className="sidebar-footer">
                     <span>v1.0.0 • 曦望燈塔救援協會</span>

@@ -34,10 +34,28 @@ api.interceptors.request.use((config) => {
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            clearToken();
-            window.location.href = '/login';
+        const status = error.response?.status;
+        const currentPath = window.location.pathname;
+
+        if (status === 401) {
+            // 401 = 需要登入但未登入或 token 過期
+            // 只有在非公開頁面時才清除 token 並重導向
+            const publicPaths = ['/dashboard', '/map', '/ncdr-alerts', '/forecast', '/manuals', '/login', '/register'];
+            const isPublicPath = publicPaths.some(p => currentPath.startsWith(p));
+
+            if (!isPublicPath) {
+                clearToken();
+                // 保留來源路徑以便登入後返回
+                window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
+            }
+            // 公開頁面的 401 錯誤不重導向，讓組件自行處理
         }
+
+        if (status === 403) {
+            // 403 = 已登入但權限不足，記錄錯誤但不重導向
+            console.warn('權限不足:', error.response?.data?.message || '無法存取此資源');
+        }
+
         return Promise.reject(error);
     }
 );

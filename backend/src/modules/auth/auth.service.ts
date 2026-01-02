@@ -61,14 +61,19 @@ export class AuthService {
         // 密碼加密
         const passwordHash = await bcrypt.hash(dto.password, 10);
 
-        // 建立帳號（不分配角色，這樣 roleLevel = 0，顯示在一般民眾列表）
-        // 用戶需要別別登記成為志工才會獲得 volunteer 角色
+        // 取得預設志工角色 (Level 1)
+        // 註冊成功後自動成為志願者，符合新的權限設計
+        const volunteerRole = await this.roleRepository.findOne({
+            where: { name: 'volunteer' },
+        });
+
+        // 建立帳號並自動分配 volunteer 角色 (Level 1)
         const account = this.accountRepository.create({
             email: dto.email,
             phone: dto.phone,
             passwordHash,
             displayName: dto.displayName,
-            roles: [],  // 新帳號不分配角色
+            roles: volunteerRole ? [volunteerRole] : [],  // 自動分配 Level 1
         });
 
         await this.accountRepository.save(account);
@@ -230,13 +235,18 @@ export class AuthService {
         }
 
         // 未綁定 - 自動建立新帳號（LIFF 登入假設使用者信任 LINE 身份）
+        // 取得志工角色以分配 Level 1
+        const volunteerRole = await this.roleRepository.findOne({
+            where: { name: 'volunteer' },
+        });
+
         const newAccount = this.accountRepository.create({
             passwordHash: '', // LIFF 登入不需要密碼
             displayName: liffProfile.displayName,
             avatarUrl: liffProfile.pictureUrl,
             lineUserId: liffProfile.userId,
             lineDisplayName: liffProfile.displayName,
-            roles: [],  // 新帳號不分配角色
+            roles: volunteerRole ? [volunteerRole] : [],  // 自動分配 Level 1
         });
 
         await this.accountRepository.save(newAccount);
@@ -309,7 +319,12 @@ export class AuthService {
             throw new ConflictException('此 LINE 帳號已註冊');
         }
 
-        // 建立帳號（不分配角色，roleLevel = 0）
+        // 取得志工角色以分配 Level 1
+        const volunteerRole = await this.roleRepository.findOne({
+            where: { name: 'volunteer' },
+        });
+
+        // 建立帳號並自動分配 volunteer 角色 (Level 1)
         const account = this.accountRepository.create({
             email: email || undefined,
             phone: phone || undefined,
@@ -318,7 +333,7 @@ export class AuthService {
             avatarUrl: lineProfile.pictureUrl,
             lineUserId: lineProfile.userId,
             lineDisplayName: lineProfile.displayName,
-            roles: [],  // 新帳號不分配角色
+            roles: volunteerRole ? [volunteerRole] : [],  // 自動分配 Level 1
         });
 
         await this.accountRepository.save(account);
@@ -525,7 +540,12 @@ export class AuthService {
             }
         }
 
-        // 建立帳號（不分配角色，roleLevel = 0）
+        // 取得志工角色以分配 Level 1
+        const volunteerRole = await this.roleRepository.findOne({
+            where: { name: 'volunteer' },
+        });
+
+        // 建立帳號並自動分配 volunteer 角色 (Level 1)
         const account = this.accountRepository.create({
             email: googleProfile.email || undefined,
             passwordHash: '', // Google 登入不需要密碼
@@ -533,7 +553,7 @@ export class AuthService {
             avatarUrl: googleProfile.picture,
             googleId: googleProfile.id,
             googleEmail: googleProfile.email,
-            roles: [],  // 新帳號不分配角色
+            roles: volunteerRole ? [volunteerRole] : [],  // 自動分配 Level 1
         });
 
         await this.accountRepository.save(account);
@@ -585,7 +605,12 @@ export class AuthService {
             return this.generateTokenResponse(account);
         }
 
-        // 建立新帳號（不分配角色，roleLevel = 0）
+        // 取得志工角色以分配 Level 1
+        const volunteerRole = await this.roleRepository.findOne({
+            where: { name: 'volunteer' },
+        });
+
+        // 建立新帳號並自動分配 volunteer 角色 (Level 1)
         account = this.accountRepository.create({
             email,
             passwordHash: '', // Firebase 登入不需要密碼
@@ -593,7 +618,7 @@ export class AuthService {
             avatarUrl: picture || undefined,
             firebaseUid: uid,
             emailVerified: email_verified || false,
-            roles: [],  // 新帳號不分配角色
+            roles: volunteerRole ? [volunteerRole] : [],  // 自動分配 Level 1
         });
 
         await this.accountRepository.save(account);

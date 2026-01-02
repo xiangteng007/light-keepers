@@ -100,9 +100,9 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
-          <Route path="/" element={<ProtectedRoute requiredLevel={0}><Layout /></ProtectedRoute>}>
+          <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
-            {/* 一般民眾可見 (0) */}
+            {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
             <Route path="dashboard" element={<DashboardPage />} />
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />

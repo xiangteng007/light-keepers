@@ -17,12 +17,14 @@ export interface User {
     avatarUrl?: string;
     lineLinked?: boolean;
     googleLinked?: boolean;
+    isAnonymous?: boolean;
 }
 
 // Auth Context 介面
 interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
+    isAnonymous: boolean;
     isLoading: boolean;
     login: (token: string, remember?: boolean) => Promise<void>;
     logout: () => void;
@@ -104,9 +106,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         await loadUser();
     };
 
+    // 判斷是否為已驗證用戶（有 user 且非匿名）
+    const isAuthenticated = !!user && !user.isAnonymous;
+    const isAnonymous = !user || !!user.isAnonymous;
+
     const value: AuthContextType = {
         user,
-        isAuthenticated: !!user,
+        isAuthenticated,
+        isAnonymous,
         isLoading,
         login,
         logout,
