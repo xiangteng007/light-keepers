@@ -154,8 +154,8 @@ export const firebaseAuthService = {
         }
 
         try {
-            // 使用後端 API 發送自訂驗證信
-            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+            // 使用後端 API 發送自訂驗證信 - VITE_API_URL 不含 /api/v1
+            const API_URL = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
             const response = await fetch(`${API_URL}/auth/resend-verification`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },

@@ -9,21 +9,29 @@ import './styles/theme.css'
 import './styles/a11y.css' // 無障礙樣式
 import './index.css'
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      staleTime: 1000 * 60 * 5, // 5 分鐘
-      retry: 1,
+// Skip React rendering for Firebase Auth handler routes
+// Firebase will handle these internally via their SDK
+if (window.location.pathname.startsWith('/__/')) {
+  // Let Firebase handle the auth callback - don't render React app
+  console.log('Firebase auth handler route detected, skipping React render');
+} else {
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 1000 * 60 * 5, // 5 分鐘
+        retry: 1,
+      },
     },
-  },
-})
+  })
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </QueryClientProvider>
-  </StrictMode>,
-)
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <App />
+        </BrowserRouter>
+      </QueryClientProvider>
+    </StrictMode>,
+  )
+}
+

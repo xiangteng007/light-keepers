@@ -44,6 +44,14 @@ export const forgotPassword = (data: { email?: string; phone?: string }) =>
 export const resetPassword = (token: string, newPassword: string) =>
     api.post<{ success: boolean; message: string }>('/auth/reset-password', { token, newPassword });
 
+// ===== 密碼設定 (OAuth 帳號) =====
+
+export const hasPassword = () =>
+    api.get<{ hasPassword: boolean }>('/auth/has-password');
+
+export const setPassword = (newPassword: string) =>
+    api.post<{ success: boolean }>('/auth/set-password', { newPassword });
+
 // ===== 帳號狀態 =====
 
 export interface AccountStatus {

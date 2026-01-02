@@ -30,6 +30,16 @@ export class AuthService {
         private readonly lineBotService: LineBotService,
     ) { }
 
+    /**
+     * 獲取帳號資料（含綁定狀態）
+     */
+    async getAccountById(id: string): Promise<Account | null> {
+        return this.accountRepository.findOne({
+            where: { id },
+            select: ['id', 'email', 'phone', 'displayName', 'avatarUrl', 'lineUserId', 'googleId'],
+        });
+    }
+
     async register(dto: RegisterDto): Promise<TokenResponseDto> {
         // 驗證 email 或 phone 必須存在
         if (!dto.email && !dto.phone) {
@@ -84,9 +94,8 @@ export class AuthService {
             throw new UnauthorizedException('帳號或密碼錯誤');
         }
 
-        // 更新最後登入時間
-        account.lastLoginAt = new Date();
-        await this.accountRepository.save(account);
+        // 更新最後登入時間（使用 update 避免清空 roles 關聯）
+        await this.accountRepository.update(account.id, { lastLoginAt: new Date() });
 
         return this.generateTokenResponse(account);
     }
@@ -107,6 +116,15 @@ export class AuthService {
      * LINE Login Callback - 用 authorization code 換取 access token
      */
     async exchangeLineCode(code: string, redirectUri: string): Promise<TokenResponseDto | { needsRegistration: true; lineProfile: { userId: string; displayName: string; pictureUrl?: string } }> {
+        const lineAccessToken = await this.exchangeLineCodeForToken(code, redirectUri);
+        // 使用取得的 access token 進行登入
+        return this.loginWithLine(lineAccessToken);
+    }
+
+    /**
+     * LINE Code 換取 Access Token (不登入，用於綁定)
+     */
+    async exchangeLineCodeForToken(code: string, redirectUri: string): Promise<string> {
         const clientId = process.env.LINE_CLIENT_ID;
         const clientSecret = process.env.LINE_CLIENT_SECRET;
 
@@ -134,10 +152,7 @@ export class AuthService {
         }
 
         const tokenData = await tokenResponse.json();
-        const lineAccessToken = tokenData.access_token;
-
-        // 使用取得的 access token 進行登入
-        return this.loginWithLine(lineAccessToken);
+        return tokenData.access_token;
     }
 
     /**
@@ -174,9 +189,8 @@ export class AuthService {
         });
 
         if (account) {
-            // 已綁定 - 直接登入
-            account.lastLoginAt = new Date();
-            await this.accountRepository.save(account);
+            // 已綁定 - 直接登入（使用 update 避免清空 roles 關聯）
+            await this.accountRepository.update(account.id, { lastLoginAt: new Date() });
             return this.generateTokenResponse(account);
         }
 
@@ -202,16 +216,16 @@ export class AuthService {
         });
 
         if (account) {
-            // 已綁定 - 直接登入
-            account.lastLoginAt = new Date();
+            // 已綁定 - 直接登入（使用 update 避免清空 roles 關聯）
+            const updateData: Partial<Account> = { lastLoginAt: new Date() };
             // 更新頭像和顯示名稱（如果有變更）
             if (liffProfile.pictureUrl && account.avatarUrl !== liffProfile.pictureUrl) {
-                account.avatarUrl = liffProfile.pictureUrl;
+                updateData.avatarUrl = liffProfile.pictureUrl;
             }
             if (liffProfile.displayName && account.lineDisplayName !== liffProfile.displayName) {
-                account.lineDisplayName = liffProfile.displayName;
+                updateData.lineDisplayName = liffProfile.displayName;
             }
-            await this.accountRepository.save(account);
+            await this.accountRepository.update(account.id, updateData);
             return this.generateTokenResponse(account);
         }
 
@@ -330,6 +344,36 @@ export class AuthService {
         });
     }
 
+    /**
+     * 診斷帳號狀態（臨時方法）
+     * 用於排查角色問題
+     */
+    async diagnoseAccount(email: string): Promise<any> {
+        // 搜尋所有可能的帳號
+        const accounts = await this.accountRepository.find({
+            where: [
+                { email },
+                { googleEmail: email },
+            ],
+            relations: ['roles'],
+        });
+
+        return {
+            searchEmail: email,
+            accountCount: accounts.length,
+            accounts: accounts.map(acc => ({
+                id: acc.id,
+                email: acc.email,
+                googleEmail: acc.googleEmail,
+                firebaseUid: acc.firebaseUid,
+                displayName: acc.displayName,
+                roles: acc.roles?.map(r => ({ name: r.name, level: r.level })) || [],
+                roleLevel: acc.roles?.length ? Math.max(...acc.roles.map(r => r.level)) : 0,
+                lastLoginAt: acc.lastLoginAt,
+            })),
+        };
+    }
+
     // =========================================
     // Google OAuth 相關方法
     // =========================================
@@ -338,6 +382,15 @@ export class AuthService {
      * Google OAuth Callback - 用 authorization code 換取 access token
      */
     async exchangeGoogleCode(code: string, redirectUri: string): Promise<TokenResponseDto | { needsRegistration: true; googleProfile: { id: string; email: string; name: string; picture?: string } }> {
+        const googleAccessToken = await this.exchangeGoogleCodeForToken(code, redirectUri);
+        // 使用取得的 access token 進行登入
+        return this.loginWithGoogle(googleAccessToken);
+    }
+
+    /**
+     * Google Code 換取 Access Token (不登入，用於綁定)
+     */
+    async exchangeGoogleCodeForToken(code: string, redirectUri: string): Promise<string> {
         const clientId = process.env.GOOGLE_CLIENT_ID;
         const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
 
@@ -365,11 +418,9 @@ export class AuthService {
         }
 
         const tokenData = await tokenResponse.json();
-        const googleAccessToken = tokenData.access_token;
-
-        // 使用取得的 access token 進行登入
-        return this.loginWithGoogle(googleAccessToken);
+        return tokenData.access_token;
     }
+
 
     /**
      * Google Login - 驗證 Google Access Token 並獲取用戶資訊
@@ -412,21 +463,22 @@ export class AuthService {
                 relations: ['roles'],
             });
 
-            // 如果找到，自動綁定 Google ID
+            // 如果找到，自動綁定 Google ID（使用 update 避免清空 roles 關聯）
             if (account) {
-                account.googleId = googleProfile.id;
-                account.googleEmail = googleProfile.email;
+                const bindData: Partial<Account> = {
+                    googleId: googleProfile.id,
+                    googleEmail: googleProfile.email,
+                };
                 if (!account.avatarUrl && googleProfile.picture) {
-                    account.avatarUrl = googleProfile.picture;
+                    bindData.avatarUrl = googleProfile.picture;
                 }
-                await this.accountRepository.save(account);
+                await this.accountRepository.update(account.id, bindData);
             }
         }
 
         if (account) {
-            // 已綁定 - 直接登入
-            account.lastLoginAt = new Date();
-            await this.accountRepository.save(account);
+            // 已綁定 - 直接登入（使用 update 避免清空 roles 關聯）
+            await this.accountRepository.update(account.id, { lastLoginAt: new Date() });
             return this.generateTokenResponse(account);
         }
 
@@ -519,16 +571,17 @@ export class AuthService {
         });
 
         if (account) {
+            // 使用 update 避免清空 roles 關聯
+            const updateData: Partial<Account> = { lastLoginAt: new Date() };
             // 更新 Firebase UID（如果之前沒有）
             if (!account.firebaseUid) {
-                account.firebaseUid = uid;
+                updateData.firebaseUid = uid;
             }
             // 如果 Firebase 已驗證 Email，同步本地狀態
             if (email_verified && !account.emailVerified) {
-                account.emailVerified = true;
+                updateData.emailVerified = true;
             }
-            account.lastLoginAt = new Date();
-            await this.accountRepository.save(account);
+            await this.accountRepository.update(account.id, updateData);
             return this.generateTokenResponse(account);
         }
 
@@ -647,6 +700,45 @@ export class AuthService {
         await this.accountRepository.save(account);
 
         return { success: true };
+    }
+
+    /**
+     * 設定密碼（針對 OAuth 帳號）
+     * 只有沒有密碼的帳號可以使用此方法
+     */
+    async setPassword(accountId: string, newPassword: string): Promise<{ success: boolean }> {
+        const account = await this.accountRepository.findOne({ where: { id: accountId } });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        // 檢查是否已有密碼（非空字串表示已設定）
+        if (account.passwordHash && account.passwordHash.length > 0) {
+            throw new BadRequestException('此帳號已設定密碼，請使用「變更密碼」功能');
+        }
+
+        // 設定新密碼
+        account.passwordHash = await bcrypt.hash(newPassword, 10);
+        await this.accountRepository.save(account);
+
+        return { success: true };
+    }
+
+    /**
+     * 檢查帳號是否已設定密碼
+     */
+    async hasPassword(accountId: string): Promise<{ hasPassword: boolean }> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            select: ['id', 'passwordHash'],
+        });
+        if (!account) {
+            throw new UnauthorizedException('帳號不存在');
+        }
+
+        return {
+            hasPassword: !!(account.passwordHash && account.passwordHash.length > 0)
+        };
     }
 
     /**

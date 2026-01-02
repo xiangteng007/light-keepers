@@ -9,7 +9,8 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging';
 import type { Messaging, MessagePayload } from 'firebase/messaging';
 import firebaseConfig from '../config/firebase.config';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+// VITE_API_URL 不含 /api/v1，需要手動加上
+const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
 const VAPID_KEY = import.meta.env.VITE_FIREBASE_VAPID_KEY || '';
 
 export interface PushNotificationPayload {

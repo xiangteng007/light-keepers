@@ -10,6 +10,9 @@ import './LoginPage.css';
 const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID || '';
 const LINE_REDIRECT_URI = `${window.location.origin}/login`;
 
+// API Base URL - VITE_API_URL 不含 /api/v1，需要手動加上
+const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
+
 export default function LoginPage() {
     const navigate = useNavigate();
     const location = useLocation();
@@ -104,8 +107,7 @@ export default function LoginPage() {
     const handleLiffLogin = async (idToken: string) => {
         setError(null);
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-backend-955234851806.us-central1.run.app';
-            const response = await fetch(`${API_URL}/api/v1/auth/liff/login`, {
+            const response = await fetch(`${API_BASE}/auth/liff/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken }),
@@ -132,7 +134,7 @@ export default function LoginPage() {
         setIsLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/line/callback`, {
+            const response = await fetch(`${API_BASE}/auth/line/callback`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ code, redirectUri: LINE_REDIRECT_URI }),
@@ -199,8 +201,7 @@ export default function LoginPage() {
                 // 註冊成功，取得 Token 並自動登入
                 const idToken = await firebaseAuthService.getIdToken();
                 if (idToken) {
-                    const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
-                    const response = await fetch(`${API_URL}/auth/firebase/login`, {
+                    const response = await fetch(`${API_BASE}/auth/firebase/login`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ idToken }),
@@ -259,7 +260,7 @@ export default function LoginPage() {
             }
 
             // 使用 Firebase ID Token 向後端換取系統 JWT
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/firebase/login`, {
+            const response = await fetch(`${API_BASE}/auth/firebase/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken }),
@@ -298,8 +299,7 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
-            const response = await fetch(`${API_URL}/auth/send-email-otp`, {
+            const response = await fetch(`${API_BASE}/auth/send-email-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: formData.email }),
@@ -331,8 +331,7 @@ export default function LoginPage() {
         setError(null);
 
         try {
-            const API_URL = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
-            const response = await fetch(`${API_URL}/auth/verify-email-otp`, {
+            const response = await fetch(`${API_BASE}/auth/verify-email-otp`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -392,7 +391,7 @@ export default function LoginPage() {
             }
 
             // 嘗試使用 Firebase Token 登入後端
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/firebase/login`, {
+            const response = await fetch(`${API_BASE}/auth/firebase/login`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ idToken }),

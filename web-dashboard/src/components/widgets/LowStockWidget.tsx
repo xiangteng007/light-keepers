@@ -7,7 +7,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, Badge } from '../../design-system';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+// VITE_API_URL 不含 /api/v1，需要手動加上
+const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
 
 interface LowStockResource {
     id: string;

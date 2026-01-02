@@ -123,14 +123,19 @@ export class SeedService implements OnModuleInit {
 
     /**
      * 確保系統擁有者帳號擁有 owner 角色
+     * 在每次啟動時檢查並修復角色遺失問題
      */
     async seedOwnerAccount() {
-        const ownerAccount = await this.accountRepository.findOne({
-            where: { email: this.OWNER_EMAIL },
+        // 搜尋所有可能的 owner 帳號（email 或 googleEmail 匹配）
+        const ownerAccounts = await this.accountRepository.find({
+            where: [
+                { email: this.OWNER_EMAIL },
+                { googleEmail: this.OWNER_EMAIL },
+            ],
             relations: ['roles'],
         });
 
-        if (!ownerAccount) {
+        if (ownerAccounts.length === 0) {
             this.logger.log(`Owner account ${this.OWNER_EMAIL} not found, skipping role assignment`);
             return;
         }
@@ -141,21 +146,34 @@ export class SeedService implements OnModuleInit {
             return;
         }
 
-        // 檢查是否已有 owner 角色
-        const hasOwnerRole = ownerAccount.roles?.some(r => r.name === 'owner');
-        if (hasOwnerRole) {
-            this.logger.log(`Account ${this.OWNER_EMAIL} already has owner role`);
-            return;
+        // 為每個匹配的帳號確保有 owner 角色
+        for (const ownerAccount of ownerAccounts) {
+            const hasOwnerRole = ownerAccount.roles?.some(r => r.name === 'owner');
+
+            if (hasOwnerRole) {
+                this.logger.log(`Account ${ownerAccount.email || ownerAccount.googleEmail} already has owner role`);
+                continue;
+            }
+
+            // 賦予 owner 角色（使用 QueryBuilder 確保不會清空其他角色）
+            this.logger.warn(`⚠️ Owner account ${ownerAccount.id} is missing owner role - fixing now...`);
+
+            // 直接插入到 account_roles 關聯表
+            await this.accountRepository
+                .createQueryBuilder()
+                .relation(Account, 'roles')
+                .of(ownerAccount.id)
+                .add(ownerRole.id);
+
+            // 更新帳號狀態
+            await this.accountRepository.update(ownerAccount.id, {
+                approvalStatus: 'approved',
+                phoneVerified: true,
+                emailVerified: true,
+                volunteerProfileCompleted: true,
+            });
+
+            this.logger.log(`✅ Granted owner role to account ${ownerAccount.id} (${ownerAccount.email || ownerAccount.googleEmail})`);
         }
-
-        // 賦予 owner 角色
-        ownerAccount.roles = [...(ownerAccount.roles || []), ownerRole];
-        ownerAccount.approvalStatus = 'approved';
-        ownerAccount.phoneVerified = true;
-        ownerAccount.emailVerified = true;
-        ownerAccount.volunteerProfileCompleted = true;
-
-        await this.accountRepository.save(ownerAccount);
-        this.logger.log(`✅ Granted owner role to ${this.OWNER_EMAIL}`);
     }
 }

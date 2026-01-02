@@ -32,8 +32,9 @@ export default function ProfilePage() {
     });
 
 
-    // Password change
+    // Password management
     const [showPasswordModal, setShowPasswordModal] = useState(false);
+    const [hasPassword, setHasPassword] = useState<boolean | null>(null);  // null = loading
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -41,13 +42,31 @@ export default function ProfilePage() {
     });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
 
-    const API_BASE = import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1';
+    // VITE_API_URL 不含 /api/v1，需要手動加上
+    const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
     const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
-    // Fetch preferences on mount
+    // Fetch preferences and password status on mount
     useEffect(() => {
         fetchPreferences();
+        checkHasPassword();
     }, []);
+
+    // Check if account has password
+    const checkHasPassword = async () => {
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/auth/has-password`, {
+                headers: { 'Authorization': `Bearer ${token}` },
+            });
+            if (response.ok) {
+                const data = await response.json();
+                setHasPassword(data.hasPassword);
+            }
+        } catch (err) {
+            console.error('Failed to check password status:', err);
+        }
+    };
 
     // Handle OAuth callback for binding
     useEffect(() => {
@@ -107,7 +126,7 @@ export default function ProfilePage() {
         }
     };
 
-    // Handle password change
+    // Handle password change (for accounts with existing password)
     const handleChangePassword = async () => {
         if (passwordData.newPassword !== passwordData.confirmPassword) {
             setMessage({ type: 'error', text: '新密碼與確認密碼不符' });
@@ -149,10 +168,53 @@ export default function ProfilePage() {
         }
     };
 
+    // Handle set password (for OAuth accounts without password)
+    const handleSetPassword = async () => {
+        if (passwordData.newPassword !== passwordData.confirmPassword) {
+            setMessage({ type: 'error', text: '新密碼與確認密碼不符' });
+            return;
+        }
+
+        if (passwordData.newPassword.length < 6) {
+            setMessage({ type: 'error', text: '密碼至少需要 6 個字元' });
+            return;
+        }
+
+        setIsChangingPassword(true);
+        try {
+            const token = getToken();
+            const response = await fetch(`${API_BASE}/auth/set-password`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    newPassword: passwordData.newPassword,
+                }),
+            });
+
+            if (response.ok) {
+                setMessage({ type: 'success', text: '密碼設定成功！現在您可以使用 Email/密碼登入' });
+                setShowPasswordModal(false);
+                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+                setHasPassword(true);  // Update state
+            } else {
+                const error = await response.json();
+                setMessage({ type: 'error', text: error.message || '密碼設定失敗' });
+            }
+        } catch (err) {
+            setMessage({ type: 'error', text: '密碼設定失敗，請稍後再試' });
+        } finally {
+            setIsChangingPassword(false);
+        }
+    };
+
     const handleLineBindCallback = async (code: string) => {
         try {
             const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/line/callback`, {
+            // 使用專門的綁定端點（需要認證）
+            const response = await fetch(`${API_BASE}/auth/line/bind-callback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -162,22 +224,27 @@ export default function ProfilePage() {
             });
 
             if (response.ok) {
-                setMessage({ type: 'success', text: 'LINE 帳號綁定成功！' });
+                const data = await response.json();
+                setMessage({ type: 'success', text: `LINE 帳號綁定成功！(${data.lineDisplayName || ''})` });
                 await refreshUser();
             } else {
-                setMessage({ type: 'error', text: 'LINE 帳號綁定失敗' });
+                const error = await response.json();
+                setMessage({ type: 'error', text: error.message || 'LINE 帳號綁定失敗' });
             }
         } catch (err) {
+            console.error('LINE binding error:', err);
             setMessage({ type: 'error', text: 'LINE 帳號綁定失敗，請稍後再試' });
         } finally {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
     };
 
+
     const handleGoogleBindCallback = async (code: string) => {
         try {
             const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/google/callback`, {
+            // 使用專門的綁定端點（需要認證）
+            const response = await fetch(`${API_BASE}/auth/google/bind-callback`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -187,12 +254,15 @@ export default function ProfilePage() {
             });
 
             if (response.ok) {
-                setMessage({ type: 'success', text: 'Google 帳號綁定成功！' });
+                const data = await response.json();
+                setMessage({ type: 'success', text: `Google 帳號綁定成功！(${data.googleEmail || ''})` });
                 await refreshUser();
             } else {
-                setMessage({ type: 'error', text: 'Google 帳號綁定失敗' });
+                const error = await response.json();
+                setMessage({ type: 'error', text: error.message || 'Google 帳號綁定失敗' });
             }
         } catch (err) {
+            console.error('Google binding error:', err);
             setMessage({ type: 'error', text: 'Google 帳號綁定失敗，請稍後再試' });
         } finally {
             window.history.replaceState({}, document.title, window.location.pathname);
@@ -221,7 +291,7 @@ export default function ProfilePage() {
         setIsSaving(true);
         try {
             const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-955234851806.asia-east1.run.app/api/v1'}/auth/profile`, {
+            const response = await fetch(`${API_BASE}/auth/profile`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',
@@ -408,11 +478,24 @@ export default function ProfilePage() {
                             <div className="profile-form">
                                 <div className="security-item">
                                     <div className="security-item-info">
-                                        <h4>變更密碼</h4>
-                                        <p>定期更換密碼以保護帳號安全</p>
+                                        {hasPassword ? (
+                                            <>
+                                                <h4>變更密碼</h4>
+                                                <p>定期更換密碼以保護帳號安全</p>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <h4>設定密碼</h4>
+                                                <p>您透過 LINE/Google 登入，尚未設定密碼。設定後可使用 Email/密碼登入</p>
+                                            </>
+                                        )}
                                     </div>
-                                    <button className="lk-btn lk-btn--secondary" onClick={() => setShowPasswordModal(true)}>
-                                        變更密碼
+                                    <button
+                                        className="lk-btn lk-btn--secondary"
+                                        onClick={() => setShowPasswordModal(true)}
+                                        disabled={hasPassword === null}
+                                    >
+                                        {hasPassword === null ? '載入中...' : hasPassword ? '變更密碼' : '設定密碼'}
                                     </button>
                                 </div>
                             </div>
@@ -472,37 +555,39 @@ export default function ProfilePage() {
                 </div>
             </div>
 
-            {/* Password Change Modal */}
+            {/* Password Modal (Set or Change) */}
             {showPasswordModal && (
                 <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
                     <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h3><Lock size={20} /> 變更密碼</h3>
+                        <h3><Lock size={20} /> {hasPassword ? '變更密碼' : '設定密碼'}</h3>
                         <div className="password-form">
+                            {hasPassword && (
+                                <div className="form-group">
+                                    <label>目前密碼</label>
+                                    <input
+                                        type="password"
+                                        value={passwordData.currentPassword}
+                                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                        placeholder="請輸入目前密碼"
+                                    />
+                                </div>
+                            )}
                             <div className="form-group">
-                                <label>目前密碼</label>
-                                <input
-                                    type="password"
-                                    value={passwordData.currentPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                    placeholder="請輸入目前密碼"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>新密碼</label>
+                                <label>{hasPassword ? '新密碼' : '密碼'}</label>
                                 <input
                                     type="password"
                                     value={passwordData.newPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                    placeholder="請輸入新密碼（至少 6 字元）"
+                                    placeholder="請輸入密碼（至少 6 字元）"
                                 />
                             </div>
                             <div className="form-group">
-                                <label>確認新密碼</label>
+                                <label>確認密碼</label>
                                 <input
                                     type="password"
                                     value={passwordData.confirmPassword}
                                     onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                    placeholder="請再次輸入新密碼"
+                                    placeholder="請再次輸入密碼"
                                 />
                             </div>
                         </div>
@@ -512,10 +597,10 @@ export default function ProfilePage() {
                             </button>
                             <button
                                 className="lk-btn lk-btn--primary"
-                                onClick={handleChangePassword}
+                                onClick={hasPassword ? handleChangePassword : handleSetPassword}
                                 disabled={isChangingPassword}
                             >
-                                {isChangingPassword ? '變更中...' : '確認變更'}
+                                {isChangingPassword ? '處理中...' : '確認'}
                             </button>
                         </div>
                     </div>

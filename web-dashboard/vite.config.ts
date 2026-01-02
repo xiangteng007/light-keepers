@@ -42,6 +42,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff,woff2}'],
+        // Exclude Firebase reserved URLs from navigation fallback
+        navigateFallbackDenylist: [/^\/__\/.*/],
         runtimeCaching: [
           {
             // Cache API responses with NetworkFirst strategy

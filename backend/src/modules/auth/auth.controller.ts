@@ -24,7 +24,9 @@ export class AuthController {
 
     @Get('me')
     @UseGuards(JwtAuthGuard)
-    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; lineUserId?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
+    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; lineUserId?: string; googleId?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
+        // 從資料庫獲取最新帳號資料（包含綁定狀態）
+        const account = await this.authService.getAccountById(req.user.id);
         const roles = req.user.roles || [];
         const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => r.level || 0)) : 0;
 
@@ -32,8 +34,10 @@ export class AuthController {
             id: req.user.id,
             email: req.user.email,
             phone: req.user.phone,
-            displayName: req.user.displayName,
-            lineLinked: !!req.user.lineUserId,
+            displayName: account?.displayName || req.user.displayName,
+            avatarUrl: account?.avatarUrl || null,
+            lineLinked: !!(account?.lineUserId),
+            googleLinked: !!(account?.googleId),
             roles: roles.map(r => r.name),
             roleLevel,
             roleDisplayName: roles.find(r => r.level === roleLevel)?.displayName || '一般民眾',
@@ -56,6 +60,15 @@ export class AuthController {
     @Get('roles')
     async getRoles() {
         return this.authService.getAllRoles();
+    }
+
+    /**
+     * 診斷帳號狀態（臨時 API）
+     * 用於排查角色問題
+     */
+    @Get('diagnose/:email')
+    async diagnoseAccount(@Param('email') email: string) {
+        return this.authService.diagnoseAccount(email);
     }
 
     /**
@@ -93,6 +106,24 @@ export class AuthController {
     @UseGuards(JwtAuthGuard)
     async bindLine(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
         const lineProfile = await this.authService.verifyLineToken(body.accessToken);
+        await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
+        return { success: true, lineDisplayName: lineProfile.displayName };
+    }
+
+    /**
+     * 綁定 LINE 帳號 (OAuth Callback 版本)
+     * 從 OAuth 回調中用 code 換取 token 並綁定
+     */
+    @Post('line/bind-callback')
+    @UseGuards(JwtAuthGuard)
+    async bindLineCallback(
+        @Request() req: { user: { id: string } },
+        @Body() body: { code: string; redirectUri: string }
+    ) {
+        // 使用 code 換取 access token
+        const accessToken = await this.authService.exchangeLineCodeForToken(body.code, body.redirectUri);
+        // 驗證並綁定
+        const lineProfile = await this.authService.verifyLineToken(accessToken);
         await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
         return { success: true, lineDisplayName: lineProfile.displayName };
     }
@@ -150,6 +181,25 @@ export class AuthController {
         return { success: true, googleEmail: googleProfile.email };
     }
 
+    /**
+     * 綁定 Google 帳號 (OAuth Callback 版本)
+     * 從 OAuth 回調中用 code 換取 token 並綁定
+     */
+    @Post('google/bind-callback')
+    @UseGuards(JwtAuthGuard)
+    async bindGoogleCallback(
+        @Request() req: { user: { id: string } },
+        @Body() body: { code: string; redirectUri: string }
+    ) {
+        // 使用 code 換取 access token
+        const accessToken = await this.authService.exchangeGoogleCodeForToken(body.code, body.redirectUri);
+        // 驗證並綁定
+        const googleProfile = await this.authService.verifyGoogleToken(accessToken);
+        await this.authService.bindGoogleAccount(req.user.id, googleProfile.id, googleProfile.email);
+        return { success: true, googleEmail: googleProfile.email };
+    }
+
+
     // =========================================
     // Firebase Token 登入端點
     // =========================================
@@ -190,6 +240,28 @@ export class AuthController {
         @Body() dto: ChangePasswordDto
     ) {
         return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
+    }
+
+    /**
+     * 設定密碼（針對 OAuth 帳號）
+     * 只有透過 LINE/Google 登入且尚未設定密碼的帳號可用
+     */
+    @Post('set-password')
+    @UseGuards(JwtAuthGuard)
+    async setPassword(
+        @Request() req: { user: { id: string } },
+        @Body() body: { newPassword: string }
+    ) {
+        return this.authService.setPassword(req.user.id, body.newPassword);
+    }
+
+    /**
+     * 檢查是否已設定密碼
+     */
+    @Get('has-password')
+    @UseGuards(JwtAuthGuard)
+    async hasPassword(@Request() req: { user: { id: string } }) {
+        return this.authService.hasPassword(req.user.id);
     }
 
     /**

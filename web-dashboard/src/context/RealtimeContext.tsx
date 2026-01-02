@@ -35,8 +35,8 @@ const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined
 
 // API URL for WebSocket
 const WS_URL = import.meta.env.VITE_WS_URL ||
-    import.meta.env.VITE_API_URL?.replace('/api/v1', '') ||
-    'https://light-keepers-api-955234851806.asia-east1.run.app';
+    import.meta.env.VITE_API_URL ||
+    'https://light-keepers-api-bsf4y44tja-de.a.run.app';
 
 export function RealtimeProvider({ children }: { children: ReactNode }) {
     const [socket, setSocket] = useState<Socket | null>(null);
