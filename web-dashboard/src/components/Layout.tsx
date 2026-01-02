@@ -392,11 +392,8 @@ export default function Layout() {
                     </div>
                 ) : (
                     <div className="sidebar-auth">
-                        <Link to="/login" className="sidebar-auth__btn sidebar-auth__btn--login" onClick={handleNavClick}>
-                            登入
-                        </Link>
-                        <Link to="/login?tab=register" className="sidebar-auth__btn sidebar-auth__btn--register" onClick={handleNavClick}>
-                            註冊
+                        <Link to="/login" className="sidebar-auth__btn" onClick={handleNavClick}>
+                            登入 / 註冊
                         </Link>
                     </div>
                 )}
