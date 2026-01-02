@@ -125,7 +125,7 @@ export default function DashboardPage() {
         <div className="page dashboard-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📊 決策儀表板</h2>
+                    <h2>📊 快速檢視</h2>
                     <p className="page-subtitle">Light Keepers 災害應變系統總覽</p>
                 </div>
                 <div className="page-header__right" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
