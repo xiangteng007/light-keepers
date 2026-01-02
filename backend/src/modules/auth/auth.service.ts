@@ -725,6 +725,24 @@ export class AuthService {
     }
 
     /**
+     * 管理員設定密碼（用於緊急重設）
+     * 可為任何帳號設定密碼
+     */
+    async adminSetPassword(email: string, newPassword: string): Promise<{ success: boolean; message: string }> {
+        const account = await this.accountRepository.findOne({ where: { email } });
+        if (!account) {
+            throw new NotFoundException(`帳號不存在: ${email}`);
+        }
+
+        // 設定新密碼
+        account.passwordHash = await bcrypt.hash(newPassword, 10);
+        await this.accountRepository.save(account);
+
+        console.log(`Admin set password for account: ${email}`);
+        return { success: true, message: `密碼已設定成功 for ${email}` };
+    }
+
+    /**
      * 檢查帳號是否已設定密碼
      */
     async hasPassword(accountId: string): Promise<{ hasPassword: boolean }> {

@@ -242,46 +242,41 @@ export default function LoginPage() {
                 formData.password
             );
 
-            if (!firebaseResult.success) {
-                setError(firebaseResult.message);
-                setIsLoading(false);
-                return;
-            }
+            if (firebaseResult.success) {
+                // Firebase 登入成功，取得 ID Token 並與後端交換 JWT
+                const idToken = await firebaseAuthService.getIdToken();
+                if (idToken) {
+                    const response = await fetch(`${API_BASE}/auth/firebase/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ idToken }),
+                    });
 
-            // 注意：登入時不檢查 Email 驗證狀態
-            // Email 驗證只在註冊時要求，登入可直接進行
-
-            // 取得 Firebase ID Token
-            const idToken = await firebaseAuthService.getIdToken();
-            if (!idToken) {
-                setError('無法取得認證 Token');
-                setIsLoading(false);
-                return;
-            }
-
-            // 使用 Firebase ID Token 向後端換取系統 JWT
-            const response = await fetch(`${API_BASE}/auth/firebase/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idToken }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                await login(data.accessToken, rememberMe);
-                navigate(from, { replace: true });
-            } else {
-                // 如果後端還未實作 Firebase 登入，使用傳統方式
-                try {
-                    const backendResponse = await backendLoginApi(formData.email, formData.password);
-                    await login(backendResponse.data.accessToken, rememberMe);
-                    navigate(from, { replace: true });
-                } catch (backendError) {
-                    setError('登入失敗，請稍後再試');
+                    if (response.ok) {
+                        const data = await response.json();
+                        await login(data.accessToken, rememberMe);
+                        navigate(from, { replace: true });
+                        return;
+                    }
                 }
             }
+
+            // Firebase 登入失敗，嘗試使用後端直接驗證（支援非 Firebase 帳號）
+            console.log('Firebase login failed, trying backend auth...');
+            try {
+                const backendResponse = await backendLoginApi(formData.email, formData.password);
+                if (backendResponse.data?.accessToken) {
+                    await login(backendResponse.data.accessToken, rememberMe);
+                    navigate(from, { replace: true });
+                    return;
+                }
+            } catch (backendError: any) {
+                // 後端驗證也失敗
+                const errorMsg = backendError?.response?.data?.message || '帳號或密碼錯誤';
+                setError(errorMsg);
+            }
         } catch (err) {
-            console.error('Firebase login failed:', err);
+            console.error('Login failed:', err);
             setError('登入失敗，請稍後再試');
         } finally {
             setIsLoading(false);

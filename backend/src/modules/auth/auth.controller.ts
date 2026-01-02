@@ -72,6 +72,19 @@ export class AuthController {
     }
 
     /**
+     * 管理員密碼重設（臨時 API）
+     * 使用密鑰保護，用於緊急設定帳號密碼
+     */
+    @Post('admin/reset-password')
+    async adminResetPassword(@Body() body: { email: string; newPassword: string; adminKey: string }) {
+        // 簡單的密鑰驗證
+        if (body.adminKey !== 'LK_ADMIN_2026_RESET') {
+            throw new UnauthorizedException('Invalid admin key');
+        }
+        return this.authService.adminSetPassword(body.email, body.newPassword);
+    }
+
+    /**
      * LINE OAuth Callback
      * 前端重導向回來時，用 authorization code 換取 access token
      */
