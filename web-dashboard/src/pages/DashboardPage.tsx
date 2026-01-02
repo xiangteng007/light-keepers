@@ -96,10 +96,12 @@ export default function DashboardPage() {
         queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data.data),
     });
 
-    // 獲取 NCDR 警報
+    // 獲取 NCDR 警報 - 僅顯示重大災害類型
+    // 5=颱風, 6=地震, 7=海嘯, 8=淹水, 9=土石流及大規模崩塌, 1087=火災, 2102=疏散避難
+    const DASHBOARD_ALERT_TYPES = '5,6,7,8,9,1087,2102';
     const { data: alertsData } = useQuery({
-        queryKey: ['recentAlerts'],
-        queryFn: () => getNcdrAlerts({ limit: 5 }).then(res => res.data.data),
+        queryKey: ['recentAlerts', DASHBOARD_ALERT_TYPES],
+        queryFn: () => getNcdrAlerts({ limit: 5, types: DASHBOARD_ALERT_TYPES }).then(res => res.data.data),
         refetchInterval: 60000, // 每分鐘刷新
     });
 
