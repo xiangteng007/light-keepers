@@ -110,9 +110,9 @@ function App() {
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="forecast" element={<ForecastPage />} />
-            <Route path="manuals" element={<ManualsPage />} />
+            <Route path="manuals" element={<ManualHomePage />} /> {/* 新版災防手冊首頁 */}
             <Route path="manuals/:id" element={<ManualDetailPage />} />
-            <Route path="manuals-v3" element={<ManualHomePage />} /> {/* 新版災防手冊首頁 */}
+            <Route path="manuals-legacy" element={<ManualsPage />} /> {/* 舊版（保留作參考） */}
             {/* 志工等級 (1) */}
             <Route path="events" element={<ProtectedRoute requiredLevel={1}><EventsPage /></ProtectedRoute>} />
             <Route path="report" element={<ProtectedRoute requiredLevel={1}><ReportPage /></ProtectedRoute>} />
