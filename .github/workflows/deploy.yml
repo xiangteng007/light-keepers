@@ -63,7 +63,7 @@ jobs:
 
   deploy-dashboard:
     runs-on: ubuntu-latest
-    needs: deploy-api
+    # 移除 needs: deploy-api 依賴，讓前端可以獨立部署
     permissions:
       contents: read
 
