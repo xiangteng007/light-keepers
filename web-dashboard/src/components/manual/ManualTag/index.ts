@@ -1,0 +1,1 @@
+export { ManualTag } from './ManualTag';

@@ -1,0 +1,372 @@
+/* ============================================
+   ManualHomePage Styles
+   災防手冊首頁 - 平衡版佈局
+============================================ */
+
+.manual-home {
+    min-height: 100vh;
+    background: var(--manual-bg-white);
+    font-family: var(--manual-font-family);
+}
+
+/* ============================================
+   Header 區塊
+============================================ */
+
+.manual-header {
+    position: sticky;
+    top: 0;
+    z-index: var(--manual-z-header);
+
+    display: flex;
+    align-items: center;
+    gap: var(--manual-spacing-md);
+
+    height: 60px;
+    padding: 0 var(--manual-spacing-md);
+
+    background: var(--manual-primary);
+    color: var(--manual-bg-white);
+    box-shadow: var(--manual-shadow-md);
+}
+
+.manual-header__menu-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+
+    background: transparent;
+    border: none;
+    color: var(--manual-bg-white);
+    font-size: 20px;
+    cursor: pointer;
+    border-radius: var(--manual-radius-sm);
+
+    transition: background var(--manual-transition-normal);
+}
+
+.manual-header__menu-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.manual-header__logo {
+    flex: 1;
+    font-size: 16px;
+    font-weight: var(--manual-weight-bold);
+    margin: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.manual-header__search {
+    display: none;
+    /* 手機版隱藏，桌機版顯示 */
+}
+
+.manual-header__user {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: var(--manual-bg-white);
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 50%;
+
+    transition: background var(--manual-transition-normal);
+}
+
+.manual-header__user:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* ============================================
+   主要內容區
+============================================ */
+
+.manual-main {
+    padding: var(--manual-spacing-md);
+}
+
+/* 區塊通用樣式 */
+.manual-section {
+    margin-bottom: var(--manual-spacing-xl);
+}
+
+.manual-section__title {
+    font-size: var(--manual-font-h2);
+    font-weight: var(--manual-weight-semibold);
+    color: var(--manual-text-primary);
+    margin: 0 0 var(--manual-spacing-md) 0;
+}
+
+/* ============================================
+   1. 值勤快捷區
+============================================ */
+
+.manual-quick-access {
+    margin-bottom: var(--manual-spacing-lg);
+}
+
+.quick-buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--manual-spacing-sm);
+}
+
+.quick-button {
+    /* 繼承 ManualButton 樣式 */
+    flex-direction: column;
+    padding: 12px 8px;
+    min-height: 70px;
+    gap: 4px;
+}
+
+.quick-button__icon {
+    font-size: 24px;
+    display: block;
+}
+
+.quick-button__label {
+    font-size: 11px;
+    text-align: center;
+    line-height: 1.2;
+}
+
+/* ============================================
+   2. 任務流程區
+============================================ */
+
+.manual-task-flows {
+    margin-bottom: var(--manual-spacing-lg);
+}
+
+.task-cards-scroll {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+
+    /* 隱藏滾動條但保持可滾動 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.task-cards-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+.task-cards-scroll>* {
+    scroll-snap-align: start;
+    flex-shrink: 0;
+}
+
+/* ============================================
+   3. 新手必讀區
+============================================ */
+
+.manual-beginner-guide {
+    margin-bottom: var(--manual-spacing-lg);
+}
+
+.beginner-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--manual-spacing-sm);
+}
+
+/* ============================================
+   4. 場域入口區
+============================================ */
+
+.manual-field-entries {
+    margin-bottom: var(--manual-spacing-lg);
+}
+
+.field-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--manual-spacing-md);
+}
+
+/* ============================================
+   5. 技能專區
+============================================ */
+
+.manual-skills-zone {
+    margin-bottom: var(--manual-spacing-lg);
+}
+
+.skills-scroll {
+    display: flex;
+    gap: var(--manual-spacing-sm);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+
+    /* 隱藏滾動條 */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.skills-scroll::-webkit-scrollbar {
+    display: none;
+}
+
+/* ============================================
+   6. 最近更新區
+============================================ */
+
+.manual-recent-updates {
+    margin-bottom: var(--manual-spacing-xl);
+}
+
+.recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--manual-spacing-sm);
+}
+
+.recent-item {
+    display: flex;
+    align-items: center;
+    gap: var(--manual-spacing-sm);
+    padding: 12px;
+
+    background: var(--manual-bg-white);
+    border: 1px solid var(--manual-border);
+    border-radius: var(--manual-radius);
+
+    cursor: pointer;
+    transition: all var(--manual-transition-normal);
+}
+
+.recent-item:hover {
+    border-color: var(--manual-accent);
+    box-shadow: var(--manual-shadow-sm);
+}
+
+.recent-item__date {
+    font-size: var(--manual-font-small);
+    color: var(--manual-text-muted);
+    white-space: nowrap;
+}
+
+.recent-item__title {
+    flex: 1;
+    font-size: var(--manual-font-body);
+    color: var(--manual-text-primary);
+    font-weight: var(--manual-weight-medium);
+
+    /* 單行省略 */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ============================================
+   響應式：平板
+============================================ */
+
+@media (min-width: 768px) {
+    .manual-header {
+        padding: 0 var(--manual-spacing-lg);
+    }
+
+    .manual-header__search {
+        display: block;
+        flex: 0 0 300px;
+    }
+
+    .manual-header__logo {
+        flex: 0 0 auto;
+        text-align: left;
+    }
+
+    .manual-main {
+        padding: var(--manual-spacing-lg);
+    }
+
+    .quick-buttons {
+        grid-template-columns: repeat(8, 1fr);
+    }
+
+    .quick-button {
+        flex-direction: row;
+        padding: 10px 12px;
+        min-height: 48px;
+        gap: var(--manual-spacing-sm);
+    }
+
+    .quick-button__icon {
+        font-size: 20px;
+    }
+
+    .quick-button__label {
+        font-size: 13px;
+    }
+
+    .field-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* ============================================
+   響應式：桌機
+============================================ */
+
+@media (min-width: 1024px) {
+    .manual-home {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: var(--manual-spacing-lg);
+    }
+
+    .manual-header {
+        height: 80px;
+        padding: 0 var(--manual-spacing-xl);
+    }
+
+    .manual-header__search {
+        flex: 0 0 400px;
+    }
+
+    .manual-main {
+        max-width: 1200px;
+        margin: 0 auto;
+        width: 100%;
+        padding: var(--manual-spacing-xl);
+    }
+
+    .task-cards-scroll {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        overflow-x: visible;
+        gap: var(--manual-spacing-lg);
+    }
+
+    .field-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--manual-spacing-lg);
+    }
+}
+
+/* ============================================
+   響應式：大屏（3欄布局）
+============================================ */
+
+@media (min-width: 1440px) {
+    .manual-home {
+        grid-template-columns: 280px 1fr 280px;
+    }
+
+    /* 未來可加入左右側邊欄 */
+}

@@ -1,0 +1,91 @@
+/* ============================================
+   ManualButton Component Styles
+   半透明實心按鈕（50% 透明度）
+============================================ */
+
+.manual-button {
+    /* 默認狀態 - 50% 透明度 */
+    background: var(--manual-accent-50);
+    border: none;
+    border-radius: var(--manual-radius);
+    padding: 10px 20px;
+    color: var(--manual-primary);
+    font-family: var(--manual-font-family);
+    font-size: var(--manual-font-body);
+    font-weight: var(--manual-weight-semibold);
+    cursor: pointer;
+    transition: all var(--manual-transition-normal);
+    box-shadow: var(--manual-shadow-button);
+
+    /* 無障礙：最小觸控區域 */
+    min-height: var(--manual-touch-target);
+    min-width: 48px;
+
+    /* 文字不換行 */
+    white-space: nowrap;
+
+    /* Flex 佈局（支援 icon + text） */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--manual-spacing-sm);
+}
+
+/* Hover 狀態 - 提升至 70% */
+.manual-button:hover:not(:disabled) {
+    background: var(--manual-accent-70);
+    transform: translateY(-2px);
+    box-shadow: var(--manual-shadow-button-hover);
+}
+
+/* Active 狀態 - 降至 65% */
+.manual-button:active:not(:disabled) {
+    background: var(--manual-accent-65);
+    transform: scale(0.98);
+    box-shadow: var(--manual-shadow-button);
+    transition: all var(--manual-transition-fast);
+}
+
+/* Disabled 狀態 - 降至 30% */
+.manual-button:disabled {
+    background: var(--manual-accent-30);
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Focus 狀態（鍵盤導航） */
+.manual-button:focus-visible {
+    outline: 2px solid var(--manual-accent);
+    outline-offset: 3px;
+}
+
+/* 全寬變體 */
+.manual-button--full-width {
+    width: 100%;
+}
+
+/* Icon 樣式（如果包含） */
+.manual-button .manual-button__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--manual-icon-sm);
+    flex-shrink: 0;
+}
+
+.manual-button .manual-button__label {
+    flex: 1;
+}
+
+/* ============================================
+   響應式：手機版
+============================================ */
+
+@media (max-width: 768px) {
+    .manual-button {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}

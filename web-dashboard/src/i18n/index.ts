@@ -33,7 +33,7 @@ i18n
         },
 
         react: {
-            useSuspense: true,
+            useSuspense: false, // 禁用 Suspense 以避免空白頁面問題
         },
     });
 

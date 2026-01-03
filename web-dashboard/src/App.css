@@ -2678,6 +2678,201 @@ button[aria-label="地圖相機控制"],
   border-radius: 20px;
 }
 
+/* Sections (擴展區塊) */
+.manual-sections {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.manual-section {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 20px;
+  border-left: 4px solid var(--accent-primary);
+}
+
+.manual-section h2 {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+}
+
+.manual-section p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+/* Pocket Card (口袋卡) */
+.manual-pocket-card {
+  margin-top: 32px;
+}
+
+.manual-pocket-card h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.pocket-card-box {
+  background: linear-gradient(135deg, #1a1f2e, #232a3d);
+  border: 2px solid var(--accent-primary);
+  border-radius: 16px;
+  padding: 20px 24px;
+  font-family: 'Courier New', 'Monaco', monospace;
+}
+
+.pocket-card-line {
+  color: #e0e0e0;
+  font-size: 13px;
+  line-height: 1.8;
+  padding: 6px 0;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.pocket-card-line:last-child {
+  border-bottom: none;
+}
+
+/* Checklists (檢核清單) */
+.manual-checklists {
+  margin-top: 32px;
+}
+
+.manual-checklists h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 20px;
+}
+
+.checklists-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+.checklist-card {
+  background: var(--bg-secondary);
+  border-radius: 12px;
+  padding: 16px 20px;
+  border: 1px solid var(--border-color);
+}
+
+.checklist-card h3 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.checklist-card ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.checklist-card li {
+  padding: 6px 0;
+}
+
+.checklist-card label {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.checklist-card input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: var(--accent-primary);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.checklist-card input[type="checkbox"]:checked+span {
+  color: var(--success);
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+/* FAQ (常見問題) */
+.manual-faq {
+  margin-top: 32px;
+}
+
+.manual-faq h2 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.faq-item {
+  background: var(--bg-secondary);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+}
+
+.faq-item summary {
+  padding: 14px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  cursor: pointer;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary::after {
+  content: '▼';
+  font-size: 10px;
+  color: var(--text-muted);
+  transition: transform 0.2s ease;
+}
+
+.faq-item[open] summary::after {
+  transform: rotate(180deg);
+}
+
+.faq-item[open] summary {
+  background: rgba(184, 151, 111, 0.1);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.faq-item p {
+  padding: 16px 20px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0;
+  background: rgba(0, 0, 0, 0.02);
+}
+
 /* Not Found */
 .manual-not-found {
   text-align: center;

@@ -73,7 +73,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-            const response = await getProfile();
+            // 添加5秒超時機制，避免後端未運行時無限等待
+            const timeoutPromise = new Promise((_, reject) => {
+                setTimeout(() => reject(new Error('API timeout')), 5000);
+            });
+
+            const response = await Promise.race([
+                getProfile(),
+                timeoutPromise
+            ]) as Awaited<ReturnType<typeof getProfile>>;
+
             setUser(response.data);
         } catch (error) {
             console.error('Failed to load user profile:', error);

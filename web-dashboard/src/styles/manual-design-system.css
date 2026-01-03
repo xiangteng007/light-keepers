@@ -1,0 +1,232 @@
+/* ============================================
+   災防手冊專用設計系統
+   基於最終確認的設計規格
+   Navy Blue (#001F3F) + Golden Amber (#D97706)
+============================================ */
+
+:root {
+    /* ===== 主要配色 ===== */
+    --manual-primary: #001F3F;
+    /* Navy Blue - 導覽、標題 */
+    --manual-accent: #D97706;
+    /* Golden Amber - 強調、按鈕 */
+    --manual-accent-light: #F59E0B;
+    /* Golden Amber Light - Hover */
+
+    /* ===== 按鈕透明度（50%） ===== */
+    --manual-accent-50: rgba(217, 151, 6, 0.5);
+    /* 預設 */
+    --manual-accent-70: rgba(245, 158, 11, 0.7);
+    /* Hover */
+    --manual-accent-65: rgba(217, 151, 6, 0.65);
+    /* Active */
+    --manual-accent-30: rgba(217, 151, 6, 0.3);
+    /* Disabled */
+
+    /* ===== 風險等級色彩 ===== */
+    --manual-risk-low: #276749;
+    /* 低風險 - 深綠 */
+    --manual-risk-medium: #C05621;
+    /* 中風險 - 橙色 */
+    --manual-risk-high: #9B2C2C;
+    /* 高風險 - 深紅 */
+    --manual-risk-critical: #702459;
+    /* 極危 - 紫紅 */
+
+    /* ===== 文字顏色 ===== */
+    --manual-text-primary: #1F2937;
+    /* 主要文字 */
+    --manual-text-secondary: #6B7280;
+    /* 次要文字 */
+    --manual-text-muted: #9CA3AF;
+    /* 輔助文字 */
+
+    /* ===== 背景與邊框 ===== */
+    --manual-bg-white: #FFFFFF;
+    /* 白色背景 */
+    --manual-bg-gray: #F9FAFB;
+    /* 淺灰背景 */
+    --manual-border: #E2E8F0;
+    /* 邊框 */
+    --manual-border-light: #F1F5F9;
+    /* 淺邊框 */
+
+    /* ===== 字體系統 ===== */
+    --manual-font-family: 'Noto Sans TC', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    /* 字體大小 */
+    --manual-font-h1: 28px;
+    /* 頁面標題 */
+    --manual-font-h2: 20px;
+    /* 區塊標題 */
+    --manual-font-h3: 16px;
+    /* 卡片標題 */
+    --manual-font-body: 14px;
+    /* 內文 */
+    --manual-font-small: 12px;
+    /* 輔助資訊 */
+    --manual-font-caption: 11px;
+    /* 極小文字 */
+
+    /* 字體粗細 */
+    --manual-weight-normal: 400;
+    --manual-weight-medium: 500;
+    --manual-weight-semibold: 600;
+    --manual-weight-bold: 700;
+
+    /* 行高 */
+    --manual-line-height-tight: 1.3;
+    --manual-line-height-normal: 1.5;
+    --manual-line-height-relaxed: 1.6;
+
+    /* ===== 間距系統（8px 基準） ===== */
+    --manual-spacing-xs: 4px;
+    --manual-spacing-sm: 8px;
+    --manual-spacing-md: 16px;
+    --manual-spacing-lg: 24px;
+    --manual-spacing-xl: 32px;
+
+    /* ===== 圓角 ===== */
+    --manual-radius: 8px;
+    /* 標準圓角 - 卡片、按鈕 */
+    --manual-radius-sm: 4px;
+    /* 小圓角 - 標籤 */
+
+    /* ===== 陰影 ===== */
+    --manual-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --manual-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --manual-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+
+    /* 按鈕陰影（金色） */
+    --manual-shadow-button: 0 2px 4px rgba(217, 151, 6, 0.15);
+    --manual-shadow-button-hover: 0 4px 8px rgba(217, 151, 6, 0.25);
+
+    /* ===== Icon 尺寸 ===== */
+    --manual-icon-sm: 24px;
+    --manual-icon-md: 32px;
+    --manual-icon-lg: 48px;
+    --manual-icon-xl: 64px;
+
+    /* ===== 觸控區域（無障礙） ===== */
+    --manual-touch-target: 48px;
+    /* WCAG AAA 最小觸控區 */
+
+    /* ===== 轉換動畫 ===== */
+    --manual-transition-fast: 100ms ease-in;
+    --manual-transition-normal: 200ms ease-out;
+    --manual-transition-slow: 300ms linear;
+
+    /* ===== Z-index 層級 ===== */
+    --manual-z-header: 100;
+    --manual-z-modal: 1000;
+    --manual-z-tooltip: 1100;
+}
+
+/* ============================================
+   災防手冊專用基礎樣式
+============================================ */
+
+/* 確保所有手冊頁面使用正確字體 */
+.manual-page,
+.manual-home,
+.manual-detail {
+    font-family: var(--manual-font-family);
+    color: var(--manual-text-primary);
+    background: var(--manual-bg-white);
+}
+
+/* ===== 文字工具類 ===== */
+.manual-text-h1 {
+    font-size: var(--manual-font-h1);
+    font-weight: var(--manual-weight-bold);
+    line-height: var(--manual-line-height-tight);
+    color: var(--manual-text-primary);
+}
+
+.manual-text-h2 {
+    font-size: var(--manual-font-h2);
+    font-weight: var(--manual-weight-semibold);
+    line-height: var(--manual-line-height-normal);
+    color: var(--manual-text-primary);
+}
+
+.manual-text-h3 {
+    font-size: var(--manual-font-h3);
+    font-weight: var(--manual-weight-semibold);
+    line-height: var(--manual-line-height-normal);
+    color: var(--manual-text-primary);
+}
+
+.manual-text-body {
+    font-size: var(--manual-font-body);
+    font-weight: var(--manual-weight-normal);
+    line-height: var(--manual-line-height-relaxed);
+    color: var(--manual-text-primary);
+}
+
+.manual-text-small {
+    font-size: var(--manual-font-small);
+    font-weight: var(--manual-weight-normal);
+    line-height: var(--manual-line-height-normal);
+    color: var(--manual-text-secondary);
+}
+
+.manual-text-caption {
+    font-size: var(--manual-font-caption);
+    font-weight: var(--manual-weight-normal);
+    line-height: var(--manual-line-height-normal);
+    color: var(--manual-text-muted);
+}
+
+/* ===== 間距工具類 ===== */
+.manual-spacing-xs {
+    margin: var(--manual-spacing-xs);
+}
+
+.manual-spacing-sm {
+    margin: var(--manual-spacing-sm);
+}
+
+.manual-spacing-md {
+    margin: var(--manual-spacing-md);
+}
+
+.manual-spacing-lg {
+    margin: var(--manual-spacing-lg);
+}
+
+.manual-spacing-xl {
+    margin: var(--manual-spacing-xl);
+}
+
+/* ===== 無障礙：鍵盤焦點樣式 ===== */
+.manual-focus-visible:focus-visible,
+*[class^="manual-"]:focus-visible {
+    outline: 2px solid var(--manual-accent);
+    outline-offset: 3px;
+}
+
+/* ===== 容器工具類 ===== */
+.manual-container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 var(--manual-spacing-md);
+}
+
+/* ===== 響應式斷點輔助類 ===== */
+/* 手機版（<768px）：預設 */
+/* 平板（768px-1023px） */
+/* 桌機（1024px-1439px） */
+/* 大屏（≥1440px） */
+
+@media (min-width: 768px) {
+    .manual-container {
+        padding: 0 var(--manual-spacing-lg);
+    }
+}
+
+@media (min-width: 1024px) {
+    .manual-container {
+        padding: 0 var(--manual-spacing-xl);
+    }
+}

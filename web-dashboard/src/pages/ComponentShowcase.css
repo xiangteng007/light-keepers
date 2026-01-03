@@ -1,0 +1,138 @@
+/* ============================================
+   Component Showcase Page Styles
+============================================ */
+
+.showcase {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    font-family: var(--manual-font-family);
+}
+
+.showcase-header {
+    background: var(--manual-primary);
+    color: var(--manual-bg-white);
+    padding: 40px 24px;
+    text-align: center;
+}
+
+.showcase-header h1 {
+    font-size: 32px;
+    font-weight: var(--manual-weight-bold);
+    margin: 0 0 8px 0;
+}
+
+.showcase-header p {
+    font-size: 16px;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.showcase-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 24px;
+}
+
+/* Section */
+.showcase-section {
+    background: var(--manual-bg-white);
+    border-radius: var(--manual-radius);
+    padding: 32px;
+    margin-bottom: 32px;
+    box-shadow: var(--manual-shadow-md);
+}
+
+.showcase-section h2 {
+    font-size: 24px;
+    font-weight: var(--manual-weight-semibold);
+    color: var(--manual-text-primary);
+    margin: 0 0 8px 0;
+}
+
+.showcase-desc {
+    font-size: 14px;
+    color: var(--manual-text-secondary);
+    margin: 0 0 24px 0;
+}
+
+/* Demo Area */
+.showcase-demo {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    margin-bottom: 16px;
+}
+
+.showcase-demo--column {
+    flex-direction: column;
+}
+
+/* Code Block */
+.showcase-code {
+    background: #f8f9fa;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+}
+
+.showcase-code pre {
+    margin: 0;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #333;
+}
+
+/* States Grid */
+.showcase-states {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.state-card {
+    background: #f8f9fa;
+    border-left: 4px solid var(--manual-accent);
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.state-card h3 {
+    font-size: 16px;
+    font-weight: var(--manual-weight-semibold);
+    color: var(--manual-text-primary);
+    margin: 0 0 12px 0;
+}
+
+.state-card ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.state-card li {
+    font-size: 14px;
+    color: var(--manual-text-secondary);
+    margin-bottom: 6px;
+    line-height: 1.5;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .showcase-header h1 {
+        font-size: 24px;
+    }
+
+    .showcase-section {
+        padding: 20px;
+    }
+
+    .showcase-demo {
+        flex-direction: column;
+    }
+
+    .showcase-states {
+        grid-template-columns: 1fr;
+    }
+}

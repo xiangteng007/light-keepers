@@ -1,0 +1,1 @@
+export { ManualHomePage } from './ManualHomePage';

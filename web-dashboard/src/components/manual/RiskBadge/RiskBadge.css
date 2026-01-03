@@ -1,0 +1,50 @@
+/* ============================================
+   RiskBadge Component Styles
+   完整風險標籤（色塊 + 圖示 + 文字）
+============================================ */
+
+.risk-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    border-radius: var(--manual-radius-sm);
+    font-size: var(--manual-font-small);
+    font-weight: var(--manual-weight-semibold);
+    line-height: var(--manual-line-height-tight);
+    white-space: nowrap;
+}
+
+.risk-badge__icon {
+    display: flex;
+    align-items: center;
+    font-size: var(--manual-font-small);
+}
+
+.risk-badge__text {
+    font-size: var(--manual-font-small);
+}
+
+/* 低風險 - 深綠 */
+.risk-badge--low {
+    background: var(--manual-risk-low);
+    color: white;
+}
+
+/* 中風險 - 橙色 */
+.risk-badge--medium {
+    background: var(--manual-risk-medium);
+    color: white;
+}
+
+/* 高風險 - 深紅 */
+.risk-badge--high {
+    background: var(--manual-risk-high);
+    color: white;
+}
+
+/* 極危 - 紫紅 */
+.risk-badge--critical {
+    background: var(--manual-risk-critical);
+    color: white;
+}

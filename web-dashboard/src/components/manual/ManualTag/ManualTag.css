@@ -1,0 +1,53 @@
+/* ============================================
+   ManualTag Component Styles
+   邊框標籤樣式（透明背景、深藍邊框）
+============================================ */
+
+.manual-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    /* 邊框樣式 - 默認 */
+    background: transparent;
+    border: 1px solid var(--manual-primary);
+    color: var(--manual-primary);
+
+    padding: 4px 12px;
+    border-radius: var(--manual-radius-sm);
+    font-size: var(--manual-font-small);
+    font-weight: var(--manual-weight-normal);
+    line-height: var(--manual-line-height-normal);
+    white-space: nowrap;
+
+    transition: all var(--manual-transition-normal);
+}
+
+/* Clickable 狀態 */
+.manual-tag--clickable {
+    cursor: pointer;
+}
+
+.manual-tag--clickable:hover {
+    border-color: var(--manual-accent);
+    color: var(--manual-accent);
+    background: rgba(217, 151, 6, 0.05);
+}
+
+.manual-tag--clickable:focus-visible {
+    outline: 2px solid var(--manual-accent);
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(217, 151, 6, 0.1);
+}
+
+/* Selected 狀態 - 填充金色 */
+.manual-tag--selected {
+    background: var(--manual-accent-50);
+    border-color: var(--manual-accent);
+    color: var(--manual-primary);
+    font-weight: var(--manual-weight-medium);
+}
+
+.manual-tag--selected:hover {
+    background: var(--manual-accent-70);
+}

@@ -8,10 +8,11 @@ import {
     Param,
     Query,
     UseGuards,
+    Request,
 } from '@nestjs/common';
 import { CommunityService, CreatePostDto, CreateCommentDto, PostFilter } from './community.service';
 import { PostCategory } from './community.entity';
-import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, ResourceOwnerGuard, ResourceOwner } from '../shared/guards';
 
 @Controller('community')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -65,13 +66,17 @@ export class CommunityController {
         };
     }
 
-    // 更新貼文
+    // 更新貼文 - 🔐 使用 JWT 用戶身份防止 IDOR
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard, ResourceOwnerGuard)
+    @ResourceOwner({ entity: 'CommunityPost', ownerField: 'authorId', bypassLevel: ROLE_LEVELS.OFFICER })
     @Patch('posts/:id')
     async updatePost(
         @Param('id') id: string,
-        @Body() dto: Partial<CreatePostDto> & { authorId: string },
+        @Body() dto: Partial<CreatePostDto>,
+        @Request() req: { user: { sub: string } },
     ) {
-        const post = await this.communityService.updatePost(id, dto.authorId, dto);
+        // 使用 JWT 中的用戶 ID，而非客戶端提供的 authorId
+        const post = await this.communityService.updatePost(id, req.user.sub, dto);
         return {
             success: true,
             message: '貼文已更新',
@@ -79,14 +84,17 @@ export class CommunityController {
         };
     }
 
-    // 刪除貼文
+    // 刪除貼文 - 🔐 使用 JWT 用戶身份防止 IDOR
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard, ResourceOwnerGuard)
+    @ResourceOwner({ entity: 'CommunityPost', ownerField: 'authorId', bypassLevel: ROLE_LEVELS.OFFICER })
     @Delete('posts/:id')
     async deletePost(
         @Param('id') id: string,
-        @Query('authorId') authorId: string,
-        @Query('isAdmin') isAdmin?: string,
+        @Request() req: { user: { sub: string; roleLevel: number } },
     ) {
-        await this.communityService.deletePost(id, authorId, isAdmin === 'true');
+        // 使用 JWT 中的用戶 ID 和角色等級
+        const isAdmin = req.user.roleLevel >= ROLE_LEVELS.OFFICER;
+        await this.communityService.deletePost(id, req.user.sub, isAdmin);
         return {
             success: true,
             message: '貼文已刪除',
@@ -137,14 +145,16 @@ export class CommunityController {
         };
     }
 
-    // 刪除評論
+    // 刪除評論 - 🔐 使用 JWT 用戶身份防止 IDOR
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard, ResourceOwnerGuard)
+    @ResourceOwner({ entity: 'PostComment', ownerField: 'authorId', bypassLevel: ROLE_LEVELS.OFFICER })
     @Delete('comments/:id')
     async deleteComment(
         @Param('id') id: string,
-        @Query('authorId') authorId: string,
-        @Query('isAdmin') isAdmin?: string,
+        @Request() req: { user: { sub: string; roleLevel: number } },
     ) {
-        await this.communityService.deleteComment(id, authorId, isAdmin === 'true');
+        const isAdmin = req.user.roleLevel >= ROLE_LEVELS.OFFICER;
+        await this.communityService.deleteComment(id, req.user.sub, isAdmin);
         return {
             success: true,
             message: '評論已刪除',
@@ -153,13 +163,14 @@ export class CommunityController {
 
     // ===== 按讚 =====
 
-    // 切換按讚
+    // 切換按讚 - 🔐 使用 JWT 用戶身份
     @Post('posts/:postId/like')
     async toggleLike(
         @Param('postId') postId: string,
-        @Body() dto: { userId: string },
+        @Request() req: { user: { sub: string } },
     ) {
-        const result = await this.communityService.toggleLike(postId, dto.userId);
+        // 使用 JWT 中的用戶 ID，而非客戶端提供的 userId
+        const result = await this.communityService.toggleLike(postId, req.user.sub);
         return {
             success: true,
             message: result.liked ? '已按讚' : '已取消按讚',

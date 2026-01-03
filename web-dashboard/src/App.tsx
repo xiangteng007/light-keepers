@@ -11,6 +11,8 @@ import MapPage from './pages/MapPage'
 import NcdrAlertsPage from './pages/NcdrAlertsPage'
 import ManualsPage from './pages/ManualsPage'
 import ManualDetailPage from './pages/ManualDetailPage'
+import { ManualHomePage } from './pages/manual'
+import { ComponentShowcase } from './pages/ComponentShowcase'
 import ReportPage from './pages/ReportPage'
 import VolunteersPage from './pages/VolunteersPage'
 import VolunteerDetailPage from './pages/VolunteerDetailPage'
@@ -100,6 +102,7 @@ function App() {
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
+          <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
@@ -109,6 +112,7 @@ function App() {
             <Route path="forecast" element={<ForecastPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:id" element={<ManualDetailPage />} />
+            <Route path="manuals-v3" element={<ManualHomePage />} /> {/* 新版災防手冊首頁 */}
             {/* 志工等級 (1) */}
             <Route path="events" element={<ProtectedRoute requiredLevel={1}><EventsPage /></ProtectedRoute>} />
             <Route path="report" element={<ProtectedRoute requiredLevel={1}><ReportPage /></ProtectedRoute>} />
