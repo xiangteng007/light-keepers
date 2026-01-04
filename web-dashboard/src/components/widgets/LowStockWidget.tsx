@@ -6,50 +6,8 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, Badge } from '../../design-system';
-
-// VITE_API_URL 不含 /api/v1，需要手動加上
-const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
-
-interface LowStockResource {
-    id: string;
-    name: string;
-    category: string;
-    quantity: number;
-    minQuantity: number;
-    unit: string;
-    status: 'low' | 'depleted';
-    location?: string;
-}
-
-interface ExpiringResource {
-    id: string;
-    name: string;
-    category: string;
-    quantity: number;
-    unit: string;
-    expiresAt: string;
-    location?: string;
-}
-
-async function getLowStockResources(): Promise<LowStockResource[]> {
-    try {
-        const response = await fetch(`${API_BASE}/resources/low-stock`);
-        const data = await response.json();
-        return data.data || [];
-    } catch {
-        return [];
-    }
-}
-
-async function getExpiringResources(days: number = 30): Promise<ExpiringResource[]> {
-    try {
-        const response = await fetch(`${API_BASE}/resources/expiring?days=${days}`);
-        const data = await response.json();
-        return data.data || [];
-    } catch {
-        return [];
-    }
-}
+import { getLowStockResources, getExpiringResources } from '../../api/services';
+import type { Resource } from '../../api/services';
 
 function getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
@@ -84,13 +42,13 @@ function formatDaysRemaining(expiresAt: string): { text: string; urgent: boolean
 export function LowStockWidget() {
     const { data: lowStockItems, isLoading: loadingLow } = useQuery({
         queryKey: ['lowStockResources'],
-        queryFn: getLowStockResources,
+        queryFn: () => getLowStockResources().then(res => res.data as Resource[]).catch(() => []),
         refetchInterval: 300000, // 5 分鐘刷新一次
     });
 
     const { data: expiringItems, isLoading: loadingExpiring } = useQuery({
         queryKey: ['expiringResources'],
-        queryFn: () => getExpiringResources(30),
+        queryFn: () => getExpiringResources(30).then(res => res.data as Resource[]).catch(() => []),
         refetchInterval: 300000,
     });
 
@@ -122,6 +80,7 @@ export function LowStockWidget() {
 
     // 即期品告警
     expiringItems?.forEach((item) => {
+        if (!item.expiresAt) return; // Skip items without expiry date
         const { text, urgent } = formatDaysRemaining(item.expiresAt);
         allAlerts.push({
             id: `exp-${item.id}`,

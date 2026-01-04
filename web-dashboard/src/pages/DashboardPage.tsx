@@ -84,10 +84,11 @@ export default function DashboardPage() {
         queryFn: () => getEventStats().then(res => res.data.data),
     });
 
-    // 獲取任務統計
+    // 獲取任務統計 (Level 2+ 需要)
     const { data: taskStats, isLoading: tasksLoading } = useQuery({
         queryKey: ['taskStats'],
         queryFn: () => getTaskStats().then(res => res.data.data),
+        enabled: roleLevel >= 2, // 只有 Level 2+ 才需要這個資料
     });
 
     // 獲取最新事件
@@ -105,16 +106,18 @@ export default function DashboardPage() {
         refetchInterval: 60000, // 每分鐘刷新
     });
 
-    // 獲取志工統計 (真實 API)
+    // 獲取志工統計 (Level 2+ 需要)
     const { data: volunteerStats } = useQuery({
         queryKey: ['volunteerStats'],
         queryFn: () => getVolunteerStats().then(res => res.data.data),
+        enabled: roleLevel >= 2, // 只有 Level 2+ 才需要這個資料
     });
 
-    // 獲取回報統計 (真實 API)
+    // 獲取回報統計 (Level 1+ 需要)
     const { data: reportStats } = useQuery({
         queryKey: ['reportStats'],
         queryFn: () => getReportStats().then(res => res.data.data),
+        enabled: roleLevel >= 1, // 只有 Level 1+ 才需要這個資料
     });
 
     // 計算完成率
