@@ -64,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
 
     // 載入使用者資訊
-    const loadUser = async () => {
+    const loadUser = async (retryCount = 0) => {
         const token = getStoredToken();
         if (!token) {
             setUser(null);
@@ -73,9 +73,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         }
 
         try {
-            // 添加5秒超時機制，避免後端未運行時無限等待
+            // 增加到 15 秒超時機制，應對 Cloud Run cold start
             const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('API timeout')), 5000);
+                setTimeout(() => reject(new Error('API timeout')), 15000);
             });
 
             const response = await Promise.race([
@@ -85,8 +85,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
             setUser(response.data);
         } catch (error) {
+            const isTimeout = error instanceof Error && error.message === 'API timeout';
+            const isAuthError = (error as any)?.response?.status === 401;
+
             console.error('Failed to load user profile:', error);
-            clearToken();
+
+            // Timeout 且有重試次數時，重試一次
+            if (isTimeout && retryCount < 1) {
+                console.log('Profile load timeout, retrying...');
+                return loadUser(retryCount + 1);
+            }
+
+            // 只有認證錯誤才清除 token
+            if (isAuthError) {
+                clearToken();
+            }
             setUser(null);
         } finally {
             setIsLoading(false);
