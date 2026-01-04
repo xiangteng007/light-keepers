@@ -26,6 +26,8 @@ export class CloudLoggerService implements NestLoggerService {
             const loggingWinston = new LoggingWinston({
                 projectId: process.env.GCP_PROJECT_ID || 'light-keepers-mvp',
                 // Cloud Run 會自動取得憑證，不需要 keyFilename
+                redirectToStdout: true,  // 非阻塞！輸出到 stdout 由 Cloud Run 自動收集
+                useMessageField: true,   // 保持訊息結構化
             });
             transports.push(loggingWinston);
         }
