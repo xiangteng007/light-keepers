@@ -1,0 +1,724 @@
+/* ============================================
+   Command Center Dashboard - 指揮中心設計系統
+   深色科技感 + 金色重點 + 玻璃擬態
+   依 command-center-design-spec.md 規範
+============================================ */
+
+/* ============================================
+   1. Design Tokens
+============================================ */
+
+:root {
+    /* === 背景色 === */
+    --cc-bg-base: #0A1628;
+    --cc-bg-card: rgba(15, 23, 42, 0.7);
+    --cc-bg-card-solid: #0F172A;
+    --cc-bg-elevated: rgba(30, 41, 59, 0.8);
+    --cc-bg-overlay: rgba(0, 0, 0, 0.6);
+
+    /* === 主色 (Golden Amber) === */
+    --cc-primary: #D97706;
+    --cc-primary-hover: #F59E0B;
+    --cc-primary-muted: rgba(217, 119, 6, 0.2);
+    --cc-primary-glow: rgba(217, 119, 6, 0.3);
+
+    /* === 文字色 === */
+    --cc-text-primary: #FFFFFF;
+    --cc-text-secondary: #94A3B8;
+    --cc-text-muted: #64748B;
+    --cc-text-disabled: #475569;
+
+    /* === 邊框色 === */
+    --cc-border-default: rgba(255, 255, 255, 0.08);
+    --cc-border-hover: rgba(255, 255, 255, 0.15);
+    --cc-border-focus: #D97706;
+
+    /* === 狀態色 - 警示 === */
+    --cc-critical: #DC2626;
+    --cc-high: #F97316;
+    --cc-medium: #FBBF24;
+    --cc-low: #22C55E;
+
+    /* === 狀態色 - 功能 === */
+    --cc-success: #22C55E;
+    --cc-warning: #FBBF24;
+    --cc-danger: #DC2626;
+    --cc-info: #3B82F6;
+
+    /* === 玻璃效果 === */
+    --cc-glass-blur: 16px;
+    --cc-glass-bg: rgba(15, 23, 42, 0.7);
+
+    /* === 陰影 === */
+    --cc-shadow-card: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --cc-shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --cc-shadow-glow: 0 0 20px rgba(217, 119, 6, 0.3);
+
+    /* === 字型 === */
+    --cc-font-display: 36px;
+    --cc-font-h1: 24px;
+    --cc-font-h2: 18px;
+    --cc-font-h3: 16px;
+    --cc-font-body: 14px;
+    --cc-font-small: 13px;
+    --cc-font-caption: 12px;
+
+    /* === 間距 === */
+    --cc-spacing-xs: 4px;
+    --cc-spacing-sm: 8px;
+    --cc-spacing-md: 16px;
+    --cc-spacing-lg: 24px;
+    --cc-spacing-xl: 32px;
+
+    /* === 圓角 === */
+    --cc-radius-sm: 4px;
+    --cc-radius-md: 8px;
+    --cc-radius-lg: 12px;
+    --cc-radius-xl: 16px;
+    --cc-radius-full: 9999px;
+}
+
+/* ============================================
+   2. Dashboard Page Container
+============================================ */
+
+.dashboard-page {
+    background: var(--cc-bg-base);
+    min-height: 100vh;
+    color: var(--cc-text-primary);
+}
+
+/* Override layout for command center */
+.layout:has(.dashboard-page) {
+    background: var(--cc-bg-base);
+}
+
+.layout:has(.dashboard-page) .main-content {
+    background: var(--cc-bg-base);
+}
+
+/* ============================================
+   3. Top Bar (Page Header)
+============================================ */
+
+.dashboard-page .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--cc-spacing-md) 0;
+    margin-bottom: var(--cc-spacing-lg);
+    border-bottom: 1px solid var(--cc-border-default);
+}
+
+.dashboard-page .page-header h2 {
+    font-size: var(--cc-font-h1);
+    font-weight: 700;
+    color: var(--cc-text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--cc-spacing-sm);
+}
+
+.dashboard-page .page-subtitle {
+    font-size: var(--cc-font-small);
+    color: var(--cc-text-muted);
+    margin-top: var(--cc-spacing-xs);
+}
+
+.dashboard-page .page-header__right {
+    display: flex;
+    align-items: center;
+    gap: var(--cc-spacing-md);
+}
+
+/* ============================================
+   4. KPI Stats Grid (6 等寬卡片)
+============================================ */
+
+.stats-grid--6 {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: var(--cc-spacing-md);
+    margin-bottom: var(--cc-spacing-xl);
+}
+
+/* KPI Tile */
+.stat-card-vi {
+    background: var(--cc-glass-bg);
+    backdrop-filter: blur(var(--cc-glass-blur));
+    -webkit-backdrop-filter: blur(var(--cc-glass-blur));
+    border: 1px solid var(--cc-border-default);
+    border-radius: var(--cc-radius-lg);
+    padding: var(--cc-spacing-lg);
+    text-align: center;
+    transition: all 0.2s ease;
+    box-shadow: var(--cc-shadow-card);
+}
+
+.stat-card-vi:hover {
+    border-color: var(--cc-border-hover);
+    transform: translateY(-2px);
+    box-shadow: var(--cc-shadow-elevated);
+}
+
+.stat-card-vi__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cc-spacing-sm);
+}
+
+.stat-card-vi__icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--cc-radius-full);
+    background: var(--cc-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 12px var(--cc-primary-glow);
+    margin-bottom: var(--cc-spacing-xs);
+}
+
+.stat-card-vi__data {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.stat-card-vi__value {
+    font-size: var(--cc-font-display);
+    font-weight: 700;
+    color: var(--cc-text-primary);
+    line-height: 1.2;
+    font-variant-numeric: tabular-nums;
+}
+
+.stat-card-vi__value--success {
+    color: var(--cc-success);
+}
+
+.stat-card-vi__value--warning {
+    color: var(--cc-warning);
+}
+
+.stat-card-vi__value--danger {
+    color: var(--cc-danger);
+}
+
+.stat-card-vi__value--info {
+    color: var(--cc-info);
+}
+
+.stat-card-vi__label {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: var(--cc-spacing-xs);
+}
+
+/* Trend indicators */
+.trend {
+    font-size: 14px;
+    margin-left: 4px;
+}
+
+.trend--up {
+    color: var(--cc-success);
+}
+
+.trend--down {
+    color: var(--cc-danger);
+}
+
+/* ============================================
+   5. Dashboard Alert
+============================================ */
+
+.dashboard-alert {
+    background: rgba(251, 191, 36, 0.1);
+    border: 1px solid rgba(251, 191, 36, 0.3);
+    border-left: 3px solid var(--cc-warning);
+    border-radius: var(--cc-radius-md);
+    margin-bottom: var(--cc-spacing-lg);
+    color: var(--cc-text-primary);
+}
+
+/* ============================================
+   6. Main Content Sections (3-column)
+============================================ */
+
+.dashboard-sections--3col {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cc-spacing-md);
+    margin-bottom: var(--cc-spacing-lg);
+}
+
+.dashboard-sections {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--cc-spacing-md);
+    margin-bottom: var(--cc-spacing-lg);
+}
+
+/* ============================================
+   7. Glass Card Override
+============================================ */
+
+.dashboard-page .lk-card,
+.dashboard-page [class*="Card"] {
+    background: var(--cc-glass-bg) !important;
+    backdrop-filter: blur(var(--cc-glass-blur));
+    -webkit-backdrop-filter: blur(var(--cc-glass-blur));
+    border: 1px solid var(--cc-border-default) !important;
+    border-radius: var(--cc-radius-xl) !important;
+    box-shadow: var(--cc-shadow-card);
+    color: var(--cc-text-primary);
+}
+
+.dashboard-page .lk-card:hover,
+.dashboard-page [class*="Card"]:hover {
+    border-color: var(--cc-border-hover) !important;
+}
+
+.dashboard-page .lk-card__header,
+.dashboard-page [class*="Card"] [class*="header"] {
+    border-bottom: 1px solid var(--cc-border-default);
+    color: var(--cc-text-primary);
+}
+
+.dashboard-page .lk-card__title,
+.dashboard-page [class*="Card"] [class*="title"] {
+    color: var(--cc-text-primary) !important;
+    font-weight: 600;
+}
+
+/* ============================================
+   8. Quick Actions Grid (2x2)
+============================================ */
+
+.quick-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--cc-spacing-md);
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cc-spacing-sm);
+    padding: var(--cc-spacing-lg);
+    background: var(--cc-primary-muted);
+    border: 1px solid rgba(217, 119, 6, 0.3);
+    border-radius: var(--cc-radius-lg);
+    color: var(--cc-text-primary);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    min-height: 100px;
+}
+
+.quick-action-btn:hover {
+    background: rgba(217, 119, 6, 0.3);
+    border-color: var(--cc-primary);
+    transform: translateY(-2px);
+    box-shadow: var(--cc-shadow-glow);
+}
+
+.quick-action-btn__icon {
+    font-size: 32px;
+    color: var(--cc-primary);
+}
+
+.quick-action-btn__label {
+    font-size: var(--cc-font-body);
+    font-weight: 500;
+    color: var(--cc-text-primary);
+}
+
+/* ============================================
+   9. Alert List (Real-time Alerts)
+============================================ */
+
+.alert-list-v2 {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cc-spacing-sm);
+}
+
+.alert-card-v2 {
+    padding: var(--cc-spacing-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--cc-radius-md);
+    border-left: 3px solid var(--cc-medium);
+    transition: background 0.2s ease;
+}
+
+.alert-card-v2:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.alert-card-v2--critical {
+    border-left-color: var(--cc-critical);
+}
+
+.alert-card-v2--warning {
+    border-left-color: var(--cc-high);
+}
+
+.alert-card-v2--info {
+    border-left-color: var(--cc-medium);
+}
+
+.alert-card-v2__header {
+    display: flex;
+    align-items: center;
+    gap: var(--cc-spacing-sm);
+    margin-bottom: var(--cc-spacing-xs);
+}
+
+.alert-card-v2__severity {
+    font-size: 10px;
+}
+
+.alert-card-v2__type {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-secondary);
+    flex: 1;
+}
+
+.alert-card-v2__time {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-muted);
+}
+
+.alert-card-v2__title {
+    font-size: var(--cc-font-body);
+    font-weight: 600;
+    color: var(--cc-text-primary);
+    line-height: 1.4;
+}
+
+.alert-card-v2__source {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-muted);
+    margin-top: var(--cc-spacing-xs);
+}
+
+/* ============================================
+   10. Event List (Latest Events Feed)
+============================================ */
+
+.event-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cc-spacing-sm);
+}
+
+.event-item {
+    display: flex;
+    align-items: center;
+    gap: var(--cc-spacing-md);
+    padding: var(--cc-spacing-sm) 0;
+    border-bottom: 1px solid var(--cc-border-default);
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-title {
+    flex: 1;
+    font-size: var(--cc-font-body);
+    color: var(--cc-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.event-time {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-muted);
+    white-space: nowrap;
+}
+
+/* ============================================
+   11. Resource Grid (Volunteer Overview)
+============================================ */
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--cc-spacing-md);
+}
+
+.resource-item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--cc-spacing-xs);
+    padding: var(--cc-spacing-md);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--cc-radius-md);
+}
+
+.resource-label {
+    font-size: var(--cc-font-caption);
+    color: var(--cc-text-secondary);
+}
+
+.resource-value {
+    font-size: var(--cc-font-h2);
+    font-weight: 700;
+    color: var(--cc-text-primary);
+}
+
+.resource-value--success {
+    color: var(--cc-success);
+}
+
+.resource-value--warning {
+    color: var(--cc-warning);
+}
+
+/* ============================================
+   12. Map Preview
+============================================ */
+
+.map-preview-v2 {
+    text-align: center;
+}
+
+.map-preview-v2__visual {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(0, 0, 0, 0.2) 100%);
+    border-radius: var(--cc-radius-lg);
+    padding: var(--cc-spacing-xl);
+    margin-bottom: var(--cc-spacing-md);
+    min-height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.map-visual-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--cc-spacing-sm);
+}
+
+.map-icon {
+    font-size: 48px;
+    opacity: 0.6;
+}
+
+.map-text {
+    font-size: var(--cc-font-h3);
+    color: var(--cc-text-secondary);
+}
+
+.map-text-sub {
+    font-size: var(--cc-font-small);
+    color: var(--cc-text-muted);
+}
+
+.map-placeholder {
+    text-align: center;
+    padding: var(--cc-spacing-xl);
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: var(--cc-radius-lg);
+}
+
+.map-placeholder span {
+    display: block;
+    font-size: 48px;
+    margin-bottom: var(--cc-spacing-md);
+}
+
+.map-placeholder p {
+    color: var(--cc-text-secondary);
+    margin-bottom: var(--cc-spacing-md);
+}
+
+/* ============================================
+   13. View More Link
+============================================ */
+
+.view-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--cc-spacing-xs);
+    margin-top: var(--cc-spacing-md);
+    font-size: var(--cc-font-small);
+    color: var(--cc-primary);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.view-more-link:hover {
+    color: var(--cc-primary-hover);
+}
+
+/* ============================================
+   14. Empty State
+============================================ */
+
+.empty-state-mini {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--cc-spacing-sm);
+    padding: var(--cc-spacing-lg);
+    color: var(--cc-text-muted);
+    font-size: var(--cc-font-body);
+}
+
+.empty-icon {
+    font-size: 24px;
+}
+
+/* ============================================
+   15. Loading State
+============================================ */
+
+.loading {
+    text-align: center;
+    padding: var(--cc-spacing-lg);
+    color: var(--cc-text-muted);
+}
+
+/* ============================================
+   16. Badge Override for Dashboard
+============================================ */
+
+.dashboard-page .lk-badge {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cc-text-primary);
+    border: 1px solid var(--cc-border-default);
+}
+
+.dashboard-page .lk-badge--success {
+    background: rgba(34, 197, 94, 0.15);
+    color: var(--cc-success);
+    border-color: rgba(34, 197, 94, 0.3);
+}
+
+.dashboard-page .lk-badge--info {
+    background: rgba(59, 130, 246, 0.15);
+    color: var(--cc-info);
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+/* ============================================
+   17. Button Override for Dashboard
+============================================ */
+
+.dashboard-page .lk-btn--primary {
+    background: var(--cc-primary);
+    color: var(--cc-bg-card-solid);
+    border: none;
+}
+
+.dashboard-page .lk-btn--primary:hover {
+    background: var(--cc-primary-hover);
+    box-shadow: var(--cc-shadow-glow);
+}
+
+.dashboard-page .lk-btn--secondary {
+    background: transparent;
+    color: var(--cc-primary);
+    border: 1px solid var(--cc-primary);
+}
+
+.dashboard-page .lk-btn--secondary:hover {
+    background: var(--cc-primary-muted);
+}
+
+/* ============================================
+   18. RWD - 響應式設計
+============================================ */
+
+/* Tablet: 2-column */
+@media (max-width: 1024px) {
+    .stats-grid--6 {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .dashboard-sections--3col,
+    .dashboard-sections {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile: 1-column + scrollable KPI */
+@media (max-width: 768px) {
+    .stats-grid--6 {
+        display: flex;
+        overflow-x: auto;
+        gap: var(--cc-spacing-sm);
+        padding-bottom: var(--cc-spacing-sm);
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+    }
+
+    .stats-grid--6>* {
+        flex: 0 0 140px;
+        min-width: 140px;
+    }
+
+    .stat-card-vi {
+        padding: var(--cc-spacing-md);
+    }
+
+    .stat-card-vi__icon {
+        width: 40px;
+        height: 40px;
+        font-size: 20px;
+    }
+
+    .stat-card-vi__value {
+        font-size: 28px;
+    }
+
+    .dashboard-sections--3col,
+    .dashboard-sections {
+        grid-template-columns: 1fr;
+    }
+
+    .quick-actions-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--cc-spacing-sm);
+    }
+
+    .quick-action-btn {
+        padding: var(--cc-spacing-md);
+        min-height: 80px;
+    }
+
+    .quick-action-btn__icon {
+        font-size: 24px;
+    }
+
+    .resource-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--cc-spacing-sm);
+    }
+}
+
+/* Extra small mobile */
+@media (max-width: 480px) {
+    .dashboard-page .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--cc-spacing-md);
+    }
+
+    .dashboard-page .page-header__right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+}

@@ -82,11 +82,12 @@ define(['./workbox-137dedbd'], (function (workbox) { 'use strict';
     "revision": "3ca0b8505b4bec776b69afdba2768812"
   }, {
     "url": "index.html",
-    "revision": "0.ig55l6k90lo"
+    "revision": "0.k31k3m64spc"
   }], {});
   workbox.cleanupOutdatedCaches();
   workbox.registerRoute(new workbox.NavigationRoute(workbox.createHandlerBoundToURL("index.html"), {
-    allowlist: [/^\/$/]
+    allowlist: [/^\/$/],
+    denylist: [/^\/__\/.*/]
   }));
   workbox.registerRoute(/^https?:\/\/.*\/api\/v1\/.*/i, new workbox.NetworkFirst({
     "cacheName": "api-cache",
@@ -105,11 +106,25 @@ define(['./workbox-137dedbd'], (function (workbox) { 'use strict';
       maxAgeSeconds: 604800
     })]
   }), 'GET');
+  workbox.registerRoute(/^https:\/\/.*\.google\.com\/.*\/(vt|kh)\/.*/i, new workbox.CacheFirst({
+    "cacheName": "google-maps-tiles-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 1000,
+      maxAgeSeconds: 2592000
+    })]
+  }), 'GET');
   workbox.registerRoute(/\.(?:png|jpg|jpeg|svg|gif|webp)$/i, new workbox.CacheFirst({
     "cacheName": "images-cache",
     plugins: [new workbox.ExpirationPlugin({
       maxEntries: 100,
       maxAgeSeconds: 2592000
+    })]
+  }), 'GET');
+  workbox.registerRoute(/^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i, new workbox.CacheFirst({
+    "cacheName": "google-fonts-cache",
+    plugins: [new workbox.ExpirationPlugin({
+      maxEntries: 30,
+      maxAgeSeconds: 31536000
     })]
   }), 'GET');
 

@@ -41,6 +41,7 @@ import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 import { getTasks } from '../api/services';
+import './Layout.css';
 
 // ===== 類型定義 =====
 interface NavItem {
