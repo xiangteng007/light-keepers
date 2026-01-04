@@ -44,6 +44,7 @@ import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
+import EmergencyResponsePage from './pages/EmergencyResponsePage'
 import './App.css'
 
 
@@ -128,6 +129,7 @@ function App() {
             <Route path="my-points" element={<ProtectedRoute requiredLevel={1}><PointsReportPage /></ProtectedRoute>} />
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
+            <Route path="emergency-response" element={<ProtectedRoute requiredLevel={2}><EmergencyResponsePage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
             <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />

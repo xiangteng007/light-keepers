@@ -284,6 +284,34 @@
     font-weight: 500;
 }
 
+/* Emergency Launch Button */
+.cc-quick-btn--emergency {
+    background: rgba(220, 38, 38, 0.15);
+    border-color: rgba(220, 38, 38, 0.4);
+    animation: emergency-pulse 2s infinite;
+}
+
+.cc-quick-btn--emergency:hover {
+    background: rgba(220, 38, 38, 0.25);
+    border-color: #DC2626;
+}
+
+.cc-quick-btn--emergency .cc-quick-btn__icon {
+    color: #DC2626;
+}
+
+@keyframes emergency-pulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4);
+    }
+
+    50% {
+        box-shadow: 0 0 0 8px rgba(220, 38, 38, 0);
+    }
+}
+
 /* ===== ALERTS LIST ===== */
 .cc-alerts-list {
     display: flex;

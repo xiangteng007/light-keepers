@@ -148,6 +148,12 @@ export default function DashboardPage() {
                     </div>
                     <div className="cc-card__body">
                         <div className="cc-quick-grid">
+                            {roleLevel >= 2 && (
+                                <Link to="/emergency-response" className="cc-quick-btn cc-quick-btn--emergency">
+                                    <span className="cc-quick-btn__icon">🚨</span>
+                                    <span className="cc-quick-btn__label">緊急啟動</span>
+                                </Link>
+                            )}
                             <Link to="/map" className="cc-quick-btn">
                                 <span className="cc-quick-btn__icon">📍</span>
                                 <span className="cc-quick-btn__label">Map</span>

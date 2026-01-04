@@ -1,4 +1,9 @@
-# Emergency Response 任務指揮副系統 - 系統概要
+# Emergency Response 系統總覽
+
+> **⚠️ 重要設計原則**  
+> Emergency Response 副系統的設計**不受主系統 Command Center 深色主題約束**，採用獨立的 Light Theme（淺藍 + 金色）設計，強調清晰易讀與緊急情境下的視覺辨識度。
+
+## 產品定位- 系統概要
 
 **文件編號**：01  
 **版本**：1.0  
