@@ -53,6 +53,7 @@ export class AuthController {
             avatarUrl: account?.avatarUrl || null,
             lineLinked: !!(account?.lineUserId),
             googleLinked: !!(account?.googleId),
+            volunteerProfileCompleted: account?.volunteerProfileCompleted || false,
             roles: roles.map(r => r.name),
             roleLevel,
             roleDisplayName: roles.find(r => r.level === roleLevel)?.displayName || '一般民眾',

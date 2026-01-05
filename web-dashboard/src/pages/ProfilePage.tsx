@@ -387,8 +387,8 @@ export default function ProfilePage() {
         { id: 'profile' as const, label: '個人資料', icon: User },
         { id: 'security' as const, label: '安全設定', icon: Shield },
         { id: 'notifications' as const, label: '通知偏好', icon: Bell },
-        // 只有一般民眾（level 0）且尚未提交志工申請的才顯示志工登記 Tab
-        ...((user?.roleLevel === 0 && !volunteerSubmitted) ? [{ id: 'volunteer' as const, label: '志工登記', icon: ClipboardList }] : []),
+        // 只要尚未提交志工申請的用戶都顯示志工登記 Tab (不論權限等級)
+        ...((!volunteerSubmitted && !user?.volunteerProfileCompleted) ? [{ id: 'volunteer' as const, label: '志工登記', icon: ClipboardList }] : []),
     ];
 
     return (

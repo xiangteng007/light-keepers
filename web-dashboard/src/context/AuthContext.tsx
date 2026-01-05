@@ -19,6 +19,7 @@ export interface User {
     lineLinked?: boolean;
     googleLinked?: boolean;
     isAnonymous?: boolean;
+    volunteerProfileCompleted?: boolean;  // 是否已完成志工資料
 }
 
 // Auth Context 介面
