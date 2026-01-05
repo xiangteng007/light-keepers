@@ -8,6 +8,7 @@ const api = axios.create({
     headers: {
         'Content-Type': 'application/json',
     },
+    withCredentials: true, // Enable sending cookies with requests
 });
 
 // Helper: 獲取存儲的 token (from either localStorage or sessionStorage)
@@ -22,6 +23,40 @@ const clearToken = (): void => {
     sessionStorage.removeItem('accessToken');
 };
 
+// Helper: 存儲 token
+const storeToken = (token: string, remember: boolean = true): void => {
+    if (remember) {
+        localStorage.setItem('accessToken', token);
+        localStorage.setItem('rememberMe', 'true');
+        sessionStorage.removeItem('accessToken');
+    } else {
+        sessionStorage.setItem('accessToken', token);
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('rememberMe');
+    }
+};
+
+// Helper: 刷新 Access Token
+const refreshAccessToken = async (): Promise<string | null> => {
+    try {
+        const response = await axios.post(
+            `${API_BASE_URL}/api/v1/auth/refresh`,
+            {},
+            { withCredentials: true }
+        );
+
+        if (response.data?.accessToken) {
+            const remember = localStorage.getItem('rememberMe') === 'true';
+            storeToken(response.data.accessToken, remember);
+            return response.data.accessToken;
+        }
+        return null;
+    } catch (error) {
+        console.error('Token refresh failed:', error);
+        return null;
+    }
+};
+
 // 請求攔截器 - 添加 Token
 api.interceptors.request.use((config) => {
     const token = getStoredToken();
@@ -31,16 +66,28 @@ api.interceptors.request.use((config) => {
     return config;
 });
 
-// 回應攔截器 - 處理錯誤
+// 回應攔截器 - 處理錯誤和自動刷新
 api.interceptors.response.use(
     (response) => response,
-    (error) => {
+    async (error) => {
         const status = error.response?.status;
         const currentPath = window.location.pathname;
+        const originalRequest = error.config;
 
-        if (status === 401) {
-            // 401 = 需要登入但未登入或 token 過期
-            // 只有在非公開頁面時才清除 token 並重導向
+        if (status === 401 && !originalRequest._retry) {
+            // 401 = Token 過期或未認證
+            originalRequest._retry = true; // 防止無限重試
+
+            // 嘗試刷新 token
+            const newToken = await refreshAccessToken();
+
+            if (newToken) {
+                // 刷新成功,更新 header 並重試原請求
+                originalRequest.headers.Authorization = `Bearer ${newToken}`;
+                return api(originalRequest);
+            }
+
+            // 刷新失敗,清除 token 並重導向登入頁
             const publicPaths = ['/dashboard', '/map', '/ncdr-alerts', '/forecast', '/manuals', '/login', '/register'];
             const isPublicPath = publicPaths.some(p => currentPath.startsWith(p));
 
@@ -49,7 +96,6 @@ api.interceptors.response.use(
                 // 保留來源路徑以便登入後返回
                 window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
             }
-            // 公開頁面的 401 錯誤不重導向，讓組件自行處理
         }
 
         if (status === 403) {

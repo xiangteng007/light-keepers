@@ -1,8 +1,9 @@
-import { Injectable, NotFoundException, Logger } from '@nestjs/common';
+import { Injectable, NotFoundException, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Volunteer, VolunteerStatus } from './volunteers.entity';
 import { AccessLogService } from '../access-log/access-log.service';
+import { AccountsService } from '../accounts/accounts.service';
 import { CryptoUtil } from '../../common/crypto.util';
 
 export interface CreateVolunteerDto {
@@ -49,6 +50,8 @@ export class VolunteersService {
         @InjectRepository(Volunteer)
         private volunteersRepository: Repository<Volunteer>,
         private accessLogService: AccessLogService,
+        @Inject(forwardRef(() => AccountsService))
+        private accountsService: AccountsService,
     ) { }
 
     // 註冊志工（預設為待審核狀態）
@@ -251,23 +254,51 @@ export class VolunteersService {
         return query.getMany();
     }
 
-    // 審核通過
+    // 審核通過 (同步帳號權限)
     async approve(id: string, approvedBy: string, note?: string): Promise<Volunteer> {
         const volunteer = await this.findOne(id);
+
+        // 1. 更新志工審核狀態
         volunteer.approvalStatus = 'approved';
         volunteer.approvedBy = approvedBy;
         volunteer.approvedAt = new Date();
         volunteer.approvalNote = note || '';
         volunteer.status = 'available'; // 審核通過後設為可用
 
+        // 2. 生成志工編號 (如果沒有)
+        if (!volunteer.volunteerCode) {
+            volunteer.volunteerCode = await this.generateVolunteerCode();
+        }
+
         const updated = await this.volunteersRepository.save(volunteer);
         this.logger.log(`Volunteer ${id} approved by ${approvedBy}`);
+
+        // 3. 同步帳號權限 - 分配 volunteer role (Level 1)
+        if (volunteer.accountId) {
+            await this.accountsService.assignRoleInternal(
+                volunteer.accountId,
+                'volunteer'
+            );
+            this.logger.log(`Auto-assigned volunteer role to account ${volunteer.accountId}`);
+        }
+
         return updated;
     }
 
-    // 拒絕申請
+    // 生成志工編號
+    private async generateVolunteerCode(): Promise<string> {
+        const count = await this.volunteersRepository.count({
+            where: { approvalStatus: 'approved' }
+        });
+        const year = new Date().getFullYear();
+        return `LK${year}${String(count + 1).padStart(4, '0')}`; // 例如: LK202400001
+    }
+
+    // 拒絕申請 (確保沒有 volunteer role)
     async reject(id: string, rejectedBy: string, note?: string): Promise<Volunteer> {
         const volunteer = await this.findOne(id);
+
+        // 1. 更新志工審核狀態
         volunteer.approvalStatus = 'rejected';
         volunteer.approvedBy = rejectedBy;
         volunteer.approvedAt = new Date();
@@ -275,6 +306,40 @@ export class VolunteersService {
 
         const updated = await this.volunteersRepository.save(volunteer);
         this.logger.log(`Volunteer ${id} rejected by ${rejectedBy}`);
+
+        // 2. 確保帳號沒有 volunteer role
+        if (volunteer.accountId) {
+            await this.accountsService.removeRoleInternal(
+                volunteer.accountId,
+                'volunteer'
+            );
+            this.logger.log(`Removed volunteer role from account ${volunteer.accountId}`);
+        }
+
+        return updated;
+    }
+
+    // 暫停志工資格 (降級為 public)
+    async suspend(id: string, reason: string): Promise<Volunteer> {
+        const volunteer = await this.findOne(id);
+
+        // 1. 更新志工狀態
+        volunteer.approvalStatus = 'suspended';
+        volunteer.approvalNote = reason;
+        volunteer.status = 'offline'; // 暫停時設為離線
+
+        const updated = await this.volunteersRepository.save(volunteer);
+        this.logger.log(`Volunteer ${id} suspended: ${reason}`);
+
+        // 2. 降級帳號權限 (移除 volunteer role)
+        if (volunteer.accountId) {
+            await this.accountsService.removeRoleInternal(
+                volunteer.accountId,
+                'volunteer'
+            );
+            this.logger.log(`Removed volunteer role from suspended account ${volunteer.accountId}`);
+        }
+
         return updated;
     }
 

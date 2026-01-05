@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { EncryptedColumnTransformer } from '../../common/crypto.util';
 
 // 志工狀態
@@ -22,6 +22,13 @@ export class Volunteer {
     // 關聯帳號 ID
     @Column({ name: 'account_id', type: 'uuid', nullable: true })
     accountId?: string;
+
+    // ===== 新增: 帳號關聯 =====
+    // 一對一關聯到 Account (雙向)
+    // 使用 lazy loading 避免循環依賴
+    @OneToOne('Account', 'volunteer')
+    @JoinColumn({ name: 'account_id' })
+    account?: any;  // 使用 any 避免循環引用問題
 
     // ===== 基本資料 =====
 

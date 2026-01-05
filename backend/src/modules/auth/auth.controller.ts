@@ -18,8 +18,23 @@ export class AuthController {
     }
 
     @Post('login')
-    async login(@Body() dto: LoginDto) {
-        return this.authService.login(dto);
+    async login(
+        @Body() dto: LoginDto,
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.login(dto);
+
+        // Generate and set refresh token cookie
+        const refreshToken = await this.refreshTokenService.createRefreshToken(
+            result.user.id,
+            req.headers['user-agent'],
+            req.ip,
+        );
+
+        res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+
+        return result;
     }
 
     @Get('me')
@@ -101,8 +116,24 @@ export class AuthController {
      * 前端重導向回來時，用 authorization code 換取 access token
      */
     @Post('line/callback')
-    async lineCallback(@Body() body: { code: string; redirectUri: string }) {
-        return this.authService.exchangeLineCode(body.code, body.redirectUri);
+    async lineCallback(
+        @Body() body: { code: string; redirectUri: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.exchangeLineCode(body.code, body.redirectUri);
+
+        // Only set cookie if login was successful (not needsRegistration)
+        if ('accessToken' in result) {
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                result.user.id,
+                req.headers['user-agent'],
+                req.ip,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+        }
+
+        return result;
     }
 
     /**
@@ -110,8 +141,24 @@ export class AuthController {
      * 前端透過 LINE SDK 取得 access token 後呼叫此 API
      */
     @Post('line/login')
-    async loginWithLine(@Body() body: { accessToken: string }) {
-        return this.authService.loginWithLine(body.accessToken);
+    async loginWithLine(
+        @Body() body: { accessToken: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.loginWithLine(body.accessToken);
+
+        // Only set cookie if login was successful (not needsRegistration)
+        if ('accessToken' in result) {
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                result.user.id,
+                req.headers['user-agent'],
+                req.ip,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+        }
+
+        return result;
     }
 
     /**
@@ -159,8 +206,24 @@ export class AuthController {
      * 用於 SSO 無縫登入體驗
      */
     @Post('liff/login')
-    async loginWithLiffToken(@Body() body: { idToken: string }) {
-        return this.authService.loginWithLiffToken(body.idToken);
+    async loginWithLiffToken(
+        @Body() body: { idToken: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.loginWithLiffToken(body.idToken);
+
+        // Only set cookie if login was successful (not needsRegistration)
+        if ('accessToken' in result) {
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                result.user.id,
+                req.headers['user-agent'],
+                req.ip,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+        }
+
+        return result;
     }
 
     // =========================================
@@ -172,8 +235,24 @@ export class AuthController {
      * 前端重導向回來時，用 authorization code 換取 access token
      */
     @Post('google/callback')
-    async googleCallback(@Body() body: { code: string; redirectUri: string }) {
-        return this.authService.exchangeGoogleCode(body.code, body.redirectUri);
+    async googleCallback(
+        @Body() body: { code: string; redirectUri: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.exchangeGoogleCode(body.code, body.redirectUri);
+
+        // Only set cookie if login was successful (not needsRegistration)
+        if ('accessToken' in result) {
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                result.user.id,
+                req.headers['user-agent'],
+                req.ip,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+        }
+
+        return result;
     }
 
     /**
@@ -181,8 +260,24 @@ export class AuthController {
      * 前端透過 Google SDK 取得 access token 後呼叫此 API
      */
     @Post('google/login')
-    async loginWithGoogle(@Body() body: { accessToken: string }) {
-        return this.authService.loginWithGoogle(body.accessToken);
+    async loginWithGoogle(
+        @Body() body: { accessToken: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.loginWithGoogle(body.accessToken);
+
+        // Only set cookie if login was successful (not needsRegistration)
+        if ('accessToken' in result) {
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                result.user.id,
+                req.headers['user-agent'],
+                req.ip,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+        }
+
+        return result;
     }
 
     /**
@@ -235,8 +330,23 @@ export class AuthController {
      * 用於 Email/Password 和 Google Popup 登入方式
      */
     @Post('firebase/login')
-    async loginWithFirebaseToken(@Body() body: { idToken: string }) {
-        return this.authService.loginWithFirebaseToken(body.idToken);
+    async loginWithFirebaseToken(
+        @Body() body: { idToken: string },
+        @Request() req: any,
+        @Res({ passthrough: true }) res: Response,
+    ) {
+        const result = await this.authService.loginWithFirebaseToken(body.idToken);
+
+        // Generate and set refresh token cookie
+        const refreshToken = await this.refreshTokenService.createRefreshToken(
+            result.user.id,
+            req.headers['user-agent'],
+            req.ip,
+        );
+
+        res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+
+        return result;
     }
 
     // =========================================
@@ -561,7 +671,7 @@ export class AuthController {
             httpOnly: true,
             secure: isProduction,
             sameSite: isProduction ? 'strict' as const : 'lax' as const,
-            path: '/api/v1/auth',
+            path: '/', // Changed from '/api/v1/auth' to allow all requests to send cookie
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
         };
     }

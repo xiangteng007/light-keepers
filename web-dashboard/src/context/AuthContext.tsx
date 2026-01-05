@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
-import { getProfile } from '../api/services';
+import { getProfile, logout as apiLogout } from '../api/services';
+import axios from 'axios';
 
 // Token 存儲 key
 const TOKEN_KEY = 'accessToken';
@@ -58,6 +59,28 @@ const clearToken = (): void => {
     sessionStorage.removeItem(TOKEN_KEY);
 };
 
+// Helper: 刷新 Access Token
+const refreshAccessToken = async (): Promise<string | null> => {
+    try {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        const response = await axios.post(
+            `${API_BASE_URL}/api/v1/auth/refresh`,
+            {},
+            { withCredentials: true }
+        );
+
+        if (response.data?.accessToken) {
+            const remember = localStorage.getItem(REMEMBER_KEY) === 'true';
+            storeToken(response.data.accessToken, remember);
+            return response.data.accessToken;
+        }
+        return null;
+    } catch (error) {
+        console.error('[AuthContext] Token refresh failed:', error);
+        return null;
+    }
+};
+
 // AuthProvider 元件
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -65,11 +88,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 載入使用者資訊
     const loadUser = async (retryCount = 0) => {
-        const token = getStoredToken();
+        let token = getStoredToken();
+
+        // 如果沒有 token,嘗試用 refresh token 換取新的
         if (!token) {
-            setUser(null);
-            setIsLoading(false);
-            return;
+            console.log('[AuthContext] No token found, attempting refresh...');
+            token = await refreshAccessToken();
+            if (!token) {
+                setUser(null);
+                setIsLoading(false);
+                return;
+            }
         }
 
         try {
@@ -88,12 +117,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             const isTimeout = error instanceof Error && error.message === 'API timeout';
             const isAuthError = (error as any)?.response?.status === 401;
 
-            console.error('Failed to load user profile:', error);
+            console.error('[AuthContext] Failed to load user profile:', error);
 
             // Timeout 且有重試次數時，重試一次
             if (isTimeout && retryCount < 1) {
-                console.log('Profile load timeout, retrying...');
+                console.log('[AuthContext] Profile load timeout, retrying...');
                 return loadUser(retryCount + 1);
+            }
+
+            // 如果是 401,嘗試刷新 token
+            if (isAuthError && retryCount < 1) {
+                console.log('[AuthContext] 401 error, attempting token refresh...');
+                const newToken = await refreshAccessToken();
+                if (newToken) {
+                    return loadUser(retryCount + 1);
+                }
             }
 
             // 只有認證錯誤才清除 token
@@ -118,9 +156,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     // 登出
-    const logout = () => {
-        clearToken();
-        setUser(null);
+    const logout = async () => {
+        try {
+            // 呼叫後端 API 清除 refresh_token cookie
+            await apiLogout();
+        } catch (error) {
+            console.error('[AuthContext] Logout API failed:', error);
+        } finally {
+            // 無論 API 成功與否,都清除本地狀態
+            clearToken();
+            setUser(null);
+        }
     };
 
     // 刷新使用者資訊
@@ -141,6 +187,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         logout,
         refreshUser,
     };
+
+    // 自動刷新定時器 - 每 13 分鐘刷新一次 (token 15 分鐘過期)
+    useEffect(() => {
+        if (!user || user.isAnonymous) return;
+
+        console.log('[AuthContext] Setting up auto-refresh timer (every 13 minutes)');
+        const interval = setInterval(async () => {
+            console.log('[AuthContext] Auto-refreshing token...');
+            await refreshAccessToken();
+        }, 13 * 60 * 1000); // 13 分鐘
+
+        return () => {
+            console.log('[AuthContext] Clearing auto-refresh timer');
+            clearInterval(interval);
+        };
+    }, [user]);
 
     return (
         <AuthContext.Provider value={value}>

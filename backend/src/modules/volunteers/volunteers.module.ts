@@ -43,9 +43,17 @@ import { VolunteerLocationController } from './volunteer-location.controller';
 // Shared JWT Module (breaks circular dependency with AuthModule)
 import { SharedJwtModule } from '../shared/shared-jwt.module';
 
+// Import AccountsModule for permission sync
+import { AccountsModule } from '../accounts/accounts.module';
+
+// Import AccessLogModule for audit logging
+import { AccessLogModule } from '../access-log/access-log.module';
+
 @Module({
     imports: [
         SharedJwtModule, // Provides JwtAuthGuard without full AuthModule dependencies
+        AccountsModule,  // ✅ Provides AccountsService for permission sync
+        AccessLogModule, // ✅ Provides AccessLogService for audit logging
         TypeOrmModule.forFeature([
             // Core entities
             Volunteer,

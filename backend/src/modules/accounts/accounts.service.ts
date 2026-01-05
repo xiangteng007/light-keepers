@@ -398,4 +398,74 @@ export class AccountsService {
             message: '帳號已加入黑名單',
         };
     }
+
+    // =========================================
+    // 內部工具方法 (給志工系統使用,不檢查操作者權限)
+    // =========================================
+
+    /**
+     * 內部使用 - 分配角色 (不檢查操作者權限)
+     * 用於志工審核等系統自動權限同步
+     */
+    async assignRoleInternal(accountId: string, roleName: string): Promise<void> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            relations: ['roles'],
+        });
+
+        if (!account) {
+            console.warn(`[AccountsService] Cannot assign role: account ${accountId} not found`);
+            return;
+        }
+
+        const role = await this.roleRepository.findOne({ where: { name: roleName } });
+        if (!role) {
+            console.warn(`[AccountsService] Cannot assign role: role ${roleName} not found`);
+            return;
+        }
+
+        // 檢查是否已有此角色
+        if (!account.roles) {
+            account.roles = [];
+        }
+
+        const hasRole = account.roles.some(r => r.id === role.id);
+        if (!hasRole) {
+            account.roles.push(role);
+            await this.accountRepository.save(account);
+            console.log(`[AccountsService] Assigned role ${roleName} to account ${accountId}`);
+        } else {
+            console.log(`[AccountsService] Account ${accountId} already has role ${roleName}`);
+        }
+    }
+
+    /**
+     * 內部使用 - 移除角色 (不檢查操作者權限)
+     * 用於志工暫停等系統自動權限同步
+     */
+    async removeRoleInternal(accountId: string, roleName: string): Promise<void> {
+        const account = await this.accountRepository.findOne({
+            where: { id: accountId },
+            relations: ['roles'],
+        });
+
+        if (!account) {
+            console.warn(`[AccountsService] Cannot remove role: account ${accountId} not found`);
+            return;
+        }
+
+        if (!account.roles || account.roles.length === 0) {
+            return;  // 已經沒有角色了
+        }
+
+        const originalCount = account.roles.length;
+        account.roles = account.roles.filter(r => r.name !== roleName);
+
+        if (account.roles.length < originalCount) {
+            await this.accountRepository.save(account);
+            console.log(`[AccountsService] Removed role ${roleName} from account ${accountId}`);
+        } else {
+            console.log(`[AccountsService] Account ${accountId} did not have role ${roleName}`);
+        }
+    }
 }

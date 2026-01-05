@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToMany, JoinTable, OneToOne } from 'typeorm';
 import { Role } from './role.entity';
 
 @Entity('accounts')
@@ -101,4 +101,11 @@ export class Account {
         inverseJoinColumn: { name: 'role_id', referencedColumnName: 'id' },
     })
     roles: Role[];
+
+    // ===== 新增: 志工關聯 =====
+    // 一對一關聯到 Volunteer (雙向)
+    // 使用 lazy loading 避免循環依賴
+    @OneToOne('Volunteer', 'account')
+    volunteer?: any;  // 使用 any 避免循環引用問題
 }
+

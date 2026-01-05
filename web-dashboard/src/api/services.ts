@@ -12,6 +12,9 @@ export const register = (data: { email?: string; phone?: string; password: strin
 
 export const getProfile = () => api.get('/auth/me');
 
+// Logout - clears refresh_token cookie on server
+export const logout = () => api.post('/auth/logout');
+
 // ===== OTP 驗證 =====
 
 export const sendPhoneOtp = (phone: string) =>
