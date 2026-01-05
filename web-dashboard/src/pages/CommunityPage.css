@@ -330,6 +330,23 @@
     margin-left: auto;
 }
 
+.action-btn svg {
+    flex-shrink: 0;
+    color: currentColor;
+}
+
+.action-btn:first-child svg {
+    color: #ef4444;  /* 愛心紅色 */
+}
+
+.action-btn:nth-child(2) svg {
+    color: #3b82f6;  /* 留言藍色 */
+}
+
+.action-btn.view-count svg {
+    color: #6b7280;  /* 瀏覽灰色 */
+}
+
 /* Modal */
 .modal-overlay {
     position: fixed;
