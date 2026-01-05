@@ -246,11 +246,18 @@ async function seedVolunteers() {
         await volunteerRepo.clear();
         console.log('🗑️ 已清空現有志工資料');
 
-        // 植入新資料
+        // 植入新資料（設定為已審核通過狀態）
         for (const volunteerData of MOCK_VOLUNTEERS) {
-            const volunteer = volunteerRepo.create(volunteerData);
+            const volunteer = volunteerRepo.create({
+                ...volunteerData,
+                approvalStatus: 'approved', // 設定為已審核通過
+                approvedBy: 'system', // 系統自動核准
+                approvedAt: new Date(),
+                privacyConsent: true, // 個資同意
+                privacyConsentAt: new Date(),
+            });
             await volunteerRepo.save(volunteer);
-            console.log(`✅ 已新增志工: ${volunteerData.name}`);
+            console.log(`✅ 已新增志工: ${volunteerData.name} (已審核通過)`);
         }
 
         console.log(`\n🎉 成功植入 ${MOCK_VOLUNTEERS.length} 位志工資料！`);
