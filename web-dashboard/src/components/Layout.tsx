@@ -6,7 +6,6 @@ import {
     AlertTriangle,
     Siren,
     ClipboardList,
-    ClipboardCheck,
     Map,
     BookOpen,
     MessageSquareWarning,
@@ -122,7 +121,6 @@ const navGroups: NavGroup[] = [
             { id: 'my-insurance', path: '/my-insurance', label: '我的保險', icon: ShieldCheck, requiredLevel: 1 },
             { id: 'my-points', path: '/my-points', label: '我的積分', icon: Award, requiredLevel: 1 },
             { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1 },
-            { id: 'volunteer-register', path: '/volunteer-register', label: '登記志工', icon: ClipboardCheck, requiredLevel: 1 },
         ],
     },
     {
