@@ -21,6 +21,7 @@ interface LiffService {
     getIDToken: () => string | null;
     isInLineApp: () => boolean;
     closeWindow: () => void;
+    openWindow: (url: string, external?: boolean) => void;
 }
 
 class LiffServiceImpl implements LiffService {
@@ -138,6 +139,23 @@ class LiffServiceImpl implements LiffService {
     closeWindow(): void {
         if (this.isInClient) {
             liff.closeWindow();
+        }
+    }
+
+    /**
+     * 在外部瀏覽器開啟 URL (LINE App 內使用)
+     * @param url 要開啟的 URL
+     * @param external 是否強制使用外部瀏覽器（預設 true）
+     */
+    openWindow(url: string, external = true): void {
+        if (this.isInClient && this.isInitialized) {
+            liff.openWindow({
+                url,
+                external,
+            });
+        } else {
+            // 非 LINE App 內，直接跳轉
+            window.location.href = url;
         }
     }
 }

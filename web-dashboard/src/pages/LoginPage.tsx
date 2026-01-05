@@ -368,6 +368,16 @@ export default function LoginPage() {
         setIsLoading(true);
         setError(null);
 
+        // 偵測是否在 LINE 內嵌瀏覽器中
+        // LINE 內嵌瀏覽器無法使用 Google OAuth（disallowed_useragent）
+        if (liffService.isInLineApp()) {
+            // 在外部瀏覽器開啟登入頁面
+            liffService.openWindow(`${window.location.origin}/login?method=google`, true);
+            setError('請在外部瀏覽器完成 Google 登入');
+            setIsLoading(false);
+            return;
+        }
+
         try {
             const result = await firebaseAuthService.loginWithGoogle();
 
