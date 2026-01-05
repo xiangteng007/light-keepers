@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { VolunteersController } from './volunteers.controller';
+import { VolunteersAdminController } from './volunteers-admin.controller';
 import { VolunteersService } from './volunteers.service';
 import { Volunteer } from './volunteers.entity';
 import { VolunteerAssignment } from './volunteer-assignments.entity';
@@ -64,6 +65,7 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
     ],
     controllers: [
         VolunteersController,
+        VolunteersAdminController,
         AssignmentsController,
         // VMS Controllers
         SkillsController,
