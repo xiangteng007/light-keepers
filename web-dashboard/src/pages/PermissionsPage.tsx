@@ -201,6 +201,9 @@ export default function PermissionsPage() {
             acc.displayName.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    // 按 roleLevel 從高到低排序（志工權限頁面用）
+    const sortedFilteredAccounts = [...filteredAccounts].sort((a, b) => b.roleLevel - a.roleLevel);
+
     // Can operator modify this account
     const canModify = (targetLevel: number): boolean => {
         const operatorLevel = user?.roleLevel ?? 0;
@@ -485,10 +488,10 @@ export default function PermissionsPage() {
                         </div>
 
                         <div className="users-list">
-                            {filteredAccounts.length === 0 ? (
+                            {sortedFilteredAccounts.length === 0 ? (
                                 <div className="users-empty">沒有找到符合條件的用戶</div>
                             ) : (
-                                filteredAccounts.map(account => (
+                                sortedFilteredAccounts.map(account => (
                                     <div
                                         key={account.id}
                                         className={`user-card ${expandedUser === account.id ? 'expanded' : ''}`}
