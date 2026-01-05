@@ -723,11 +723,11 @@ export const getResourceStats = () => api.get<{
 
 // 取得低庫存物資
 export const getLowStockResources = () =>
-    api.get<Resource[]>('/resources/low-stock');
+    api.get<{ success: boolean; data: Resource[]; count: number }>('/resources/low-stock');
 
 // 取得即期品
 export const getExpiringResources = (days?: number) =>
-    api.get<Resource[]>('/resources/expiring', { params: { days } });
+    api.get<{ success: boolean; data: Resource[]; count: number }>('/resources/expiring', { params: { days } });
 
 // ===== 培訓系統爬蟲 Training Scraper =====
 

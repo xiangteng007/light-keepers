@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, Badge } from '../../design-system';
 import { getLowStockResources, getExpiringResources } from '../../api/services';
-import type { Resource } from '../../api/services';
 
 function getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
@@ -42,13 +41,13 @@ function formatDaysRemaining(expiresAt: string): { text: string; urgent: boolean
 export function LowStockWidget() {
     const { data: lowStockItems, isLoading: loadingLow } = useQuery({
         queryKey: ['lowStockResources'],
-        queryFn: () => getLowStockResources().then(res => res.data as Resource[]).catch(() => []),
+        queryFn: () => getLowStockResources().then(res => res.data.data ?? []).catch(() => []),
         refetchInterval: 300000, // 5 分鐘刷新一次
     });
 
     const { data: expiringItems, isLoading: loadingExpiring } = useQuery({
         queryKey: ['expiringResources'],
-        queryFn: () => getExpiringResources(30).then(res => res.data as Resource[]).catch(() => []),
+        queryFn: () => getExpiringResources(30).then(res => res.data.data ?? []).catch(() => []),
         refetchInterval: 300000,
     });
 
