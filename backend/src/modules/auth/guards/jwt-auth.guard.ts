@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -22,7 +22,7 @@ export class JwtAuthGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
-            return false;
+            throw new UnauthorizedException('No token provided');
         }
 
         try {
@@ -33,13 +33,16 @@ export class JwtAuthGuard implements CanActivate {
             });
 
             if (!user) {
-                return false;
+                throw new UnauthorizedException('User not found');
             }
 
             request.user = user;
             return true;
-        } catch {
-            return false;
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new UnauthorizedException('Invalid token');
         }
     }
 
