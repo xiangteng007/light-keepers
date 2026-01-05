@@ -30,7 +30,6 @@ import ProfilePage from './pages/ProfilePage'
 import PermissionsPage from './pages/PermissionsPage'
 import BindLinePage from './pages/BindLinePage'
 import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
-import VolunteerRegisterPage from './pages/VolunteerRegisterPage'
 import ForecastPage from './pages/ForecastPage'
 import DonationsPage from './pages/DonationsPage'
 import ResourcesPublicPage from './pages/ResourcesPublicPage'
@@ -119,7 +118,6 @@ function App() {
             <Route path="training" element={<ProtectedRoute requiredLevel={1}><TrainingPage /></ProtectedRoute>} />
             <Route path="notifications" element={<ProtectedRoute requiredLevel={1}><NotificationsPage /></ProtectedRoute>} />
             <Route path="profile" element={<ProtectedRoute requiredLevel={0}><ProfilePage /></ProtectedRoute>} />
-            <Route path="volunteer-register" element={<ProtectedRoute requiredLevel={0}><VolunteerRegisterPage /></ProtectedRoute>} />
             <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
             <Route path="community" element={<ProtectedRoute requiredLevel={1}><CommunityPage /></ProtectedRoute>} />
             <Route path="activities" element={<ProtectedRoute requiredLevel={1}><ActivitiesPage /></ProtectedRoute>} />

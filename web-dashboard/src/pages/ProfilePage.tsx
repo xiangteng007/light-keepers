@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut } from 'lucide-react';
+import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList } from 'lucide-react';
+import { createVolunteer } from '../api/services';
+import { Badge } from '../design-system';
 import './ProfilePage.css';
 
 // LINE Login Config
@@ -11,9 +13,21 @@ const LINE_REDIRECT_URI = `${window.location.origin}/profile?action=bind-line`;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const GOOGLE_REDIRECT_URI = `${window.location.origin}/profile?action=bind-google`;
 
+// 志工技能選項
+const SKILL_OPTIONS = [
+    { value: 'medical', label: '醫療救護', icon: '🏥' },
+    { value: 'rescue', label: '搜救救難', icon: '🚒' },
+    { value: 'logistics', label: '物資運送', icon: '📦' },
+    { value: 'cooking', label: '炑事料理', icon: '🍳' },
+    { value: 'communication', label: '通訊聯絡', icon: '📡' },
+    { value: 'driving', label: '駕駛運輸', icon: '🚗' },
+    { value: 'construction', label: '土木修繕', icon: '🔧' },
+    { value: 'social', label: '社工關懷', icon: '💝' },
+];
+
 export default function ProfilePage() {
     const { user, logout, refreshUser } = useAuth();
-    const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'volunteer'>('profile');
     const [isEditing, setIsEditing] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -41,6 +55,21 @@ export default function ProfilePage() {
         confirmPassword: '',
     });
     const [isChangingPassword, setIsChangingPassword] = useState(false);
+
+    // 志工登記表單狀態
+    const [volunteerForm, setVolunteerForm] = useState({
+        name: '',
+        phone: '',
+        email: user?.email || '',
+        region: '',
+        address: '',
+        skills: [] as string[],
+        emergencyContact: '',
+        emergencyPhone: '',
+        notes: '',
+    });
+    const [isVolunteerSubmitting, setIsVolunteerSubmitting] = useState(false);
+    const [volunteerSubmitted, setVolunteerSubmitted] = useState(false);
 
     // VITE_API_URL 不含 /api/v1，需要手動加上
     const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
@@ -316,10 +345,50 @@ export default function ProfilePage() {
         }
     };
 
+    // 志工技能選擇切換
+    const toggleSkill = (skillValue: string) => {
+        setVolunteerForm(prev => ({
+            ...prev,
+            skills: prev.skills.includes(skillValue)
+                ? prev.skills.filter(s => s !== skillValue)
+                : [...prev.skills, skillValue]
+        }));
+    };
+
+    // 志工登記綁定檢查
+    const hasLineBinding = !!user?.lineLinked;
+    const hasGoogleBinding = !!user?.googleLinked;
+    const canRegisterVolunteer = hasLineBinding && hasGoogleBinding;
+
+    // 提交志工申請
+    const handleVolunteerSubmit = async () => {
+        if (!volunteerForm.name || !volunteerForm.phone || !volunteerForm.region || !volunteerForm.emergencyContact || !volunteerForm.emergencyPhone) {
+            setMessage({ type: 'error', text: '請填寫必填欄位：姓名、電話、所在地區、緊急聯絡人、緊急聯絡電話' });
+            return;
+        }
+
+        setIsVolunteerSubmitting(true);
+        try {
+            await createVolunteer({
+                ...volunteerForm,
+                accountId: user?.id,
+            });
+            setVolunteerSubmitted(true);
+            setMessage({ type: 'success', text: '志工登記申請已送出！' });
+        } catch (err) {
+            console.error('Failed to register volunteer:', err);
+            setMessage({ type: 'error', text: '登記失敗，請稍後再試' });
+        } finally {
+            setIsVolunteerSubmitting(false);
+        }
+    };
+
     const tabs = [
         { id: 'profile' as const, label: '個人資料', icon: User },
         { id: 'security' as const, label: '安全設定', icon: Shield },
         { id: 'notifications' as const, label: '通知偏好', icon: Bell },
+        // 只有一般民眾（level 0）且尚未提交志工申請的才顯示志工登記 Tab
+        ...((user?.roleLevel === 0 && !volunteerSubmitted) ? [{ id: 'volunteer' as const, label: '志工登記', icon: ClipboardList }] : []),
     ];
 
     return (
@@ -550,6 +619,182 @@ export default function ProfilePage() {
                                     </label>
                                 </div>
                             </div>
+                        </div>
+                    )}
+
+                    {activeTab === 'volunteer' && (
+                        <div className="profile-section volunteer-register-section">
+                            <h2><ClipboardList size={20} /> 志工登記</h2>
+                            <p className="profile-section-desc">加入 Light Keepers 志工團隊</p>
+
+                            {volunteerSubmitted ? (
+                                <div className="register-success">
+                                    <span className="success-icon">✅</span>
+                                    <h3>志工登記申請已送出</h3>
+                                    <p>感謝您願意加入 Light Keepers 志工團隊！</p>
+                                    <p className="note">您的申請正在等待管理員審核，審核通過後您將收到通知。</p>
+                                </div>
+                            ) : !canRegisterVolunteer ? (
+                                <div className="binding-required">
+                                    <div className="binding-alert">
+                                        <span className="alert-icon">⚠️</span>
+                                        <h4>需要完成帳號綁定</h4>
+                                        <p>登記志工前，請先完成以下帳號綁定：</p>
+                                    </div>
+                                    <div className="binding-checklist">
+                                        <div className={`binding-item ${hasLineBinding ? 'done' : ''}`}>
+                                            <span className="binding-icon">{hasLineBinding ? '✅' : '❌'}</span>
+                                            <span>LINE 帳號綁定</span>
+                                            {!hasLineBinding && (
+                                                <button className="lk-btn lk-btn--sm lk-btn--primary" onClick={handleLineBind}>
+                                                    綁定
+                                                </button>
+                                            )}
+                                        </div>
+                                        <div className={`binding-item ${hasGoogleBinding ? 'done' : ''}`}>
+                                            <span className="binding-icon">{hasGoogleBinding ? '✅' : '❌'}</span>
+                                            <span>Google 帳號綁定</span>
+                                            {!hasGoogleBinding && (
+                                                <button className="lk-btn lk-btn--sm lk-btn--primary" onClick={handleGoogleBind}>
+                                                    綁定
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="volunteer-form">
+                                    <div className="form-row">
+                                        <div className="form-section">
+                                            <label className="form-label">姓名 *</label>
+                                            <input
+                                                type="text"
+                                                className="form-input"
+                                                placeholder="請輸入姓名"
+                                                value={volunteerForm.name}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, name: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="form-section">
+                                            <label className="form-label">電話 *</label>
+                                            <input
+                                                type="tel"
+                                                className="form-input"
+                                                placeholder="09XX-XXX-XXX"
+                                                value={volunteerForm.phone}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, phone: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-section">
+                                            <label className="form-label">Email</label>
+                                            <input
+                                                type="email"
+                                                className="form-input"
+                                                placeholder="volunteer@email.com"
+                                                value={volunteerForm.email}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, email: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="form-section">
+                                            <label className="form-label">所在地區 *</label>
+                                            <input
+                                                type="text"
+                                                className="form-input"
+                                                placeholder="例如：台北市中山區"
+                                                value={volunteerForm.region}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, region: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-section">
+                                        <label className="form-label">
+                                            詳細地址
+                                            <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            className="form-input form-input--private"
+                                            placeholder="詳細地址（選填）"
+                                            value={volunteerForm.address}
+                                            onChange={e => setVolunteerForm({ ...volunteerForm, address: e.target.value })}
+                                        />
+                                    </div>
+
+                                    <div className="form-section">
+                                        <label className="form-label">專長技能</label>
+                                        <div className="skills-grid">
+                                            {SKILL_OPTIONS.map(skill => (
+                                                <button
+                                                    key={skill.value}
+                                                    type="button"
+                                                    className={`skill-btn ${volunteerForm.skills.includes(skill.value) ? 'skill-btn--selected' : ''}`}
+                                                    onClick={() => toggleSkill(skill.value)}
+                                                >
+                                                    <span className="skill-btn__icon">{skill.icon}</span>
+                                                    <span className="skill-btn__label">{skill.label}</span>
+                                                    {volunteerForm.skills.includes(skill.value) && (
+                                                        <span className="skill-btn__check">✓</span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+
+                                    <div className="form-row">
+                                        <div className="form-section">
+                                            <label className="form-label">
+                                                緊急聯絡人 *
+                                                <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                            </label>
+                                            <input
+                                                type="text"
+                                                className="form-input form-input--private"
+                                                placeholder="聯絡人姓名"
+                                                value={volunteerForm.emergencyContact}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, emergencyContact: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="form-section">
+                                            <label className="form-label">
+                                                緊急聯絡電話 *
+                                                <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                            </label>
+                                            <input
+                                                type="tel"
+                                                className="form-input form-input--private"
+                                                placeholder="緊急聯絡電話"
+                                                value={volunteerForm.emergencyPhone}
+                                                onChange={e => setVolunteerForm({ ...volunteerForm, emergencyPhone: e.target.value })}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="form-section">
+                                        <label className="form-label">備註事項（過敏原或慢性疾病等需特別註記事項）</label>
+                                        <textarea
+                                            className="form-textarea"
+                                            placeholder="請填寫過敏原、慢性疾病或其他需要特別注意的事項..."
+                                            value={volunteerForm.notes}
+                                            onChange={e => setVolunteerForm({ ...volunteerForm, notes: e.target.value })}
+                                            rows={3}
+                                        />
+                                    </div>
+
+                                    <div className="form-actions">
+                                        <button
+                                            className="lk-btn lk-btn--primary"
+                                            onClick={handleVolunteerSubmit}
+                                            disabled={isVolunteerSubmitting}
+                                        >
+                                            {isVolunteerSubmitting ? '提交中...' : '✅ 提交申請'}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

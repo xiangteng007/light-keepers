@@ -532,3 +532,220 @@ input:checked+.slider:before {
         padding-top: 12px;
     }
 }
+
+/* ========== Volunteer Registration Section ========== */
+.volunteer-register-section .profile-section-desc {
+    margin-bottom: 24px;
+}
+
+/* Binding Required */
+.binding-required {
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+}
+
+.binding-alert {
+    margin-bottom: 20px;
+}
+
+.binding-alert .alert-icon {
+    font-size: 24px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.binding-alert h4 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.binding-alert p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.binding-checklist {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.binding-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--bg-card);
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.binding-item.done {
+    border-color: var(--success);
+    background: rgba(92, 184, 92, 0.05);
+}
+
+.binding-icon {
+    font-size: 18px;
+}
+
+.binding-item span:nth-child(2) {
+    flex: 1;
+    font-weight: 500;
+}
+
+/* Register Success */
+.register-success {
+    text-align: center;
+    padding: 48px 24px;
+}
+
+.register-success .success-icon {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.register-success h3 {
+    margin: 0 0 12px 0;
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--text-primary);
+    display: block;
+}
+
+.register-success p {
+    margin: 0 0 8px 0;
+    color: var(--text-secondary);
+}
+
+.register-success .note {
+    font-size: 13px;
+    color: var(--text-muted);
+}
+
+/* Volunteer Form */
+.volunteer-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.volunteer-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+}
+
+.volunteer-form .form-section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.volunteer-form .form-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.volunteer-form .form-input,
+.volunteer-form .form-textarea {
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    font-size: 15px;
+    font-family: inherit;
+    transition: border-color 0.2s ease;
+}
+
+.volunteer-form .form-input:focus,
+.volunteer-form .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.1);
+}
+
+.volunteer-form .form-input--private {
+    background: linear-gradient(90deg, var(--bg-secondary) 0%, rgba(196, 167, 125, 0.05) 100%);
+}
+
+.volunteer-form .form-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+/* Skills Grid */
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+}
+
+.skill-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 14px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.skill-btn:hover {
+    border-color: var(--accent-primary);
+    background: rgba(196, 167, 125, 0.05);
+}
+
+.skill-btn--selected {
+    border-color: var(--accent-primary);
+    background: rgba(196, 167, 125, 0.1);
+    color: var(--text-primary);
+}
+
+.skill-btn__icon {
+    font-size: 16px;
+}
+
+.skill-btn__label {
+    flex: 1;
+}
+
+.skill-btn__check {
+    color: var(--success);
+    font-weight: 600;
+}
+
+/* Form Actions */
+.volunteer-form .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 12px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .volunteer-form .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .skills-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
