@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, createParamDecorator } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, createParamDecorator, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
 
@@ -40,7 +40,7 @@ export class CoreJwtGuard implements CanActivate {
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
-            return false;
+            throw new UnauthorizedException('No token provided');
         }
 
         try {
@@ -57,8 +57,11 @@ export class CoreJwtGuard implements CanActivate {
             };
 
             return true;
-        } catch {
-            return false;
+        } catch (error) {
+            if (error instanceof UnauthorizedException) {
+                throw error;
+            }
+            throw new UnauthorizedException('Invalid token');
         }
     }
 
