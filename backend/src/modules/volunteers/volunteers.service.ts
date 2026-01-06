@@ -190,7 +190,8 @@ export class VolunteersService {
         let available = 0, busy = 0, offline = 0, totalServiceHours = 0;
 
         for (const v of volunteers) {
-            totalServiceHours += v.serviceHours;
+            // TypeORM decimal 欄位返回字串，需要轉換為數字
+            totalServiceHours += parseFloat(String(v.serviceHours)) || 0;
             if (v.status === 'available') available++;
             else if (v.status === 'busy') busy++;
             else if (v.status === 'offline') offline++;
@@ -201,7 +202,7 @@ export class VolunteersService {
             available,
             busy,
             offline,
-            totalServiceHours,
+            totalServiceHours: Math.round(totalServiceHours), // 取整數
         };
     }
 

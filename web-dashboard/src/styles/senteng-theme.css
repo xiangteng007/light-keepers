@@ -313,7 +313,10 @@ a:hover {
     font-weight: var(--font-medium);
     line-height: var(--leading-normal);
     text-decoration: none;
-    white-space: nowrap;
+    white-space: normal; /* 允許換行 */
+    text-align: center;
+    word-break: break-word; /* 長文字自動換行 */
+    max-width: 100%; /* 確保不超出容器 */
     border: 1px solid transparent;
     border-radius: var(--radius-lg);
     cursor: pointer;
