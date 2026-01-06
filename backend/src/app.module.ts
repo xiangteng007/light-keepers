@@ -98,6 +98,11 @@ import { DamageSimulationModule } from './modules/damage-simulation/damage-simul
 import { EvacuationSimModule } from './modules/evacuation-sim/evacuation-sim.module'; // 🚶 疏散模擬
 import { NgoIntegrationModule } from './modules/ngo-integration/ngo-integration.module'; // 🤝 NGO 整合
 import { InsaragModule } from './modules/insarag/insarag.module'; // 🌍 INSARAG
+// v6.0 組織特色模組
+import { CommunityResilienceModule } from './modules/community-resilience/community-resilience.module'; // 🏠 社區韌性
+import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module'; // 🎓 志工認證
+import { PsychologicalTrackingModule } from './modules/psychological-tracking/psychological-tracking.module'; // 🧠 心理追蹤
+import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module'; // 🤝 物資媒合
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -227,6 +232,11 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         EvacuationSimModule, // 🚶 疏散模擬
         NgoIntegrationModule, // 🤝 NGO 整合
         InsaragModule, // 🌍 INSARAG
+        // v6.0 組織特色模組
+        CommunityResilienceModule, // 🏠 社區韌性
+        VolunteerCertificationModule, // 🎓 志工認證
+        PsychologicalTrackingModule, // 🧠 心理追蹤
+        ResourceMatchingModule, // 🤝 物資媒合
     ],
     providers: [
         CloudLoggerService,
