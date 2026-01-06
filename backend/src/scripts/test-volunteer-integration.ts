@@ -63,6 +63,10 @@ async function testIntegration() {
 
         // 檢查帳號當前權限
         const accountBefore = await accountsService.findById(accountId);
+        if (!accountBefore) {
+            console.error('❌ 找不到帳號!');
+            process.exit(1);
+        }
         console.log('  帳號當前角色:', accountBefore.roles?.map(r => r.name).join(', ') || '無');
 
         // ========== 測試 2: 審核通過 - 自動分配權限 ==========
@@ -85,6 +89,10 @@ async function testIntegration() {
 
         // 驗證結果
         const accountAfter = await accountsService.findById(accountId);
+        if (!accountAfter) {
+            console.error('❌ 找不到帳號!');
+            process.exit(1);
+        }
         const roleNames = accountAfter.roles?.map(r => r.name) || [];
         const maxLevel = accountAfter.roles?.length > 0
             ? Math.max(...accountAfter.roles.map(r => r.level))
@@ -115,6 +123,10 @@ async function testIntegration() {
 
         // 驗證結果
         const accountSuspended = await accountsService.findById(accountId);
+        if (!accountSuspended) {
+            console.error('❌ 找不到帳號!');
+            process.exit(1);
+        }
         const suspendedRoles = accountSuspended.roles?.map(r => r.name) || [];
 
         console.log('\n驗證結果:');
