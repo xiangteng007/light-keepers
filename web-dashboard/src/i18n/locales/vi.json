@@ -1,0 +1,212 @@
+{
+    "common": {
+        "appName": "Nền tảng Phòng chống Thiên tai Light Keepers",
+        "loading": "Đang tải...",
+        "error": "Đã xảy ra lỗi",
+        "success": "Thành công",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "confirm": "Xác nhận",
+        "delete": "Xóa",
+        "edit": "Chỉnh sửa",
+        "add": "Thêm",
+        "search": "Tìm kiếm",
+        "filter": "Lọc",
+        "refresh": "Làm mới",
+        "back": "Quay lại",
+        "next": "Tiếp theo",
+        "previous": "Trước đó",
+        "submit": "Gửi",
+        "close": "Đóng",
+        "yes": "Có",
+        "no": "Không",
+        "all": "Tất cả",
+        "none": "Không có",
+        "required": "Bắt buộc",
+        "optional": "Tùy chọn"
+    },
+    "nav": {
+        "dashboard": "Bảng điều khiển",
+        "map": "Bản đồ Thiên tai",
+        "reports": "Báo cáo Thiên tai",
+        "volunteers": "Quản lý Tình nguyện viên",
+        "resources": "Quản lý Nguồn lực",
+        "events": "Quản lý Sự kiện",
+        "activities": "Đăng ký Hoạt động",
+        "announcements": "Thông báo",
+        "settings": "Cài đặt",
+        "permissions": "Quyền hạn",
+        "profile": "Hồ sơ",
+        "logout": "Đăng xuất"
+    },
+    "auth": {
+        "login": "Đăng nhập",
+        "logout": "Đăng xuất",
+        "register": "Đăng ký",
+        "email": "Email",
+        "password": "Mật khẩu",
+        "confirmPassword": "Xác nhận mật khẩu",
+        "forgotPassword": "Quên mật khẩu?",
+        "rememberMe": "Nhớ tôi",
+        "loginWithGoogle": "Đăng nhập với Google",
+        "loginWithLine": "Đăng nhập với LINE",
+        "loginSuccess": "Đăng nhập thành công",
+        "loginFailed": "Đăng nhập thất bại",
+        "logoutSuccess": "Đã đăng xuất thành công"
+    },
+    "dashboard": {
+        "title": "Bảng điều khiển",
+        "welcome": "Chào mừng trở lại",
+        "overview": "Tổng quan",
+        "todayReports": "Báo cáo Hôm nay",
+        "activeVolunteers": "Tình nguyện viên Đang hoạt động",
+        "totalResources": "Tổng Nguồn lực",
+        "pendingTasks": "Công việc Chờ xử lý",
+        "recentActivity": "Hoạt động Gần đây",
+        "quickActions": "Hành động Nhanh",
+        "newReport": "Báo cáo Mới",
+        "viewMap": "Xem Bản đồ"
+    },
+    "reports": {
+        "title": "Báo cáo Thiên tai",
+        "new": "Báo cáo Mới",
+        "list": "Danh sách Báo cáo",
+        "status": {
+            "pending": "Đang chờ",
+            "confirmed": "Đã xác nhận",
+            "rejected": "Đã từ chối",
+            "resolved": "Đã giải quyết"
+        },
+        "type": {
+            "flood": "Lũ lụt",
+            "debris": "Sạt lở",
+            "fire": "Hỏa hoạn",
+            "accident": "Tai nạn",
+            "other": "Khác"
+        },
+        "severity": {
+            "low": "Thấp",
+            "medium": "Trung bình",
+            "high": "Cao",
+            "critical": "Nghiêm trọng"
+        },
+        "fields": {
+            "title": "Tiêu đề",
+            "description": "Mô tả",
+            "location": "Vị trí",
+            "photos": "Hình ảnh",
+            "contact": "Thông tin Liên hệ"
+        }
+    },
+    "volunteers": {
+        "title": "Quản lý Tình nguyện viên",
+        "list": "Danh sách Tình nguyện viên",
+        "add": "Thêm Tình nguyện viên",
+        "status": {
+            "available": "Sẵn sàng",
+            "busy": "Đang bận",
+            "offline": "Ngoại tuyến"
+        },
+        "fields": {
+            "name": "Tên",
+            "phone": "Điện thoại",
+            "region": "Khu vực Phục vụ",
+            "skills": "Kỹ năng",
+            "hours": "Giờ Phục vụ",
+            "points": "Điểm"
+        },
+        "recognition": {
+            "badges": "Huy hiệu",
+            "awards": "Giải thưởng",
+            "milestones": "Cột mốc",
+            "leaderboard": "Bảng xếp hạng"
+        }
+    },
+    "resources": {
+        "title": "Quản lý Nguồn lực",
+        "list": "Danh sách Nguồn lực",
+        "add": "Thêm Nguồn lực",
+        "status": {
+            "available": "Sẵn có",
+            "low": "Tồn kho Thấp",
+            "depleted": "Hết hàng"
+        },
+        "fields": {
+            "name": "Tên",
+            "category": "Danh mục",
+            "quantity": "Số lượng",
+            "unit": "Đơn vị",
+            "location": "Vị trí",
+            "expiresAt": "Ngày Hết hạn"
+        }
+    },
+    "activities": {
+        "title": "Đăng ký Hoạt động",
+        "list": "Danh sách Hoạt động",
+        "create": "Tạo Hoạt động",
+        "register": "Đăng ký",
+        "status": {
+            "draft": "Bản nháp",
+            "open": "Đang mở",
+            "closed": "Đã đóng",
+            "cancelled": "Đã hủy",
+            "completed": "Đã hoàn thành"
+        },
+        "fields": {
+            "title": "Tên Hoạt động",
+            "description": "Mô tả",
+            "date": "Ngày",
+            "location": "Vị trí",
+            "participants": "Người tham gia"
+        }
+    },
+    "sos": {
+        "title": "SOS Khẩn cấp",
+        "send": "Gửi Tín hiệu SOS",
+        "status": {
+            "active": "Đang hoạt động",
+            "acknowledged": "Đã xác nhận",
+            "resolved": "Đã giải quyết"
+        }
+    },
+    "settings": {
+        "title": "Cài đặt",
+        "theme": {
+            "title": "Giao diện",
+            "light": "Chế độ Sáng",
+            "dark": "Chế độ Tối",
+            "system": "Theo Hệ thống"
+        },
+        "language": {
+            "title": "Ngôn ngữ",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia"
+        },
+        "notifications": {
+            "title": "Cài đặt Thông báo",
+            "push": "Thông báo Đẩy",
+            "email": "Thông báo Email"
+        }
+    },
+    "errors": {
+        "notFound": "Không tìm thấy Trang",
+        "unauthorized": "Không được Ủy quyền",
+        "forbidden": "Truy cập bị Cấm",
+        "serverError": "Lỗi Máy chủ",
+        "networkError": "Lỗi Mạng",
+        "timeout": "Hết thời gian"
+    },
+    "offline": {
+        "title": "Chế độ Ngoại tuyến",
+        "message": "Bạn hiện đang ngoại tuyến. Một số tính năng có thể bị giới hạn.",
+        "pending": "đang chờ đồng bộ",
+        "sync": "Đồng bộ"
+    }
+}

@@ -1,0 +1,513 @@
+# Light Keepers 災害防救平台 - 系統架構文件
+
+> **版本**: 1.0  
+> **更新日期**: 2026-01-06  
+> **專案網址**: https://lightkeepers.ngo
+
+---
+
+## 📋 目錄
+
+1. [系統概覽](#系統概覽)
+2. [技術架構圖](#技術架構圖)
+3. [前端技術棧](#前端技術棧)
+4. [後端技術棧](#後端技術棧)
+5. [雲端基礎設施](#雲端基礎設施)
+6. [資料庫架構](#資料庫架構)
+7. [後端模組清單](#後端模組清單)
+8. [外部整合服務](#外部整合服務)
+9. [CI/CD 流程](#cicd-流程)
+10. [安全性設計](#安全性設計)
+
+---
+
+## 系統概覽
+
+Light Keepers 是一個專為台灣災害防救設計的全方位平台，整合志工管理、災情回報、資源調度、即時警報等功能。
+
+### 核心架構
+
+```mermaid
+graph TB
+    subgraph "用戶端"
+        WEB[Web Dashboard<br/>React + Vite]
+        LINE[LINE Bot<br/>LIFF 應用]
+        PWA[PWA 離線支援]
+    end
+
+    subgraph "GCP 雲端"
+        CR[Cloud Run<br/>後端 API]
+        FH[Firebase Hosting<br/>前端靜態]
+        CS[Cloud SQL<br/>PostgreSQL]
+        SM[Secret Manager<br/>機密管理]
+        GCS[Cloud Storage<br/>檔案儲存]
+    end
+
+    subgraph "外部服務"
+        NCDR[NCDR 災防中心<br/>警報資料]
+        GEMINI[Google Gemini<br/>AI 分析]
+        RESEND[Resend<br/>Email 服務]
+        FIREBASE[Firebase Auth<br/>身份驗證]
+    end
+
+    WEB --> CR
+    LINE --> CR
+    CR --> CS
+    CR --> SM
+    CR --> GCS
+    CR --> NCDR
+    CR --> GEMINI
+    CR --> RESEND
+    WEB --> FIREBASE
+```
+
+---
+
+## 技術架構圖
+
+```mermaid
+flowchart LR
+    subgraph Frontend["前端 (React 19)"]
+        direction TB
+        UI[UI 元件]
+        STATE[狀態管理<br/>React Query]
+        ROUTER[路由<br/>React Router v7]
+        MAP[地圖<br/>Leaflet + Google Maps]
+        CHART[圖表<br/>Chart.js]
+        WS[WebSocket<br/>Socket.io Client]
+    end
+
+    subgraph Backend["後端 (NestJS 10)"]
+        direction TB
+        API[REST API<br/>Express]
+        AUTH[認證<br/>JWT + Passport]
+        ORM[ORM<br/>TypeORM]
+        SOCKET[即時通訊<br/>Socket.io]
+        SCHEDULER[排程任務<br/>@nestjs/schedule]
+        SWAGGER[API 文件<br/>Swagger]
+    end
+
+    subgraph Database["資料庫"]
+        PG[(PostgreSQL 15)]
+    end
+
+    Frontend <--> Backend
+    Backend <--> Database
+```
+
+---
+
+## 前端技術棧
+
+### 核心框架
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **React** | 19.2.0 | UI 框架 |
+| **Vite** | 7.2.4 | 建置工具 |
+| **TypeScript** | 5.9.3 | 型別安全 |
+| **React Router** | 7.11.0 | 路由管理 |
+
+### UI 與視覺化
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **Bootstrap** | 5.3.8 | CSS 框架 |
+| **React Bootstrap** | 2.10.10 | UI 元件 |
+| **Lucide React** | 0.562.0 | 圖示庫 |
+| **Chart.js** | 4.5.1 | 資料圖表 |
+| **Leaflet** | 1.9.4 | 開源地圖 |
+| **Google Maps API** | 2.20.8 | Google 地圖 |
+
+### 狀態與資料
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **TanStack Query** | 5.90.12 | 資料獲取/快取 |
+| **Axios** | 1.13.2 | HTTP 請求 |
+| **Socket.io Client** | 4.8.3 | 即時通訊 |
+
+### 特殊功能
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **@line/liff** | 2.27.3 | LINE 登入整合 |
+| **Firebase** | 12.7.0 | Auth + FCM 推播 |
+| **i18next** | 25.7.3 | 多語系 (9 種語言) |
+| **Vite-plugin-PWA** | 1.2.0 | PWA 離線支援 |
+| **html5-qrcode** | 2.3.8 | QR Code 掃描 |
+| **jsPDF** | 3.0.4 | PDF 報表生成 |
+| **ExcelJS** | 4.4.0 | Excel 報表生成 |
+| **Fuse.js** | 7.1.0 | 模糊搜尋 |
+| **@dnd-kit** | 6.3.1 | 拖放排序 |
+
+---
+
+## 後端技術棧
+
+### 核心框架
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **NestJS** | 10.3.0 | 後端框架 |
+| **Express** | (NestJS 內建) | HTTP 伺服器 |
+| **TypeScript** | 5.3.3 | 型別安全 |
+| **TypeORM** | 0.3.19 | ORM 資料庫操作 |
+
+### 認證與安全
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **@nestjs/jwt** | 10.2.0 | JWT Token 簽發 |
+| **@nestjs/passport** | 10.0.3 | 認證策略 |
+| **passport-jwt** | 4.0.1 | JWT 驗證 |
+| **bcryptjs** | 3.0.3 | 密碼雜湊 |
+| **helmet** | 8.1.0 | 安全 Headers |
+| **@nestjs/throttler** | 6.5.0 | 速率限制 |
+
+### 即時通訊與排程
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **Socket.io** | 4.8.2 | WebSocket 即時通訊 |
+| **@nestjs/schedule** | 6.1.0 | 定時任務 |
+
+### 外部服務整合
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **@line/bot-sdk** | 10.5.0 | LINE Bot API |
+| **firebase-admin** | 13.6.0 | Firebase FCM 推播 |
+| **@google/generative-ai** | 0.24.1 | Gemini AI |
+| **nodemailer** | 7.0.12 | Email (備用) |
+| **resend** | 6.6.0 | Email 服務 |
+
+### 資料處理
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **xml2js** | 0.6.2 | NCDR XML 解析 |
+| **cheerio** | 1.1.2 | HTML 爬蟲 |
+| **papaparse** | 5.5.3 | CSV 解析 |
+| **pdfkit** | 0.17.2 | PDF 生成 |
+
+### 監控與日誌
+
+| 技術 | 版本 | 用途 |
+|------|------|------|
+| **winston** | 3.19.0 | 日誌管理 |
+| **@google-cloud/logging-winston** | 6.0.1 | Cloud Logging 整合 |
+| **@google-cloud/error-reporting** | 3.0.5 | 錯誤追蹤 |
+
+---
+
+## 雲端基礎設施
+
+### Google Cloud Platform (GCP)
+
+| 服務 | 用途 | 規格 |
+|------|------|------|
+| **Cloud Run** | 後端 API 託管 | 512Mi RAM, 1 CPU, 0-10 instances |
+| **Cloud SQL** | PostgreSQL 資料庫 | 1 vCPU, 3.75GB RAM, 10GB SSD |
+| **Cloud Storage** | 檔案儲存 | 標準儲存類型 |
+| **Secret Manager** | 機密管理 | 8 個 secrets |
+| **Artifact Registry** | Docker 映像儲存 | asia-east1 |
+| **Cloud Logging** | 日誌與監控 | 自動整合 |
+
+### Firebase
+
+| 服務 | 用途 |
+|------|------|
+| **Firebase Hosting** | 前端靜態網站託管 |
+| **Firebase Authentication** | 用戶身份驗證 |
+| **Firebase Cloud Messaging** | 推播通知 |
+
+### 網域與 DNS
+
+| 項目 | 設定 |
+|------|------|
+| **主網域** | lightkeepers.ngo |
+| **API 端點** | https://light-keepers-api-955234851806.asia-east1.run.app |
+| **區域** | asia-east1 (台灣彰化) |
+
+---
+
+## 資料庫架構
+
+### 資料庫資訊
+
+| 項目 | 設定 |
+|------|------|
+| **類型** | PostgreSQL 15 |
+| **實例名稱** | light-keepers-db |
+| **資料庫名稱** | lightkeepers |
+| **連線方式** | Cloud SQL Unix Socket |
+
+### 主要資料表
+
+```mermaid
+erDiagram
+    accounts ||--o{ account_roles : has
+    accounts ||--o| volunteers : links
+    roles ||--o{ account_roles : has
+    
+    volunteers ||--o{ tasks : assigned
+    volunteers ||--o{ training_records : has
+    
+    events ||--o{ reports : has
+    events ||--o{ tasks : has
+    
+    resources ||--o{ resource_allocations : has
+    
+    accounts {
+        uuid id PK
+        string email
+        string display_name
+        boolean is_verified
+    }
+    
+    volunteers {
+        uuid id PK
+        string volunteer_code
+        string name
+        uuid account_id FK
+        string approval_status
+    }
+    
+    events {
+        uuid id PK
+        string title
+        string event_type
+        string status
+    }
+    
+    resources {
+        uuid id PK
+        string name
+        string category
+        int quantity
+    }
+```
+
+---
+
+## 後端模組清單
+
+### 核心系統 (8 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **auth** | `/modules/auth` | 認證授權 (JWT, OAuth, RBAC) |
+| **accounts** | `/modules/accounts` | 帳號管理 (CRUD, 角色) |
+| **database** | `/modules/database` | 資料庫連線 (TypeORM) |
+| **health** | `/modules/health` | 健康檢查 (/live, /ready) |
+| **shared** | `/modules/shared` | 共用服務 (Guards, Decorators) |
+| **realtime** | `/modules/realtime` | WebSocket 即時通訊 |
+| **notifications** | `/modules/notifications` | 推播通知 (FCM, Email) |
+| **uploads** | `/modules/uploads` | 檔案上傳 (Cloud Storage) |
+
+### 災防核心 (6 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **ncdr-alerts** | `/modules/ncdr-alerts` | NCDR 災防警報同步 |
+| **weather-forecast** | `/modules/weather-forecast` | 氣象預報資料 |
+| **reports** | `/modules/reports` | 災情回報 (通報、照片) |
+| **reports-export** | `/modules/reports-export` | 報表匯出 (PDF, Excel) |
+| **events** | `/modules/events` | 事件管理 (災害、演習) |
+| **tasks** | `/modules/tasks` | 任務派遣 (分配、追蹤) |
+
+### 志工管理 (4 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **volunteers** | `/modules/volunteers` | 志工資料 (註冊、審核) |
+| **training** | `/modules/training` | 教育訓練 (課程、認證) |
+| **activities** | `/modules/activities` | 活動管理 (出勤、簽到) |
+| **manuals** | `/modules/manuals` | SOP 手冊管理 |
+
+### 資源與物資 (3 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **resources** | `/modules/resources` | 物資管理 (庫存、調度) |
+| **public-resources** | `/modules/public-resources` | 公開資源查詢 |
+| **donations** | `/modules/donations` | 捐贈管理 (物資、金流) |
+
+### 社群與整合 (5 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **line-bot** | `/modules/line-bot` | LINE Bot 訊息處理 |
+| **community** | `/modules/community` | 社區韌性管理 |
+| **announcements** | `/modules/announcements` | 公告管理 |
+| **integrations** | `/modules/integrations` | 第三方整合 |
+| **analytics** | `/modules/analytics` | 數據分析儀表板 |
+
+### 系統管理 (4 個模組)
+
+| 模組 | 路徑 | 功能說明 |
+|------|------|----------|
+| **menu-config** | `/modules/menu-config` | 選單配置 |
+| **tenants** | `/modules/tenants` | 多租戶管理 |
+| **backup** | `/modules/backup` | 資料備份 |
+| **access-log** | `/modules/access-log` | 存取日誌 |
+
+---
+
+## 外部整合服務
+
+### LINE 平台
+
+| 服務 | 用途 |
+|------|------|
+| **LINE Login** | OAuth 社群登入 |
+| **LINE LIFF** | LINE 內嵌應用 |
+| **LINE Messaging API** | Bot 訊息推播 |
+
+### Google 服務
+
+| 服務 | 用途 |
+|------|------|
+| **Google OAuth** | 社群登入 |
+| **Google Maps API** | 地圖顯示與地理編碼 |
+| **Gemini AI** | AI 文字分析與建議 |
+| **Firebase Auth** | 身份驗證 |
+| **Firebase Cloud Messaging** | 推播通知 |
+
+### 政府資料
+
+| 服務 | 用途 |
+|------|------|
+| **NCDR 國家災害防救科技中心** | 災防警報 RSS/XML |
+| **中央氣象署 API** | 氣象預報資料 |
+
+### 通訊服務
+
+| 服務 | 用途 |
+|------|------|
+| **Resend** | 交易性 Email (驗證碼等) |
+
+---
+
+## CI/CD 流程
+
+### GitHub Actions 工作流程
+
+```mermaid
+flowchart LR
+    A[Push to main] --> B[CI/CD Pipeline]
+    B --> C[Build & Test]
+    C --> D{成功?}
+    D -->|Yes| E[Deploy API<br/>Cloud Run]
+    D -->|Yes| F[Deploy Dashboard<br/>Firebase Hosting]
+    D -->|No| G[Failed]
+    E --> H[Health Check]
+    F --> I[Live Site]
+```
+
+### 工作流程檔案
+
+| 檔案 | 觸發條件 | 功能 |
+|------|----------|------|
+| [ci-cd.yml](file:///c:/Users/xiang/Light%20Keepers/xiwang-disaster-platform/.github/workflows/ci-cd.yml) | Push to main | 建置測試 |
+| [deploy.yml](file:///c:/Users/xiang/Light%20Keepers/xiwang-disaster-platform/.github/workflows/deploy.yml) | Push to main | 部署 API + 前端 |
+| [docker-health-check.yml](file:///c:/Users/xiang/Light%20Keepers/xiwang-disaster-platform/.github/workflows/docker-health-check.yml) | Deploy 完成後 | 健康檢查 |
+
+### 部署配置
+
+**API (Cloud Run)**:
+- 來源: [./backend](file:///c:/Users/xiang/Light%20Keepers/xiwang-disaster-platform/backend) 目錄
+- 記憶體: 512Mi
+- CPU: 1 核心
+- 自動擴展: 0-10 instances
+- 並發數: 80
+
+**前端 (Firebase Hosting)**:
+- 來源: `./web-dashboard/dist`
+- Channel: live
+
+---
+
+## 安全性設計
+
+### 認證機制
+
+| 方法 | 說明 |
+|------|------|
+| **JWT Access Token** | 有效期 15 分鐘 |
+| **Refresh Token Cookie** | HttpOnly, Secure, SameSite=None |
+| **Email 驗證碼** | 6 位數字驗證碼 |
+| **OAuth 2.0** | LINE、Google 社群登入 |
+
+### 授權控制 (RBAC)
+
+| 等級 | 角色名稱 | 權限範圍 |
+|------|----------|----------|
+| 0 | 一般民眾 | 公開頁面 |
+| 1 | 志工 | 任務查看、出勤 |
+| 2 | 組長 | 小隊管理 |
+| 3 | 區域負責人 | 區域管理 |
+| 4 | 管理員 | 系統管理 |
+| 5 | 最高管理員 | 完全控制 |
+
+### Secret Manager 機密
+
+| Secret 名稱 | 用途 |
+|-------------|------|
+| `db-password` | PostgreSQL 密碼 |
+| `line-client-secret` | LINE Login |
+| `line-channel-access-token` | LINE Bot |
+| `line-channel-secret` | LINE Webhook |
+| `google-client-id` | Google OAuth |
+| `google-client-secret` | Google OAuth |
+| `GEMINI_API_KEY` | Gemini AI |
+| `resend-api-key` | Email 服務 |
+
+---
+
+## 附錄：環境變數
+
+### 後端環境變數
+
+```bash
+# 基礎設定
+NODE_ENV=production
+PORT=8080
+
+# 資料庫
+DB_HOST=/cloudsql/light-keepers-mvp:asia-east1:light-keepers-db
+DB_USERNAME=postgres
+DB_PASSWORD=(Secret Manager)
+DB_DATABASE=lightkeepers
+
+# LINE 整合
+LINE_CLIENT_ID=2008769727
+LINE_CLIENT_SECRET=(Secret Manager)
+LINE_CHANNEL_ACCESS_TOKEN=(Secret Manager)
+LINE_CHANNEL_SECRET=(Secret Manager)
+
+# Google 整合
+GOOGLE_CLIENT_ID=(Secret Manager)
+GOOGLE_CLIENT_SECRET=(Secret Manager)
+GEMINI_API_KEY=(Secret Manager)
+
+# Email
+RESEND_API_KEY=(Secret Manager)
+RESEND_FROM=noreply@lightkeepers.ngo
+```
+
+### 前端環境變數
+
+```bash
+VITE_API_URL=https://light-keepers-api-955234851806.asia-east1.run.app
+VITE_LINE_CLIENT_ID=2008769727
+VITE_LIFF_ID=(GitHub Secret)
+VITE_GOOGLE_MAPS_API_KEY=(GitHub Secret)
+VITE_FIREBASE_PROJECT_ID=light-keepers-mvp
+VITE_FIREBASE_AUTH_DOMAIN=lightkeepers.ngo
+```
+
+---
+
+> 📝 **文件維護**: 本文件應於系統架構變更時同步更新。

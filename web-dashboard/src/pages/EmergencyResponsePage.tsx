@@ -200,6 +200,42 @@ const EmergencyResponsePage: React.FC = () => {
                 <div className="active-session-card">
                     <h2>進行中任務：{activeSession.title}</h2>
                     <p>指揮官：{activeSession.commanderName || '未指定'}</p>
+
+                    {/* Command Tools */}
+                    <div className="command-tools">
+                        <h4>📋 指揮工具</h4>
+                        <div className="tools-grid">
+                            <button
+                                className="tool-btn"
+                                onClick={() => navigate(`/emergency-response/map/${activeSession.id}`)}
+                            >
+                                <span className="tool-icon">🗺️</span>
+                                <span className="tool-label">COP 地圖</span>
+                            </button>
+                            <button
+                                className="tool-btn"
+                                onClick={() => navigate(`/mission-command/${activeSession.id}`)}
+                            >
+                                <span className="tool-icon">📡</span>
+                                <span className="tool-label">指揮中心</span>
+                            </button>
+                            <button
+                                className="tool-btn"
+                                onClick={() => navigate(`/emergency-response/iap/${activeSession.id}`)}
+                            >
+                                <span className="tool-icon">📋</span>
+                                <span className="tool-label">作戰計畫</span>
+                            </button>
+                            <button
+                                className="tool-btn"
+                                onClick={() => navigate(`/emergency-response/sitrep/${activeSession.id}`)}
+                            >
+                                <span className="tool-icon">📊</span>
+                                <span className="tool-label">情勢報告</span>
+                            </button>
+                        </div>
+                    </div>
+
                     <div className="session-actions">
                         <button
                             className="btn btn-secondary"
@@ -243,14 +279,24 @@ const EmergencyResponsePage: React.FC = () => {
                             <p className="session-date">
                                 建立時間：{new Date(session.createdAt).toLocaleString('zh-TW')}
                             </p>
-                            {session.status === 'preparing' && (
-                                <button
-                                    className="btn btn-success btn-sm"
-                                    onClick={() => startSession(session.id)}
-                                >
-                                    啟動任務
-                                </button>
-                            )}
+                            <div className="session-card-actions">
+                                {session.status === 'preparing' && (
+                                    <button
+                                        className="btn btn-success btn-sm"
+                                        onClick={() => startSession(session.id)}
+                                    >
+                                        啟動任務
+                                    </button>
+                                )}
+                                {session.status === 'completed' && (
+                                    <button
+                                        className="btn btn-secondary btn-sm"
+                                        onClick={() => navigate(`/emergency-response/aar/${session.id}`)}
+                                    >
+                                        📊 復盤報告
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ))}
                 </div>

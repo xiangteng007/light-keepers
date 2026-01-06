@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Light Keepers Tactical C2 / ICS UI-UX 規範 v1.0</title>
+<style>
+body{font-family:system-ui,-apple-system,"Noto Sans TC","Segoe UI",Arial,sans-serif;line-height:1.6;margin:40px;max-width:980px}
+table{border-collapse:collapse;width:100%} th,td{border:1px solid #ddd;padding:8px;vertical-align:top}
+th{background:#f7f7f7}
+code,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+pre{background:#f3f4f6;padding:12px;overflow:auto;white-space:pre-wrap}
+blockquote{border-left:4px solid #ddd;margin:16px 0;padding:0 12px;color:#555}
+</style>
+</head>
+<body>
+<h1>Light Keepers Tactical C2 / ICS UI-UX 規範 (v1.0)</h1>
+<p>日期：2026-01-05</p>
+<blockquote>此檔案為 UTF-8 HTML（<code>&lt;meta charset="utf-8"&gt;</code>）。建議以 Markdown 作為單一來源。</blockquote>
+<pre># Light Keepers Tactical C2 / ICS UI-UX 規範 (v1.0)
+日期：2026-01-05
+
+&gt; 說明：PDF 並不像 `.txt/.md` 有「UTF-8 檔案編碼」可切換；PDF 文字是以字型/字碼映射方式內嵌。
+&gt; 為了滿足「可用 UTF-8 編碼保存與交換」的需求，我同時提供本規範的 **UTF-8 Markdown/HTML 版本**（可直接放入 repo 或轉成其他格式）。
+
+---
+
+## 1. 設計目標與原則
+
+本系統屬於「高壓、低容錯、需可追溯」的緊急應變指揮場景。所有 UI 決策以降低認知負荷、加速決策、確保審計為最高優先。
+
+**四大原則**
+- **可讀性優先**：低光、長時間、高密度仍能快速辨識；避免花俏動畫與低對比。
+- **可行動性優先**：資訊必須導向下一步行動（ACK、派遣、指派、升級、結案）。
+- **可審計性優先**：重要操作必須產生事件紀錄（Event Log），對應角色/時間/對象。
+- **可離線降級**：弱網/離線仍可完成核心流程（回報、任務領取、位置分享(選配)、物資掃碼），其餘延後同步。
+
+**分工建議**
+- 指揮所維持 Web（桌機最佳）
+- 外勤以 PWA + Capacitor 混合 App（手機最佳）作為選配：推播/背景能力、離線地圖包、掃碼盤點等
+
+---
+
+## 2. 視覺語言與品牌語氣
+
+偏好的 UI 屬於「戰術作業台」語彙：
+- 深色底、霧面質感、細格線、低飽和
+- 金色作為克制高亮（關鍵行動/焦點）
+- 紅色僅用於生命/安全警示（SOS/禁入）
+
+**介面語氣（Microcopy）**
+- 用詞短促、命令式、可回覆：ACK/派遣/結案/升級
+- 狀態可枚舉：待命、進行、受阻、完成、取消
+- 重要事件三要素：**時間戳 + 操作者 + 對象**
+- 不可逆操作皆需二次確認 + 審計
+
+---
+
+## 3. 色彩系統（Tactical Dark Theme）
+
+下列色票由你確認喜歡的 6 張樣本 UI 取樣歸納，作為戰術深色主題的最小可行色盤。
+
+| Token | Hex | 用途 |
+|---|---|---|
+| color.bg.app | #161E2A | 全域背景（戰情中心/外勤） |
+| color.bg.panel | #1D2635 | 主要面板/卡片底色 |
+| color.border.subtle | #2F3641 | 分隔線/細邊框/格線 |
+| color.text.primary | #F3F3F2 | 主要文字（深色底） |
+| color.text.secondary | #D0CEC3 | 次要文字/輔助資訊 |
+| color.text.muted | #AEAEA7 | 低優先資訊/標籤 |
+| color.accent.gold | #C39B6F | 強調色（關鍵行動/高亮） |
+| color.alert.critical | #893336 | 緊急/SOS/危險 |
+| color.neutral.700 | #65696A | 次線/disabled |
+| color.shadow.ink | #080A0F | 陰影/更深背景層 |
+
+**狀態/告警規則**
+- **Gold**：可行動的「關鍵按鈕/選取/高亮」；不可濫用。
+- **Critical Red**：SOS、生命危險、禁入區；務必搭配圖示與文字避免色盲誤判。
+- 其他 success/warning/info 可沿用既有 Light Theme，但在深色主題需降低飽和度。
+
+---
+
+## 4. 字體與排版（Typography）
+
+建議字體組合：
+- 繁中：Noto Sans CJK TC（或同等級無襯線）
+- 拉丁：Inter（或同等級）
+- 時間戳/座標/編號：等寬字體（避免跳動）
+
+建議尺寸（參考）：
+- H1：桌機 20–24px / 手機 18–20px
+- H2：14–16px
+- 正文：桌機 10.5–12px / 手機 12–13px
+- 表格/次要：桌機 9–10px
+- Chip/Badge：9–10px
+
+&gt; 繁中按鈕文案建議 **2–4 字**；空間不足使用 i18n meta 檔提供縮寫。
+
+---
+
+## 5. 版面結構與 RWD
+
+**指揮所（Desktop Web）**：高密度、多窗格
+- 左側導覽（Nav）
+- 主工作區（Map/Board/Timeline）
+- 右側細節/指令面板（Details/Actions）
+
+**外勤（Mobile App / PWA）**：單手操作、最短路徑
+- 首頁只保留 4–6 個關鍵入口：回報、任務、求救、地圖、物資掃碼、離線/同步
+
+**RWD 規則**
+- 桌機最小寬 1280；1440–1920 保持表格可讀
+- 手機 360–430；觸控目標 ≥ 44px
+- 抽屜/Modal 支援 Esc；行動端採 Bottom Sheet
+- 頂部狀態區顯示 Online/Offline、Sync、Outbox 數量
+
+**間距與圓角**
+- Spacing：4/8/12/16/24
+- Radius：8/12/16（避免過度圓潤）
+
+---
+
+## 6. 元件規範（Components）
+
+- **App Shell**：固定導覽 + 狀態列（Online/Offline/Sync/Outbox）+ 快捷鍵
+- **Panel/Card**：霧面深色 + 細邊框；標題列含狀態徽章與主要行動（Gold）
+- **Table（後勤/列表）**：固定表頭、欄位切換、異常列用邊框/圖示提示
+- **Timeline/Event Feed**：關鍵操作必落事件流，可依人員/類型/任務過濾
+- **Form（回報/任務）**：分段（位置、內容、媒體、上圖、權限），離線進 Outbox
+- **Map Controls**：圖層、量測、格線、AOI 編輯、標註管理，不遮擋地圖
+- **Toast/Banner**：同步、離線、衝突、限流（429）；Critical 用置頂 Banner
+- **Scanner（外勤）**：掃描成功震動/音效；離線先入本機交易佇列
+
+---
+
+## 7. 核心工作流（Command + Field）
+
+最短閉環：**回報 → 分流 → 任務 → 執行 → 結案**
+
+- **回報**：GPS 自動帶入、拍照/錄影、嚴重度、是否上圖；離線進 Outbox
+- **分流與合併**：去重、標記危險等級與 AOI；合併保留原始來源
+- **派遣/指派**：回報一鍵建任務；指派隊伍/物資/SOP；寫入事件流
+- **領取與回報進度**：外勤更新狀態/百分比，附照片/位置點作證據
+- **SOS**：外勤一鍵；指揮所紅色 Banner + 音效；需 ACK/派遣/結案
+- **物資掃碼/盤點**：掃 QR 產生交易；離線先記錄，回線後批次同步
+
+**離線/弱網約束**
+- 所有寫入操作必須可離線排隊（Outbox）
+- UI 必須可見：離線狀態、待送出數量、最後同步時間
+- 衝突：伺服器事件流為權威；客端提供重新整理/保留草稿
+
+---
+
+## 8. 地圖態勢視覺化標準
+
+- 底圖：低彩度，避免與態勢色衝突
+- 態勢疊圖：Hazard/AOI 半透明填色 + 邊框；必要時用斜線紋理
+- POI：物資點/集合點/避難所/AED 各自 icon；支援群聚
+- 志工位置：可選分享；獨立圖層；標示最後回報時間
+- 照片證據：縮圖點位；可關閉避免噪音
+
+**AOI/危險區編輯**
+- 指揮所：框選/多邊形/節點編輯；改動寫入事件流
+- 外勤：以檢視與簡易新增點位為主
+
+**離線地圖包**
+- 外勤出勤前預下載指定區域；支援新增/刪除/更新
+- UI 顯示：範圍、細節等級、大小、下載進度、可用狀態
+
+---
+
+## 9. 可用性、無障礙與驗收清單
+
+- 對比：主要文字與背景 ≥ 4.5:1；Critical 同時有文字/圖示
+- 鍵盤：桌機可全鍵盤操作，焦點可見
+- 觸控：≥ 44px；掃碼/SOS 防誤觸（長按或二次確認）
+- 回饋：送出/同步/失敗/重試皆有清楚狀態
+- 審計：指派、派遣、結案、刪除、合併、地圖範圍修改皆留 log
+- 離線：離線可完成核心流程且不丟資料；回線自動補送
+- i18n：繁中不超字數；不足用縮寫；數字格式一致
+
+---
+
+## 附錄：產圖 Prompt 範本（繁中 UI）
+
+```text
+請生成一張「軍事/戰術指揮」風格的 UI 截圖，並使用繁體中文介面文字。
+
+場景：{SCREEN_NAME}
+風格：霧面深色、細格線、低飽和；金色克制高亮；紅色僅用於緊急。
+配色：背景 #161E2A、面板 #1D2635、邊框 #2F3641、文字 #F3F3F2/#D0CEC3、強調 #C39B6F、緊急 #893336
+字體：Noto Sans TC 類無襯線；數字使用等寬
+排版：高密度專業作業台；元素對齊嚴謹；直線不變形
+要求：真實產品截圖感（非插畫）、乾淨清晰、沒有多餘裝飾
+介面文字：繁體中文，短促詞彙（例：戰情中心、任務會話、回報、派遣、結案、圖層、離線、同步中、待送出）
+不要：卡通風、霓虹過量、科幻 UI、過度漸層、過度發光
+```
+</pre>
+</body></html>

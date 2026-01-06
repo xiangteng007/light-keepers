@@ -1,0 +1,4377 @@
+{
+  "entries": {
+    "access.denied": {
+      "abbr": {
+        "en": "Denied",
+        "zh-TW": "不足"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "access.level_required": {
+      "abbr": {
+        "en": "Level",
+        "zh-TW": "需權限"
+      },
+      "maxChars": {
+        "en": 24,
+        "zh-TW": 8
+      }
+    },
+    "access.login_required": {
+      "abbr": {
+        "en": "Login",
+        "zh-TW": "需登入"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "action.ack": {
+      "abbr": {
+        "en": "ACK",
+        "zh-TW": "確認"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 2
+      }
+    },
+    "action.assign": {
+      "abbr": {
+        "en": "Asgn",
+        "zh-TW": "指派"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "action.create_task": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "建任"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "action.dispatch": {
+      "abbr": {
+        "en": "Disp",
+        "zh-TW": "派遣"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "action.end_mission": {
+      "abbr": {
+        "en": "End",
+        "zh-TW": "結束"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.escalate": {
+      "abbr": {
+        "en": "Esc",
+        "zh-TW": "升級"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "action.hold": {
+      "abbr": {
+        "en": "Hold",
+        "zh-TW": "暫緩"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.issue_supply": {
+      "abbr": {
+        "en": "Issue",
+        "zh-TW": "發放"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "action.lock": {
+      "abbr": {
+        "en": "Lock",
+        "zh-TW": "鎖定"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.open": {
+      "abbr": {
+        "en": "Open",
+        "zh-TW": "開啟"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.pause_mission": {
+      "abbr": {
+        "en": "Pause",
+        "zh-TW": "暫停"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.request_supply": {
+      "abbr": {
+        "en": "Req",
+        "zh-TW": "需求"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "action.resolve": {
+      "abbr": {
+        "en": "Res",
+        "zh-TW": "結案"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "action.resume_mission": {
+      "abbr": {
+        "en": "Resume",
+        "zh-TW": "繼續"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "action.start_mission": {
+      "abbr": {
+        "en": "Start",
+        "zh-TW": "啟動"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "action.unlock": {
+      "abbr": {
+        "en": "Unlock",
+        "zh-TW": "解鎖"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "admin.permissions": {
+      "abbr": {
+        "en": "Perm",
+        "zh-TW": "權限"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "admin.roles": {
+      "abbr": {
+        "en": "Roles",
+        "zh-TW": "角色"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "admin.system": {
+      "abbr": {
+        "en": "Sys",
+        "zh-TW": "系統"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "admin.users": {
+      "abbr": {
+        "en": "Users",
+        "zh-TW": "用戶"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "ai.accept": {
+      "abbr": {
+        "en": "Acc",
+        "zh-TW": "採用"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "ai.cancelled": {
+      "abbr": {
+        "en": "Cncl",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "ai.cooldown": {
+      "abbr": {
+        "en": "Cool",
+        "zh-TW": "冷卻"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 3
+      }
+    },
+    "ai.draft": {
+      "abbr": {
+        "en": "Draft",
+        "zh-TW": "草稿"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "ai.explain": {
+      "abbr": {
+        "en": "Why",
+        "zh-TW": "原因"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ai.failed": {
+      "abbr": {
+        "en": "Fail",
+        "zh-TW": "失敗"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "ai.generating": {
+      "abbr": {
+        "en": "Gen",
+        "zh-TW": "生成"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "ai.jobs": {
+      "abbr": {
+        "en": "AI",
+        "zh-TW": "AI"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "ai.optional": {
+      "abbr": {
+        "en": "Opt",
+        "zh-TW": "可選"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ai.queue": {
+      "abbr": {
+        "en": "Q",
+        "zh-TW": "佇列"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ai.rate_limited": {
+      "abbr": {
+        "en": "429",
+        "zh-TW": "限流"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 2
+      }
+    },
+    "ai.ready": {
+      "abbr": {
+        "en": "Ready",
+        "zh-TW": "就緒"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "ai.reject": {
+      "abbr": {
+        "en": "Rej",
+        "zh-TW": "拒用"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "ai.run": {
+      "abbr": {
+        "en": "Run",
+        "zh-TW": "執行"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "ai.skipped": {
+      "abbr": {
+        "en": "Skip",
+        "zh-TW": "略過"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ai.use_case.cluster": {
+      "abbr": {
+        "en": "Clus",
+        "zh-TW": "聚類"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "ai.use_case.summarize": {
+      "abbr": {
+        "en": "Sum",
+        "zh-TW": "摘要"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "ai.use_case.task_draft": {
+      "abbr": {
+        "en": "Draft",
+        "zh-TW": "草稿"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "audit.action": {
+      "abbr": {
+        "en": "Act",
+        "zh-TW": "動作"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "audit.actor": {
+      "abbr": {
+        "en": "Actor",
+        "zh-TW": "操作者"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "audit.after": {
+      "abbr": {
+        "en": "After",
+        "zh-TW": "後"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "audit.before": {
+      "abbr": {
+        "en": "Before",
+        "zh-TW": "前"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "audit.log": {
+      "abbr": {
+        "en": "Audit",
+        "zh-TW": "稽核"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "audit.target": {
+      "abbr": {
+        "en": "Target",
+        "zh-TW": "對象"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "audit.time": {
+      "abbr": {
+        "en": "Time",
+        "zh-TW": "時間"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "auth.email": {
+      "abbr": {
+        "en": "Email",
+        "zh-TW": "信箱"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "auth.forgot_password": {
+      "abbr": {
+        "en": "Forgot",
+        "zh-TW": "忘密"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "auth.login": {
+      "abbr": {
+        "en": "Sign in",
+        "zh-TW": "登入"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "auth.logout": {
+      "abbr": {
+        "en": "Sign out",
+        "zh-TW": "登出"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "auth.password": {
+      "abbr": {
+        "en": "Pass",
+        "zh-TW": "密碼"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "auth.register": {
+      "abbr": {
+        "en": "Register",
+        "zh-TW": "註冊"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "auth.reset_password": {
+      "abbr": {
+        "en": "Reset",
+        "zh-TW": "重設"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "auth.two_factor": {
+      "abbr": {
+        "en": "2FA",
+        "zh-TW": "2FA"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "auth.verify": {
+      "abbr": {
+        "en": "Verify",
+        "zh-TW": "驗證"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "badge.active": {
+      "abbr": {
+        "en": "On",
+        "zh-TW": "啟"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "badge.critical": {
+      "abbr": {
+        "en": "CRIT",
+        "zh-TW": "急"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "badge.disabled": {
+      "abbr": {
+        "en": "Off",
+        "zh-TW": "停"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "badge.info": {
+      "abbr": {
+        "en": "INFO",
+        "zh-TW": "資"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "badge.success": {
+      "abbr": {
+        "en": "OK",
+        "zh-TW": "成"
+      },
+      "maxChars": {
+        "en": 7,
+        "zh-TW": 2
+      }
+    },
+    "badge.warning": {
+      "abbr": {
+        "en": "WARN",
+        "zh-TW": "警"
+      },
+      "maxChars": {
+        "en": 7,
+        "zh-TW": 2
+      }
+    },
+    "common.add": {
+      "abbr": {
+        "en": "Add",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.apply": {
+      "abbr": {
+        "en": "Apply",
+        "zh-TW": "套用"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.back": {
+      "abbr": {
+        "en": "Back",
+        "zh-TW": "返回"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.cancel": {
+      "abbr": {
+        "en": "Cancel",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.clear": {
+      "abbr": {
+        "en": "Clear",
+        "zh-TW": "清"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.close": {
+      "abbr": {
+        "en": "Close",
+        "zh-TW": "關閉"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.collapse": {
+      "abbr": {
+        "en": "Collapse",
+        "zh-TW": "收合"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.confirm": {
+      "abbr": {
+        "en": "OK",
+        "zh-TW": "確認"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.copy": {
+      "abbr": {
+        "en": "Copy",
+        "zh-TW": "複製"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.create": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "建立"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.delete": {
+      "abbr": {
+        "en": "Del",
+        "zh-TW": "刪"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.deselect_all": {
+      "abbr": {
+        "en": "None",
+        "zh-TW": "全不選"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 3
+      }
+    },
+    "common.details": {
+      "abbr": {
+        "en": "Info",
+        "zh-TW": "詳"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.download": {
+      "abbr": {
+        "en": "DL",
+        "zh-TW": "下載"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.edit": {
+      "abbr": {
+        "en": "Edit",
+        "zh-TW": "編"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.expand": {
+      "abbr": {
+        "en": "Expand",
+        "zh-TW": "展開"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.export": {
+      "abbr": {
+        "en": "Export",
+        "zh-TW": "匯出"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.filter": {
+      "abbr": {
+        "en": "Filt",
+        "zh-TW": "篩"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.import": {
+      "abbr": {
+        "en": "Import",
+        "zh-TW": "匯入"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.loading": {
+      "abbr": {
+        "en": "Loading",
+        "zh-TW": "載入"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "common.more": {
+      "abbr": {
+        "en": "More",
+        "zh-TW": "更多"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.next": {
+      "abbr": {
+        "en": "Next",
+        "zh-TW": "下一步"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "common.no": {
+      "abbr": {
+        "en": "N",
+        "zh-TW": "否"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 1
+      }
+    },
+    "common.offline": {
+      "abbr": {
+        "en": "Off",
+        "zh-TW": "離線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.ok": {
+      "abbr": {
+        "en": "OK",
+        "zh-TW": "確定"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 2
+      }
+    },
+    "common.online": {
+      "abbr": {
+        "en": "On",
+        "zh-TW": "在線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.optional": {
+      "abbr": {
+        "en": "Opt",
+        "zh-TW": "選填"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.pin": {
+      "abbr": {
+        "en": "Pin",
+        "zh-TW": "釘"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "common.prev": {
+      "abbr": {
+        "en": "Prev",
+        "zh-TW": "上一步"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "common.print": {
+      "abbr": {
+        "en": "Print",
+        "zh-TW": "列印"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.refresh": {
+      "abbr": {
+        "en": "Refresh",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.required": {
+      "abbr": {
+        "en": "Req",
+        "zh-TW": "必填"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.reset": {
+      "abbr": {
+        "en": "Reset",
+        "zh-TW": "重設"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.retry": {
+      "abbr": {
+        "en": "Retry",
+        "zh-TW": "重試"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.save": {
+      "abbr": {
+        "en": "Save",
+        "zh-TW": "存"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.saving": {
+      "abbr": {
+        "en": "Saving",
+        "zh-TW": "儲存"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "common.search": {
+      "abbr": {
+        "en": "Find",
+        "zh-TW": "搜"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.select": {
+      "abbr": {
+        "en": "Select",
+        "zh-TW": "選擇"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.select_all": {
+      "abbr": {
+        "en": "All",
+        "zh-TW": "全選"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "common.share": {
+      "abbr": {
+        "en": "Share",
+        "zh-TW": "分享"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.sort": {
+      "abbr": {
+        "en": "Sort",
+        "zh-TW": "排"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.submit": {
+      "abbr": {
+        "en": "Send",
+        "zh-TW": "送出"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.syncing": {
+      "abbr": {
+        "en": "Sync",
+        "zh-TW": "同步"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "common.unpin": {
+      "abbr": {
+        "en": "Unpin",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 4
+      }
+    },
+    "common.update": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.upload": {
+      "abbr": {
+        "en": "Up",
+        "zh-TW": "上傳"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "common.view": {
+      "abbr": {
+        "en": "View",
+        "zh-TW": "檢視"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "common.yes": {
+      "abbr": {
+        "en": "Y",
+        "zh-TW": "是"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 1
+      }
+    },
+    "comms.attach": {
+      "abbr": {
+        "en": "Att",
+        "zh-TW": "附件"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.broadcast": {
+      "abbr": {
+        "en": "BC",
+        "zh-TW": "廣播"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.callsign": {
+      "abbr": {
+        "en": "Call",
+        "zh-TW": "呼號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.channel": {
+      "abbr": {
+        "en": "Chan",
+        "zh-TW": "頻道"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.compose": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "撰寫"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.direct": {
+      "abbr": {
+        "en": "DM",
+        "zh-TW": "私訊"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.message": {
+      "abbr": {
+        "en": "Msg",
+        "zh-TW": "訊息"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "comms.radio_mode": {
+      "abbr": {
+        "en": "Radio",
+        "zh-TW": "無線"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "comms.send": {
+      "abbr": {
+        "en": "Send",
+        "zh-TW": "送出"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "confirm.cancel_mission": {
+      "abbr": {
+        "en": "Cancel?",
+        "zh-TW": "取消？"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 8
+      }
+    },
+    "confirm.delete_item": {
+      "abbr": {
+        "en": "Delete?",
+        "zh-TW": "刪除？"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 6
+      }
+    },
+    "confirm.end_mission": {
+      "abbr": {
+        "en": "End?",
+        "zh-TW": "結束？"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 8
+      }
+    },
+    "confirm.issue_supply": {
+      "abbr": {
+        "en": "Issue?",
+        "zh-TW": "發放？"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 8
+      }
+    },
+    "confirm.merge_reports": {
+      "abbr": {
+        "en": "Merge?",
+        "zh-TW": "合併？"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 8
+      }
+    },
+    "confirm.resolve_sos": {
+      "abbr": {
+        "en": "Resolve?",
+        "zh-TW": "結案？"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 8
+      }
+    },
+    "confirm.sign_out": {
+      "abbr": {
+        "en": "Sign out?",
+        "zh-TW": "登出？"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 6
+      }
+    },
+    "error.conflict": {
+      "abbr": {
+        "en": "409",
+        "zh-TW": "衝突"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "error.forbidden": {
+      "abbr": {
+        "en": "403",
+        "zh-TW": "禁止"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "error.generic": {
+      "abbr": {
+        "en": "Error",
+        "zh-TW": "錯誤"
+      },
+      "maxChars": {
+        "en": 22,
+        "zh-TW": 4
+      }
+    },
+    "error.invalid_format": {
+      "abbr": {
+        "en": "Fmt",
+        "zh-TW": "格式"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "error.max_length": {
+      "abbr": {
+        "en": "Max",
+        "zh-TW": "最多"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 10
+      }
+    },
+    "error.min_length": {
+      "abbr": {
+        "en": "Min",
+        "zh-TW": "至少"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 10
+      }
+    },
+    "error.network": {
+      "abbr": {
+        "en": "Net",
+        "zh-TW": "網路"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "error.not_found": {
+      "abbr": {
+        "en": "404",
+        "zh-TW": "無"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "error.required": {
+      "abbr": {
+        "en": "Req",
+        "zh-TW": "必填"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "error.timeout": {
+      "abbr": {
+        "en": "TO",
+        "zh-TW": "逾時"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "error.too_many_requests": {
+      "abbr": {
+        "en": "429",
+        "zh-TW": "過多"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "error.unauthorized": {
+      "abbr": {
+        "en": "401",
+        "zh-TW": "未授權"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 3
+      }
+    },
+    "error.validation": {
+      "abbr": {
+        "en": "Invalid",
+        "zh-TW": "有誤"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "event.actor": {
+      "abbr": {
+        "en": "Actor",
+        "zh-TW": "執行"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "event.feed": {
+      "abbr": {
+        "en": "Feed",
+        "zh-TW": "事件流"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "event.list": {
+      "abbr": {
+        "en": "List",
+        "zh-TW": "清單"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "event.message": {
+      "abbr": {
+        "en": "Msg",
+        "zh-TW": "訊息"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "event.time": {
+      "abbr": {
+        "en": "Time",
+        "zh-TW": "時間"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "event.timeline": {
+      "abbr": {
+        "en": "Time",
+        "zh-TW": "時間線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "event.type": {
+      "abbr": {
+        "en": "Type",
+        "zh-TW": "類型"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "event.updated_by": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "field.battery": {
+      "abbr": {
+        "en": "Batt",
+        "zh-TW": "電量"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "field.gps_accuracy": {
+      "abbr": {
+        "en": "Acc",
+        "zh-TW": "精度"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "field.home": {
+      "abbr": {
+        "en": "Field",
+        "zh-TW": "外勤"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "field.last_seen": {
+      "abbr": {
+        "en": "Seen",
+        "zh-TW": "末定"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "field.location_share": {
+      "abbr": {
+        "en": "Share",
+        "zh-TW": "分享"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "field.location_share_off": {
+      "abbr": {
+        "en": "Off",
+        "zh-TW": "未分享"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 3
+      }
+    },
+    "field.location_share_on": {
+      "abbr": {
+        "en": "On",
+        "zh-TW": "分享"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "field.outbox": {
+      "abbr": {
+        "en": "Outbox",
+        "zh-TW": "待送"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "field.queue_count": {
+      "abbr": {
+        "en": "Out",
+        "zh-TW": "待送"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 10
+      }
+    },
+    "field.signal": {
+      "abbr": {
+        "en": "Sig",
+        "zh-TW": "訊號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "field.weak_network": {
+      "abbr": {
+        "en": "Weak",
+        "zh-TW": "弱網"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 2
+      }
+    },
+    "inv.alerts": {
+      "abbr": {
+        "en": "Alert",
+        "zh-TW": "警示"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.balance": {
+      "abbr": {
+        "en": "Bal",
+        "zh-TW": "庫存"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.batch": {
+      "abbr": {
+        "en": "Batch",
+        "zh-TW": "批次"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.dashboard": {
+      "abbr": {
+        "en": "Dash",
+        "zh-TW": "總覽"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "inv.exception": {
+      "abbr": {
+        "en": "Ex",
+        "zh-TW": "異常"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "inv.export_ledger": {
+      "abbr": {
+        "en": "Export",
+        "zh-TW": "匯出"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 5
+      }
+    },
+    "inv.from": {
+      "abbr": {
+        "en": "From",
+        "zh-TW": "來源"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.fulfill": {
+      "abbr": {
+        "en": "Ful",
+        "zh-TW": "核發"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.issue": {
+      "abbr": {
+        "en": "Issue",
+        "zh-TW": "發放"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.item": {
+      "abbr": {
+        "en": "Item",
+        "zh-TW": "品項"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.items": {
+      "abbr": {
+        "en": "Items",
+        "zh-TW": "品項"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.ledger": {
+      "abbr": {
+        "en": "Ledg",
+        "zh-TW": "流水"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "inv.note": {
+      "abbr": {
+        "en": "Note",
+        "zh-TW": "備註"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.operator": {
+      "abbr": {
+        "en": "Op",
+        "zh-TW": "經手"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "inv.partial": {
+      "abbr": {
+        "en": "Part",
+        "zh-TW": "部分"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.qty": {
+      "abbr": {
+        "en": "Qty",
+        "zh-TW": "數量"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 2
+      }
+    },
+    "inv.receive": {
+      "abbr": {
+        "en": "Recv",
+        "zh-TW": "入庫"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.request": {
+      "abbr": {
+        "en": "Req",
+        "zh-TW": "需求"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.request_new": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "inv.request_qty": {
+      "abbr": {
+        "en": "Req",
+        "zh-TW": "需求"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "inv.request_status": {
+      "abbr": {
+        "en": "Status",
+        "zh-TW": "狀態"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "inv.scan_item": {
+      "abbr": {
+        "en": "Scan",
+        "zh-TW": "掃描"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "inv.scan_qr": {
+      "abbr": {
+        "en": "Scan",
+        "zh-TW": "掃碼"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "inv.scan_stockpoint": {
+      "abbr": {
+        "en": "Scan",
+        "zh-TW": "掃描"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 5
+      }
+    },
+    "inv.sku": {
+      "abbr": {
+        "en": "SKU",
+        "zh-TW": "SKU"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 3
+      }
+    },
+    "inv.stockpoint": {
+      "abbr": {
+        "en": "SP",
+        "zh-TW": "物資點"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "inv.stockpoint_new": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 5
+      }
+    },
+    "inv.stockpoints": {
+      "abbr": {
+        "en": "SP",
+        "zh-TW": "物資點"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "inv.stocktake": {
+      "abbr": {
+        "en": "Count",
+        "zh-TW": "盤點"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.threshold": {
+      "abbr": {
+        "en": "Th",
+        "zh-TW": "下限"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.time": {
+      "abbr": {
+        "en": "Time",
+        "zh-TW": "時間"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.to": {
+      "abbr": {
+        "en": "To",
+        "zh-TW": "去向"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.transfer": {
+      "abbr": {
+        "en": "Xfer",
+        "zh-TW": "調撥"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "inv.txn": {
+      "abbr": {
+        "en": "Txn",
+        "zh-TW": "交易"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "inv.txn_id": {
+      "abbr": {
+        "en": "ID",
+        "zh-TW": "編號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "inv.txn_type": {
+      "abbr": {
+        "en": "Type",
+        "zh-TW": "類型"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "inv.unit": {
+      "abbr": {
+        "en": "Unit",
+        "zh-TW": "單位"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "kb.aed": {
+      "abbr": {
+        "en": "AED",
+        "zh-TW": "AED"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 3
+      }
+    },
+    "kb.camping": {
+      "abbr": {
+        "en": "Camp",
+        "zh-TW": "露營"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.categories": {
+      "abbr": {
+        "en": "Cats",
+        "zh-TW": "分類"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "kb.checklists": {
+      "abbr": {
+        "en": "List",
+        "zh-TW": "清單"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "kb.cold": {
+      "abbr": {
+        "en": "Cold",
+        "zh-TW": "低溫"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.download": {
+      "abbr": {
+        "en": "Offline",
+        "zh-TW": "離線"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "kb.earthquake": {
+      "abbr": {
+        "en": "Quake",
+        "zh-TW": "地震"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "kb.evacuation": {
+      "abbr": {
+        "en": "Evac",
+        "zh-TW": "撤離"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "kb.fire": {
+      "abbr": {
+        "en": "Fire",
+        "zh-TW": "生火"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.first_aid": {
+      "abbr": {
+        "en": "Aid",
+        "zh-TW": "急救"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.flood": {
+      "abbr": {
+        "en": "Flood",
+        "zh-TW": "淹水"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.hazmat": {
+      "abbr": {
+        "en": "HZM",
+        "zh-TW": "危化"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.heat": {
+      "abbr": {
+        "en": "Heat",
+        "zh-TW": "高溫"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.landslide": {
+      "abbr": {
+        "en": "Slide",
+        "zh-TW": "土流"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "kb.library": {
+      "abbr": {
+        "en": "KB",
+        "zh-TW": "知識"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 3
+      }
+    },
+    "kb.print": {
+      "abbr": {
+        "en": "Print",
+        "zh-TW": "列印"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.radio": {
+      "abbr": {
+        "en": "Radio",
+        "zh-TW": "無線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "kb.search": {
+      "abbr": {
+        "en": "Find",
+        "zh-TW": "搜"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.shelter": {
+      "abbr": {
+        "en": "Shel",
+        "zh-TW": "避難"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.sop": {
+      "abbr": {
+        "en": "SOP",
+        "zh-TW": "SOP"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 3
+      }
+    },
+    "kb.survival": {
+      "abbr": {
+        "en": "Surv",
+        "zh-TW": "求生"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "kb.triage": {
+      "abbr": {
+        "en": "Triage",
+        "zh-TW": "檢傷"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.typhoon": {
+      "abbr": {
+        "en": "Typh",
+        "zh-TW": "颱風"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "kb.war": {
+      "abbr": {
+        "en": "War",
+        "zh-TW": "戰"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.add_marker": {
+      "abbr": {
+        "en": "Add",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "map.aoi": {
+      "abbr": {
+        "en": "AOI",
+        "zh-TW": "範圍"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 4
+      }
+    },
+    "map.center_on_me": {
+      "abbr": {
+        "en": "Me",
+        "zh-TW": "到我"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "map.center_on_target": {
+      "abbr": {
+        "en": "Target",
+        "zh-TW": "到目標"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 5
+      }
+    },
+    "map.coords": {
+      "abbr": {
+        "en": "Coord",
+        "zh-TW": "座標"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "map.delete_marker": {
+      "abbr": {
+        "en": "Del",
+        "zh-TW": "刪除"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "map.delete_pack": {
+      "abbr": {
+        "en": "Del",
+        "zh-TW": "刪除"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 5
+      }
+    },
+    "map.download_pack": {
+      "abbr": {
+        "en": "DL",
+        "zh-TW": "下載"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 5
+      }
+    },
+    "map.edit_marker": {
+      "abbr": {
+        "en": "Edit",
+        "zh-TW": "編輯"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "map.grid": {
+      "abbr": {
+        "en": "Grid",
+        "zh-TW": "格線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "map.hazard": {
+      "abbr": {
+        "en": "Haz",
+        "zh-TW": "危險"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "map.layer.overlays": {
+      "abbr": {
+        "en": "Ovly",
+        "zh-TW": "態勢"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "map.layer.photos": {
+      "abbr": {
+        "en": "Photo",
+        "zh-TW": "照片"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "map.layer.reports": {
+      "abbr": {
+        "en": "Rpt",
+        "zh-TW": "回報"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "map.layer.tasks": {
+      "abbr": {
+        "en": "Tsk",
+        "zh-TW": "任務"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "map.layer.volunteers": {
+      "abbr": {
+        "en": "Vol",
+        "zh-TW": "志工"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "map.layers": {
+      "abbr": {
+        "en": "Layers",
+        "zh-TW": "圖層"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.manage_packs": {
+      "abbr": {
+        "en": "Manage",
+        "zh-TW": "管理"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 5
+      }
+    },
+    "map.measure": {
+      "abbr": {
+        "en": "Meas",
+        "zh-TW": "量測"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.navigate": {
+      "abbr": {
+        "en": "Nav",
+        "zh-TW": "導航"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.north": {
+      "abbr": {
+        "en": "N",
+        "zh-TW": "北向"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "map.offline": {
+      "abbr": {
+        "en": "Offline",
+        "zh-TW": "離線"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "map.pack": {
+      "abbr": {
+        "en": "Pack",
+        "zh-TW": "地圖包"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "map.pack_detail": {
+      "abbr": {
+        "en": "Detail",
+        "zh-TW": "細節"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.pack_downloading": {
+      "abbr": {
+        "en": "DL",
+        "zh-TW": "下載"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "map.pack_failed": {
+      "abbr": {
+        "en": "Fail",
+        "zh-TW": "失敗"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "map.pack_ready": {
+      "abbr": {
+        "en": "Ready",
+        "zh-TW": "可用"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "map.pack_region": {
+      "abbr": {
+        "en": "Region",
+        "zh-TW": "範圍"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.pack_size": {
+      "abbr": {
+        "en": "Size",
+        "zh-TW": "大小"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "map.poi": {
+      "abbr": {
+        "en": "POI",
+        "zh-TW": "標註"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.scale": {
+      "abbr": {
+        "en": "Scale",
+        "zh-TW": "尺"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "map.street_view": {
+      "abbr": {
+        "en": "SV",
+        "zh-TW": "街景"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "map.update_pack": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 5
+      }
+    },
+    "map.zoom_in": {
+      "abbr": {
+        "en": "In",
+        "zh-TW": "放大"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "map.zoom_out": {
+      "abbr": {
+        "en": "Out",
+        "zh-TW": "縮小"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "mission.brief": {
+      "abbr": {
+        "en": "Brief",
+        "zh-TW": "簡報"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "mission.commander": {
+      "abbr": {
+        "en": "Cmdr",
+        "zh-TW": "指揮"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "mission.created_at": {
+      "abbr": {
+        "en": "Created",
+        "zh-TW": "建立"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "mission.duration": {
+      "abbr": {
+        "en": "Dur",
+        "zh-TW": "時長"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "mission.ended_at": {
+      "abbr": {
+        "en": "End",
+        "zh-TW": "結束"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "mission.header": {
+      "abbr": {
+        "en": "Overview",
+        "zh-TW": "總覽"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 4
+      }
+    },
+    "mission.location": {
+      "abbr": {
+        "en": "Area",
+        "zh-TW": "區域"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "mission.notes": {
+      "abbr": {
+        "en": "Notes",
+        "zh-TW": "備註"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "mission.objectives": {
+      "abbr": {
+        "en": "Obj",
+        "zh-TW": "目標"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "mission.participants": {
+      "abbr": {
+        "en": "People",
+        "zh-TW": "人員"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "mission.rules": {
+      "abbr": {
+        "en": "Rules",
+        "zh-TW": "規則"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "mission.started_at": {
+      "abbr": {
+        "en": "Start",
+        "zh-TW": "啟動"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "mission.updated_at": {
+      "abbr": {
+        "en": "Updated",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "nav.admin": {
+      "abbr": {
+        "en": "Admin",
+        "zh-TW": "管"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "nav.analytics": {
+      "abbr": {
+        "en": "Stats",
+        "zh-TW": "統計"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "nav.audit": {
+      "abbr": {
+        "en": "Audit",
+        "zh-TW": "稽核"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "nav.command_center": {
+      "abbr": {
+        "en": "C2",
+        "zh-TW": "戰情"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "nav.comms": {
+      "abbr": {
+        "en": "Comms",
+        "zh-TW": "通聯"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "nav.events": {
+      "abbr": {
+        "en": "Evt",
+        "zh-TW": "事"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "nav.help": {
+      "abbr": {
+        "en": "Help",
+        "zh-TW": "說明"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "nav.inventory": {
+      "abbr": {
+        "en": "Inv",
+        "zh-TW": "物資"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "nav.knowledge": {
+      "abbr": {
+        "en": "SOP",
+        "zh-TW": "SOP"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "nav.logistics": {
+      "abbr": {
+        "en": "Logi",
+        "zh-TW": "後勤"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "nav.map": {
+      "abbr": {
+        "en": "Map",
+        "zh-TW": "圖"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "nav.mission_sessions": {
+      "abbr": {
+        "en": "Sessions",
+        "zh-TW": "會話"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "nav.reports": {
+      "abbr": {
+        "en": "Rpt",
+        "zh-TW": "報"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "nav.settings": {
+      "abbr": {
+        "en": "Prefs",
+        "zh-TW": "設"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "nav.sitrep": {
+      "abbr": {
+        "en": "SITREP",
+        "zh-TW": "戰情"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "nav.tasks": {
+      "abbr": {
+        "en": "Tsk",
+        "zh-TW": "任"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "notif.critical": {
+      "abbr": {
+        "en": "Crit",
+        "zh-TW": "緊急"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "notif.info": {
+      "abbr": {
+        "en": "Info",
+        "zh-TW": "一般"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "notif.muted": {
+      "abbr": {
+        "en": "Mute",
+        "zh-TW": "靜音"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "notif.warning": {
+      "abbr": {
+        "en": "Warn",
+        "zh-TW": "警示"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "profile.callsign": {
+      "abbr": {
+        "en": "Call",
+        "zh-TW": "呼號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "profile.certifications": {
+      "abbr": {
+        "en": "Cert",
+        "zh-TW": "證照"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 2
+      }
+    },
+    "profile.emergency_contact": {
+      "abbr": {
+        "en": "ICE",
+        "zh-TW": "緊急聯絡"
+      },
+      "maxChars": {
+        "en": 18,
+        "zh-TW": 6
+      }
+    },
+    "profile.insurance": {
+      "abbr": {
+        "en": "Ins",
+        "zh-TW": "保險"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "profile.name": {
+      "abbr": {
+        "en": "Name",
+        "zh-TW": "姓名"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "profile.phone": {
+      "abbr": {
+        "en": "Phone",
+        "zh-TW": "電話"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "profile.privacy": {
+      "abbr": {
+        "en": "Privacy",
+        "zh-TW": "隱私"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "profile.profile": {
+      "abbr": {
+        "en": "Profile",
+        "zh-TW": "資料"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "profile.training": {
+      "abbr": {
+        "en": "Train",
+        "zh-TW": "培訓"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "profile.unit": {
+      "abbr": {
+        "en": "Unit",
+        "zh-TW": "單位"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "profile.vehicle": {
+      "abbr": {
+        "en": "Veh",
+        "zh-TW": "車輛"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.ack": {
+      "abbr": {
+        "en": "ACK",
+        "zh-TW": "確認"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 3
+      }
+    },
+    "report.add_photo": {
+      "abbr": {
+        "en": "Photo",
+        "zh-TW": "照片"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "report.add_video": {
+      "abbr": {
+        "en": "Video",
+        "zh-TW": "影片"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "report.address": {
+      "abbr": {
+        "en": "Addr",
+        "zh-TW": "地址"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.attachments": {
+      "abbr": {
+        "en": "Files",
+        "zh-TW": "附件"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "report.category": {
+      "abbr": {
+        "en": "Cat",
+        "zh-TW": "類別"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.channel": {
+      "abbr": {
+        "en": "Chan",
+        "zh-TW": "管道"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "report.close": {
+      "abbr": {
+        "en": "Close",
+        "zh-TW": "結案"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "report.contact": {
+      "abbr": {
+        "en": "Contact",
+        "zh-TW": "聯絡"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.coordinates": {
+      "abbr": {
+        "en": "Coord",
+        "zh-TW": "座標"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "report.description": {
+      "abbr": {
+        "en": "Desc",
+        "zh-TW": "描述"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.distance": {
+      "abbr": {
+        "en": "Dist",
+        "zh-TW": "距離"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.duplicate": {
+      "abbr": {
+        "en": "Dup",
+        "zh-TW": "重複"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "report.escalate": {
+      "abbr": {
+        "en": "Esc",
+        "zh-TW": "升級"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.gps_tag": {
+      "abbr": {
+        "en": "GPS",
+        "zh-TW": "GPS"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "report.hide_from_map": {
+      "abbr": {
+        "en": "Hide",
+        "zh-TW": "隱藏"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "report.id": {
+      "abbr": {
+        "en": "ID",
+        "zh-TW": "編號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "report.last_updated": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "末更"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "report.link_task": {
+      "abbr": {
+        "en": "Task",
+        "zh-TW": "建任"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "report.list": {
+      "abbr": {
+        "en": "List",
+        "zh-TW": "清單"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "report.location": {
+      "abbr": {
+        "en": "Loc",
+        "zh-TW": "位置"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.media": {
+      "abbr": {
+        "en": "Media",
+        "zh-TW": "媒體"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.merge": {
+      "abbr": {
+        "en": "Merge",
+        "zh-TW": "合併"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "report.new": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "report.notes": {
+      "abbr": {
+        "en": "Notes",
+        "zh-TW": "備註"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.phone": {
+      "abbr": {
+        "en": "Phone",
+        "zh-TW": "電話"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.privacy_notice": {
+      "abbr": {
+        "en": "Privacy",
+        "zh-TW": "隱私"
+      },
+      "maxChars": {
+        "en": 16,
+        "zh-TW": 4
+      }
+    },
+    "report.reopen": {
+      "abbr": {
+        "en": "Reopen",
+        "zh-TW": "重開"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "report.reporter": {
+      "abbr": {
+        "en": "Rpt",
+        "zh-TW": "回報者"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "report.severity": {
+      "abbr": {
+        "en": "Sev",
+        "zh-TW": "等級"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "report.show_on_map": {
+      "abbr": {
+        "en": "Map",
+        "zh-TW": "上圖"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 5
+      }
+    },
+    "report.source": {
+      "abbr": {
+        "en": "Src",
+        "zh-TW": "來源"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.status": {
+      "abbr": {
+        "en": "Status",
+        "zh-TW": "狀態"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.status_assigned": {
+      "abbr": {
+        "en": "Asgn",
+        "zh-TW": "指派"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "report.status_closed": {
+      "abbr": {
+        "en": "Closed",
+        "zh-TW": "結案"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "report.status_open": {
+      "abbr": {
+        "en": "Open",
+        "zh-TW": "開"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "report.status_triaged": {
+      "abbr": {
+        "en": "Tri",
+        "zh-TW": "分流"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "report.time": {
+      "abbr": {
+        "en": "Time",
+        "zh-TW": "時間"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.title": {
+      "abbr": {
+        "en": "Title",
+        "zh-TW": "標題"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.triage": {
+      "abbr": {
+        "en": "Tri",
+        "zh-TW": "分流"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "report.updated_by": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "role.chairman": {
+      "abbr": {
+        "en": "CHM",
+        "zh-TW": "理事"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "role.director": {
+      "abbr": {
+        "en": "DIR",
+        "zh-TW": "常務"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "role.officer": {
+      "abbr": {
+        "en": "OFC",
+        "zh-TW": "幹部"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "role.owner": {
+      "abbr": {
+        "en": "OWN",
+        "zh-TW": "擁有者"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 5
+      }
+    },
+    "role.public": {
+      "abbr": {
+        "en": "PUBLIC",
+        "zh-TW": "公開"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "role.volunteer": {
+      "abbr": {
+        "en": "VOL",
+        "zh-TW": "志工"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "safety.check_in": {
+      "abbr": {
+        "en": "In",
+        "zh-TW": "報到"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "safety.check_out": {
+      "abbr": {
+        "en": "Out",
+        "zh-TW": "離開"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "safety.scene_safe": {
+      "abbr": {
+        "en": "Safe",
+        "zh-TW": "安全"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "safety.unsafe": {
+      "abbr": {
+        "en": "Unsafe",
+        "zh-TW": "危險"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "settings.language": {
+      "abbr": {
+        "en": "Lang",
+        "zh-TW": "語言"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "settings.location": {
+      "abbr": {
+        "en": "Loc",
+        "zh-TW": "定位"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "settings.notifications": {
+      "abbr": {
+        "en": "Notif",
+        "zh-TW": "通知"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 2
+      }
+    },
+    "settings.privacy": {
+      "abbr": {
+        "en": "Privacy",
+        "zh-TW": "隱私"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "settings.sound": {
+      "abbr": {
+        "en": "Sound",
+        "zh-TW": "音效"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "settings.theme": {
+      "abbr": {
+        "en": "Theme",
+        "zh-TW": "主題"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "settings.vibration": {
+      "abbr": {
+        "en": "Vibe",
+        "zh-TW": "震動"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.actions": {
+      "abbr": {
+        "en": "Act",
+        "zh-TW": "行動"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.export": {
+      "abbr": {
+        "en": "Export",
+        "zh-TW": "匯出"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.generate": {
+      "abbr": {
+        "en": "Gen",
+        "zh-TW": "生成"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "sitrep.key_points": {
+      "abbr": {
+        "en": "Keys",
+        "zh-TW": "重點"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.period": {
+      "abbr": {
+        "en": "Period",
+        "zh-TW": "期間"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.resources": {
+      "abbr": {
+        "en": "Res",
+        "zh-TW": "資源"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.risks": {
+      "abbr": {
+        "en": "Risk",
+        "zh-TW": "風險"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.summary": {
+      "abbr": {
+        "en": "Sum",
+        "zh-TW": "摘要"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "sitrep.title": {
+      "abbr": {
+        "en": "SITREP",
+        "zh-TW": "戰情"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "sos": {
+      "abbr": {
+        "en": "SOS",
+        "zh-TW": "求救"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 2
+      }
+    },
+    "sos.active": {
+      "abbr": {
+        "en": "SOS",
+        "zh-TW": "求救"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "sos.cancel": {
+      "abbr": {
+        "en": "Stop",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "sos.resolve": {
+      "abbr": {
+        "en": "Res",
+        "zh-TW": "結案"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "sos.resolved": {
+      "abbr": {
+        "en": "Res",
+        "zh-TW": "結案"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "sos.send": {
+      "abbr": {
+        "en": "SOS",
+        "zh-TW": "求救"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 4
+      }
+    },
+    "sos.status": {
+      "abbr": {
+        "en": "Stat",
+        "zh-TW": "狀態"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "status.active": {
+      "abbr": {
+        "en": "Act",
+        "zh-TW": "執行"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 3
+      }
+    },
+    "status.blocked": {
+      "abbr": {
+        "en": "Block",
+        "zh-TW": "受阻"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "status.cancelled": {
+      "abbr": {
+        "en": "Cncl",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "status.completed": {
+      "abbr": {
+        "en": "Done",
+        "zh-TW": "完成"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "status.done": {
+      "abbr": {
+        "en": "Done",
+        "zh-TW": "完成"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "status.in_progress": {
+      "abbr": {
+        "en": "Prog",
+        "zh-TW": "進行"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "status.last_sync": {
+      "abbr": {
+        "en": "Sync",
+        "zh-TW": "末同"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "status.paused": {
+      "abbr": {
+        "en": "Pause",
+        "zh-TW": "暫停"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "status.pending": {
+      "abbr": {
+        "en": "Pend",
+        "zh-TW": "待處"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "status.preparing": {
+      "abbr": {
+        "en": "Prep",
+        "zh-TW": "準備"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "status.stale": {
+      "abbr": {
+        "en": "Stale",
+        "zh-TW": "延遲"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "status.todo": {
+      "abbr": {
+        "en": "Todo",
+        "zh-TW": "待辦"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "task.aoi": {
+      "abbr": {
+        "en": "AOI",
+        "zh-TW": "範圍"
+      },
+      "maxChars": {
+        "en": 4,
+        "zh-TW": 4
+      }
+    },
+    "task.assign_now": {
+      "abbr": {
+        "en": "Asgn",
+        "zh-TW": "指派"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.assignee": {
+      "abbr": {
+        "en": "Asgn",
+        "zh-TW": "執行"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 3
+      }
+    },
+    "task.board": {
+      "abbr": {
+        "en": "Board",
+        "zh-TW": "看板"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.cancel": {
+      "abbr": {
+        "en": "Cancel",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.checklist": {
+      "abbr": {
+        "en": "List",
+        "zh-TW": "清單"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.checklist_add": {
+      "abbr": {
+        "en": "Add",
+        "zh-TW": "新增"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "task.claim": {
+      "abbr": {
+        "en": "Claim",
+        "zh-TW": "領取"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 4
+      }
+    },
+    "task.complete": {
+      "abbr": {
+        "en": "Done",
+        "zh-TW": "完成"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.create": {
+      "abbr": {
+        "en": "New",
+        "zh-TW": "建任"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.created_at": {
+      "abbr": {
+        "en": "Created",
+        "zh-TW": "建立"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.description": {
+      "abbr": {
+        "en": "Desc",
+        "zh-TW": "描述"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.due": {
+      "abbr": {
+        "en": "Due",
+        "zh-TW": "截止"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "task.eta": {
+      "abbr": {
+        "en": "ETA",
+        "zh-TW": "到達"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 4
+      }
+    },
+    "task.id": {
+      "abbr": {
+        "en": "ID",
+        "zh-TW": "編號"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "task.last_update": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "末更"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "task.list": {
+      "abbr": {
+        "en": "List",
+        "zh-TW": "清單"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.location": {
+      "abbr": {
+        "en": "Loc",
+        "zh-TW": "位置"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.log": {
+      "abbr": {
+        "en": "Log",
+        "zh-TW": "紀錄"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.objective": {
+      "abbr": {
+        "en": "Obj",
+        "zh-TW": "目標"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 2
+      }
+    },
+    "task.owner": {
+      "abbr": {
+        "en": "Owner",
+        "zh-TW": "負責"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "task.pause": {
+      "abbr": {
+        "en": "Pause",
+        "zh-TW": "暫停"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "task.priority": {
+      "abbr": {
+        "en": "Pri",
+        "zh-TW": "優先"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 3
+      }
+    },
+    "task.progress": {
+      "abbr": {
+        "en": "Prog",
+        "zh-TW": "進度"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.release": {
+      "abbr": {
+        "en": "Rel",
+        "zh-TW": "釋放"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "task.required_items": {
+      "abbr": {
+        "en": "Items",
+        "zh-TW": "物資"
+      },
+      "maxChars": {
+        "en": 14,
+        "zh-TW": 4
+      }
+    },
+    "task.resume": {
+      "abbr": {
+        "en": "Resume",
+        "zh-TW": "繼續"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "task.route": {
+      "abbr": {
+        "en": "Route",
+        "zh-TW": "路線"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.sop_links": {
+      "abbr": {
+        "en": "SOP",
+        "zh-TW": "SOP"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.start": {
+      "abbr": {
+        "en": "Start",
+        "zh-TW": "開始"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "task.status": {
+      "abbr": {
+        "en": "Status",
+        "zh-TW": "狀態"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.team": {
+      "abbr": {
+        "en": "Team",
+        "zh-TW": "小隊"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.title": {
+      "abbr": {
+        "en": "Title",
+        "zh-TW": "標題"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "task.unassign": {
+      "abbr": {
+        "en": "Unasg",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "task.update_progress": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 4
+      }
+    },
+    "task.updated_at": {
+      "abbr": {
+        "en": "Updated",
+        "zh-TW": "更新"
+      },
+      "maxChars": {
+        "en": 12,
+        "zh-TW": 4
+      }
+    },
+    "time.last_updated": {
+      "abbr": {
+        "en": "Upd",
+        "zh-TW": "末更"
+      },
+      "maxChars": {
+        "en": 24,
+        "zh-TW": 12
+      }
+    },
+    "time.now": {
+      "abbr": {
+        "en": "Now",
+        "zh-TW": "現在"
+      },
+      "maxChars": {
+        "en": 6,
+        "zh-TW": 2
+      }
+    },
+    "time.today": {
+      "abbr": {
+        "en": "Today",
+        "zh-TW": "今天"
+      },
+      "maxChars": {
+        "en": 8,
+        "zh-TW": 2
+      }
+    },
+    "time.tomorrow": {
+      "abbr": {
+        "en": "Tmr",
+        "zh-TW": "明天"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "time.yesterday": {
+      "abbr": {
+        "en": "Yday",
+        "zh-TW": "昨天"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ui.state.active": {
+      "abbr": {
+        "en": "Act",
+        "zh-TW": "進行"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ui.state.cancelled": {
+      "abbr": {
+        "en": "Cncl",
+        "zh-TW": "取消"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ui.state.completed": {
+      "abbr": {
+        "en": "Done",
+        "zh-TW": "完成"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "ui.state.pending": {
+      "abbr": {
+        "en": "Pend",
+        "zh-TW": "待命"
+      },
+      "maxChars": {
+        "en": 10,
+        "zh-TW": 2
+      }
+    },
+    "unit.box": {
+      "abbr": {
+        "en": "box",
+        "zh-TW": "箱"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 1
+      }
+    },
+    "unit.day": {
+      "abbr": {
+        "en": "d",
+        "zh-TW": "天"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 1
+      }
+    },
+    "unit.hr": {
+      "abbr": {
+        "en": "hr",
+        "zh-TW": "時"
+      },
+      "maxChars": {
+        "en": 2,
+        "zh-TW": 2
+      }
+    },
+    "unit.km": {
+      "abbr": {
+        "en": "km",
+        "zh-TW": "km"
+      },
+      "maxChars": {
+        "en": 2,
+        "zh-TW": 2
+      }
+    },
+    "unit.m": {
+      "abbr": {
+        "en": "m",
+        "zh-TW": "m"
+      },
+      "maxChars": {
+        "en": 2,
+        "zh-TW": 2
+      }
+    },
+    "unit.min": {
+      "abbr": {
+        "en": "min",
+        "zh-TW": "分"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 2
+      }
+    },
+    "unit.pcs": {
+      "abbr": {
+        "en": "pcs",
+        "zh-TW": "件"
+      },
+      "maxChars": {
+        "en": 3,
+        "zh-TW": 1
+      }
+    }
+  },
+  "generatedAt": "2026-01-05T19:12:27Z",
+  "metaVersion": "1.1.0",
+  "notes": "maxChars are UI layout recommendations; abbr are suggested fallbacks for tight spaces."
+}

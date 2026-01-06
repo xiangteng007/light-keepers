@@ -1,0 +1,25 @@
+:root[data-theme="tactical"]{
+  --bg-app: #161E2A;
+  --bg-panel: #1D2635;
+  --border-subtle: #2F3641;
+
+  --text-primary: #F3F3F2;
+  --text-secondary: #D0CEC3;
+  --text-muted: #AEAEA7;
+
+  --accent-gold: #C39B6F;
+  --alert-critical: #893336;
+
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+
+  --shadow-1: 0 8px 20px rgba(8,10,15,.45);
+  --shadow-2: 0 18px 46px rgba(8,10,15,.55);
+}

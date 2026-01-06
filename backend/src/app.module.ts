@@ -34,6 +34,24 @@ import { IntegrationsModule } from './modules/integrations/integrations.module';
 import { BackupModule } from './modules/backup/backup.module';
 import { TenantModule } from './modules/tenants/tenant.module';
 import { MissionSessionsModule } from './modules/mission-sessions/mission-sessions.module';
+import { OverlaysModule } from './modules/overlays/overlays.module'; // 🗺️ 戰術地圖模組
+import { FieldReportsModule } from './modules/field-reports/field-reports.module'; // 📡 即時回報系統
+import { AiQueueModule } from './modules/ai-queue/ai-queue.module'; // 🤖 AI 隊列平台
+import { AuditModule } from './modules/audit/audit.module'; // 🔒 稽核日誌
+import { CacheModule } from './modules/cache/cache.module'; // 🚀 快取服務
+import { ErrorTrackingModule } from './modules/error-tracking/error-tracking.module'; // 📊 錯誤追蹤
+import { SystemModule } from './modules/system/system.module'; // ⚙️ 系統管理
+import { LocationModule } from './modules/location/location.module'; // 📍 地理圍欄
+import { SchedulerModule } from './modules/scheduler/scheduler.module'; // ⏰ 排程任務
+import { MetricsModule } from './modules/metrics/metrics.module'; // 📈 API 指標
+import { WebhooksModule } from './modules/webhooks/webhooks.module'; // 🔗 Webhooks
+import { FeaturesModule } from './modules/features/features.module'; // 🚩 Feature Flags
+import { FilesModule } from './modules/files/files.module'; // 📁 檔案管理
+// v2.0 擴充模組
+import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module'; // 🎮 演練模擬
+import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module'; // 📡 離線網狀
+import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module'; // ❤️ 心理支持
+import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module'; // 🔗 責信區塊鏈
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -99,6 +117,24 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         BackupModule, // 💾 數據備份
         TenantModule, // 🏢 多租戶
         MissionSessionsModule, // 🚨 緊急應變任務系統
+        OverlaysModule, // 🗺️ 戰術地圖模組
+        FieldReportsModule, // 📡 即時回報系統
+        AiQueueModule, // 🤖 AI 隊列平台
+        AuditModule, // 🔒 稽核日誌
+        CacheModule, // 🚀 快取服務
+        ErrorTrackingModule, // 📊 錯誤追蹤
+        SystemModule, // ⚙️ 系統管理
+        LocationModule, // 📍 地理圍欄
+        SchedulerModule, // ⏰ 排程任務
+        MetricsModule, // 📈 API 指標
+        WebhooksModule, // 🔗 Webhooks
+        FeaturesModule, // 🚩 Feature Flags
+        FilesModule, // 📁 檔案管理
+        // v2.0 擴充模組
+        DrillSimulationModule, // 🎮 演練模擬
+        OfflineMeshModule, // 📡 離線網狀
+        PsychologicalSupportModule, // ❤️ 心理支持
+        IntegrityLedgerModule, // 🔗 責信區塊鏈
     ],
     providers: [
         CloudLoggerService,

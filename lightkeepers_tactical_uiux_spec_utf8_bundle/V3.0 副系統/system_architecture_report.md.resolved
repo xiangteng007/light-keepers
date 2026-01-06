@@ -1,0 +1,259 @@
+# 光守護者防災平台 - 系統架構與技術堆疊報告
+
+**報告日期**: 2026-01-06  
+**版本**: v8.2 (Light Guardian v2.0)
+
+---
+
+## 1. 系統概覽
+
+**光守護者防災平台 (Lightkeepers Disaster Prevention Platform)** 是一個任務導向的即時災害協調系統，專為台灣區域災害應變需求設計。
+
+### 核心價值
+| 核心功能 | 說明 |
+|:---|:---|
+| **即時資訊** | 整合 NCDR/CWA 官方資料與群眾通報 |
+| **智慧決策** | AI 輔助派遣與優先順序分類 |
+| **協同行動** | 統一指揮志工與幹部的協作平台 |
+
+---
+
+## 2. 副系統架構 (52+ 後端模組)
+
+### 2.1 核心基礎設施模組
+| 模組名稱 | 功能說明 |
+|:---|:---|
+| `auth` | 身份驗證 (JWT/LINE/Google OAuth) |
+| `accounts` | 用戶檔案與 5 級 RBAC 管理 |
+| `tenants` | 多租戶隔離邏輯 |
+| `cache` | Redis / 記憶體快取策略 |
+| `database` | TypeORM / PostgreSQL 連接中樞 |
+| `health` | 活性與就緒監控 |
+| `metrics` | API 延遲與系統資源追蹤 (Prometheus) |
+| `error-tracking` | 全域錯誤捕捉 (Sentry) |
+| `system` | 平台全域設定 |
+| `backup` | 快照與還原服務 |
+| `scheduler` | 持久感知 Cron 任務管理器 |
+| `audit` | 不可變動作日誌 |
+| `access-log` | HTTP 流量可見性 |
+
+---
+
+### 2.2 任務指揮系統 (ICS / C2)
+| 模組名稱 | 功能說明 |
+|:---|:---|
+| `mission-sessions` | 核心任務生命週期 (準備中/進行中/已完成) |
+| `field-reports` | 現場情報蒐集 (群眾通報/NCDR) |
+| `tasks` | 作業任務 CRUD 操作 |
+| `task-dispatch` | 進階派遣邏輯 (距離/優先順序) |
+| `overlays` | 共通作戰圖層管理 (區域/路線/點位) |
+| `location` | 即時志工與事件追蹤 |
+
+---
+
+### 2.3 營運與後勤模組
+| 模組名稱 | 功能說明 |
+|:---|:---|
+| `volunteers` | 志工進階檔案、技能與審核 |
+| `training` | 教育訓練與認證管理 |
+| `activities` | 協會活動追蹤 (非任務) |
+| `resources` | 資產庫存與物資追蹤 |
+| `donations` | 財務與物資捐款記錄 |
+| `public-resources` | 民眾端資源透明度入口 |
+| `community` | 協會內部社群與回饋中心 |
+
+---
+
+### 2.4 情報與分析模組
+| 模組名稱 | 功能說明 |
+|:---|:---|
+| `ai-queue` | 非同步 LLM 處理引擎 (Gemini/GPT) |
+| `analytics` | 戰略任務績效指標 |
+| `reports` | 每日/每週營運摘要生成 |
+| `reports-export` | 多格式資料匯出 (PDF/CSV) |
+| `ncdr-alerts` | 國家災害防救科技中心同步 |
+| `weather` | 即時 CWA 氣象資料 |
+| `weather-forecast` | 預測氣象分析 |
+
+---
+
+### 2.5 專業化 v2.0 模組
+| 模組名稱 | 功能說明 |
+|:---|:---|
+| `drill-simulation` | 演練響應準備沙盒 |
+| `offline-mesh` | Meshtastic LoRa 整合 (離線通訊區) |
+| `psychological-support` | AI HopeBot 心理急救 |
+| `integrity-ledger` | 區塊鏈 SHA-256 雜湊鏈 (物資追蹤) |
+| `voice` | WebRTC 語音任務通訊 |
+
+---
+
+## 3. 前端頁面架構 (76+ 頁面)
+
+### 3.1 任務指揮套件
+| 頁面 | 功能說明 |
+|:---|:---|
+| `EmergencyResponsePage` | 指揮發射台與任務歷史 |
+| `MissionCommandPage` | 高強度戰術駕駛艙 |
+| `CommandPostMapPage` | 地理空間區域管理與派遣 |
+| `IAPManagerPage` | 作業期間與 ICS 文件 (202-208) 管理 |
+| `SITREPViewerPage` | 即時狀況摘要與決策日誌 |
+| `AARPlaybackPage` | 互動任務時間軸回放 (事後檢討) |
+
+### 3.2 營運儀表板
+| 頁面 | 功能說明 |
+|:---|:---|
+| `DashboardPage` | 統一登陸頁含即時 KPI 元件 |
+| `MapPage` | 一般態勢感知地圖 |
+| `NcdrAlertsPage` | 國家警報監控動態 |
+| `ForecastPage` | 氣象與災害風險預測 |
+| `AnalyticsPage` | 戰略資料視覺化套件 |
+
+### 3.3 管理與營運
+| 頁面 | 功能說明 |
+|:---|:---|
+| `VolunteersPage` | 應變人員列表與狀態管理 |
+| `VolunteerDetailPage` | 深入檔案與活動日誌 |
+| `ResourcesPage` | 庫存與供應鏈儀表板 |
+| `TasksPage` | 協調人員全域任務列表 |
+| `TrainingPage` | 課程、報名與記錄 |
+| `DonationsPage` | 財務與資產透明入口 |
+
+### 3.4 檔案與設定
+| 頁面 | 功能說明 |
+|:---|:---|
+| `ProfilePage` | 用戶個人儀表板 |
+| `PermissionsPage` | 全系統 RBAC 與選單設定 |
+| `BackupPage` | 災難復原與快照控制台 |
+| `ManualsPage` | 離線可用 SOP 與技術手冊 |
+| `BindLinePage` | 社群 ID 連結控制台 |
+
+---
+
+## 4. 技術堆疊規格
+
+### 4.1 後端技術
+
+| 類別 | 技術 | 版本 |
+|:---|:---|:---|
+| **主框架** | NestJS | v10.3 |
+| **語言** | TypeScript | v5.3 |
+| **ORM** | TypeORM | v0.3.19 |
+| **資料庫** | PostgreSQL + PostGIS | 15 |
+| **即時通訊** | Socket.io | v4.8.2 |
+| **離線通訊** | MQTT (Meshtastic) | v5.14 |
+| **AI 服務** | Google Gemini Generative AI | v0.24 |
+| **通訊整合** | LINE Messaging SDK | v10.5 |
+| **郵件服務** | Nodemailer / Resend | - |
+| **身份驗證** | Firebase Admin | v13.6 |
+| **安全套件** | Passport-JWT, Helmet, Throttler | - |
+
+---
+
+### 4.2 前端技術
+
+| 類別 | 技術 | 版本 |
+|:---|:---|:---|
+| **主框架** | React | v19.2 |
+| **建構工具** | Vite | v7.2 |
+| **語言** | TypeScript | v5.9 |
+| **狀態管理** | TanStack Query | v5.90 |
+| **地圖引擎** | Leaflet | v1.9 |
+| **離線地圖** | MapLibre GL + PMTiles | v5.15 / v4.3 |
+| **圖表元件** | Chart.js | v4.5 |
+| **UI 框架** | React-Bootstrap | v2.10 |
+| **圖標庫** | Lucide Icons | - |
+| **原生封裝** | Capacitor | v8.0 |
+| **PWA 工具** | Vite PWA Plugin | v1.2 |
+| **LINE 整合** | LINE LIFF SDK | v2.27 |
+| **多語系** | react-i18next | - |
+
+---
+
+### 4.3 雲端基礎設施與儲存
+
+| 服務類型 | 平台/技術 | 用途 |
+|:---|:---|:---|
+| **主要雲端** | Google Cloud Platform (GCP) | 整體基礎設施 |
+| **應用層** | Cloud Run | NestJS API 部署 |
+| **無伺服器** | Cloud Functions | Webhook 處理 |
+| **身份驗證** | Firebase Auth | 用戶認證 |
+| **訊息佇列** | Cloud Pub/Sub, Cloud Tasks | 非同步處理 |
+| **監控** | Cloud Logging & Monitoring | 可觀察性 |
+| **CI/CD** | GitHub Actions → Cloud Run | 自動部署 |
+
+---
+
+### 4.4 混合儲存策略
+
+| 儲存層 | 資料類型 | 實作方式 |
+|:---|:---|:---|
+| **Cloud SQL** | 交易型資料 | PostgreSQL (ACID: 帳戶/事件/任務) |
+| **Firestore** | 即時資料 | NoSQL (工地日誌/GPS 打卡/通知) |
+| **Cloud Storage** | 二進位檔案 | GCS (任務照片/藍圖/簽署文件) |
+| **BigQuery** | 分析資料 | 長期趨勢分析與 AI RAG 來源 |
+| **Redis** | 快取 | API 節流/快取 |
+| **IndexedDB** | 本機儲存 | PWA 離線資料持久化 |
+
+---
+
+## 5. 角色權限層級 (RBAC)
+
+| 等級 | 角色識別 | 主要功能 |
+|:---|:---|:---|
+| **5** | System Owner (系統擁有者) | 完整控制、選單管理 |
+| **4** | Chairman (理事長) | 政策與審核 |
+| **3** | Senior Officer (資深幹部) | 營運監督 |
+| **2** | Officer (幹部) | 協調與任務指派 |
+| **1** | Volunteer (志工) | **預設** - 任務執行 |
+| **0** | Anonymous (匿名) | 公開檢視與手冊 |
+
+---
+
+## 6. 安全標準
+
+| 安全機制 | 實作方式 |
+|:---|:---|
+| **身份驗證** | JWT Session + HttpOnly Refresh Cookies |
+| **RBAC 執行** | `UnifiedRolesGuard` (等級式閘控) |
+| **IDOR 防護** | `ResourceOwnerGuard` (變動端點) |
+| **Cookie 設定** | `SameSite=None; Secure` (跨域持久會話) |
+
+---
+
+## 7. 開發路線圖 (v2.0 狀態)
+
+| 階段 | 功能 | 優先順序 | 狀態 |
+|:---|:---|:---|:---|
+| **已完成** | AI 照片分析與智慧派遣 | ✅ | Phase 15 |
+| **已完成** | 數位雙胞胎演練系統 (v2.0) | ✅ | Phase 48 |
+| **已完成** | 離線 Mesh 中繼 (v2.0) | ✅ | Phase 49 |
+| **已完成** | 心理韌性 (v2.0) | ✅ | Phase 50 |
+| **已完成** | 責任帳本 (區塊鏈 v2.0) | ✅ | Phase 51 |
+| **已完成** | ICS 與戰術 C2 整合 (P0-P1) | ✅ | Phase 52-53 |
+| **進行中** | Capacitor 原生封裝 | 高 | Phase 12 |
+| **中期** | 區域「幽靈」地圖 (PMTiles) | 高 | 2026 Q1 |
+| **長期** | 多代理任務 AI 代理人 | 低 | 2026 Q3 |
+
+---
+
+## 8. 專案目錄結構
+
+```
+xiwang-disaster-respond/
+├── backend/                 # NestJS 後端 API
+│   └── src/modules/        # 52+ 模組
+├── web-dashboard/           # React 前端應用
+│   └── src/pages/          # 76+ 頁面
+├── docs/                    # 文件
+├── infra/                   # 基礎設施設定
+├── .github/workflows/       # CI/CD (GitHub Actions)
+├── cloudbuild.yaml          # Cloud Build 設定
+└── docker-compose.yml       # 本地開發環境
+```
+
+---
+
+**報告結束**
+
+> 此報告為自動生成，整合自知識庫 `lightkeepers_disaster_prevention_platform` 文件。

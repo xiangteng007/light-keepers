@@ -1,0 +1,212 @@
+{
+    "common": {
+        "appName": "Platform Pencegahan Bencana Light Keepers",
+        "loading": "Memuatkan...",
+        "error": "Ralat berlaku",
+        "success": "Berjaya",
+        "save": "Simpan",
+        "cancel": "Batal",
+        "confirm": "Sahkan",
+        "delete": "Padam",
+        "edit": "Edit",
+        "add": "Tambah",
+        "search": "Cari",
+        "filter": "Tapis",
+        "refresh": "Muat semula",
+        "back": "Kembali",
+        "next": "Seterusnya",
+        "previous": "Sebelumnya",
+        "submit": "Hantar",
+        "close": "Tutup",
+        "yes": "Ya",
+        "no": "Tidak",
+        "all": "Semua",
+        "none": "Tiada",
+        "required": "Diperlukan",
+        "optional": "Pilihan"
+    },
+    "nav": {
+        "dashboard": "Papan Pemuka",
+        "map": "Peta Bencana",
+        "reports": "Laporan Bencana",
+        "volunteers": "Pengurusan Sukarelawan",
+        "resources": "Pengurusan Sumber",
+        "events": "Pengurusan Acara",
+        "activities": "Pendaftaran Aktiviti",
+        "announcements": "Pengumuman",
+        "settings": "Tetapan",
+        "permissions": "Kebenaran",
+        "profile": "Profil",
+        "logout": "Log Keluar"
+    },
+    "auth": {
+        "login": "Log Masuk",
+        "logout": "Log Keluar",
+        "register": "Daftar",
+        "email": "E-mel",
+        "password": "Kata Laluan",
+        "confirmPassword": "Sahkan Kata Laluan",
+        "forgotPassword": "Lupa Kata Laluan?",
+        "rememberMe": "Ingat Saya",
+        "loginWithGoogle": "Log masuk dengan Google",
+        "loginWithLine": "Log masuk dengan LINE",
+        "loginSuccess": "Log masuk berjaya",
+        "loginFailed": "Log masuk gagal",
+        "logoutSuccess": "Berjaya log keluar"
+    },
+    "dashboard": {
+        "title": "Papan Pemuka",
+        "welcome": "Selamat kembali",
+        "overview": "Gambaran Keseluruhan",
+        "todayReports": "Laporan Hari Ini",
+        "activeVolunteers": "Sukarelawan Aktif",
+        "totalResources": "Jumlah Sumber",
+        "pendingTasks": "Tugas Tertangguh",
+        "recentActivity": "Aktiviti Terkini",
+        "quickActions": "Tindakan Pantas",
+        "newReport": "Laporan Baharu",
+        "viewMap": "Lihat Peta"
+    },
+    "reports": {
+        "title": "Laporan Bencana",
+        "new": "Laporan Baharu",
+        "list": "Senarai Laporan",
+        "status": {
+            "pending": "Menunggu",
+            "confirmed": "Disahkan",
+            "rejected": "Ditolak",
+            "resolved": "Diselesaikan"
+        },
+        "type": {
+            "flood": "Banjir",
+            "debris": "Tanah Runtuh",
+            "fire": "Kebakaran",
+            "accident": "Kemalangan",
+            "other": "Lain-lain"
+        },
+        "severity": {
+            "low": "Rendah",
+            "medium": "Sederhana",
+            "high": "Tinggi",
+            "critical": "Kritikal"
+        },
+        "fields": {
+            "title": "Tajuk",
+            "description": "Penerangan",
+            "location": "Lokasi",
+            "photos": "Gambar",
+            "contact": "Maklumat Hubungan"
+        }
+    },
+    "volunteers": {
+        "title": "Pengurusan Sukarelawan",
+        "list": "Senarai Sukarelawan",
+        "add": "Tambah Sukarelawan",
+        "status": {
+            "available": "Tersedia",
+            "busy": "Sibuk",
+            "offline": "Luar Talian"
+        },
+        "fields": {
+            "name": "Nama",
+            "phone": "Telefon",
+            "region": "Kawasan Perkhidmatan",
+            "skills": "Kemahiran",
+            "hours": "Jam Perkhidmatan",
+            "points": "Mata"
+        },
+        "recognition": {
+            "badges": "Lencana",
+            "awards": "Anugerah",
+            "milestones": "Pencapaian",
+            "leaderboard": "Papan Pendahulu"
+        }
+    },
+    "resources": {
+        "title": "Pengurusan Sumber",
+        "list": "Senarai Sumber",
+        "add": "Tambah Sumber",
+        "status": {
+            "available": "Tersedia",
+            "low": "Stok Rendah",
+            "depleted": "Habis"
+        },
+        "fields": {
+            "name": "Nama",
+            "category": "Kategori",
+            "quantity": "Kuantiti",
+            "unit": "Unit",
+            "location": "Lokasi",
+            "expiresAt": "Tarikh Luput"
+        }
+    },
+    "activities": {
+        "title": "Pendaftaran Aktiviti",
+        "list": "Senarai Aktiviti",
+        "create": "Cipta Aktiviti",
+        "register": "Daftar",
+        "status": {
+            "draft": "Draf",
+            "open": "Terbuka",
+            "closed": "Ditutup",
+            "cancelled": "Dibatalkan",
+            "completed": "Selesai"
+        },
+        "fields": {
+            "title": "Nama Aktiviti",
+            "description": "Penerangan",
+            "date": "Tarikh",
+            "location": "Lokasi",
+            "participants": "Peserta"
+        }
+    },
+    "sos": {
+        "title": "SOS Kecemasan",
+        "send": "Hantar Isyarat SOS",
+        "status": {
+            "active": "Aktif",
+            "acknowledged": "Diakui",
+            "resolved": "Diselesaikan"
+        }
+    },
+    "settings": {
+        "title": "Tetapan",
+        "theme": {
+            "title": "Tema",
+            "light": "Mod Cerah",
+            "dark": "Mod Gelap",
+            "system": "Ikut Sistem"
+        },
+        "language": {
+            "title": "Bahasa",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia"
+        },
+        "notifications": {
+            "title": "Tetapan Pemberitahuan",
+            "push": "Pemberitahuan Push",
+            "email": "Pemberitahuan E-mel"
+        }
+    },
+    "errors": {
+        "notFound": "Halaman Tidak Ditemui",
+        "unauthorized": "Akses Tidak Dibenarkan",
+        "forbidden": "Akses Dilarang",
+        "serverError": "Ralat Pelayan",
+        "networkError": "Ralat Rangkaian",
+        "timeout": "Tamat Masa"
+    },
+    "offline": {
+        "title": "Mod Luar Talian",
+        "message": "Anda sedang luar talian. Sesetengah ciri mungkin terhad.",
+        "pending": "menunggu penyegerakan",
+        "sync": "Segerak"
+    }
+}

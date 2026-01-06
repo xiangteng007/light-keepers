@@ -1,0 +1,202 @@
+/* Publish Workflow Panel Styles */
+
+.pwp-container {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.pwp-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: rgba(245, 158, 11, 0.1);
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.pwp-header:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.pwp-header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.pwp-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 6px;
+    background: #f59e0b;
+    color: #000;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 12px;
+}
+
+.pwp-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e2e8f0;
+}
+
+.pwp-toggle {
+    color: #94a3b8;
+    font-size: 10px;
+}
+
+.pwp-content {
+    padding: 12px;
+}
+
+.pwp-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.pwp-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.pwp-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pwp-btn--select-all {
+    background: transparent;
+    border: 1px solid #475569;
+    color: #94a3b8;
+}
+
+.pwp-btn--select-all:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}
+
+.pwp-btn--publish {
+    background: #3b82f6;
+    color: #fff;
+}
+
+.pwp-btn--publish:hover:not(:disabled) {
+    background: #2563eb;
+}
+
+.pwp-btn--publish-all {
+    background: #22c55e;
+    color: #fff;
+    margin-left: auto;
+}
+
+.pwp-btn--publish-all:hover:not(:disabled) {
+    background: #16a34a;
+}
+
+/* Draft list */
+.pwp-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.pwp-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    background: #0f172a;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+}
+
+.pwp-item:hover {
+    background: #1e293b;
+}
+
+.pwp-item.selected {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.1);
+}
+
+.pwp-item-checkbox {
+    display: flex;
+    align-items: center;
+}
+
+.pwp-item-checkbox input {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.pwp-item-icon {
+    font-size: 16px;
+}
+
+.pwp-item-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.pwp-item-name {
+    font-size: 13px;
+    color: #e2e8f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.pwp-item-type {
+    font-size: 11px;
+    color: #64748b;
+    text-transform: uppercase;
+}
+
+.pwp-item-discard {
+    padding: 4px;
+    background: transparent;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.15s ease;
+}
+
+.pwp-item-discard:hover:not(:disabled) {
+    opacity: 1;
+}
+
+/* Scrollbar */
+.pwp-list::-webkit-scrollbar {
+    width: 4px;
+}
+
+.pwp-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.pwp-list::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 2px;
+}

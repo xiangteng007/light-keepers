@@ -1,0 +1,234 @@
+.dashboard-editor-page {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 60px);
+    background: var(--bg-secondary, #f9fafb);
+}
+
+.editor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--card-bg, white);
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.editor-title {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+.editor-title h1 {
+    font-size: 1.25rem;
+    color: var(--text-primary, #1a1a2e);
+    margin: 0;
+}
+
+.layout-name-input {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 6px;
+    font-size: 0.9rem;
+    min-width: 200px;
+}
+
+.layout-name-input:focus {
+    outline: none;
+    border-color: #d4af37;
+}
+
+.editor-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.reset-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.save-btn {
+    padding: 0.5rem 1.5rem;
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.editor-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Widget Palette */
+.widget-palette {
+    width: 280px;
+    background: var(--card-bg, white);
+    border-right: 1px solid var(--border-color, #e5e7eb);
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+.widget-palette h2 {
+    font-size: 1rem;
+    margin: 0 0 0.25rem 0;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.palette-hint {
+    font-size: 0.8rem;
+    color: var(--text-muted, #9ca3af);
+    margin-bottom: 1rem;
+}
+
+.widget-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.widget-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 8px;
+    cursor: grab;
+    transition: all 0.2s ease;
+}
+
+.widget-item:hover {
+    background: #e5e7eb;
+    transform: translateX(4px);
+}
+
+.widget-item:active {
+    cursor: grabbing;
+}
+
+.widget-item .widget-icon {
+    font-size: 1.25rem;
+}
+
+.widget-item .widget-name {
+    flex: 1;
+    font-size: 0.9rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.widget-item .widget-size {
+    font-size: 0.75rem;
+    color: var(--text-muted, #9ca3af);
+    background: white;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+}
+
+/* Grid Area */
+.grid-area {
+    flex: 1;
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.grid-container {
+    flex: 1;
+    display: grid;
+    gap: 0.75rem;
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 1rem;
+    position: relative;
+}
+
+.grid-container.dragging .grid-cell {
+    border: 2px dashed #d4af37;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.grid-cell {
+    border: 1px dashed #e5e7eb;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.grid-cell:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Placed Widgets */
+.placed-widget {
+    position: relative;
+    background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+    border: 2px solid #d4af37;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.placed-widget .widget-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.placed-widget .widget-icon {
+    font-size: 2rem;
+}
+
+.placed-widget .widget-label {
+    font-size: 0.85rem;
+    color: var(--text-primary, #1a1a2e);
+    font-weight: 500;
+}
+
+.remove-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #ef4444;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.placed-widget:hover .remove-btn {
+    opacity: 1;
+}
+
+/* Grid Legend */
+.grid-legend {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding-top: 1rem;
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.85rem;
+}

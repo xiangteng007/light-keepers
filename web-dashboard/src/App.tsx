@@ -45,6 +45,12 @@ import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
 import EmergencyResponsePage from './pages/EmergencyResponsePage'
+import CommandPostMapPage from './pages/CommandPostMapPage'
+import MissionCommandPage from './pages/MissionCommandPage'
+import IAPManagerPage from './pages/command/IAPManagerPage'
+import SITREPViewerPage from './pages/command/SITREPViewerPage'
+import AARPlaybackPage from './pages/command/AARPlaybackPage'
+import TacticalMapPage from './pages/TacticalMapPage'
 import './App.css'
 
 
@@ -103,6 +109,7 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
+          <Route path="/mission-command/:missionSessionId" element={<MissionCommandPage />} /> {/* 任務指揮中心（獨立頁面） */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
@@ -130,6 +137,11 @@ function App() {
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
             <Route path="emergency-response" element={<ProtectedRoute requiredLevel={2}><EmergencyResponsePage /></ProtectedRoute>} />
+            <Route path="emergency-response/map/:sessionId" element={<ProtectedRoute requiredLevel={2}><CommandPostMapPage /></ProtectedRoute>} />
+            <Route path="emergency-response/iap/:sessionId" element={<ProtectedRoute requiredLevel={2}><IAPManagerPage /></ProtectedRoute>} />
+            <Route path="emergency-response/sitrep/:sessionId" element={<ProtectedRoute requiredLevel={2}><SITREPViewerPage /></ProtectedRoute>} />
+            <Route path="emergency-response/aar/:sessionId" element={<ProtectedRoute requiredLevel={2}><AARPlaybackPage /></ProtectedRoute>} />
+            <Route path="tactical-map" element={<ProtectedRoute requiredLevel={2}><TacticalMapPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
             <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />

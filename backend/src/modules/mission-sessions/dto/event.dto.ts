@@ -1,5 +1,5 @@
 import { IsString, IsOptional, IsEnum, IsObject, IsUUID, IsArray } from 'class-validator';
-import { EventType } from '../entities/event.entity';
+import { MissionEventType } from '../entities/event.entity';
 
 export class CreateEventDto {
     @IsUUID()
@@ -13,8 +13,8 @@ export class CreateEventDto {
     description?: string;
 
     @IsOptional()
-    @IsEnum(EventType)
-    type?: EventType;
+    @IsEnum(MissionEventType)
+    type?: MissionEventType;
 
     @IsOptional()
     @IsString()

@@ -132,5 +132,89 @@ export class ReportsExportController {
         res.setHeader('Content-Disposition', 'attachment; filename=inventory-transactions.csv');
         res.send('\uFEFF' + csv);
     }
-}
 
+    // ==================== 現場回報 (Emergency Response) ====================
+
+    // 現場回報報表
+    @Get('field-reports')
+    async getFieldReports(
+        @Query('missionSessionId') missionSessionId: string,
+        @Query('start') start?: string,
+        @Query('end') end?: string,
+    ) {
+        const startDate = start ? new Date(start) : undefined;
+        const endDate = end ? new Date(end) : undefined;
+        const report = await this.exportService.getFieldReportsExport(missionSessionId, startDate, endDate);
+        return { success: true, data: report };
+    }
+
+    // 現場回報 CSV 下載
+    @Get('field-reports/csv')
+    async downloadFieldReportsCSV(
+        @Query('missionSessionId') missionSessionId: string,
+        @Query('start') start: string,
+        @Query('end') end: string,
+        @Res() res: Response,
+    ) {
+        const startDate = start ? new Date(start) : undefined;
+        const endDate = end ? new Date(end) : undefined;
+        const report = await this.exportService.getFieldReportsExport(missionSessionId, startDate, endDate);
+        const csv = this.exportService.generateCSV(report);
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename=field-reports.csv');
+        res.send('\uFEFF' + csv);
+    }
+
+    // SOS 信號報表
+    @Get('sos-signals')
+    async getSosSignals(
+        @Query('missionSessionId') missionSessionId: string,
+        @Query('start') start?: string,
+        @Query('end') end?: string,
+    ) {
+        const startDate = start ? new Date(start) : undefined;
+        const endDate = end ? new Date(end) : undefined;
+        const report = await this.exportService.getSosExport(missionSessionId, startDate, endDate);
+        return { success: true, data: report };
+    }
+
+    // SOS 信號 CSV 下載
+    @Get('sos-signals/csv')
+    async downloadSosCSV(
+        @Query('missionSessionId') missionSessionId: string,
+        @Query('start') start: string,
+        @Query('end') end: string,
+        @Res() res: Response,
+    ) {
+        const startDate = start ? new Date(start) : undefined;
+        const endDate = end ? new Date(end) : undefined;
+        const report = await this.exportService.getSosExport(missionSessionId, startDate, endDate);
+        const csv = this.exportService.generateCSV(report);
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', 'attachment; filename=sos-signals.csv');
+        res.send('\uFEFF' + csv);
+    }
+
+    // 任務統計摘要
+    @Get('mission-summary')
+    async getMissionSummary(@Query('missionSessionId') missionSessionId: string) {
+        const report = await this.exportService.getMissionSummary(missionSessionId);
+        return { success: true, data: report };
+    }
+
+    // 任務統計摘要 JSON 下載
+    @Get('mission-summary/json')
+    async downloadMissionSummaryJSON(
+        @Query('missionSessionId') missionSessionId: string,
+        @Res() res: Response,
+    ) {
+        const report = await this.exportService.getMissionSummary(missionSessionId);
+        const json = this.exportService.generateJSON(report);
+
+        res.setHeader('Content-Type', 'application/json');
+        res.setHeader('Content-Disposition', 'attachment; filename=mission-summary.json');
+        res.send(json);
+    }
+}

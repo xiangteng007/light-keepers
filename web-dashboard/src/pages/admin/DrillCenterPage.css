@@ -1,0 +1,306 @@
+.drill-center-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.drill-center-page.drill-mode {
+    border: 4px solid #ef4444;
+    position: relative;
+}
+
+.drill-center-page.drill-mode::before {
+    content: '演練中';
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-45deg);
+    font-size: 8rem;
+    color: rgba(239, 68, 68, 0.1);
+    font-weight: bold;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.drill-mode-banner {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(90deg, #ef4444, #dc2626);
+    color: white;
+    padding: 0.75rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.8;
+    }
+}
+
+.drill-mode-banner button {
+    background: white;
+    color: #dc2626;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.drill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.drill-header h1 {
+    font-size: 1.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.create-btn {
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.drill-content {
+    display: grid;
+    gap: 2rem;
+}
+
+/* Scenarios Section */
+.scenarios-section h2 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.scenarios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+}
+
+.scenario-card {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.scenario-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+.scenario-card.selected {
+    border: 2px solid #d4af37;
+}
+
+.scenario-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.scenario-header h3 {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.status-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
+    color: white;
+    font-weight: 600;
+}
+
+.scenario-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0 0 0.75rem 0;
+}
+
+.scenario-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #9ca3af;
+    margin-bottom: 0.75rem;
+}
+
+.start-btn {
+    width: 100%;
+    padding: 0.5rem;
+    background: #10b981;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+/* Scenario Detail */
+.scenario-detail {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.scenario-detail h2 {
+    font-size: 1.1rem;
+    margin: 0 0 1.5rem 0;
+}
+
+/* Timeline */
+.events-timeline h3 {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.75rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.timeline-event {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.event-time {
+    font-size: 0.8rem;
+    color: #6b7280;
+    min-width: 40px;
+}
+
+.event-marker {
+    position: absolute;
+    left: -1.35rem;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 2px solid #d4af37;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.event-content {
+    flex: 1;
+}
+
+.event-content strong {
+    font-size: 0.9rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.event-content p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0 0;
+}
+
+/* Drill Result */
+.drill-result {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.drill-result h3 {
+    font-size: 0.95rem;
+    margin-bottom: 1rem;
+}
+
+.result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.result-card {
+    background: #f9fafb;
+    padding: 1rem;
+    border-radius: 10px;
+    text-align: center;
+}
+
+.result-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #d4af37;
+}
+
+.result-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.ai-recommendations {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), transparent);
+    padding: 1rem;
+    border-radius: 10px;
+}
+
+.ai-recommendations h4 {
+    font-size: 0.9rem;
+    margin: 0 0 0.75rem 0;
+}
+
+.ai-recommendations ul {
+    margin: 0;
+    padding-left: 1.25rem;
+}
+
+.ai-recommendations li {
+    font-size: 0.85rem;
+    color: #374151;
+    margin-bottom: 0.5rem;
+}
+
+.drill-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.25rem;
+    color: #6b7280;
+}

@@ -1,0 +1,79 @@
+/**
+ * TrendChart Styles
+ */
+
+.trend-chart {
+    position: relative;
+    background: var(--bg-secondary, #21262d);
+    border-radius: 12px;
+    padding: 16px;
+    border: 1px solid var(--border, #30363d);
+}
+
+.trend-chart--empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted, #6e7681);
+}
+
+.trend-chart__title {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-primary, #e6edf3);
+}
+
+.trend-chart__svg {
+    width: 100%;
+    overflow: visible;
+}
+
+.trend-chart__grid {
+    color: var(--border, #30363d);
+}
+
+.trend-chart__point {
+    cursor: pointer;
+    transition: r 0.2s ease;
+}
+
+.trend-chart__point:hover {
+    r: 2;
+}
+
+.trend-chart__labels {
+    position: absolute;
+    right: 8px;
+    top: 40px;
+    bottom: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--text-muted, #6e7681);
+}
+
+.trend-chart__x-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 10px;
+    color: var(--text-muted, #6e7681);
+}
+
+/* Animation */
+@keyframes draw-line {
+    from {
+        stroke-dashoffset: 1000;
+    }
+
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+
+.trend-chart__svg polyline {
+    stroke-dasharray: 1000;
+    animation: draw-line 1s ease forwards;
+}

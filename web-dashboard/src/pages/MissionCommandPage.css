@@ -1,0 +1,209 @@
+/* Mission Command Page Styles */
+
+.mission-command-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg-primary, #0a0e17);
+    color: var(--text-primary, #e5e7eb);
+}
+
+/* Header */
+.command-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
+    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(8px);
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.command-header h1 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--accent-gold, #d4af37);
+}
+
+.mission-id {
+    font-family: var(--font-mono, 'Roboto Mono', monospace);
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    background: rgba(59, 130, 246, 0.2);
+    border-radius: 4px;
+    color: #60a5fa;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.connection-status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.875rem;
+}
+
+.connection-status.connected {
+    color: #34d399;
+}
+
+.connection-status.disconnected {
+    color: #f87171;
+}
+
+.online-count {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #9ca3af);
+}
+
+/* Main content */
+.command-content {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Sidebar */
+.command-sidebar {
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    background: rgba(15, 23, 42, 0.9);
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-tabs .tab {
+    flex: 1;
+    padding: 12px 16px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary, #9ca3af);
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.sidebar-tabs .tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary, #e5e7eb);
+}
+
+.sidebar-tabs .tab.active {
+    color: var(--accent-gold, #d4af37);
+    border-bottom: 2px solid var(--accent-gold, #d4af37);
+}
+
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0;
+}
+
+/* Locations list */
+.locations-list {
+    padding: 16px;
+}
+
+.location-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 8px;
+}
+
+.location-name {
+    font-weight: 500;
+}
+
+.location-time {
+    font-size: 0.75rem;
+    color: var(--text-secondary, #9ca3af);
+}
+
+.empty-state {
+    text-align: center;
+    color: var(--text-secondary, #9ca3af);
+    padding: 32px;
+}
+
+/* Map */
+.command-map {
+    flex: 1;
+    position: relative;
+}
+
+.map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+    color: var(--text-secondary, #9ca3af);
+    font-size: 1.25rem;
+}
+
+.map-placeholder p {
+    margin: 8px 0;
+}
+
+/* SOS container */
+.sos-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+}
+
+/* Error state */
+.error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    text-align: center;
+}
+
+.error-state h2 {
+    color: #f87171;
+    margin-bottom: 8px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .command-sidebar {
+        width: 100%;
+        height: 50%;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .command-content {
+        flex-direction: column;
+    }
+
+    .sos-container {
+        bottom: 16px;
+        right: 16px;
+    }
+}

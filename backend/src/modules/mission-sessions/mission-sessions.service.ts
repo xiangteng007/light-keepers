@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { MissionSession, MissionStatus } from './entities/mission-session.entity';
-import { Event } from './entities/event.entity';
+import { MissionEvent } from './entities/event.entity';
 import { Task } from './entities/task.entity';
 import { InventoryTransaction } from './entities/inventory-transaction.entity';
 import { CreateMissionSessionDto, UpdateMissionSessionDto } from './dto/mission-session.dto';
@@ -14,8 +14,8 @@ export class MissionSessionsService {
     constructor(
         @InjectRepository(MissionSession)
         private missionSessionRepo: Repository<MissionSession>,
-        @InjectRepository(Event)
-        private eventRepo: Repository<Event>,
+        @InjectRepository(MissionEvent)
+        private eventRepo: Repository<MissionEvent>,
         @InjectRepository(Task)
         private taskRepo: Repository<Task>,
         @InjectRepository(InventoryTransaction)
@@ -75,12 +75,12 @@ export class MissionSessionsService {
     }
 
     // Event CRUD
-    async createEvent(dto: CreateEventDto): Promise<Event> {
+    async createEvent(dto: CreateEventDto): Promise<MissionEvent> {
         const event = this.eventRepo.create(dto);
         return this.eventRepo.save(event);
     }
 
-    async findEventsBySession(sessionId: string): Promise<Event[]> {
+    async findEventsBySession(sessionId: string): Promise<MissionEvent[]> {
         return this.eventRepo.find({
             where: { sessionId },
             order: { createdAt: 'DESC' },

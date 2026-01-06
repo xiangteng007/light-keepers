@@ -94,6 +94,24 @@ export class Account {
     @Column({ name: 'fcm_tokens', type: 'text', array: true, nullable: true, default: '{}' })
     fcmTokens: string[];
 
+    // ============ Break-Glass Protocol (v3.0) ============
+
+    // 心跳時間戳 - 用於指揮官在線狀態監控
+    @Column({ name: 'last_heartbeat', type: 'timestamp', nullable: true })
+    lastHeartbeat: Date;
+
+    // 緊急接班人 - 副指揮官帳號 ID
+    @Column({ name: 'emergency_successor', type: 'uuid', nullable: true })
+    emergencySuccessor: string;
+
+    // 是否啟用 Break-Glass 協議
+    @Column({ name: 'break_glass_enabled', default: false })
+    breakGlassEnabled: boolean;
+
+    // Break-Glass 觸發超時時間 (分鐘)
+    @Column({ name: 'break_glass_timeout_minutes', default: 15 })
+    breakGlassTimeoutMinutes: number;
+
     @ManyToMany(() => Role)
     @JoinTable({
         name: 'account_roles',

@@ -1,23 +1,61 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MissionSessionsController } from './mission-sessions.controller';
 import { MissionSessionsService } from './mission-sessions.service';
 import { MissionSession } from './entities/mission-session.entity';
-import { Event } from './entities/event.entity';
+import { MissionEvent } from './entities/event.entity';
 import { Task } from './entities/task.entity';
 import { InventoryTransaction } from './entities/inventory-transaction.entity';
+import { OperationalPeriod } from './entities/operational-period.entity';
+import { IAPDocument } from './entities/iap-document.entity';
+import { SITREP } from './entities/sitrep.entity';
+import { DecisionLog } from './entities/decision-log.entity';
+import { AfterActionReview } from './entities/aar.entity';
+import { IAPService } from './iap.service';
+import { IAPController } from './iap.controller';
+import { SITREPService } from './sitrep.service';
+import { SITREPController } from './sitrep.controller';
+import { AARService } from './aar.service';
+import { AARController } from './aar.controller';
+import { AuthModule } from '../auth/auth.module';
+import { FieldReportsModule } from '../field-reports/field-reports.module';
+import { TasksModule } from '../tasks/tasks.module';
 
 @Module({
     imports: [
         TypeOrmModule.forFeature([
             MissionSession,
-            Event,
+            MissionEvent,
             Task,
             InventoryTransaction,
+            OperationalPeriod,
+            IAPDocument,
+            SITREP,
+            DecisionLog,
+            AfterActionReview,
         ]),
+        forwardRef(() => AuthModule),
+        forwardRef(() => FieldReportsModule),
+        forwardRef(() => TasksModule),
     ],
-    controllers: [MissionSessionsController],
-    providers: [MissionSessionsService],
-    exports: [MissionSessionsService],
+    controllers: [
+        MissionSessionsController,
+        IAPController,
+        SITREPController,
+        AARController,
+    ],
+    providers: [
+        MissionSessionsService,
+        IAPService,
+        SITREPService,
+        AARService,
+    ],
+    exports: [
+        MissionSessionsService,
+        IAPService,
+        SITREPService,
+        AARService,
+    ],
 })
 export class MissionSessionsModule { }
+

@@ -1,0 +1,52 @@
+[
+  {
+    "token": "color.bg.app",
+    "hex": "#161E2A",
+    "usage": "全域背景（戰情中心/外勤）"
+  },
+  {
+    "token": "color.bg.panel",
+    "hex": "#1D2635",
+    "usage": "主要面板/卡片底色"
+  },
+  {
+    "token": "color.border.subtle",
+    "hex": "#2F3641",
+    "usage": "分隔線/細邊框/格線"
+  },
+  {
+    "token": "color.text.primary",
+    "hex": "#F3F3F2",
+    "usage": "主要文字（深色底）"
+  },
+  {
+    "token": "color.text.secondary",
+    "hex": "#D0CEC3",
+    "usage": "次要文字/輔助資訊"
+  },
+  {
+    "token": "color.text.muted",
+    "hex": "#AEAEA7",
+    "usage": "低優先資訊/標籤"
+  },
+  {
+    "token": "color.accent.gold",
+    "hex": "#C39B6F",
+    "usage": "強調色（關鍵行動/高亮）"
+  },
+  {
+    "token": "color.alert.critical",
+    "hex": "#893336",
+    "usage": "緊急/SOS/危險"
+  },
+  {
+    "token": "color.neutral.700",
+    "hex": "#65696A",
+    "usage": "次線/disabled"
+  },
+  {
+    "token": "color.shadow.ink",
+    "hex": "#080A0F",
+    "usage": "陰影/更深背景層"
+  }
+]

@@ -1,0 +1,302 @@
+.geofencing-page {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.geo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+}
+
+.geo-header h1 {
+    font-size: 1.75rem;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 0.25rem;
+}
+
+.geo-header p {
+    color: var(--text-secondary, #6b7280);
+    font-size: 0.9rem;
+}
+
+.create-btn {
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.create-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.zones-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+}
+
+.zone-card {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+}
+
+.zone-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.zone-card.disabled {
+    opacity: 0.6;
+}
+
+.zone-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.zone-type {
+    font-size: 1.5rem;
+}
+
+.zone-header h3 {
+    flex: 1;
+    font-size: 1.1rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.toggle-btn {
+    padding: 0.25rem 0.75rem;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.toggle-btn.on {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.toggle-btn.off {
+    background: #f3f4f6;
+    color: #6b7280;
+}
+
+.zone-description {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 1rem;
+}
+
+.zone-details {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 1rem;
+}
+
+.zone-details span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.zone-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.action-btn.delete {
+    padding: 0.5rem 0.75rem;
+    background: #fee2e2;
+    color: #dc2626;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 4rem 2rem;
+    background: var(--card-bg, white);
+    border-radius: 12px;
+}
+
+.empty-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state p {
+    color: var(--text-secondary, #6b7280);
+    margin-bottom: 1rem;
+}
+
+.empty-state button {
+    background: #d4af37;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--card-bg, white);
+    border-radius: 16px;
+    padding: 2rem;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content h2 {
+    margin-bottom: 1.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.form-group textarea {
+    min-height: 80px;
+    resize: vertical;
+}
+
+.type-selector {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.type-selector button {
+    flex: 1;
+    padding: 0.75rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.type-selector button.active {
+    background: #d4af37;
+    color: white;
+    border-color: #d4af37;
+}
+
+.type-selector button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.coord-inputs {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.coord-inputs input {
+    flex: 1;
+}
+
+.location-btn {
+    width: 44px;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1.25rem;
+}
+
+.location-btn:hover {
+    background: #f3f4f6;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}
+
+.cancel-btn {
+    padding: 0.75rem 1.5rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    background: transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.save-btn {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.geo-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.25rem;
+    color: var(--text-secondary, #6b7280);
+}

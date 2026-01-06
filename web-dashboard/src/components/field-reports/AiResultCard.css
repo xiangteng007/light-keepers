@@ -1,0 +1,246 @@
+.ai-result-card {
+    background: linear-gradient(145deg, rgba(59, 130, 246, 0.1), rgba(16, 185, 129, 0.1));
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+    margin: 12px 0;
+    animation: slideIn 0.3s ease-out;
+}
+
+.ai-result-card.fallback {
+    background: linear-gradient(145deg, rgba(234, 179, 8, 0.1), rgba(251, 146, 60, 0.1));
+    border-color: rgba(234, 179, 8, 0.3);
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ai-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.ai-result-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.ai-icon {
+    font-size: 18px;
+}
+
+.fallback-badge {
+    background: rgba(234, 179, 8, 0.2);
+    color: #ca8a04;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 10px;
+}
+
+.dismiss-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #6b7280;
+    font-size: 16px;
+    padding: 4px;
+    line-height: 1;
+}
+
+.dismiss-btn:hover {
+    color: #374151;
+}
+
+.ai-result-summary {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.ai-result-summary p {
+    margin: 0;
+    font-size: 14px;
+    line-height: 1.5;
+    color: #1f2937;
+}
+
+.ai-result-confidence {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.confidence-label {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 50px;
+}
+
+.confidence-bar {
+    flex: 1;
+    height: 6px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.confidence-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease-out;
+}
+
+.confidence-value {
+    font-size: 12px;
+    font-weight: 600;
+    min-width: 35px;
+    text-align: right;
+}
+
+.ai-result-classification {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.classification-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.classification-item .label {
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.classification-item .value {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.category-badge {
+    background: rgba(59, 130, 246, 0.2);
+    color: #2563eb;
+}
+
+.severity-badge {
+    color: white;
+}
+
+.ai-result-section {
+    margin-bottom: 12px;
+}
+
+.ai-result-section h4 {
+    font-size: 12px;
+    font-weight: 600;
+    margin: 0 0 6px 0;
+    color: #374151;
+}
+
+.needs-list,
+.questions-list {
+    margin: 0;
+    padding-left: 20px;
+    font-size: 13px;
+    color: #4b5563;
+}
+
+.needs-list li,
+.questions-list li {
+    margin-bottom: 4px;
+}
+
+.ai-result-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.btn-accept,
+.btn-reject {
+    flex: 1;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-accept {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.btn-accept:hover:not(:disabled) {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+}
+
+.btn-reject {
+    background: rgba(239, 68, 68, 0.1);
+    color: #dc2626;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.btn-reject:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.btn-accept:disabled,
+.btn-reject:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Loading spinner for AI processing */
+.ai-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 8px;
+    margin: 8px 0;
+}
+
+.ai-loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(59, 130, 246, 0.3);
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ai-loading-text {
+    font-size: 13px;
+    color: #3b82f6;
+}

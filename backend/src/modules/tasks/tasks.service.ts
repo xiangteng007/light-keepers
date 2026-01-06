@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Task } from './entities';
+import { Task, TaskStatus } from './entities';
 import { CreateTaskDto, UpdateTaskDto, TaskQueryDto } from './dto/task.dto';
 import { Account } from '../accounts/entities';
 import { LineBotService } from '../line-bot/line-bot.service';
@@ -87,10 +87,10 @@ export class TasksService {
     async update(id: string, dto: UpdateTaskDto): Promise<Task> {
         const task = await this.findOne(id);
 
-        if (dto.status === 'completed' && task.status !== 'completed') {
+        if (dto.status === 'completed' && task.status !== TaskStatus.COMPLETED) {
             task.completedAt = new Date();
         }
-        if (dto.status === 'in_progress' && task.status === 'pending') {
+        if (dto.status === 'in_progress' && task.status === TaskStatus.PENDING) {
             // 任務開始進行
         }
 
@@ -113,19 +113,19 @@ export class TasksService {
     }> {
         try {
             const pending = await this.taskRepository.find({
-                where: { status: 'pending' },
+                where: { status: TaskStatus.PENDING },
                 order: { createdAt: 'DESC' },
                 take: 50,
             });
 
             const inProgress = await this.taskRepository.find({
-                where: { status: 'in_progress' },
+                where: { status: TaskStatus.IN_PROGRESS },
                 order: { createdAt: 'DESC' },
                 take: 50,
             });
 
             const completed = await this.taskRepository.find({
-                where: { status: 'completed' },
+                where: { status: TaskStatus.COMPLETED },
                 order: { createdAt: 'DESC' },
                 take: 20,
             });
@@ -143,13 +143,13 @@ export class TasksService {
         completed: number;
         overdue: number;
     }> {
-        const pending = await this.taskRepository.count({ where: { status: 'pending' } });
-        const inProgress = await this.taskRepository.count({ where: { status: 'in_progress' } });
-        const completed = await this.taskRepository.count({ where: { status: 'completed' } });
+        const pending = await this.taskRepository.count({ where: { status: TaskStatus.PENDING } });
+        const inProgress = await this.taskRepository.count({ where: { status: TaskStatus.IN_PROGRESS } });
+        const completed = await this.taskRepository.count({ where: { status: TaskStatus.COMPLETED } });
 
         const overdue = await this.taskRepository
             .createQueryBuilder('task')
-            .where('task.status IN (:...statuses)', { statuses: ['pending', 'in_progress'] })
+            .where('task.status IN (:...statuses)', { statuses: [TaskStatus.PENDING, TaskStatus.IN_PROGRESS] })
             .andWhere('task.dueAt < NOW()')
             .getCount();
 

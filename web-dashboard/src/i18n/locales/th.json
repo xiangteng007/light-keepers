@@ -1,0 +1,212 @@
+{
+    "common": {
+        "appName": "แพลตฟอร์มป้องกันภัยพิบัติ Light Keepers",
+        "loading": "กำลังโหลด...",
+        "error": "เกิดข้อผิดพลาด",
+        "success": "สำเร็จ",
+        "save": "บันทึก",
+        "cancel": "ยกเลิก",
+        "confirm": "ยืนยัน",
+        "delete": "ลบ",
+        "edit": "แก้ไข",
+        "add": "เพิ่ม",
+        "search": "ค้นหา",
+        "filter": "กรอง",
+        "refresh": "รีเฟรช",
+        "back": "กลับ",
+        "next": "ถัดไป",
+        "previous": "ก่อนหน้า",
+        "submit": "ส่ง",
+        "close": "ปิด",
+        "yes": "ใช่",
+        "no": "ไม่",
+        "all": "ทั้งหมด",
+        "none": "ไม่มี",
+        "required": "จำเป็น",
+        "optional": "ตัวเลือก"
+    },
+    "nav": {
+        "dashboard": "แดชบอร์ด",
+        "map": "แผนที่ภัยพิบัติ",
+        "reports": "รายงานภัยพิบัติ",
+        "volunteers": "การจัดการอาสาสมัคร",
+        "resources": "การจัดการทรัพยากร",
+        "events": "การจัดการกิจกรรม",
+        "activities": "ลงทะเบียนกิจกรรม",
+        "announcements": "ประกาศ",
+        "settings": "การตั้งค่า",
+        "permissions": "สิทธิ์การใช้งาน",
+        "profile": "โปรไฟล์",
+        "logout": "ออกจากระบบ"
+    },
+    "auth": {
+        "login": "เข้าสู่ระบบ",
+        "logout": "ออกจากระบบ",
+        "register": "ลงทะเบียน",
+        "email": "อีเมล",
+        "password": "รหัสผ่าน",
+        "confirmPassword": "ยืนยันรหัสผ่าน",
+        "forgotPassword": "ลืมรหัสผ่าน?",
+        "rememberMe": "จดจำฉัน",
+        "loginWithGoogle": "เข้าสู่ระบบด้วย Google",
+        "loginWithLine": "เข้าสู่ระบบด้วย LINE",
+        "loginSuccess": "เข้าสู่ระบบสำเร็จ",
+        "loginFailed": "เข้าสู่ระบบล้มเหลว",
+        "logoutSuccess": "ออกจากระบบสำเร็จ"
+    },
+    "dashboard": {
+        "title": "แดชบอร์ด",
+        "welcome": "ยินดีต้อนรับกลับ",
+        "overview": "ภาพรวม",
+        "todayReports": "รายงานวันนี้",
+        "activeVolunteers": "อาสาสมัครที่ใช้งานอยู่",
+        "totalResources": "ทรัพยากรทั้งหมด",
+        "pendingTasks": "งานที่รอดำเนินการ",
+        "recentActivity": "กิจกรรมล่าสุด",
+        "quickActions": "การดำเนินการด่วน",
+        "newReport": "รายงานใหม่",
+        "viewMap": "ดูแผนที่"
+    },
+    "reports": {
+        "title": "รายงานภัยพิบัติ",
+        "new": "รายงานใหม่",
+        "list": "รายการรายงาน",
+        "status": {
+            "pending": "รอดำเนินการ",
+            "confirmed": "ยืนยันแล้ว",
+            "rejected": "ถูกปฏิเสธ",
+            "resolved": "แก้ไขแล้ว"
+        },
+        "type": {
+            "flood": "น้ำท่วม",
+            "debris": "ดินถล่ม",
+            "fire": "ไฟไหม้",
+            "accident": "อุบัติเหตุ",
+            "other": "อื่นๆ"
+        },
+        "severity": {
+            "low": "ต่ำ",
+            "medium": "ปานกลาง",
+            "high": "สูง",
+            "critical": "วิกฤต"
+        },
+        "fields": {
+            "title": "หัวข้อ",
+            "description": "รายละเอียด",
+            "location": "สถานที่",
+            "photos": "รูปภาพ",
+            "contact": "ข้อมูลติดต่อ"
+        }
+    },
+    "volunteers": {
+        "title": "การจัดการอาสาสมัคร",
+        "list": "รายชื่ออาสาสมัคร",
+        "add": "เพิ่มอาสาสมัคร",
+        "status": {
+            "available": "พร้อมให้บริการ",
+            "busy": "ไม่ว่าง",
+            "offline": "ออฟไลน์"
+        },
+        "fields": {
+            "name": "ชื่อ",
+            "phone": "โทรศัพท์",
+            "region": "พื้นที่ให้บริการ",
+            "skills": "ทักษะ",
+            "hours": "ชั่วโมงบริการ",
+            "points": "คะแนน"
+        },
+        "recognition": {
+            "badges": "เหรียญตรา",
+            "awards": "รางวัล",
+            "milestones": "เป้าหมาย",
+            "leaderboard": "กระดานผู้นำ"
+        }
+    },
+    "resources": {
+        "title": "การจัดการทรัพยากร",
+        "list": "รายการทรัพยากร",
+        "add": "เพิ่มทรัพยากร",
+        "status": {
+            "available": "มีพร้อม",
+            "low": "สต็อกต่ำ",
+            "depleted": "หมด"
+        },
+        "fields": {
+            "name": "ชื่อ",
+            "category": "หมวดหมู่",
+            "quantity": "จำนวน",
+            "unit": "หน่วย",
+            "location": "สถานที่",
+            "expiresAt": "วันหมดอายุ"
+        }
+    },
+    "activities": {
+        "title": "ลงทะเบียนกิจกรรม",
+        "list": "รายการกิจกรรม",
+        "create": "สร้างกิจกรรม",
+        "register": "ลงทะเบียน",
+        "status": {
+            "draft": "ร่าง",
+            "open": "เปิดรับ",
+            "closed": "ปิดรับ",
+            "cancelled": "ยกเลิก",
+            "completed": "เสร็จสิ้น"
+        },
+        "fields": {
+            "title": "ชื่อกิจกรรม",
+            "description": "รายละเอียด",
+            "date": "วันที่",
+            "location": "สถานที่",
+            "participants": "ผู้เข้าร่วม"
+        }
+    },
+    "sos": {
+        "title": "SOS ฉุกเฉิน",
+        "send": "ส่งสัญญาณ SOS",
+        "status": {
+            "active": "ใช้งานอยู่",
+            "acknowledged": "รับทราบแล้ว",
+            "resolved": "แก้ไขแล้ว"
+        }
+    },
+    "settings": {
+        "title": "การตั้งค่า",
+        "theme": {
+            "title": "ธีม",
+            "light": "โหมดสว่าง",
+            "dark": "โหมดมืด",
+            "system": "ตามระบบ"
+        },
+        "language": {
+            "title": "ภาษา",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia"
+        },
+        "notifications": {
+            "title": "การตั้งค่าการแจ้งเตือน",
+            "push": "การแจ้งเตือนพุช",
+            "email": "การแจ้งเตือนอีเมล"
+        }
+    },
+    "errors": {
+        "notFound": "ไม่พบหน้า",
+        "unauthorized": "ไม่ได้รับอนุญาต",
+        "forbidden": "ห้ามเข้าถึง",
+        "serverError": "เซิร์ฟเวอร์ผิดพลาด",
+        "networkError": "เครือข่ายผิดพลาด",
+        "timeout": "หมดเวลา"
+    },
+    "offline": {
+        "title": "โหมดออฟไลน์",
+        "message": "คุณกำลังออฟไลน์อยู่ บางฟีเจอร์อาจถูกจำกัด",
+        "pending": "รอการซิงค์",
+        "sync": "ซิงค์"
+    }
+}

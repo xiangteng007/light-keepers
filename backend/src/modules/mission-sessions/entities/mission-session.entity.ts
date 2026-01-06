@@ -6,7 +6,7 @@ import {
     UpdateDateColumn,
     OneToMany,
 } from 'typeorm';
-import { Event } from './event.entity';
+import { MissionEvent } from './event.entity';
 import { Task } from './task.entity';
 import { InventoryTransaction } from './inventory-transaction.entity';
 
@@ -58,8 +58,8 @@ export class MissionSession {
     endedAt: Date;
 
     // Relations
-    @OneToMany(() => Event, (event) => event.session, { cascade: true })
-    events: Event[];
+    @OneToMany(() => MissionEvent, (event) => event.session, { cascade: true })
+    events: MissionEvent[];
 
     @OneToMany(() => Task, (task) => task.session, { cascade: true })
     tasks: Task[];

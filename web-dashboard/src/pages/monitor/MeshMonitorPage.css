@@ -1,0 +1,358 @@
+.mesh-monitor-page {
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.mesh-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.mesh-header h1 {
+    font-size: 1.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.sync-btn {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.sync-btn:disabled {
+    opacity: 0.6;
+}
+
+/* Stats Grid */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.stat-card.online {
+    border-left: 3px solid #10b981;
+}
+
+.stat-card.warning {
+    border-left: 3px solid #f59e0b;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), transparent);
+}
+
+.stat-card.alert {
+    border-left: 3px solid #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), transparent);
+}
+
+.stat-icon {
+    font-size: 1.5rem;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Content Layout */
+.mesh-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.nodes-section,
+.messages-section {
+    background: var(--card-bg, white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.nodes-section h2,
+.messages-section h2 {
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+    color: var(--text-primary, #1a1a2e);
+}
+
+/* Nodes List */
+.nodes-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.no-nodes {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+.no-nodes span {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.node-card {
+    padding: 1rem;
+    border-radius: 10px;
+    background: #f9fafb;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-left: 3px solid transparent;
+}
+
+.node-card:hover {
+    background: #f3f4f6;
+}
+
+.node-card.selected {
+    border-left-color: #3b82f6;
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), transparent);
+}
+
+.node-card.online {
+    border-left-color: #10b981;
+}
+
+.node-card.idle {
+    border-left-color: #f59e0b;
+}
+
+.node-card.offline {
+    border-left-color: #9ca3af;
+    opacity: 0.7;
+}
+
+.node-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+.status-dot.online {
+    background: #10b981;
+    animation: pulse 2s infinite;
+}
+
+.status-dot.idle {
+    background: #f59e0b;
+}
+
+.status-dot.offline {
+    background: #9ca3af;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.node-name {
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.node-meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+    margin-bottom: 0.5rem;
+}
+
+.node-footer {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* Messages List */
+.messages-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.no-messages {
+    text-align: center;
+    padding: 2rem;
+    color: #9ca3af;
+}
+
+.message-card {
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.message-card.processed {
+    border-left: 3px solid #ef4444;
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), transparent);
+}
+
+.message-content {
+    font-size: 0.95rem;
+    color: var(--text-primary, #1a1a2e);
+    margin-bottom: 0.5rem;
+    word-break: break-word;
+}
+
+.message-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+/* Topology Section */
+.topology-section {
+    background: var(--card-bg, white);
+    border-radius: 16px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.topology-section h2 {
+    font-size: 1rem;
+    margin: 0 0 1rem 0;
+}
+
+.topology-map {
+    position: relative;
+    height: 250px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.topology-center {
+    position: absolute;
+    z-index: 2;
+}
+
+.gateway-node {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+}
+
+.gateway-node span {
+    font-size: 1.5rem;
+}
+
+.gateway-node p {
+    font-size: 0.7rem;
+    margin: 0;
+}
+
+.topology-ring {
+    position: absolute;
+    width: 200px;
+    height: 200px;
+}
+
+.topology-node {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    text-align: center;
+    transform-origin: center center;
+}
+
+.topology-node p {
+    font-size: 0.65rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0;
+    white-space: nowrap;
+}
+
+.status-indicator {
+    display: inline-block;
+    padding: 0.25rem;
+    background: white;
+    border-radius: 50%;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+.status-indicator.online {
+    animation: pulse 2s infinite;
+}
+
+.mesh-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.25rem;
+    color: #6b7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .mesh-content {
+        grid-template-columns: 1fr;
+    }
+}

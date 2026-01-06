@@ -1,0 +1,443 @@
+/* ==================== Widget Container ==================== */
+
+.widget-container {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.widget-container:hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+.widget-small {
+    min-height: 120px;
+}
+
+.widget-medium {
+    min-height: 200px;
+}
+
+.widget-large {
+    min-height: 300px;
+}
+
+.widget-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.widget-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary, #1a1a2e);
+    margin: 0;
+}
+
+.widget-icon {
+    font-size: 1.1rem;
+}
+
+.widget-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.refresh-btn {
+    padding: 0.25rem 0.5rem;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: all 0.3s ease;
+}
+
+.refresh-btn:hover:not(:disabled) {
+    opacity: 1;
+}
+
+.refresh-btn:disabled {
+    cursor: not-allowed;
+}
+
+.widget-content {
+    padding: 1.25rem;
+}
+
+.widget-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100px;
+}
+
+.spinner {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #e5e7eb;
+    border-top-color: #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ==================== Stats Card ==================== */
+
+.stats-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 150, 46, 0.05));
+}
+
+.stats-primary {
+    background: linear-gradient(135deg, rgba(212, 175, 55, 0.1), rgba(184, 150, 46, 0.05));
+}
+
+.stats-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(5, 150, 105, 0.05));
+}
+
+.stats-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(217, 119, 6, 0.05));
+}
+
+.stats-danger {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(220, 38, 38, 0.05));
+}
+
+.stats-icon {
+    font-size: 2rem;
+}
+
+.stats-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stats-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.stats-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.stats-trend {
+    font-size: 0.75rem;
+    margin-top: 0.25rem;
+}
+
+.stats-trend.up {
+    color: #10b981;
+}
+
+.stats-trend.down {
+    color: #ef4444;
+}
+
+/* ==================== Recent Activity ==================== */
+
+.recent-activity-widget {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.activity-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.activity-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+}
+
+.activity-item:last-child {
+    border-bottom: none;
+}
+
+.activity-icon {
+    font-size: 1.25rem;
+}
+
+.activity-content p {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.9rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.activity-time {
+    font-size: 0.75rem;
+    color: var(--text-muted, #9ca3af);
+}
+
+.empty-activity {
+    text-align: center;
+    color: var(--text-secondary, #6b7280);
+    padding: 2rem;
+}
+
+/* ==================== Quick Actions ==================== */
+
+.quick-actions-widget {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    gap: 0.75rem;
+}
+
+.quick-action-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: var(--bg-secondary, #f9fafb);
+    border: 2px solid transparent;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover {
+    background: white;
+    border-color: #d4af37;
+    transform: translateY(-2px);
+}
+
+.action-icon {
+    font-size: 1.5rem;
+}
+
+.action-label {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+/* ==================== SOS Monitor ==================== */
+
+.sos-monitor-widget {
+    min-height: 100px;
+}
+
+.sos-safe {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    color: #10b981;
+}
+
+.safe-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.sos-alerts .alert-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: #ef4444;
+}
+
+.alert-icon.pulse {
+    animation: pulse-alert 1s infinite;
+}
+
+@keyframes pulse-alert {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.sos-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sos-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: #fef2f2;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+}
+
+.sos-info strong {
+    display: block;
+    color: #991b1b;
+}
+
+.sos-info span {
+    font-size: 0.85rem;
+    color: #be123c;
+}
+
+.ack-btn {
+    padding: 0.5rem 1rem;
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+/* ==================== Task List ==================== */
+
+.task-list-widget {
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.task-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border-color, #f3f4f6);
+}
+
+.priority-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.task-info {
+    flex: 1;
+}
+
+.task-title {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.task-assignee {
+    font-size: 0.75rem;
+    color: var(--text-muted, #9ca3af);
+}
+
+.task-status {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    background: #f3f4f6;
+    border-radius: 4px;
+    color: var(--text-secondary, #6b7280);
+}
+
+.empty-tasks {
+    text-align: center;
+    color: var(--text-secondary, #6b7280);
+    padding: 2rem;
+}
+
+/* ==================== Weather Alert ==================== */
+
+.weather-alert-widget {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.no-alerts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.no-alerts span {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+}
+
+.alert-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.alert-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: var(--bg-secondary, #f9fafb);
+    border-left: 3px solid;
+    border-radius: 0 8px 8px 0;
+    margin-bottom: 0.5rem;
+}
+
+.alert-info strong {
+    display: block;
+    font-size: 0.9rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.alert-info span {
+    font-size: 0.8rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+.alert-severity {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+.alert-severity.advisory {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.alert-severity.watch {
+    background: #ffedd5;
+    color: #c2410c;
+}
+
+.alert-severity.warning {
+    background: #fee2e2;
+    color: #dc2626;
+}

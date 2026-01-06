@@ -1,0 +1,212 @@
+{
+    "common": {
+        "appName": "Lightkeepers Disaster Prevention Platform",
+        "loading": "Naglo-load...",
+        "error": "May naganap na error",
+        "success": "Tagumpay",
+        "save": "I-save",
+        "cancel": "Kanselahin",
+        "confirm": "Kumpirmahin",
+        "delete": "Burahin",
+        "edit": "I-edit",
+        "add": "Magdagdag",
+        "search": "Maghanap",
+        "filter": "I-filter",
+        "refresh": "I-refresh",
+        "back": "Bumalik",
+        "next": "Susunod",
+        "previous": "Nakaraang",
+        "submit": "Isumite",
+        "close": "Isara",
+        "yes": "Oo",
+        "no": "Hindi",
+        "all": "Lahat",
+        "none": "Wala",
+        "required": "Kinakailangan",
+        "optional": "Opsyonal"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "map": "Mapa ng Sakuna",
+        "reports": "Mga Ulat ng Sakuna",
+        "volunteers": "Pamamahala ng Boluntaryo",
+        "resources": "Pamamahala ng Resources",
+        "events": "Pamamahala ng Events",
+        "activities": "Pagpaparehistro ng Aktibidad",
+        "announcements": "Mga Anunsyo",
+        "settings": "Mga Setting",
+        "permissions": "Mga Permiso",
+        "profile": "Profile",
+        "logout": "Mag-logout"
+    },
+    "auth": {
+        "login": "Mag-login",
+        "logout": "Mag-logout",
+        "register": "Magparehistro",
+        "email": "Email",
+        "password": "Password",
+        "confirmPassword": "Kumpirmahin ang Password",
+        "forgotPassword": "Nakalimutan ang Password?",
+        "rememberMe": "Tandaan Ako",
+        "loginWithGoogle": "Mag-login gamit ang Google",
+        "loginWithLine": "Mag-login gamit ang LINE",
+        "loginSuccess": "Matagumpay na naka-login",
+        "loginFailed": "Hindi nakapag-login",
+        "logoutSuccess": "Matagumpay na naka-logout"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "Maligayang pagbabalik",
+        "overview": "Pangkalahatang-ideya",
+        "todayReports": "Mga Ulat Ngayon",
+        "activeVolunteers": "Mga Aktibong Boluntaryo",
+        "totalResources": "Kabuuang Resources",
+        "pendingTasks": "Mga Naghihintay na Gawain",
+        "recentActivity": "Kamakailang Aktibidad",
+        "quickActions": "Mabilis na Aksyon",
+        "newReport": "Bagong Ulat",
+        "viewMap": "Tingnan ang Mapa"
+    },
+    "reports": {
+        "title": "Mga Ulat ng Sakuna",
+        "new": "Bagong Ulat",
+        "list": "Listahan ng Ulat",
+        "status": {
+            "pending": "Naghihintay",
+            "confirmed": "Nakumpirma",
+            "rejected": "Tinanggihan",
+            "resolved": "Nalutas"
+        },
+        "type": {
+            "flood": "Baha",
+            "debris": "Pagguho ng Lupa",
+            "fire": "Sunog",
+            "accident": "Aksidente",
+            "other": "Iba pa"
+        },
+        "severity": {
+            "low": "Mababa",
+            "medium": "Katamtaman",
+            "high": "Mataas",
+            "critical": "Kritikal"
+        },
+        "fields": {
+            "title": "Pamagat",
+            "description": "Paglalarawan",
+            "location": "Lokasyon",
+            "photos": "Mga Larawan",
+            "contact": "Impormasyon sa Pakikipag-ugnayan"
+        }
+    },
+    "volunteers": {
+        "title": "Pamamahala ng Boluntaryo",
+        "list": "Listahan ng Boluntaryo",
+        "add": "Magdagdag ng Boluntaryo",
+        "status": {
+            "available": "Available",
+            "busy": "Abala",
+            "offline": "Offline"
+        },
+        "fields": {
+            "name": "Pangalan",
+            "phone": "Telepono",
+            "region": "Rehiyon ng Serbisyo",
+            "skills": "Mga Kasanayan",
+            "hours": "Oras ng Serbisyo",
+            "points": "Mga Puntos"
+        },
+        "recognition": {
+            "badges": "Mga Badge",
+            "awards": "Mga Award",
+            "milestones": "Mga Milestone",
+            "leaderboard": "Leaderboard"
+        }
+    },
+    "resources": {
+        "title": "Pamamahala ng Resources",
+        "list": "Listahan ng Resources",
+        "add": "Magdagdag ng Resource",
+        "status": {
+            "available": "Available",
+            "low": "Mababang Stock",
+            "depleted": "Ubos"
+        },
+        "fields": {
+            "name": "Pangalan",
+            "category": "Kategorya",
+            "quantity": "Dami",
+            "unit": "Unit",
+            "location": "Lokasyon",
+            "expiresAt": "Petsa ng Pagka-expire"
+        }
+    },
+    "activities": {
+        "title": "Pagpaparehistro ng Aktibidad",
+        "list": "Listahan ng Aktibidad",
+        "create": "Gumawa ng Aktibidad",
+        "register": "Magparehistro",
+        "status": {
+            "draft": "Draft",
+            "open": "Bukas",
+            "closed": "Sarado",
+            "cancelled": "Kinansela",
+            "completed": "Tapos na"
+        },
+        "fields": {
+            "title": "Pangalan ng Aktibidad",
+            "description": "Paglalarawan",
+            "date": "Petsa",
+            "location": "Lokasyon",
+            "participants": "Mga Kalahok"
+        }
+    },
+    "sos": {
+        "title": "Emergency SOS",
+        "send": "Magpadala ng SOS Signal",
+        "status": {
+            "active": "Aktibo",
+            "acknowledged": "Nakumpirma",
+            "resolved": "Nalutas"
+        }
+    },
+    "settings": {
+        "title": "Mga Setting",
+        "theme": {
+            "title": "Tema",
+            "light": "Light Mode",
+            "dark": "Dark Mode",
+            "system": "Sundin ang System"
+        },
+        "language": {
+            "title": "Wika",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia"
+        },
+        "notifications": {
+            "title": "Mga Setting ng Abiso",
+            "push": "Push Notification",
+            "email": "Email Notification"
+        }
+    },
+    "errors": {
+        "notFound": "Hindi Nahanap ang Pahina",
+        "unauthorized": "Hindi Awtorisado",
+        "forbidden": "Bawal ang Access",
+        "serverError": "Server Error",
+        "networkError": "Network Error",
+        "timeout": "Nag-timeout"
+    },
+    "offline": {
+        "title": "Offline Mode",
+        "message": "Kasalukuyan kang offline. Ang ilang feature ay maaaring limitado.",
+        "pending": "naghihintay na i-sync",
+        "sync": "I-sync"
+    }
+}

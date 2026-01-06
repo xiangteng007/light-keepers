@@ -1,0 +1,130 @@
+/**
+ * KPI Cards Styles
+ */
+
+.kpi-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+    background: var(--surface-card, #ffffff);
+    border-radius: 12px;
+    padding: 1.25rem;
+    border-top: 4px solid #3b82f6;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.kpi-card__header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.kpi-card__icon {
+    font-size: 1.25rem;
+}
+
+.kpi-card__title {
+    font-size: 0.875rem;
+    color: var(--text-secondary, #6b7280);
+    font-weight: 500;
+}
+
+.kpi-card__value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary, #111827);
+    line-height: 1.2;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-card__trend {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+}
+
+.kpi-card__trend--up {
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.kpi-card__trend--down {
+    color: #dc2626;
+    background: rgba(220, 38, 38, 0.1);
+}
+
+.kpi-card__subtitle {
+    font-size: 0.75rem;
+    color: var(--text-tertiary, #9ca3af);
+    margin-top: 0.5rem;
+}
+
+/* Loading skeleton */
+.kpi-card--loading {
+    pointer-events: none;
+}
+
+.kpi-card__skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: 4px;
+}
+
+.kpi-card__skeleton--title {
+    height: 1rem;
+    width: 60%;
+    margin-bottom: 0.75rem;
+}
+
+.kpi-card__skeleton--value {
+    height: 2.5rem;
+    width: 40%;
+    margin-bottom: 0.5rem;
+}
+
+.kpi-card__skeleton--subtitle {
+    height: 0.75rem;
+    width: 80%;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .kpi-card {
+        background: var(--surface-card-dark, #1f2937);
+    }
+
+    .kpi-card__value {
+        color: var(--text-primary-dark, #f9fafb);
+    }
+
+    .kpi-card__skeleton {
+        background: linear-gradient(90deg, #374151 25%, #4b5563 50%, #374151 75%);
+        background-size: 200% 100%;
+    }
+}

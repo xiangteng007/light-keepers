@@ -1,0 +1,374 @@
+.transparency-page {
+    padding: 2rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    background: #f0fdf4;
+    min-height: 100vh;
+}
+
+.transparency-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.transparency-header h1 {
+    font-size: 1.75rem;
+    color: #166534;
+    margin: 0;
+}
+
+.transparency-header p {
+    color: #6b7280;
+    margin: 0.25rem 0 0;
+}
+
+/* Stats Bar */
+.stats-bar {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-item {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.stat-item.highlight {
+    background: linear-gradient(135deg, #166534, #22c55e);
+    color: white;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #166534;
+}
+
+.stat-item.highlight .stat-value {
+    color: white;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.stat-item.highlight .stat-label {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+/* Search Section */
+.search-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.search-section h2 {
+    font-size: 1.1rem;
+    margin: 0 0 0.25rem 0;
+    color: #166534;
+}
+
+.search-section>p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0 0 1rem 0;
+}
+
+.search-box {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.search-box input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 1rem;
+}
+
+.search-box input:focus {
+    outline: none;
+    border-color: #22c55e;
+}
+
+.search-box button {
+    padding: 0.75rem 2rem;
+    background: linear-gradient(135deg, #166534, #22c55e);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.search-box button:disabled {
+    opacity: 0.6;
+}
+
+.search-error {
+    margin-top: 0.75rem;
+    color: #dc2626;
+    font-size: 0.9rem;
+}
+
+/* Search Result */
+.search-result {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+}
+
+.result-title h3 {
+    font-size: 1.1rem;
+    margin: 0 0 0.25rem 0;
+    color: #166534;
+}
+
+.receipt-badge {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.verification-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+.verification-badge.verified {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.verification-badge.warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.result-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.summary-item span {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.summary-item strong {
+    font-size: 0.95rem;
+    color: #374151;
+}
+
+/* Timeline */
+.result-timeline h4 {
+    font-size: 0.95rem;
+    margin: 0 0 1rem 0;
+}
+
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.6rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e5e7eb;
+}
+
+.timeline-step {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.step-marker {
+    position: absolute;
+    left: -1.5rem;
+    width: 20px;
+    height: 20px;
+    background: white;
+    border: 2px solid #e5e7eb;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: #6b7280;
+}
+
+.timeline-step.verified .step-marker {
+    background: #22c55e;
+    border-color: #22c55e;
+    color: white;
+}
+
+.step-content {
+    flex: 1;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.step-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+}
+
+.step-action {
+    font-weight: 600;
+    color: #374151;
+}
+
+.step-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.step-details {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+/* Recent Section */
+.recent-section {
+    background: white;
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+}
+
+.recent-section h2 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    color: #374151;
+}
+
+.recent-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.recent-item {
+    display: flex;
+    gap: 1rem;
+    padding: 0.75rem;
+    background: #f9fafb;
+    border-radius: 10px;
+}
+
+.recent-icon {
+    font-size: 1.25rem;
+}
+
+.recent-content {
+    flex: 1;
+}
+
+.recent-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.resource-name {
+    font-weight: 500;
+    color: #374151;
+}
+
+.action-badge {
+    font-size: 0.7rem;
+    padding: 0.15rem 0.5rem;
+    background: #e5e7eb;
+    border-radius: 4px;
+    color: #6b7280;
+}
+
+.recent-meta {
+    font-size: 0.8rem;
+    color: #9ca3af;
+    display: flex;
+    gap: 1rem;
+}
+
+.recent-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+/* Info Section */
+.info-section h2 {
+    font-size: 1.1rem;
+    margin: 0 0 1rem 0;
+    color: #374151;
+}
+
+.info-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+}
+
+.info-card {
+    background: white;
+    padding: 1.25rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.info-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.info-card h3 {
+    font-size: 0.95rem;
+    margin: 0 0 0.5rem 0;
+    color: #374151;
+}
+
+.info-card p {
+    font-size: 0.85rem;
+    color: #6b7280;
+    margin: 0;
+}

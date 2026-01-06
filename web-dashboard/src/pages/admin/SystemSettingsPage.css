@@ -1,0 +1,187 @@
+.system-settings-page {
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+}
+
+.settings-header h1 {
+    font-size: 1.75rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.save-btn {
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.save-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.4);
+}
+
+.save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.settings-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 2px solid var(--border-color, #e5e7eb);
+    padding-bottom: 0.5rem;
+}
+
+.settings-tabs .tab {
+    background: transparent;
+    border: none;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.95rem;
+    color: var(--text-secondary, #6b7280);
+    cursor: pointer;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+}
+
+.settings-tabs .tab:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--text-primary, #1a1a2e);
+}
+
+.settings-tabs .tab.active {
+    background: linear-gradient(135deg, #d4af37, #b8962e);
+    color: white;
+}
+
+.settings-content {
+    background: var(--card-bg, white);
+    border-radius: 12px;
+    padding: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.settings-section h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+    color: var(--text-primary, #1a1a2e);
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color, #e5e7eb);
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary, #1a1a2e);
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="number"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-color, #d1d5db);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    background: var(--input-bg, white);
+    color: var(--text-primary, #1a1a2e);
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #d4af37;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2);
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 0.5rem;
+    color: var(--text-muted, #9ca3af);
+    font-size: 0.85rem;
+}
+
+.toggle-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    background: var(--bg-secondary, #f9fafb);
+    border-radius: 8px;
+}
+
+.toggle-group label {
+    margin-bottom: 0;
+}
+
+.toggle-group input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    accent-color: #d4af37;
+}
+
+.settings-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.25rem;
+    color: var(--text-secondary, #6b7280);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+    .settings-header h1 {
+        color: #f0f0f0;
+    }
+
+    .settings-content {
+        background: #1e1e2e;
+    }
+
+    .settings-section h2 {
+        color: #f0f0f0;
+    }
+
+    .form-group label {
+        color: #e0e0e0;
+    }
+
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        background: #2a2a3e;
+        border-color: #3a3a4e;
+        color: #f0f0f0;
+    }
+
+    .toggle-group {
+        background: #2a2a3e;
+    }
+}

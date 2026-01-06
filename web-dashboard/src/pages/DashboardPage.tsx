@@ -14,19 +14,6 @@ function formatTime(dateString: string): string {
     return `${hours}:${minutes}`;
 }
 
-// 格式化相對時間
-function formatRelativeTime(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    if (minutes < 1) return '剛剛';
-    if (minutes < 60) return `${minutes}分鐘前`;
-    if (hours < 24) return `${hours}小時前`;
-    return formatTime(dateString);
-}
-
 export default function DashboardPage() {
     const { user } = useAuth();
     const roleLevel = user?.roleLevel ?? 0;
@@ -248,7 +235,7 @@ export default function DashboardPage() {
                                 <div className="cc-volunteer-stat__content">
                                     <span className="cc-volunteer-stat__label">On Duty</span>
                                     <span className="cc-volunteer-stat__value">{volunteerStats?.busy || 0}</span>
-                                    <span className="cc-volunteer-stat__sub">Across {volunteerStats?.sectors || 0} sectors</span>
+                                    <span className="cc-volunteer-stat__sub">On duty now</span>
                                 </div>
                             </div>
                             <div className="cc-volunteer-stat">
@@ -262,8 +249,8 @@ export default function DashboardPage() {
                             <div className="cc-volunteer-stat">
                                 <span className="cc-volunteer-stat__icon">😴</span>
                                 <div className="cc-volunteer-stat__content">
-                                    <span className="cc-volunteer-stat__label">Resting</span>
-                                    <span className="cc-volunteer-stat__value">{volunteerStats?.resting || 0}</span>
+                                    <span className="cc-volunteer-stat__label">Offline</span>
+                                    <span className="cc-volunteer-stat__value">{volunteerStats?.offline || 0}</span>
                                     <span className="cc-volunteer-stat__sub">Next shift in 2 hours</span>
                                 </div>
                             </div>

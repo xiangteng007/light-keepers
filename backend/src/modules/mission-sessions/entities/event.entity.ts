@@ -8,15 +8,19 @@ import {
 } from 'typeorm';
 import { MissionSession } from './mission-session.entity';
 
-export enum EventType {
+export enum MissionEventType {
     INFO = 'info',
     WARNING = 'warning',
     CRITICAL = 'critical',
     SUCCESS = 'success',
 }
 
-@Entity('events')
-export class Event {
+/**
+ * Mission Event Entity
+ * Renamed from Event to avoid collision with events module
+ */
+@Entity('mission_events')
+export class MissionEvent {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
@@ -31,10 +35,10 @@ export class Event {
 
     @Column({
         type: 'enum',
-        enum: EventType,
-        default: EventType.INFO,
+        enum: MissionEventType,
+        default: MissionEventType.INFO,
     })
-    type: EventType;
+    type: MissionEventType;
 
     @Column({ name: 'reporter_id', type: 'varchar', nullable: true })
     reporterId: string;

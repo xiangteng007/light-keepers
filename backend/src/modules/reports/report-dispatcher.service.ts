@@ -2,7 +2,7 @@ import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportSeverity, ReportType } from './reports.entity';
-import { Task } from '../tasks/entities';
+import { Task, TaskStatus } from '../tasks/entities';
 import { Account } from '../accounts/entities';
 import { LineBotService } from '../line-bot/line-bot.service';
 
@@ -78,7 +78,7 @@ export class ReportDispatcherService {
             title: `[自動調度] ${report.title}`,
             description: this.buildTaskDescription(report),
             priority: SEVERITY_TO_PRIORITY[report.severity] || 3,
-            status: 'pending',
+            status: TaskStatus.PENDING,
             sourceReportId: reportId,
             address: report.address || undefined,
             dueAt: this.calculateDueAt(report.severity),

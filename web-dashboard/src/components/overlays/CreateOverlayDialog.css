@@ -1,0 +1,217 @@
+/* Create Overlay Dialog Styles */
+
+.cod-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    backdrop-filter: blur(4px);
+}
+
+.cod-dialog {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    animation: cod-fadeIn 0.2s ease;
+}
+
+@keyframes cod-fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.cod-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 20px;
+    border-bottom: 1px solid #334155;
+}
+
+.cod-title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: #f59e0b;
+}
+
+.cod-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: #94a3b8;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cod-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+
+.cod-body {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cod-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cod-field--info {
+    padding-top: 12px;
+    border-top: 1px solid #334155;
+}
+
+.cod-label {
+    font-size: 12px;
+    font-weight: 500;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cod-input,
+.cod-select {
+    padding: 10px 12px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #e2e8f0;
+    font-size: 14px;
+    transition: all 0.15s ease;
+}
+
+.cod-input:focus,
+.cod-select:focus {
+    outline: none;
+    border-color: #f59e0b;
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.2);
+}
+
+.cod-input::placeholder {
+    color: #64748b;
+}
+
+.cod-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%2394a3b8' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 10px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 36px;
+}
+
+/* Severity options */
+.cod-severity-options {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+
+.cod-severity-btn {
+    padding: 8px;
+    border: 1px solid #334155;
+    border-radius: 6px;
+    background: #0f172a;
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cod-severity-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: var(--severity-color);
+}
+
+.cod-severity-btn.active {
+    background: var(--severity-color);
+    border-color: var(--severity-color);
+    color: #fff;
+}
+
+/* Geometry info */
+.cod-geometry-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #0f172a;
+    border-radius: 8px;
+    border: 1px solid #334155;
+}
+
+.cod-geometry-type {
+    font-size: 14px;
+    color: #e2e8f0;
+}
+
+.cod-geometry-detail {
+    font-size: 12px;
+    color: #64748b;
+}
+
+/* Footer */
+.cod-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px 20px;
+    border-top: 1px solid #334155;
+}
+
+.cod-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cod-btn--primary {
+    background: #f59e0b;
+    color: #000;
+}
+
+.cod-btn--primary:hover {
+    background: #d97706;
+}
+
+.cod-btn--secondary {
+    background: transparent;
+    border: 1px solid #334155;
+    color: #94a3b8;
+}
+
+.cod-btn--secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #e2e8f0;
+}

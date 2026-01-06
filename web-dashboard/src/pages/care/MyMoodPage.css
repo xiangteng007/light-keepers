@@ -1,0 +1,380 @@
+.my-mood-page {
+    padding: 2rem;
+    max-width: 600px;
+    margin: 0 auto;
+    background: linear-gradient(180deg, #f0f9ff, #ffffff);
+    min-height: 100vh;
+}
+
+.mood-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.mood-header h1 {
+    font-size: 1.5rem;
+    color: #1e40af;
+    margin: 0;
+}
+
+.mood-header p {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin: 0.25rem 0 0;
+}
+
+/* Mood Summary */
+.mood-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.summary-item {
+    background: white;
+    border-radius: 16px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.summary-emoji {
+    display: block;
+    font-size: 1.5rem;
+    margin-bottom: 0.25rem;
+}
+
+.summary-label {
+    display: block;
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.summary-value {
+    display: block;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e40af;
+}
+
+/* Tabs */
+.mood-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.mood-tabs button {
+    flex: 1;
+    padding: 0.75rem;
+    border: none;
+    background: white;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+}
+
+.mood-tabs button.active {
+    background: #1e40af;
+    color: white;
+}
+
+/* Tracker Section */
+.tracker-section {
+    background: white;
+    border-radius: 20px;
+    padding: 1.5rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.score-picker,
+.tags-picker,
+.note-input {
+    margin-bottom: 1.5rem;
+}
+
+.score-picker h3,
+.tags-picker h3,
+.note-input h3 {
+    font-size: 0.95rem;
+    color: #374151;
+    margin: 0 0 1rem 0;
+}
+
+.score-display {
+    text-align: center;
+    margin-bottom: 1rem;
+}
+
+.score-emoji {
+    font-size: 4rem;
+    display: block;
+}
+
+.score-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e40af;
+}
+
+.score-slider {
+    width: 100%;
+    height: 8px;
+    -webkit-appearance: none;
+    background: linear-gradient(to right, #fecaca, #fef3c7, #d1fae5);
+    border-radius: 4px;
+    outline: none;
+}
+
+.score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 24px;
+    height: 24px;
+    background: white;
+    border: 3px solid #1e40af;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+}
+
+.score-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    color: #9ca3af;
+    margin-top: 0.5rem;
+}
+
+.tags-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+}
+
+.tag-btn {
+    padding: 0.5rem 0.25rem;
+    border: 1px solid #e5e7eb;
+    background: white;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.tag-btn.selected {
+    background: #1e40af;
+    color: white;
+    border-color: #1e40af;
+}
+
+.note-input textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    resize: none;
+    font-family: inherit;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Chat Section */
+.chat-section {
+    background: white;
+    border-radius: 20px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 1rem;
+}
+
+.chat-message {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.chat-message.user {
+    justify-content: flex-end;
+}
+
+.chat-message.assistant {
+    justify-content: flex-start;
+}
+
+.bot-avatar {
+    font-size: 1.5rem;
+}
+
+.message-content {
+    max-width: 80%;
+    padding: 0.75rem 1rem;
+    border-radius: 16px;
+}
+
+.chat-message.user .message-content {
+    background: #1e40af;
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.chat-message.assistant .message-content {
+    background: #f3f4f6;
+    color: #374151;
+    border-bottom-left-radius: 4px;
+}
+
+.message-content p {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.message-content.typing {
+    padding: 1rem;
+}
+
+.message-content.typing span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #9ca3af;
+    border-radius: 50%;
+    margin-right: 4px;
+    animation: typing 1.4s infinite;
+}
+
+.message-content.typing span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.message-content.typing span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing {
+
+    0%,
+    60%,
+    100% {
+        transform: translateY(0);
+    }
+
+    30% {
+        transform: translateY(-6px);
+    }
+}
+
+.chat-input-area {
+    display: flex;
+    gap: 0.5rem;
+    padding: 1rem;
+    border-top: 1px solid #e5e7eb;
+}
+
+.chat-input-area input {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    outline: none;
+}
+
+.chat-input-area button {
+    padding: 0.75rem 1.25rem;
+    background: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+/* History Section */
+.history-section {
+    background: white;
+    border-radius: 20px;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.history-item {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 12px;
+}
+
+.history-score {
+    text-align: center;
+}
+
+.history-score span {
+    display: block;
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.history-content {
+    flex: 1;
+}
+
+.history-tags {
+    display: flex;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    margin-bottom: 0.25rem;
+}
+
+.history-tags span {
+    font-size: 0.7rem;
+    background: #e5e7eb;
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+}
+
+.history-content p {
+    font-size: 0.85rem;
+    color: #374151;
+    margin: 0;
+}
+
+.history-time {
+    font-size: 0.75rem;
+    color: #9ca3af;
+}
+
+.empty-history {
+    text-align: center;
+    padding: 3rem;
+    color: #9ca3af;
+}
+
+.empty-history span {
+    font-size: 3rem;
+}
