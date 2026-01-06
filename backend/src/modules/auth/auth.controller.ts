@@ -670,9 +670,11 @@ export class AuthController {
         const isProduction = process.env.NODE_ENV === 'production';
         return {
             httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? 'strict' as const : 'lax' as const,
-            path: '/', // Changed from '/api/v1/auth' to allow all requests to send cookie
+            secure: isProduction, // Required for sameSite: 'none'
+            // Use 'none' for cross-origin (frontend: lightkeepers.ngo, backend: run.app)
+            // 'strict' blocks cookies on cross-site requests
+            sameSite: isProduction ? 'none' as const : 'lax' as const,
+            path: '/',
             maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days in milliseconds
         };
     }
