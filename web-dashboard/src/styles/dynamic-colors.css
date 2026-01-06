@@ -1,0 +1,268 @@
+/**
+ * Dynamic Color Utilities - CSS Custom Properties Approach
+ * Use data attributes with CSS variables to handle dynamic colors
+ */
+
+/* ============ Severity Colors ============ */
+[data-severity="critical"],
+[data-severity="4"] {
+    --dynamic-color: #dc2626;
+    --dynamic-bg: rgba(220, 38, 38, 0.1);
+}
+
+[data-severity="high"],
+[data-severity="3"] {
+    --dynamic-color: #ef4444;
+    --dynamic-bg: rgba(239, 68, 68, 0.1);
+}
+
+[data-severity="medium"],
+[data-severity="2"] {
+    --dynamic-color: #f59e0b;
+    --dynamic-bg: rgba(245, 158, 11, 0.1);
+}
+
+[data-severity="low"],
+[data-severity="1"] {
+    --dynamic-color: #22c55e;
+    --dynamic-bg: rgba(34, 197, 94, 0.1);
+}
+
+[data-severity="info"],
+[data-severity="0"] {
+    --dynamic-color: #3b82f6;
+    --dynamic-bg: rgba(59, 130, 246, 0.1);
+}
+
+/* ============ Priority Colors ============ */
+[data-priority="urgent"],
+[data-priority="critical"] {
+    --dynamic-color: #dc2626;
+    --dynamic-bg: rgba(220, 38, 38, 0.2);
+}
+
+[data-priority="high"] {
+    --dynamic-color: #ef4444;
+    --dynamic-bg: rgba(239, 68, 68, 0.15);
+}
+
+[data-priority="medium"] {
+    --dynamic-color: #f59e0b;
+    --dynamic-bg: rgba(245, 158, 11, 0.15);
+}
+
+[data-priority="low"] {
+    --dynamic-color: #22c55e;
+    --dynamic-bg: rgba(34, 197, 94, 0.15);
+}
+
+[data-priority="normal"] {
+    --dynamic-color: #64748b;
+    --dynamic-bg: rgba(100, 116, 139, 0.15);
+}
+
+/* ============ Triage Level Colors ============ */
+[data-triage="BLACK"] {
+    --dynamic-color: #1a1a1a;
+    --dynamic-bg: #1a1a1a;
+}
+
+[data-triage="RED"] {
+    --dynamic-color: #ef4444;
+    --dynamic-bg: #ef4444;
+}
+
+[data-triage="YELLOW"] {
+    --dynamic-color: #f59e0b;
+    --dynamic-bg: #f59e0b;
+}
+
+[data-triage="GREEN"] {
+    --dynamic-color: #22c55e;
+    --dynamic-bg: #22c55e;
+}
+
+/* ============ Status Colors ============ */
+[data-status="active"],
+[data-status="online"],
+[data-status="available"] {
+    --dynamic-color: #22c55e;
+    --dynamic-bg: rgba(34, 197, 94, 0.15);
+}
+
+[data-status="pending"],
+[data-status="busy"] {
+    --dynamic-color: #f59e0b;
+    --dynamic-bg: rgba(245, 158, 11, 0.15);
+}
+
+[data-status="offline"],
+[data-status="inactive"] {
+    --dynamic-color: #64748b;
+    --dynamic-bg: rgba(100, 116, 139, 0.15);
+}
+
+[data-status="error"],
+[data-status="emergency"] {
+    --dynamic-color: #dc2626;
+    --dynamic-bg: rgba(220, 38, 38, 0.15);
+}
+
+/* ============ Role Colors ============ */
+[data-role="commander"] {
+    --dynamic-color: #dc2626;
+    --dynamic-bg: rgba(220, 38, 38, 0.2);
+}
+
+[data-role="volunteer"] {
+    --dynamic-color: #22c55e;
+    --dynamic-bg: rgba(34, 197, 94, 0.2);
+}
+
+[data-role="medical"] {
+    --dynamic-color: #3b82f6;
+    --dynamic-bg: rgba(59, 130, 246, 0.2);
+}
+
+[data-role="logistics"] {
+    --dynamic-color: #f59e0b;
+    --dynamic-bg: rgba(245, 158, 11, 0.2);
+}
+
+/* ============ Org Type Colors ============ */
+[data-org-type="department"] {
+    --dynamic-color: #3b82f6;
+}
+
+[data-org-type="division"] {
+    --dynamic-color: #8b5cf6;
+}
+
+[data-org-type="team"] {
+    --dynamic-color: #22c55e;
+}
+
+[data-org-type="position"] {
+    --dynamic-color: #f59e0b;
+}
+
+/* ============ Utility Classes ============ */
+.dynamic-border {
+    border-color: var(--dynamic-color) !important;
+}
+
+.dynamic-border-left {
+    border-left-color: var(--dynamic-color) !important;
+}
+
+.dynamic-border-top {
+    border-top-color: var(--dynamic-color) !important;
+}
+
+.dynamic-bg {
+    background-color: var(--dynamic-bg) !important;
+}
+
+.dynamic-bg-solid {
+    background-color: var(--dynamic-color) !important;
+}
+
+.dynamic-text {
+    color: var(--dynamic-color) !important;
+}
+
+/* ============ Common Layout Utilities ============ */
+.text-center {
+    text-align: center;
+}
+
+.mt-1 {
+    margin-top: 0.5rem;
+}
+
+.mt-2 {
+    margin-top: 1rem;
+}
+
+.mt-3 {
+    margin-top: 1.5rem;
+}
+
+.mb-1 {
+    margin-bottom: 0.5rem;
+}
+
+.mb-2 {
+    margin-bottom: 1rem;
+}
+
+.p-1 {
+    padding: 0.5rem;
+}
+
+.p-2 {
+    padding: 1rem;
+}
+
+.p-3 {
+    padding: 2rem;
+}
+
+/* ============ Table Empty States ============ */
+.table-empty-cell {
+    text-align: center;
+    padding: 2rem;
+}
+
+.table-empty-cell--error {
+    text-align: center;
+    padding: 2rem;
+    color: #F44336;
+}
+
+/* ============ Progress Bar Utilities ============ */
+.progress-fill {
+    height: 100%;
+    background: var(--accent-gold, #d4af37);
+    border-radius: inherit;
+    transition: width 0.3s ease;
+}
+
+/* ============ Badge Utilities ============ */
+.badge--dynamic {
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: white;
+    background-color: var(--dynamic-color);
+}
+
+/* ============ Color Legend Dots ============ */
+.legend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+}
+
+.legend-dot--red {
+    background-color: #dc2626;
+}
+
+.legend-dot--green {
+    background-color: #22c55e;
+}
+
+.legend-dot--blue {
+    background-color: #3b82f6;
+}
+
+.legend-dot--yellow {
+    background-color: #f59e0b;
+}
+
+.legend-dot--purple {
+    background-color: #8b5cf6;
+}

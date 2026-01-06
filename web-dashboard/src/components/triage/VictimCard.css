@@ -180,3 +180,48 @@
 .transport-btn:hover {
     transform: scale(1.02);
 }
+
+/* Triage Level Colors */
+.victim-card[data-triage="BLACK"],
+.victim-card.triage-BLACK {
+    border-top-color: #1a1a1a;
+    border-left-color: #1a1a1a;
+}
+
+.victim-card[data-triage="RED"],
+.victim-card.triage-RED {
+    border-top-color: #dc2626;
+    border-left-color: #dc2626;
+}
+
+.victim-card[data-triage="YELLOW"],
+.victim-card.triage-YELLOW {
+    border-top-color: #f59e0b;
+    border-left-color: #f59e0b;
+}
+
+.victim-card[data-triage="GREEN"],
+.victim-card.triage-GREEN {
+    border-top-color: #22c55e;
+    border-left-color: #22c55e;
+}
+
+.triage-badge[data-triage="BLACK"],
+.triage-badge.triage-BLACK {
+    background-color: #1a1a1a;
+}
+
+.triage-badge[data-triage="RED"],
+.triage-badge.triage-RED {
+    background-color: #dc2626;
+}
+
+.triage-badge[data-triage="YELLOW"],
+.triage-badge.triage-YELLOW {
+    background-color: #f59e0b;
+}
+
+.triage-badge[data-triage="GREEN"],
+.triage-badge.triage-GREEN {
+    background-color: #22c55e;
+}

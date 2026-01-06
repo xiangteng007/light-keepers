@@ -39,16 +39,6 @@ export const VictimCard: React.FC<VictimCardProps> = ({
     onTransport,
     compact = false,
 }) => {
-    const getTriageColor = (level: Victim['triageLevel']) => {
-        const colors = {
-            BLACK: '#1a1a1a',
-            RED: '#dc2626',
-            YELLOW: '#f59e0b',
-            GREEN: '#22c55e',
-        };
-        return colors[level];
-    };
-
     const getTriageLabel = (level: Victim['triageLevel']) => {
         const labels = {
             BLACK: '黑 - 死亡/無法救治',
@@ -76,13 +66,13 @@ export const VictimCard: React.FC<VictimCardProps> = ({
     if (compact) {
         return (
             <div
-                className="victim-card compact"
+                className={`victim-card compact triage-${victim.triageLevel}`}
                 onClick={() => onSelect?.(victim)}
-                style={{ borderLeftColor: getTriageColor(victim.triageLevel) }}
+                data-triage={victim.triageLevel}
             >
                 <div className="compact-header">
                     <span className="bracelet-id">{victim.braceletId || victim.id.slice(0, 8)}</span>
-                    <span className="triage-badge" style={{ backgroundColor: getTriageColor(victim.triageLevel) }}>
+                    <span className={`triage-badge triage-${victim.triageLevel}`} data-triage={victim.triageLevel}>
                         {victim.triageLevel}
                     </span>
                 </div>
@@ -93,9 +83,9 @@ export const VictimCard: React.FC<VictimCardProps> = ({
 
     return (
         <div
-            className="victim-card"
+            className={`victim-card triage-${victim.triageLevel}`}
             onClick={() => onSelect?.(victim)}
-            style={{ borderTopColor: getTriageColor(victim.triageLevel) }}
+            data-triage={victim.triageLevel}
         >
             <div className="card-header">
                 <div className="bracelet-section">
@@ -103,8 +93,8 @@ export const VictimCard: React.FC<VictimCardProps> = ({
                     <span className="bracelet-id">{victim.braceletId || 'N/A'}</span>
                 </div>
                 <div
-                    className="triage-badge large"
-                    style={{ backgroundColor: getTriageColor(victim.triageLevel) }}
+                    className={`triage-badge large triage-${victim.triageLevel}`}
+                    data-triage={victim.triageLevel}
                 >
                     {victim.triageLevel}
                 </div>
