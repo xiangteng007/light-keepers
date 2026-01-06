@@ -192,6 +192,22 @@ import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-poin
 import { EventAiModule } from './modules/event-ai/event-ai.module'; // 🧠 事件 AI 分析
 // v31.0 行動同步模組
 import { MobileSyncModule } from './modules/mobile-sync/mobile-sync.module'; // 📱 行動 App 同步
+// v32.0 儀表板分析模組
+import { DashboardAnalyticsModule } from './modules/dashboard-analytics/dashboard-analytics.module'; // 📊 KPI 監控
+// v33.0 氣象整合模組
+import { WeatherAlertIntegrationModule } from './modules/weather-alert-integration/weather-alert-integration.module'; // 🌦️ 氣象預警
+// v34.0 區塊鏈物資追蹤模組
+import { SupplyChainBlockchainModule } from './modules/supply-chain-blockchain/supply-chain-blockchain.module'; // ⛓️ 物資帳本
+// v35.0 AR 現場導引模組
+import { ArFieldGuidanceModule } from './modules/ar-field-guidance/ar-field-guidance.module'; // 🥽 AR 導引
+// v36.0 無人機群控模組
+import { DroneSwarmModule } from './modules/drone-swarm/drone-swarm.module'; // 🛸 無人機群控
+// v37.0 社群救災網路模組
+import { DisasterCommunityModule } from './modules/disaster-community/disaster-community.module'; // 👥 社群網路
+// v38.0 AI 航拍分析模組
+import { AerialImageAnalysisModule } from './modules/aerial-image-analysis/aerial-image-analysis.module'; // 🖼️ 航拍分析
+// v39.0 家屬通報協尋模組
+import { FamilyReunificationModule } from './modules/family-reunification/family-reunification.module'; // 👨‍👩‍👧 家屬協尋
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -415,6 +431,22 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         EventAiModule, // 🧠 事件 AI 分析
         // === v31.0 行動同步 ===
         MobileSyncModule, // 📱 行動 App 同步
+        // === v32.0 儀表板分析 ===
+        DashboardAnalyticsModule, // 📊 KPI 監控
+        // === v33.0 氣象整合 ===
+        WeatherAlertIntegrationModule, // 🌦️ 氣象預警
+        // === v34.0 區塊鏈物資 ===
+        SupplyChainBlockchainModule, // ⛓️ 物資帳本
+        // === v35.0 AR 導引 ===
+        ArFieldGuidanceModule, // 🥽 AR 現場導引
+        // === v36.0 無人機群控 ===
+        DroneSwarmModule, // 🛸 多機協調
+        // === v37.0 社群網路 ===
+        DisasterCommunityModule, // 👥 志工社群
+        // === v38.0 航拍分析 ===
+        AerialImageAnalysisModule, // 🖼️ AI 損害評估
+        // === v39.0 家屬協尋 ===
+        FamilyReunificationModule, // 👨‍👩‍👧 AI 照片比對
     ],
     providers: [
         CloudLoggerService,
