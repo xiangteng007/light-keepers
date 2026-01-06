@@ -41,6 +41,7 @@ import type { LucideIcon } from 'lucide-react';
 import logoImage from '../assets/logo.jpg';
 import { useAuth } from '../context/AuthContext';
 import { getTasks } from '../api/services';
+import ChatWidget from './chat/ChatWidget';
 import './Layout.css';
 
 // ===== 類型定義 =====
@@ -122,6 +123,7 @@ const navGroups: NavGroup[] = [
             { id: 'my-insurance', path: '/my-insurance', label: '我的保險', icon: ShieldCheck, requiredLevel: 1 },
             { id: 'my-points', path: '/my-points', label: '我的積分', icon: Award, requiredLevel: 1 },
             { id: 'training', path: '/training', label: '培訓中心', icon: GraduationCap, requiredLevel: 1 },
+            { id: '2fa-setup', path: '/2fa-setup', label: '雙重驗證設定', icon: Shield, requiredLevel: 1 },
         ],
     },
     {
@@ -132,6 +134,9 @@ const navGroups: NavGroup[] = [
         items: [
             { id: 'volunteers', path: '/volunteers', label: '志工列表', icon: Users, requiredLevel: 2 },
             { id: 'volunteers-schedule', path: '/volunteers/schedule', label: '志工排班', icon: CalendarDays, requiredLevel: 2 },
+            { id: 'shift-calendar', path: '/shift-calendar', label: '班次日曆', icon: Calendar, requiredLevel: 2 },
+            { id: 'attendance', path: '/attendance', label: '出勤打卡', icon: CheckSquare, requiredLevel: 2 },
+            { id: 'org-chart', path: '/org-chart', label: '組織架構', icon: Users, requiredLevel: 2 },
             { id: 'approvals', path: '/approvals', label: '審批中心', icon: CheckSquare, requiredLevel: 2 },
         ],
     },
@@ -405,6 +410,9 @@ export default function Layout() {
             <main className="main-content">
                 <Outlet />
             </main>
+
+            {/* AI Chat Widget */}
+            <ChatWidget />
         </div>
     );
 }

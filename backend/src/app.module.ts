@@ -180,6 +180,16 @@ import { MockDataModule } from './modules/mock-data/mock-data.module'; // 🎭 �
 // v23.0 進階安全模組
 import { DeviceManagementModule } from './modules/device-management/device-management.module'; // 📱 裝置管理
 import { SessionTimeoutModule } from './modules/session-timeout/session-timeout.module'; // ⏱️ Session 逾時
+// v26.0 即時通訊模組
+import { RealtimeChatModule } from './modules/realtime-chat/realtime-chat.module'; // 💬 WebSocket 聊天
+// v27.0 進階報表模組
+import { ReportBuilderModule } from './modules/report-builder/report-builder.module'; // 📊 報表建立器
+// v28.0 裝備管理模組
+import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module'; // 📦 裝備 QR
+// v29.0 志工積點模組
+import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module'; // 🏆 積點系統
+// v30.0 AI 分析模組
+import { EventAiModule } from './modules/event-ai/event-ai.module'; // 🧠 事件 AI 分析
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -391,6 +401,16 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         // === v23.0 進階安全 ===
         DeviceManagementModule, // 📱 裝置管理
         SessionTimeoutModule, // ⏱️ Session 逾時
+        // === v26.0 即時通訊 ===
+        RealtimeChatModule, // 💬 WebSocket 聊天
+        // === v27.0 進階報表 ===
+        ReportBuilderModule, // 📊 報表建立器
+        // === v28.0 裝備管理 ===
+        EquipmentQrModule, // 📦 裝備 QR
+        // === v29.0 志工積點 ===
+        VolunteerPointsModule, // 🏆 積點系統
+        // === v30.0 AI 分析 ===
+        EventAiModule, // 🧠 事件 AI 分析
     ],
     providers: [
         CloudLoggerService,
