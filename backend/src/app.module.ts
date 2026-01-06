@@ -168,6 +168,18 @@ import { OrgChartModule } from './modules/org-chart/org-chart.module'; // 🏢 �
 import { ShiftCalendarModule } from './modules/shift-calendar/shift-calendar.module'; // 📅 排班日曆
 import { AttendanceModule } from './modules/attendance/attendance.module'; // ⏰ 出勤打卡
 import { PayrollModule } from './modules/payroll/payroll.module'; // 💰 補助計算
+// v20.0 報表與匯出模組
+import { PdfGeneratorModule } from './modules/pdf-generator/pdf-generator.module'; // 📄 PDF 產生
+import { ExcelExportModule } from './modules/excel-export/excel-export.module'; // 📊 Excel 匯出
+import { ReportSchedulerModule } from './modules/report-scheduler/report-scheduler.module'; // ⏰ 排程報表
+// v21.0 災情追蹤強化模組
+import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-media-monitor.module'; // 📱 社群監控
+// v22.0 開發者體驗模組
+import { SwaggerAutoDocsModule } from './modules/swagger-auto-docs/swagger-auto-docs.module'; // 📚 API 文件
+import { MockDataModule } from './modules/mock-data/mock-data.module'; // 🎭 假資料
+// v23.0 進階安全模組
+import { DeviceManagementModule } from './modules/device-management/device-management.module'; // 📱 裝置管理
+import { SessionTimeoutModule } from './modules/session-timeout/session-timeout.module'; // ⏱️ Session 逾時
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -367,6 +379,18 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         ShiftCalendarModule, // 📅 排班日曆
         AttendanceModule, // ⏰ 出勤打卡
         PayrollModule, // 💰 補助計算
+        // === v20.0 報表與匯出 ===
+        PdfGeneratorModule, // 📄 PDF 產生
+        ExcelExportModule, // 📊 Excel 匯出
+        ReportSchedulerModule, // ⏰ 排程報表
+        // === v21.0 災情追蹤強化 ===
+        SocialMediaMonitorModule, // 📱 社群監控
+        // === v22.0 開發者體驗 ===
+        SwaggerAutoDocsModule, // 📚 API 文件
+        MockDataModule, // 🎭 假資料
+        // === v23.0 進階安全 ===
+        DeviceManagementModule, // 📱 裝置管理
+        SessionTimeoutModule, // ⏱️ Session 逾時
     ],
     providers: [
         CloudLoggerService,
