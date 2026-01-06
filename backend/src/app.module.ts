@@ -190,6 +190,8 @@ import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module'; 
 import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module'; // 🏆 積點系統
 // v30.0 AI 分析模組
 import { EventAiModule } from './modules/event-ai/event-ai.module'; // 🧠 事件 AI 分析
+// v31.0 行動同步模組
+import { MobileSyncModule } from './modules/mobile-sync/mobile-sync.module'; // 📱 行動 App 同步
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -411,6 +413,8 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         VolunteerPointsModule, // 🏆 積點系統
         // === v30.0 AI 分析 ===
         EventAiModule, // 🧠 事件 AI 分析
+        // === v31.0 行動同步 ===
+        MobileSyncModule, // 📱 行動 App 同步
     ],
     providers: [
         CloudLoggerService,

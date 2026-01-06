@@ -229,9 +229,8 @@ export const TriagePage: React.FC = () => {
                 {['ALL', 'BLACK', 'RED', 'YELLOW', 'GREEN'].map(level => (
                     <button
                         key={level}
-                        className={`filter-btn ${filterLevel === level ? 'active' : ''}`}
+                        className={`filter-btn ${filterLevel === level ? 'active' : ''} ${level !== 'ALL' ? `level-${level}` : ''}`}
                         onClick={() => setFilterLevel(level)}
-                        style={level !== 'ALL' ? { borderColor: getLevelColor(level) } : {}}
                     >
                         {level === 'ALL' ? '全部' : getLevelLabel(level)}
                     </button>
@@ -243,15 +242,11 @@ export const TriagePage: React.FC = () => {
                 {filteredVictims.map(victim => (
                     <div
                         key={victim.id}
-                        className="victim-card"
-                        style={{ borderLeftColor: getLevelColor(victim.triageLevel) }}
+                        className={`victim-card level-${victim.triageLevel}`}
                         onClick={() => setSelectedVictim(victim)}
                     >
                         <div className="victim-header">
-                            <span
-                                className="level-badge"
-                                style={{ backgroundColor: getLevelColor(victim.triageLevel) }}
-                            >
+                            <span className={`level-badge level-${victim.triageLevel}`}>
                                 {victim.triageLevel}
                             </span>
                             {victim.braceletId && (

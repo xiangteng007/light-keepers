@@ -350,3 +350,52 @@
     font-weight: 600;
     cursor: pointer;
 }
+
+/* Triage Level Classes */
+.filter-btn.level-BLACK {
+    border-color: #1a1a1a;
+}
+
+.filter-btn.level-RED {
+    border-color: #ef4444;
+}
+
+.filter-btn.level-YELLOW {
+    border-color: #f59e0b;
+}
+
+.filter-btn.level-GREEN {
+    border-color: #22c55e;
+}
+
+.victim-card.level-BLACK {
+    border-left-color: #1a1a1a;
+}
+
+.victim-card.level-RED {
+    border-left-color: #ef4444;
+}
+
+.victim-card.level-YELLOW {
+    border-left-color: #f59e0b;
+}
+
+.victim-card.level-GREEN {
+    border-left-color: #22c55e;
+}
+
+.level-badge.level-BLACK {
+    background-color: #1a1a1a;
+}
+
+.level-badge.level-RED {
+    background-color: #ef4444;
+}
+
+.level-badge.level-YELLOW {
+    background-color: #f59e0b;
+}
+
+.level-badge.level-GREEN {
+    background-color: #22c55e;
+}
