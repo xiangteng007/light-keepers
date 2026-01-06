@@ -198,7 +198,7 @@ export const ReunificationPage: React.FC = () => {
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                 />
-                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <select title="篩選失蹤者狀態" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
                     <option value="ALL">全部狀態</option>
                     <option value="MISSING">搜尋中</option>
                     <option value="FOUND_SAFE">已尋獲 - 平安</option>
@@ -270,6 +270,7 @@ export const ReunificationPage: React.FC = () => {
                                 <label>姓名 *</label>
                                 <input
                                     type="text"
+                                    placeholder="失蹤者姓名"
                                     value={formData.name}
                                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 />
@@ -278,13 +279,14 @@ export const ReunificationPage: React.FC = () => {
                                 <label>年齡</label>
                                 <input
                                     type="number"
+                                    placeholder="年齡"
                                     value={formData.age}
                                     onChange={e => setFormData({ ...formData, age: e.target.value })}
                                 />
                             </div>
                             <div className="form-section half">
                                 <label>性別</label>
-                                <select value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })}>
+                                <select title="性別" value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })}>
                                     <option value="">-</option>
                                     <option value="男">男</option>
                                     <option value="女">女</option>
@@ -318,6 +320,7 @@ export const ReunificationPage: React.FC = () => {
                                 <label>姓名</label>
                                 <input
                                     type="text"
+                                    placeholder="報案人姓名"
                                     value={formData.reporterName}
                                     onChange={e => setFormData({ ...formData, reporterName: e.target.value })}
                                 />
@@ -326,6 +329,7 @@ export const ReunificationPage: React.FC = () => {
                                 <label>電話</label>
                                 <input
                                     type="tel"
+                                    placeholder="聯絡電話"
                                     value={formData.reporterPhone}
                                     onChange={e => setFormData({ ...formData, reporterPhone: e.target.value })}
                                 />

@@ -41,7 +41,6 @@ export const EquipmentPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [filter, setFilter] = useState({ category: '', status: '' });
     const [showNewModal, setShowNewModal] = useState(false);
-    const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
 
     // Form state
     const [formData, setFormData] = useState({
@@ -207,7 +206,7 @@ export const EquipmentPage: React.FC = () => {
 
             {/* Filters */}
             <div className="filter-bar">
-                <select value={filter.category} onChange={e => setFilter({ ...filter, category: e.target.value })}>
+                <select title="篩選設備類別" value={filter.category} onChange={e => setFilter({ ...filter, category: e.target.value })}>
                     <option value="">全部類別</option>
                     <option value="RADIO">無線電</option>
                     <option value="GPS">GPS</option>
@@ -217,7 +216,7 @@ export const EquipmentPage: React.FC = () => {
                     <option value="LIGHT">照明</option>
                     <option value="POWER_BANK">行動電源</option>
                 </select>
-                <select value={filter.status} onChange={e => setFilter({ ...filter, status: e.target.value })}>
+                <select title="篩選設備狀態" value={filter.status} onChange={e => setFilter({ ...filter, status: e.target.value })}>
                     <option value="">全部狀態</option>
                     <option value="AVAILABLE">可用</option>
                     <option value="IN_USE">使用中</option>
@@ -229,7 +228,7 @@ export const EquipmentPage: React.FC = () => {
             {/* Equipment Grid */}
             <div className="equipment-grid">
                 {equipment.map(item => (
-                    <div key={item.id} className="equipment-card" onClick={() => setSelectedEquipment(item)}>
+                    <div key={item.id} className="equipment-card">
                         <div className="card-header">
                             <span className="category">{getCategoryLabel(item.category)}</span>
                             {getStatusBadge(item.status)}
@@ -304,12 +303,14 @@ export const EquipmentPage: React.FC = () => {
                                 type="text"
                                 value={formData.qrCode}
                                 onChange={e => setFormData({ ...formData, qrCode: e.target.value })}
+                                placeholder="QR Code 識別碼"
                             />
                         </div>
 
                         <div className="form-section">
                             <label>類別</label>
                             <select
+                                title="設備類別"
                                 value={formData.category}
                                 onChange={e => setFormData({ ...formData, category: e.target.value })}
                             >
