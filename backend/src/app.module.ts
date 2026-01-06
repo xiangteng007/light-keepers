@@ -52,6 +52,21 @@ import { DrillSimulationModule } from './modules/drill-simulation/drill-simulati
 import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module'; // 📡 離線網狀
 import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module'; // ❤️ 心理支持
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module'; // 🔗 責信區塊鏈
+// v3.0 擴充模組
+import { TriageModule } from './modules/triage/triage.module'; // 🏥 E-Triage 檢傷
+import { VoiceModule } from './modules/voice/voice.module'; // 🎤 語音轉錄
+import { RoutingModule } from './modules/routing/routing.module'; // 🛣️ 路徑規劃
+import { ReunificationModule } from './modules/reunification/reunification.module'; // 🔍 災民協尋
+import { EquipmentModule } from './modules/equipment/equipment.module'; // 📦 設備管理
+import { TacticalMapsModule } from './modules/tactical-maps/tactical-maps.module'; // 🗺️ 3D 戰術
+import { IndoorPositioningModule } from './modules/indoor-positioning/indoor-positioning.module'; // 📍 室內定位
+import { DroneOpsModule } from './modules/drone-ops/drone-ops.module'; // 🛸 無人機
+import { SpectrumAnalysisModule } from './modules/spectrum-analysis/spectrum-analysis.module'; // 📡 頻譜分析
+// v3.0 擴展模組
+import { NfcModule } from './modules/nfc/nfc.module'; // 📲 NFC 手環
+import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module'; // 📷 QR 掃描
+import { PttModule } from './modules/ptt/ptt.module'; // 🎙️ PTT 對講機
+import { OfflineTilesModule } from './modules/offline-tiles/offline-tiles.module'; // 🗺️ 離線地圖
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -135,6 +150,21 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         OfflineMeshModule, // 📡 離線網狀
         PsychologicalSupportModule, // ❤️ 心理支持
         IntegrityLedgerModule, // 🔗 責信區塊鏈
+        // v3.0 擴充模組
+        TriageModule, // 🏥 E-Triage 檢傷
+        VoiceModule, // 🎤 語音轉錄
+        RoutingModule, // 🛣️ 路徑規劃
+        ReunificationModule, // 🔍 災民協尋
+        EquipmentModule, // 📦 設備管理
+        TacticalMapsModule, // 🗺️ 3D 戰術
+        IndoorPositioningModule, // 📍 室內定位
+        DroneOpsModule, // 🛸 無人機
+        SpectrumAnalysisModule, // 📡 頻譜分析
+        // v3.0 擴展模組
+        NfcModule, // 📲 NFC 手環
+        QrScannerModule, // 📷 QR 掃描
+        PttModule, // 🎙️ PTT 對講機
+        OfflineTilesModule, // 🗺️ 離線地圖
     ],
     providers: [
         CloudLoggerService,

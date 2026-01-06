@@ -51,6 +51,9 @@ import IAPManagerPage from './pages/command/IAPManagerPage'
 import SITREPViewerPage from './pages/command/SITREPViewerPage'
 import AARPlaybackPage from './pages/command/AARPlaybackPage'
 import TacticalMapPage from './pages/TacticalMapPage'
+import TriagePage from './pages/TriagePage'
+import EquipmentPage from './pages/EquipmentPage'
+import ReunificationPage from './pages/ReunificationPage'
 import './App.css'
 
 
@@ -142,6 +145,9 @@ function App() {
             <Route path="emergency-response/sitrep/:sessionId" element={<ProtectedRoute requiredLevel={2}><SITREPViewerPage /></ProtectedRoute>} />
             <Route path="emergency-response/aar/:sessionId" element={<ProtectedRoute requiredLevel={2}><AARPlaybackPage /></ProtectedRoute>} />
             <Route path="tactical-map" element={<ProtectedRoute requiredLevel={2}><TacticalMapPage /></ProtectedRoute>} />
+            <Route path="emergency-response/triage/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
+            <Route path="emergency-response/reunification/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><ReunificationPage /></ProtectedRoute>} />
+            <Route path="equipment" element={<ProtectedRoute requiredLevel={2}><EquipmentPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
             <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
