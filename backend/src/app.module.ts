@@ -128,6 +128,17 @@ import { AuditLogModule } from './modules/audit-log/audit-log.module'; // 📝 �
 import { MultiTenantModule } from './modules/multi-tenant/multi-tenant.module'; // 🏢 多租戶
 import { ScheduledTasksModule } from './modules/scheduled-tasks/scheduled-tasks.module'; // ⏰ 排程任務
 import { I18nApiModule } from './modules/i18n-api/i18n-api.module'; // 🌐 國際化
+// v10.0 安全與監控模組
+import { PrometheusModule } from './modules/prometheus/prometheus.module'; // 📊 Prometheus
+import { SentryModule } from './modules/sentry/sentry.module'; // 🚨 Sentry
+import { SecretRotationModule } from './modules/secret-rotation/secret-rotation.module'; // 🔐 金鑰輪替
+// v11.0 AI 進階模組
+import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module'; // 🧠 RAG 知識庫
+import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module'; // 🖼️ 圖像辨識
+import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module'; // 🎴 語音轉文字
+import { AutoSummaryModule } from './modules/auto-summary/auto-summary.module'; // 📝 自動摘要
+// v12.0 前端支援模組
+import { OfflineSyncModule } from './modules/offline-sync/offline-sync.module'; // 📡 離線同步
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -287,6 +298,17 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         MultiTenantModule, // 🏢 多租戶
         ScheduledTasksModule, // ⏰ 排程任務
         I18nApiModule, // 🌐 國際化
+        // === v10.0 安全與監控 ===
+        PrometheusModule, // 📊 Prometheus 監控
+        SentryModule, // 🚨 錯誤追蹤
+        SecretRotationModule, // 🔐 金鑰輪替
+        // === v11.0 AI 進階 ===
+        RagKnowledgeModule, // 🧠 RAG 知識庫
+        ImageRecognitionModule, // 🖼️ 圖像辨識
+        SpeechToTextModule, // 🎴 語音轉文字
+        AutoSummaryModule, // 📝 自動摘要 SITREP
+        // === v12.0 前端支援 ===
+        OfflineSyncModule, // 📡 離線同步
     ],
     providers: [
         CloudLoggerService,
