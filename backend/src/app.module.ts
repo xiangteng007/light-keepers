@@ -108,6 +108,19 @@ import { LineLiffModule } from './modules/line-liff/line-liff.module'; // 📱 L
 import { CitizenAppModule } from './modules/citizen-app/citizen-app.module'; // 👥 公民 App
 import { BluetoothAudioModule } from './modules/bluetooth-audio/bluetooth-audio.module'; // 🎧 藍牙音訊
 import { NgoApiModule } from './modules/ngo-api/ngo-api.module'; // 🏛️ NGO API
+// v8.0 數據分析與整合模組
+import { PowerBiModule } from './modules/power-bi/power-bi.module'; // 📊 Power BI
+import { TrendPredictionModule } from './modules/trend-prediction/trend-prediction.module'; // 📈 趨勢預測
+import { PerformanceReportModule } from './modules/performance-report/performance-report.module'; // 📋 績效報表
+import { GeofenceAlertModule } from './modules/geofence-alert/geofence-alert.module'; // 📍 地理圍欄
+import { SmartSchedulingModule } from './modules/smart-scheduling/smart-scheduling.module'; // 🤖 智慧排班
+import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module'; // 😴 疲勞偵測
+import { Fire119Module } from './modules/fire-119/fire-119.module'; // 🚒 消防 119
+import { WaterResourcesModule } from './modules/water-resources/water-resources.module'; // 💧 水利署
+import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module'; // 🌡️ TCCIP 氣候
+import { DonationTrackingModule } from './modules/donation-tracking/donation-tracking.module'; // 💰 捐款追蹤
+import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module'; // 🧾 經費核銷
+import { PublicFinanceModule } from './modules/public-finance/public-finance.module'; // 📊 公開財報
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -247,6 +260,19 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         CitizenAppModule, // 👥 公民 App
         BluetoothAudioModule, // 🎧 藍牙音訊
         NgoApiModule, // 🏛️ NGO API
+        // v8.0 數據分析與整合模組
+        PowerBiModule, // 📊 Power BI
+        TrendPredictionModule, // 📈 趨勢預測
+        PerformanceReportModule, // 📋 績效報表
+        GeofenceAlertModule, // 📍 地理圍欄
+        SmartSchedulingModule, // 🤖 智慧排班
+        FatigueDetectionModule, // 😴 疲勞偵測
+        Fire119Module, // 🚒 消防 119
+        WaterResourcesModule, // 💧 水利署
+        TccipClimateModule, // 🌡️ TCCIP 氣候
+        DonationTrackingModule, // 💰 捐款追蹤
+        ExpenseReimbursementModule, // 🧾 經費核銷
+        PublicFinanceModule, // 📊 公開財報
     ],
     providers: [
         CloudLoggerService,
