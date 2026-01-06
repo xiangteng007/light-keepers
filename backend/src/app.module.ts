@@ -121,6 +121,13 @@ import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module
 import { DonationTrackingModule } from './modules/donation-tracking/donation-tracking.module'; // 💰 捐款追蹤
 import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module'; // 🧾 經費核銷
 import { PublicFinanceModule } from './modules/public-finance/public-finance.module'; // 📊 公開財報
+// v9.0 基礎設施模組
+import { RedisCacheModule } from './modules/redis-cache/redis-cache.module'; // 🗃️ Redis 快取
+import { FileUploadModule } from './modules/file-upload/file-upload.module'; // 📎 檔案上傳
+import { AuditLogModule } from './modules/audit-log/audit-log.module'; // 📝 審計日誌
+import { MultiTenantModule } from './modules/multi-tenant/multi-tenant.module'; // 🏢 多租戶
+import { ScheduledTasksModule } from './modules/scheduled-tasks/scheduled-tasks.module'; // ⏰ 排程任務
+import { I18nApiModule } from './modules/i18n-api/i18n-api.module'; // 🌐 國際化
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -273,6 +280,13 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         DonationTrackingModule, // 💰 捐款追蹤
         ExpenseReimbursementModule, // 🧾 經費核銷
         PublicFinanceModule, // 📊 公開財報
+        // v9.0 基礎設施模組
+        RedisCacheModule, // 🗃️ Redis 快取
+        FileUploadModule, // 📎 檔案上傳
+        AuditLogModule, // 📝 審計日誌
+        MultiTenantModule, // 🏢 多租戶
+        ScheduledTasksModule, // ⏰ 排程任務
+        I18nApiModule, // 🌐 國際化
     ],
     providers: [
         CloudLoggerService,
