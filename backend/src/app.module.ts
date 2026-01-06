@@ -82,6 +82,22 @@ import { WeatherModule } from './modules/weather/weather.module'; // 🌦️ 氣
 import { WearableModule } from './modules/wearable/wearable.module'; // ⌚ 穿戴裝置
 import { VrCommandModule } from './modules/vr-command/vr-command.module'; // 🕶️ VR 指揮
 import { RobotRescueModule } from './modules/robot-rescue/robot-rescue.module'; // 🤖 機器人搜救
+// v5.0 進階擴展模組
+import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module'; // 🎙️ 語音助手
+import { TranslationModule } from './modules/translation/translation.module'; // 🌐 即時翻譯
+import { EmotionAnalysisModule } from './modules/emotion-analysis/emotion-analysis.module'; // 💭 情緒辨識
+import { CrowdReportingModule } from './modules/crowd-reporting/crowd-reporting.module'; // 📱 群眾回報
+import { MicroTaskModule } from './modules/micro-task/micro-task.module'; // 📋 微任務
+import { RewardsModule } from './modules/rewards/rewards.module'; // 🏆 獎勵積分
+import { BimIntegrationModule } from './modules/bim-integration/bim-integration.module'; // 🏗️ BIM 整合
+import { MultiEocModule } from './modules/multi-eoc/multi-eoc.module'; // 🏛️ 跨縣市 EOC
+import { DisasterSummaryModule } from './modules/disaster-summary/disaster-summary.module'; // 📝 災情摘要
+import { ResourceOptimizationModule } from './modules/resource-optimization/resource-optimization.module'; // 📊 資源最佳化
+import { AarAnalysisModule } from './modules/aar-analysis/aar-analysis.module'; // 📋 AAR 分析
+import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module'; // 🏚️ 損壞模擬
+import { EvacuationSimModule } from './modules/evacuation-sim/evacuation-sim.module'; // 🚶 疏散模擬
+import { NgoIntegrationModule } from './modules/ngo-integration/ngo-integration.module'; // 🤝 NGO 整合
+import { InsaragModule } from './modules/insarag/insarag.module'; // 🌍 INSARAG
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -195,6 +211,22 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         WearableModule, // ⌚ 穿戴裝置
         VrCommandModule, // 🕶️ VR 指揮
         RobotRescueModule, // 🤖 機器人搜救
+        // v5.0 進階擴展模組
+        VoiceAssistantModule, // 🎙️ 語音助手
+        TranslationModule, // 🌐 即時翻譯
+        EmotionAnalysisModule, // 💭 情緒辨識
+        CrowdReportingModule, // 📱 群眾回報
+        MicroTaskModule, // 📋 微任務
+        RewardsModule, // 🏆 獎勵積分
+        BimIntegrationModule, // 🏗️ BIM 整合
+        MultiEocModule, // 🏛️ 跨縣市 EOC
+        DisasterSummaryModule, // 📝 災情摘要
+        ResourceOptimizationModule, // 📊 資源最佳化
+        AarAnalysisModule, // 📋 AAR 分析
+        DamageSimulationModule, // 🏚️ 損壞模擬
+        EvacuationSimModule, // 🚶 疏散模擬
+        NgoIntegrationModule, // 🤝 NGO 整合
+        InsaragModule, // 🌍 INSARAG
     ],
     providers: [
         CloudLoggerService,
