@@ -71,6 +71,9 @@ import { OfflineTilesModule } from './modules/offline-tiles/offline-tiles.module
 import { Cesium3dModule } from './modules/cesium-3d/cesium-3d.module'; // 🌐 3D 沙盤
 import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module'; // 📹 影像串流
 import { AiVisionModule } from './modules/ai-vision/ai-vision.module'; // 🤖 AI 辨識
+// v3.0 長期擴展
+import { AiPredictionModule } from './modules/ai-prediction/ai-prediction.module'; // 📊 AI 預測
+import { PushNotificationModule } from './modules/push-notification/push-notification.module'; // 🔔 推播通知
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -173,6 +176,9 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         Cesium3dModule, // 🌐 3D 沙盤
         MediaStreamingModule, // 📹 影像串流
         AiVisionModule, // 🤖 AI 辨識
+        // v3.0 長期擴展模組
+        AiPredictionModule, // 📊 AI 預測
+        PushNotificationModule, // 🔔 推播通知
     ],
     providers: [
         CloudLoggerService,

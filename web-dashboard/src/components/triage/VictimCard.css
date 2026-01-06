@@ -1,0 +1,182 @@
+/**
+ * Victim Card Component Styles
+ */
+
+.victim-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 1rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-top: 4px solid;
+}
+
+.victim-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Compact Mode */
+.victim-card.compact {
+    padding: 0.75rem;
+    border-top: none;
+    border-left: 4px solid;
+    border-radius: 8px;
+}
+
+.compact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25rem;
+}
+
+.compact-location {
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Card Header */
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.bracelet-section {
+    display: flex;
+    flex-direction: column;
+}
+
+.bracelet-label {
+    font-size: 0.7rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.bracelet-id {
+    font-family: monospace;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--accent-gold, #d4af37);
+}
+
+.triage-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.triage-badge.large {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+}
+
+.triage-label {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.75rem;
+}
+
+/* Vital Signs */
+.vital-signs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.vital {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.7rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+}
+
+.vital .icon {
+    font-size: 1.2rem;
+    margin-bottom: 0.25rem;
+}
+
+.vital.ok {
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.vital.alert {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.1);
+}
+
+/* Injuries & Location */
+.injuries,
+.location {
+    font-size: 0.85rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+
+.injuries .label,
+.location .label {
+    opacity: 0.7;
+    margin-right: 0.25rem;
+}
+
+/* Footer */
+.card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: rgba(255, 255, 255, 0.6);
+    margin-top: 0.75rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.transport-status {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.time-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.assessor {
+    font-size: 0.7rem;
+}
+
+.time {
+    color: var(--accent-gold, #d4af37);
+}
+
+/* Transport Button */
+.transport-btn {
+    width: 100%;
+    padding: 0.75rem;
+    margin-top: 0.75rem;
+    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.transport-btn:hover {
+    transform: scale(1.02);
+}
