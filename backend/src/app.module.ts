@@ -67,6 +67,10 @@ import { NfcModule } from './modules/nfc/nfc.module'; // 📲 NFC 手環
 import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module'; // 📷 QR 掃描
 import { PttModule } from './modules/ptt/ptt.module'; // 🎙️ PTT 對講機
 import { OfflineTilesModule } from './modules/offline-tiles/offline-tiles.module'; // 🗺️ 離線地圖
+// v3.0 中期擴展
+import { Cesium3dModule } from './modules/cesium-3d/cesium-3d.module'; // 🌐 3D 沙盤
+import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module'; // 📹 影像串流
+import { AiVisionModule } from './modules/ai-vision/ai-vision.module'; // 🤖 AI 辨識
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -165,6 +169,10 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         QrScannerModule, // 📷 QR 掃描
         PttModule, // 🎙️ PTT 對講機
         OfflineTilesModule, // 🗺️ 離線地圖
+        // v3.0 中期擴展模組
+        Cesium3dModule, // 🌐 3D 沙盤
+        MediaStreamingModule, // 📹 影像串流
+        AiVisionModule, // 🤖 AI 辨識
     ],
     providers: [
         CloudLoggerService,

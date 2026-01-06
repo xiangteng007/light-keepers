@@ -54,6 +54,8 @@ import TacticalMapPage from './pages/TacticalMapPage'
 import TriagePage from './pages/TriagePage'
 import EquipmentPage from './pages/EquipmentPage'
 import ReunificationPage from './pages/ReunificationPage'
+import PublicSearchPage from './pages/PublicSearchPage'
+import DroneControlPage from './pages/DroneControlPage'
 import './App.css'
 
 
@@ -113,6 +115,7 @@ function App() {
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
           <Route path="/mission-command/:missionSessionId" element={<MissionCommandPage />} /> {/* 任務指揮中心（獨立頁面） */}
+          <Route path="/search" element={<PublicSearchPage />} /> {/* 民眾協尋查詢（公開） */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
@@ -148,6 +151,7 @@ function App() {
             <Route path="emergency-response/triage/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
             <Route path="emergency-response/reunification/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><ReunificationPage /></ProtectedRoute>} />
             <Route path="equipment" element={<ProtectedRoute requiredLevel={2}><EquipmentPage /></ProtectedRoute>} />
+            <Route path="drone-control" element={<ProtectedRoute requiredLevel={2}><DroneControlPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
             <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
