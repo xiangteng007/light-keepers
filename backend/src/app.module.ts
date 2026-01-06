@@ -139,6 +139,35 @@ import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.modu
 import { AutoSummaryModule } from './modules/auto-summary/auto-summary.module'; // 📝 自動摘要
 // v12.0 前端支援模組
 import { OfflineSyncModule } from './modules/offline-sync/offline-sync.module'; // 📡 離線同步
+// v13.0 進階整合模組
+import { LineNotifyModule } from './modules/line-notify/line-notify.module'; // 📱 LINE Notify
+import { TelegramBotModule } from './modules/telegram-bot/telegram-bot.module'; // 🤖 Telegram Bot
+import { SlackIntegrationModule } from './modules/slack-integration/slack-integration.module'; // 💬 Slack
+import { EmailTemplateModule } from './modules/email-template/email-template.module'; // 📧 Email 模板
+// v14.0 資料視覺化模組
+import { DashboardBuilderModule } from './modules/dashboard-builder/dashboard-builder.module'; // 📊 儀表板配置
+import { HeatmapAnalyticsModule } from './modules/heatmap-analytics/heatmap-analytics.module'; // 🔥 熱點分析
+import { TimelineVisualizationModule } from './modules/timeline-visualization/timeline-visualization.module'; // ⏱️ 時序視覺化
+import { D3ChartModule } from './modules/d3-chart/d3-chart.module'; // 📈 D3 圖表
+// v15.0 AI 自動化模組
+import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module'; // 💬 AI 問答
+import { AutoDispatchModule } from './modules/auto-dispatch/auto-dispatch.module'; // 🚀 自動派遣
+import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module'; // 🔧 設備預測
+import { DocumentOcrModule } from './modules/document-ocr/document-ocr.module'; // 📝 OCR 數位化
+// v16.0 合規與安全模組
+import { GdprComplianceModule } from './modules/gdpr-compliance/gdpr-compliance.module'; // 🔒 GDPR
+import { TwoFactorAuthModule } from './modules/two-factor-auth/two-factor-auth.module'; // 🔐 2FA
+import { IpWhitelistModule } from './modules/ip-whitelist/ip-whitelist.module'; // 🛡️ IP 白名單
+import { DataEncryptionModule } from './modules/data-encryption/data-encryption.module'; // 🔑 欄位加密
+// v17.0 行動端強化模組
+import { PushNotificationV2Module } from './modules/push-notification-v2/push-notification-v2.module'; // 🔔 FCM 推播
+import { OfflineMapCacheModule } from './modules/offline-map-cache/offline-map-cache.module'; // 🗺️ 離線地圖
+import { BiometricAuthModule } from './modules/biometric-auth/biometric-auth.module'; // 👆 生物辨識
+// v18.0 組織管理模組
+import { OrgChartModule } from './modules/org-chart/org-chart.module'; // 🏢 組織架構
+import { ShiftCalendarModule } from './modules/shift-calendar/shift-calendar.module'; // 📅 排班日曆
+import { AttendanceModule } from './modules/attendance/attendance.module'; // ⏰ 出勤打卡
+import { PayrollModule } from './modules/payroll/payroll.module'; // 💰 補助計算
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -309,6 +338,35 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         AutoSummaryModule, // 📝 自動摘要 SITREP
         // === v12.0 前端支援 ===
         OfflineSyncModule, // 📡 離線同步
+        // === v13.0 進階整合 ===
+        LineNotifyModule, // 📱 LINE Notify
+        TelegramBotModule, // 🤖 Telegram Bot
+        SlackIntegrationModule, // 💬 Slack
+        EmailTemplateModule, // 📧 Email 模板
+        // === v14.0 資料視覺化 ===
+        DashboardBuilderModule, // 📊 儀表板配置
+        HeatmapAnalyticsModule, // 🔥 熱點分析
+        TimelineVisualizationModule, // ⏱️ 時序視覺化
+        D3ChartModule, // 📈 D3 圖表
+        // === v15.0 AI 自動化 ===
+        ChatbotAssistantModule, // 💬 AI 問答
+        AutoDispatchModule, // 🚀 自動派遣
+        PredictiveMaintenanceModule, // 🔧 設備預測
+        DocumentOcrModule, // 📝 OCR 數位化
+        // === v16.0 合規與安全 ===
+        GdprComplianceModule, // 🔒 GDPR 合規
+        TwoFactorAuthModule, // 🔐 2FA
+        IpWhitelistModule, // 🛡️ IP 白名單
+        DataEncryptionModule, // 🔑 欄位加密
+        // === v17.0 行動端強化 ===
+        PushNotificationV2Module, // 🔔 FCM 推播
+        OfflineMapCacheModule, // 🗺️ 離線地圖
+        BiometricAuthModule, // 👆 生物辨識
+        // === v18.0 組織管理 ===
+        OrgChartModule, // 🏢 組織架構
+        ShiftCalendarModule, // 📅 排班日曆
+        AttendanceModule, // ⏰ 出勤打卡
+        PayrollModule, // 💰 補助計算
     ],
     providers: [
         CloudLoggerService,
