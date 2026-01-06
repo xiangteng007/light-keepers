@@ -74,6 +74,14 @@ import { AiVisionModule } from './modules/ai-vision/ai-vision.module'; // 🤖 A
 // v3.0 長期擴展
 import { AiPredictionModule } from './modules/ai-prediction/ai-prediction.module'; // 📊 AI 預測
 import { PushNotificationModule } from './modules/push-notification/push-notification.module'; // 🔔 推播通知
+// v4.0 未來擴展模組
+import { ArNavigationModule } from './modules/ar-navigation/ar-navigation.module'; // 🥽 AR 導航
+import { SatelliteCommModule } from './modules/satellite-comm/satellite-comm.module'; // 🛰️ 衛星通訊
+import { BlockchainModule } from './modules/blockchain/blockchain.module'; // ⛓️ 區塊鏈追蹤
+import { WeatherModule } from './modules/weather/weather.module'; // 🌦️ 氣象雷達
+import { WearableModule } from './modules/wearable/wearable.module'; // ⌚ 穿戴裝置
+import { VrCommandModule } from './modules/vr-command/vr-command.module'; // 🕶️ VR 指揮
+import { RobotRescueModule } from './modules/robot-rescue/robot-rescue.module'; // 🤖 機器人搜救
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -179,6 +187,14 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         // v3.0 長期擴展模組
         AiPredictionModule, // 📊 AI 預測
         PushNotificationModule, // 🔔 推播通知
+        // v4.0 未來擴展模組
+        ArNavigationModule, // 🥽 AR 導航
+        SatelliteCommModule, // 🛰️ 衛星通訊
+        BlockchainModule, // ⛓️ 區塊鏈追蹤
+        WeatherModule, // 🌦️ 氣象雷達
+        WearableModule, // ⌚ 穿戴裝置
+        VrCommandModule, // 🕶️ VR 指揮
+        RobotRescueModule, // 🤖 機器人搜救
     ],
     providers: [
         CloudLoggerService,
