@@ -183,8 +183,9 @@ export class ShiftCalendarService {
 }
 
 // Types
-interface ShiftTemplate { id: string; name: string; startTime: string; endTime: string; color: string; }
-interface ShiftInput { date: string; templateId: string; volunteerId: string; volunteerName: string; notes?: string; }
-interface Shift { id: string; date: string; templateId: string; volunteerId: string; volunteerName: string; status: string; notes?: string; createdAt: Date; }
-interface CalendarDay { date: string; dayOfWeek: number; shifts: any[]; totalVolunteers: number; }
-interface Vacancy { date: string; templateId: string; templateName: string; required: number; filled: number; shortage: number; }
+export interface ShiftTemplate { id: string; name: string; startTime: string; endTime: string; color: string; }
+export interface ShiftInput { date: string; templateId: string; volunteerId: string; volunteerName: string; notes?: string; }
+export interface Shift { id: string; date: string; templateId: string; volunteerId: string; volunteerName: string; status: string; notes?: string; createdAt: Date; }
+export interface CalendarDay { date: string; dayOfWeek: number; shifts: any[]; totalVolunteers: number; }
+export interface Vacancy { date: string; templateId: string; templateName: string; required: number; filled: number; shortage: number; }
+

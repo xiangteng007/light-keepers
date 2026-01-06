@@ -177,11 +177,12 @@ export class AttendanceService {
 }
 
 // Types
-interface GpsLocation { lat: number; lng: number; accuracy?: number; }
-interface QrLocation { locationId: string; locationName: string; }
-interface AttendanceRecord { id: string; volunteerId: string; method: 'gps' | 'qr'; checkInTime: Date; checkOutTime?: Date; location: GpsLocation | QrLocation; checkOutLocation?: GpsLocation; hoursWorked?: number; }
-interface CheckInResult { success: boolean; recordId?: string; timestamp?: Date; location?: any; error?: string; }
-interface CheckOutResult { success: boolean; recordId?: string; checkOutTime?: Date; hoursWorked?: number; error?: string; }
-interface DailySummary { date: string; totalCheckIns: number; uniqueVolunteers: number; totalHours: number; avgHoursPerPerson: number; byCheckInMethod: { gps: number; qr: number }; }
-interface MonthlyReport { volunteerId: string; month: number; year: number; totalRecords: number; daysWorked: number; totalHours: number; avgHoursPerDay: number; }
-interface QrCodeInfo { code: string; locationId: string; locationName: string; expiresAt: Date; qrImageUrl: string; }
+export interface GpsLocation { lat: number; lng: number; accuracy?: number; }
+export interface QrLocation { locationId: string; locationName: string; }
+export interface AttendanceRecord { id: string; volunteerId: string; method: 'gps' | 'qr'; checkInTime: Date; checkOutTime?: Date; location: GpsLocation | QrLocation; checkOutLocation?: GpsLocation; hoursWorked?: number; }
+export interface CheckInResult { success: boolean; recordId?: string; timestamp?: Date; location?: any; error?: string; }
+export interface CheckOutResult { success: boolean; recordId?: string; checkOutTime?: Date; hoursWorked?: number; error?: string; }
+export interface DailySummary { date: string; totalCheckIns: number; uniqueVolunteers: number; totalHours: number; avgHoursPerPerson: number; byCheckInMethod: { gps: number; qr: number }; }
+export interface MonthlyReport { volunteerId: string; month: number; year: number; totalRecords: number; daysWorked: number; totalHours: number; avgHoursPerDay: number; }
+export interface QrCodeInfo { code: string; locationId: string; locationName: string; expiresAt: Date; qrImageUrl: string; }
+

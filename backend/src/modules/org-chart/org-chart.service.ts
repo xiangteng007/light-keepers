@@ -178,7 +178,8 @@ export class OrgChartService {
 }
 
 // Types
-interface NodeInput { id?: string; name: string; type: string; parentId: string | null; managerId?: string; metadata?: Record<string, any>; }
-interface OrgNode { id: string; name: string; type: string; parentId: string | null; managerId?: string; metadata: Record<string, any>; createdAt: Date; }
-interface TreeNode extends OrgNode { children: TreeNode[]; }
-interface OrgStats { totalNodes: number; byType: Record<string, number>; maxDepth: number; }
+export interface NodeInput { id?: string; name: string; type: string; parentId: string | null; managerId?: string; metadata?: Record<string, any>; }
+export interface OrgNode { id: string; name: string; type: string; parentId: string | null; managerId?: string; metadata: Record<string, any>; createdAt: Date; }
+export interface TreeNode extends OrgNode { children: TreeNode[]; }
+export interface OrgStats { totalNodes: number; byType: Record<string, number>; maxDepth: number; }
+

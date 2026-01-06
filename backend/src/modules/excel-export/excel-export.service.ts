@@ -11,7 +11,7 @@ export class ExcelExportService {
     /**
      * 匯出事件列表
      */
-    async exportEvents(events: EventData[]): Promise<ExcelResult> {
+    async exportEvents(events: ExcelEventData[]): Promise<ExcelResult> {
         const headers = ['編號', '標題', '類型', '地點', '發生時間', '嚴重程度', '狀態'];
         const rows = events.map((e) => [e.id, e.title, e.type, e.location, e.occurredAt, e.severity, e.status]);
 
@@ -21,7 +21,7 @@ export class ExcelExportService {
     /**
      * 匯出志工列表
      */
-    async exportVolunteers(volunteers: VolunteerData[]): Promise<ExcelResult> {
+    async exportVolunteers(volunteers: ExcelVolunteerData[]): Promise<ExcelResult> {
         const headers = ['編號', '姓名', '電話', '專長', '狀態', '總服務時數'];
         const rows = volunteers.map((v) => [v.id, v.name, v.phone, v.skills.join(', '), v.status, v.totalHours]);
 
@@ -31,7 +31,7 @@ export class ExcelExportService {
     /**
      * 匯出出勤記錄
      */
-    async exportAttendance(records: AttendanceData[]): Promise<ExcelResult> {
+    async exportAttendance(records: ExcelAttendanceData[]): Promise<ExcelResult> {
         const headers = ['日期', '志工', '簽到時間', '簽退時間', '工時', '地點'];
         const rows = records.map((r) => [r.date, r.volunteerName, r.checkIn, r.checkOut || '-', r.hours, r.location]);
 
@@ -41,7 +41,7 @@ export class ExcelExportService {
     /**
      * 匯出補助明細
      */
-    async exportPayroll(payrolls: PayrollData[]): Promise<ExcelResult> {
+    async exportPayroll(payrolls: ExcelPayrollData[]): Promise<ExcelResult> {
         const headers = ['月份', '志工', '出勤次數', '總工時', '基本補助', '加給', '總額', '狀態'];
         const rows = payrolls.map((p) => [
             `${p.year}/${p.month}`, p.volunteerName, p.shiftCount, p.totalHours,
@@ -146,11 +146,12 @@ export class ExcelExportService {
 }
 
 // Types
-interface EventData { id: string; title: string; type: string; location: string; occurredAt: string; severity: string; status: string; }
-interface VolunteerData { id: string; name: string; phone: string; skills: string[]; status: string; totalHours: number; }
-interface AttendanceData { date: string; volunteerName: string; checkIn: string; checkOut?: string; hours: number; location: string; }
-interface PayrollData { year: number; month: number; volunteerName: string; shiftCount: number; totalHours: number; basePay: number; bonuses: number; total: number; status: string; }
-interface StatisticsSheet { sheetName: string; headers: string[]; rows: any[][]; }
-interface CustomQueryData { filename: string; headers: string[]; rows: any[][]; }
-interface SheetData { name: string; headers: string[]; rows: any[][]; }
-interface ExcelResult { success: boolean; filename?: string; contentType?: string; base64?: string; rowCount?: number; sheetCount?: number; error?: string; }
+export interface ExcelEventData { id: string; title: string; type: string; location: string; occurredAt: string; severity: string; status: string; }
+export interface ExcelVolunteerData { id: string; name: string; phone: string; skills: string[]; status: string; totalHours: number; }
+export interface ExcelAttendanceData { date: string; volunteerName: string; checkIn: string; checkOut?: string; hours: number; location: string; }
+export interface ExcelPayrollData { year: number; month: number; volunteerName: string; shiftCount: number; totalHours: number; basePay: number; bonuses: number; total: number; status: string; }
+export interface StatisticsSheet { sheetName: string; headers: string[]; rows: any[][]; }
+export interface CustomQueryData { filename: string; headers: string[]; rows: any[][]; }
+export interface SheetData { name: string; headers: string[]; rows: any[][]; }
+export interface ExcelResult { success: boolean; filename?: string; contentType?: string; base64?: string; rowCount?: number; sheetCount?: number; error?: string; }
+

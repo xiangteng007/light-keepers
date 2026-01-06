@@ -56,6 +56,11 @@ import EquipmentPage from './pages/EquipmentPage'
 import ReunificationPage from './pages/ReunificationPage'
 import PublicSearchPage from './pages/PublicSearchPage'
 import DroneControlPage from './pages/DroneControlPage'
+// v19.0 新增頁面
+import ShiftCalendarPage from './pages/ShiftCalendarPage'
+import AttendancePage from './pages/AttendancePage'
+import OrgChartPage from './pages/OrgChartPage'
+import TwoFactorSetupPage from './pages/TwoFactorSetupPage'
 import './App.css'
 
 
@@ -170,6 +175,11 @@ function App() {
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
             {/* 系統擁有者等級 (5) */}
             <Route path="donations" element={<ProtectedRoute requiredLevel={5}><DonationsPage /></ProtectedRoute>} />
+            {/* v19.0 組織管理頁面 */}
+            <Route path="shift-calendar" element={<ProtectedRoute requiredLevel={2}><ShiftCalendarPage /></ProtectedRoute>} />
+            <Route path="attendance" element={<ProtectedRoute requiredLevel={1}><AttendancePage /></ProtectedRoute>} />
+            <Route path="org-chart" element={<ProtectedRoute requiredLevel={2}><OrgChartPage /></ProtectedRoute>} />
+            <Route path="settings/2fa" element={<ProtectedRoute requiredLevel={1}><TwoFactorSetupPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

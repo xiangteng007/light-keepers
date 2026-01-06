@@ -166,10 +166,11 @@ export class PayrollService {
 }
 
 // Types
-interface PayrollRates { baseHourlyRate: number; nightBonus: number; weekendBonus: number; hazardBonus: number; mealAllowance: number; transportAllowance: number; }
-interface ShiftData { date: Date; startTime: string; endTime: string; hours: number; hazardous?: boolean; }
-interface Bonus { type: string; multiplier: number; reason: string; }
-interface PayCalculation { basePay: number; bonuses: Bonus[]; mealAllowance: number; transportAllowance: number; total: number; breakdown: any; }
-interface PayrollRecord { id: string; volunteerId: string; month: number; year: number; totalShifts: number; totalHours: number; totalBasePay: number; totalAllowances: number; grandTotal: number; status: string; createdAt: Date; paidAt?: Date; note?: string; }
-interface MonthlyPayroll { record: PayrollRecord; details: { shift: ShiftData; pay: PayCalculation }[]; }
-interface PayrollReport { month: number; year: number; totalRecords: number; totalAmount: number; totalHours: number; byStatus: Record<string, number>; generatedAt: Date; }
+export interface PayrollRates { baseHourlyRate: number; nightBonus: number; weekendBonus: number; hazardBonus: number; mealAllowance: number; transportAllowance: number; }
+export interface ShiftData { date: Date; startTime: string; endTime: string; hours: number; hazardous?: boolean; }
+export interface Bonus { type: string; multiplier: number; reason: string; }
+export interface PayCalculation { basePay: number; bonuses: Bonus[]; mealAllowance: number; transportAllowance: number; total: number; breakdown: any; }
+export interface PayrollRecord { id: string; volunteerId: string; month: number; year: number; totalShifts: number; totalHours: number; totalBasePay: number; totalAllowances: number; grandTotal: number; status: string; createdAt: Date; paidAt?: Date; note?: string; }
+export interface MonthlyPayroll { record: PayrollRecord; details: { shift: ShiftData; pay: PayCalculation }[]; }
+export interface PayrollReport { month: number; year: number; totalRecords: number; totalAmount: number; totalHours: number; byStatus: Record<string, number>; generatedAt: Date; }
+

@@ -237,11 +237,12 @@ export class PdfGeneratorService {
 }
 
 // Types
-interface EventData { id: string; title: string; occurredAt: string; location: string; type: string; severity: string; description: string; }
-interface AttendanceReportData { month: number; year: number; totalRecords: number; totalHours: number; records: AttendanceRecord[]; }
-interface AttendanceRecord { volunteerName: string; date: string; checkIn: string; checkOut?: string; hours: number; }
-interface SitrepData { id: string; dtg: string; situation: string; actions: string; resources: string; nextSteps: string; }
-interface StatisticsData { period: string; eventCount: number; attendanceCount: number; totalHours: number; }
-interface VolunteerData { id: string; name: string; totalHours: number; }
-interface PdfResult { success: boolean; filename?: string; size?: number; base64?: string; contentType?: string; error?: string; }
-interface BatchPdfResult { total: number; successful: number; results: PdfResult[]; }
+export interface EventData { id: string; title: string; occurredAt: string; location: string; type: string; severity: string; description: string; }
+export interface AttendanceReportData { month: number; year: number; totalRecords: number; totalHours: number; records: PdfAttendanceRecord[]; }
+export interface PdfAttendanceRecord { volunteerName: string; date: string; checkIn: string; checkOut?: string; hours: number; }
+export interface SitrepData { id: string; dtg: string; situation: string; actions: string; resources: string; nextSteps: string; }
+export interface StatisticsData { period: string; eventCount: number; attendanceCount: number; totalHours: number; }
+export interface VolunteerData { id: string; name: string; totalHours: number; }
+export interface PdfResult { success: boolean; filename?: string; size?: number; base64?: string; contentType?: string; error?: string; }
+export interface BatchPdfResult { total: number; successful: number; results: PdfResult[]; }
+
