@@ -103,6 +103,11 @@ import { CommunityResilienceModule } from './modules/community-resilience/commun
 import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module'; // 🎓 志工認證
 import { PsychologicalTrackingModule } from './modules/psychological-tracking/psychological-tracking.module'; // 🧠 心理追蹤
 import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module'; // 🤝 物資媒合
+// v7.0 深度整合模組
+import { LineLiffModule } from './modules/line-liff/line-liff.module'; // 📱 LINE LIFF
+import { CitizenAppModule } from './modules/citizen-app/citizen-app.module'; // 👥 公民 App
+import { BluetoothAudioModule } from './modules/bluetooth-audio/bluetooth-audio.module'; // 🎧 藍牙音訊
+import { NgoApiModule } from './modules/ngo-api/ngo-api.module'; // 🏛️ NGO API
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -237,6 +242,11 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         VolunteerCertificationModule, // 🎓 志工認證
         PsychologicalTrackingModule, // 🧠 心理追蹤
         ResourceMatchingModule, // 🤝 物資媒合
+        // v7.0 深度整合模組
+        LineLiffModule, // 📱 LINE LIFF
+        CitizenAppModule, // 👥 公民 App
+        BluetoothAudioModule, // 🎧 藍牙音訊
+        NgoApiModule, // 🏛️ NGO API
     ],
     providers: [
         CloudLoggerService,
