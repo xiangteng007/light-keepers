@@ -85,10 +85,10 @@
 }
 
 .v2-nav-item.active {
-    color: var(--v2-secondary);
-    background: rgba(6, 182, 212, 0.1);
-    border-color: var(--v2-border-neon);
-    box-shadow: 0 0 12px rgba(6, 182, 212, 0.2);
+    color: #C39B6F;
+    background: rgba(195, 155, 111, 0.1);
+    border-color: #C39B6F;
+    box-shadow: 0 0 12px rgba(195, 155, 111, 0.2);
 }
 
 /* Active Indicator */
@@ -100,9 +100,9 @@
     transform: translateY(-50%);
     width: 4px;
     height: 24px;
-    background: var(--v2-secondary);
+    background: #C39B6F;
     border-radius: 0 4px 4px 0;
-    box-shadow: var(--v2-glow-cyan);
+    box-shadow: 0 0 8px rgba(195, 155, 111, 0.4);
 }
 
 .v2-nav-user {
