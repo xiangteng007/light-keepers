@@ -1,0 +1,470 @@
+/* 📚 培訓中心頁面樣式 */
+
+.training-page {
+    padding: 1rem;
+}
+
+/* Tab 切換 */
+.training-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    background: #f1f5f9;
+    padding: 0.25rem;
+    border-radius: 12px;
+}
+
+.training-tab {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 10px;
+    background: transparent;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.training-tab:hover {
+    color: #334155;
+}
+
+.training-tab.active {
+    background: white;
+    color: #667eea;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+/* 統計卡片 */
+.training-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.stat-card {
+    text-align: center;
+}
+
+.stat-card__value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.stat-card__label {
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.stat-card--success .stat-card__value {
+    color: #10b981;
+}
+
+.stat-card--warning .stat-card__value {
+    color: #f59e0b;
+}
+
+.stat-card--info .stat-card__value {
+    color: #3b82f6;
+}
+
+.stat-card--danger .stat-card__value {
+    color: #ef4444;
+}
+
+/* 🌐 爬取課程分類 */
+.scraped-categories {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 14px;
+}
+
+.scraped-category-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1rem;
+    border: 2px solid transparent;
+    border-radius: 25px;
+    background: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #475569;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.scraped-category-btn:hover {
+    border-color: var(--cat-color, #667eea);
+    background: rgba(102, 126, 234, 0.05);
+}
+
+.scraped-category-btn.active {
+    background: var(--cat-color, #667eea);
+    color: white;
+    border-color: var(--cat-color, #667eea);
+}
+
+.scraped-category-icon {
+    font-size: 1.1rem;
+}
+
+/* 爬取課程 Grid */
+.scraped-courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* 爬取課程卡片 */
+.scraped-course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s;
+}
+
+.scraped-course-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #667eea;
+}
+
+.scraped-course-header {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.scraped-course-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.scraped-course-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-size: 0.85rem;
+    color: #64748b;
+}
+
+.scraped-course-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.scraped-course-actions {
+    margin-top: auto;
+    padding-top: 0.5rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+/* 資料來源說明 */
+.data-source-info {
+    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    border-left: 4px solid #667eea;
+}
+
+.data-source-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #4338ca;
+}
+
+.data-source-info p:first-child {
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+}
+
+/* 空狀態 */
+.empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    color: #94a3b8;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+/* 大型空狀態 */
+.empty-state--large {
+    padding: 4rem 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    border-radius: 16px;
+    border: 2px dashed #e2e8f0;
+}
+
+.empty-state--large h3 {
+    margin: 0.5rem 0;
+    font-size: 1.25rem;
+    color: #334155;
+}
+
+.empty-state--large p {
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+/* 內部課程區塊 */
+.internal-courses-section {
+    min-height: 300px;
+}
+
+/* 新增課程表單 */
+.add-course-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.375rem;
+}
+
+.form-group label {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.form-group select,
+.form-group input[type="number"] {
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    background: white;
+    transition: border-color 0.2s;
+}
+
+.form-group select:focus,
+.form-group input[type="number"]:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    height: 100%;
+    padding-top: 1.5rem;
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: #667eea;
+}
+
+@media (max-width: 480px) {
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 內部課程分類 */
+.training-categories {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-bottom: 1.5rem;
+}
+
+.category-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    background: white;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.category-btn:hover {
+    border-color: #667eea;
+    background: #f8fafc;
+}
+
+.category-btn.active {
+    background: #667eea;
+    color: white;
+    border-color: #667eea;
+}
+
+/* 課程 Grid */
+.courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+}
+
+/* 課程卡片 */
+.course-card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.course-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.course-card__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    color: white;
+}
+
+.course-card__title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0;
+}
+
+.course-card__desc {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin: 0;
+    flex: 1;
+}
+
+.course-card__meta {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.8rem;
+}
+
+.progress-bar {
+    height: 6px;
+    background: #e2e8f0;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-bar__fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.3s;
+}
+
+.course-card__actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.progress-text {
+    font-size: 0.8rem;
+    color: #64748b;
+}
+
+/* Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.modal-content {
+    max-width: 500px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.modal-content--lg {
+    max-width: 600px;
+}
+
+.modal-desc {
+    color: #64748b;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.course-content {
+    background: #f8fafc;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.course-content h4 {
+    margin: 0 0 0.5rem 0;
+}
+
+/* RWD */
+@media (max-width: 768px) {
+    .training-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .scraped-categories {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .scraped-category-btn {
+        flex-shrink: 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .training-tabs {
+        flex-direction: column;
+    }
+
+    .scraped-courses-grid {
+        grid-template-columns: 1fr;
+    }
+}

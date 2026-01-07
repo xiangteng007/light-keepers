@@ -1,0 +1,136 @@
+/**
+ * Tactical Map Page Styles
+ */
+
+.tactical-map-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: var(--bg-primary, #0a0a0f);
+    color: var(--text-primary, #e0e0e0);
+}
+
+.tactical-map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background: linear-gradient(180deg, rgba(20, 20, 30, 0.95), rgba(15, 15, 25, 0.9));
+    border-bottom: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.tactical-map-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--accent-gold, #d4af37);
+}
+
+.header-info {
+    display: flex;
+    gap: 1.5rem;
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.tactical-map-content {
+    flex: 1;
+    position: relative;
+    display: flex;
+}
+
+.map-container {
+    flex: 1;
+    position: relative;
+}
+
+.marker-detail-panel {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 280px;
+    padding: 1rem;
+    background: rgba(20, 20, 30, 0.95);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.marker-detail-panel h3 {
+    margin: 0 0 0.75rem 0;
+    color: var(--accent-gold, #d4af37);
+    font-size: 1.1rem;
+}
+
+.marker-detail-panel p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.marker-detail-panel button {
+    margin-top: 1rem;
+    padding: 0.5rem 1rem;
+    background: rgba(212, 175, 55, 0.2);
+    border: 1px solid rgba(212, 175, 55, 0.5);
+    border-radius: 4px;
+    color: var(--accent-gold, #d4af37);
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.marker-detail-panel button:hover {
+    background: rgba(212, 175, 55, 0.3);
+}
+
+.legend {
+    position: absolute;
+    bottom: 2rem;
+    left: 1rem;
+    padding: 1rem;
+    background: rgba(20, 20, 30, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    z-index: 100;
+}
+
+.legend h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: var(--accent-gold, #d4af37);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0.25rem 0;
+    font-size: 0.8rem;
+}
+
+.legend-item .dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 1px solid white;
+}
+
+.dot.volunteer { background-color: #3b82f6; }
+.dot.task { background-color: #f59e0b; }
+.dot.resource { background-color: #10b981; }
+.dot.sos { background-color: #ef4444; }
+.dot.hazard { background-color: #dc2626; }
+.dot.rally { background-color: #8b5cf6; }
+
+/* MapLibre overrides */
+.maplibregl-ctrl-group {
+    background: rgba(20, 20, 30, 0.9) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.maplibregl-ctrl-group button {
+    background-color: transparent !important;
+}
+
+.maplibregl-ctrl-group button:hover {
+    background-color: rgba(212, 175, 55, 0.2) !important;
+}

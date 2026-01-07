@@ -1,0 +1,392 @@
+/* Command Post Map Page Styles */
+
+.command-post-map-page {
+    --cpm-toolbar-height: 48px;
+    --cpm-status-bar-height: 28px;
+    --cpm-panel-width: 280px;
+    --cpm-bg-dark: #0f172a;
+    --cpm-bg-panel: #1e293b;
+    --cpm-border: #334155;
+    --cpm-text: #e2e8f0;
+    --cpm-text-muted: #94a3b8;
+    --cpm-accent: #f59e0b;
+    --cpm-accent-hover: #d97706;
+    --cpm-blue: #3b82f6;
+    --cpm-red: #ef4444;
+    --cpm-green: #22c55e;
+
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--cpm-bg-dark);
+    color: var(--cpm-text);
+    font-family: 'Inter', 'Noto Sans TC', sans-serif;
+}
+
+/* Toolbar */
+.cpm-toolbar {
+    display: flex;
+    align-items: center;
+    height: var(--cpm-toolbar-height);
+    padding: 0 12px;
+    background: var(--cpm-bg-panel);
+    border-bottom: 1px solid var(--cpm-border);
+    gap: 8px;
+}
+
+.cpm-toolbar-group {
+    display: flex;
+    gap: 4px;
+}
+
+.cpm-toolbar-divider {
+    width: 1px;
+    height: 24px;
+    background: var(--cpm-border);
+    margin: 0 8px;
+}
+
+.cpm-toolbar-spacer {
+    flex: 1;
+}
+
+.cpm-tool-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--cpm-border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--cpm-text);
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cpm-tool-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--cpm-accent);
+}
+
+.cpm-tool-btn.active {
+    background: var(--cpm-accent);
+    border-color: var(--cpm-accent);
+    color: #000;
+}
+
+/* Main layout */
+.cpm-main {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Panels */
+.cpm-panel {
+    display: flex;
+    flex-direction: column;
+    width: var(--cpm-panel-width);
+    background: var(--cpm-bg-panel);
+    border-right: 1px solid var(--cpm-border);
+    transition: width 0.2s ease;
+}
+
+.cpm-panel.closed {
+    width: 40px;
+}
+
+.cpm-panel-right {
+    border-right: none;
+    border-left: 1px solid var(--cpm-border);
+}
+
+.cpm-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    border-bottom: 1px solid var(--cpm-border);
+}
+
+.cpm-panel-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--cpm-accent);
+}
+
+.cpm-panel-toggle {
+    width: 24px;
+    height: 24px;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--cpm-text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cpm-panel-toggle:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--cpm-text);
+}
+
+.cpm-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+/* Overlay list */
+.cpm-overlay-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.cpm-overlay-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    margin-bottom: 4px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cpm-overlay-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.cpm-overlay-item.selected {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid var(--cpm-blue);
+}
+
+.cpm-overlay-item.draft {
+    opacity: 0.7;
+}
+
+.cpm-overlay-icon {
+    font-size: 18px;
+}
+
+.cpm-overlay-name {
+    flex: 1;
+    font-size: 13px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.cpm-overlay-state {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+}
+
+.cpm-overlay-state.draft {
+    background: rgba(234, 179, 8, 0.2);
+    color: #fbbf24;
+}
+
+.cpm-overlay-state.published {
+    background: rgba(34, 197, 94, 0.2);
+    color: #4ade80;
+}
+
+/* Property editor */
+.cpm-property-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cpm-property-group {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.cpm-property-group label {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--cpm-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.cpm-property-value {
+    font-size: 14px;
+    color: var(--cpm-text);
+}
+
+.cpm-property-input {
+    padding: 8px 10px;
+    border: 1px solid var(--cpm-border);
+    border-radius: 6px;
+    background: var(--cpm-bg-dark);
+    color: var(--cpm-text);
+    font-size: 13px;
+}
+
+.cpm-property-input:focus {
+    outline: none;
+    border-color: var(--cpm-accent);
+}
+
+.cpm-severity-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.cpm-property-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.cpm-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.cpm-btn-primary {
+    background: var(--cpm-accent);
+    color: #000;
+}
+
+.cpm-btn-primary:hover {
+    background: var(--cpm-accent-hover);
+}
+
+.cpm-btn-danger {
+    background: var(--cpm-red);
+    color: #fff;
+}
+
+.cpm-btn-danger:hover {
+    background: #dc2626;
+}
+
+.cpm-lock-info {
+    margin-top: 12px;
+    padding: 8px;
+    border-radius: 6px;
+    background: rgba(239, 68, 68, 0.1);
+    color: #fca5a5;
+    font-size: 12px;
+}
+
+/* Map container */
+.cpm-map-container {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.cpm-map {
+    width: 100%;
+    height: 100%;
+}
+
+.cpm-map-error {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.cpm-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    padding: 20px 40px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #fff;
+    border-radius: 8px;
+}
+
+.cpm-error-banner {
+    position: absolute;
+    top: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 16px;
+    background: rgba(239, 68, 68, 0.9);
+    color: #fff;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.cpm-error-banner button {
+    background: none;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+/* Status bar */
+.cpm-status-bar {
+    display: flex;
+    align-items: center;
+    height: var(--cpm-status-bar-height);
+    padding: 0 12px;
+    background: var(--cpm-bg-panel);
+    border-top: 1px solid var(--cpm-border);
+    font-size: 11px;
+    color: var(--cpm-text-muted);
+    gap: 24px;
+}
+
+/* Empty state */
+.cpm-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100px;
+    color: var(--cpm-text-muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+/* MapLibre overrides for dark theme */
+.maplibregl-ctrl-group {
+    background: var(--cpm-bg-panel) !important;
+    border: 1px solid var(--cpm-border) !important;
+}
+
+.maplibregl-ctrl-group button {
+    filter: invert(1);
+}
+
+.maplibregl-ctrl-attrib {
+    background: rgba(0, 0, 0, 0.5) !important;
+    color: #fff !important;
+}
+
+.maplibregl-ctrl-attrib a {
+    color: var(--cpm-accent) !important;
+}
