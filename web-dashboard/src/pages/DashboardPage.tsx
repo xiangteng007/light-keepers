@@ -1,340 +1,147 @@
-import { useQuery } from '@tanstack/react-query';
-import { Link } from 'react-router-dom';
-import { getEvents, getTaskStats, getEventStats, getNcdrAlerts, getVolunteerStats, getReportStats } from '../api';
-import { Card, Badge, Alert, Button } from '../design-system';
-import { useRealtime } from '../context/RealtimeContext';
+import React from 'react';
+import {
+    AlertTriangle,
+    Package,
+    Users,
+    MoreHorizontal,
+    MapPin,
+    Activity,
+    Shield
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { LowStockWidget } from '../components/widgets/LowStockWidget';
-
-// 統計卡片組件
-interface StatCardProps {
-    icon: string;
-    value: number | string;
-    label: string;
-    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
-    trend?: 'up' | 'down' | 'stable';
-}
-
-function StatCard({ icon, value, label, variant = 'default', trend }: StatCardProps) {
-    const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '';
-    return (
-        <Card variant="elevated" padding="md" className="stat-card-vi">
-            <div className="stat-card-vi__content">
-                <div className="stat-card-vi__icon">{icon}</div>
-                <div className="stat-card-vi__data">
-                    <span className={`stat-card-vi__value stat-card-vi__value--${variant}`}>
-                        {value}
-                        {trendIcon && <span className={`trend trend--${trend}`}>{trendIcon}</span>}
-                    </span>
-                    <span className="stat-card-vi__label">{label}</span>
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-// 快速操作按鈕 - 根據權限等級顯示不同選項
-function QuickActions({ roleLevel }: { roleLevel: number }) {
-    return (
-        <Card title="快速操作" icon="⚡" padding="md">
-            <div className="quick-actions-grid">
-                {/* Level 0+: 公開頁面 */}
-                <Link to="/map" className="quick-action-btn">
-                    <span className="quick-action-btn__icon">🗺️</span>
-                    <span className="quick-action-btn__label">地圖總覽</span>
-                </Link>
-                <Link to="/manuals" className="quick-action-btn">
-                    <span className="quick-action-btn__icon">📖</span>
-                    <span className="quick-action-btn__label">實務手冊</span>
-                </Link>
-                <Link to="/ncdr-alerts" className="quick-action-btn">
-                    <span className="quick-action-btn__icon">⚠️</span>
-                    <span className="quick-action-btn__label">災害示警</span>
-                </Link>
-                {/* Level 1+: 志工功能 */}
-                {roleLevel >= 1 && (
-                    <Link to="/report" className="quick-action-btn">
-                        <span className="quick-action-btn__icon">📢</span>
-                        <span className="quick-action-btn__label">新增回報</span>
-                    </Link>
-                )}
-                {/* Level 2+: 幹部功能 */}
-                {roleLevel >= 2 && (
-                    <Link to="/volunteers" className="quick-action-btn">
-                        <span className="quick-action-btn__icon">👥</span>
-                        <span className="quick-action-btn__label">志工調度</span>
-                    </Link>
-                )}
-            </div>
-        </Card>
-    );
-}
+import { TacticalPanel } from '../components/ui/TacticalPanel';
+import './DashboardPage.css';
 
 export default function DashboardPage() {
-    // 用戶權限
     const { user } = useAuth();
-    const roleLevel = user?.roleLevel ?? 0;
 
-    // 即時連線狀態
-    const { isConnected, onlineCount } = useRealtime();
+    // Mock Data for Bento Grid
+    const ALERTS = [
+        { id: 1, type: 'critical', title: 'FIRE: Sector 4', time: '14:25 UTC', desc: 'New Seismic Activity Detected' },
+        { id: 2, type: 'warning', title: 'FLOOD: Downtown', time: '14:15 UTC', desc: 'Levee Breach Reported' },
+        { id: 3, type: 'info', title: 'MED: Team Alpha', time: '13:45 UTC', desc: 'Resource Request: Medical Supplies' },
+    ];
 
-    // 獲取事件統計
-    const { data: eventStats, isLoading: eventsLoading } = useQuery({
-        queryKey: ['eventStats'],
-        queryFn: () => getEventStats().then(res => res.data.data),
-    });
-
-    // 獲取任務統計 (Level 2+ 需要)
-    const { data: taskStats, isLoading: tasksLoading } = useQuery({
-        queryKey: ['taskStats'],
-        queryFn: () => getTaskStats().then(res => res.data.data),
-        enabled: roleLevel >= 2, // 只有 Level 2+ 才需要這個資料
-    });
-
-    // 獲取最新事件
-    const { data: eventsData } = useQuery({
-        queryKey: ['recentEvents'],
-        queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data.data),
-    });
-
-    // 獲取 NCDR 警報 - 僅顯示重大災害類型
-    // 5=颱風, 6=地震, 7=海嘯, 8=淹水, 9=土石流及大規模崩塌, 1087=火災, 2102=疏散避難
-    const DASHBOARD_ALERT_TYPES = '5,6,7,8,9,1087,2102';
-    const { data: alertsData } = useQuery({
-        queryKey: ['recentAlerts', DASHBOARD_ALERT_TYPES],
-        queryFn: () => getNcdrAlerts({ limit: 5, types: DASHBOARD_ALERT_TYPES }).then(res => res.data.data),
-        refetchInterval: 60000, // 每分鐘刷新
-    });
-
-    // 獲取志工統計 (Level 2+ 需要)
-    const { data: volunteerStats } = useQuery({
-        queryKey: ['volunteerStats'],
-        queryFn: () => getVolunteerStats().then(res => res.data.data),
-        enabled: roleLevel >= 2, // 只有 Level 2+ 才需要這個資料
-    });
-
-    // 獲取回報統計 (Level 1+ 需要)
-    const { data: reportStats } = useQuery({
-        queryKey: ['reportStats'],
-        queryFn: () => getReportStats().then(res => res.data.data),
-        enabled: roleLevel >= 1, // 只有 Level 1+ 才需要這個資料
-    });
-
-    // 計算完成率
-    const total = (taskStats?.pending || 0) + (taskStats?.inProgress || 0) + (taskStats?.completed || 0);
-    const completionRate = total > 0 ? Math.round((taskStats?.completed || 0) / total * 100) : 0;
-
-    const isLoading = eventsLoading || tasksLoading;
+    const RESOURCES = [
+        { label: 'Vehicles', value: '45/50', percent: 90, color: 'text-neon-cyan', icon: Activity },
+        { label: 'Personnel', value: '320', percent: 80, color: 'text-neon-amber', icon: Users },
+        { label: 'Supplies', value: 'OK', percent: 60, color: 'text-neon-success', icon: Package },
+    ];
 
     return (
-        <div className="page dashboard-page">
-            <div className="page-header">
-                <div className="page-header__left">
-                    <h2>📊 快速檢視</h2>
-                    <p className="page-subtitle">Light Keepers 災害應變系統總覽</p>
-                </div>
-                <div className="page-header__right" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
-                    {onlineCount > 0 && (
-                        <Badge variant="info">👥 {onlineCount} 人在線</Badge>
-                    )}
-                    <Badge variant={isConnected ? 'success' : 'default'} dot>
-                        {isConnected ? '即時連線中' : '系統運作正常'}
-                    </Badge>
-                </div>
-            </div>
-
-            {/* KPI 統計卡片 - 根據權限等級顯示 */}
-            <div className="stats-grid stats-grid--6">
-                {/* Level 0+: 公開資訊 */}
-                <StatCard
-                    icon="🚨"
-                    value={eventStats?.active || 0}
-                    label="進行中事件"
-                    variant="danger"
-                />
-                <StatCard
-                    icon="⚠️"
-                    value={alertsData?.length || 0}
-                    label="NCDR 警報"
-                    variant="warning"
-                />
-                {/* Level 1+: 志工可見 */}
-                {roleLevel >= 1 && (
-                    <StatCard
-                        icon="📢"
-                        value={reportStats?.pending || 0}
-                        label="待審核回報"
-                        variant="warning"
-                    />
-                )}
-                {/* Level 2+: 幹部可見 */}
-                {roleLevel >= 2 && (
-                    <>
-                        <StatCard
-                            icon="👥"
-                            value={volunteerStats?.available || 0}
-                            label="可用志工"
-                            variant="success"
-                        />
-                        <StatCard
-                            icon="📋"
-                            value={taskStats?.pending || 0}
-                            label="待處理任務"
-                            variant="info"
-                        />
-                        <StatCard
-                            icon="✅"
-                            value={`${completionRate}%`}
-                            label="任務完成率"
-                            variant="success"
-                        />
-                    </>
-                )}
-            </div>
-
-            {/* 任務過期警告 - Level 2+ */}
-            {roleLevel >= 2 && taskStats?.overdue && taskStats.overdue > 0 && (
-                <Alert variant="warning" title="注意" className="dashboard-alert">
-                    有 {taskStats.overdue} 個任務已逾期，請盡速處理！
-                </Alert>
-            )}
-
-            {/* 主要內容區 */}
-            <div className="dashboard-sections dashboard-sections--3col">
-                {/* 快速操作 */}
-                <QuickActions roleLevel={roleLevel} />
-
-                {/* 最新 NCDR 警報 - 公開 */}
-                <Card title="即時警報" icon="⚠️" padding="md">
-                    <div className="alert-list-v2">
-                        {alertsData?.slice(0, 4).map((alert: any) => {
-                            const severityClass = alert.severity === 'critical' ? 'critical' :
-                                alert.severity === 'warning' ? 'warning' : 'info';
-                            const severityIcon = alert.severity === 'critical' ? '🔴' :
-                                alert.severity === 'warning' ? '🟠' : '🟡';
-                            return (
-                                <div key={alert.id} className={`alert-card-v2 alert-card-v2--${severityClass}`}>
-                                    <div className="alert-card-v2__header">
-                                        <span className="alert-card-v2__severity">{severityIcon}</span>
-                                        <span className="alert-card-v2__type">{alert.alertTypeName || alert.type || '警報'}</span>
-                                        <span className="alert-card-v2__time">{formatTime(alert.publishedAt || alert.createdAt)}</span>
-                                    </div>
-                                    <div className="alert-card-v2__title">{alert.title}</div>
-                                    {alert.sourceUnit && (
-                                        <div className="alert-card-v2__source">📡 {alert.sourceUnit}</div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                        {(!alertsData || alertsData.length === 0) && (
-                            <div className="empty-state-mini">
-                                <span className="empty-icon">✅</span>
-                                <span>目前無重大警報</span>
-                            </div>
-                        )}
+        <div className="bento-dashboard bg-grid-pattern bg-tactical-app">
+            {/* Widget 1: Operational Picture (Map) */}
+            <TacticalPanel
+                className="grid-area-map overflow-hidden p-0 border-tactical-border/50"
+                noPadding
+                title="OPERATIONAL PICTURE"
+                action={<button className="text-slate-400 hover:text-white"><MoreHorizontal size={16} /></button>}
+            >
+                <div className="relative w-full h-full">
+                    {/* Map Background with Grid */}
+                    <div className="absolute inset-0 bg-[#0B1120] opacity-80 z-0">
+                        {/* Grid Lines Overlay */}
+                        <div className="absolute inset-0 bg-grid-pattern opacity-20"></div>
                     </div>
-                    <Link to="/ncdr-alerts" className="view-more-link">
-                        查看全部警報 →
-                    </Link>
-                </Card>
 
-                {/* 地圖概覽 - 結合 Level 1+ 事件顯示 */}
-                {roleLevel >= 1 ? (
-                    <Card title="最新事件" icon="📢" padding="md">
-                        <div className="event-list">
-                            {isLoading && <div className="loading">載入中...</div>}
-                            {!isLoading && eventsData?.length === 0 && (
-                                <div className="empty-state-mini">目前沒有進行中的事件</div>
-                            )}
-                            {eventsData?.slice(0, 4).map((event) => (
-                                <div
-                                    key={event.id}
-                                    className={`event-item priority-${event.severity && event.severity >= 4 ? 'high' : event.severity === 3 ? 'medium' : 'low'}`}
-                                >
-                                    <Badge variant={event.severity && event.severity >= 4 ? 'danger' : 'default'} size="sm">
-                                        {event.category || '其他'}
-                                    </Badge>
-                                    <span className="event-title">{event.title}</span>
-                                    <span className="event-time">{formatTime(event.createdAt)}</span>
-                                </div>
-                            ))}
+                    {/* Map UI Overlay */}
+                    <div className="absolute top-4 left-4 z-10 flex flex-col gap-1">
+                        <div className="flex items-center gap-2 text-tactical-gold font-mono text-xs">
+                            <MapPin size={12} />
+                            <span>LAT: 25.0330 N / LON: 121.5654 E</span>
                         </div>
-                        <Link to="/events" className="view-more-link">
-                            查看全部 →
-                        </Link>
-                    </Card>
-                ) : (
-                    <Card title="地圖概覽" icon="🗺️" padding="md">
-                        <div className="map-preview-v2">
-                            <div className="map-preview-v2__visual">
-                                <div className="map-visual-placeholder">
-                                    <span className="map-icon">🗺️</span>
-                                    <span className="map-text">即時災情地圖</span>
-                                    <span className="map-text-sub">查看災情分布與避難所位置</span>
-                                </div>
-                            </div>
-                            <Link to="/map" className="map-preview-v2__btn">
-                                <Button variant="primary" size="md">開啟互動地圖</Button>
-                            </Link>
-                        </div>
-                    </Card>
-                )}
-            </div>
+                    </div>
 
-            {/* 資源分布概覽 - Level 2+ 才顯示 */}
-            {roleLevel >= 2 && (
-                <div className="dashboard-sections">
-                    <Card title="志工資源概覽" icon="👥" padding="md">
-                        <div className="resource-grid">
-                            <div className="resource-item">
-                                <span className="resource-label">總志工數</span>
-                                <span className="resource-value">{volunteerStats?.total || 0}</span>
-                            </div>
-                            <div className="resource-item">
-                                <span className="resource-label">可用</span>
-                                <span className="resource-value resource-value--success">{volunteerStats?.available || 0}</span>
-                            </div>
-                            <div className="resource-item">
-                                <span className="resource-label">執勤中</span>
-                                <span className="resource-value resource-value--warning">{volunteerStats?.busy || 0}</span>
-                            </div>
-                            <div className="resource-item">
-                                <span className="resource-label">回報總數</span>
-                                <span className="resource-value">{reportStats?.total || 0}</span>
+                    {/* Map Markers (Simulated) */}
+                    <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <div className="relative">
+                            <div className="w-4 h-4 rounded-full bg-red-500/50 animate-ping absolute"></div>
+                            <div className="w-4 h-4 rounded-full bg-red-500 border-2 border-white shadow-[0_0_20px_rgba(239,68,68,0.8)] z-10 relative"></div>
+                            <div className="absolute left-6 top-[-4px] bg-black/80 border border-red-500/50 px-2 py-0.5 text-[10px] text-red-400 font-mono whitespace-nowrap backdrop-blur-sm">
+                                CRITICAL: SEISMIC
                             </div>
                         </div>
-                        <Link to="/volunteers" className="view-more-link">
-                            前往志工管理 →
-                        </Link>
-                    </Card>
+                    </div>
 
-                    <Card title="地圖概覽" icon="🗺️" padding="md">
-                        <div className="map-placeholder">
-                            <span>🗺️</span>
-                            <p>地圖顯示災情與資源分布</p>
-                            <Link to="/map">
-                                <Button variant="secondary" size="sm">開啟地圖</Button>
-                            </Link>
-                        </div>
-                    </Card>
-
-                    <LowStockWidget />
+                    {/* Map Controls */}
+                    <div className="absolute bottom-4 left-4 flex gap-2 z-10">
+                        <button className="v2-btn v2-btn--primary text-xs py-1">DEPLOY UNIT</button>
+                        <button className="v2-btn text-xs py-1">LAYERS</button>
+                    </div>
                 </div>
-            )}
+            </TacticalPanel>
+
+            {/* Widget 2: Active Alerts - Styling Gap 2: Critical Variant */}
+            <TacticalPanel
+                className="grid-area-alerts"
+                variant="critical"
+                title="ACTIVE ALERTS"
+                action={<div className="bg-red-500/20 text-red-400 text-[10px] px-2 py-0.5 rounded border border-red-500/30">3 CRITICAL</div>}
+            >
+                <div className="flex flex-col gap-2 h-full overflow-y-auto pr-1 custom-scrollbar">
+                    {ALERTS.map(alert => (
+                        <div key={alert.id} className="p-3 bg-white/5 border border-white/5 hover:bg-white/10 hover:border-white/10 transition-colors group cursor-pointer relative overflow-hidden">
+                            {/* Side Accent */}
+                            <div className={`absolute left-0 top-0 bottom-0 w-[2px] ${alert.type === 'critical' ? 'bg-red-500' : alert.type === 'warning' ? 'bg-amber-500' : 'bg-blue-500'}`} />
+
+                            <div className="flex justify-between items-start mb-1 pl-2">
+                                <span className={`text-[11px] font-bold tracking-wide uppercase ${alert.type === 'critical' ? 'text-red-400' : alert.type === 'warning' ? 'text-amber-400' : 'text-blue-400'}`}>
+                                    {alert.title}
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-500">{alert.time}</span>
+                            </div>
+                            <div className="text-[11px] text-slate-400 pl-2 leading-tight">{alert.desc}</div>
+                        </div>
+                    ))}
+                </div>
+            </TacticalPanel>
+
+            {/* Widget 3: Logistics - Styling Gap 1: Standard Matte Glass */}
+            <TacticalPanel
+                className="grid-area-stats"
+                variant="alert"
+                title="LOGISTICS & SUPPLY"
+            >
+                <div className="flex flex-col justify-around h-full gap-4">
+                    {RESOURCES.map((res, i) => (
+                        <div key={i} className="flex items-center gap-4 border-b border-white/5 pb-2 last:border-0">
+                            {/* Circular Chart Placeholder */}
+                            <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+                                <svg className="w-full h-full transform -rotate-90">
+                                    <circle cx="20" cy="20" r="16" stroke="rgba(255,255,255,0.05)" strokeWidth="3" fill="transparent" />
+                                    <circle cx="20" cy="20" r="16" stroke="currentColor" strokeWidth="3" fill="transparent" strokeDasharray={`${res.percent} 100`} className={res.color} />
+                                </svg>
+                                <span className="absolute text-[9px] font-mono">{res.percent}%</span>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                                <div className="text-[10px] text-slate-500 uppercase tracking-wider mb-0.5">{res.label}</div>
+                                <div className="text-sm font-bold font-mono text-slate-200">{res.value}</div>
+                            </div>
+                        </div>
+                    ))}
+                    <button className="v2-btn w-full mt-auto text-[10px] py-1.5 opacity-80 hover:opacity-100">MANAGE RESOURCES</button>
+                </div>
+            </TacticalPanel>
+
+            {/* Widget 4: Team Status */}
+            <TacticalPanel
+                className="grid-area-team"
+                title="UNIT STATUS"
+            >
+                <div className="grid grid-cols-2 gap-2 h-full content-start">
+                    {['ALPHA', 'BRAVO', 'CHARLIE', 'DELTA'].map((team, i) => (
+                        <div key={i} className="bg-white/5 p-2 border border-white/5 flex flex-col hover:bg-white/10 transition-colors">
+                            <div className="flex justify-between items-center mb-2">
+                                <span className="text-[10px] font-bold text-slate-300 tracking-wider">{team}</span>
+                                <div className={`w-1.5 h-1.5 rounded-full ${i === 0 ? 'bg-red-500 animate-pulse' : 'bg-green-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]'}`}></div>
+                            </div>
+                            <div className="text-[9px] text-slate-500 font-mono uppercase">
+                                {i === 0 ? 'ENGAGED' : 'STANDBY'}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </TacticalPanel>
         </div>
     );
-}
-
-function formatTime(dateString: string): string {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / 60000);
-    const hours = Math.floor(diff / 3600000);
-    const days = Math.floor(diff / 86400000);
-
-    if (minutes < 1) return '剛剛';
-    if (minutes < 60) return `${minutes}分鐘前`;
-    if (hours < 24) return `${hours}小時前`;
-    return `${days}天前`;
 }

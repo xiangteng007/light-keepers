@@ -44,6 +44,55 @@ import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
+
+// ===== V2 Domain Architecture Imports =====
+// Workforce Domain
+import {
+  AttendancePage as WorkforceAttendancePage,
+  LeaderboardPage as WorkforceLeaderboardPage,
+  OrgChartPage as WorkforceOrgChartPage,
+  PointsReportPage as WorkforcePointsReportPage,
+  ShiftCalendarPage as WorkforceShiftCalendarPage,
+} from './pages/domains/workforce'
+
+// Mission Command Domain
+import {
+  MissionCommandPage,
+  TriagePage,
+} from './pages/domains/mission-command'
+
+// Logistics Domain
+import {
+  EquipmentPage as LogisticsEquipmentPage,
+  ResourcesPage as LogisticsResourcesPage,
+} from './pages/domains/logistics'
+
+// Data Insight Domain
+import {
+  ReportsPage as DataInsightReportsPage,
+} from './pages/domains/data-insight'
+
+// Connectivity Domain
+import {
+  CommunicationsPage as ConnectivityCommunicationsPage,
+} from './pages/domains/connectivity'
+
+// Community Domain
+import {
+  CommunityPage as DomainCommunityPage,
+} from './pages/domains/community'
+
+// Core Domain
+import {
+  SettingsPage as CoreSettingsPage,
+  DashboardPage as CoreDashboardPage,
+} from './pages/domains/core'
+
+// Air Ops Domain
+import {
+  DroneControlPage,
+} from './pages/domains/air-ops'
+
 import './App.css'
 
 
@@ -146,6 +195,38 @@ function App() {
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
             {/* 系統擁有者等級 (5) */}
             <Route path="donations" element={<ProtectedRoute requiredLevel={5}><DonationsPage /></ProtectedRoute>} />
+
+            {/* ===== V2 Domain Architecture Routes ===== */}
+            {/* Mission Command Domain */}
+            <Route path="domains/mission-command" element={<ProtectedRoute requiredLevel={2}><MissionCommandPage /></ProtectedRoute>} />
+            <Route path="domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
+
+            {/* Workforce Domain */}
+            <Route path="domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><WorkforceShiftCalendarPage /></ProtectedRoute>} />
+            <Route path="domains/workforce/attendance" element={<ProtectedRoute requiredLevel={2}><WorkforceAttendancePage /></ProtectedRoute>} />
+            <Route path="domains/workforce/org-chart" element={<ProtectedRoute requiredLevel={2}><WorkforceOrgChartPage /></ProtectedRoute>} />
+            <Route path="domains/workforce/leaderboard" element={<ProtectedRoute requiredLevel={1}><WorkforceLeaderboardPage /></ProtectedRoute>} />
+            <Route path="domains/workforce/points-report" element={<ProtectedRoute requiredLevel={2}><WorkforcePointsReportPage /></ProtectedRoute>} />
+
+            {/* Logistics Domain */}
+            <Route path="domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><LogisticsEquipmentPage /></ProtectedRoute>} />
+            <Route path="domains/logistics/resources" element={<ProtectedRoute requiredLevel={2}><LogisticsResourcesPage /></ProtectedRoute>} />
+
+            {/* Data Insight Domain */}
+            <Route path="domains/data-insight/reports" element={<ProtectedRoute requiredLevel={2}><DataInsightReportsPage /></ProtectedRoute>} />
+
+            {/* Connectivity Domain */}
+            <Route path="domains/connectivity/communications" element={<ProtectedRoute requiredLevel={2}><ConnectivityCommunicationsPage /></ProtectedRoute>} />
+
+            {/* Community Domain */}
+            <Route path="domains/community" element={<ProtectedRoute requiredLevel={1}><DomainCommunityPage /></ProtectedRoute>} />
+
+            {/* Core Domain */}
+            <Route path="domains/core/settings" element={<ProtectedRoute requiredLevel={3}><CoreSettingsPage /></ProtectedRoute>} />
+            <Route path="domains/core/dashboard" element={<ProtectedRoute requiredLevel={3}><CoreDashboardPage /></ProtectedRoute>} />
+
+            {/* Air Ops Domain */}
+            <Route path="domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><DroneControlPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

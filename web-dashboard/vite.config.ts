@@ -112,7 +112,7 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true // Enable PWA in dev mode for testing
+        enabled: false // Disable PWA in dev to prevent cache loops
       }
     })
   ],

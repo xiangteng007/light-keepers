@@ -1,71 +1,75 @@
 /**
  * Light Keepers Tactical C2 / ICS Global Styles
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
- * Theme: "Tactical Dark" (Command Center)
- * Style: Matte, Low-Saturation, High-Contrast
+ * Theme: "Tactical V2 - Bento Command Deck"
+ * Style: Cybernetic, High-Contrast, Fixed Viewport
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+TC:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Chakra+Petch:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════════
-   CSS CUSTOM PROPERTIES - TACTICAL DARK THEME (DEFAULT)
+   CSS CUSTOM PROPERTIES - V2 TACTICAL THEME
    ═══════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ── Background Hierarchy ── */
-  --tactical-bg-app: #161E2A;
-  --tactical-bg-panel: #1D2635;
-  --tactical-bg-surface: #242D3D;
-  --tactical-bg-hover: #2A3548;
-  
-  /* ── Borders ── */
-  --tactical-border: #2F3641;
-  --tactical-border-light: #3A4556;
-  --tactical-border-focus: #4A5568;
-  
+  /* ── Background Hierarchy (Void) ── */
+  --v2-bg-void: #0B1120;
+  --v2-bg-glass: rgba(15, 23, 42, 0.85);
+  --v2-bg-glass-heavy: rgba(11, 17, 32, 0.95);
+  --v2-bg-dim: rgba(0, 0, 0, 0.4);
+
+  /* ── Borders & Edges ── */
+  --v2-border-subtle: rgba(255, 255, 255, 0.08);
+  --v2-border-neon: rgba(6, 182, 212, 0.4);
+  /* Cyan glow */
+  --v2-border-amber: rgba(245, 158, 11, 0.5);
+  /* Amber glow */
+
   /* ── Text ── */
-  --tactical-text-primary: #E8E4DE;
-  --tactical-text-secondary: #9CA3AF;
-  --tactical-text-tertiary: #6B7280;
-  --tactical-text-inverse: #161E2A;
-  
-  /* ── Accent: Gold ── */
-  --tactical-gold: #C39B6F;
-  --tactical-gold-light: #D4B896;
-  --tactical-gold-dark: #A67C52;
-  --tactical-gold-muted: rgba(195, 155, 111, 0.15);
-  
-  /* ── Status: Critical (SOS) ── */
-  --tactical-critical: #893336;
-  --tactical-critical-light: #A94438;
-  --tactical-critical-bg: rgba(137, 51, 54, 0.2);
-  
-  /* ── Status: Warning ── */
-  --tactical-warning: #B45309;
-  --tactical-warning-light: #D97706;
-  --tactical-warning-bg: rgba(180, 83, 9, 0.2);
-  
-  /* ── Status: Success ── */
-  --tactical-success: #047857;
-  --tactical-success-light: #059669;
-  --tactical-success-bg: rgba(4, 120, 87, 0.2);
-  
-  /* ── Status: Info ── */
-  --tactical-info: #1D4ED8;
-  --tactical-info-light: #2563EB;
-  --tactical-info-bg: rgba(29, 78, 216, 0.2);
-  
+  --v2-text-primary: #F8FAFC;
+  --v2-text-secondary: #94A3B8;
+  --v2-text-dim: #64748B;
+  --v2-text-accent: #38BDF8;
+
+  /* ── Accent Colors ── */
+  --v2-primary: #F59E0B;
+  /* Amber 500 */
+  --v2-secondary: #06B6D4;
+  /* Cyan 500 */
+  --v2-critical: #EF4444;
+  /* Red 500 */
+  --v2-success: #10B981;
+  /* Emerald 500 */
+
   /* ── Effects ── */
-  --tactical-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  --tactical-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.6);
-  --tactical-blur: 12px;
-  
-  /* ── Transitions ── */
-  --tactical-transition: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --v2-glow-amber: 0 0 12px rgba(245, 158, 11, 0.3);
+  --v2-glow-cyan: 0 0 12px rgba(6, 182, 212, 0.3);
+  --v2-backdrop-blur: 16px;
+
+  /* ── Layout Dimensions ── */
+  --v2-nav-width: 80px;
+  --v2-header-height: 64px;
+  --v2-ticker-height: 32px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   UTILITY - BACKGROUND PATTERNS (Gap 3 Fix)
+   ═══════════════════════════════════════════════════════════════ */
+.bg-grid-pattern {
+  background-size: 40px 40px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-position: center center;
+}
+
+.bg-dot-pattern {
+  background-size: 20px 20px;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -73,278 +77,223 @@
    ═══════════════════════════════════════════════════════════════ */
 
 @layer base {
-  *,
-  *::before,
-  *::after {
-    border-color: var(--tactical-border);
-  }
-  
-  html {
-    font-family: 'Inter', 'Noto Sans TC', sans-serif;
-    font-size: 14px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-rendering: optimizeLegibility;
-  }
-  
+
+  html,
   body {
-    background-color: var(--tactical-bg-app);
-    color: var(--tactical-text-primary);
-    min-height: 100vh;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    /* FORCE FIXED VIEWPORT */
+    background-color: var(--v2-bg-void);
+    color: var(--v2-text-primary);
+    font-family: 'Inter', sans-serif;
   }
-  
-  /* Scrollbar - Tactical Style */
+
+  /* Headings use tactical font */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Chakra Petch', sans-serif;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* Monospace for data */
+  code,
+  pre,
+  .mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Custom Scrollbar (Slim) */
   ::-webkit-scrollbar {
-    width: 8px;
-    height: 8px;
+    width: 4px;
+    height: 4px;
   }
-  
+
   ::-webkit-scrollbar-track {
-    background: var(--tactical-bg-app);
+    background: transparent;
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    background: var(--tactical-border-light);
-    border-radius: 4px;
-  }
-  
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--tactical-border-focus);
-  }
-  
-  /* Selection - Gold accent */
-  ::selection {
-    background-color: var(--tactical-gold-muted);
-    color: var(--tactical-text-primary);
-  }
-  
-  /* Focus ring override */
-  *:focus-visible {
-    outline: 2px solid var(--tactical-gold);
-    outline-offset: 2px;
+    background: var(--v2-text-dim);
+    border-radius: 2px;
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   COMPONENT LAYER - TACTICAL UI PRIMITIVES
+   COMPONENT LAYER - BENTO PRIMITIVES
    ═══════════════════════════════════════════════════════════════ */
 
 @layer components {
-  /* ── Panel / Card ── */
-  .tactical-panel {
-    background-color: var(--tactical-bg-panel);
-    border: 1px solid var(--tactical-border);
-    border-radius: 0.375rem;
-    box-shadow: var(--tactical-shadow);
+
+  /* ── Bento Widget Container (Chamfered) ── */
+  .bento-widget {
+    position: relative;
+    background: var(--v2-bg-glass);
+    backdrop-filter: blur(var(--v2-backdrop-blur));
+    -webkit-backdrop-filter: blur(var(--v2-backdrop-blur));
+    border: 1px solid var(--v2-border-subtle);
+    border-radius: 0;
+    /* Clear standard radius */
+
+    /* Chamfered Edges using clip-path could be used, or pseudo elements */
+    /* Using specific border radius for chamfer-like look */
+    /* Or just sharp edges for V2 Tactical look */
+
+    /* Tech Border Effect */
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4);
+    transition: all 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
   }
-  
-  .tactical-panel-elevated {
-    background-color: var(--tactical-bg-surface);
-    border: 1px solid var(--tactical-border-light);
-    border-radius: 0.375rem;
-    box-shadow: var(--tactical-shadow-lg);
+
+  /* Decorative Corner Accents */
+  .bento-widget::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid var(--v2-secondary);
+    border-left: 2px solid var(--v2-secondary);
+    pointer-events: none;
+    z-index: 1;
   }
-  
-  /* ── Matte Glassmorphism ── */
-  .tactical-glass {
-    background: linear-gradient(
-      135deg,
-      rgba(29, 38, 53, 0.9) 0%,
-      rgba(22, 30, 42, 0.95) 100%
-    );
-    backdrop-filter: blur(var(--tactical-blur));
-    -webkit-backdrop-filter: blur(var(--tactical-blur));
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    box-shadow: 
-      var(--tactical-shadow),
-      inset 0 1px 0 rgba(255, 255, 255, 0.03);
+
+  .bento-widget::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 12px;
+    height: 12px;
+    border-bottom: 2px solid var(--v2-secondary);
+    border-right: 2px solid var(--v2-secondary);
+    pointer-events: none;
+    z-index: 1;
   }
-  
-  /* ── Primary Button (Gold) ── */
-  .tactical-btn-primary {
+
+  .bento-widget--amber::before,
+  .bento-widget--amber::after {
+    border-color: var(--v2-primary);
+  }
+
+  .bento-widget--critical::before,
+  .bento-widget--critical::after {
+    border-color: var(--v2-critical);
+  }
+
+  /* ── Widget Header ── */
+  .bento-header {
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--v2-border-subtle);
+    background: rgba(255, 255, 255, 0.02);
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: 1px;
+    color: var(--v2-text-secondary);
+  }
+
+  .bento-header__title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bento-header__actions {
+    display: flex;
+    gap: 4px;
+  }
+
+  /* ── Widget Body ── */
+  .bento-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    min-height: 0;
+    /* Crucial for flexbox scrolling */
+  }
+
+  /* ── Tactical Button ── */
+  .v2-btn {
     @apply inline-flex items-center justify-center;
     @apply px-4 py-2;
-    @apply text-tactical-base font-medium tracking-tactical;
-    @apply uppercase;
-    background-color: var(--tactical-gold);
-    color: var(--tactical-text-inverse);
-    border-radius: 0.25rem;
-    transition: all var(--tactical-transition);
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    background: rgba(6, 182, 212, 0.1);
+    border: 1px solid var(--v2-secondary);
+    color: var(--v2-secondary);
+    font-family: 'Chakra Petch', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
   }
-  
-  .tactical-btn-primary:hover {
-    background-color: var(--tactical-gold-light);
-    box-shadow: 0 0 12px rgba(195, 155, 111, 0.3);
+
+  .v2-btn:hover {
+    background: var(--v2-secondary);
+    color: #000;
+    box-shadow: var(--v2-glow-cyan);
   }
-  
-  .tactical-btn-primary:active {
-    background-color: var(--tactical-gold-dark);
-    transform: translateY(1px);
+
+  .v2-btn--primary {
+    border-color: var(--v2-primary);
+    color: var(--v2-primary);
+    background: rgba(245, 158, 11, 0.1);
   }
-  
-  /* ── Ghost Button ── */
-  .tactical-btn-ghost {
-    @apply inline-flex items-center justify-center;
-    @apply px-3 py-1.5;
-    @apply text-tactical-sm font-medium tracking-tactical;
-    color: var(--tactical-text-secondary);
-    background: transparent;
-    border: 1px solid var(--tactical-border);
-    border-radius: 0.25rem;
-    transition: all var(--tactical-transition);
-  }
-  
-  .tactical-btn-ghost:hover {
-    background-color: var(--tactical-bg-hover);
-    color: var(--tactical-text-primary);
-    border-color: var(--tactical-border-light);
-  }
-  
-  /* ── Critical Button (SOS) ── */
-  .tactical-btn-critical {
-    @apply inline-flex items-center justify-center;
-    @apply px-4 py-2;
-    @apply text-tactical-base font-bold tracking-tactical-wide;
-    @apply uppercase;
-    background-color: var(--tactical-critical);
-    color: var(--tactical-text-primary);
-    border-radius: 0.25rem;
-    transition: all var(--tactical-transition);
-    animation: pulse-tactical 2s infinite;
-  }
-  
-  .tactical-btn-critical:hover {
-    background-color: var(--tactical-critical-light);
-    box-shadow: 0 0 20px rgba(137, 51, 54, 0.4);
-  }
-  
-  /* ── Input Fields ── */
-  .tactical-input {
-    @apply w-full px-3 py-2;
-    @apply text-tactical-base;
-    background-color: var(--tactical-bg-app);
-    color: var(--tactical-text-primary);
-    border: 1px solid var(--tactical-border);
-    border-radius: 0.375rem;
-    transition: all var(--tactical-transition);
-  }
-  
-  .tactical-input::placeholder {
-    color: var(--tactical-text-tertiary);
-  }
-  
-  .tactical-input:focus {
-    border-color: var(--tactical-gold);
-    box-shadow: 0 0 0 2px var(--tactical-gold-muted);
-    outline: none;
-  }
-  
-  /* ── Labels ── */
-  .tactical-label {
-    @apply block mb-1;
-    @apply text-tactical-sm font-medium tracking-tactical-wide;
-    @apply uppercase;
-    color: var(--tactical-text-secondary);
-  }
-  
-  /* ── Badges ── */
-  .tactical-badge {
-    @apply inline-flex items-center;
-    @apply px-2 py-0.5;
-    @apply text-tactical-xs font-semibold tracking-tactical;
-    @apply uppercase;
-    border-radius: 0.25rem;
-    background-color: var(--tactical-bg-surface);
-    color: var(--tactical-text-secondary);
-  }
-  
-  .tactical-badge-gold {
-    background-color: var(--tactical-gold-muted);
-    color: var(--tactical-gold);
-  }
-  
-  .tactical-badge-critical {
-    background-color: var(--tactical-critical-bg);
-    color: var(--tactical-critical-light);
-  }
-  
-  .tactical-badge-success {
-    background-color: var(--tactical-success-bg);
-    color: var(--tactical-success-light);
-  }
-  
-  .tactical-badge-warning {
-    background-color: var(--tactical-warning-bg);
-    color: var(--tactical-warning-light);
-  }
-  
-  /* ── Dividers ── */
-  .tactical-divider {
-    border-top: 1px solid var(--tactical-border);
-  }
-  
-  .tactical-divider-vertical {
-    border-left: 1px solid var(--tactical-border);
+
+  .v2-btn--primary:hover {
+    background: var(--v2-primary);
+    color: #000;
+    box-shadow: var(--v2-glow-amber);
   }
 }
 
 /* ═══════════════════════════════════════════════════════════════
-   UTILITY LAYER - TACTICAL HELPERS
+   UTILITY LAYER - V2 HELPERS
    ═══════════════════════════════════════════════════════════════ */
 
 @layer utilities {
-  /* Monospace for coordinates and data */
-  .font-tactical-mono {
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
-    font-feature-settings: 'tnum' on, 'lnum' on;
+  .text-neon-cyan {
+    color: var(--v2-secondary);
+    text-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
   }
-  
-  /* Truncate with ellipsis */
-  .tactical-truncate {
-    @apply overflow-hidden text-ellipsis whitespace-nowrap;
-  }
-  
-  /* Glow effects */
-  .tactical-glow-gold {
-    box-shadow: 0 0 20px rgba(195, 155, 111, 0.3);
-  }
-  
-  .tactical-glow-critical {
-    box-shadow: 0 0 20px rgba(137, 51, 54, 0.4);
-  }
-  
-  /* Status indicator dot */
-  .tactical-status-dot {
-    @apply w-2 h-2 rounded-full;
-  }
-  
-  .tactical-status-dot-online {
-    @apply tactical-status-dot bg-tactical-status-success;
-    box-shadow: 0 0 6px rgba(4, 120, 87, 0.6);
-  }
-  
-  .tactical-status-dot-offline {
-    @apply tactical-status-dot bg-tactical-status-offline;
-  }
-  
-  .tactical-status-dot-critical {
-    @apply tactical-status-dot bg-tactical-status-critical;
-    animation: blink-critical 1s step-end infinite;
-  }
-}
 
-/* ═══════════════════════════════════════════════════════════════
-   ANIMATIONS
-   ═══════════════════════════════════════════════════════════════ */
+  .text-neon-amber {
+    color: var(--v2-primary);
+    text-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
+  }
 
-@keyframes pulse-tactical {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
-}
+  .border-neon-cyan {
+    border-color: var(--v2-secondary);
+    box-shadow: var(--v2-glow-cyan);
+  }
 
-@keyframes blink-critical {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  /* Grid Areas Helper */
+  .grid-area-map {
+    grid-area: map;
+  }
+
+  .grid-area-stats {
+    grid-area: stats;
+  }
+
+  .grid-area-alerts {
+    grid-area: alerts;
+  }
+
+  .grid-area-team {
+    grid-area: team;
+  }
 }

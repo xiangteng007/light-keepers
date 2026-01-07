@@ -34,8 +34,8 @@ if (window.location.pathname.startsWith('/__/')) {
     </StrictMode>,
   )
 
-  // PWA Service Worker Registration
-  if ('serviceWorker' in navigator) {
+  // PWA Service Worker Registration - Only in Production
+  if ('serviceWorker' in navigator && import.meta.env.PROD) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {

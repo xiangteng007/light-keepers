@@ -23,66 +23,43 @@ const config: Config = {
             colors: {
                 tactical: {
                     // ── Background Hierarchy ──
-                    app: '#161E2A',           // Deepest background (app shell)
-                    panel: '#1D2635',         // Card/Panel background
-                    surface: '#242D3D',       // Elevated surface (modals, dropdowns)
-                    hover: '#2A3548',         // Hover state background
+                    app: '#13171F',           // V2 Polish: Deep Charcoal (Base)
+                    panel: 'rgba(19, 23, 31, 0.90)', // V2 Polish: Matte Glass
+                    surface: '#1D2635',       // Elevated surface
+                    hover: '#2A3548',         // Hover state
 
                     // ── Borders & Dividers ──
-                    border: '#2F3641',        // Default border
-                    'border-light': '#3A4556', // Subtle dividers
-                    'border-focus': '#4A5568', // Focus ring
+                    border: '#2F3641',        // V2 Polish: Thin, subtle border
+                    'border-light': 'rgba(255, 255, 255, 0.1)',
+                    'border-focus': '#4A5568',
 
                     // ── Text Hierarchy ──
                     text: {
-                        primary: '#E8E4DE',     // Primary text (high contrast)
-                        secondary: '#9CA3AF',   // Secondary/muted text
-                        tertiary: '#6B7280',    // Disabled/hint text
-                        inverse: '#161E2A',     // Text on light backgrounds
+                        primary: '#E2E8F0',     // Slate-200 (Primary)
+                        secondary: '#94A3B8',   // Slate-400 (Labels)
+                        tertiary: '#64748B',    // Slate-500 (Dim)
+                        inverse: '#13171F',
                     },
 
                     // ── Accent Colors ──
                     gold: {
-                        DEFAULT: '#C39B6F',     // Primary accent (CTA buttons)
-                        light: '#D4B896',       // Hover state
-                        dark: '#A67C52',        // Active/pressed state
-                        muted: 'rgba(195, 155, 111, 0.15)', // Badge backgrounds
+                        DEFAULT: '#C39B6F',     // Gold Accent
+                        light: '#E2C29A',
+                        dark: '#A67C52',
+                        muted: 'rgba(195, 155, 111, 0.15)',
                     },
 
                     // ── Status Colors ──
                     status: {
-                        // Critical/SOS - Use SPARINGLY
-                        critical: '#893336',
-                        'critical-light': '#A94438',
-                        'critical-bg': 'rgba(137, 51, 54, 0.2)',
-
-                        // Warning
-                        warning: '#B45309',
-                        'warning-light': '#D97706',
-                        'warning-bg': 'rgba(180, 83, 9, 0.2)',
-
-                        // Success/Active
-                        success: '#047857',
-                        'success-light': '#059669',
-                        'success-bg': 'rgba(4, 120, 87, 0.2)',
-
-                        // Info/Neutral
-                        info: '#1D4ED8',
-                        'info-light': '#2563EB',
-                        'info-bg': 'rgba(29, 78, 216, 0.2)',
-
-                        // Offline/Inactive
-                        offline: '#4B5563',
-                        'offline-bg': 'rgba(75, 85, 99, 0.2)',
+                        critical: '#EF4444',
+                        warning: '#F59E0B',
+                        success: '#10B981',
+                        info: '#06B6D4',
+                        neutral: '#475569',
                     },
 
-                    // ── Mission Priority Colors ──
-                    priority: {
-                        p1: '#893336',          // Critical
-                        p2: '#B45309',          // High
-                        p3: '#C39B6F',          // Medium
-                        p4: '#6B7280',          // Low
-                    },
+                    // ── Semantic ──
+                    void: '#0B1120', // Deepest void for maps
                 },
             },
 
