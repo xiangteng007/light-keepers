@@ -131,10 +131,10 @@ export class AARService {
         const session = await this.sessionRepo.findOne({ where: { id: missionSessionId } });
 
         const [totalReports, totalTasks, completedTasks, sosCount] = await Promise.all([
-            this.reportRepo.count({ where: { missionSessionId } }),
-            this.taskRepo.count({ where: { missionSessionId } }),
-            this.taskRepo.count({ where: { missionSessionId, status: 'completed' as any } }),
-            this.reportRepo.count({ where: { missionSessionId, type: 'sos' } }),
+            this.reportRepo.count({ where: { missionSessionId } as any }),
+            this.taskRepo.count({ where: { sessionId: missionSessionId } as any }),
+            this.taskRepo.count({ where: { sessionId: missionSessionId, status: 'completed' } as any }),
+            this.reportRepo.count({ where: { missionSessionId, type: 'sos' } as any }),
         ]);
 
         const duration = session?.startedAt && session?.endedAt

@@ -1,6 +1,6 @@
 {
     "common": {
-        "appName": "Lightkeepers Disaster Prevention Platform",
+        "appName": "Light Keepers Disaster Platform",
         "loading": "Loading...",
         "error": "An error occurred",
         "success": "Success",
@@ -28,11 +28,11 @@
     "nav": {
         "dashboard": "Dashboard",
         "map": "Disaster Map",
-        "reports": "Incident Reports",
-        "volunteers": "Volunteer Management",
-        "resources": "Resource Management",
-        "events": "Event Management",
-        "activities": "Activity Registration",
+        "reports": "Reports",
+        "volunteers": "Volunteers",
+        "resources": "Resources",
+        "events": "Events",
+        "activities": "Activities",
         "announcements": "Announcements",
         "settings": "Settings",
         "permissions": "Permissions",
@@ -52,7 +52,7 @@
         "loginWithLine": "Login with LINE",
         "loginSuccess": "Login successful",
         "loginFailed": "Login failed",
-        "logoutSuccess": "Logged out successfully"
+        "logoutSuccess": "Logged out"
     },
     "dashboard": {
         "title": "Dashboard",
@@ -68,7 +68,7 @@
         "viewMap": "View Map"
     },
     "reports": {
-        "title": "Incident Reports",
+        "title": "Disaster Reports",
         "new": "New Report",
         "list": "Report List",
         "status": {
@@ -95,7 +95,7 @@
             "description": "Description",
             "location": "Location",
             "photos": "Photos",
-            "contact": "Contact Information"
+            "contact": "Contact Info"
         }
     },
     "volunteers": {
@@ -160,44 +160,30 @@
             "participants": "Participants"
         }
     },
-    "sos": {
-        "title": "Emergency SOS",
-        "send": "Send SOS Signal",
-        "status": {
-            "active": "Active",
-            "acknowledged": "Acknowledged",
-            "resolved": "Resolved"
-        }
-    },
     "settings": {
         "title": "Settings",
         "theme": {
             "title": "Theme",
             "light": "Light Mode",
             "dark": "Dark Mode",
-            "system": "System Default"
+            "system": "System"
         },
         "language": {
             "title": "Language",
-            "zh-TW": "繁體中文",
-            "zh-CN": "简体中文",
+            "zh": "繁體中文",
             "en": "English",
-            "ja": "日本語",
-            "ms": "Bahasa Melayu",
-            "fil": "Filipino",
-            "th": "ภาษาไทย",
-            "vi": "Tiếng Việt"
+            "ja": "日本語"
         },
         "notifications": {
-            "title": "Notification Settings",
+            "title": "Notifications",
             "push": "Push Notifications",
             "email": "Email Notifications"
         }
     },
     "errors": {
         "notFound": "Page Not Found",
-        "unauthorized": "Unauthorized Access",
-        "forbidden": "Access Forbidden",
+        "unauthorized": "Unauthorized",
+        "forbidden": "Forbidden",
         "serverError": "Server Error",
         "networkError": "Network Error",
         "timeout": "Request Timeout"

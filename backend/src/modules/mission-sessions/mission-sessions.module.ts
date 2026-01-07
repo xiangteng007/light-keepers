@@ -17,6 +17,9 @@ import { SITREPService } from './sitrep.service';
 import { SITREPController } from './sitrep.controller';
 import { AARService } from './aar.service';
 import { AARController } from './aar.controller';
+import { MissionSessionGateway } from './mission-session.gateway';
+import { MissionReportService } from './mission-report.service';
+import { MissionReportController } from './mission-report.controller';
 import { AuthModule } from '../auth/auth.module';
 import { FieldReportsModule } from '../field-reports/field-reports.module';
 import { TasksModule } from '../tasks/tasks.module';
@@ -43,18 +46,23 @@ import { TasksModule } from '../tasks/tasks.module';
         IAPController,
         SITREPController,
         AARController,
+        MissionReportController,
     ],
     providers: [
         MissionSessionsService,
         IAPService,
         SITREPService,
         AARService,
+        MissionSessionGateway,
+        MissionReportService,
     ],
     exports: [
         MissionSessionsService,
         IAPService,
         SITREPService,
         AARService,
+        MissionSessionGateway,
+        MissionReportService,
     ],
 })
 export class MissionSessionsModule { }

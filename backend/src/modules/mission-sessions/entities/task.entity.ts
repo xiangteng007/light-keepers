@@ -11,6 +11,8 @@ import { MissionSession } from './mission-session.entity';
 
 export enum TaskStatus {
     TODO = 'todo',
+    PENDING = 'pending',
+    ASSIGNED = 'assigned',
     IN_PROGRESS = 'in_progress',
     COMPLETED = 'completed',
     CANCELLED = 'cancelled',
@@ -23,13 +25,18 @@ export enum TaskPriority {
     URGENT = 'urgent',
 }
 
-@Entity('tasks')
+@Entity('mission_tasks')
 export class Task {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ name: 'session_id', type: 'uuid' })
     sessionId: string;
+
+    // Alias for backward compatibility
+    get missionSessionId(): string {
+        return this.sessionId;
+    }
 
     @Column({ type: 'varchar', length: 255 })
     title: string;
@@ -56,6 +63,22 @@ export class Task {
 
     @Column({ name: 'assignee_name', type: 'varchar', nullable: true })
     assigneeName: string;
+
+    // Team assignment fields (for map-dispatch)
+    @Column({ name: 'assigned_team_id', type: 'varchar', nullable: true })
+    assignedTeamId: string;
+
+    @Column({ name: 'assigned_team_name', type: 'varchar', nullable: true })
+    assignedTeamName: string;
+
+    @Column({ name: 'sector_id', type: 'uuid', nullable: true })
+    sectorId: string;
+
+    @Column({ type: 'jsonb', nullable: true, comment: 'Location {lat, lng}' })
+    location: { lat: number; lng: number };
+
+    @Column({ name: 'created_by', type: 'varchar', nullable: true })
+    createdBy: string;
 
     @Column({ name: 'due_at', type: 'timestamp', nullable: true })
     dueAt: Date;

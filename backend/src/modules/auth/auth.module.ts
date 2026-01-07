@@ -1,11 +1,9 @@
-import { Module, forwardRef } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-import { HeartbeatController } from './heartbeat.controller';
-import { HeartbeatService } from './heartbeat.service';
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
@@ -13,7 +11,6 @@ import { RefreshToken } from './entities/refresh-token.entity';
 import { SmsService, OtpService, PasswordResetService, EmailService, FirebaseAdminService } from './services';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { LineBotModule } from '../line-bot/line-bot.module';
-import { AuditModule } from '../audit/audit.module';
 
 @Module({
     imports: [
@@ -33,9 +30,8 @@ import { AuditModule } from '../audit/audit.module';
             }),
         }),
         LineBotModule,
-        forwardRef(() => AuditModule),
     ],
-    controllers: [AuthController, HeartbeatController],
+    controllers: [AuthController],
     providers: [
         AuthService,
         JwtAuthGuard,
@@ -46,9 +42,8 @@ import { AuditModule } from '../audit/audit.module';
         EmailService,
         FirebaseAdminService,
         RefreshTokenService,
-        HeartbeatService,
     ],
-    exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, TypeOrmModule],
+    exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService],
 })
 export class AuthModule { }
 

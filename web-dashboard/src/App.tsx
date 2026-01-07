@@ -44,23 +44,6 @@ import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
-import EmergencyResponsePage from './pages/EmergencyResponsePage'
-import CommandPostMapPage from './pages/CommandPostMapPage'
-import MissionCommandPage from './pages/MissionCommandPage'
-import IAPManagerPage from './pages/command/IAPManagerPage'
-import SITREPViewerPage from './pages/command/SITREPViewerPage'
-import AARPlaybackPage from './pages/command/AARPlaybackPage'
-import TacticalMapPage from './pages/TacticalMapPage'
-import TriagePage from './pages/TriagePage'
-import EquipmentPage from './pages/EquipmentPage'
-import ReunificationPage from './pages/ReunificationPage'
-import PublicSearchPage from './pages/PublicSearchPage'
-import DroneControlPage from './pages/DroneControlPage'
-// v19.0 新增頁面
-import ShiftCalendarPage from './pages/ShiftCalendarPage'
-import AttendancePage from './pages/AttendancePage'
-import OrgChartPage from './pages/OrgChartPage'
-import TwoFactorSetupPage from './pages/TwoFactorSetupPage'
 import './App.css'
 
 
@@ -119,8 +102,6 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
-          <Route path="/mission-command/:missionSessionId" element={<MissionCommandPage />} /> {/* 任務指揮中心（獨立頁面） */}
-          <Route path="/search" element={<PublicSearchPage />} /> {/* 民眾協尋查詢（公開） */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
@@ -147,16 +128,6 @@ function App() {
             <Route path="my-points" element={<ProtectedRoute requiredLevel={1}><PointsReportPage /></ProtectedRoute>} />
             {/* 幹部等級 (2) */}
             <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
-            <Route path="emergency-response" element={<ProtectedRoute requiredLevel={2}><EmergencyResponsePage /></ProtectedRoute>} />
-            <Route path="emergency-response/map/:sessionId" element={<ProtectedRoute requiredLevel={2}><CommandPostMapPage /></ProtectedRoute>} />
-            <Route path="emergency-response/iap/:sessionId" element={<ProtectedRoute requiredLevel={2}><IAPManagerPage /></ProtectedRoute>} />
-            <Route path="emergency-response/sitrep/:sessionId" element={<ProtectedRoute requiredLevel={2}><SITREPViewerPage /></ProtectedRoute>} />
-            <Route path="emergency-response/aar/:sessionId" element={<ProtectedRoute requiredLevel={2}><AARPlaybackPage /></ProtectedRoute>} />
-            <Route path="tactical-map" element={<ProtectedRoute requiredLevel={2}><TacticalMapPage /></ProtectedRoute>} />
-            <Route path="emergency-response/triage/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
-            <Route path="emergency-response/reunification/:missionSessionId" element={<ProtectedRoute requiredLevel={2}><ReunificationPage /></ProtectedRoute>} />
-            <Route path="equipment" element={<ProtectedRoute requiredLevel={2}><EquipmentPage /></ProtectedRoute>} />
-            <Route path="drone-control" element={<ProtectedRoute requiredLevel={2}><DroneControlPage /></ProtectedRoute>} />
             <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
             <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
             <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
@@ -175,11 +146,6 @@ function App() {
             <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
             {/* 系統擁有者等級 (5) */}
             <Route path="donations" element={<ProtectedRoute requiredLevel={5}><DonationsPage /></ProtectedRoute>} />
-            {/* v19.0 組織管理頁面 */}
-            <Route path="shift-calendar" element={<ProtectedRoute requiredLevel={2}><ShiftCalendarPage /></ProtectedRoute>} />
-            <Route path="attendance" element={<ProtectedRoute requiredLevel={1}><AttendancePage /></ProtectedRoute>} />
-            <Route path="org-chart" element={<ProtectedRoute requiredLevel={2}><OrgChartPage /></ProtectedRoute>} />
-            <Route path="settings/2fa" element={<ProtectedRoute requiredLevel={1}><TwoFactorSetupPage /></ProtectedRoute>} />
           </Route>
         </Routes>
       </AuthProvider>

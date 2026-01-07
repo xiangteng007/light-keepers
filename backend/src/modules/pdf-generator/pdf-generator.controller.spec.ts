@@ -1,28 +1,19 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PdfGeneratorController } from './pdf-generator.controller';
 import { PdfGeneratorService } from './pdf-generator.service';
-import { Response } from 'express';
 
 describe('PdfGeneratorController', () => {
     let controller: PdfGeneratorController;
     let service: PdfGeneratorService;
 
     const mockService = {
-        generatePdf: jest.fn(),
-        getTemplates: jest.fn(),
-        createTemplate: jest.fn(),
-        updateTemplate: jest.fn(),
-        deleteTemplate: jest.fn(),
-        generateFromTemplate: jest.fn(),
-        mergePdfs: jest.fn(),
-        addWatermark: jest.fn(),
+        generateEventReport: jest.fn(),
+        generateAttendanceReport: jest.fn(),
+        generateSitrep: jest.fn(),
+        generateStatisticsReport: jest.fn(),
+        generateCertificate: jest.fn(),
+        batchGenerate: jest.fn(),
     };
-
-    const mockResponse = {
-        setHeader: jest.fn(),
-        send: jest.fn(),
-        status: jest.fn().mockReturnThis(),
-    } as unknown as Response;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
@@ -44,104 +35,81 @@ describe('PdfGeneratorController', () => {
         expect(controller).toBeDefined();
     });
 
-    describe('generatePdf', () => {
-        it('should generate PDF from HTML content', async () => {
-            const dto = { html: '<h1>Test</h1>', options: { format: 'A4' } };
-            const pdfBuffer = Buffer.from('PDF content');
-            mockService.generatePdf.mockResolvedValue(pdfBuffer);
+    describe('generateEventReport', () => {
+        it('should generate event report PDF', async () => {
+            const event = { id: 'e1', title: 'Test Event' };
+            const result = { success: true, base64: 'abc123' };
+            mockService.generateEventReport.mockResolvedValue(result);
 
-            const result = await controller.generatePdf(dto);
+            const response = await controller.generateEventReport(event);
 
-            expect(service.generatePdf).toHaveBeenCalledWith(dto.html, dto.options);
-            expect(result).toEqual(pdfBuffer);
+            expect(service.generateEventReport).toHaveBeenCalledWith(event);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('getTemplates', () => {
-        it('should return all PDF templates', async () => {
-            const templates = [{ id: 't1', name: 'Report Template' }];
-            mockService.getTemplates.mockResolvedValue(templates);
+    describe('generateAttendanceReport', () => {
+        it('should generate attendance report PDF', async () => {
+            const data = { records: [] };
+            const result = { success: true };
+            mockService.generateAttendanceReport.mockResolvedValue(result);
 
-            const result = await controller.getTemplates();
+            const response = await controller.generateAttendanceReport(data);
 
-            expect(service.getTemplates).toHaveBeenCalled();
-            expect(result).toEqual(templates);
+            expect(service.generateAttendanceReport).toHaveBeenCalledWith(data);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('createTemplate', () => {
-        it('should create a new PDF template', async () => {
-            const dto = { name: 'New Template', html: '<h1>{{title}}</h1>' };
-            const newTemplate = { id: 't2', ...dto };
-            mockService.createTemplate.mockResolvedValue(newTemplate);
+    describe('generateSitrep', () => {
+        it('should generate SITREP PDF', async () => {
+            const sitrep = { sessionId: 's1', summary: 'Test' };
+            const result = { success: true };
+            mockService.generateSitrep.mockResolvedValue(result);
 
-            const result = await controller.createTemplate(dto);
+            const response = await controller.generateSitrep(sitrep);
 
-            expect(service.createTemplate).toHaveBeenCalledWith(dto);
-            expect(result).toEqual(newTemplate);
+            expect(service.generateSitrep).toHaveBeenCalledWith(sitrep);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('updateTemplate', () => {
-        it('should update existing template', async () => {
-            const updates = { name: 'Updated Template' };
-            const updatedTemplate = { id: 't1', name: 'Updated Template' };
-            mockService.updateTemplate.mockResolvedValue(updatedTemplate);
+    describe('generateStatisticsReport', () => {
+        it('should generate statistics report PDF', async () => {
+            const stats = { data: [] };
+            const result = { success: true };
+            mockService.generateStatisticsReport.mockResolvedValue(result);
 
-            const result = await controller.updateTemplate('t1', updates);
+            const response = await controller.generateStatisticsReport(stats);
 
-            expect(service.updateTemplate).toHaveBeenCalledWith('t1', updates);
-            expect(result).toEqual(updatedTemplate);
+            expect(service.generateStatisticsReport).toHaveBeenCalledWith(stats);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('deleteTemplate', () => {
-        it('should delete template by ID', async () => {
-            mockService.deleteTemplate.mockResolvedValue(true);
+    describe('generateCertificate', () => {
+        it('should generate volunteer certificate PDF', async () => {
+            const volunteer = { name: 'Test Volunteer' };
+            const result = { success: true };
+            mockService.generateCertificate.mockResolvedValue(result);
 
-            const result = await controller.deleteTemplate('t1');
+            const response = await controller.generateCertificate('v1', volunteer);
 
-            expect(service.deleteTemplate).toHaveBeenCalledWith('t1');
-            expect(result).toEqual({ deleted: true });
+            expect(service.generateCertificate).toHaveBeenCalledWith({ id: 'v1', ...volunteer });
+            expect(response).toEqual(result);
         });
     });
 
-    describe('generateFromTemplate', () => {
-        it('should generate PDF from template with data', async () => {
-            const dto = { templateId: 't1', data: { title: 'Report' } };
-            const pdfBuffer = Buffer.from('PDF content');
-            mockService.generateFromTemplate.mockResolvedValue(pdfBuffer);
+    describe('batchGenerate', () => {
+        it('should batch generate multiple PDFs', async () => {
+            const items = [{ type: 'event', data: {} }];
+            const result = { generated: 1, success: true };
+            mockService.batchGenerate.mockResolvedValue(result);
 
-            const result = await controller.generateFromTemplate(dto);
+            const response = await controller.batchGenerate(items);
 
-            expect(service.generateFromTemplate).toHaveBeenCalledWith(dto.templateId, dto.data);
-            expect(result).toEqual(pdfBuffer);
-        });
-    });
-
-    describe('mergePdfs', () => {
-        it('should merge multiple PDFs', async () => {
-            const dto = { pdfIds: ['p1', 'p2', 'p3'] };
-            const mergedBuffer = Buffer.from('Merged PDF');
-            mockService.mergePdfs.mockResolvedValue(mergedBuffer);
-
-            const result = await controller.mergePdfs(dto);
-
-            expect(service.mergePdfs).toHaveBeenCalledWith(dto.pdfIds);
-            expect(result).toEqual(mergedBuffer);
-        });
-    });
-
-    describe('addWatermark', () => {
-        it('should add watermark to PDF', async () => {
-            const dto = { pdfId: 'p1', watermark: 'CONFIDENTIAL' };
-            const watemarkedBuffer = Buffer.from('Watermarked PDF');
-            mockService.addWatermark.mockResolvedValue(watemarkedBuffer);
-
-            const result = await controller.addWatermark(dto);
-
-            expect(service.addWatermark).toHaveBeenCalledWith(dto.pdfId, dto.watermark);
-            expect(result).toEqual(watemarkedBuffer);
+            expect(service.batchGenerate).toHaveBeenCalledWith(items);
+            expect(response).toEqual(result);
         });
     });
 });

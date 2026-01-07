@@ -7,14 +7,13 @@ describe('ExcelExportController', () => {
     let service: ExcelExportService;
 
     const mockService = {
-        exportToExcel: jest.fn(),
-        getTemplates: jest.fn(),
-        createTemplate: jest.fn(),
-        exportFromTemplate: jest.fn(),
-        exportMultiSheet: jest.fn(),
+        exportEvents: jest.fn(),
+        exportVolunteers: jest.fn(),
+        exportAttendance: jest.fn(),
+        exportPayroll: jest.fn(),
+        exportStatistics: jest.fn(),
+        exportCustomQuery: jest.fn(),
         generateCsv: jest.fn(),
-        parseExcel: jest.fn(),
-        applyStyle: jest.fn(),
     };
 
     beforeEach(async () => {
@@ -37,117 +36,94 @@ describe('ExcelExportController', () => {
         expect(controller).toBeDefined();
     });
 
-    describe('exportToExcel', () => {
-        it('should export data to Excel format', async () => {
-            const dto = {
-                data: [{ name: 'Test', value: 100 }],
-                columns: [{ field: 'name', header: 'Name' }],
-            };
-            const excelBuffer = Buffer.from('Excel content');
-            mockService.exportToExcel.mockResolvedValue(excelBuffer);
+    describe('exportEvents', () => {
+        it('should export events to Excel format', async () => {
+            const events = [{ id: '1', title: 'Test Event' }];
+            const result = { success: true, base64: 'abc123', filename: 'events.xlsx' };
+            mockService.exportEvents.mockResolvedValue(result);
 
-            const result = await controller.exportToExcel(dto);
+            const response = await controller.exportEvents(events);
 
-            expect(service.exportToExcel).toHaveBeenCalledWith(dto.data, dto.columns);
-            expect(result).toEqual(excelBuffer);
+            expect(service.exportEvents).toHaveBeenCalledWith(events);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('getTemplates', () => {
-        it('should return all Excel templates', async () => {
-            const templates = [{ id: 't1', name: 'Monthly Report' }];
-            mockService.getTemplates.mockResolvedValue(templates);
+    describe('exportVolunteers', () => {
+        it('should export volunteers to Excel format', async () => {
+            const volunteers = [{ id: '1', name: 'Test Volunteer' }];
+            const result = { success: true, base64: 'abc123' };
+            mockService.exportVolunteers.mockResolvedValue(result);
 
-            const result = await controller.getTemplates();
+            const response = await controller.exportVolunteers(volunteers);
 
-            expect(service.getTemplates).toHaveBeenCalled();
-            expect(result).toEqual(templates);
+            expect(service.exportVolunteers).toHaveBeenCalledWith(volunteers);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('createTemplate', () => {
-        it('should create a new Excel template', async () => {
-            const dto = { name: 'New Template', columns: [] };
-            const newTemplate = { id: 't2', ...dto };
-            mockService.createTemplate.mockResolvedValue(newTemplate);
+    describe('exportAttendance', () => {
+        it('should export attendance records to Excel', async () => {
+            const records = [{ date: '2026-01-01', volunteerName: 'Test' }];
+            const result = { success: true };
+            mockService.exportAttendance.mockResolvedValue(result);
 
-            const result = await controller.createTemplate(dto);
+            const response = await controller.exportAttendance(records);
 
-            expect(service.createTemplate).toHaveBeenCalledWith(dto);
-            expect(result).toEqual(newTemplate);
+            expect(service.exportAttendance).toHaveBeenCalledWith(records);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('exportFromTemplate', () => {
-        it('should export Excel from template with data', async () => {
-            const dto = { templateId: 't1', data: [{ row: 1 }] };
-            const excelBuffer = Buffer.from('Excel content');
-            mockService.exportFromTemplate.mockResolvedValue(excelBuffer);
+    describe('exportPayroll', () => {
+        it('should export payroll to Excel', async () => {
+            const payrolls = [{ month: 1, year: 2026, volunteerName: 'Test' }];
+            const result = { success: true };
+            mockService.exportPayroll.mockResolvedValue(result);
 
-            const result = await controller.exportFromTemplate(dto);
+            const response = await controller.exportPayroll(payrolls);
 
-            expect(service.exportFromTemplate).toHaveBeenCalledWith(dto.templateId, dto.data);
-            expect(result).toEqual(excelBuffer);
+            expect(service.exportPayroll).toHaveBeenCalledWith(payrolls);
+            expect(response).toEqual(result);
         });
     });
 
-    describe('exportMultiSheet', () => {
-        it('should export Excel with multiple sheets', async () => {
-            const dto = {
-                sheets: [
-                    { name: 'Sheet1', data: [] },
-                    { name: 'Sheet2', data: [] },
-                ],
-            };
-            const excelBuffer = Buffer.from('Multi-sheet Excel');
-            mockService.exportMultiSheet.mockResolvedValue(excelBuffer);
+    describe('exportStatistics', () => {
+        it('should export statistics with multiple sheets', async () => {
+            const stats = [{ sheetName: 'Summary', headers: [], rows: [] }];
+            const result = { success: true, sheetCount: 1 };
+            mockService.exportStatistics.mockResolvedValue(result);
 
-            const result = await controller.exportMultiSheet(dto);
+            const response = await controller.exportStatistics(stats);
 
-            expect(service.exportMultiSheet).toHaveBeenCalledWith(dto.sheets);
-            expect(result).toEqual(excelBuffer);
+            expect(service.exportStatistics).toHaveBeenCalledWith(stats);
+            expect(response).toEqual(result);
+        });
+    });
+
+    describe('exportCustomQuery', () => {
+        it('should export custom query to Excel', async () => {
+            const query = { filename: 'custom', headers: ['Col1'], rows: [['data']] };
+            const result = { success: true };
+            mockService.exportCustomQuery.mockResolvedValue(result);
+
+            const response = await controller.exportCustomQuery(query);
+
+            expect(service.exportCustomQuery).toHaveBeenCalledWith(query);
+            expect(response).toEqual(result);
         });
     });
 
     describe('generateCsv', () => {
-        it('should generate CSV from data', async () => {
-            const dto = { data: [{ col: 'value' }] };
-            const csvContent = 'col\nvalue';
-            mockService.generateCsv.mockResolvedValue(csvContent);
+        it('should generate CSV from data', () => {
+            const body = { headers: ['Name', 'Value'], rows: [['Test', 100]] };
+            const csvContent = '"Name","Value"\n"Test","100"';
+            mockService.generateCsv.mockReturnValue(csvContent);
 
-            const result = await controller.generateCsv(dto);
+            const response = controller.generateCsv(body);
 
-            expect(service.generateCsv).toHaveBeenCalledWith(dto.data);
-            expect(result).toEqual(csvContent);
-        });
-    });
-
-    describe('parseExcel', () => {
-        it('should parse uploaded Excel file', async () => {
-            const mockFile = { buffer: Buffer.from('Excel file'), originalname: 'test.xlsx' };
-            const parsedData = [{ row: 1, col: 'value' }];
-            mockService.parseExcel.mockResolvedValue(parsedData);
-
-            const result = await controller.parseExcel(mockFile as any);
-
-            expect(service.parseExcel).toHaveBeenCalledWith(mockFile.buffer);
-            expect(result).toEqual(parsedData);
-        });
-    });
-
-    describe('applyStyle', () => {
-        it('should apply styling to Excel export', async () => {
-            const dto = {
-                data: [{ name: 'Test' }],
-                styles: { header: { bold: true, fontSize: 14 } },
-            };
-            const styledBuffer = Buffer.from('Styled Excel');
-            mockService.applyStyle.mockResolvedValue(styledBuffer);
-
-            const result = await controller.applyStyle(dto);
-
-            expect(service.applyStyle).toHaveBeenCalledWith(dto.data, dto.styles);
-            expect(result).toEqual(styledBuffer);
+            expect(service.generateCsv).toHaveBeenCalledWith(body.headers, body.rows);
+            expect(response).toEqual({ csv: csvContent });
         });
     });
 });

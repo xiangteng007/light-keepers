@@ -7,16 +7,16 @@ describe('OrgChartController', () => {
     let service: OrgChartService;
 
     const mockService = {
-        getTree: jest.fn(),
-        getNode: jest.fn(),
         addNode: jest.fn(),
+        getNode: jest.fn(),
         updateNode: jest.fn(),
         deleteNode: jest.fn(),
         getChildren: jest.fn(),
+        getTree: jest.fn(),
+        getPath: jest.fn(),
         search: jest.fn(),
         moveNode: jest.fn(),
         getStats: jest.fn(),
-        getPath: jest.fn(),
         exportFlat: jest.fn(),
     };
 
@@ -40,15 +40,16 @@ describe('OrgChartController', () => {
         expect(controller).toBeDefined();
     });
 
-    describe('getTree', () => {
-        it('should return org tree from root', async () => {
-            const tree = { id: 'root', name: 'Organization', children: [] };
-            mockService.getTree.mockResolvedValue(tree);
+    describe('addNode', () => {
+        it('should create a new node', async () => {
+            const dto = { name: 'New Team', type: 'team', parentId: 'n1' };
+            const newNode = { id: 'n2', ...dto };
+            mockService.addNode.mockResolvedValue(newNode);
 
-            const result = await controller.getTree('root');
+            const result = await controller.addNode(dto);
 
-            expect(service.getTree).toHaveBeenCalledWith('root');
-            expect(result).toEqual(tree);
+            expect(service.addNode).toHaveBeenCalledWith(dto);
+            expect(result).toEqual(newNode);
         });
     });
 
@@ -61,19 +62,6 @@ describe('OrgChartController', () => {
 
             expect(service.getNode).toHaveBeenCalledWith('n1');
             expect(result).toEqual(node);
-        });
-    });
-
-    describe('addNode', () => {
-        it('should create a new node', async () => {
-            const dto = { name: 'New Team', type: 'team', parentId: 'n1' };
-            const newNode = { id: 'n2', ...dto };
-            mockService.addNode.mockResolvedValue(newNode);
-
-            const result = await controller.addNode(dto);
-
-            expect(service.addNode).toHaveBeenCalledWith(dto);
-            expect(result).toEqual(newNode);
         });
     });
 
@@ -92,12 +80,12 @@ describe('OrgChartController', () => {
 
     describe('deleteNode', () => {
         it('should delete node by ID', async () => {
-            mockService.deleteNode.mockResolvedValue(true);
+            mockService.deleteNode.mockReturnValue(true);
 
             const result = await controller.deleteNode('n1');
 
             expect(service.deleteNode).toHaveBeenCalledWith('n1');
-            expect(result).toEqual({ deleted: true });
+            expect(result).toEqual({ success: true });
         });
     });
 
@@ -110,6 +98,30 @@ describe('OrgChartController', () => {
 
             expect(service.getChildren).toHaveBeenCalledWith('n1');
             expect(result).toEqual(children);
+        });
+    });
+
+    describe('getTree', () => {
+        it('should return org tree from root', async () => {
+            const tree = { id: 'root', name: 'Organization', children: [] };
+            mockService.getTree.mockResolvedValue(tree);
+
+            const result = await controller.getTree('root');
+
+            expect(service.getTree).toHaveBeenCalledWith('root');
+            expect(result).toEqual(tree);
+        });
+    });
+
+    describe('getPath', () => {
+        it('should return path from root to node', async () => {
+            const path = [{ id: 'root' }, { id: 'n1' }, { id: 'n2' }];
+            mockService.getPath.mockResolvedValue(path);
+
+            const result = await controller.getPath('n2');
+
+            expect(service.getPath).toHaveBeenCalledWith('n2');
+            expect(result).toEqual(path);
         });
     });
 
@@ -127,9 +139,9 @@ describe('OrgChartController', () => {
 
     describe('moveNode', () => {
         it('should move node to new parent', async () => {
-            mockService.moveNode.mockResolvedValue(true);
+            mockService.moveNode.mockReturnValue(true);
 
-            const result = await controller.moveNode({ nodeId: 'n2', newParentId: 'n3' });
+            const result = await controller.moveNode('n2', { newParentId: 'n3' });
 
             expect(service.moveNode).toHaveBeenCalledWith('n2', 'n3');
             expect(result).toEqual({ success: true });
@@ -145,18 +157,6 @@ describe('OrgChartController', () => {
 
             expect(service.getStats).toHaveBeenCalled();
             expect(result).toEqual(stats);
-        });
-    });
-
-    describe('getPath', () => {
-        it('should return path from root to node', async () => {
-            const path = [{ id: 'root' }, { id: 'n1' }, { id: 'n2' }];
-            mockService.getPath.mockResolvedValue(path);
-
-            const result = await controller.getPath('n2');
-
-            expect(service.getPath).toHaveBeenCalledWith('n2');
-            expect(result).toEqual(path);
         });
     });
 

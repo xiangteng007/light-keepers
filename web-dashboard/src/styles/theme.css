@@ -1,60 +1,253 @@
 /* ============================================
-   Light Keepers - Theme Utilities
-   依 light-theme-design.md 規範
-   版本: 3.0.0 - 僅亮色主題
+   Dark Theme Variables & Toggle Styles
+   深色主題系統
 ============================================ */
 
-/* 
- * 注意：系統現在僅使用亮色主題
- * Navy Blue (#001F3F) + Golden Amber (#D97706)
- * 深色主題已停用
- */
+/* 深色主題 CSS 變數覆蓋 */
+:root[data-theme='dark'],
+.dark {
+    /* 背景色 */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --bg-hover: #334155;
+    --bg-active: #475569;
+
+    /* 文字色 */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-disabled: #475569;
+
+    /* 邊框色 */
+    --border-color: #334155;
+    --border-light: #1e293b;
+
+    /* 主色調整 */
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --primary-light: rgba(96, 165, 250, 0.15);
+
+    /* 狀態色 */
+    --success-color: #34d399;
+    --success-light: rgba(52, 211, 153, 0.15);
+    --warning-color: #fbbf24;
+    --warning-light: rgba(251, 191, 36, 0.15);
+    --danger-color: #f87171;
+    --danger-light: rgba(248, 113, 113, 0.15);
+    --info-color: #38bdf8;
+    --info-light: rgba(56, 189, 248, 0.15);
+
+    /* 玻璃態效果 */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-light: rgba(30, 41, 59, 0.9);
+    --glass-bg-subtle: rgba(30, 41, 59, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-light: rgba(255, 255, 255, 0.15);
+
+    /* 陰影 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+    /* 滾動條 */
+    --scrollbar-track: #1e293b;
+    --scrollbar-thumb: #475569;
+    --scrollbar-thumb-hover: #64748b;
+
+    /* 北歐金色調整（深色模式下更亮） */
+    --color-gold-400: #d4a373;
+    --color-gold-500: #c4956c;
+    --color-beige-400: #475569;
+
+    /* 漸變 */
+    --gradient-gold: linear-gradient(135deg, #d4a373 0%, #c4956c 100%);
+}
+
+/* 深色模式下的特定元素調整 */
+.dark body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dark .lk-card,
+.dark .card {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dark .sidebar {
+    background: var(--bg-secondary);
+    border-right-color: var(--border-color);
+}
+
+.dark .header {
+    background: var(--bg-secondary);
+    border-bottom-color: var(--border-color);
+}
+
+.dark input,
+.dark textarea,
+.dark select {
+    background: var(--bg-secondary);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.dark .modal-content {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dark .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+}
+
+/* 深色模式表格 */
+.dark table {
+    border-color: var(--border-color);
+}
+
+.dark th {
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+}
+
+.dark td {
+    border-color: var(--border-color);
+}
+
+.dark tr:hover {
+    background: var(--bg-hover);
+}
+
+/* 深色模式骨架載入 */
+.dark .skeleton {
+    background: linear-gradient(90deg,
+            var(--bg-secondary) 25%,
+            var(--bg-hover) 50%,
+            var(--bg-secondary) 75%);
+    background-size: 200% 100%;
+}
 
 /* ============================================
-   Theme Toggle Button - 保留兼容性
+   Theme Toggle Button Styles
 ============================================ */
 
 .theme-toggle {
-    display: none;
-    /* 深色主題已停用，隱藏切換按鈕 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background: transparent;
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: var(--text-secondary, #64748b);
+}
+
+.theme-toggle:hover {
+    background: var(--bg-hover, #f1f5f9);
+    color: var(--text-primary, #1e293b);
+    transform: scale(1.05);
+}
+
+.theme-toggle__icon {
+    font-size: 1.125rem;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle:hover .theme-toggle__icon {
+    transform: rotate(15deg);
+}
+
+/* 深色模式下的切換按鈕 */
+.dark .theme-toggle {
+    border-color: var(--border-color);
+    color: var(--text-secondary);
+}
+
+.dark .theme-toggle:hover {
+    background: var(--bg-hover);
+    color: #fbbf24;
 }
 
 /* ============================================
-   Dropdown Animation
+   Theme Selector Dropdown
 ============================================ */
 
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-8px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+.theme-selector {
+    position: relative;
+    display: inline-block;
 }
 
-/* ============================================
-   Print Styles
-============================================ */
+.theme-selector__menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    min-width: 150px;
+    background: var(--bg-card, #ffffff);
+    border: 1px solid var(--border-color, #e5e7eb);
+    border-radius: 10px;
+    box-shadow: var(--shadow-lg, 0 10px 15px rgba(0, 0, 0, 0.1));
+    overflow: hidden;
+    z-index: 1000;
+    animation: slideDown 0.2s ease;
+}
 
-@media print {
+.theme-selector__option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 14px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    color: var(--text-secondary, #64748b);
+    transition: all 0.15s ease;
+}
 
-    .sidebar,
-    .header,
-    .theme-toggle,
-    .nav-edit-controls {
-        display: none !important;
-    }
+.theme-selector__option:hover {
+    background: var(--bg-hover, #f1f5f9);
+    color: var(--text-primary, #1e293b);
+}
 
-    .main-content {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
+.theme-selector__option--active {
+    background: var(--primary-light, rgba(59, 130, 246, 0.1));
+    color: var(--primary-color, #3b82f6);
+}
 
-    body {
-        background: white !important;
-        color: black !important;
-    }
+.theme-selector__option-icon {
+    font-size: 1rem;
+}
+
+.theme-selector__option-label {
+    flex: 1;
+    text-align: left;
+}
+
+.theme-selector__option-check {
+    color: var(--primary-color, #3b82f6);
+    font-size: 0.875rem;
+}
+
+/* 深色模式下拉選單 */
+.dark .theme-selector__menu {
+    background: var(--bg-card);
+    border-color: var(--border-color);
+}
+
+.dark .theme-selector__option:hover {
+    background: var(--bg-hover);
 }

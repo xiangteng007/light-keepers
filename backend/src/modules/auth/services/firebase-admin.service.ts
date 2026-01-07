@@ -98,11 +98,11 @@ export class FirebaseAdminService implements OnModuleInit {
 
     /**
      * 將 Firebase 預設網域替換為自訂網域
-     * emergency-response-911.firebaseapp.com -> lightkeepers.ngo
+     * light-keepers-mvp.firebaseapp.com -> lightkeepers.ngo
      */
     private replaceFirebaseDomain(link: string): string {
         return link.replace(
-            /https:\/\/emergency-response-911\.firebaseapp\.com\/__\/auth\/action/g,
+            /https:\/\/light-keepers-mvp\.firebaseapp\.com\/__\/auth\/action/g,
             'https://lightkeepers.ngo/__/auth/action'
         );
     }

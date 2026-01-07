@@ -170,29 +170,14 @@
         },
         "language": {
             "title": "語言",
-            "zh-TW": "繁體中文",
-            "zh-CN": "简体中文",
+            "zh": "繁體中文",
             "en": "English",
-            "ja": "日本語",
-            "ms": "Bahasa Melayu",
-            "fil": "Filipino",
-            "th": "ภาษาไทย",
-            "vi": "Tiếng Việt",
-            "id": "Bahasa Indonesia"
+            "ja": "日本語"
         },
         "notifications": {
             "title": "通知設定",
             "push": "推播通知",
             "email": "電子郵件通知"
-        }
-    },
-    "sos": {
-        "title": "緊急求救",
-        "send": "發送求救信號",
-        "status": {
-            "active": "進行中",
-            "acknowledged": "已確認",
-            "resolved": "已解決"
         }
     },
     "errors": {

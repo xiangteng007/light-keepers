@@ -72,7 +72,7 @@ export class MeshSyncService implements OnModuleInit {
                 this.logger.log('Connected to MQTT broker');
 
                 // 訂閱 Meshtastic 主題
-                client.subscribe('msh/+/json/#', (err: Error | null) => {
+                client.subscribe('msh/+/json/#', { qos: 0 }, (err: Error | null) => {
                     if (err) {
                         this.logger.error('Failed to subscribe to Meshtastic topics');
                     } else {

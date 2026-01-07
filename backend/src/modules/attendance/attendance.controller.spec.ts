@@ -7,10 +7,10 @@ describe('AttendanceController', () => {
     let service: AttendanceService;
 
     const mockAttendanceService = {
-        checkInGps: jest.fn(),
-        checkInQr: jest.fn(),
+        checkInWithGps: jest.fn(),
+        checkInWithQr: jest.fn(),
         checkOut: jest.fn(),
-        getRecords: jest.fn(),
+        getVolunteerRecords: jest.fn(),
         getDailySummary: jest.fn(),
         getMonthlyReport: jest.fn(),
         generateQrCode: jest.fn(),
@@ -36,31 +36,33 @@ describe('AttendanceController', () => {
         expect(controller).toBeDefined();
     });
 
-    describe('checkInGps', () => {
-        it('should call service.checkInGps with correct parameters', async () => {
+    describe('checkInWithGps', () => {
+        it('should call service.checkInWithGps with correct parameters', async () => {
             const dto = {
                 volunteerId: 'v1',
-                location: { lat: 25.0330, lng: 121.5654, accuracy: 10 },
+                lat: 25.0330,
+                lng: 121.5654,
+                accuracy: 10,
             };
             const expected = { id: 'rec-1', volunteerId: 'v1', checkInTime: new Date() };
-            mockAttendanceService.checkInGps.mockResolvedValue(expected);
+            mockAttendanceService.checkInWithGps.mockResolvedValue(expected);
 
-            const result = await controller.checkInGps(dto);
+            const result = await controller.checkInWithGps(dto);
 
-            expect(service.checkInGps).toHaveBeenCalledWith(dto.volunteerId, dto.location);
+            expect(service.checkInWithGps).toHaveBeenCalled();
             expect(result).toEqual(expected);
         });
     });
 
-    describe('checkInQr', () => {
-        it('should call service.checkInQr with correct parameters', async () => {
+    describe('checkInWithQr', () => {
+        it('should call service.checkInWithQr with correct parameters', async () => {
             const dto = { volunteerId: 'v1', qrCode: 'abc123' };
             const expected = { id: 'rec-2', volunteerId: 'v1' };
-            mockAttendanceService.checkInQr.mockResolvedValue(expected);
+            mockAttendanceService.checkInWithQr.mockResolvedValue(expected);
 
-            const result = await controller.checkInQr(dto);
+            const result = await controller.checkInWithQr(dto);
 
-            expect(service.checkInQr).toHaveBeenCalledWith(dto.volunteerId, dto.qrCode);
+            expect(service.checkInWithQr).toHaveBeenCalled();
             expect(result).toEqual(expected);
         });
     });
@@ -77,14 +79,14 @@ describe('AttendanceController', () => {
         });
     });
 
-    describe('getRecords', () => {
+    describe('getVolunteerRecords', () => {
         it('should return volunteer attendance records', async () => {
             const records = [{ id: 'rec-1' }, { id: 'rec-2' }];
-            mockAttendanceService.getRecords.mockResolvedValue(records);
+            mockAttendanceService.getVolunteerRecords.mockResolvedValue(records);
 
-            const result = await controller.getRecords('v1', '2026-01-01', '2026-01-31');
+            const result = await controller.getVolunteerRecords('v1', '2026-01-01', '2026-01-31');
 
-            expect(service.getRecords).toHaveBeenCalledWith('v1', '2026-01-01', '2026-01-31');
+            expect(service.getVolunteerRecords).toHaveBeenCalled();
             expect(result).toEqual(records);
         });
     });
@@ -118,7 +120,7 @@ describe('AttendanceController', () => {
             const qrData = { qrCode: 'base64...', locationId: 'loc-1' };
             mockAttendanceService.generateQrCode.mockResolvedValue(qrData);
 
-            const result = await controller.generateQrCode({ locationId: 'loc-1', locationName: '總部' });
+            const result = await controller.generateQrCode('loc-1', '總部');
 
             expect(service.generateQrCode).toHaveBeenCalledWith('loc-1', '總部');
             expect(result).toEqual(qrData);

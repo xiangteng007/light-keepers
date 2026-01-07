@@ -1,30 +1,85 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { getEvents, getTaskStats, getEventStats, getNcdrAlerts, getVolunteerStats, getReportStats } from '../api';
+import { Card, Badge, Alert, Button } from '../design-system';
 import { useRealtime } from '../context/RealtimeContext';
 import { useAuth } from '../context/AuthContext';
 import { LowStockWidget } from '../components/widgets/LowStockWidget';
-import './DashboardPage.css';
 
-// 格式化時間
-function formatTime(dateString: string): string {
-    const date = new Date(dateString);
-    const hours = date.getHours().toString().padStart(2, '0');
-    const minutes = date.getMinutes().toString().padStart(2, '0');
-    return `${hours}:${minutes}`;
+// 統計卡片組件
+interface StatCardProps {
+    icon: string;
+    value: number | string;
+    label: string;
+    variant?: 'default' | 'success' | 'warning' | 'danger' | 'info';
+    trend?: 'up' | 'down' | 'stable';
+}
+
+function StatCard({ icon, value, label, variant = 'default', trend }: StatCardProps) {
+    const trendIcon = trend === 'up' ? '↑' : trend === 'down' ? '↓' : '';
+    return (
+        <Card variant="elevated" padding="md" className="stat-card-vi">
+            <div className="stat-card-vi__content">
+                <div className="stat-card-vi__icon">{icon}</div>
+                <div className="stat-card-vi__data">
+                    <span className={`stat-card-vi__value stat-card-vi__value--${variant}`}>
+                        {value}
+                        {trendIcon && <span className={`trend trend--${trend}`}>{trendIcon}</span>}
+                    </span>
+                    <span className="stat-card-vi__label">{label}</span>
+                </div>
+            </div>
+        </Card>
+    );
+}
+
+// 快速操作按鈕 - 根據權限等級顯示不同選項
+function QuickActions({ roleLevel }: { roleLevel: number }) {
+    return (
+        <Card title="快速操作" icon="⚡" padding="md">
+            <div className="quick-actions-grid">
+                {/* Level 0+: 公開頁面 */}
+                <Link to="/map" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">🗺️</span>
+                    <span className="quick-action-btn__label">地圖總覽</span>
+                </Link>
+                <Link to="/manuals" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">📖</span>
+                    <span className="quick-action-btn__label">實務手冊</span>
+                </Link>
+                <Link to="/ncdr-alerts" className="quick-action-btn">
+                    <span className="quick-action-btn__icon">⚠️</span>
+                    <span className="quick-action-btn__label">災害示警</span>
+                </Link>
+                {/* Level 1+: 志工功能 */}
+                {roleLevel >= 1 && (
+                    <Link to="/report" className="quick-action-btn">
+                        <span className="quick-action-btn__icon">📢</span>
+                        <span className="quick-action-btn__label">新增回報</span>
+                    </Link>
+                )}
+                {/* Level 2+: 幹部功能 */}
+                {roleLevel >= 2 && (
+                    <Link to="/volunteers" className="quick-action-btn">
+                        <span className="quick-action-btn__icon">👥</span>
+                        <span className="quick-action-btn__label">志工調度</span>
+                    </Link>
+                )}
+            </div>
+        </Card>
+    );
 }
 
 export default function DashboardPage() {
+    // 用戶權限
     const { user } = useAuth();
     const roleLevel = user?.roleLevel ?? 0;
+
+    // 即時連線狀態
     const { isConnected, onlineCount } = useRealtime();
 
-    // 取得當前時間
-    const now = new Date();
-    const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
-
-    // API Queries
-    const { data: eventStats } = useQuery({
+    // 獲取事件統計
+    const { data: eventStats, isLoading: eventsLoading } = useQuery({
         queryKey: ['eventStats'],
         queryFn: () => getEventStats().then(res => res.data.data),
     });
@@ -36,18 +91,19 @@ export default function DashboardPage() {
         enabled: roleLevel >= 2, // 只有 Level 2+ 才需要這個資料
     });
 
-    // 獲取 NCDR 警報 - 僅顯示重大災害類型
-    // 5=颱風, 6=地震, 7=海嘯, 8=淹水, 9=土石流及大規模崩塌, 1087=火災, 2102=疏散避難
-    const DASHBOARD_ALERT_TYPES = '5,6,7,8,9,1087,2102';
-    const { data: alertsData, refetch: refetchAlerts } = useQuery({
-        queryKey: ['recentAlerts', DASHBOARD_ALERT_TYPES],
-        queryFn: () => getNcdrAlerts({ limit: 5, types: DASHBOARD_ALERT_TYPES }).then(res => res.data.data),
-        refetchInterval: 60000, // 每分鐘刷新
-    });
-
+    // 獲取最新事件
     const { data: eventsData } = useQuery({
         queryKey: ['recentEvents'],
         queryFn: () => getEvents({ limit: 5, status: 'active' }).then(res => res.data.data),
+    });
+
+    // 獲取 NCDR 警報 - 僅顯示重大災害類型
+    // 5=颱風, 6=地震, 7=海嘯, 8=淹水, 9=土石流及大規模崩塌, 1087=火災, 2102=疏散避難
+    const DASHBOARD_ALERT_TYPES = '5,6,7,8,9,1087,2102';
+    const { data: alertsData } = useQuery({
+        queryKey: ['recentAlerts', DASHBOARD_ALERT_TYPES],
+        queryFn: () => getNcdrAlerts({ limit: 5, types: DASHBOARD_ALERT_TYPES }).then(res => res.data.data),
+        refetchInterval: 60000, // 每分鐘刷新
     });
 
     // 獲取志工統計 (Level 2+ 需要)
@@ -68,236 +124,217 @@ export default function DashboardPage() {
     const total = (taskStats?.pending || 0) + (taskStats?.inProgress || 0) + (taskStats?.completed || 0);
     const completionRate = total > 0 ? Math.round((taskStats?.completed || 0) / total * 100) : 0;
 
+    const isLoading = eventsLoading || tasksLoading;
+
     return (
-        <div className="command-center">
-            {/* ===== TOP BAR ===== */}
-            <header className="cc-topbar">
-                <div className="cc-topbar__left">
-                    <span className={`cc-status ${isConnected ? 'cc-status--online' : ''}`}>
-                        <span className="cc-status__dot"></span>
-                        {isConnected ? 'Online' : 'Offline'}
-                    </span>
+        <div className="page dashboard-page">
+            <div className="page-header">
+                <div className="page-header__left">
+                    <h2>📊 快速檢視</h2>
+                    <p className="page-subtitle">Light Keepers 災害應變系統總覽</p>
                 </div>
-                <div className="cc-topbar__center">
-                    <span className="cc-topbar__logo">📊</span>
-                    <h1 className="cc-topbar__title">指揮中心</h1>
+                <div className="page-header__right" style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                    {onlineCount > 0 && (
+                        <Badge variant="info">👥 {onlineCount} 人在線</Badge>
+                    )}
+                    <Badge variant={isConnected ? 'success' : 'default'} dot>
+                        {isConnected ? '即時連線中' : '系統運作正常'}
+                    </Badge>
                 </div>
-                <div className="cc-topbar__right">
-                    <span className="cc-topbar__time">{timestamp}</span>
-                    <div className="cc-search">
-                        <input type="text" placeholder="Search" className="cc-search__input" />
-                        <span className="cc-search__icon">🔍</span>
-                    </div>
-                    <span className="cc-topbar__users">👥 Online Users: {onlineCount || 0}</span>
-                </div>
-            </header>
+            </div>
 
-            {/* ===== KPI ROW (6 tiles) ===== */}
-            <section className="cc-kpi-row">
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--danger">⚠️</div>
-                    <div className="cc-kpi__value">{eventStats?.active || 0}</div>
-                    <div className="cc-kpi__label">Active Events</div>
-                </div>
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--warning">📋</div>
-                    <div className="cc-kpi__value">{alertsData?.length || 0}</div>
-                    <div className="cc-kpi__label">NCDR Alerts</div>
-                </div>
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--info">📄</div>
-                    <div className="cc-kpi__value">{reportStats?.pending || 0}</div>
-                    <div className="cc-kpi__label">Pending Reports</div>
-                </div>
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--success">👥</div>
-                    <div className="cc-kpi__value">{volunteerStats?.available || 0}</div>
-                    <div className="cc-kpi__label">Available Volunteers</div>
-                </div>
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--primary">✅</div>
-                    <div className="cc-kpi__value">{taskStats?.pending || 0}</div>
-                    <div className="cc-kpi__label">Pending Tasks</div>
-                </div>
-                <div className="cc-kpi">
-                    <div className="cc-kpi__icon cc-kpi__icon--success">📊</div>
-                    <div className="cc-kpi__value">{completionRate}%</div>
-                    <div className="cc-kpi__label">Completion Rate</div>
-                </div>
-            </section>
+            {/* KPI 統計卡片 - 根據權限等級顯示 */}
+            <div className="stats-grid stats-grid--6">
+                {/* Level 0+: 公開資訊 */}
+                <StatCard
+                    icon="🚨"
+                    value={eventStats?.active || 0}
+                    label="進行中事件"
+                    variant="danger"
+                />
+                <StatCard
+                    icon="⚠️"
+                    value={alertsData?.length || 0}
+                    label="NCDR 警報"
+                    variant="warning"
+                />
+                {/* Level 1+: 志工可見 */}
+                {roleLevel >= 1 && (
+                    <StatCard
+                        icon="📢"
+                        value={reportStats?.pending || 0}
+                        label="待審核回報"
+                        variant="warning"
+                    />
+                )}
+                {/* Level 2+: 幹部可見 */}
+                {roleLevel >= 2 && (
+                    <>
+                        <StatCard
+                            icon="👥"
+                            value={volunteerStats?.available || 0}
+                            label="可用志工"
+                            variant="success"
+                        />
+                        <StatCard
+                            icon="📋"
+                            value={taskStats?.pending || 0}
+                            label="待處理任務"
+                            variant="info"
+                        />
+                        <StatCard
+                            icon="✅"
+                            value={`${completionRate}%`}
+                            label="任務完成率"
+                            variant="success"
+                        />
+                    </>
+                )}
+            </div>
 
-            {/* ===== CONTENT ROW 1 ===== */}
-            <section className="cc-content-row">
-                {/* Quick Actions */}
-                <div className="cc-card cc-card--quick-actions">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Quick Actions</h3>
-                    </div>
-                    <div className="cc-card__body">
-                        <div className="cc-quick-grid">
-                            {roleLevel >= 2 && (
-                                <Link to="/emergency-response" className="cc-quick-btn cc-quick-btn--emergency">
-                                    <span className="cc-quick-btn__icon">🚨</span>
-                                    <span className="cc-quick-btn__label">緊急啟動</span>
-                                </Link>
-                            )}
-                            <Link to="/map" className="cc-quick-btn">
-                                <span className="cc-quick-btn__icon">📍</span>
-                                <span className="cc-quick-btn__label">Map</span>
-                            </Link>
-                            <Link to="/manuals" className="cc-quick-btn">
-                                <span className="cc-quick-btn__icon">📖</span>
-                                <span className="cc-quick-btn__label">Manual</span>
-                            </Link>
-                            <Link to="/ncdr-alerts" className="cc-quick-btn">
-                                <span className="cc-quick-btn__icon">🔔</span>
-                                <span className="cc-quick-btn__label">Alerts</span>
-                            </Link>
-                            <Link to="/report" className="cc-quick-btn">
-                                <span className="cc-quick-btn__icon">➕</span>
-                                <span className="cc-quick-btn__label">New Report</span>
-                            </Link>
-                        </div>
-                    </div>
-                </div>
+            {/* 任務過期警告 - Level 2+ */}
+            {roleLevel >= 2 && taskStats?.overdue && taskStats.overdue > 0 && (
+                <Alert variant="warning" title="注意" className="dashboard-alert">
+                    有 {taskStats.overdue} 個任務已逾期，請盡速處理！
+                </Alert>
+            )}
 
-                {/* Real-time Alerts */}
-                <div className="cc-card cc-card--alerts">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Real-time Alerts</h3>
-                        <button className="cc-card__action" onClick={() => refetchAlerts()}>🔄</button>
-                    </div>
-                    <div className="cc-card__body">
-                        <div className="cc-alerts-list">
-                            {alertsData?.slice(0, 4).map((alert: any) => {
-                                const severityClass = alert.severity === 'critical' ? 'critical' :
-                                    alert.severity === 'warning' ? 'warning' : 'info';
-                                return (
-                                    <div key={alert.id} className={`cc-alert-item cc-alert-item--${severityClass}`}>
-                                        <span className={`cc-alert-item__dot cc-alert-item__dot--${severityClass}`}></span>
-                                        <div className="cc-alert-item__content">
-                                            <div className="cc-alert-item__title">{alert.title}</div>
-                                            <div className="cc-alert-item__desc">
-                                                {alert.description?.substring(0, 60) || alert.alertTypeName}
-                                            </div>
-                                        </div>
-                                        <span className="cc-alert-item__time">{formatTime(alert.publishedAt || alert.createdAt)}</span>
+            {/* 主要內容區 */}
+            <div className="dashboard-sections dashboard-sections--3col">
+                {/* 快速操作 */}
+                <QuickActions roleLevel={roleLevel} />
+
+                {/* 最新 NCDR 警報 - 公開 */}
+                <Card title="即時警報" icon="⚠️" padding="md">
+                    <div className="alert-list-v2">
+                        {alertsData?.slice(0, 4).map((alert: any) => {
+                            const severityClass = alert.severity === 'critical' ? 'critical' :
+                                alert.severity === 'warning' ? 'warning' : 'info';
+                            const severityIcon = alert.severity === 'critical' ? '🔴' :
+                                alert.severity === 'warning' ? '🟠' : '🟡';
+                            return (
+                                <div key={alert.id} className={`alert-card-v2 alert-card-v2--${severityClass}`}>
+                                    <div className="alert-card-v2__header">
+                                        <span className="alert-card-v2__severity">{severityIcon}</span>
+                                        <span className="alert-card-v2__type">{alert.alertTypeName || alert.type || '警報'}</span>
+                                        <span className="alert-card-v2__time">{formatTime(alert.publishedAt || alert.createdAt)}</span>
                                     </div>
-                                );
-                            })}
-                            {(!alertsData || alertsData.length === 0) && (
-                                <div className="cc-empty">✅ 目前無重大警報</div>
+                                    <div className="alert-card-v2__title">{alert.title}</div>
+                                    {alert.sourceUnit && (
+                                        <div className="alert-card-v2__source">📡 {alert.sourceUnit}</div>
+                                    )}
+                                </div>
+                            );
+                        })}
+                        {(!alertsData || alertsData.length === 0) && (
+                            <div className="empty-state-mini">
+                                <span className="empty-icon">✅</span>
+                                <span>目前無重大警報</span>
+                            </div>
+                        )}
+                    </div>
+                    <Link to="/ncdr-alerts" className="view-more-link">
+                        查看全部警報 →
+                    </Link>
+                </Card>
+
+                {/* 地圖概覽 - 結合 Level 1+ 事件顯示 */}
+                {roleLevel >= 1 ? (
+                    <Card title="最新事件" icon="📢" padding="md">
+                        <div className="event-list">
+                            {isLoading && <div className="loading">載入中...</div>}
+                            {!isLoading && eventsData?.length === 0 && (
+                                <div className="empty-state-mini">目前沒有進行中的事件</div>
                             )}
+                            {eventsData?.slice(0, 4).map((event) => (
+                                <div
+                                    key={event.id}
+                                    className={`event-item priority-${event.severity && event.severity >= 4 ? 'high' : event.severity === 3 ? 'medium' : 'low'}`}
+                                >
+                                    <Badge variant={event.severity && event.severity >= 4 ? 'danger' : 'default'} size="sm">
+                                        {event.category || '其他'}
+                                    </Badge>
+                                    <span className="event-title">{event.title}</span>
+                                    <span className="event-time">{formatTime(event.createdAt)}</span>
+                                </div>
+                            ))}
                         </div>
-                    </div>
-                </div>
-
-                {/* Latest Events */}
-                <div className="cc-card cc-card--events">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Latest Events</h3>
-                        <button className="cc-card__action">🔽</button>
-                    </div>
-                    <div className="cc-card__body">
-                        <div className="cc-events-list">
-                            {eventsData?.slice(0, 4).map((event: any) => {
-                                const icon = event.severity >= 4 ? '⚠️' : event.severity === 3 ? '⚡' : '✓';
-                                return (
-                                    <div key={event.id} className="cc-event-item">
-                                        <span className="cc-event-item__time">{formatTime(event.createdAt)}</span>
-                                        <span className="cc-event-item__icon">{icon}</span>
-                                        <div className="cc-event-item__content">
-                                            <div className="cc-event-item__title">{event.title}</div>
-                                            <div className="cc-event-item__desc">{event.location || event.category}</div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                            {(!eventsData || eventsData.length === 0) && (
-                                <div className="cc-empty">目前沒有進行中事件</div>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            {/* ===== CONTENT ROW 2 ===== */}
-            <section className="cc-content-row cc-content-row--second">
-                {/* Volunteer Overview */}
-                <div className="cc-card cc-card--volunteers">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Volunteer Overview</h3>
-                    </div>
-                    <div className="cc-card__body">
-                        <div className="cc-volunteer-stats">
-                            <div className="cc-volunteer-stat">
-                                <span className="cc-volunteer-stat__icon">👥</span>
-                                <div className="cc-volunteer-stat__content">
-                                    <span className="cc-volunteer-stat__label">On Duty</span>
-                                    <span className="cc-volunteer-stat__value">{volunteerStats?.busy || 0}</span>
-                                    <span className="cc-volunteer-stat__sub">On duty now</span>
+                        <Link to="/events" className="view-more-link">
+                            查看全部 →
+                        </Link>
+                    </Card>
+                ) : (
+                    <Card title="地圖概覽" icon="🗺️" padding="md">
+                        <div className="map-preview-v2">
+                            <div className="map-preview-v2__visual">
+                                <div className="map-visual-placeholder">
+                                    <span className="map-icon">🗺️</span>
+                                    <span className="map-text">即時災情地圖</span>
+                                    <span className="map-text-sub">查看災情分布與避難所位置</span>
                                 </div>
                             </div>
-                            <div className="cc-volunteer-stat">
-                                <span className="cc-volunteer-stat__icon">👤</span>
-                                <div className="cc-volunteer-stat__content">
-                                    <span className="cc-volunteer-stat__label">Available</span>
-                                    <span className="cc-volunteer-stat__value">{volunteerStats?.available || 0}</span>
-                                    <span className="cc-volunteer-stat__sub">Ready for deployment</span>
-                                </div>
+                            <Link to="/map" className="map-preview-v2__btn">
+                                <Button variant="primary" size="md">開啟互動地圖</Button>
+                            </Link>
+                        </div>
+                    </Card>
+                )}
+            </div>
+
+            {/* 資源分布概覽 - Level 2+ 才顯示 */}
+            {roleLevel >= 2 && (
+                <div className="dashboard-sections">
+                    <Card title="志工資源概覽" icon="👥" padding="md">
+                        <div className="resource-grid">
+                            <div className="resource-item">
+                                <span className="resource-label">總志工數</span>
+                                <span className="resource-value">{volunteerStats?.total || 0}</span>
                             </div>
-                            <div className="cc-volunteer-stat">
-                                <span className="cc-volunteer-stat__icon">😴</span>
-                                <div className="cc-volunteer-stat__content">
-                                    <span className="cc-volunteer-stat__label">Offline</span>
-                                    <span className="cc-volunteer-stat__value">{volunteerStats?.offline || 0}</span>
-                                    <span className="cc-volunteer-stat__sub">Next shift in 2 hours</span>
-                                </div>
+                            <div className="resource-item">
+                                <span className="resource-label">可用</span>
+                                <span className="resource-value resource-value--success">{volunteerStats?.available || 0}</span>
+                            </div>
+                            <div className="resource-item">
+                                <span className="resource-label">執勤中</span>
+                                <span className="resource-value resource-value--warning">{volunteerStats?.busy || 0}</span>
+                            </div>
+                            <div className="resource-item">
+                                <span className="resource-label">回報總數</span>
+                                <span className="resource-value">{reportStats?.total || 0}</span>
                             </div>
                         </div>
-                    </div>
-                </div>
+                        <Link to="/volunteers" className="view-more-link">
+                            前往志工管理 →
+                        </Link>
+                    </Card>
 
-                {/* Map Overview */}
-                <div className="cc-card cc-card--map">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Map Overview</h3>
-                        <Link to="/map" className="cc-card__action">⛶</Link>
-                    </div>
-                    <div className="cc-card__body">
-                        <div className="cc-map-preview">
-                            <div className="cc-map-visual">
-                                <div className="cc-map-controls">
-                                    <button className="cc-map-btn">+</button>
-                                    <button className="cc-map-btn">−</button>
-                                </div>
-                                <div className="cc-map-center">
-                                    <span className="cc-map-pin">📍</span>
-                                </div>
-                                <div className="cc-map-hotspots">
-                                    <span className="cc-hotspot cc-hotspot--1">⚡</span>
-                                    <span className="cc-hotspot cc-hotspot--2">🔴</span>
-                                </div>
-                                <div className="cc-map-bottom">
-                                    <button className="cc-map-btn">🔍</button>
-                                    <button className="cc-map-btn">◉</button>
-                                </div>
-                            </div>
+                    <Card title="地圖概覽" icon="🗺️" padding="md">
+                        <div className="map-placeholder">
+                            <span>🗺️</span>
+                            <p>地圖顯示災情與資源分布</p>
+                            <Link to="/map">
+                                <Button variant="secondary" size="sm">開啟地圖</Button>
+                            </Link>
                         </div>
-                    </div>
-                </div>
+                    </Card>
 
-                {/* Low Stock Resources */}
-                <div className="cc-card cc-card--resources">
-                    <div className="cc-card__header">
-                        <h3 className="cc-card__title">Low Stock Resources</h3>
-                        <span className="cc-card__badge">⚠️</span>
-                    </div>
-                    <div className="cc-card__body">
-                        <LowStockWidget />
-                    </div>
+                    <LowStockWidget />
                 </div>
-            </section>
+            )}
         </div>
     );
+}
+
+function formatTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return '剛剛';
+    if (minutes < 60) return `${minutes}分鐘前`;
+    if (hours < 24) return `${hours}小時前`;
+    return `${days}天前`;
 }

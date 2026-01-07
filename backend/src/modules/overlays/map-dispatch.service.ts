@@ -9,7 +9,7 @@ import { Repository } from 'typeorm';
 import { Sector, SectorStatus } from './entities/sector.entity';
 import { RallyPoint, RallyPointStatus } from './entities/rally-point.entity';
 import { PlannedRoute, RouteStatus } from './entities/planned-route.entity';
-import { Task, TaskStatus } from '../tasks/entities/task.entity';
+import { Task, TaskStatus, TaskPriority } from '../mission-sessions/entities/task.entity';
 import { DecisionLog, DecisionType } from '../mission-sessions/entities/decision-log.entity';
 
 interface BboxDispatchDto {
@@ -165,10 +165,10 @@ export class MapDispatchService {
 
         // 建立任務
         const task = this.taskRepo.create({
-            missionSessionId: dto.missionSessionId,
+            sessionId: dto.missionSessionId,
             title: dto.taskTitle,
             description: dto.taskDescription,
-            priority: dto.priority || 3,
+            priority: TaskPriority.MEDIUM,
             status: TaskStatus.ASSIGNED,
             assignedTeamId: dto.teamId,
             assignedTeamName: dto.teamName,
@@ -217,9 +217,10 @@ export class MapDispatchService {
         const centerLat = coords.reduce((sum, c) => sum + c[1], 0) / coords.length;
 
         const task = this.taskRepo.create({
-            missionSessionId,
+            sessionId: missionSessionId,
             title: taskTitle,
             description: taskDescription,
+            priority: TaskPriority.MEDIUM,
             sectorId,
             assignedTeamId: sector.assignedTeamId,
             assignedTeamName: sector.assignedTeamName,
