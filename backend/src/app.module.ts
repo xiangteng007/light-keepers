@@ -106,6 +106,42 @@ import { I18nApiModule } from './modules/i18n-api/i18n-api.module';
 import { SwaggerAutoDocsModule } from './modules/swagger-auto-docs/swagger-auto-docs.module';
 import { SystemModule } from './modules/system/system.module';
 import { AuditLogModule } from './modules/audit-log/audit-log.module';
+// ==============================================
+// Batch 4: High Side-Effect Modules
+// ==============================================
+// Webhooks & Integrations
+import { WebhooksModule } from './modules/webhooks/webhooks.module';
+import { NgoApiModule } from './modules/ngo-api/ngo-api.module';
+import { NgoIntegrationModule } from './modules/ngo-integration/ngo-integration.module';
+import { Fire119Module } from './modules/fire-119/fire-119.module';
+import { CitizenAppModule } from './modules/citizen-app/citizen-app.module';
+import { SatelliteCommModule } from './modules/satellite-comm/satellite-comm.module';
+import { SlackIntegrationModule } from './modules/slack-integration/slack-integration.module';
+import { TelegramBotModule } from './modules/telegram-bot/telegram-bot.module';
+// AI & ML
+import { AiPredictionModule } from './modules/ai-prediction/ai-prediction.module';
+import { AiVisionModule } from './modules/ai-vision/ai-vision.module';
+import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module';
+import { AerialImageAnalysisModule } from './modules/aerial-image-analysis/aerial-image-analysis.module';
+import { EmotionAnalysisModule } from './modules/emotion-analysis/emotion-analysis.module';
+import { EventAiModule } from './modules/event-ai/event-ai.module';
+import { AutoSummaryModule } from './modules/auto-summary/auto-summary.module';
+import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module';
+import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
+import { DisasterSummaryModule } from './modules/disaster-summary/disaster-summary.module';
+import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
+import { DocumentOcrModule } from './modules/document-ocr/document-ocr.module';
+import { TranslationModule } from './modules/translation/translation.module';
+// Scheduling & Dispatch
+import { AutoDispatchModule } from './modules/auto-dispatch/auto-dispatch.module';
+import { SmartSchedulingModule } from './modules/smart-scheduling/smart-scheduling.module';
+import { ScheduledTasksModule } from './modules/scheduled-tasks/scheduled-tasks.module';
+// Weather & Climate
+import { WeatherModule } from './modules/weather/weather.module';
+import { WeatherAlertIntegrationModule } from './modules/weather-alert-integration/weather-alert-integration.module';
+import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module';
+import { TrendPredictionModule } from './modules/trend-prediction/trend-prediction.module';
+import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-media-monitor.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -243,6 +279,42 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         SwaggerAutoDocsModule, // 📚 Swagger 文件
         SystemModule, // ⚙️ 系統管理
         AuditLogModule, // 📜 稽核日誌
+        // ==============================================
+        // Batch 4: High Side-Effect Modules
+        // ==============================================
+        // Webhooks & Integrations
+        WebhooksModule, // 🔗 Webhook 接收
+        NgoApiModule, // 🏢 NGO API
+        NgoIntegrationModule, // 🤝 NGO 整合
+        Fire119Module, // 🚒 119 消防整合
+        CitizenAppModule, // 📱 市民 App
+        SatelliteCommModule, // 🛰️ 衛星通訊
+        SlackIntegrationModule, // 💬 Slack 整合
+        TelegramBotModule, // 🤖 Telegram Bot
+        // AI & ML
+        AiPredictionModule, // 🔮 AI 預測
+        AiVisionModule, // 👁️ AI 視覺
+        ImageRecognitionModule, // 🖼️ 圖像辨識
+        AerialImageAnalysisModule, // 🛩️ 空拍分析
+        EmotionAnalysisModule, // 😊 情緒分析
+        EventAiModule, // 🧠 事件 AI
+        AutoSummaryModule, // 📝 自動摘要
+        ChatbotAssistantModule, // 💬 聊天機器人
+        RagKnowledgeModule, // 📚 RAG 知識庫
+        DisasterSummaryModule, // 📊 災情摘要
+        FatigueDetectionModule, // 😴 疲勞偵測
+        DocumentOcrModule, // 📄 文件 OCR
+        TranslationModule, // 🌐 翻譯服務
+        // Scheduling & Dispatch
+        AutoDispatchModule, // 🚀 自動派遣
+        SmartSchedulingModule, // 📅 智慧排程
+        ScheduledTasksModule, // ⏰ 排程任務
+        // Weather & Climate
+        WeatherModule, // ☀️ 氣象服務
+        WeatherAlertIntegrationModule, // ⚠️ 氣象警報
+        TccipClimateModule, // 🌡️ TCCIP 氣候
+        TrendPredictionModule, // 📈 趨勢預測
+        SocialMediaMonitorModule, // 📱 社群監控
     ],
     providers: [
         CloudLoggerService,
