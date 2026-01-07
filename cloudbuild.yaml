@@ -40,7 +40,7 @@ steps:
       - "--add-cloudsql-instances"
       - "$PROJECT_ID:asia-east1:light-keepers-db"
       - "--set-env-vars"
-      - "NODE_ENV=production,DB_HOST=/cloudsql/$PROJECT_ID:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers"
+      - "NODE_ENV=production,DB_HOST=/cloudsql/$PROJECT_ID:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,SYNC_TABLES=true"
       - "--memory"
       - "512Mi"
       - "--cpu"
