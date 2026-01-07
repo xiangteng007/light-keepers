@@ -1,442 +1,221 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button, Badge } from '../design-system';
-import { getApprovedVolunteers, getVolunteerStats, getPendingVolunteers, approveVolunteer, rejectVolunteer } from '../api/services';
-import { useAuth } from '../../../context/AuthContext';
-import type { Volunteer as VolunteerType, VolunteerStatus } from '../api/services';
 
-// 技能選�?
-const SKILL_OPTIONS = [
-    { value: 'medical', label: '醫療救護', icon: '🏥' },
-    { value: 'rescue', label: '搜救救難', icon: '🚒' },
-    { value: 'logistics', label: '物資運�?, icon: '📦' },
-    { value: 'cooking', label: '炊事料理', icon: '🍳' },
-    { value: 'communication', label: '通訊聯絡', icon: '📡' },
-    { value: 'driving', label: '駕駛運輸', icon: '🚗' },
-    { value: 'construction', label: '土木修繕', icon: '🔧' },
-    { value: 'social', label: '社工關懷', icon: '💝' },
-];
+interface Volunteer {
+    id: string;
+    name: string;
+    email: string;
+    status: 'active' | 'pending' | 'inactive';
+    skills: string[];
+    region: string;
+    joinedAt: string;
+    lastActive: string;
+    avatar?: string;
+}
 
-const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgColor: string }> = {
-    available: { label: '可用', color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.15)' },
-    busy: { label: '執勤�?, color: '#FF9800', bgColor: 'rgba(255, 152, 0, 0.15)' },
-    offline: { label: '離線', color: '#9E9E9E', bgColor: 'rgba(158, 158, 158, 0.15)' },
-};
-
-interface AssignmentForm {
-    volunteerId: string;
-    volunteerName: string;
-    taskTitle: string;
-    taskDescription: string;
-    location: string;
-    scheduledStart: string;
+interface VolunteerStats {
+    total: number;
+    active: number;
+    pending: number;
+    inactive: number;
 }
 
 export default function VolunteersPage() {
-    const { user } = useAuth();
-    const [activeTab, setActiveTab] = useState<'pending' | 'list'>('list');
-    const [volunteers, setVolunteers] = useState<VolunteerType[]>([]);
-    const [pendingVolunteers, setPendingVolunteers] = useState<VolunteerType[]>([]);
-    const [stats, setStats] = useState({
-        total: 0,
-        available: 0,
-        busy: 0,
-        offline: 0,
-        totalServiceHours: 0,
-    });
-    const [isLoading, setIsLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
+    const [volunteers, setVolunteers] = useState<Volunteer[]>([]);
+    const [stats, setStats] = useState<VolunteerStats>({ total: 0, active: 0, pending: 0, inactive: 0 });
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<string>('all');
 
-    const [showAssignModal, setShowAssignModal] = useState(false);
-    const [filterStatus, setFilterStatus] = useState<VolunteerStatus | ''>('');
-    const [searchQuery, setSearchQuery] = useState('');
-    const [processingId, setProcessingId] = useState<string | null>(null);
-    const [assignmentForm, setAssignmentForm] = useState<AssignmentForm>({
-        volunteerId: '',
-        volunteerName: '',
-        taskTitle: '',
-        taskDescription: '',
-        location: '',
-        scheduledStart: '',
-    });
-    const [successMessage, setSuccessMessage] = useState('');
-
-    // 載入志工資料
     useEffect(() => {
-        const fetchData = async () => {
-            setIsLoading(true);
-            setError(null);
-            try {
-                const [volunteersRes, statsRes, pendingRes] = await Promise.all([
-                    getApprovedVolunteers({ status: filterStatus || undefined }),
-                    getVolunteerStats(),
-                    getPendingVolunteers(),
-                ]);
-                setVolunteers(volunteersRes.data.data);
-                setStats(statsRes.data.data);
-                setPendingVolunteers(pendingRes.data.data || []);
-            } catch (err) {
-                console.error('Failed to fetch volunteers:', err);
-                setError('載入志工資料失敗');
-            } finally {
-                setIsLoading(false);
-            }
-        };
-        fetchData();
-    }, [filterStatus]);
+        const mockVolunteers: Volunteer[] = [
+            {
+                id: '1',
+                name: 'Wang Daming',
+                email: 'wang@example.com',
+                status: 'active',
+                skills: ['First Aid', 'Communications'],
+                region: 'North',
+                joinedAt: '2024-01-15',
+                lastActive: '2024-12-01',
+            },
+            {
+                id: '2',
+                name: 'Lin Xiaohua',
+                email: 'lin@example.com',
+                status: 'active',
+                skills: ['Driving', 'Search & Rescue'],
+                region: 'South',
+                joinedAt: '2024-03-20',
+                lastActive: '2024-12-05',
+            },
+            {
+                id: '3',
+                name: 'Chen Zhiqiang',
+                email: 'chen@example.com',
+                status: 'pending',
+                skills: ['Medical'],
+                region: 'Central',
+                joinedAt: '2024-11-10',
+                lastActive: '2024-11-10',
+            },
+        ];
 
-    // 篩選志工 (搜尋)
-    const filteredVolunteers = volunteers.filter(v => {
-        if (searchQuery && !v.name.includes(searchQuery) && !v.region.includes(searchQuery)) return false;
-        return true;
+        setVolunteers(mockVolunteers);
+        setStats({
+            total: mockVolunteers.length,
+            active: mockVolunteers.filter(v => v.status === 'active').length,
+            pending: mockVolunteers.filter(v => v.status === 'pending').length,
+            inactive: mockVolunteers.filter(v => v.status === 'inactive').length,
+        });
+        setLoading(false);
+    }, []);
+
+    const filteredVolunteers = volunteers.filter(volunteer => {
+        const matchesSearch = volunteer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            volunteer.email.toLowerCase().includes(searchTerm.toLowerCase());
+        const matchesStatus = statusFilter === 'all' || volunteer.status === statusFilter;
+        return matchesSearch && matchesStatus;
     });
 
-    const getSkillLabel = (skillValue: string) => {
-        const skill = SKILL_OPTIONS.find(s => s.value === skillValue);
-        return skill ? `${skill.icon} ${skill.label}` : skillValue;
+    const getStatusBadge = (status: string) => {
+        const colors: Record<string, string> = {
+            active: 'bg-green-500',
+            pending: 'bg-yellow-500',
+            inactive: 'bg-gray-500',
+        };
+        const labels: Record<string, string> = {
+            active: 'Active',
+            pending: 'Pending',
+            inactive: 'Inactive',
+        };
+        return (
+            <span className={`px-2 py-1 text-xs rounded-full text-white ${colors[status]}`}>
+                {labels[status]}
+            </span>
+        );
     };
 
-
-    // 開啟指派任務
-    const openAssignModal = (volunteer: VolunteerType) => {
-        setAssignmentForm({
-            volunteerId: volunteer.id,
-            volunteerName: volunteer.name,
-            taskTitle: '',
-            taskDescription: '',
-            location: '',
-            scheduledStart: new Date().toISOString().slice(0, 16),
-        });
-        setShowAssignModal(true);
-    };
-
-    // 提交任務指派
-    const handleAssign = async () => {
-        if (!assignmentForm.taskTitle) {
-            alert('請輸入任務標�?);
-            return;
-        }
-
-        // 實際應呼�?API
-        // await fetch('/api/v1/volunteer-assignments', { method: 'POST', body: JSON.stringify(assignmentForm) });
-
-        setShowAssignModal(false);
-        setSuccessMessage(`已成功指派任務給 ${assignmentForm.volunteerName}`);
-        setTimeout(() => setSuccessMessage(''), 3000);
-    };
-
-    // 審核通過
-    const handleApprove = async (id: string) => {
-        setProcessingId(id);
-        try {
-            await approveVolunteer(id, user?.id || '', '管理員核�?);
-            setPendingVolunteers(prev => prev.filter(v => v.id !== id));
-            setSuccessMessage('志工已核�?);
-            setTimeout(() => setSuccessMessage(''), 3000);
-            // 重新載入列表
-            const res = await getApprovedVolunteers({});
-            setVolunteers(res.data.data);
-        } catch (err) {
-            console.error('Failed to approve volunteer:', err);
-            setError('核准失敗');
-        } finally {
-            setProcessingId(null);
-        }
-    };
-
-    // 拒絕申請
-    const handleReject = async (id: string) => {
-        const note = prompt('請輸入拒絕原因（選填�?);
-        setProcessingId(id);
-        try {
-            await rejectVolunteer(id, user?.id || '', note || '');
-            setPendingVolunteers(prev => prev.filter(v => v.id !== id));
-            setSuccessMessage('志工申請已拒�?);
-            setTimeout(() => setSuccessMessage(''), 3000);
-        } catch (err) {
-            console.error('Failed to reject volunteer:', err);
-            setError('拒絕失敗');
-        } finally {
-            setProcessingId(null);
-        }
-    };
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center min-h-screen">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+            </div>
+        );
+    }
 
     return (
-        <div className="page volunteers-page">
-            <div className="page-header">
-                <div className="page-header__left">
-                    <h2>👥 志工管理</h2>
-                    <p className="page-subtitle">志工動員與調度系�?/p>
+        <div className="p-6 space-y-6">
+            <div className="flex justify-between items-center">
+                <div>
+                    <h1 className="text-2xl font-bold text-white">Volunteer Management</h1>
+                    <p className="text-gray-400">Manage and view all volunteer data</p>
+                </div>
+                <Link
+                    to="/volunteers/new"
+                    className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400 transition-colors"
+                >
+                    Add Volunteer
+                </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <p className="text-gray-400 text-sm">Total Volunteers</p>
+                    <p className="text-2xl font-bold text-white">{stats.total}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <p className="text-gray-400 text-sm">Active</p>
+                    <p className="text-2xl font-bold text-green-400">{stats.active}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <p className="text-gray-400 text-sm">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-400">{stats.pending}</p>
+                </div>
+                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700">
+                    <p className="text-gray-400 text-sm">Inactive</p>
+                    <p className="text-2xl font-bold text-gray-400">{stats.inactive}</p>
                 </div>
             </div>
 
-            {/* Tab 切換 */}
-            <div className="volunteers-tabs">
-                <button
-                    className={`tab-btn ${activeTab === 'pending' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('pending')}
+            <div className="flex gap-4">
+                <input
+                    type="text"
+                    placeholder="Search by name or email..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-amber-500"
+                />
+                <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white focus:outline-none focus:border-amber-500"
                 >
-                    �?待審�?{pendingVolunteers.length > 0 && <Badge variant="warning" size="sm">{pendingVolunteers.length}</Badge>}
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('list')}
-                >
-                    👥 志工名單
-                </button>
+                    <option value="all">All Status</option>
+                    <option value="active">Active</option>
+                    <option value="pending">Pending</option>
+                    <option value="inactive">Inactive</option>
+                </select>
             </div>
 
-            {/* 成功訊息 */}
-            {successMessage && (
-                <div className="success-toast">
-                    �?{successMessage}
-                </div>
-            )}
-
-            {/* 統計卡片 */}
-            <div className="volunteers-stats">
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__value">{stats.total}</div>
-                    <div className="stat-card__label">總志工數</div>
-                </Card>
-                <Card className="stat-card stat-card--success" padding="md">
-                    <div className="stat-card__value">{stats.available}</div>
-                    <div className="stat-card__label">可用</div>
-                </Card>
-                <Card className="stat-card stat-card--warning" padding="md">
-                    <div className="stat-card__value">{stats.busy}</div>
-                    <div className="stat-card__label">執勤�?/div>
-                </Card>
-                <Card className="stat-card stat-card--info" padding="md">
-                    <div className="stat-card__value">{stats.totalServiceHours}</div>
-                    <div className="stat-card__label">總服務時�?/div>
-                </Card>
-                <Card className="stat-card stat-card--primary" padding="md">
-                    <div className="stat-card__value">{stats.offline}</div>
-                    <div className="stat-card__label">離線</div>
-                </Card>
-            </div>
-
-            {/* 搜尋與篩�?- 只在志工名單 Tab 顯示 */}
-            {activeTab === 'list' && (
-                <div className="volunteers-filters">
-                    <input
-                        type="text"
-                        className="form-input volunteers-search"
-                        placeholder="搜尋姓名或地區..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                    />
-                    <div className="volunteers-status-filters">
-                        <button
-                            className={`status-filter-btn ${filterStatus === '' ? 'active' : ''}`}
-                            onClick={() => setFilterStatus('')}
-                        >
-                            全部
-                        </button>
-                        {Object.entries(STATUS_CONFIG).map(([key, config]) => (
-                            <button
-                                key={key}
-                                className={`status-filter-btn ${filterStatus === key ? 'active' : ''}`}
-                                style={{
-                                    borderColor: filterStatus === key ? config.color : undefined,
-                                    backgroundColor: filterStatus === key ? config.bgColor : undefined,
-                                }}
-                                onClick={() => setFilterStatus(key as VolunteerStatus)}
-                            >
-                                {config.label}
-                            </button>
+            <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
+                <table className="w-full">
+                    <thead>
+                        <tr className="border-b border-slate-700">
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Volunteer</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Skills</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Region</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Last Active</th>
+                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-700">
+                        {filteredVolunteers.map((volunteer) => (
+                            <tr key={volunteer.id} className="hover:bg-slate-700/50 transition-colors">
+                                <td className="px-6 py-4">
+                                    <div className="flex items-center">
+                                        <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-medium">
+                                            {volunteer.name.charAt(0)}
+                                        </div>
+                                        <div className="ml-4">
+                                            <p className="text-white font-medium">{volunteer.name}</p>
+                                            <p className="text-gray-400 text-sm">{volunteer.email}</p>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4">
+                                    {getStatusBadge(volunteer.status)}
+                                </td>
+                                <td className="px-6 py-4">
+                                    <div className="flex flex-wrap gap-1">
+                                        {volunteer.skills.map((skill, index) => (
+                                            <span key={index} className="px-2 py-0.5 text-xs bg-slate-600 rounded text-gray-300">
+                                                {skill}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </td>
+                                <td className="px-6 py-4 text-gray-300">{volunteer.region}</td>
+                                <td className="px-6 py-4 text-gray-300">{volunteer.lastActive}</td>
+                                <td className="px-6 py-4">
+                                    <Link
+                                        to={`/volunteers/${volunteer.id}`}
+                                        className="text-amber-400 hover:text-amber-300"
+                                    >
+                                        View Details
+                                    </Link>
+                                </td>
+                            </tr>
                         ))}
-                    </div>
-                </div>
-            )}
-
-            {/* 待審核志工列�?*/}
-            {activeTab === 'pending' && (
-                <div className="pending-volunteers-list">
-                    {pendingVolunteers.length === 0 ? (
-                        <div className="volunteers-empty">
-                            <span>�?/span>
-                            <p>沒有待審核的志工申請</p>
-                        </div>
-                    ) : (
-                        pendingVolunteers.map(volunteer => (
-                            <Card key={volunteer.id} className="pending-volunteer-card" padding="md">
-                                <div className="pending-volunteer-info">
-                                    <div className="pending-volunteer-avatar">
-                                        {volunteer.name.charAt(0)}
-                                    </div>
-                                    <div className="pending-volunteer-details">
-                                        <h4>{volunteer.name}</h4>
-                                        <p>📍 {volunteer.region}</p>
-                                        <p>📞 {volunteer.phone}</p>
-                                        <p className="pending-volunteer-skills">
-                                            {volunteer.skills.map(skill => (
-                                                <span key={skill} className="skill-tag">{getSkillLabel(skill)}</span>
-                                            ))}
-                                        </p>
-                                    </div>
-                                </div>
-                                <div className="pending-volunteer-actions">
-                                    <Button
-                                        variant="primary"
-                                        size="sm"
-                                        onClick={() => handleApprove(volunteer.id)}
-                                        disabled={processingId === volunteer.id}
-                                    >
-                                        {processingId === volunteer.id ? '處理�?..' : '�?核准'}
-                                    </Button>
-                                    <Button
-                                        variant="secondary"
-                                        size="sm"
-                                        onClick={() => handleReject(volunteer.id)}
-                                        disabled={processingId === volunteer.id}
-                                    >
-                                        �?拒絕
-                                    </Button>
-                                </div>
-                            </Card>
-                        ))
-                    )}
-                </div>
-            )}
-
-            {/* 志工列表 - 只在志工名單 Tab 顯示 */}
-            {activeTab === 'list' && (<div className="volunteers-list">
-                {isLoading ? (
-                    <div className="volunteers-empty">
-                        <span>�?/span>
-                        <p>載入志工資料�?..</p>
-                    </div>
-                ) : error ? (
-                    <div className="volunteers-empty">
-                        <span>⚠️</span>
-                        <p>{error}</p>
-                        <Button variant="secondary" onClick={() => window.location.reload()}>
-                            重新載入
-                        </Button>
-                    </div>
-                ) : filteredVolunteers.length > 0 ? (
-                    filteredVolunteers.map(volunteer => (
-                        <Card key={volunteer.id} className="volunteer-card" padding="md">
-                            <div className="volunteer-card__header">
-                                <div className="volunteer-card__avatar">
-                                    {volunteer.name.charAt(0)}
-                                </div>
-                                <div className="volunteer-card__info">
-                                    <h4 className="volunteer-card__name">{volunteer.name}</h4>
-                                    <p className="volunteer-card__region">📍 {volunteer.region}</p>
-                                </div>
-                                <Badge
-                                    variant={
-                                        volunteer.status === 'available' ? 'success' :
-                                            volunteer.status === 'busy' ? 'warning' : 'default'
-                                    }
-                                >
-                                    {STATUS_CONFIG[volunteer.status as VolunteerStatus].label}
-                                </Badge>
-                            </div>
-
-                            <div className="volunteer-card__skills">
-                                {volunteer.skills.map(skill => (
-                                    <span key={skill} className="skill-tag">
-                                        {getSkillLabel(skill)}
-                                    </span>
-                                ))}
-                            </div>
-
-                            <div className="volunteer-card__stats">
-                                <span>📞 {volunteer.phone}</span>
-                                <span>⏱️ {volunteer.serviceHours} 小時</span>
-                                <span>📋 {volunteer.taskCount} 次任�?/span>
-                            </div>
-
-                            <div className="volunteer-card__actions">
-                                <Link to={`/volunteers/${volunteer.id}`}>
-                                    <Button variant="secondary" size="sm">
-                                        檢視詳情
-                                    </Button>
-                                </Link>
-                                <Button
-                                    variant="primary"
-                                    size="sm"
-                                    onClick={() => openAssignModal(volunteer)}
-                                    disabled={volunteer.status !== 'available'}
-                                >
-                                    📋 指派任務
-                                </Button>
-                            </div>
-                        </Card>
-                    ))
-                ) : (
-                    <div className="volunteers-empty">
-                        <span>👥</span>
-                        <p>沒有符合條件的志�?/p>
+                    </tbody>
+                </table>
+                {filteredVolunteers.length === 0 && (
+                    <div className="text-center py-8 text-gray-400">
+                        No volunteers found matching criteria
                     </div>
                 )}
-            </div>)}
-
-            {/* 指派任務 Modal */}
-            {showAssignModal && (
-                <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
-                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>📋 指派任務�?{assignmentForm.volunteerName}</h3>
-
-                        <div className="form-section">
-                            <label className="form-label">任務標題 *</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="例如：物資運�?- 新北市板橋區"
-                                value={assignmentForm.taskTitle}
-                                onChange={(e) => setAssignmentForm({ ...assignmentForm, taskTitle: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">任務描述</label>
-                            <textarea
-                                className="form-textarea"
-                                placeholder="詳細說明任務內容..."
-                                value={assignmentForm.taskDescription}
-                                onChange={(e) => setAssignmentForm({ ...assignmentForm, taskDescription: e.target.value })}
-                                rows={3}
-                            />
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">地點</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="任務地點"
-                                value={assignmentForm.location}
-                                onChange={(e) => setAssignmentForm({ ...assignmentForm, location: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="form-section">
-                            <label className="form-label">預定開始時間</label>
-                            <input
-                                type="datetime-local"
-                                className="form-input"
-                                value={assignmentForm.scheduledStart}
-                                onChange={(e) => setAssignmentForm({ ...assignmentForm, scheduledStart: e.target.value })}
-                            />
-                        </div>
-
-                        <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => setShowAssignModal(false)}>
-                                取消
-                            </Button>
-                            <Button onClick={handleAssign}>
-                                確認指派
-                            </Button>
-                        </div>
-                    </Card>
-                </div>
-            )}
+            </div>
         </div>
     );
 }
-
