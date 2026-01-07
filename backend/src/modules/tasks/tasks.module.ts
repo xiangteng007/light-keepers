@@ -13,6 +13,6 @@ import { LineBotModule } from '../line-bot/line-bot.module';
     ],
     controllers: [TasksController],
     providers: [TasksService],
-    exports: [TasksService],
+    exports: [TypeOrmModule, TasksService],
 })
 export class TasksModule { }

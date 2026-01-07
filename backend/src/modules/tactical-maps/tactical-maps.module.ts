@@ -8,14 +8,18 @@
  * 3. 戰術標記 CRUD
  */
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TacticalMarker } from './entities/tactical-marker.entity';
 import { TacticalMapsService } from './tactical-maps.service';
 import { TacticalMapsController } from './tactical-maps.controller';
+import { AuthModule } from '../auth/auth.module';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([TacticalMarker])],
+    imports: [
+        TypeOrmModule.forFeature([TacticalMarker]),
+        forwardRef(() => AuthModule), // For JwtAuthGuard
+    ],
     controllers: [TacticalMapsController],
     providers: [TacticalMapsService],
     exports: [TacticalMapsService],

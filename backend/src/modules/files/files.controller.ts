@@ -47,10 +47,10 @@ export class FilesController {
     /**
      * Download a file
      */
-    @Get('download/:path(*)')
+    @Get('download/*filepath')
     @RequiredLevel(ROLE_LEVELS.PUBLIC)
     async downloadFile(
-        @Param('path') filePath: string,
+        @Param('filepath') filePath: string,
         @Res({ passthrough: true }) res: Response
     ): Promise<StreamableFile | { success: boolean; error: string }> {
         const buffer = this.fileStorageService.getFile(filePath);
@@ -70,9 +70,9 @@ export class FilesController {
     /**
      * Delete a file
      */
-    @Delete(':path(*)')
+    @Delete('*filepath')
     @RequiredLevel(ROLE_LEVELS.OFFICER)
-    async deleteFile(@Param('path') filePath: string) {
+    async deleteFile(@Param('filepath') filePath: string) {
         const deleted = this.fileStorageService.deleteFile(filePath);
         return { success: deleted };
     }
@@ -80,7 +80,7 @@ export class FilesController {
     /**
      * List files in a folder
      */
-    @Get('list/:folder(*)')
+    @Get('list/*folder')
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async listFiles(@Param('folder') folder: string) {
         const files = this.fileStorageService.listFiles(folder);

@@ -57,6 +57,7 @@ import { TasksModule } from '../tasks/tasks.module';
         MissionReportService,
     ],
     exports: [
+        TypeOrmModule, // Export for DecisionLog, Task, etc. repositories
         MissionSessionsService,
         IAPService,
         SITREPService,
