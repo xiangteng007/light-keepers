@@ -97,7 +97,11 @@ export default function Layout() {
                 </div>
 
                 <div className="relative w-[320px]">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none" size={16} />
+                    <Search
+                        className="text-gray-500 pointer-events-none"
+                        size={16}
+                        style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)' }}
+                    />
                     <input
                         type="text"
                         placeholder="SEARCH INTEL..."
@@ -110,6 +114,7 @@ export default function Layout() {
                     <button
                         className="text-[#94A3B8] hover:text-[#C39B6F] hover:bg-[#1D2635] hover:bg-opacity-50 rounded-full p-2 transition-colors duration-200 flex items-center justify-center focus:outline-none ring-offset-0 focus:ring-1 focus:ring-[#C39B6F]"
                         title="Notifications"
+                        style={{ backgroundColor: 'transparent', border: 'none', boxShadow: 'none' }}
                     >
                         <Bell size={20} strokeWidth={1.5} />
                     </button>
