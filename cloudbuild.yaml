@@ -2,28 +2,17 @@
 # 自動建置並部署到 Cloud Run
 
 steps:
-  # Step 1: 建置 Docker 映像
-  - name: "gcr.io/cloud-builders/docker"
+  # Step 1: 使用 Kaniko 建置並推送 Docker 映像（比 Docker build 更好的 layer caching）
+  - name: "gcr.io/kaniko-project/executor:latest"
     args:
-      - "build"
-      - "-t"
-      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
-      - "-t"
-      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
-      - "./backend"
+      - "--destination=asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
+      - "--destination=asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
+      - "--context=./backend"
+      - "--dockerfile=./backend/Dockerfile"
+      - "--cache=true"
+      - "--cache-ttl=168h"
 
-  # Step 2: 推送映像到 Artifact Registry
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      - "push"
-      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
-
-  - name: "gcr.io/cloud-builders/docker"
-    args:
-      - "push"
-      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
-
-  # Step 3: 部署到 Cloud Run
+  # Step 2: 部署到 Cloud Run
   - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:

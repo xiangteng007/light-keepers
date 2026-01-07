@@ -15,8 +15,8 @@ WORKDIR /app
 # 複製 package files
 COPY package*.json ./
 
-# 安裝所有依賴（包含 dev）以便構建
-RUN npm install --legacy-peer-deps
+# 使用 npm ci 比 npm install 更快更可靠（嚴格遵循 package-lock.json）
+RUN npm ci --legacy-peer-deps
 
 # 複製源碼
 COPY . .
@@ -37,8 +37,9 @@ ENV PORT=8080
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
-# 只安裝生產依賴
-RUN npm install --legacy-peer-deps --omit=dev
+# 只安裝生產依賴，並清理 npm cache 減少 image 大小
+RUN npm ci --legacy-peer-deps --omit=dev && \
+    npm cache clean --force
 
 # Cloud Run HEALTHCHECK - 確保容器啟動後可響應
 # 注意：Cloud Run 使用 HTTP startup/liveness probe，但本地 Docker 使用此 HEALTHCHECK
