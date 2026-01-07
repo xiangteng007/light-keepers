@@ -1,5 +1,6 @@
 # Light Keepers 災防平台 - 後端 API
 # Dockerfile for Cloud Run
+# Build optimization: v2 - Kaniko cache enabled
 #
 # 本機驗證指令:
 #   docker build -t light-keepers-api:test ./backend
