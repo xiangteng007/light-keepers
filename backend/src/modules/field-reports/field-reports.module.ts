@@ -68,6 +68,7 @@ import { Role } from '../accounts/entities/role.entity';
         EmergencyNotificationService,
     ],
     exports: [
+        TypeOrmModule, // Export TypeOrmModule so other modules can use FieldReport repository
         FieldReportsService,
         AttachmentsService,
         SosService,
