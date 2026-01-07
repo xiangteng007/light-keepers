@@ -3,63 +3,61 @@
 
 steps:
   # Step 1: 建置 Docker 映像
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: "gcr.io/cloud-builders/docker"
     args:
-      - 'build'
-      - '-t'
-      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA'
-      - '-t'
-      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest'
-      - './backend'
+      - "build"
+      - "-t"
+      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
+      - "-t"
+      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
+      - "./backend"
 
   # Step 2: 推送映像到 Artifact Registry
-  - name: 'gcr.io/cloud-builders/docker'
+  - name: "gcr.io/cloud-builders/docker"
     args:
-      - 'push'
-      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA'
-  
-  - name: 'gcr.io/cloud-builders/docker'
+      - "push"
+      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
+
+  - name: "gcr.io/cloud-builders/docker"
     args:
-      - 'push'
-      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest'
+      - "push"
+      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
 
   # Step 3: 部署到 Cloud Run
-  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+  - name: "gcr.io/google.com/cloudsdktool/cloud-sdk"
     entrypoint: gcloud
     args:
-      - 'run'
-      - 'deploy'
-      - 'light-keepers-api'
-      - '--image'
-      - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA'
-      - '--region'
-      - 'asia-east1'
-      - '--platform'
-      - 'managed'
-      - '--allow-unauthenticated'
-      - '--add-cloudsql-instances'
-      - '$PROJECT_ID:asia-east1:light-keepers-db'
-      - '--set-env-vars'
-      - 'NODE_ENV=production,DATABASE_URL=postgresql://postgres:${_DB_PASSWORD}@localhost/lightkeepers?host=/cloudsql/$PROJECT_ID:asia-east1:light-keepers-db,LINE_CHANNEL_ACCESS_TOKEN=${_LINE_CHANNEL_ACCESS_TOKEN},LINE_CHANNEL_SECRET=${_LINE_CHANNEL_SECRET}'
-      - '--memory'
-      - '512Mi'
-      - '--cpu'
-      - '1'
-      - '--min-instances'
-      - '0'
-      - '--max-instances'
-      - '5'
+      - "run"
+      - "deploy"
+      - "light-keepers-api"
+      - "--image"
+      - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
+      - "--region"
+      - "asia-east1"
+      - "--platform"
+      - "managed"
+      - "--allow-unauthenticated"
+      - "--add-cloudsql-instances"
+      - "$PROJECT_ID:asia-east1:light-keepers-db"
+      - "--set-env-vars"
+      - "NODE_ENV=production,DATABASE_URL=postgresql://postgres:${_DB_PASSWORD}@localhost/lightkeepers?host=/cloudsql/$PROJECT_ID:asia-east1:light-keepers-db"
+      - "--memory"
+      - "512Mi"
+      - "--cpu"
+      - "1"
+      - "--min-instances"
+      - "0"
+      - "--max-instances"
+      - "5"
 
 # 設定映像儲存位置
 images:
-  - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA'
-  - 'asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest'
+  - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:$COMMIT_SHA"
+  - "asia-east1-docker.pkg.dev/$PROJECT_ID/light-keepers/backend:latest"
 
 # 替換變數（需在 Cloud Build 觸發器中設定）
 substitutions:
-  _DB_PASSWORD: ''  # 在 Cloud Build 中設定為 Secret
-  _LINE_CHANNEL_ACCESS_TOKEN: ''  # LINE Messaging API Token
-  _LINE_CHANNEL_SECRET: ''  # LINE Channel Secret
+  _DB_PASSWORD: "" # 在 Cloud Build 中設定為 Secret
 
 # 建置選項
 options:
