@@ -4,7 +4,171 @@
    融合：極簡高端 · 現代 SaaS · 北歐溫暖
 ============================================ */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&display=swap');
+/* ============================================
+   TACTICAL DARK THEME - Command Center Override
+   當 html.dark 時啟用戰術主題
+============================================ */
+@import url('./styles/globals.css');
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Dark Mode Override - Tactical Theme */
+html.dark {
+  --bg-primary: #161E2A;
+  --bg-secondary: #1D2635;
+  --bg-card: #1D2635;
+  --bg-hover: #2A3548;
+  --bg-surface: #242D3D;
+
+  --text-primary: #E8E4DE;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+
+  --border-color: #2F3641;
+  --border-light: #3A4556;
+
+  --color-gold-400: #C39B6F;
+  --color-gold-500: #C39B6F;
+  --color-gold-600: #A67C52;
+
+  --primary: #C39B6F;
+  --primary-hover: #D4B896;
+
+  --glass-bg: rgba(29, 38, 53, 0.9);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}
+
+html.dark body {
+  background-color: var(--bg-primary) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sidebar,
+html.dark .nav-sidebar {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark .sidebar .nav-item,
+html.dark .nav-item {
+  color: var(--text-secondary) !important;
+}
+
+html.dark .sidebar .nav-item:hover,
+html.dark .nav-item:hover {
+  background: var(--bg-hover) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .sidebar .nav-item.active,
+html.dark .nav-item.active {
+  background: var(--bg-hover) !important;
+  color: var(--color-gold-400) !important;
+  border-left-color: var(--color-gold-400) !important;
+}
+
+html.dark .main-content,
+html.dark .dashboard-content {
+  background: var(--bg-primary) !important;
+}
+
+html.dark .card,
+html.dark .lk-card,
+html.dark .stats-card,
+html.dark .panel {
+  background: var(--bg-card) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark .lk-btn--primary,
+html.dark .btn-primary {
+  background: var(--color-gold-400) !important;
+  color: #161E2A !important;
+  border-color: var(--color-gold-400) !important;
+}
+
+html.dark .lk-btn--primary:hover,
+html.dark .btn-primary:hover {
+  background: var(--color-gold-600) !important;
+  box-shadow: 0 0 12px rgba(195, 155, 111, 0.3) !important;
+}
+
+html.dark .header,
+html.dark .top-header,
+html.dark .page-header {
+  background: var(--bg-secondary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark input,
+html.dark textarea,
+html.dark select {
+  background: var(--bg-primary) !important;
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark input:focus,
+html.dark textarea:focus,
+html.dark select:focus {
+  border-color: var(--color-gold-400) !important;
+  box-shadow: 0 0 0 2px rgba(195, 155, 111, 0.15) !important;
+}
+
+html.dark h1,
+html.dark h2,
+html.dark h3,
+html.dark h4,
+html.dark h5,
+html.dark h6 {
+  color: var(--text-primary) !important;
+}
+
+html.dark p,
+html.dark span,
+html.dark label {
+  color: var(--text-secondary);
+}
+
+html.dark .badge {
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+}
+
+html.dark table {
+  background: var(--bg-card) !important;
+}
+
+html.dark th {
+  background: var(--bg-surface) !important;
+  color: var(--text-secondary) !important;
+  border-color: var(--border-color) !important;
+}
+
+html.dark td {
+  border-color: var(--border-color) !important;
+  color: var(--text-primary) !important;
+}
+
+html.dark tr:hover {
+  background: var(--bg-hover) !important;
+}
+
+/* Scrollbar Dark Mode */
+html.dark ::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+html.dark ::-webkit-scrollbar-thumb {
+  background: var(--border-light);
+  border-color: var(--bg-primary);
+}
+
+html.dark ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gold-400);
+}
 
 :root {
   font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
