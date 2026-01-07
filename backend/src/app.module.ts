@@ -67,6 +67,45 @@ import { AuditModule } from './modules/audit/audit.module';
 import { CacheModule as AppCacheModule } from './modules/cache/cache.module';
 import { ErrorTrackingModule } from './modules/error-tracking/error-tracking.module';
 import { PrometheusModule } from './modules/prometheus/prometheus.module';
+// ==============================================
+// Batch 3: Low Side-Effect Modules (CRUD-only)
+// ==============================================
+// Dashboard & Visualization (Note: DashboardModule has no module file)
+import { DashboardAnalyticsModule } from './modules/dashboard-analytics/dashboard-analytics.module';
+import { DashboardBuilderModule } from './modules/dashboard-builder/dashboard-builder.module';
+import { HeatmapAnalyticsModule } from './modules/heatmap-analytics/heatmap-analytics.module';
+import { TimelineVisualizationModule } from './modules/timeline-visualization/timeline-visualization.module';
+import { D3ChartModule } from './modules/d3-chart/d3-chart.module';
+// Reports
+import { ReportBuilderModule } from './modules/report-builder/report-builder.module';
+import { ReportSchedulerModule } from './modules/report-scheduler/report-scheduler.module';
+import { PerformanceReportModule } from './modules/performance-report/performance-report.module';
+import { ExcelExportModule } from './modules/excel-export/excel-export.module';
+import { PdfGeneratorModule } from './modules/pdf-generator/pdf-generator.module';
+// Operations
+import { DroneOpsModule } from './modules/drone-ops/drone-ops.module';
+import { AirOpsModule } from './modules/air-ops/air-ops.module';
+import { TacticalMapsModule } from './modules/tactical-maps/tactical-maps.module';
+import { RoutingModule } from './modules/routing/routing.module';
+// Community
+import { ReunificationModule } from './modules/reunification/reunification.module';
+import { FamilyReunificationModule } from './modules/family-reunification/family-reunification.module';
+import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module';
+import { PsychologicalTrackingModule } from './modules/psychological-tracking/psychological-tracking.module';
+import { CommunityResilienceModule } from './modules/community-resilience/community-resilience.module';
+import { DisasterCommunityModule } from './modules/disaster-community/disaster-community.module';
+import { CrowdReportingModule } from './modules/crowd-reporting/crowd-reporting.module';
+// Volunteer
+import { RewardsModule } from './modules/rewards/rewards.module';
+import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module';
+import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module';
+// Equipment & Misc
+import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module';
+import { MockDataModule } from './modules/mock-data/mock-data.module';
+import { I18nApiModule } from './modules/i18n-api/i18n-api.module';
+import { SwaggerAutoDocsModule } from './modules/swagger-auto-docs/swagger-auto-docs.module';
+import { SystemModule } from './modules/system/system.module';
+import { AuditLogModule } from './modules/audit-log/audit-log.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -165,6 +204,45 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         AppCacheModule, // ⚡ 快取服務
         ErrorTrackingModule, // 🐛 錯誤追蹤
         PrometheusModule, // 📊 Prometheus 監控
+        // ==============================================
+        // Batch 3: Low Side-Effect Modules (CRUD-only)
+        // ==============================================
+        // Dashboard & Visualization
+        DashboardAnalyticsModule, // 📊 儀表板分析
+        DashboardBuilderModule, // 🔧 儀表板建構器
+        HeatmapAnalyticsModule, // 🗺️ 熱力圖
+        TimelineVisualizationModule, // 📅 時間軸視覺化
+        D3ChartModule, // 📈 D3 圖表
+        // Reports
+        ReportBuilderModule, // 📄 報表建構器
+        ReportSchedulerModule, // 📅 報表排程
+        PerformanceReportModule, // 📊 效能報告
+        ExcelExportModule, // 📊 Excel 匯出
+        PdfGeneratorModule, // 📑 PDF 產生器
+        // Operations
+        DroneOpsModule, // 🚁 無人機運作
+        AirOpsModule, // ✈️ 空中作業
+        TacticalMapsModule, // 🗺️ 戰術地圖
+        RoutingModule, // 🛣️ 路徑規劃
+        // Community
+        ReunificationModule, // 👨‍👩‍👧 家庭團聚
+        FamilyReunificationModule, // 👨‍👩‍👧‍👦 家屬尋人
+        PsychologicalSupportModule, // 🧠 心理支援
+        PsychologicalTrackingModule, // 📊 心理追蹤
+        CommunityResilienceModule, // 💪 社區韌性
+        DisasterCommunityModule, // 🏘️ 災區社群
+        CrowdReportingModule, // 📢 群眾回報
+        // Volunteer
+        RewardsModule, // 🏆 獎勵系統
+        VolunteerPointsModule, // ⭐ 志工積分
+        VolunteerCertificationModule, // 🎓 志工認證
+        // Equipment & Misc
+        EquipmentQrModule, // 📱 裝備 QR 碼
+        MockDataModule, // 🧪 模擬資料
+        I18nApiModule, // 🌐 多語系 API
+        SwaggerAutoDocsModule, // 📚 Swagger 文件
+        SystemModule, // ⚙️ 系統管理
+        AuditLogModule, // 📜 稽核日誌
     ],
     providers: [
         CloudLoggerService,
