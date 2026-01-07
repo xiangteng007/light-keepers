@@ -1,757 +1,184 @@
-import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { login as backendLoginApi } from '../api/services';
-import { firebaseAuthService } from '../services/firebase-auth.service';
-import { liffService } from '../services/liff.service';
-import './LoginPage.css';
+import { login as apiLogin } from '../api/services';
+import { Lock, ChevronRight, ShieldCheck, Activity, AlertTriangle } from 'lucide-react';
+import '../styles/globals.css';
 
-// LINE Login Config
-const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID || '';
-const LINE_REDIRECT_URI = `${window.location.origin}/login`;
-
-// API Base URL - VITE_API_URL 不含 /api/v1，需要手動加上
-const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
-
-export default function LoginPage() {
+const LoginPage: React.FC = () => {
     const navigate = useNavigate();
-    const location = useLocation();
-    const { login, isAuthenticated } = useAuth();
-    const [isLogin, setIsLogin] = useState(true);
+    const { login } = useAuth();
+
+    // Local state for implementation
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const [successMessage, setSuccessMessage] = useState<string | null>(null);
-    const [rememberMe, setRememberMe] = useState(true);
 
-    // Email 驗證狀態
-    const [otpSent, setOtpSent] = useState(false);            // OTP 已發送
-    const [emailVerified, setEmailVerified] = useState(false); // OTP 已驗證
-    const [verificationCode, setVerificationCode] = useState('');
-    const [isVerifyingCode, setIsVerifyingCode] = useState(false);
-
-    const [formData, setFormData] = useState({
-        email: '',
-        password: '',
-        confirmPassword: '',
-        displayName: '',
-    });
-
-    // 取得重定向目標
-    const from = (location.state as { from?: string })?.from || '/dashboard';
-
-    // 已登入則跳轉
-    useEffect(() => {
-        if (isAuthenticated) {
-            navigate(from, { replace: true });
-        }
-    }, [isAuthenticated, navigate, from]);
-
-    // 處理 LINE OAuth callback
-    useEffect(() => {
-        const urlParams = new URLSearchParams(window.location.search);
-        const code = urlParams.get('code');
-        const state = urlParams.get('state');
-        const verified = urlParams.get('verified');
-
-        if (code && state === 'line-login') {
-            handleLineCallback(code);
-        }
-
-        // 從 Email 驗證連結返回
-        if (verified === 'true') {
-            setSuccessMessage('Email 已驗證成功！請登入您的帳號');
-            setIsLogin(true);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    }, []);
-
-    // LIFF 初始化與自動登入
-    useEffect(() => {
-        const initLiffAndAutoLogin = async () => {
-            // 初始化 LIFF SDK
-            const initialized = await liffService.init();
-
-            if (!initialized) {
-                // LIFF 未設定或初始化失敗，使用一般登入流程
-                return;
-            }
-
-            // 檢查是否在 LINE App 內
-            if (liffService.isInLineApp()) {
-                setIsLoading(true);
-
-                // 如果未登入 LINE，觸發 LIFF 登入
-                if (!liffService.isLoggedIn) {
-                    liffService.login();
-                    return;
-                }
-
-                // 已登入 LINE，取得 ID Token 並與後端交換 JWT
-                const idToken = liffService.getIDToken();
-                if (idToken) {
-                    try {
-                        await handleLiffLogin(idToken);
-                    } catch (err) {
-                        console.error('LIFF auto-login failed:', err);
-                        setError('LINE SSO 登入失敗，請稍後再試');
-                        setIsLoading(false);
-                    }
-                }
-            }
-        };
-
-        initLiffAndAutoLogin();
-    }, []);
-
-    // LIFF Token 登入處理
-    const handleLiffLogin = async (idToken: string) => {
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/auth/liff/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idToken }),
-            });
-
-            const data = await response.json();
-
-            if (data.accessToken) {
-                await login(data.accessToken, true); // LIFF 登入預設記住
-                navigate(from, { replace: true });
-            } else if (data.needsRegistration) {
-                // LIFF 登入應該自動建立帳號，此處不應發生
-                setError('LIFF 登入發生錯誤，請使用其他方式登入');
-            }
-        } catch (err) {
-            console.error('LIFF login API failed:', err);
-            throw err;
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    const handleLineCallback = async (code: string) => {
-        setIsLoading(true);
-        setError(null);
-        try {
-            const response = await fetch(`${API_BASE}/auth/line/callback`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ code, redirectUri: LINE_REDIRECT_URI }),
-            });
-
-            const data = await response.json();
-
-            if (data.accessToken) {
-                await login(data.accessToken);
-                navigate(from, { replace: true });
-            } else if (data.needsRegistration) {
-                setError('LINE 帳號尚未綁定，請先使用 Email 登入後在設定中綁定 LINE');
-            }
-        } catch (err) {
-            console.error('LINE login failed:', err);
-            setError('LINE 登入失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-            window.history.replaceState({}, document.title, window.location.pathname);
-        }
-    };
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
-        setError(null);
-        setSuccessMessage(null);
-    };
-
-    // Email 註冊 (OTP 驗證後)
-    const handleFirebaseRegister = async () => {
-        setError(null);
-        setIsLoading(true);
-
-        // 確認 Email 已驗證
-        if (!emailVerified) {
-            setError('請先驗證您的 Email');
-            setIsLoading(false);
-            return;
-        }
-
-        // 驗證密碼
-        if (formData.password !== formData.confirmPassword) {
-            setError('密碼不一致');
-            setIsLoading(false);
-            return;
-        }
-
-        if (formData.password.length < 6) {
-            setError('密碼至少需要 6 個字元');
-            setIsLoading(false);
-            return;
-        }
-
-        try {
-            // 使用 Firebase 註冊
-            const result = await firebaseAuthService.registerWithEmail(
-                formData.email,
-                formData.password,
-                formData.displayName
-            );
-
-            if (result.success) {
-                // 註冊成功，取得 Token 並自動登入
-                const idToken = await firebaseAuthService.getIdToken();
-                if (idToken) {
-                    const response = await fetch(`${API_BASE}/auth/firebase/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ idToken }),
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        await login(data.accessToken, rememberMe);
-                        navigate(from, { replace: true });
-                        return;
-                    }
-                }
-                // 如果自動登入失敗，提示用戶手動登入
-                setSuccessMessage('註冊成功！請使用您的帳號登入');
-                setIsLogin(true);
-                setEmailVerified(false);
-                setOtpSent(false);
-            } else {
-                setError(result.message);
-            }
-        } catch (err) {
-            console.error('Registration failed:', err);
-            setError('註冊失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // Firebase Email 登入
-    const handleFirebaseLogin = async () => {
-        setError(null);
-        setIsLoading(true);
-
-        try {
-            // 使用 Firebase 登入
-            const firebaseResult = await firebaseAuthService.loginWithEmail(
-                formData.email,
-                formData.password
-            );
-
-            if (firebaseResult.success) {
-                // Firebase 登入成功，取得 ID Token 並與後端交換 JWT
-                const idToken = await firebaseAuthService.getIdToken();
-                if (idToken) {
-                    const response = await fetch(`${API_BASE}/auth/firebase/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ idToken }),
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        await login(data.accessToken, rememberMe);
-                        navigate(from, { replace: true });
-                        return;
-                    }
-                }
-            }
-
-            // Firebase 登入失敗，嘗試使用後端直接驗證（支援非 Firebase 帳號）
-            console.log('Firebase login failed, trying backend auth...');
-            try {
-                const backendResponse = await backendLoginApi(formData.email, formData.password);
-                if (backendResponse.data?.accessToken) {
-                    await login(backendResponse.data.accessToken, rememberMe);
-                    navigate(from, { replace: true });
-                    return;
-                }
-            } catch (backendError: any) {
-                // 後端驗證也失敗
-                const errorMsg = backendError?.response?.data?.message || '帳號或密碼錯誤';
-                setError(errorMsg);
-            }
-        } catch (err) {
-            console.error('Login failed:', err);
-            setError('登入失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 發送 Email OTP 驗證碼
-    const handleResendVerification = async () => {
-        if (!formData.email) {
-            setError('請先輸入電子郵件');
-            return;
-        }
-
-        setIsLoading(true);
-        setError(null);
-
-        try {
-            const response = await fetch(`${API_BASE}/auth/send-email-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: formData.email }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                setOtpSent(true);
-                setSuccessMessage('驗證碼已發送至您的 Email，請查收');
-            } else {
-                setError(data.message || '發送失敗，請稍後再試');
-            }
-        } catch (err) {
-            setError('發送失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // 驗證驗證碼
-    const handleVerifyCode = async () => {
-        if (!verificationCode || verificationCode.length < 6) {
-            setError('請輸入完整的6位驗證碼');
-            return;
-        }
-
-        setIsVerifyingCode(true);
-        setError(null);
-
-        try {
-            const response = await fetch(`${API_BASE}/auth/verify-email-otp`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    email: formData.email,
-                    code: verificationCode
-                }),
-            });
-
-            const data = await response.json();
-
-            if (response.ok && data.success) {
-                // 驗證成功，標記 Email 已驗證
-                setEmailVerified(true);
-                setSuccessMessage('✓ Email 驗證成功！請填寫以下資料完成註冊');
-                setVerificationCode('');
-            } else {
-                setError(data.message || '驗證碼錯誤，請重新輸入');
-            }
-        } catch (err) {
-            setError('驗證失敗，請稍後再試');
-        } finally {
-            setIsVerifyingCode(false);
-        }
-    };
-
-    // 表單提交
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
-
-        if (isLogin) {
-            await handleFirebaseLogin();
-        } else {
-            await handleFirebaseRegister();
-        }
-    };
-
-    // Google 登入（使用 Firebase）
-    const handleGoogleLogin = async () => {
         setIsLoading(true);
         setError(null);
 
-        // 偵測是否在 LINE 內嵌瀏覽器中
-        // LINE 內嵌瀏覽器無法使用 Google OAuth（disallowed_useragent）
-        if (liffService.isInLineApp()) {
-            // 在外部瀏覽器開啟登入頁面
-            liffService.openWindow(`${window.location.origin}/login?method=google`, true);
-            setError('請在外部瀏覽器完成 Google 登入');
-            setIsLoading(false);
-            return;
-        }
-
         try {
-            const result = await firebaseAuthService.loginWithGoogle();
+            // 1. Call API to get token
+            const response = await apiLogin(email, password);
 
-            if (!result.success) {
-                setError(result.message);
-                setIsLoading(false);
-                return;
-            }
-
-            // 取得 Firebase ID Token
-            const idToken = await firebaseAuthService.getIdToken();
-            if (!idToken) {
-                setError('無法取得認證 Token');
-                setIsLoading(false);
-                return;
-            }
-
-            // 嘗試使用 Firebase Token 登入後端
-            const response = await fetch(`${API_BASE}/auth/firebase/login`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ idToken }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                await login(data.accessToken, true);
-                navigate(from, { replace: true });
+            // 2. Pass token to AuthContext
+            if (response.data && response.data.accessToken) {
+                await login(response.data.accessToken);
+                navigate('/dashboard');
             } else {
-                // Fallback: 嘗試 Google OAuth 流程
-                setError('Google 登入設定進行中，請使用 Email 登入');
+                throw new Error('No access token received');
             }
-        } catch (err) {
-            console.error('Google login failed:', err);
-            setError('Google 登入失敗，請稍後再試');
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    // LINE 登入
-    const handleLineLogin = () => {
-        if (!LINE_CLIENT_ID) {
-            setError('LINE 登入尚未設定，請聯繫系統管理員');
-            return;
-        }
-        const lineAuthUrl = `https://access.line.me/oauth2/v2.1/authorize?response_type=code&client_id=${LINE_CLIENT_ID}&redirect_uri=${encodeURIComponent(LINE_REDIRECT_URI)}&state=line-login&scope=profile%20openid`;
-        window.location.href = lineAuthUrl;
-    };
-
-    // 忘記密碼
-    const [showForgotPassword, setShowForgotPassword] = useState(false);
-    const [forgotEmail, setForgotEmail] = useState('');
-
-    const handleForgotPassword = async () => {
-        if (!forgotEmail) {
-            setError('請輸入 Email');
-            return;
-        }
-
-        setIsLoading(true);
-        try {
-            const result = await firebaseAuthService.sendPasswordReset(forgotEmail);
-            if (result.success) {
-                setSuccessMessage('密碼重設信已發送至您的 Email');
-                setShowForgotPassword(false);
-            } else {
-                setError(result.message);
-            }
-        } catch (err) {
-            setError('發送失敗，請稍後再試');
+        } catch (err: any) {
+            console.error('Login failed:', err);
+            setError('ACCESS DENIED: Invalid credentials');
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="login-page">
-            <div className="login-container">
-                <div className="login-header">
-                    <div className="login-logo">
-                        <h1>Light Keepers</h1>
-                        <p className="login-subtitle">曦望燈塔資訊管理平台</p>
+        <div
+            className="min-h-screen w-full bg-[#0F1218] flex items-center justify-center relative font-sans selection:bg-[#C39B6F] selection:text-[#0F1218]"
+            style={{
+                minHeight: '100vh',
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+            }}
+        >
+            {/* Background Texture & Gradient - Absolutely positioned to not affect flow */}
+            <div className="absolute inset-0 bg-grid-pattern opacity-10 pointer-events-none"></div>
+            <div className="absolute inset-0 bg-gradient-to-b from-[#0F1218]/80 via-transparent to-[#0F1218] pointer-events-none"></div>
+
+            {/* Ambient Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#1D2635] blur-[120px] rounded-full opacity-20 pointer-events-none"></div>
+            <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-[#C39B6F]/5 blur-[150px] rounded-full pointer-events-none mix-blend-screen"></div>
+
+            {/* Login Glass Panel - Centered by flex container */}
+            <div className="relative z-10 w-full max-w-md p-8">
+                {/* Tactical Card Container */}
+                <div className="relative bg-[#0F1218]/90 backdrop-blur-xl border border-[#2F3641] rounded-lg shadow-2xl overflow-hidden group">
+
+                    {/* Corner Decorators (SVG) */}
+                    <div className="absolute top-0 left-0 p-3 opacity-80">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M2 22V2H22" stroke="#C39B6F" strokeWidth="2" strokeLinecap="square" />
+                        </svg>
                     </div>
-                </div>
+                    <div className="absolute top-0 right-0 p-3 opacity-80">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="rotate-90">
+                            <path d="M2 22V2H22" stroke="#C39B6F" strokeWidth="2" strokeLinecap="square" />
+                        </svg>
+                    </div>
+                    <div className="absolute bottom-0 left-0 p-3 opacity-80">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="-rotate-90">
+                            <path d="M2 22V2H22" stroke="#C39B6F" strokeWidth="2" strokeLinecap="square" />
+                        </svg>
+                    </div>
+                    <div className="absolute bottom-0 right-0 p-3 opacity-80">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" className="rotate-180">
+                            <path d="M2 22V2H22" stroke="#C39B6F" strokeWidth="2" strokeLinecap="square" />
+                        </svg>
+                    </div>
 
-                {!showForgotPassword ? (
-                    <>
-                        <div className="login-tabs">
-                            <button
-                                className={`login-tab ${isLogin ? 'active' : ''}`}
-                                onClick={() => {
-                                    setIsLogin(true);
-                                    setError(null);
-                                    setSuccessMessage(null);
-                                }}
-                            >
-                                登入
-                            </button>
-                            <button
-                                className={`login-tab ${!isLogin ? 'active' : ''}`}
-                                onClick={() => {
-                                    setIsLogin(false);
-                                    setError(null);
-                                    setSuccessMessage(null);
-                                }}
-                            >
-                                註冊
-                            </button>
+                    {/* Panel Header */}
+                    <div className="flex flex-col items-center pt-12 pb-6 px-8 border-b border-[#2F3641]/50 bg-[#13171F]/50">
+                        {/* Status Badge */}
+                        <div className="flex items-center gap-2 mb-6 px-3 py-1 bg-[#0B1120] border border-[#2F3641] rounded-full shadow-[0_0_10px_rgba(195,155,111,0.1)]">
+                            <ShieldCheck size={14} className="text-[#C39B6F]" />
+                            <span className="text-[10px] font-mono text-[#C39B6F] tracking-widest uppercase relative top-[1px]">
+                                System Status: SECURE
+                            </span>
                         </div>
 
-                        <form className="login-form" onSubmit={handleSubmit}>
-                            {/* 註冊模式且 Email 已驗證後才顯示顯示名稱 */}
-                            {!isLogin && emailVerified && (
-                                <div className="form-group">
-                                    <label htmlFor="displayName">顯示名稱</label>
-                                    <input
-                                        type="text"
-                                        id="displayName"
-                                        name="displayName"
-                                        placeholder="請輸入您的名稱"
-                                        value={formData.displayName}
-                                        onChange={handleChange}
-                                        required={!isLogin}
-                                    />
-                                </div>
-                            )}
+                        {/* Title */}
+                        <h1 className="text-3xl font-bold text-white tracking-[0.2em] mb-2 font-sans relative text-center">
+                            LIGHT KEEPERS
+                            <span className="absolute -bottom-3 left-1/2 -translate-x-1/2 w-24 h-[2px] bg-gradient-to-r from-transparent via-[#C39B6F] to-transparent"></span>
+                        </h1>
+                        <p className="text-xs text-gray-500 font-mono tracking-wider mt-3">
+                            曦望燈塔資訊管理平台
+                        </p>
+                    </div>
 
-                            <div className="form-group">
-                                <label htmlFor="email">電子郵件</label>
-                                {!isLogin ? (
-                                    <div className="input-with-button">
-                                        <input
-                                            type="email"
-                                            id="email"
-                                            name="email"
-                                            autoComplete="email"
-                                            placeholder="請輸入電子郵件"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                        <button
-                                            type="button"
-                                            className="inline-btn"
-                                            onClick={handleResendVerification}
-                                            disabled={isLoading || !formData.email}
-                                        >
-                                            {otpSent ? '重發' : '發送'}
-                                        </button>
-                                    </div>
-                                ) : (
-                                    <input
-                                        type="email"
-                                        id="email"
-                                        name="email"
-                                        autoComplete="email"
-                                        placeholder="請輸入電子郵件"
-                                        value={formData.email}
-                                        onChange={handleChange}
-                                        required
-                                    />
-                                )}
-                            </div>
+                    {/* Login Form */}
+                    <form onSubmit={handleLogin} className="px-8 py-10 relative">
+                        {/* Scanline Effect Overlay (Subtle) */}
+                        <div className="absolute inset-0 bg-[url('/scanline.png')] opacity-5 pointer-events-none mix-blend-overlay"></div>
 
-                            {/* 註冊時顯示驗證碼欄位 */}
-                            {!isLogin && (
-                                <div className="form-group">
-                                    <label htmlFor="verificationCode">驗證碼</label>
-                                    <div className="input-with-button">
-                                        <input
-                                            type="text"
-                                            id="verificationCode"
-                                            placeholder="請輸入 6 位數驗證碼"
-                                            value={verificationCode}
-                                            onChange={(e) => setVerificationCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
-                                            maxLength={6}
-                                        />
-                                        <button
-                                            type="button"
-                                            className="inline-btn"
-                                            onClick={handleVerifyCode}
-                                            disabled={isVerifyingCode || verificationCode.length < 6}
-                                        >
-                                            {isVerifyingCode ? '...' : '驗證'}
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* 密碼欄位 - 登入模式或 Email 已驗證後顯示 */}
-                            {(isLogin || emailVerified) && (
-                                <div className="form-group">
-                                    <label htmlFor="password">密碼</label>
-                                    <input
-                                        type="password"
-                                        id="password"
-                                        name="password"
-                                        autoComplete={isLogin ? 'current-password' : 'new-password'}
-                                        placeholder="請輸入密碼"
-                                        value={formData.password}
-                                        onChange={handleChange}
-                                        required
-                                        minLength={6}
-                                    />
-                                </div>
-                            )}
-
-                            {/* 確認密碼 - 註冊模式且 Email 已驗證後顯示 */}
-                            {!isLogin && emailVerified && (
-                                <div className="form-group">
-                                    <label htmlFor="confirmPassword">確認密碼</label>
-                                    <input
-                                        type="password"
-                                        id="confirmPassword"
-                                        name="confirmPassword"
-                                        autoComplete="new-password"
-                                        placeholder="請再次輸入密碼"
-                                        value={formData.confirmPassword}
-                                        onChange={handleChange}
-                                        required={!isLogin && emailVerified}
-                                        minLength={6}
-                                    />
-                                </div>
-                            )}
-
-                            {isLogin && (
-                                <div className="form-group form-group--checkbox">
-                                    <label className="checkbox-label">
-                                        <input
-                                            type="checkbox"
-                                            checked={rememberMe}
-                                            onChange={(e) => setRememberMe(e.target.checked)}
-                                        />
-                                        <span className="checkbox-text">記住我</span>
-                                    </label>
-                                    <button
-                                        type="button"
-                                        className="forgot-password-link"
-                                        onClick={() => {
-                                            setShowForgotPassword(true);
-                                            setForgotEmail(formData.email);
-                                        }}
-                                    >
-                                        忘記密碼？
-                                    </button>
-                                </div>
-                            )}
-
-                            {error && (
-                                <div className="login-error">
-                                    ⚠️ {error}
-                                </div>
-                            )}
-
-                            {successMessage && (
-                                <div className="login-success">
-                                    ✅ {successMessage}
-                                </div>
-                            )}
-
-                            {/* 登入模式或已驗證 Email 後顯示註冊按鈕 */}
-                            {(isLogin || emailVerified) && (
-                                <button
-                                    type="submit"
-                                    className="login-submit"
-                                    disabled={isLoading}
-                                >
-                                    {isLoading ? '處理中...' : (isLogin ? '登入' : '註冊')}
-                                </button>
-                            )}
-
-                            {/* 註冊模式但尚未驗證 Email - 顯示提示 */}
-                            {!isLogin && !emailVerified && otpSent && (
-                                <div className="login-hint">
-                                    請輸入驗證碼並點擊「驗證」
-                                </div>
-                            )}
-                        </form>
-
-
-                        {/* 社群登入 - 僅在登入模式顯示 */}
-                        {isLogin && (
-                            <>
-                                <div className="login-divider">
-                                    <span>或使用其他方式</span>
-                                </div>
-
-                                <button
-                                    type="button"
-                                    className="login-line-btn"
-                                    onClick={handleLineLogin}
-                                    disabled={isLoading}
-                                >
-                                    <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
-                                        <path d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.629.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.104.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314" />
-                                    </svg>
-                                    使用 LINE 登入
-                                </button>
-
-                                <button
-                                    type="button"
-                                    className="login-google-btn"
-                                    onClick={handleGoogleLogin}
-                                    disabled={isLoading}
-                                >
-                                    <svg viewBox="0 0 24 24" width="20" height="20">
-                                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
-                                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" />
-                                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" />
-                                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" />
-                                    </svg>
-                                    使用 Google 登入
-                                </button>
-                            </>
-                        )}
-
-                        <div className="login-footer">
-                            <p>© 2026 曦望燈塔救援協會</p>
-                        </div>
-                    </>
-                ) : (
-                    /* 忘記密碼表單 */
-                    <div className="forgot-password-form">
-                        <h3>忘記密碼</h3>
-                        <p>請輸入您的 Email，我們將發送密碼重設連結</p>
-
-                        <div className="form-group">
-                            <label htmlFor="forgotEmail">電子郵件</label>
-                            <input
-                                type="email"
-                                id="forgotEmail"
-                                placeholder="請輸入電子郵件"
-                                value={forgotEmail}
-                                onChange={(e) => setForgotEmail(e.target.value)}
-                                required
-                            />
-                        </div>
-
+                        {/* Error Message */}
                         {error && (
-                            <div className="login-error">
-                                ⚠️ {error}
+                            <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono p-3 rounded flex items-center gap-2 mb-6 animate-in fade-in slide-in-from-top-2">
+                                <AlertTriangle size={14} />
+                                {error}
                             </div>
                         )}
 
-                        {successMessage && (
-                            <div className="login-success">
-                                ✅ {successMessage}
+                        <div className="mb-4">
+                            <label className="block text-[10px] text-gray-400 font-mono tracking-wider uppercase pl-1 mb-2">
+                                Operator ID (Email)
+                            </label>
+                            <div className="relative group/input">
+                                <input
+                                    type="email"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    placeholder="ENTER ID..."
+                                    className="w-full bg-[#13171F] border border-[#2F3641] rounded-sm text-white px-4 py-3 text-sm font-mono placeholder-gray-600 outline-none transition-all duration-300 focus:border-[#C39B6F] focus:ring-1 focus:ring-[#C39B6F]/50 shadow-inner"
+                                    required
+                                />
+                                <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[#C39B6F] opacity-0 transition-opacity duration-300 group-focus-within/input:opacity-100"></div>
                             </div>
-                        )}
+                        </div>
+
+                        <div className="mb-8">
+                            <label className="block text-[10px] text-gray-400 font-mono tracking-wider uppercase pl-1 mb-2">
+                                Access Code (Password)
+                            </label>
+                            <div className="relative group/input">
+                                <input
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="••••••••"
+                                    className="w-full bg-[#13171F] border border-[#2F3641] rounded-sm text-white px-4 py-3 text-sm font-mono placeholder-gray-600 outline-none transition-all duration-300 focus:border-[#C39B6F] focus:ring-1 focus:ring-[#C39B6F]/50 shadow-inner"
+                                    required
+                                />
+                                <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-[#C39B6F] opacity-0 transition-opacity duration-300 group-focus-within/input:opacity-100"></div>
+                            </div>
+                        </div>
 
                         <button
-                            type="button"
-                            className="login-submit"
-                            onClick={handleForgotPassword}
+                            type="submit"
                             disabled={isLoading}
+                            className={`w-full !bg-[#C39B6F] hover:!bg-[#D4AF37] !text-[#0F1218] font-bold py-3.5 px-4 rounded-sm transition-all duration-200 flex items-center justify-center gap-2 uppercase tracking-[0.15em] transform active:scale-[0.98] shadow-[0_0_20px_rgba(195,155,111,0.3)] hover:shadow-[0_0_30px_rgba(195,155,111,0.5)] border border-[#FCD34D]/20 relative overflow-hidden group/btn ${isLoading ? 'opacity-70 cursor-not-allowed' : ''}`}
                         >
-                            {isLoading ? '發送中...' : '發送重設連結'}
+                            <div className="absolute inset-0 bg-white/20 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+                            {isLoading ? (
+                                <Activity className="animate-spin" size={20} />
+                            ) : (
+                                <>
+                                    <span>Initiate Uplink</span>
+                                    <ChevronRight size={20} strokeWidth={2.5} className="group-hover/btn:translate-x-1 transition-transform" />
+                                </>
+                            )}
                         </button>
 
-                        <button
-                            type="button"
-                            className="login-back-btn"
-                            onClick={() => {
-                                setShowForgotPassword(false);
-                                setError(null);
-                                setSuccessMessage(null);
-                            }}
-                        >
-                            ← 返回登入
-                        </button>
-                    </div>
-                )}
+                        <div className="text-center pt-6 mt-2">
+                            <div className="flex items-center justify-center gap-2 text-[10px] text-gray-600 font-mono opacity-60 hover:opacity-100 transition-opacity cursor-help" title="Restricted Access">
+                                <Lock size={10} />
+                                <span>VERSION: v2.0.4.5 // CLASSIFIED</span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );
-}
+};
+
+export default LoginPage;

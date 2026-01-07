@@ -78,8 +78,8 @@ export default function Layout() {
                 </nav>
 
                 <button className="v2-nav-user" onClick={() => navigate('/profile')}>
-                    {user?.photoURL ? (
-                        <img src={user.photoURL} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    {user?.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                     ) : (
                         <User size={24} color="#94A3B8" style={{ margin: 'auto' }} />
                     )}
