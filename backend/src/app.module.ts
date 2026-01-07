@@ -42,6 +42,12 @@ import { OverlaysModule } from './modules/overlays/overlays.module';
 import { MetricsModule } from './modules/metrics/metrics.module';
 // PR5: 重構模組
 import { WeatherHubModule } from './modules/weather-hub/weather-hub.module';
+// PR6: P1 缺失模組 (E2E 閉環必需)
+import { TriageModule } from './modules/triage/triage.module';
+import { LocationModule } from './modules/location/location.module';
+import { TaskDispatchModule } from './modules/task-dispatch/task-dispatch.module';
+// Core Domains 聚合模組
+import { CoreDomainsModule } from './core/core-domains.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -115,6 +121,12 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         MetricsModule, // 📊 API 效能監控
         // PR5: 重構整併
         WeatherHubModule, // 🌤️ 氣象整合中心
+        // PR6: P1 缺失模組 (E2E 閉環必需)
+        TriageModule, // 🏥 檢傷分類 (START)
+        LocationModule, // 📍 地理圍欄服務
+        TaskDispatchModule, // 🔄 智慧任務派遣
+        // Core Domains 聚合
+        CoreDomainsModule, // 🏛️ 核心領域聚合
     ],
     providers: [
         CloudLoggerService,
