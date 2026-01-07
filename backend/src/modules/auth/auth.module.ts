@@ -43,7 +43,7 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         FirebaseAdminService,
         RefreshTokenService,
     ],
-    exports: [AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService],
+    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService],
 })
 export class AuthModule { }
 
