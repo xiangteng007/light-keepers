@@ -20,15 +20,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import './Layout.css';
 
-// ===== Nav Data =====
-const NAV_ITEMS = [
-    { id: 'dashboard', path: '/dashboard', icon: LayoutDashboard, label: '指揮艙' },
-    { id: 'map', path: '/map', icon: MapIcon, label: '戰術地圖' },
-    { id: 'events', path: '/events', icon: Radio, label: '災情通報' },
-    { id: 'resources', path: '/resources', icon: Package, label: '物資庫房' },
-    { id: 'team', path: '/volunteers', icon: Users, label: '部隊管理' },
-    { id: 'settings', path: '/settings', icon: Settings, label: '系統設定' },
-];
+import Sidebar, { NAV_ITEMS } from './layout/Sidebar';
 
 export default function Layout() {
     const location = useLocation();
@@ -43,11 +35,6 @@ export default function Layout() {
         return () => clearInterval(timer);
     }, []);
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
-    };
-
     const formatTime = (date: Date) => {
         return date.toLocaleTimeString('en-US', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
     };
@@ -55,36 +42,7 @@ export default function Layout() {
     return (
         <div className="v2-framework">
             {/* Zone A: Slim Nav Rail */}
-            <aside className="v2-nav-rail">
-                <div className="v2-logo" title="Light Keepers Tactical V2">
-                    LK
-                </div>
-
-                <nav className="v2-nav-items">
-                    {NAV_ITEMS.map(item => {
-                        const Icon = item.icon;
-                        const isActive = location.pathname.startsWith(item.path);
-                        return (
-                            <Link
-                                key={item.id}
-                                to={item.path}
-                                className={`v2-nav-item ${isActive ? 'active' : ''}`}
-                                title={item.label}
-                            >
-                                <Icon strokeWidth={1.5} size={24} />
-                            </Link>
-                        );
-                    })}
-                </nav>
-
-                <button className="v2-nav-user" onClick={() => navigate('/profile')}>
-                    {user?.avatarUrl ? (
-                        <img src={user.avatarUrl} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
-                        <User size={24} color="#94A3B8" style={{ margin: 'auto' }} />
-                    )}
-                </button>
-            </aside>
+            <Sidebar />
 
             {/* Zone B: Header */}
             <header className="v2-header">

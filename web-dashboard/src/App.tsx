@@ -23,7 +23,7 @@ import ReportsAdminPage from './pages/ReportsAdminPage'
 import ReportsExportPage from './pages/ReportsExportPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
-import LoginPage from './pages/LoginPage'
+// import LoginPage from './pages/LoginPage' // Deprecated
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import ProfilePage from './pages/ProfilePage'
@@ -145,7 +145,7 @@ function App() {
         )}
 
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
+          {/* <Route path="/login" element={<LoginPage />} /> Deprecated: Use Modal Login */}
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />

@@ -41,7 +41,7 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
 
     // Level 1+ 頁面：未登入導向登入頁
     if (!isAuthenticated) {
-        return <Navigate to="/login" state={{ from: location }} replace />;
+        return <Navigate to="/" state={{ from: location }} replace />;
     }
 
     // 檢查權限等級（匿名用戶 = Level 0）
