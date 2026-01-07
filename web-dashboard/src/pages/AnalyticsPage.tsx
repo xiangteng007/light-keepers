@@ -43,7 +43,7 @@ ChartJS.register(
 
 // 生成過去 N 天的日期標籤
 function getDateLabels(days: number): string[] {
-    const labels = [];
+    const labels: string[] = [];
     for (let i = days - 1; i >= 0; i--) {
         const date = new Date();
         date.setDate(date.getDate() - i);
