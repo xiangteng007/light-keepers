@@ -142,6 +142,81 @@ import { WeatherAlertIntegrationModule } from './modules/weather-alert-integrati
 import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module';
 import { TrendPredictionModule } from './modules/trend-prediction/trend-prediction.module';
 import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-media-monitor.module';
+// ==============================================
+// Batch 5: Remaining Infrastructure Modules (FINAL)
+// ==============================================
+// AR/VR
+import { ArFieldGuidanceModule } from './modules/ar-field-guidance/ar-field-guidance.module';
+import { ArNavigationModule } from './modules/ar-navigation/ar-navigation.module';
+import { VrCommandModule } from './modules/vr-command/vr-command.module';
+// Offline & Mobile
+import { OfflineSyncModule } from './modules/offline-sync/offline-sync.module';
+import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module';
+import { OfflineMapCacheModule } from './modules/offline-map-cache/offline-map-cache.module';
+import { OfflineTilesModule } from './modules/offline-tiles/offline-tiles.module';
+import { MobileSyncModule } from './modules/mobile-sync/mobile-sync.module';
+import { DeviceManagementModule } from './modules/device-management/device-management.module';
+// Push Notifications
+import { PushNotificationModule } from './modules/push-notification/push-notification.module';
+import { PushNotificationV2Module } from './modules/push-notification-v2/push-notification-v2.module';
+// LINE & Social
+import { LineLiffModule } from './modules/line-liff/line-liff.module';
+import { LineNotifyModule } from './modules/line-notify/line-notify.module';
+// Blockchain & Security
+import { BlockchainModule } from './modules/blockchain/blockchain.module';
+import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
+import { SupplyChainBlockchainModule } from './modules/supply-chain-blockchain/supply-chain-blockchain.module';
+import { BiometricAuthModule } from './modules/biometric-auth/biometric-auth.module';
+import { TwoFactorAuthModule } from './modules/two-factor-auth/two-factor-auth.module';
+import { SecretRotationModule } from './modules/secret-rotation/secret-rotation.module';
+import { GdprComplianceModule } from './modules/gdpr-compliance/gdpr-compliance.module';
+import { IpWhitelistModule } from './modules/ip-whitelist/ip-whitelist.module';
+import { SessionTimeoutModule } from './modules/session-timeout/session-timeout.module';
+import { DataEncryptionModule } from './modules/data-encryption/data-encryption.module';
+// Simulation & Training
+import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module';
+import { EvacuationSimModule } from './modules/evacuation-sim/evacuation-sim.module';
+import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module';
+// Specialty
+import { AarAnalysisModule } from './modules/aar-analysis/aar-analysis.module';
+import { BimIntegrationModule } from './modules/bim-integration/bim-integration.module';
+import { Cesium3dModule } from './modules/cesium-3d/cesium-3d.module';
+import { DroneSwarmModule } from './modules/drone-swarm/drone-swarm.module';
+import { InsaragModule } from './modules/insarag/insarag.module';
+import { RobotRescueModule } from './modules/robot-rescue/robot-rescue.module';
+import { SpectrumAnalysisModule } from './modules/spectrum-analysis/spectrum-analysis.module';
+import { WaterResourcesModule } from './modules/water-resources/water-resources.module';
+import { WearableModule } from './modules/wearable/wearable.module';
+// Communication
+import { PttModule } from './modules/ptt/ptt.module';
+import { BluetoothAudioModule } from './modules/bluetooth-audio/bluetooth-audio.module';
+import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module';
+import { RealtimeChatModule } from './modules/realtime-chat/realtime-chat.module';
+import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
+import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
+// Infrastructure
+import { RedisCacheModule } from './modules/redis-cache/redis-cache.module';
+import { SentryModule } from './modules/sentry/sentry.module';
+import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module';
+import { NfcModule } from './modules/nfc/nfc.module';
+import { IndoorPositioningModule } from './modules/indoor-positioning/indoor-positioning.module';
+import { GeofenceAlertModule } from './modules/geofence-alert/geofence-alert.module';
+// Note: GeoIntelModule has no module file (only agents subfolder)
+// Resource Management
+import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module';
+import { ResourceOptimizationModule } from './modules/resource-optimization/resource-optimization.module';
+import { DonationTrackingModule } from './modules/donation-tracking/donation-tracking.module';
+import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module';
+// Admin & Finance
+import { MultiEocModule } from './modules/multi-eoc/multi-eoc.module';
+import { MultiTenantModule } from './modules/multi-tenant/multi-tenant.module';
+import { PublicFinanceModule } from './modules/public-finance/public-finance.module';
+import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module';
+import { PowerBiModule } from './modules/power-bi/power-bi.module';
+// Misc
+import { MicroTaskModule } from './modules/micro-task/micro-task.module';
+import { FileUploadModule } from './modules/file-upload/file-upload.module';
+import { EmailTemplateModule } from './modules/email-template/email-template.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -315,6 +390,80 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         TccipClimateModule, // 🌡️ TCCIP 氣候
         TrendPredictionModule, // 📈 趨勢預測
         SocialMediaMonitorModule, // 📱 社群監控
+        // ==============================================
+        // Batch 5: Remaining Infrastructure Modules (FINAL)
+        // ==============================================
+        // AR/VR
+        ArFieldGuidanceModule, // 📱 AR 現場指引
+        ArNavigationModule, // 🗺️ AR 導航
+        VrCommandModule, // 🥽 VR 指揮
+        // Offline & Mobile
+        OfflineSyncModule, // 📴 離線同步
+        OfflineMeshModule, // 🔗 Mesh 網路
+        OfflineMapCacheModule, // 🗺️ 離線地圖
+        OfflineTilesModule, // 🔲 離線圖磚
+        MobileSyncModule, // 📱 行動同步
+        DeviceManagementModule, // 📲 裝置管理
+        // Push Notifications
+        PushNotificationModule, // 🔔 推播通知
+        PushNotificationV2Module, // 🔔 推播 V2
+        // LINE & Social
+        LineLiffModule, // 💚 LINE LIFF
+        LineNotifyModule, // 📢 LINE Notify
+        // Blockchain & Security
+        BlockchainModule, // ⛓️ 區塊鏈
+        IntegrityLedgerModule, // 📜 完整性帳本
+        SupplyChainBlockchainModule, // 📦 供應鏈區塊鏈
+        BiometricAuthModule, // 👆 生物辨識
+        TwoFactorAuthModule, // 🔐 雙因素驗證
+        SecretRotationModule, // 🔄 密鑰輪換
+        GdprComplianceModule, // 🇪🇺 GDPR 合規
+        IpWhitelistModule, // 🔒 IP 白名單
+        SessionTimeoutModule, // ⏱️ 工作階段逾時
+        DataEncryptionModule, // 🔐 資料加密
+        // Simulation & Training
+        DrillSimulationModule, // 🎯 演習模擬
+        EvacuationSimModule, // 🏃 疏散模擬
+        DamageSimulationModule, // 💥 損害模擬
+        // Specialty
+        AarAnalysisModule, // 📊 AAR 分析
+        BimIntegrationModule, // 🏗️ BIM 整合
+        Cesium3dModule, // 🌍 Cesium 3D
+        DroneSwarmModule, // 🐝 無人機群
+        InsaragModule, // 🏥 INSARAG
+        RobotRescueModule, // 🤖 機器人救援
+        SpectrumAnalysisModule, // 📡 頻譜分析
+        WaterResourcesModule, // 💧 水資源
+        WearableModule, // ⌚ 穿戴裝置
+        // Communication
+        PttModule, // 📻 PTT 對講
+        BluetoothAudioModule, // 🎧 藍牙音訊
+        MediaStreamingModule, // 📺 媒體串流
+        RealtimeChatModule, // 💬 即時聊天
+        SpeechToTextModule, // 🎤 語音轉文字
+        VoiceAssistantModule, // 🗣️ 語音助理
+        // Infrastructure
+        RedisCacheModule, // ⚡ Redis 快取
+        SentryModule, // 🐛 Sentry 監控
+        QrScannerModule, // 📱 QR 掃描
+        NfcModule, // 📲 NFC
+        IndoorPositioningModule, // 📍 室內定位
+        GeofenceAlertModule, // 🗺️ 地理圍欄
+        // Resource Management
+        ResourceMatchingModule, // 🎯 資源媒合
+        ResourceOptimizationModule, // ⚡ 資源優化
+        DonationTrackingModule, // 💰 捐贈追蹤
+        PredictiveMaintenanceModule, // 🔧 預測維護
+        // Admin & Finance
+        MultiEocModule, // 🏢 多 EOC
+        MultiTenantModule, // 🏢 多租戶
+        PublicFinanceModule, // 💰 公共財務
+        ExpenseReimbursementModule, // 💳 費用報銷
+        PowerBiModule, // 📊 Power BI
+        // Misc
+        MicroTaskModule, // ✅ 微任務
+        FileUploadModule, // 📤 檔案上傳
+        EmailTemplateModule, // 📧 郵件範本
     ],
     providers: [
         CloudLoggerService,
