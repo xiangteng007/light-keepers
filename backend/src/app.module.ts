@@ -48,6 +48,25 @@ import { LocationModule } from './modules/location/location.module';
 import { TaskDispatchModule } from './modules/task-dispatch/task-dispatch.module';
 // Core Domains 聚合模組
 import { CoreDomainsModule } from './core/core-domains.module';
+// ==============================================
+// Batch 2: E2E Closed Loop Modules
+// ==============================================
+// P1 Modules
+import { EquipmentModule } from './modules/equipment/equipment.module';
+import { AttendanceModule } from './modules/attendance/attendance.module';
+import { SchedulerModule } from './modules/scheduler/scheduler.module';
+import { VoiceModule } from './modules/voice/voice.module';
+import { OrgChartModule } from './modules/org-chart/org-chart.module';
+import { AiQueueModule } from './modules/ai-queue/ai-queue.module';
+// P2 Modules
+import { ShiftCalendarModule } from './modules/shift-calendar/shift-calendar.module';
+import { PayrollModule } from './modules/payroll/payroll.module';
+import { FeaturesModule } from './modules/features/features.module';
+import { FilesModule } from './modules/files/files.module';
+import { AuditModule } from './modules/audit/audit.module';
+import { CacheModule as AppCacheModule } from './modules/cache/cache.module';
+import { ErrorTrackingModule } from './modules/error-tracking/error-tracking.module';
+import { PrometheusModule } from './modules/prometheus/prometheus.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
@@ -127,6 +146,25 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         TaskDispatchModule, // 🔄 智慧任務派遣
         // Core Domains 聚合
         CoreDomainsModule, // 🏛️ 核心領域聚合
+        // ==============================================
+        // Batch 2: E2E Closed Loop Modules
+        // ==============================================
+        // P1 Modules
+        EquipmentModule, // 🔧 裝備管理
+        AttendanceModule, // 📋 出勤簽到
+        SchedulerModule, // 📅 排程服務
+        VoiceModule, // 🎙️ 語音通訊
+        OrgChartModule, // 🏢 組織架構
+        AiQueueModule, // 🤖 AI 任務佇列
+        // P2 Modules
+        ShiftCalendarModule, // 📆 班表日曆
+        PayrollModule, // 💰 薪資計算
+        FeaturesModule, // 🎛️ 功能開關
+        FilesModule, // 📁 檔案管理
+        AuditModule, // 📝 稽核日誌
+        AppCacheModule, // ⚡ 快取服務
+        ErrorTrackingModule, // 🐛 錯誤追蹤
+        PrometheusModule, // 📊 Prometheus 監控
     ],
     providers: [
         CloudLoggerService,
