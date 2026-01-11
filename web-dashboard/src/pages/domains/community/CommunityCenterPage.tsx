@@ -9,7 +9,7 @@ import {
     Home, Users, Heart, MapPin, Phone, Calendar,
     AlertTriangle, CheckCircle, Clock, ChevronRight
 } from 'lucide-react';
-import { PageTemplate } from '../../components/PageTemplate';
+import { PageTemplate } from '../../../components/PageTemplate';
 import './CommunityCenterPage.css';
 
 const MOCK_COMMUNITIES = [

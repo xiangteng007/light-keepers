@@ -9,7 +9,7 @@ import {
     Users, UserCheck, UserX, Clock, Award, Search, Filter,
     Phone, Mail, MapPin, Shield, ChevronRight, Plus
 } from 'lucide-react';
-import { PageTemplate } from '../../components/PageTemplate';
+import { PageTemplate } from '../../../components/PageTemplate';
 import './PersonnelManagementPage.css';
 
 const MOCK_PERSONNEL = [
