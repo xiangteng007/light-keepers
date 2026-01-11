@@ -104,6 +104,11 @@ import PersonnelManagementPage from './pages/domains/workforce/PersonnelManageme
 import CommunityCenterPage from './pages/domains/community/CommunityCenterPage'
 import ReportGeneratorPage from './pages/analytics/ReportGeneratorPage'
 
+// ===== C2 Domain Pages =====
+import IncidentsPage from './pages/c2/IncidentsPage'
+import DrillsPage from './pages/c2/DrillsPage'
+import AARPage from './pages/c2/AARPage'
+
 import './App.css'
 
 
@@ -214,6 +219,11 @@ function App() {
             <Route path="domains/mission-command" element={<ProtectedRoute requiredLevel={2}><MissionCommandPage /></ProtectedRoute>} />
             <Route path="domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
             <Route path="domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><TaskDispatchPage /></ProtectedRoute>} />
+
+            {/* C2 Additional Pages */}
+            <Route path="incidents" element={<ProtectedRoute requiredLevel={1}><IncidentsPage /></ProtectedRoute>} />
+            <Route path="drills" element={<ProtectedRoute requiredLevel={3}><DrillsPage /></ProtectedRoute>} />
+            <Route path="aar" element={<ProtectedRoute requiredLevel={3}><AARPage /></ProtectedRoute>} />
 
             {/* Workforce Domain */}
             <Route path="domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><WorkforceShiftCalendarPage /></ProtectedRoute>} />

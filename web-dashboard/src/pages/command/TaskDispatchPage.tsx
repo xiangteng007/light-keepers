@@ -10,6 +10,7 @@ import {
     MapPin, User, ChevronDown, Search, Zap
 } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import { TaskModal, TaskFormData } from '../../components/TaskModal';
 import { useTasks, useCreateTask, useUpdateTaskStatus, usePersonnel } from '../../hooks/useCoreObjects';
 import './TaskDispatchPage.css';
 
@@ -76,6 +77,12 @@ export default function TaskDispatchPage() {
             case 3: return 'priority-normal';
             default: return '';
         }
+    };
+
+    const handleCreateTask = (task: TaskFormData) => {
+        console.log('New task created:', task);
+        // In a real app, this would call the API
+        // createTask.mutate(task);
     };
 
     return (
@@ -185,6 +192,13 @@ export default function TaskDispatchPage() {
                     </div>
                 </div>
             </div>
+
+            {/* Task Modal */}
+            <TaskModal
+                isOpen={showNewTaskModal}
+                onClose={() => setShowNewTaskModal(false)}
+                onSubmit={handleCreateTask}
+            />
         </PageTemplate>
     );
 }

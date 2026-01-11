@@ -1,0 +1,145 @@
+/**
+ * IncidentsPage.css
+ */
+.incidents-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stats-bar {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 100px;
+}
+
+.stat-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-item.active {
+    border-color: var(--stat-color);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.stat-count {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--stat-color);
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted, #5f6368);
+    margin-top: 4px;
+}
+
+.page-actions {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 20px;
+    background: var(--accent-gold, #d4a84b);
+    border: none;
+    border-radius: 10px;
+    color: #0b111b;
+    font-weight: 500;
+    cursor: pointer;
+    transition: filter 0.2s;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+}
+
+.incident-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.incident-card {
+    display: flex;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.2s;
+}
+
+.incident-card:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateX(4px);
+}
+
+.priority-bar {
+    width: 4px;
+    flex-shrink: 0;
+}
+
+.incident-content {
+    flex: 1;
+    padding: 16px;
+}
+
+.incident-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.incident-number {
+    font-size: 12px;
+    font-family: monospace;
+    color: var(--text-muted, #5f6368);
+}
+
+.status-badge {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 500;
+    color: white;
+}
+
+.incident-title {
+    margin: 0 0 12px;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-primary, #e8eaed);
+}
+
+.incident-meta {
+    display: flex;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--text-muted, #5f6368);
+}
+
+.incident-meta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
