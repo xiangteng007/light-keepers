@@ -45,6 +45,17 @@ import BackupPage from './pages/BackupPage'
 import CommandCenterPage from './pages/CommandCenterPage'
 import MentalHealthPage from './pages/MentalHealthPage'
 
+// ===== New Domain Pages =====
+import TacticalMapPage from './pages/TacticalMapPage'
+import ResourceMatchingPage from './pages/ResourceMatchingPage'
+import ReunificationPage from './pages/ReunificationPage'
+import AISummaryPage from './pages/AISummaryPage'
+import AuditLogPage from './pages/AuditLogPage'
+import AccountsPage from './pages/AccountsPage'
+import TenantsPage from './pages/TenantsPage'
+import SettingsPage from './pages/SettingsPage'
+import FeaturesPage from './pages/FeaturesPage'
+
 // ===== V2 Domain Architecture Imports =====
 import {
   AttendancePage as WorkforceAttendancePage,
@@ -162,6 +173,7 @@ function App() {
           <Route index element={<Navigate to="/dashboard" replace />} />
 
           {/* ===== 公開頁面 (Level 0) - 使用 PageWrapper ===== */}
+          <Route path="/tactical-map" element={<PageWrapper pageId="tactical-map"><TacticalMapPage /></PageWrapper>} />
           <Route path="/ncdr-alerts" element={<PageWrapper pageId="ncdr"><NcdrAlertsPage /></PageWrapper>} />
           <Route path="/map" element={<PageWrapper pageId="map"><MapPage /></PageWrapper>} />
           <Route path="/forecast" element={<PageWrapper pageId="forecast"><ForecastPage /></PageWrapper>} />
@@ -177,6 +189,7 @@ function App() {
           <Route path="/profile" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="profile"><ProfilePage /></PageWrapper></ProtectedRoute>} />
           <Route path="/resources-public" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="resources-public"><ResourcesPublicPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/community" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community"><CommunityPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/reunification" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="reunification"><ReunificationPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/activities" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="activities"><ActivitiesPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/leaderboard" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="leaderboard"><LeaderboardPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/my-vehicles" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="my-vehicles"><VehicleManagementPage /></PageWrapper></ProtectedRoute>} />
@@ -193,6 +206,8 @@ function App() {
           <Route path="/report-schedules" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="report-schedules"><ReportSchedulePage /></PageWrapper></ProtectedRoute>} />
           <Route path="/reports" element={<Navigate to="/reports/admin" replace />} />
           <Route path="/reports/admin" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="reports-admin"><ReportsAdminPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/resource-matching" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="resource-matching"><ResourceMatchingPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/ai-summary" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ai-summary"><AISummaryPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== 常務理事等級 (3) ===== */}
           <Route path="/reports/export" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="reports-export"><ReportsExportPage /></PageWrapper></ProtectedRoute>} />
@@ -200,12 +215,17 @@ function App() {
           <Route path="/sensitive-audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="sensitive-audit"><SensitiveAuditPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/label-management" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="label-management"><LabelManagementPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/backups" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="backups"><BackupPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="audit"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== 理事長等級 (4) ===== */}
           <Route path="/permissions" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="permissions"><PermissionsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/accounts" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="accounts"><AccountsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== 系統擁有者等級 (5) ===== */}
           <Route path="/donations" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="donations"><DonationsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/tenants" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="tenants"><TenantsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/settings" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="settings"><SettingsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/features" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="features"><FeaturesPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== V2 Domain Architecture Routes ===== */}
           {/* Mission Command Domain */}

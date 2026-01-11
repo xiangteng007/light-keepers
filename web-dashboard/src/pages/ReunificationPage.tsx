@@ -1,359 +1,192 @@
 /**
- * Reunification Page - 災民協尋與平安回報
+ * ReunificationPage.tsx
+ * 
+ * 家庭團聚頁面 - Community Domain
+ * 功能：失蹤人口登記、尋人系統、配對結果
  */
-
-import React, { useState, useEffect, useCallback } from 'react';
-import { useParams } from 'react-router-dom';
-import api from '../services/api';
+import { useState } from 'react';
+import {
+    Home, Users, Search, MapPin, Phone, Calendar,
+    CheckCircle, AlertCircle, Clock, Plus, Filter
+} from 'lucide-react';
 import './ReunificationPage.css';
-
-// ============ Types ============
 
 interface MissingPerson {
     id: string;
-    missionSessionId: string;
     name: string;
-    age?: number;
-    gender?: string;
-    description?: string;
-    lastKnownLocation?: string;
-    lastSeenAt?: string;
-    photoUrls?: string[];
-    contactPhone?: string;
-    status: 'MISSING' | 'FOUND_SAFE' | 'FOUND_INJURED' | 'FOUND_DECEASED' | 'REUNITED';
-    foundLocation?: string;
-    foundAt?: string;
-    foundByVolunteerName?: string;
-    reporterName?: string;
-    reporterPhone?: string;
-    reporterRelation?: string;
-    queryCode: string;
-    createdAt: string;
+    age: number;
+    gender: string;
+    lastSeen: string;
+    location: string;
+    description: string;
+    photo?: string;
+    status: 'missing' | 'found' | 'reunited';
+    reportedBy: string;
+    reportedAt: string;
+    contact: string;
 }
 
-interface ReunificationStats {
-    total: number;
-    missing: number;
-    foundSafe: number;
-    foundInjured: number;
-    reunited: number;
-}
+const MOCK_CASES: MissingPerson[] = [
+    { id: 'MP-001', name: '王小明', age: 8, gender: '男', lastSeen: '2026-01-11 14:30', location: '信義區市政府站', description: '紅色外套、藍色背包', status: 'missing', reportedBy: '王媽媽', reportedAt: '2026-01-11 15:00', contact: '0912-345-678' },
+    { id: 'MP-002', name: '李阿姨', age: 72, gender: '女', lastSeen: '2026-01-11 10:00', location: '大安公園', description: '灰色毛衣、行動不便', status: 'found', reportedBy: '李先生', reportedAt: '2026-01-11 11:30', contact: '0923-456-789' },
+    { id: 'MP-003', name: '陳小華', age: 12, gender: '女', lastSeen: '2026-01-10 16:00', location: '士林夜市', description: '學校制服', status: 'reunited', reportedBy: '陳爸爸', reportedAt: '2026-01-10 18:00', contact: '0934-567-890' },
+];
 
-// ============ Component ============
+export default function ReunificationPage() {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterStatus, setFilterStatus] = useState('all');
+    const [showForm, setShowForm] = useState(false);
 
-export const ReunificationPage: React.FC = () => {
-    const { missionSessionId } = useParams<{ missionSessionId: string }>();
-
-    const [persons, setPersons] = useState<MissingPerson[]>([]);
-    const [stats, setStats] = useState<ReunificationStats | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [showNewModal, setShowNewModal] = useState(false);
-    const [filterStatus, setFilterStatus] = useState('ALL');
-    const [searchQuery, setSearchQuery] = useState('');
-
-    // Form state
-    const [formData, setFormData] = useState({
-        name: '',
-        age: '',
-        gender: '',
-        description: '',
-        lastKnownLocation: '',
-        contactPhone: '',
-        reporterName: '',
-        reporterPhone: '',
-        reporterRelation: '',
-    });
-
-    // ============ Data Fetching ============
-
-    const fetchPersons = useCallback(async () => {
-        if (!missionSessionId) return;
-        try {
-            const response = await api.get(`/reunification/missions/${missionSessionId}`);
-            setPersons(response.data);
-        } catch (error) {
-            console.error('Failed to fetch:', error);
-        }
-    }, [missionSessionId]);
-
-    const fetchStats = useCallback(async () => {
-        if (!missionSessionId) return;
-        try {
-            const response = await api.get(`/reunification/missions/${missionSessionId}/stats`);
-            setStats(response.data);
-        } catch (error) {
-            console.error('Failed to fetch stats:', error);
-        }
-    }, [missionSessionId]);
-
-    useEffect(() => {
-        const loadData = async () => {
-            setLoading(true);
-            await Promise.all([fetchPersons(), fetchStats()]);
-            setLoading(false);
-        };
-        loadData();
-    }, [fetchPersons, fetchStats]);
-
-    // ============ Handlers ============
-
-    const handleCreate = async () => {
-        if (!missionSessionId) return;
-        try {
-            await api.post('/reunification/reports', {
-                missionSessionId,
-                ...formData,
-                age: formData.age ? parseInt(formData.age) : undefined,
-            });
-            setShowNewModal(false);
-            setFormData({
-                name: '', age: '', gender: '', description: '',
-                lastKnownLocation: '', contactPhone: '',
-                reporterName: '', reporterPhone: '', reporterRelation: '',
-            });
-            await Promise.all([fetchPersons(), fetchStats()]);
-        } catch (error) {
-            console.error('Failed to create:', error);
+    const getStatusColor = (status: string) => {
+        switch (status) {
+            case 'reunited': return '#22c55e';
+            case 'found': return '#3B82F6';
+            default: return '#ef4444';
         }
     };
 
-    const handleMarkFound = async (id: string, status: string) => {
-        const location = prompt('發現地點:');
-        if (!location) return;
-
-        try {
-            await api.put(`/reunification/${id}/found`, {
-                status,
-                foundLocation: location,
-            });
-            await Promise.all([fetchPersons(), fetchStats()]);
-        } catch (error) {
-            console.error('Failed to mark found:', error);
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case 'reunited': return '已團聚';
+            case 'found': return '已尋獲';
+            default: return '尋找中';
         }
     };
 
-    const handleMarkReunited = async (id: string) => {
-        if (!confirm('確認已與家屬團聚？')) return;
-        try {
-            await api.put(`/reunification/${id}/reunited`);
-            await Promise.all([fetchPersons(), fetchStats()]);
-        } catch (error) {
-            console.error('Failed to mark reunited:', error);
-        }
-    };
-
-    // ============ Filtering ============
-
-    const filteredPersons = persons.filter(p => {
-        if (filterStatus !== 'ALL' && p.status !== filterStatus) return false;
-        if (searchQuery && !p.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
-        return true;
-    });
-
-    // ============ Render Helpers ============
-
-    const getStatusBadge = (status: string) => {
-        const styles: Record<string, { bg: string; label: string }> = {
-            MISSING: { bg: '#ef4444', label: '搜尋中' },
-            FOUND_SAFE: { bg: '#22c55e', label: '已尋獲 - 平安' },
-            FOUND_INJURED: { bg: '#f59e0b', label: '已尋獲 - 受傷' },
-            FOUND_DECEASED: { bg: '#1a1a1a', label: '罹難' },
-            REUNITED: { bg: '#3b82f6', label: '已團聚' },
-        };
-        const s = styles[status] || { bg: '#888', label: status };
-        return <span className="status-badge" style={{ background: s.bg }}>{s.label}</span>;
-    };
-
-    // ============ Render ============
-
-    if (loading) {
-        return <div className="reunification-page loading">載入中...</div>;
-    }
+    const filteredCases = MOCK_CASES.filter(c =>
+        (filterStatus === 'all' || c.status === filterStatus) &&
+        (c.name.includes(searchTerm) || c.location.includes(searchTerm))
+    );
 
     return (
         <div className="reunification-page">
-            <header className="page-header">
-                <h1>🔍 災民協尋</h1>
-                <button className="btn-new" onClick={() => setShowNewModal(true)}>
-                    + 新增報案
-                </button>
+            <header className="reunification-header">
+                <div className="header-content">
+                    <Home size={28} className="header-icon" />
+                    <div>
+                        <h1>家庭團聚中心</h1>
+                        <p>災後失蹤人口登記與尋人配對系統</p>
+                    </div>
+                </div>
+                <div className="header-stats">
+                    <div className="stat missing">
+                        <AlertCircle size={16} />
+                        <span>{MOCK_CASES.filter(c => c.status === 'missing').length}</span>
+                        <label>尋找中</label>
+                    </div>
+                    <div className="stat found">
+                        <Clock size={16} />
+                        <span>{MOCK_CASES.filter(c => c.status === 'found').length}</span>
+                        <label>已尋獲</label>
+                    </div>
+                    <div className="stat reunited">
+                        <CheckCircle size={16} />
+                        <span>{MOCK_CASES.filter(c => c.status === 'reunited').length}</span>
+                        <label>已團聚</label>
+                    </div>
+                </div>
             </header>
 
-            {/* Stats */}
-            {stats && (
-                <div className="stats-panel">
-                    <div className="stat-card total"><span>總登記</span><span>{stats.total}</span></div>
-                    <div className="stat-card missing"><span>搜尋中</span><span>{stats.missing}</span></div>
-                    <div className="stat-card found"><span>已尋獲(安)</span><span>{stats.foundSafe}</span></div>
-                    <div className="stat-card injured"><span>已尋獲(傷)</span><span>{stats.foundInjured}</span></div>
-                    <div className="stat-card reunited"><span>已團聚</span><span>{stats.reunited}</span></div>
+            <div className="reunification-toolbar">
+                <div className="search-section">
+                    <div className="search-input">
+                        <Search size={16} />
+                        <input
+                            type="text"
+                            placeholder="搜尋姓名或地點..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <select
+                        value={filterStatus}
+                        onChange={(e) => setFilterStatus(e.target.value)}
+                    >
+                        <option value="all">所有狀態</option>
+                        <option value="missing">尋找中</option>
+                        <option value="found">已尋獲</option>
+                        <option value="reunited">已團聚</option>
+                    </select>
                 </div>
-            )}
-
-            {/* Search & Filter */}
-            <div className="filter-bar">
-                <input
-                    type="text"
-                    placeholder="搜尋姓名..."
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                />
-                <select title="篩選失蹤者狀態" value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
-                    <option value="ALL">全部狀態</option>
-                    <option value="MISSING">搜尋中</option>
-                    <option value="FOUND_SAFE">已尋獲 - 平安</option>
-                    <option value="FOUND_INJURED">已尋獲 - 受傷</option>
-                    <option value="REUNITED">已團聚</option>
-                </select>
+                <button className="btn-report" onClick={() => setShowForm(true)}>
+                    <Plus size={16} />
+                    通報失蹤
+                </button>
             </div>
 
-            {/* Person List */}
-            <div className="person-list">
-                {filteredPersons.map(person => (
-                    <div key={person.id} className="person-card">
-                        <div className="card-header">
-                            <h3>{person.name}</h3>
-                            {getStatusBadge(person.status)}
-                        </div>
-
-                        <div className="person-info">
-                            {person.age && <span>🎂 {person.age}歲</span>}
-                            {person.gender && <span>👤 {person.gender}</span>}
-                        </div>
-
-                        {person.description && (
-                            <p className="description">{person.description}</p>
-                        )}
-
-                        <p className="location">📍 最後地點: {person.lastKnownLocation || '未知'}</p>
-
-                        <div className="query-code">
-                            查詢碼: <strong>{person.queryCode}</strong>
-                        </div>
-
-                        {person.status === 'MISSING' && (
-                            <div className="card-actions">
-                                <button onClick={() => handleMarkFound(person.id, 'FOUND_SAFE')}>
-                                    尋獲 (平安)
-                                </button>
-                                <button className="warning" onClick={() => handleMarkFound(person.id, 'FOUND_INJURED')}>
-                                    尋獲 (受傷)
-                                </button>
+            <div className="cases-grid">
+                {filteredCases.map(person => (
+                    <div key={person.id} className={`case-card ${person.status}`}>
+                        <div className="case-header">
+                            <div className="case-photo">
+                                <Users size={32} />
                             </div>
-                        )}
-
-                        {(person.status === 'FOUND_SAFE' || person.status === 'FOUND_INJURED') && (
-                            <div className="card-actions">
-                                <button onClick={() => handleMarkReunited(person.id)}>
-                                    確認團聚
-                                </button>
+                            <div className="case-info">
+                                <h3>{person.name}</h3>
+                                <p>{person.age}歲 · {person.gender}</p>
                             </div>
-                        )}
-
-                        {person.foundAt && (
-                            <p className="found-info">
-                                ✅ 於 {new Date(person.foundAt).toLocaleString()} 尋獲於 {person.foundLocation}
-                            </p>
-                        )}
+                            <span className="case-status" style={{ color: getStatusColor(person.status) }}>
+                                {getStatusLabel(person.status)}
+                            </span>
+                        </div>
+                        <div className="case-details">
+                            <div className="detail-row">
+                                <MapPin size={14} />
+                                <span>最後位置：{person.location}</span>
+                            </div>
+                            <div className="detail-row">
+                                <Calendar size={14} />
+                                <span>最後出現：{person.lastSeen}</span>
+                            </div>
+                            <div className="detail-row">
+                                <span className="description">特徵：{person.description}</span>
+                            </div>
+                        </div>
+                        <div className="case-contact">
+                            <Phone size={14} />
+                            <span>聯絡人：{person.reportedBy}</span>
+                            <a href={`tel:${person.contact}`}>{person.contact}</a>
+                        </div>
+                        <div className="case-actions">
+                            <button className="btn-primary">提供線索</button>
+                            {person.status === 'missing' && (
+                                <button className="btn-secondary">標記尋獲</button>
+                            )}
+                        </div>
                     </div>
                 ))}
             </div>
 
-            {/* New Report Modal */}
-            {showNewModal && (
-                <div className="modal-overlay" onClick={() => setShowNewModal(false)}>
-                    <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h2>新增失蹤者報案</h2>
-
-                        <div className="form-row">
-                            <div className="form-section">
-                                <label>姓名 *</label>
-                                <input
-                                    type="text"
-                                    placeholder="失蹤者姓名"
-                                    value={formData.name}
-                                    onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                />
+            {showForm && (
+                <div className="modal-overlay" onClick={() => setShowForm(false)}>
+                    <div className="report-modal" onClick={(e) => e.stopPropagation()}>
+                        <h2>通報失蹤人口</h2>
+                        <form>
+                            <div className="form-row">
+                                <input type="text" placeholder="姓名 *" required />
+                                <input type="number" placeholder="年齡" />
                             </div>
-                            <div className="form-section half">
-                                <label>年齡</label>
-                                <input
-                                    type="number"
-                                    placeholder="年齡"
-                                    value={formData.age}
-                                    onChange={e => setFormData({ ...formData, age: e.target.value })}
-                                />
-                            </div>
-                            <div className="form-section half">
-                                <label>性別</label>
-                                <select title="性別" value={formData.gender} onChange={e => setFormData({ ...formData, gender: e.target.value })}>
-                                    <option value="">-</option>
-                                    <option value="男">男</option>
-                                    <option value="女">女</option>
+                            <div className="form-row">
+                                <select>
+                                    <option value="">性別</option>
+                                    <option value="male">男</option>
+                                    <option value="female">女</option>
                                 </select>
+                                <input type="text" placeholder="最後出現地點 *" required />
                             </div>
-                        </div>
-
-                        <div className="form-section">
-                            <label>外觀特徵</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                placeholder="身高、體型、穿著、特殊記號等"
-                            />
-                        </div>
-
-                        <div className="form-section">
-                            <label>最後出現地點</label>
-                            <input
-                                type="text"
-                                value={formData.lastKnownLocation}
-                                onChange={e => setFormData({ ...formData, lastKnownLocation: e.target.value })}
-                            />
-                        </div>
-
-                        <hr />
-
-                        <h4>報案人資料</h4>
-                        <div className="form-row">
-                            <div className="form-section">
-                                <label>姓名</label>
-                                <input
-                                    type="text"
-                                    placeholder="報案人姓名"
-                                    value={formData.reporterName}
-                                    onChange={e => setFormData({ ...formData, reporterName: e.target.value })}
-                                />
+                            <textarea placeholder="外觀特徵描述"></textarea>
+                            <div className="form-row">
+                                <input type="text" placeholder="通報人姓名" />
+                                <input type="tel" placeholder="聯絡電話 *" required />
                             </div>
-                            <div className="form-section">
-                                <label>電話</label>
-                                <input
-                                    type="tel"
-                                    placeholder="聯絡電話"
-                                    value={formData.reporterPhone}
-                                    onChange={e => setFormData({ ...formData, reporterPhone: e.target.value })}
-                                />
+                            <div className="form-actions">
+                                <button type="button" onClick={() => setShowForm(false)}>取消</button>
+                                <button type="submit" className="btn-submit">送出通報</button>
                             </div>
-                            <div className="form-section">
-                                <label>關係</label>
-                                <input
-                                    type="text"
-                                    value={formData.reporterRelation}
-                                    onChange={e => setFormData({ ...formData, reporterRelation: e.target.value })}
-                                    placeholder="例: 配偶、子女"
-                                />
-                            </div>
-                        </div>
-
-                        <div className="modal-actions">
-                            <button className="btn-cancel" onClick={() => setShowNewModal(false)}>取消</button>
-                            <button className="btn-save" onClick={handleCreate}>提交報案</button>
-                        </div>
+                        </form>
                     </div>
                 </div>
             )}
         </div>
     );
-};
-
-export default ReunificationPage;
+}
