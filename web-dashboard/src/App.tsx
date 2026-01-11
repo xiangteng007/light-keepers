@@ -167,11 +167,11 @@ function App() {
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
           <Route path="/command-center" element={<CommandCenterPage />} /> {/* Widget Layout Demo */}
+          <Route path="/dashboard" element={<CommandCenterPage />} /> {/* Main Dashboard - Widget Grid */}
           <Route path="/mental-health" element={<MentalHealthPage />} /> {/* 心理健康中心 - 暫時公開測試 */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
-            <Route path="dashboard" element={<CommandCenterPage />} />
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="forecast" element={<ForecastPage />} />
