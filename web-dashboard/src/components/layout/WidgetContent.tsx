@@ -782,29 +782,381 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
     // Features
     'feature-flags': <FeatureFlagsWidget />,
 
+    // ===== Additional Widget Placeholders =====
+
+    // Analytics
+    'mission-stats': <KeyMetricsWidget />,
+
+    // Volunteers
+    'volunteer-grid': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                {['林志明', '王美玲', '陳大同', '李小華', '張志強'].map((name, i) => (
+                    <div key={i} style={{
+                        padding: '16px',
+                        background: 'rgba(47, 54, 65, 0.3)',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                    }}>
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: 'rgba(195, 155, 111, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--accent-gold)',
+                            fontWeight: 600,
+                        }}>{name.charAt(0)}</div>
+                        <div>
+                            <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{name}</div>
+                            <div style={{ fontSize: '11px', color: '#22c55e' }}>● 在線</div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ),
+
+    // Notifications
+    'notification-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {[
+                { title: '新任務指派', time: '5 分鐘前', type: 'task' },
+                { title: '系統維護通知', time: '1 小時前', type: 'system' },
+                { title: 'NCDR 警報', time: '2 小時前', type: 'alert' },
+            ].map((notif, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{notif.title}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{notif.time}</div>
+                </div>
+            ))}
+        </div>
+    ),
+    'notification-settings': (
+        <div style={{ padding: '16px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '16px' }}>通知偏好</div>
+            {['Email', 'LINE', '推播'].map((type, i) => (
+                <div key={i} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    padding: '12px 0',
+                    borderBottom: '1px solid rgba(47, 54, 65, 0.5)',
+                }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{type}</span>
+                    <div style={{ width: '40px', height: '22px', borderRadius: '11px', background: i === 0 ? '#22c55e' : 'rgba(47, 54, 65, 0.5)', cursor: 'pointer' }} />
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Events
+    'event-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {[
+                { title: '暴雨警報發布', location: '台北市', time: '10:30', severity: 'critical' },
+                { title: '土石流警戒', location: '新北市', time: '09:15', severity: 'high' },
+                { title: '交通事故', location: '桃園市', time: '08:00', severity: 'medium' },
+            ].map((event, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    borderLeft: `4px solid ${event.severity === 'critical' ? '#ef4444' : event.severity === 'high' ? '#f97316' : '#eab308'}`,
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{event.title}</span>
+                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{event.time}</span>
+                    </div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{event.location}</div>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Training
+    'training-progress': (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
+            <MetricCard label="已完成" value="8" color="#22c55e" />
+            <MetricCard label="進行中" value="2" color="#3B82F6" />
+            <MetricCard label="待開始" value="4" color="#94A3B8" />
+            <MetricCard label="完成率" value="60%" trend="up" color="#C39B6F" />
+        </div>
+    ),
+    'course-grid': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))', gap: '12px' }}>
+                {[
+                    { title: 'CPR 急救訓練', progress: 100, status: 'completed' },
+                    { title: '災害應變基礎', progress: 75, status: 'inprogress' },
+                    { title: '無線電通訊', progress: 0, status: 'pending' },
+                ].map((course, i) => (
+                    <div key={i} style={{
+                        padding: '16px',
+                        background: 'rgba(47, 54, 65, 0.3)',
+                        borderRadius: '10px',
+                    }}>
+                        <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '8px' }}>{course.title}</div>
+                        <div style={{ height: '4px', background: 'rgba(47, 54, 65, 0.5)', borderRadius: '2px', overflow: 'hidden' }}>
+                            <div style={{ width: `${course.progress}%`, height: '100%', background: course.status === 'completed' ? '#22c55e' : '#3B82F6' }} />
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>{course.progress}% 完成</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ),
+
+    // Resources
+    'resource-stats': <KeyMetricsWidget />,
+    'resource-table': <SuppliesGridWidget />,
+
+    // Tasks
+    'task-stats': <KeyMetricsWidget />,
+    'task-board': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {[
+                { title: '派遣急救組', status: 'active', priority: 'high' },
+                { title: '物資清點', status: 'pending', priority: 'medium' },
+                { title: '據點撤收', status: 'completed', priority: 'low' },
+            ].map((task, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    opacity: task.status === 'completed' ? 0.6 : 1,
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{task.title}</span>
+                        <span style={{
+                            fontSize: '10px',
+                            padding: '2px 8px',
+                            borderRadius: '20px',
+                            background: task.status === 'active' ? 'rgba(59, 130, 246, 0.2)' : task.status === 'pending' ? 'rgba(234, 179, 8, 0.2)' : 'rgba(34, 197, 94, 0.2)',
+                            color: task.status === 'active' ? '#3B82F6' : task.status === 'pending' ? '#eab308' : '#22c55e',
+                        }}>
+                            {task.status === 'active' ? '進行中' : task.status === 'pending' ? '待處理' : '已完成'}
+                        </span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Incidents
+    'incident-map': <TacticalMapWidget />,
+    'incident-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {['水災', '火災', '交通事故'].map((type, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    borderLeft: `4px solid ${i === 0 ? '#3B82F6' : i === 1 ? '#ef4444' : '#eab308'}`,
+                }}>
+                    <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{type}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>處理中</div>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Community
+    'community-stats': <KeyMetricsWidget />,
+    'community-map': <TacticalMapWidget />,
+    'blessing-wall': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {['🕯️ 平安順利', '🙏 祈求平安', '❤️ 加油'].map((msg, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(195, 155, 111, 0.1)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    fontSize: '13px',
+                    color: 'var(--text-secondary)',
+                }}>{msg}</div>
+            ))}
+        </div>
+    ),
+
+    // NCDR
+    'alert-summary': <KeyMetricsWidget />,
+
+    // Forecast
+    'weather-radar': <TacticalMapWidget />,
+    'forecast-cards': (
+        <div style={{ padding: '8px' }}>
+            {[
+                { day: '今天', temp: '28°', condition: '☀️ 晴' },
+                { day: '明天', temp: '26°', condition: '🌧️ 雨' },
+                { day: '後天', temp: '25°', condition: '⛅ 多雲' },
+            ].map((f, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{f.day}</span>
+                    <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{f.temp}</span>
+                    <span>{f.condition}</span>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Donations
+    'donation-stats': <KeyMetricsWidget />,
+    'donation-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {[
+                { donor: '匿名善心人', amount: 10000, time: '今天' },
+                { donor: '王先生', amount: 5000, time: '昨天' },
+            ].map((d, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{d.donor}</span>
+                        <span style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>NT$ {d.amount.toLocaleString()}</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{d.time}</div>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Approvals
+    'pending-count': <KeyMetricsWidget />,
+    'approval-queue': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {['志工申請 - 林先生', '物資領用 - 急救站', '權限申請 - 陳小姐'].map((item, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                }}>
+                    <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{item}</span>
+                    <button style={{
+                        padding: '6px 12px',
+                        background: 'rgba(34, 197, 94, 0.2)',
+                        border: '1px solid rgba(34, 197, 94, 0.3)',
+                        borderRadius: '6px',
+                        color: '#22c55e',
+                        fontSize: '11px',
+                        cursor: 'pointer',
+                    }}>審核</button>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Activities
+    'activity-feed': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {['社區防災演練', '志工培訓日', '捐血活動'].map((act, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{act}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>下週六 10:00</div>
+                </div>
+            ))}
+        </div>
+    ),
+    'activity-calendar': (
+        <div style={{ padding: '8px', textAlign: 'center' }}>
+            <div style={{ fontSize: '16px', color: 'var(--accent-gold)', marginBottom: '16px' }}>2026 年 1 月</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', fontSize: '11px' }}>
+                {['日', '一', '二', '三', '四', '五', '六'].map(d => (
+                    <div key={d} style={{ color: 'var(--text-muted)', padding: '8px' }}>{d}</div>
+                ))}
+                {Array.from({ length: 31 }, (_, i) => (
+                    <div key={i} style={{
+                        padding: '8px',
+                        borderRadius: '4px',
+                        background: i === 11 ? 'var(--accent-gold)' : 'transparent',
+                        color: i === 11 ? '#0B1120' : 'var(--text-secondary)',
+                    }}>{i + 1}</div>
+                ))}
+            </div>
+        </div>
+    ),
+
+    // Leaderboard
+    'top-volunteers': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            {[
+                { rank: 1, name: '林志明', points: 2450 },
+                { rank: 2, name: '王美玲', points: 2180 },
+                { rank: 3, name: '陳大同', points: 1920 },
+            ].map((v, i) => (
+                <div key={i} style={{
+                    padding: '16px',
+                    background: i === 0 ? 'rgba(195, 155, 111, 0.15)' : 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '10px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                }}>
+                    <span style={{
+                        fontSize: '18px',
+                        fontWeight: 700,
+                        color: i === 0 ? '#C39B6F' : i === 1 ? '#94A3B8' : '#CD7F32',
+                    }}>#{v.rank}</span>
+                    <span style={{ flex: 1, fontSize: '14px', color: 'var(--text-primary)' }}>{v.name}</span>
+                    <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)' }}>{v.points} pts</span>
+                </div>
+            ))}
+        </div>
+    ),
+    'my-ranking': (
+        <div style={{ padding: '16px', textAlign: 'center' }}>
+            <div style={{ fontSize: '48px', fontWeight: 700, color: 'var(--accent-gold)' }}>15</div>
+            <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '8px' }}>目前排名</div>
+            <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
+                <div style={{ fontSize: '24px', fontWeight: 600, color: '#22c55e' }}>850</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>累積積分</div>
+            </div>
+        </div>
+    ),
+
     // Default placeholders from original AppShellLayout
     'workspace': (
         <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)' }}>
             [M-W] 地圖內容區
         </div>
     ),
-    'event-timeline': (
-        <div style={{ display: 'flex', gap: '12px', overflowX: 'auto' }}>
-            <CardPlaceholder title="事件 1" />
-            <CardPlaceholder title="事件 2" />
-            <CardPlaceholder title="事件 3" />
-        </div>
-    ),
     'disaster-reports': (
         <div>
             <CardPlaceholder title="災情通報 1" />
             <CardPlaceholder title="災情通報 2" />
-        </div>
-    ),
-    'ncdr-alerts': (
-        <div>
-            <CardPlaceholder title="NCDR 警報 1" />
-            <CardPlaceholder title="NCDR 警報 2" />
         </div>
     ),
 };

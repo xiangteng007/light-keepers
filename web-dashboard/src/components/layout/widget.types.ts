@@ -224,5 +224,107 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
         { id: 'key-metrics', title: '功能統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
         { id: 'feature-flags', title: '功能開關', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
     ],
+
+    // ===== Additional Page Configs =====
+
+    // Analytics Page
+    'analytics': [
+        { id: 'key-metrics', title: '關鍵指標', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'trends-chart', title: '趨勢圖表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 4, minW: 6, minH: 3 }, style: 'card' },
+        { id: 'mission-stats', title: '任務統計', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
+    ],
+
+    // Volunteers Page
+    'volunteers': [
+        { id: 'search-panel', title: '搜尋志工', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 1 }, style: 'glass' },
+        { id: 'volunteer-grid', title: '志工名冊', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Notifications Page
+    'notifications': [
+        { id: 'notification-list', title: '通知列表', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
+        { id: 'notification-settings', title: '通知設定', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 8, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Events Page
+    'events': [
+        { id: 'event-timeline', title: '事件時間線', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'event-list', title: '事件列表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Training Page
+    'training': [
+        { id: 'training-progress', title: '學習進度', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'course-grid', title: '課程列表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Resources Page
+    'resources': [
+        { id: 'resource-stats', title: '庫存統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'resource-table', title: '物資清單', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Tasks Page
+    'tasks': [
+        { id: 'task-stats', title: '任務統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'task-board', title: '任務看板', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Incidents Page (C2)
+    'incidents': [
+        { id: 'incident-map', title: '事件地圖', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'incident-list', title: '事件列表', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+        { id: 'event-timeline', title: '時間軸', region: 'footer', visible: true, locked: false, position: { x: 0, y: 6, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+    ],
+
+    // Community Page
+    'community': [
+        { id: 'community-stats', title: '社區統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'community-map', title: '社區地圖', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'blessing-wall', title: '祈福牆', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // NCDR Alerts Page
+    'ncdr': [
+        { id: 'alert-summary', title: '警報摘要', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'ncdr-alerts', title: 'NCDR 警報', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Map Page
+    'map': [
+        { id: 'map-layers', title: '圖層', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 3, h: 8, minW: 2, minH: 4 }, style: 'card' },
+        { id: 'tactical-map', title: '地圖', region: 'main', visible: true, locked: false, position: { x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 }, style: 'card' },
+    ],
+
+    // Forecast Page
+    'forecast': [
+        { id: 'weather-radar', title: '氣象雷達', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'forecast-cards', title: '預報資訊', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+        { id: 'alert-summary', title: '警報', region: 'footer', visible: true, locked: false, position: { x: 0, y: 6, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+    ],
+
+    // Donations Page
+    'donations': [
+        { id: 'donation-stats', title: '捐贈統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'donation-list', title: '捐贈記錄', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Approvals Page
+    'approvals': [
+        { id: 'pending-count', title: '待審核', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'approval-queue', title: '審核佇列', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Activities Page
+    'activities': [
+        { id: 'activity-feed', title: '活動動態', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
+        { id: 'activity-calendar', title: '活動日曆', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 8, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Leaderboard Page
+    'leaderboard': [
+        { id: 'top-volunteers', title: '排行榜', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
+        { id: 'my-ranking', title: '我的排名', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 8, minW: 3, minH: 4 }, style: 'card' },
+    ],
 };
 
