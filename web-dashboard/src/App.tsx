@@ -223,12 +223,12 @@ function App() {
           {/* ===== V2 Domain Architecture Routes ===== */}
           {/* Mission Command Domain */}
           <Route path="/domains/mission-command" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="mission-command"><MissionCommandPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="task-dispatch"><TaskDispatchPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="triage" /></ProtectedRoute>} />
+          <Route path="/domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="task-dispatch" /></ProtectedRoute>} />
 
           {/* C2 Additional Pages */}
           <Route path="/incidents" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="incidents"><IncidentsPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/drills" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drills"><DrillsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/drills" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drills" /></ProtectedRoute>} />
           <Route path="/aar" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="aar"><AARPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Workforce Domain */}
