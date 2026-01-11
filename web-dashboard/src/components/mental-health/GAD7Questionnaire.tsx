@@ -54,7 +54,7 @@ export function GAD7Questionnaire({ onComplete }: GAD7QuestionnaireProps) {
     };
 
     const allAnswered = answers.every(a => a !== null);
-    const score = answers.reduce((sum, val) => sum + (val ?? 0), 0);
+    const score: number = answers.reduce<number>((sum, val) => sum + (val ?? 0), 0);
     const result = getResultInterpretation(score);
 
     const handleSubmit = () => {
