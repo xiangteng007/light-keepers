@@ -1300,4 +1300,295 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
             </div>
         </div>
     ),
+
+    // ===== V2 Domain Page Widgets =====
+
+    // Drone Control (無人機作業)
+    'drone-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>無人機列表</div>
+            {['DJI-01', 'DJI-02', 'Mavic-03'].map((drone, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: i === 0 ? 'rgba(34, 197, 94, 0.15)' : 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                }}>
+                    <span style={{
+                        width: '8px',
+                        height: '8px',
+                        borderRadius: '50%',
+                        background: i === 0 ? '#22c55e' : i === 1 ? '#eab308' : '#94a3b8',
+                    }} />
+                    <div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{drone}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>
+                            {i === 0 ? '飛行中 · 電量 78%' : i === 1 ? '待命 · 電量 95%' : '離線'}
+                        </div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ),
+    'drone-controls': (
+        <div style={{ padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>飛行控制</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
+                {['⬆', '↖', '↗', '⬅', '⏸', '➡', '↙', '⬇', '↘'].map((dir, i) => (
+                    <button key={i} style={{
+                        padding: '12px',
+                        background: i === 4 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(47, 54, 65, 0.5)',
+                        border: i === 4 ? '1px solid #ef4444' : '1px solid rgba(195, 155, 111, 0.2)',
+                        borderRadius: '8px',
+                        color: i === 4 ? '#ef4444' : 'var(--text-primary)',
+                        fontSize: '16px',
+                        cursor: 'pointer',
+                    }}>{dir}</button>
+                ))}
+            </div>
+        </div>
+    ),
+    'drone-status': (
+        <div style={{ padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>狀態監控</div>
+            {[
+                { label: '高度', value: '120m' },
+                { label: '速度', value: '35 km/h' },
+                { label: '電量', value: '78%' },
+            ].map((stat, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
+                </div>
+            ))}
+        </div>
+    ),
+    'drone-log': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-muted)' }}>
+                <div>[14:30:00] DJI-01 起飛</div>
+                <div>[14:30:15] 到達指定高度 120m</div>
+                <div>[14:32:00] 開始偵察任務</div>
+                <div style={{ color: '#3B82F6' }}>[14:35:00] 發現目標區域</div>
+            </div>
+        </div>
+    ),
+
+    // Equipment (裝備標籤)
+    'equipment-stats': (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
+            <MetricCard label="總裝備數" value={256} color="#C39B6F" />
+            <MetricCard label="已借出" value={45} color="#3B82F6" />
+            <MetricCard label="待維修" value={8} color="#ef4444" />
+            <MetricCard label="可用" value={203} color="#22c55e" />
+        </div>
+    ),
+    'equipment-scanner': (
+        <div style={{ height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '16px' }}>
+            <div style={{
+                width: '150px',
+                height: '150px',
+                border: '2px dashed var(--accent-gold)',
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                marginBottom: '16px',
+            }}>
+                <span style={{ fontSize: '48px' }}>📷</span>
+            </div>
+            <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
+                掃描 QR Code 或輸入裝備編號
+            </div>
+            <input type="text" placeholder="輸入編號..." style={{
+                marginTop: '12px',
+                padding: '10px 16px',
+                background: 'rgba(47, 54, 65, 0.5)',
+                border: '1px solid rgba(195, 155, 111, 0.2)',
+                borderRadius: '8px',
+                color: 'var(--text-primary)',
+                fontSize: '14px',
+                width: '100%',
+                maxWidth: '200px',
+            }} />
+        </div>
+    ),
+    'equipment-grid': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' }}>
+                {['發電機', '對講機', '帳篷', '急救箱', '照明燈', '繩索'].map((item, i) => (
+                    <div key={i} style={{
+                        padding: '16px',
+                        background: 'rgba(47, 54, 65, 0.3)',
+                        borderRadius: '10px',
+                        textAlign: 'center',
+                    }}>
+                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>
+                            {['⚡', '📻', '⛺', '🩹', '💡', '🪢'][i]}
+                        </div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
+                            可用: {Math.floor(Math.random() * 20 + 5)}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ),
+
+    // Shift Calendar (排班日曆)
+    'calendar-view': (
+        <div style={{ height: '100%', padding: '16px' }}>
+            <div style={{ fontSize: '16px', color: 'var(--accent-gold)', marginBottom: '16px', textAlign: 'center' }}>2026 年 1 月</div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: '4px', fontSize: '12px' }}>
+                {['日', '一', '二', '三', '四', '五', '六'].map(d => (
+                    <div key={d} style={{ color: 'var(--text-muted)', padding: '12px', textAlign: 'center' }}>{d}</div>
+                ))}
+                {Array.from({ length: 31 }, (_, i) => (
+                    <div key={i} style={{
+                        padding: '12px',
+                        borderRadius: '6px',
+                        background: i === 11 ? 'var(--accent-gold)' : [4, 5, 11, 12, 18, 19, 25, 26].includes(i) ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                        color: i === 11 ? '#0B1120' : [4, 5, 11, 12, 18, 19, 25, 26].includes(i) ? '#22c55e' : 'var(--text-secondary)',
+                        textAlign: 'center',
+                        cursor: 'pointer',
+                    }}>{i + 1}</div>
+                ))}
+            </div>
+        </div>
+    ),
+    'shift-summary': (
+        <div style={{ padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>排班統計</div>
+            {[
+                { label: '本月班次', value: '8 班' },
+                { label: '總時數', value: '48 小時' },
+                { label: '待確認', value: '2 班' },
+            ].map((stat, i) => (
+                <div key={i} style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    padding: '10px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '6px',
+                    marginBottom: '6px',
+                }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</span>
+                    <span style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
+                </div>
+            ))}
+        </div>
+    ),
+    'my-shifts': (
+        <div style={{ padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>我的班表</div>
+            {['1/12 (日) 08:00-16:00', '1/13 (一) 16:00-00:00'].map((shift, i) => (
+                <div key={i} style={{
+                    padding: '10px',
+                    background: i === 0 ? 'rgba(195, 155, 111, 0.15)' : 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '6px',
+                    marginBottom: '6px',
+                    fontSize: '12px',
+                    color: 'var(--text-primary)',
+                }}>
+                    {shift}
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Resource Overview (資源總覽)
+    'resource-stats': (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
+            <MetricCard label="物資種類" value={42} color="#C39B6F" />
+            <MetricCard label="據點總數" value={15} color="#3B82F6" />
+            <MetricCard label="待補充" value={8} color="#ef4444" />
+            <MetricCard label="充足率" value="87%" trend="up" color="#22c55e" />
+        </div>
+    ),
+    'resource-categories': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>資源分類</div>
+            {['飲水食品', '醫療用品', '照明設備', '通訊器材', '帳篷睡袋'].map((cat, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{cat}</span>
+                    <span style={{
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontSize: '11px',
+                        background: 'rgba(34, 197, 94, 0.2)',
+                        color: '#22c55e',
+                    }}>{Math.floor(Math.random() * 500 + 100)}</span>
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Personnel (人員管理)
+    'personnel-grid': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '12px' }}>
+                {['林志明', '王美玲', '陳大同', '李小華', '張志強', '黃雅婷'].map((name, i) => (
+                    <div key={i} style={{
+                        padding: '16px',
+                        background: 'rgba(47, 54, 65, 0.3)',
+                        borderRadius: '10px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '12px',
+                    }}>
+                        <div style={{
+                            width: '40px',
+                            height: '40px',
+                            borderRadius: '50%',
+                            background: 'rgba(195, 155, 111, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: 'var(--accent-gold)',
+                            fontWeight: 600,
+                        }}>{name.charAt(0)}</div>
+                        <div>
+                            <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{name}</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                                {['幹部', '志工', '理事', '志工', '常務理事', '志工'][i]}
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ),
+    'personnel-stats': (
+        <div style={{ padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>人員統計</div>
+            {[
+                { label: '總人數', value: 156, color: '#C39B6F' },
+                { label: '幹部', value: 12, color: '#3B82F6' },
+                { label: '志工', value: 144, color: '#22c55e' },
+            ].map((stat, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    textAlign: 'center',
+                }}>
+                    <div style={{ fontSize: '24px', fontWeight: 700, color: stat.color }}>{stat.value}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{stat.label}</div>
+                </div>
+            ))}
+        </div>
+    ),
 };

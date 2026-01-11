@@ -168,6 +168,9 @@
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
+    padding: var(--gutter);
+    padding-left: 0;
+    /* Sidebar already has border */
 }
 
 /* ===== [R] RightColumn (Desktop) ===== */

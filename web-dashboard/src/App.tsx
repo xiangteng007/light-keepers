@@ -232,17 +232,17 @@ function App() {
           <Route path="/aar" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="aar"><AARPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Workforce Domain */}
-          <Route path="/domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="shift-calendar"><WorkforceShiftCalendarPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="shift-calendar" /></ProtectedRoute>} />
           <Route path="/domains/workforce/attendance" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="attendance"><WorkforceAttendancePage /></PageWrapper></ProtectedRoute>} />
           <Route path="/domains/workforce/org-chart" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="org-chart"><WorkforceOrgChartPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/domains/workforce/leaderboard" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-leaderboard"><WorkforceLeaderboardPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/domains/workforce/points-report" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="workforce-points"><WorkforcePointsReportPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/domains/workforce/personnel" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="personnel"><PersonnelManagementPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/personnel" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="personnel" /></ProtectedRoute>} />
 
           {/* Logistics Domain */}
-          <Route path="/domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="equipment"><LogisticsEquipmentPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="equipment" /></ProtectedRoute>} />
           <Route path="/domains/logistics/resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-resources"><LogisticsResourcesPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/domains/logistics/resource-overview" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="resource-overview"><ResourceOverviewPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/logistics/resource-overview" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="resource-overview" /></ProtectedRoute>} />
 
           {/* Data Insight Domain */}
           <Route path="/domains/data-insight/reports" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="data-reports"><DataInsightReportsPage /></PageWrapper></ProtectedRoute>} />
@@ -262,7 +262,7 @@ function App() {
           <Route path="/domains/core/dashboard" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="core-dashboard"><CoreDashboardPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Air Ops Domain */}
-          <Route path="/domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drone-control"><DroneControlPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drone-control" /></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </RealtimeProvider>

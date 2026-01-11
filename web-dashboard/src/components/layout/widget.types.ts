@@ -350,5 +350,44 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
         { id: 'top-volunteers', title: '排行榜', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
         { id: 'my-ranking', title: '我的排名', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 8, minW: 3, minH: 4 }, style: 'card' },
     ],
+
+    // ===== V2 Domain Pages =====
+
+    // Drone Control (無人機作業)
+    'drone-control': [
+        { id: 'drone-list', title: '無人機列表', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 3, h: 8, minW: 2, minH: 6 }, style: 'card' },
+        { id: 'tactical-map', title: '飛行地圖', region: 'main', visible: true, locked: false, position: { x: 3, y: 0, w: 6, h: 6, minW: 5, minH: 4 }, style: 'card' },
+        { id: 'drone-controls', title: '飛行控制', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 0, w: 3, h: 4, minW: 2, minH: 3 }, style: 'card' },
+        { id: 'drone-status', title: '狀態監控', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 4, w: 3, h: 4, minW: 2, minH: 3 }, style: 'glass' },
+        { id: 'drone-log', title: '飛行日誌', region: 'footer', visible: true, locked: false, position: { x: 3, y: 6, w: 6, h: 2, minW: 4, minH: 2 }, style: 'glass' },
+    ],
+
+    // Equipment (裝備標籤)
+    'equipment': [
+        { id: 'equipment-stats', title: '裝備統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'equipment-scanner', title: 'QR 掃描', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+        { id: 'equipment-grid', title: '裝備清單', region: 'main', visible: true, locked: false, position: { x: 4, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+    ],
+
+    // Shift Calendar (排班日曆)
+    'shift-calendar': [
+        { id: 'calendar-view', title: '排班日曆', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 9, h: 8, minW: 7, minH: 6 }, style: 'card' },
+        { id: 'shift-summary', title: '排班統計', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 0, w: 3, h: 4, minW: 2, minH: 3 }, style: 'card' },
+        { id: 'my-shifts', title: '我的班表', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 4, w: 3, h: 4, minW: 2, minH: 3 }, style: 'card' },
+    ],
+
+    // Resource Overview (資源總覽)
+    'resource-overview': [
+        { id: 'resource-stats', title: '資源統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'tactical-map', title: '資源分佈', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'resource-categories', title: '資源分類', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Personnel (人員管理)
+    'personnel': [
+        { id: 'search-panel', title: '搜尋人員', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 1 }, style: 'glass' },
+        { id: 'personnel-grid', title: '人員名冊', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'personnel-stats', title: '人員統計', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
 };
 
