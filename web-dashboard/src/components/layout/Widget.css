@@ -1,0 +1,306 @@
+/**
+ * Widget.css
+ * 
+ * iOS Widget-style with glassmorphism and smooth animations
+ */
+
+/* ===== Base Widget ===== */
+.widget {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Card style - solid background */
+.widget--card {
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow:
+        0 4px 6px rgba(0, 0, 0, 0.1),
+        0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Glass style - glassmorphism */
+.widget--glass {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.2),
+        inset 0 1px 1px rgba(255, 255, 255, 0.1);
+}
+
+/* Minimal style */
+.widget--minimal {
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Edit Mode States ===== */
+.widget--editable {
+    cursor: grab;
+}
+
+.widget--editable:active {
+    cursor: grabbing;
+}
+
+.widget--selected {
+    border-color: var(--accent-gold, #d4a84b) !important;
+    box-shadow:
+        0 0 0 2px var(--accent-gold, #d4a84b),
+        0 8px 32px rgba(212, 168, 75, 0.3);
+    transform: scale(1.02);
+}
+
+.widget--locked {
+    opacity: 0.7;
+    cursor: not-allowed !important;
+}
+
+.widget--locked .widget__header {
+    background: rgba(100, 100, 100, 0.2);
+}
+
+/* ===== Widget Header ===== */
+.widget__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.widget__drag-handle {
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: grab;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.widget__drag-handle:hover {
+    color: var(--accent-gold, #d4a84b);
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.widget__title {
+    flex: 1;
+    font-size: 13px;
+    font-weight: 600;
+    color: #e8eaed;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.widget__title-edit-btn {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.widget--editable .widget__title-edit-btn {
+    display: flex;
+}
+
+.widget__title-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--accent-gold, #d4a84b);
+}
+
+.widget__title-input {
+    flex: 1;
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--accent-gold, #d4a84b);
+    border-radius: 4px;
+    color: #e8eaed;
+    font-size: 13px;
+    font-weight: 600;
+    outline: none;
+}
+
+.widget__title-input:focus {
+    box-shadow: 0 0 0 2px rgba(212, 168, 75, 0.3);
+}
+
+.widget__region {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: 'SF Mono', monospace;
+}
+
+.widget__controls {
+    display: flex;
+    gap: 4px;
+    margin-left: auto;
+}
+
+.widget__control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 6px;
+    color: rgba(255, 255, 255, 0.6);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.widget__control-btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+}
+
+.widget__control-btn--danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.widget__control-btn--danger:hover {
+    background: rgba(239, 68, 68, 0.4);
+    color: #fff;
+}
+
+/* ===== Widget Content ===== */
+.widget__content {
+    flex: 1;
+    padding: 16px;
+    overflow: auto;
+}
+
+.widget__placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 14px;
+}
+
+/* ===== Resize Indicator ===== */
+.widget__resize-indicator {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    width: 16px;
+    height: 16px;
+    background: linear-gradient(135deg, transparent 50%, var(--accent-gold, #d4a84b) 50%);
+    border-radius: 2px;
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* ===== Edit Controls Toolbar ===== */
+.widget-edit-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.widget-edit-controls__btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 8px;
+    color: #e8eaed;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.widget-edit-controls__btn:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.widget-edit-controls__btn.active {
+    background: var(--accent-gold, #d4a84b);
+    color: #000;
+}
+
+.widget-edit-controls__btn--danger {
+    background: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+}
+
+.widget-edit-controls__btn--danger:hover {
+    background: rgba(239, 68, 68, 0.4);
+}
+
+.widget-edit-controls__hidden {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding-left: 12px;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.widget-edit-controls__show-btn {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 8px;
+    background: rgba(34, 197, 94, 0.2);
+    border: none;
+    border-radius: 4px;
+    color: #22c55e;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.widget-edit-controls__show-btn:hover {
+    background: rgba(34, 197, 94, 0.4);
+}
+
+/* ===== Animations ===== */
+@keyframes widget-shake {
+
+    0%,
+    100% {
+        transform: rotate(0deg);
+    }
+
+    25% {
+        transform: rotate(-0.5deg);
+    }
+
+    75% {
+        transform: rotate(0.5deg);
+    }
+}
+
+.widget--editable {
+    animation: widget-shake 0.6s ease-in-out infinite;
+}
+
+.widget--editable:hover,
+.widget--selected {
+    animation: none;
+}

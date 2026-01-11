@@ -1,0 +1,337 @@
+/**
+ * TaskDispatchPage.css
+ * C2 Domain - Task Dispatch Page Styles
+ */
+
+.task-dispatch {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Stats Bar */
+.task-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.stat-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.stat-card:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.stat-card.active {
+    border-color: var(--accent-gold, #d4a84b);
+    background: rgba(212, 168, 75, 0.1);
+}
+
+.stat-count {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text-primary, #e8eaed);
+}
+
+.stat-count.pending {
+    color: #f59e0b;
+}
+
+.stat-count.in-progress {
+    color: #3b82f6;
+}
+
+.stat-count.completed {
+    color: #10b981;
+}
+
+.stat-label {
+    font-size: 12px;
+    color: var(--text-muted, #5f6368);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Toolbar */
+.task-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.search-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px 12px;
+    flex: 1;
+    max-width: 320px;
+    color: var(--text-muted);
+}
+
+.search-box input {
+    background: transparent;
+    border: none;
+    color: var(--text-primary, #e8eaed);
+    font-size: 14px;
+    outline: none;
+    flex: 1;
+}
+
+.search-box input::placeholder {
+    color: var(--text-muted, #5f6368);
+}
+
+.toolbar-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-icon {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-primary);
+}
+
+.btn-primary {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--accent-gold, #d4a84b);
+    border: none;
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #0b111b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-primary:hover {
+    filter: brightness(1.1);
+}
+
+/* Task List */
+.task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.task-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+    transition: all 0.2s;
+}
+
+.task-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.task-card.priority-critical {
+    border-left: 3px solid #ef4444;
+}
+
+.task-card.priority-high {
+    border-left: 3px solid #f59e0b;
+}
+
+.task-card.priority-normal {
+    border-left: 3px solid #3b82f6;
+}
+
+.task-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.status-icon {
+    flex-shrink: 0;
+}
+
+.status-icon.pending {
+    color: #f59e0b;
+}
+
+.status-icon.in-progress {
+    color: #3b82f6;
+}
+
+.status-icon.completed {
+    color: #10b981;
+}
+
+.task-title {
+    flex: 1;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-primary, #e8eaed);
+}
+
+.task-status {
+    font-size: 11px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
+
+.task-status.pending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #f59e0b;
+}
+
+.task-status.in_progress {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+}
+
+.task-status.completed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+}
+
+.task-meta {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--text-muted, #5f6368);
+}
+
+.task-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.btn-dispatch,
+.btn-complete {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-dispatch {
+    background: rgba(212, 168, 75, 0.15);
+    border: 1px solid var(--accent-gold, #d4a84b);
+    color: var(--accent-gold);
+}
+
+.btn-dispatch:hover {
+    background: rgba(212, 168, 75, 0.25);
+}
+
+.btn-complete {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid #10b981;
+    color: #10b981;
+}
+
+.btn-complete:hover {
+    background: rgba(16, 185, 129, 0.25);
+}
+
+/* Personnel Panel */
+.personnel-panel {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.personnel-panel h3 {
+    margin: 0 0 12px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text-secondary, #9aa0a6);
+}
+
+.personnel-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.personnel-chip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text-primary, #e8eaed);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.personnel-chip:hover {
+    background: rgba(212, 168, 75, 0.1);
+    border-color: var(--accent-gold, #d4a84b);
+}
+
+.personnel-chip .role {
+    font-size: 11px;
+    color: var(--text-muted, #5f6368);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .task-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .task-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .search-box {
+        max-width: 100%;
+    }
+
+    .task-meta {
+        flex-wrap: wrap;
+    }
+}

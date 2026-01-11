@@ -108,7 +108,7 @@ body {
 
 /* ===== Senteng Style Sidebar ===== */
 .sidebar {
-  width: 260px;
+  width: var(--sidebar-w-collapsed, 24px);
   background: var(--bg-sidebar);
   padding: 16px 12px;
   display: flex;

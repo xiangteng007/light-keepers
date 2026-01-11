@@ -20,7 +20,10 @@ const AppDataSource = new DataSource({
     synchronize: false,
     logging: process.env.NODE_ENV !== 'production',
     // Include all entities via glob pattern
-    entities: [join(__dirname, 'modules/**/*.entity.{ts,js}')],
+    entities: [
+        join(__dirname, 'modules/**/*.entity.{ts,js}'),
+        join(__dirname, 'common/entities/*.entity.{ts,js}'),
+    ],
     migrations: [join(__dirname, 'migrations/*.{ts,js}')],
     migrationsTableName: 'typeorm_migrations',
 });

@@ -1,0 +1,170 @@
+/**
+ * MentalHealthPage.css
+ */
+
+.mental-health-page {
+    min-height: 100vh;
+    background: var(--layout-bg, #0b111b);
+    padding: 24px;
+}
+
+/* Header */
+.mh-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.mh-header h1 {
+    font-size: 28px;
+    color: #e8eaed;
+    margin: 0 0 8px;
+}
+
+.mh-header p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0;
+}
+
+/* Hotline Banner */
+.mh-hotline {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 20px;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 12px;
+    margin-bottom: 24px;
+}
+
+.mh-hotline span {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.mh-hotline a {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ef4444;
+    text-decoration: none;
+}
+
+.mh-hotline a:hover {
+    text-decoration: underline;
+}
+
+/* Tabs */
+.mh-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+}
+
+.mh-tab {
+    flex-shrink: 0;
+    padding: 12px 20px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.mh-tab:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.mh-tab.active {
+    background: var(--accent-gold, #d4a84b);
+    border-color: var(--accent-gold, #d4a84b);
+    color: #000;
+    font-weight: 600;
+}
+
+/* Content */
+.mh-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.mh-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Resources */
+.mh-resources {
+    background: rgba(30, 41, 59, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.mh-resources h4 {
+    font-size: 16px;
+    color: #e8eaed;
+    margin: 0 0 16px;
+}
+
+.resource-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.resource-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.resource-card:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    transform: translateY(-2px);
+}
+
+.resource-card span:first-child {
+    font-size: 28px;
+}
+
+.resource-card span:last-child {
+    font-size: 13px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .mental-health-page {
+        padding: 16px;
+    }
+
+    .mh-header h1 {
+        font-size: 22px;
+    }
+
+    .mh-hotline {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .resource-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

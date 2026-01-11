@@ -218,6 +218,8 @@ import { MicroTaskModule } from './modules/micro-task/micro-task.module';
 import { FileUploadModule } from './modules/file-upload/file-upload.module';
 import { EmailTemplateModule } from './modules/email-template/email-template.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
+import { EventPublisherModule } from './common/services/event-publisher.module';
+import { StorageModule } from './common/storage';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 
@@ -251,6 +253,12 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
 
         // 共用認證模組 (Global)
         SharedAuthModule,
+
+        // P3: Outbox Pattern - 事件驅動
+        EventPublisherModule,
+
+        // P4: Storage 統一抽象
+        StorageModule.forRoot(),
 
         // 功能模組
         HealthModule,

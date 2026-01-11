@@ -44,6 +44,8 @@ import ActivitiesPage from './pages/ActivitiesPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
+import CommandCenterPage from './pages/CommandCenterPage'
+import MentalHealthPage from './pages/MentalHealthPage'
 
 // ===== V2 Domain Architecture Imports =====
 // Workforce Domain
@@ -92,6 +94,15 @@ import {
 import {
   DroneControlPage,
 } from './pages/domains/air-ops'
+
+// ===== P9 New Pages =====
+import TaskDispatchPage from './pages/command/TaskDispatchPage'
+import ResourceOverviewPage from './pages/resources/ResourceOverviewPage'
+
+// ===== P11 Domain Pages =====
+import PersonnelManagementPage from './pages/domains/workforce/PersonnelManagementPage'
+import CommunityCenterPage from './pages/domains/community/CommunityCenterPage'
+import ReportGeneratorPage from './pages/analytics/ReportGeneratorPage'
 
 import './App.css'
 
@@ -151,6 +162,8 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
+          <Route path="/command-center" element={<CommandCenterPage />} /> {/* Widget Layout Demo */}
+          <Route path="/mental-health" element={<MentalHealthPage />} /> {/* 心理健康中心 - 暫時公開測試 */}
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
@@ -200,6 +213,7 @@ function App() {
             {/* Mission Command Domain */}
             <Route path="domains/mission-command" element={<ProtectedRoute requiredLevel={2}><MissionCommandPage /></ProtectedRoute>} />
             <Route path="domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
+            <Route path="domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><TaskDispatchPage /></ProtectedRoute>} />
 
             {/* Workforce Domain */}
             <Route path="domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><WorkforceShiftCalendarPage /></ProtectedRoute>} />
@@ -207,10 +221,12 @@ function App() {
             <Route path="domains/workforce/org-chart" element={<ProtectedRoute requiredLevel={2}><WorkforceOrgChartPage /></ProtectedRoute>} />
             <Route path="domains/workforce/leaderboard" element={<ProtectedRoute requiredLevel={1}><WorkforceLeaderboardPage /></ProtectedRoute>} />
             <Route path="domains/workforce/points-report" element={<ProtectedRoute requiredLevel={2}><WorkforcePointsReportPage /></ProtectedRoute>} />
+            <Route path="domains/workforce/personnel" element={<ProtectedRoute requiredLevel={2}><PersonnelManagementPage /></ProtectedRoute>} />
 
             {/* Logistics Domain */}
             <Route path="domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><LogisticsEquipmentPage /></ProtectedRoute>} />
             <Route path="domains/logistics/resources" element={<ProtectedRoute requiredLevel={2}><LogisticsResourcesPage /></ProtectedRoute>} />
+            <Route path="domains/logistics/resource-overview" element={<ProtectedRoute requiredLevel={2}><ResourceOverviewPage /></ProtectedRoute>} />
 
             {/* Data Insight Domain */}
             <Route path="domains/data-insight/reports" element={<ProtectedRoute requiredLevel={2}><DataInsightReportsPage /></ProtectedRoute>} />
@@ -220,6 +236,10 @@ function App() {
 
             {/* Community Domain */}
             <Route path="domains/community" element={<ProtectedRoute requiredLevel={1}><DomainCommunityPage /></ProtectedRoute>} />
+            <Route path="domains/community/center" element={<ProtectedRoute requiredLevel={1}><CommunityCenterPage /></ProtectedRoute>} />
+
+            {/* Analytics Domain */}
+            <Route path="domains/analytics/report-generator" element={<ProtectedRoute requiredLevel={3}><ReportGeneratorPage /></ProtectedRoute>} />
 
             {/* Core Domain */}
             <Route path="domains/core/settings" element={<ProtectedRoute requiredLevel={3}><CoreSettingsPage /></ProtectedRoute>} />

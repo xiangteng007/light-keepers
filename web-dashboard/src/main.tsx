@@ -4,7 +4,6 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import './i18n' // 多語系支援
-import './styles/senteng-theme.css'
 import './styles/theme.css'
 import './styles/a11y.css' // 無障礙樣式
 import './index.css'

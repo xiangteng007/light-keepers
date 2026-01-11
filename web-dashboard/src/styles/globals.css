@@ -51,7 +51,7 @@
   --v2-backdrop-blur: 16px;
 
   /* ── Layout Dimensions ── */
-  --v2-nav-width: 80px;
+  --v2-nav-width: 24px;
   --v2-header-height: 64px;
   --v2-ticker-height: 32px;
 }

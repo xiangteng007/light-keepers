@@ -1,0 +1,207 @@
+/**
+ * BlessingWall.css
+ */
+
+.blessing-wall {
+    background: rgba(30, 41, 59, 0.95);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.blessing-wall__header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.blessing-wall__header h3 {
+    font-size: 18px;
+    color: #e8eaed;
+    margin: 0 0 8px;
+}
+
+.blessing-wall__header p {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    margin: 0 0 16px;
+}
+
+.blessing-wall__add-btn {
+    padding: 10px 20px;
+    background: var(--accent-gold, #d4a84b);
+    color: #000;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.blessing-wall__add-btn:hover {
+    background: #e5b95c;
+}
+
+/* Blessing Form */
+.blessing-form {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+}
+
+.blessing-form__icons {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.icon-btn {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid transparent;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.icon-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.icon-btn.selected {
+    border-color: var(--accent-gold, #d4a84b);
+    background: rgba(212, 168, 75, 0.2);
+}
+
+.blessing-form textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #e8eaed;
+    font-size: 14px;
+    resize: vertical;
+}
+
+.blessing-form textarea:focus {
+    outline: none;
+    border-color: var(--accent-gold, #d4a84b);
+}
+
+.blessing-form__footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.char-count {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.submit-btn {
+    padding: 10px 20px;
+    background: var(--accent-gold, #d4a84b);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Blessing Grid */
+.blessing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.blessing-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.blessing-empty span {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 12px;
+}
+
+/* Blessing Card */
+.blessing-card {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    transition: all 0.2s;
+}
+
+.blessing-card:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.blessing-card__icon {
+    font-size: 28px;
+    flex-shrink: 0;
+}
+
+.blessing-card__content {
+    flex: 1;
+    min-width: 0;
+}
+
+.blessing-message {
+    font-size: 14px;
+    color: #e8eaed;
+    line-height: 1.5;
+    margin: 0 0 8px;
+    word-wrap: break-word;
+}
+
+.blessing-meta {
+    display: flex;
+    gap: 12px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.blessing-author {
+    color: var(--accent-gold, #d4a84b);
+}
+
+.blessing-card__like {
+    padding: 6px 12px;
+    background: rgba(239, 68, 68, 0.1);
+    border: none;
+    border-radius: 16px;
+    color: #ef4444;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    align-self: flex-start;
+}
+
+.blessing-card__like:hover {
+    background: rgba(239, 68, 68, 0.2);
+}

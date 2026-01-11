@@ -10,6 +10,10 @@
         "start:prod": "node dist/src/main",
         "test": "jest",
         "test:e2e": "jest --config ./test/jest-e2e.json",
+        "typeorm": "ts-node -r tsconfig-paths/register ./node_modules/typeorm/cli.js -d src/data-source.ts",
+        "migration:generate": "npm run typeorm -- migration:generate",
+        "migration:run": "npm run typeorm -- migration:run",
+        "migration:revert": "npm run typeorm -- migration:revert",
         "seed:volunteers": "npx ts-node src/scripts/seed-volunteers.ts",
         "seed:resources": "npx ts-node src/scripts/seed-resources.ts",
         "seed:all": "npm run seed:volunteers && npm run seed:resources"
@@ -79,6 +83,7 @@
         "supertest": "^7.1.4",
         "ts-jest": "^29.1.1",
         "ts-node": "^10.9.2",
+        "tsconfig-paths": "^4.2.0",
         "typescript": "^5.3.3"
     }
 }
