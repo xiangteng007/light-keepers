@@ -74,6 +74,21 @@ export function useWidgetLayout({ userLevel, pageId = 'default' }: UseWidgetLayo
         resizeEnabled: false,
     });
 
+    // 🔧 核心修復: 當 pageId 變化時，立即重新載入對應的 widgets
+    // 這解決了頁面切換時顯示舊內容的閃爍問題
+    useEffect(() => {
+        const saved = localStorage.getItem(storageKey);
+        if (saved) {
+            try {
+                setWidgets(JSON.parse(saved));
+            } catch {
+                setWidgets(getDefaultWidgets());
+            }
+        } else {
+            setWidgets(getDefaultWidgets());
+        }
+    }, [pageId, storageKey]);
+
     // Persist layout changes (page-specific)
     useEffect(() => {
         localStorage.setItem(storageKey, JSON.stringify(widgets));

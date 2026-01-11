@@ -85,7 +85,10 @@ const refreshAccessToken = async (): Promise<string | null> => {
 // AuthProvider 元件
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
+
+    // 🔧 DevMode 時不需要等待 API，直接設 isLoading = false
+    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    const [isLoading, setIsLoading] = useState(!devModeEnabled);
 
     // 載入使用者資訊
     const loadUser = async (retryCount = 0) => {
