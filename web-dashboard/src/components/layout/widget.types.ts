@@ -41,12 +41,15 @@ export interface LayoutConfig {
 
 // User permission levels (using const object for compatibility)
 export const PermissionLevel = {
+    Anonymous: 0,
     Guest: 0,
     Volunteer: 1,
     TeamLead: 2,
+    Supervisor: 2,    // Alias for TeamLead
     Coordinator: 3,
+    Manager: 3,       // Alias for Coordinator
     Admin: 4,
-    SystemOwner: 5,  // Only this level can edit widgets
+    SystemOwner: 5,   // Only this level can edit widgets
 } as const;
 
 export type PermissionLevel = typeof PermissionLevel[keyof typeof PermissionLevel];
