@@ -13,6 +13,7 @@ import { SidebarSettings } from './SidebarSettings';
 import { useWidgetLayout } from './useWidgetLayout';
 import { useSidebarConfig, ICON_MAP } from './useSidebarConfig';
 import { PermissionLevel } from './widget.types';
+import { WIDGET_CONTENT_MAP } from './WidgetContent';
 import './AppShellLayout.css';
 
 interface AppShellLayoutProps {
@@ -76,33 +77,8 @@ export default function AppShellLayout({
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
     const closeDrawer = () => setDrawerOpen(false);
 
-    // Widget content placeholders - can be replaced with actual components
-    const widgetContent: Record<string, React.ReactNode> = {
-        'workspace': (
-            <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(255,255,255,0.3)' }}>
-                [M-W] 地圖內容區
-            </div>
-        ),
-        'event-timeline': (
-            <div style={{ display: 'flex', gap: '12px', overflowX: 'auto' }}>
-                <EventPlaceholder title="事件 1" />
-                <EventPlaceholder title="事件 2" />
-                <EventPlaceholder title="事件 3" />
-            </div>
-        ),
-        'disaster-reports': (
-            <div>
-                <CardPlaceholder title="災情通報 1" />
-                <CardPlaceholder title="災情通報 2" />
-            </div>
-        ),
-        'ncdr-alerts': (
-            <div>
-                <CardPlaceholder title="NCDR 警報 1" />
-                <CardPlaceholder title="NCDR 警報 2" />
-            </div>
-        ),
-    };
+    // Widget content is now provided by WIDGET_CONTENT_MAP
+    const widgetContent = WIDGET_CONTENT_MAP;
 
     return (
         <div className={`appShellLayout ${editState.isEditMode ? 'appShellLayout--edit-mode' : ''}`}>

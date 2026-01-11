@@ -13,6 +13,7 @@ import {
     WidgetEditState,
     PermissionLevel,
     DEFAULT_WIDGETS,
+    PAGE_WIDGET_CONFIGS,
     WidgetModule,
 } from './widget.types';
 
@@ -43,6 +44,11 @@ export function useWidgetLayout({ userLevel, pageId = 'default' }: UseWidgetLayo
     // Page-specific storage key
     const storageKey = `${STORAGE_KEY_PREFIX}-${pageId}`;
 
+    // Get page-specific default widgets
+    const getDefaultWidgets = (): WidgetConfig[] => {
+        return PAGE_WIDGET_CONFIGS[pageId] || DEFAULT_WIDGETS;
+    };
+
     // Permission check - only Level 5 can edit
     const canEdit = userLevel >= PermissionLevel.SystemOwner;
 
@@ -53,11 +59,12 @@ export function useWidgetLayout({ userLevel, pageId = 'default' }: UseWidgetLayo
             try {
                 return JSON.parse(saved);
             } catch {
-                return DEFAULT_WIDGETS;
+                return getDefaultWidgets();
             }
         }
-        return DEFAULT_WIDGETS;
+        return getDefaultWidgets();
     });
+
 
     // Edit mode state
     const [editState, setEditState] = useState<WidgetEditState>({
@@ -148,10 +155,10 @@ export function useWidgetLayout({ userLevel, pageId = 'default' }: UseWidgetLayo
         ));
     }, [canEdit]);
 
-    // Reset to default layout
+    // Reset to default layout (page-specific)
     const resetLayout = useCallback(() => {
         if (!canEdit) return;
-        setWidgets(DEFAULT_WIDGETS);
+        setWidgets(getDefaultWidgets());
     }, [canEdit]);
 
     // Add new widget from module picker

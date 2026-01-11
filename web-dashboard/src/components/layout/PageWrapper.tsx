@@ -1,29 +1,48 @@
 /**
  * PageWrapper.tsx
  * 
- * Wraps traditional page components within AppShellLayout
- * This allows legacy pages to use the new unified layout system
- * with Header, Sidebar, and Widget-compatible structure.
+ * Wraps page components within AppShellLayout
+ * Two modes:
+ * 1. Widget Mode (useWidgets=true): Uses WidgetGrid with page-specific widget config
+ * 2. Legacy Mode (useWidgets=false): Renders children in main content area
  */
 import React from 'react';
 import AppShellLayout from './AppShellLayout';
-import { PermissionLevel } from './widget.types';
+import { PermissionLevel, PAGE_WIDGET_CONFIGS } from './widget.types';
 import { useAuth } from '../../context/AuthContext';
 
 interface PageWrapperProps {
-    children: React.ReactNode;
+    children?: React.ReactNode;
     pageId?: string;
+    useWidgets?: boolean;  // If true, use WidgetGrid instead of children
 }
 
-export default function PageWrapper({ children, pageId = 'page' }: PageWrapperProps) {
+export default function PageWrapper({
+    children,
+    pageId = 'page',
+    useWidgets,
+}: PageWrapperProps) {
     const { user } = useAuth();
 
     // Map user role to PermissionLevel
     const userLevel = (user?.roleLevel as PermissionLevel) ?? PermissionLevel.Guest;
 
+    // Auto-detect: if pageId has a widget config, use widgets mode
+    const hasWidgetConfig = pageId in PAGE_WIDGET_CONFIGS;
+    const shouldUseWidgets = useWidgets ?? hasWidgetConfig;
+
+    // If using widgets mode, don't pass children to let AppShellLayout render WidgetGrid
+    if (shouldUseWidgets) {
+        return (
+            <AppShellLayout userLevel={userLevel} pageId={pageId}>
+                {/* No children - AppShellLayout will render WidgetGrid */}
+            </AppShellLayout>
+        );
+    }
+
+    // Legacy mode: wrap children in a scrollable container
     return (
         <AppShellLayout userLevel={userLevel} pageId={pageId}>
-            {/* Render traditional page content inside the main column */}
             <div className="page-content" style={{
                 height: '100%',
                 overflow: 'auto',
