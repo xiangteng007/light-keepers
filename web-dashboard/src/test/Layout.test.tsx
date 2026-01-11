@@ -1,8 +1,9 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
-import Layout from '../components/Layout';
+import AppShellLayout from '../components/layout/AppShellLayout';
 import { AuthProvider } from '../context/AuthContext';
+import { PermissionLevel } from '../components/layout/widget.types';
 
 // Mock Lucide icons
 vi.mock('lucide-react', async (importOriginal) => {
@@ -12,41 +13,51 @@ vi.mock('lucide-react', async (importOriginal) => {
     }
 })
 
-describe('Layout Component', () => {
-    it('renders the sidebar with correct navigation items', () => {
+describe('AppShellLayout Component', () => {
+    it('renders the header with LIGHTKEEPERS branding', () => {
         render(
             <BrowserRouter>
                 <AuthProvider>
-                    <Layout />
+                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                        <div>Test Content</div>
+                    </AppShellLayout>
                 </AuthProvider>
             </BrowserRouter>
         );
 
-        // Check for new V2 Nav Items (Tactical Labels)
-        // Note: Some might be tooltips or hidden on mobile, but in default desktop view they should be links with title attributes or rendered content.
-        // In the new Sidebar, titles are on the Link component. 
-        // We can query by title or finding the icons if we mock them, but searching for the distinct labels in the DOM (if rendered) or title attributes is safer.
-        // The current Sidebar implementation renders icons, and titles are attributes.
-        // Let's check for the logo first.
-        expect(screen.getByText('LK')).toBeInTheDocument();
-
-        // The header renders "LIGHT KEEPERS"
-        expect(screen.getByText('LIGHT KEEPERS')).toBeInTheDocument();
+        // Check for the header branding
+        expect(screen.getByText('LIGHTKEEPERS')).toBeInTheDocument();
     });
 
-    it('renders the system status indicators', () => {
+    it('renders the sidebar navigation', () => {
         render(
             <BrowserRouter>
                 <AuthProvider>
-                    <Layout />
+                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                        <div>Test Content</div>
+                    </AppShellLayout>
                 </AuthProvider>
             </BrowserRouter>
         );
 
-        // Check for Header System Status
-        expect(screen.getByText('SYS: ONLINE')).toBeInTheDocument();
+        // Check that sidebar exists by looking for the navigation structure
+        // The sidebar should have navigation items
+        const sidebar = document.querySelector('.sidebar');
+        expect(sidebar).toBeInTheDocument();
+    });
 
-        // Check for Footer Status Ticker
-        expect(screen.getByText('OPERATIONAL')).toBeInTheDocument();
+    it('renders child content correctly', () => {
+        render(
+            <BrowserRouter>
+                <AuthProvider>
+                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                        <div data-testid="test-content">Hello World</div>
+                    </AppShellLayout>
+                </AuthProvider>
+            </BrowserRouter>
+        );
+
+        expect(screen.getByTestId('test-content')).toBeInTheDocument();
+        expect(screen.getByText('Hello World')).toBeInTheDocument();
     });
 });
