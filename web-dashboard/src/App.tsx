@@ -4,7 +4,6 @@ import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
 import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
-import DashboardPage from './pages/DashboardPage'
 import EventsPage from './pages/EventsPage'
 import TasksPage from './pages/TasksPage'
 import MapPage from './pages/MapPage'
@@ -172,7 +171,7 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Navigate to="/dashboard" replace />} />
             {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
-            <Route path="dashboard" element={<DashboardPage />} />
+            <Route path="dashboard" element={<CommandCenterPage />} />
             <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
             <Route path="map" element={<MapPage />} />
             <Route path="forecast" element={<ForecastPage />} />
