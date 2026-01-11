@@ -24,12 +24,26 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
     const { isAuthenticated, isLoading, user } = useAuth();
     const location = useLocation();
 
-    // 等待驗證完成
+    // 等待驗證完成 - 使用最小化加載指示，減少閃爍
     if (isLoading) {
         return (
-            <div className="loading-screen">
-                <div className="loading-spinner"></div>
-                <p>驗證中...</p>
+            <div style={{
+                width: '100vw',
+                height: '100vh',
+                background: 'var(--layout-bg, #0b111b)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+            }}>
+                <div style={{
+                    width: '24px',
+                    height: '24px',
+                    border: '2px solid rgba(195, 155, 111, 0.3)',
+                    borderTopColor: 'var(--accent-gold, #C39B6F)',
+                    borderRadius: '50%',
+                    animation: 'spin 0.8s linear infinite',
+                }} />
+                <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
             </div>
         );
     }

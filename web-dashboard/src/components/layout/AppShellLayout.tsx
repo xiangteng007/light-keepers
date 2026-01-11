@@ -28,7 +28,11 @@ export default function AppShellLayout({
     pageId = 'default',
 }: AppShellLayoutProps) {
     const [drawerOpen, setDrawerOpen] = useState(false);
-    const [sidebarExpanded, setSidebarExpanded] = useState(false);
+    // Persist sidebar expanded state to localStorage
+    const [sidebarExpanded, setSidebarExpanded] = useState(() => {
+        const saved = localStorage.getItem('sidebarExpanded');
+        return saved === 'true';
+    });
     const [isMobile, setIsMobile] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [sidebarSettingsOpen, setSidebarSettingsOpen] = useState(false);
@@ -237,7 +241,11 @@ export default function AppShellLayout({
                 <aside className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
                     <div className="sbTop">
                         <button
-                            onClick={() => setSidebarExpanded(!sidebarExpanded)}
+                            onClick={() => {
+                                const newState = !sidebarExpanded;
+                                setSidebarExpanded(newState);
+                                localStorage.setItem('sidebarExpanded', String(newState));
+                            }}
                             style={{
                                 background: 'rgba(255,255,255,0.05)',
                                 border: 'none',
