@@ -2,8 +2,8 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
-import Layout from './components/Layout'
 import ProtectedRoute from './components/ProtectedRoute'
+import PageWrapper from './components/layout/PageWrapper'
 import EventsPage from './pages/EventsPage'
 import TasksPage from './pages/TasksPage'
 import MapPage from './pages/MapPage'
@@ -22,7 +22,6 @@ import ReportsAdminPage from './pages/ReportsAdminPage'
 import ReportsExportPage from './pages/ReportsExportPage'
 import AnalyticsPage from './pages/AnalyticsPage'
 import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
-// import LoginPage from './pages/LoginPage' // Deprecated
 import ForgotPasswordPage from './pages/ForgotPasswordPage'
 import ResetPasswordPage from './pages/ResetPasswordPage'
 import ProfilePage from './pages/ProfilePage'
@@ -47,7 +46,6 @@ import CommandCenterPage from './pages/CommandCenterPage'
 import MentalHealthPage from './pages/MentalHealthPage'
 
 // ===== V2 Domain Architecture Imports =====
-// Workforce Domain
 import {
   AttendancePage as WorkforceAttendancePage,
   LeaderboardPage as WorkforceLeaderboardPage,
@@ -56,54 +54,43 @@ import {
   ShiftCalendarPage as WorkforceShiftCalendarPage,
 } from './pages/domains/workforce'
 
-// Mission Command Domain
 import {
   MissionCommandPage,
   TriagePage,
 } from './pages/domains/mission-command'
 
-// Logistics Domain
 import {
   EquipmentPage as LogisticsEquipmentPage,
   ResourcesPage as LogisticsResourcesPage,
 } from './pages/domains/logistics'
 
-// Data Insight Domain
 import {
   ReportsPage as DataInsightReportsPage,
 } from './pages/domains/data-insight'
 
-// Connectivity Domain
 import {
   CommunicationsPage as ConnectivityCommunicationsPage,
 } from './pages/domains/connectivity'
 
-// Community Domain
 import {
   CommunityPage as DomainCommunityPage,
 } from './pages/domains/community'
 
-// Core Domain
 import {
   SettingsPage as CoreSettingsPage,
   DashboardPage as CoreDashboardPage,
 } from './pages/domains/core'
 
-// Air Ops Domain
 import {
   DroneControlPage,
 } from './pages/domains/air-ops'
 
-// ===== P9 New Pages =====
 import TaskDispatchPage from './pages/command/TaskDispatchPage'
 import ResourceOverviewPage from './pages/resources/ResourceOverviewPage'
-
-// ===== P11 Domain Pages =====
 import PersonnelManagementPage from './pages/domains/workforce/PersonnelManagementPage'
 import CommunityCenterPage from './pages/domains/community/CommunityCenterPage'
 import ReportGeneratorPage from './pages/analytics/ReportGeneratorPage'
 
-// ===== C2 Domain Pages =====
 import IncidentsPage from './pages/c2/IncidentsPage'
 import DrillsPage from './pages/c2/DrillsPage'
 import AARPage from './pages/c2/AARPage'
@@ -121,7 +108,6 @@ import './App.css'
  * 5 = 系統擁有者
  */
 function App() {
-  // PWA Service Worker registration with update prompt
   const {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
@@ -160,103 +146,110 @@ function App() {
         )}
 
         <Routes>
-          {/* <Route path="/login" element={<LoginPage />} /> Deprecated: Use Modal Login */}
+          {/* ===== 獨立頁面 (無需 Layout 包裝) ===== */}
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
-          <Route path="/showcase" element={<ComponentShowcase />} /> {/* 組件展示頁（無需登入） */}
-          <Route path="/command-center" element={<CommandCenterPage />} /> {/* Widget Layout Demo */}
-          <Route path="/dashboard" element={<CommandCenterPage />} /> {/* Main Dashboard - Widget Grid */}
-          <Route path="/mental-health" element={<MentalHealthPage />} /> {/* 心理健康中心 - 暫時公開測試 */}
-          <Route path="/" element={<Layout />}>
-            <Route index element={<Navigate to="/dashboard" replace />} />
-            {/* 公開頁面 (Level 0) - 匿名訪客可存取 */}
-            <Route path="ncdr-alerts" element={<NcdrAlertsPage />} />
-            <Route path="map" element={<MapPage />} />
-            <Route path="forecast" element={<ForecastPage />} />
-            <Route path="manuals" element={<ManualsPage />} /> {/* 原始 10 大分類設計 */}
-            <Route path="manuals/:id" element={<ManualDetailPage />} />
-            <Route path="manuals-v3" element={<ManualHomePage />} /> {/* 新版首頁（備用） */}
-            {/* 志工等級 (1) */}
-            <Route path="events" element={<ProtectedRoute requiredLevel={1}><EventsPage /></ProtectedRoute>} />
-            <Route path="report" element={<ProtectedRoute requiredLevel={1}><ReportPage /></ProtectedRoute>} />
-            <Route path="training" element={<ProtectedRoute requiredLevel={1}><TrainingPage /></ProtectedRoute>} />
-            <Route path="notifications" element={<ProtectedRoute requiredLevel={1}><NotificationsPage /></ProtectedRoute>} />
-            <Route path="profile" element={<ProtectedRoute requiredLevel={0}><ProfilePage /></ProtectedRoute>} />
-            <Route path="resources-public" element={<ProtectedRoute requiredLevel={1}><ResourcesPublicPage /></ProtectedRoute>} />
-            <Route path="community" element={<ProtectedRoute requiredLevel={1}><CommunityPage /></ProtectedRoute>} />
-            <Route path="activities" element={<ProtectedRoute requiredLevel={1}><ActivitiesPage /></ProtectedRoute>} />
-            <Route path="leaderboard" element={<ProtectedRoute requiredLevel={1}><LeaderboardPage /></ProtectedRoute>} />
-            {/* VMS 志工個人管理頁面 (1) */}
-            <Route path="my-vehicles" element={<ProtectedRoute requiredLevel={1}><VehicleManagementPage /></ProtectedRoute>} />
-            <Route path="my-insurance" element={<ProtectedRoute requiredLevel={1}><InsuranceManagementPage /></ProtectedRoute>} />
-            <Route path="my-points" element={<ProtectedRoute requiredLevel={1}><PointsReportPage /></ProtectedRoute>} />
-            {/* 幹部等級 (2) */}
-            <Route path="tasks" element={<ProtectedRoute requiredLevel={2}><TasksPage /></ProtectedRoute>} />
-            <Route path="volunteers" element={<ProtectedRoute requiredLevel={2}><VolunteersPage /></ProtectedRoute>} />
-            <Route path="volunteers/:id" element={<ProtectedRoute requiredLevel={2}><VolunteerDetailPage /></ProtectedRoute>} />
-            <Route path="volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><VolunteerSchedulePage /></ProtectedRoute>} />
-            <Route path="resources" element={<ProtectedRoute requiredLevel={2}><ResourcesPage /></ProtectedRoute>} />
-            <Route path="approvals" element={<ProtectedRoute requiredLevel={2}><ApprovalCenterPage /></ProtectedRoute>} />
-            <Route path="report-schedules" element={<ProtectedRoute requiredLevel={2}><ReportSchedulePage /></ProtectedRoute>} />
-            <Route path="reports" element={<Navigate to="/reports/admin" replace />} />
-            <Route path="reports/admin" element={<ProtectedRoute requiredLevel={2}><ReportsAdminPage /></ProtectedRoute>} />
-            {/* 常務理事等級 (3) */}
-            <Route path="reports/export" element={<ProtectedRoute requiredLevel={3}><ReportsExportPage /></ProtectedRoute>} />
-            <Route path="analytics" element={<ProtectedRoute requiredLevel={3}><AnalyticsPage /></ProtectedRoute>} />
-            <Route path="sensitive-audit" element={<ProtectedRoute requiredLevel={3}><SensitiveAuditPage /></ProtectedRoute>} />
-            <Route path="label-management" element={<ProtectedRoute requiredLevel={3}><LabelManagementPage /></ProtectedRoute>} />
-            <Route path="backups" element={<ProtectedRoute requiredLevel={3}><BackupPage /></ProtectedRoute>} />
-            {/* 理事長等級 (4) */}
-            <Route path="permissions" element={<ProtectedRoute requiredLevel={4}><PermissionsPage /></ProtectedRoute>} />
-            {/* 系統擁有者等級 (5) */}
-            <Route path="donations" element={<ProtectedRoute requiredLevel={5}><DonationsPage /></ProtectedRoute>} />
+          <Route path="/showcase" element={<ComponentShowcase />} />
 
-            {/* ===== V2 Domain Architecture Routes ===== */}
-            {/* Mission Command Domain */}
-            <Route path="domains/mission-command" element={<ProtectedRoute requiredLevel={2}><MissionCommandPage /></ProtectedRoute>} />
-            <Route path="domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><TriagePage /></ProtectedRoute>} />
-            <Route path="domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><TaskDispatchPage /></ProtectedRoute>} />
+          {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
+          <Route path="/dashboard" element={<CommandCenterPage />} />
+          <Route path="/command-center" element={<CommandCenterPage />} />
+          <Route path="/mental-health" element={<MentalHealthPage />} />
 
-            {/* C2 Additional Pages */}
-            <Route path="incidents" element={<ProtectedRoute requiredLevel={1}><IncidentsPage /></ProtectedRoute>} />
-            <Route path="drills" element={<ProtectedRoute requiredLevel={3}><DrillsPage /></ProtectedRoute>} />
-            <Route path="aar" element={<ProtectedRoute requiredLevel={3}><AARPage /></ProtectedRoute>} />
+          {/* ===== 根路由重導向 ===== */}
+          <Route index element={<Navigate to="/dashboard" replace />} />
 
-            {/* Workforce Domain */}
-            <Route path="domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><WorkforceShiftCalendarPage /></ProtectedRoute>} />
-            <Route path="domains/workforce/attendance" element={<ProtectedRoute requiredLevel={2}><WorkforceAttendancePage /></ProtectedRoute>} />
-            <Route path="domains/workforce/org-chart" element={<ProtectedRoute requiredLevel={2}><WorkforceOrgChartPage /></ProtectedRoute>} />
-            <Route path="domains/workforce/leaderboard" element={<ProtectedRoute requiredLevel={1}><WorkforceLeaderboardPage /></ProtectedRoute>} />
-            <Route path="domains/workforce/points-report" element={<ProtectedRoute requiredLevel={2}><WorkforcePointsReportPage /></ProtectedRoute>} />
-            <Route path="domains/workforce/personnel" element={<ProtectedRoute requiredLevel={2}><PersonnelManagementPage /></ProtectedRoute>} />
+          {/* ===== 公開頁面 (Level 0) - 使用 PageWrapper ===== */}
+          <Route path="/ncdr-alerts" element={<PageWrapper pageId="ncdr"><NcdrAlertsPage /></PageWrapper>} />
+          <Route path="/map" element={<PageWrapper pageId="map"><MapPage /></PageWrapper>} />
+          <Route path="/forecast" element={<PageWrapper pageId="forecast"><ForecastPage /></PageWrapper>} />
+          <Route path="/manuals" element={<PageWrapper pageId="manuals"><ManualsPage /></PageWrapper>} />
+          <Route path="/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
+          <Route path="/manuals-v3" element={<PageWrapper pageId="manuals-v3"><ManualHomePage /></PageWrapper>} />
 
-            {/* Logistics Domain */}
-            <Route path="domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><LogisticsEquipmentPage /></ProtectedRoute>} />
-            <Route path="domains/logistics/resources" element={<ProtectedRoute requiredLevel={2}><LogisticsResourcesPage /></ProtectedRoute>} />
-            <Route path="domains/logistics/resource-overview" element={<ProtectedRoute requiredLevel={2}><ResourceOverviewPage /></ProtectedRoute>} />
+          {/* ===== 志工等級 (1) ===== */}
+          <Route path="/events" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="events"><EventsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/report" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="report"><ReportPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/training" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="training"><TrainingPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/notifications" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="notifications"><NotificationsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/profile" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="profile"><ProfilePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/resources-public" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="resources-public"><ResourcesPublicPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/community" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community"><CommunityPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/activities" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="activities"><ActivitiesPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/leaderboard" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="leaderboard"><LeaderboardPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/my-vehicles" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="my-vehicles"><VehicleManagementPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/my-insurance" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="my-insurance"><InsuranceManagementPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/my-points" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="my-points"><PointsReportPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Data Insight Domain */}
-            <Route path="domains/data-insight/reports" element={<ProtectedRoute requiredLevel={2}><DataInsightReportsPage /></ProtectedRoute>} />
+          {/* ===== 幹部等級 (2) ===== */}
+          <Route path="/tasks" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="tasks"><TasksPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/volunteers" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="volunteers"><VolunteersPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/volunteers/:id" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="volunteer-detail"><VolunteerDetailPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/volunteers/schedule" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="volunteer-schedule"><VolunteerSchedulePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="resources"><ResourcesPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/approvals" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="approvals"><ApprovalCenterPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/report-schedules" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="report-schedules"><ReportSchedulePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/reports" element={<Navigate to="/reports/admin" replace />} />
+          <Route path="/reports/admin" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="reports-admin"><ReportsAdminPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Connectivity Domain */}
-            <Route path="domains/connectivity/communications" element={<ProtectedRoute requiredLevel={2}><ConnectivityCommunicationsPage /></ProtectedRoute>} />
+          {/* ===== 常務理事等級 (3) ===== */}
+          <Route path="/reports/export" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="reports-export"><ReportsExportPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/analytics" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="analytics"><AnalyticsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/sensitive-audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="sensitive-audit"><SensitiveAuditPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/label-management" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="label-management"><LabelManagementPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/backups" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="backups"><BackupPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Community Domain */}
-            <Route path="domains/community" element={<ProtectedRoute requiredLevel={1}><DomainCommunityPage /></ProtectedRoute>} />
-            <Route path="domains/community/center" element={<ProtectedRoute requiredLevel={1}><CommunityCenterPage /></ProtectedRoute>} />
+          {/* ===== 理事長等級 (4) ===== */}
+          <Route path="/permissions" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="permissions"><PermissionsPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Analytics Domain */}
-            <Route path="domains/analytics/report-generator" element={<ProtectedRoute requiredLevel={3}><ReportGeneratorPage /></ProtectedRoute>} />
+          {/* ===== 系統擁有者等級 (5) ===== */}
+          <Route path="/donations" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="donations"><DonationsPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Core Domain */}
-            <Route path="domains/core/settings" element={<ProtectedRoute requiredLevel={3}><CoreSettingsPage /></ProtectedRoute>} />
-            <Route path="domains/core/dashboard" element={<ProtectedRoute requiredLevel={3}><CoreDashboardPage /></ProtectedRoute>} />
+          {/* ===== V2 Domain Architecture Routes ===== */}
+          {/* Mission Command Domain */}
+          <Route path="/domains/mission-command" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="mission-command"><MissionCommandPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="task-dispatch"><TaskDispatchPage /></PageWrapper></ProtectedRoute>} />
 
-            {/* Air Ops Domain */}
-            <Route path="domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><DroneControlPage /></ProtectedRoute>} />
-          </Route>
+          {/* C2 Additional Pages */}
+          <Route path="/incidents" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="incidents"><IncidentsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/drills" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drills"><DrillsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/aar" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="aar"><AARPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Workforce Domain */}
+          <Route path="/domains/workforce/shift-calendar" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="shift-calendar"><WorkforceShiftCalendarPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/attendance" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="attendance"><WorkforceAttendancePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/org-chart" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="org-chart"><WorkforceOrgChartPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/leaderboard" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-leaderboard"><WorkforceLeaderboardPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/points-report" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="workforce-points"><WorkforcePointsReportPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/workforce/personnel" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="personnel"><PersonnelManagementPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Logistics Domain */}
+          <Route path="/domains/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="equipment"><LogisticsEquipmentPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/logistics/resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-resources"><LogisticsResourcesPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/logistics/resource-overview" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="resource-overview"><ResourceOverviewPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Data Insight Domain */}
+          <Route path="/domains/data-insight/reports" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="data-reports"><DataInsightReportsPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Connectivity Domain */}
+          <Route path="/domains/connectivity/communications" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="communications"><ConnectivityCommunicationsPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Community Domain */}
+          <Route path="/domains/community" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="domain-community"><DomainCommunityPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/community/center" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community-center"><CommunityCenterPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Analytics Domain */}
+          <Route path="/domains/analytics/report-generator" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="report-generator"><ReportGeneratorPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Core Domain */}
+          <Route path="/domains/core/settings" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="core-settings"><CoreSettingsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/domains/core/dashboard" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="core-dashboard"><CoreDashboardPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Air Ops Domain */}
+          <Route path="/domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drone-control"><DroneControlPage /></PageWrapper></ProtectedRoute>} />
         </Routes>
       </AuthProvider>
     </RealtimeProvider>
@@ -264,4 +257,3 @@ function App() {
 }
 
 export default App
-
