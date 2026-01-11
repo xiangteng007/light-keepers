@@ -59,7 +59,7 @@ export function PHQ9Questionnaire({ onComplete }: PHQ9QuestionnaireProps) {
     };
 
     const allAnswered = answers.every(a => a !== null);
-    const score = calculateScore();
+    const score = answers.reduce((sum, val) => sum + (val ?? 0), 0);
     const result = getResultInterpretation(score);
 
     const handleSubmit = () => {

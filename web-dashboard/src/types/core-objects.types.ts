@@ -443,8 +443,8 @@ export interface DomainEvent {
 // ============================================================
 
 export interface StorageProvider {
-    upload(file: File | Buffer, path: string): Promise<{ url: string; size: number }>;
-    download(path: string): Promise<Buffer>;
+    upload(file: File | Uint8Array, path: string): Promise<{ url: string; size: number }>;
+    download(path: string): Promise<Uint8Array>;
     delete(path: string): Promise<void>;
     getSignedUrl(path: string, expiresIn?: number): Promise<string>;
     exists(path: string): Promise<boolean>;

@@ -14,7 +14,7 @@ export default function CommandCenterPage() {
 
     // Map user role to PermissionLevel
     // Level 5 = SystemOwner (Full widget editing)
-    const userLevel = user?.roleLevel ?? PermissionLevel.SystemOwner;  // Default to 5 for demo
+    const userLevel = (user?.roleLevel as PermissionLevel) ?? PermissionLevel.SystemOwner;  // Default to 5 for demo
 
     return (
         <AppShellLayout userLevel={userLevel} pageId="command-center">
