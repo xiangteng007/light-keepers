@@ -89,6 +89,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // 載入使用者資訊
     const loadUser = async (retryCount = 0) => {
+        // DEV MODE: 如果設置了 devModeUser，使用模擬用戶
+        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        if (devModeEnabled) {
+            console.log('[AuthContext] DEV MODE: Using mock Level 5 user');
+            setUser({
+                id: 'dev-user-001',
+                email: 'xiangteng007@gmail.com',
+                displayName: '開發測試用戶',
+                roles: ['系統擁有者'],
+                roleLevel: 5,
+                roleDisplayName: '系統擁有者',
+                isAnonymous: false,
+                volunteerProfileCompleted: true,
+            });
+            setIsLoading(false);
+            return;
+        }
+
         let token = getStoredToken();
 
         // 如果沒有 token,嘗試用 refresh token 換取新的
