@@ -11,7 +11,7 @@ import {
     Index,
 } from 'typeorm';
 
-export type SocialPlatform = 'facebook' | 'instagram' | 'twitter' | 'ptt' | 'line' | 'other';
+export type SocialPlatform = 'facebook' | 'instagram' | 'twitter' | 'threads' | 'ptt' | 'line' | 'other';
 export type SentimentType = 'positive' | 'negative' | 'neutral';
 
 export interface PostAnalysis {

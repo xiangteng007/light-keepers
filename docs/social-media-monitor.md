@@ -16,8 +16,8 @@
 │                Social Media Monitor                  │
 ├─────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐ │
-│  │  Facebook   │  │  Instagram  │  │   Twitter   │ │
-│  │  Graph API  │  │  Basic API  │  │   (Stub)    │ │
+│  │  Facebook   │  │  Instagram  │  │  Threads    │ │
+│  │  Graph API  │  │  Basic API  │  │  via Meta   │ │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘ │
 │         │                │                │         │
 │         ▼                ▼                ▼         │
@@ -69,7 +69,7 @@ export class SocialPost {
     id: string;
 
     @Column()
-    platform: 'facebook' | 'instagram' | 'twitter' | 'ptt' | 'other';
+    platform: 'facebook' | 'instagram' | 'twitter' | 'threads' | 'ptt' | 'line' | 'other';
 
     @Column()
     externalId: string;  // 平台原始 ID
@@ -134,4 +134,4 @@ export class SocialPost {
 | 版本 | 日期 | 變更 |
 |------|------|------|
 | v1.0 | 2025-12 | 初始 Service 實作 |
-| v2.0 | 2026-01-12 | 新增 Controller, Entity, EventEmitter |
+| v2.0 | 2026-01-12 | ✅ 完成: Controller, Entity, DTOs, EventEmitter, 7 API endpoints |
