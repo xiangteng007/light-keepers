@@ -6,6 +6,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import {
     AfterActionReview,
     AARStatus,
@@ -19,6 +20,7 @@ import { SITREP } from './entities/sitrep.entity';
 import { FieldReport } from '../field-reports/entities/field-report.entity';
 import { Task } from '../tasks/entities/task.entity';
 import { AuditLog } from '../field-reports/entities/audit-log.entity';
+import { ANALYTICS_EVENTS } from '../../common/events';
 
 @Injectable()
 export class AARService {
@@ -35,6 +37,7 @@ export class AARService {
         private taskRepo: Repository<Task>,
         @InjectRepository(AuditLog)
         private auditRepo: Repository<AuditLog>,
+        private readonly eventEmitter: EventEmitter2,
     ) { }
 
     /**
@@ -221,7 +224,18 @@ export class AARService {
         aar.finalizedBy = finalizedBy;
         aar.finalizedAt = new Date();
 
-        return this.aarRepo.save(aar);
+        const saved = await this.aarRepo.save(aar);
+
+        // v2.1: 發送 AAR 發布事件
+        this.eventEmitter.emit(ANALYTICS_EVENTS.AAR_PUBLISHED, {
+            aarId: saved.id,
+            incidentId: saved.missionSessionId,
+            title: saved.title,
+            userId: finalizedBy,
+            aiGenerated: saved.aiGenerated,
+        });
+
+        return saved;
     }
 
     /**
