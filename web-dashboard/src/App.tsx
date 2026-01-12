@@ -13,6 +13,7 @@ import ManualDetailPage from './pages/ManualDetailPage'
 import { ManualHomePage } from './pages/manual'
 import { ComponentShowcase } from './pages/ComponentShowcase'
 import ReportPage from './pages/ReportPage'
+import AccountPage from './pages/AccountPage'
 import VolunteersPage from './pages/VolunteersPage'
 import VolunteerDetailPage from './pages/VolunteerDetailPage'
 import TrainingPage from './pages/TrainingPage'
@@ -156,6 +157,7 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} />
+          <Route path="/account" element={<ProtectedRoute requiredLevel={0}><AccountPage /></ProtectedRoute>} />
 
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
           <Route path="/dashboard" element={<CommandCenterPage />} />
