@@ -224,6 +224,8 @@ import { GlobalExceptionFilter } from './common/filters/global-exception.filter'
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
 // v2.1 SSOT: 統一通報入口
 import { IntakeModule } from './modules/intake/intake.module';
+// v4.0: Hub 服務整合
+import { HubServicesModule } from './common/services/hub-services.module';
 
 @Module({
     imports: [
@@ -261,6 +263,9 @@ import { IntakeModule } from './modules/intake/intake.module';
 
         // P4: Storage 統一抽象
         StorageModule.forRoot(),
+
+        // v4.0: Hub 服務整合 (Global)
+        HubServicesModule,
 
         // 功能模組
         HealthModule,

@@ -99,6 +99,13 @@ export const EVENT_TYPES = {
     ...NOTIFICATION_EVENTS,
     ...AUDIT_EVENTS,
     ...ANALYTICS_EVENTS,
+    // v4.0 Hub Events
+    AI_TASK_COMPLETED: 'ai.task.completed',
+    AI_INCIDENT_CLASSIFIED: 'ai.incident.classified',
+    OFFLINE_SYNC_COMPLETED: 'offline.sync.completed',
+    OFFLINE_SYNC_CONFLICT: 'offline.sync.conflict',
+    GEO_INTEL_UPDATED: 'geo.intel.updated',
+    NOTIFICATIONS_BATCH_COMPLETED: 'notifications.batch.completed',
 } as const;
 
 export type EventType = typeof EVENT_TYPES[keyof typeof EVENT_TYPES];
