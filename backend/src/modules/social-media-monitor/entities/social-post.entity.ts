@@ -1,7 +1,7 @@
 /**
  * social-post.entity.ts
  * 
- * 社群貼文實體 - 儲存監控到的社群媒體貼文及分析結果
+ * v3.0: 社群貼文實體 - 含互動指標、地區、擴展分析
  */
 import {
     Entity,
@@ -21,11 +21,21 @@ export interface PostAnalysis {
     location: string | null;
 }
 
+// v3.0: 互動指標
+export interface EngagementMetrics {
+    likeCount: number;
+    commentCount: number;
+    shareCount: number;
+    viewCount: number;
+}
+
 @Entity('social_posts')
 @Index(['platform'])
 @Index(['urgency'])
 @Index(['createdAt'])
 @Index(['alertSent'])
+@Index(['location'])
+@Index(['likeCount'])
 export class SocialPost {
     @PrimaryGeneratedColumn('uuid')
     id: string;
@@ -58,6 +68,27 @@ export class SocialPost {
     @Column({ type: 'int', default: 0 })
     urgency: number;
 
+    /** 地區 (冗餘欄位方便查詢) */
+    @Column({ type: 'varchar', length: 50, nullable: true })
+    location: string;
+
+    // ===== v3.0: 互動指標 =====
+    /** 按讚數 */
+    @Column({ name: 'like_count', type: 'int', default: 0 })
+    likeCount: number;
+
+    /** 留言數 */
+    @Column({ name: 'comment_count', type: 'int', default: 0 })
+    commentCount: number;
+
+    /** 分享數 */
+    @Column({ name: 'share_count', type: 'int', default: 0 })
+    shareCount: number;
+
+    /** 瀏覽數 */
+    @Column({ name: 'view_count', type: 'int', default: 0 })
+    viewCount: number;
+
     /** 是否已發送警報 */
     @Column({ name: 'alert_sent', default: false })
     alertSent: boolean;
@@ -73,3 +104,4 @@ export class SocialPost {
     @CreateDateColumn({ name: 'created_at' })
     createdAt: Date;
 }
+

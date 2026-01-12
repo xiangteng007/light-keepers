@@ -1,21 +1,24 @@
 /**
  * social-media-monitor.module.ts
  * 
- * v2.0: 社群媒體監視模組
- * - Controller: API endpoints
+ * v3.0: 社群媒體監視模組
+ * - Controller: API endpoints (含匯出、通知)
  * - Service: 分析引擎 + 事件發送
- * - Entity: 持久化儲存 (TypeORM)
+ * - NotificationService: Telegram/LINE/Webhook
+ * - Entities: SocialPost, NotificationConfig
  */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { SocialMediaMonitorService } from './social-media-monitor.service';
 import { SocialMediaMonitorController } from './social-media-monitor.controller';
+import { NotificationService } from './services/notification.service';
 import { SocialPost } from './entities/social-post.entity';
+import { NotificationConfig } from './entities/notification-config.entity';
 
 @Module({
-    imports: [TypeOrmModule.forFeature([SocialPost])],
+    imports: [TypeOrmModule.forFeature([SocialPost, NotificationConfig])],
     controllers: [SocialMediaMonitorController],
-    providers: [SocialMediaMonitorService],
-    exports: [SocialMediaMonitorService],
+    providers: [SocialMediaMonitorService, NotificationService],
+    exports: [SocialMediaMonitorService, NotificationService],
 })
 export class SocialMediaMonitorModule { }
