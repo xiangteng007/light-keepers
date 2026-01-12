@@ -15,8 +15,11 @@ import {
 import { Logger, UseGuards } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { OnEvent } from '@nestjs/event-emitter';
-import { EVENT_TYPES } from '../../common/events/event-types';
-import { WsJwtGuard } from '../../modules/auth/guards/ws-jwt.guard';
+import {
+    EVENT_TYPES,
+    INCIDENT_EVENTS,
+    TASK_EVENTS
+} from '../../common/events/event-types';
 
 @WebSocketGateway({
     cors: {
@@ -44,7 +47,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
             if (!this.activeUsers.has(userId)) {
                 this.activeUsers.set(userId, new Set());
             }
-            this.activeUsers.get(userId).add(client.id);
+            this.activeUsers.get(userId)!.add(client.id);
             client.join(`user:${userId}`);
             this.logger.debug(`Client connected: ${client.id} (User: ${userId})`);
 
@@ -58,7 +61,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     handleDisconnect(client: Socket) {
         const userId = client.handshake.query.userId as string;
         if (userId && this.activeUsers.has(userId)) {
-            const userSockets = this.activeUsers.get(userId);
+            const userSockets = this.activeUsers.get(userId)!;
             userSockets.delete(client.id);
             if (userSockets.size === 0) {
                 this.activeUsers.delete(userId);
@@ -143,7 +146,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     /**
      * 任務更新
      */
-    @OnEvent(EVENT_TYPES.UPDATED)
+    @OnEvent(TASK_EVENTS.UPDATED)
     handleTaskUpdate(payload: any) {
         if (payload.assigneeId) {
             this.server.to(`user:${payload.assigneeId}`).emit('task:update', payload);
@@ -153,7 +156,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
     /**
      * 事件(Incident)更新
      */
-    @OnEvent(EVENT_TYPES.INCIDENT_EVENTS.UPDATED)
+    @OnEvent(INCIDENT_EVENTS.UPDATED)
     handleIncidentUpdate(payload: any) {
         this.server.emit('incident:update', payload);
     }
