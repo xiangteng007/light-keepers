@@ -400,13 +400,6 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
 
     // ===== 新增頁面 Widget 配置 =====
 
-    // Events (事件通報)
-    'events': [
-        { id: 'event-timeline', title: '事件時間線', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
-        { id: 'event-list', title: '事件列表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
-        { id: 'event-form', title: '新增事件', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
-    ],
-
     // Report (災情通報)
     'report': [
         { id: 'report-form', title: '災情通報表單', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
@@ -418,19 +411,6 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
         { id: 'search-panel', title: '搜尋手冊', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 1 }, style: 'glass' },
         { id: 'manual-categories', title: '手冊分類', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 2, w: 3, h: 6, minW: 2, minH: 4 }, style: 'card' },
         { id: 'manual-list', title: '手冊列表', region: 'main', visible: true, locked: false, position: { x: 3, y: 2, w: 9, h: 6, minW: 6, minH: 4 }, style: 'card' },
-    ],
-
-    // Activities (活動動態)
-    'activities': [
-        { id: 'activity-feed', title: '動態消息', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
-        { id: 'activity-calendar', title: '活動日曆', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
-        { id: 'upcoming-events', title: '即將到來', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 4, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
-    ],
-
-    // Approvals (審批中心)
-    'approvals': [
-        { id: 'pending-count', title: '待審核統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
-        { id: 'approval-queue', title: '審核佇列', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
     ],
 
     // Permissions (權限管理)

@@ -1501,14 +1501,6 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
     ),
 
     // Resource Overview (資源總覽)
-    'resource-stats': (
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
-            <MetricCard label="物資種類" value={42} color="#C39B6F" />
-            <MetricCard label="據點總數" value={15} color="#3B82F6" />
-            <MetricCard label="待補充" value={8} color="#ef4444" />
-            <MetricCard label="充足率" value="87%" trend="up" color="#22c55e" />
-        </div>
-    ),
     'resource-categories': (
         <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
             <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>資源分類</div>
@@ -1714,90 +1706,8 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
             </div>
         </div>
     ),
-    'blessing-wall': (
-        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
-            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>
-                🕯️ 祈福牆
-            </div>
-            {[
-                { name: '志工小明', msg: '願災區平安，大家加油！', likes: 12 },
-                { name: '匿名', msg: '希望受災民眾能早日重建家園', likes: 8 },
-                { name: '救援隊員', msg: '持續守護，不離不棄', likes: 15 },
-            ].map((blessing, i) => (
-                <div key={i} style={{
-                    padding: '12px',
-                    background: 'rgba(47, 54, 65, 0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                    borderLeft: '3px solid rgba(195, 155, 111, 0.5)',
-                }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px' }}>{blessing.name}</div>
-                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '8px' }}>{blessing.msg}</div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
-                        <span style={{ cursor: 'pointer' }}>❤️ {blessing.likes}</span>
-                    </div>
-                </div>
-            ))}
-            <button style={{
-                width: '100%',
-                marginTop: '8px',
-                padding: '10px',
-                background: 'rgba(195, 155, 111, 0.2)',
-                border: '1px dashed rgba(195, 155, 111, 0.5)',
-                borderRadius: '8px',
-                color: 'var(--accent-gold)',
-                fontSize: '12px',
-                cursor: 'pointer',
-            }}>+ 發送祝福</button>
-        </div>
-    ),
 
     // ===== 新增頁面 Widget 內容 =====
-
-    // Events 事件通報
-    'event-list': (
-        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
-            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>事件列表</div>
-            {[
-                { title: '台北市大安區水管破裂', type: '水災', time: '10:30', priority: 'high' },
-                { title: '新北市板橋區停電通報', type: '電力', time: '09:45', priority: 'medium' },
-                { title: '桃園市中壢區道路塌陷', type: '交通', time: '08:20', priority: 'critical' },
-            ].map((event, i) => (
-                <div key={i} style={{
-                    padding: '12px',
-                    background: 'rgba(47, 54, 65, 0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                    borderLeft: `3px solid ${event.priority === 'critical' ? '#ef4444' : event.priority === 'high' ? '#f97316' : '#eab308'}`,
-                }}>
-                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>{event.title}</div>
-                    <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
-                        <span>{event.type}</span>
-                        <span>{event.time}</span>
-                    </div>
-                </div>
-            ))}
-        </div>
-    ),
-    'event-form': (
-        <div style={{ height: '100%', padding: '12px' }}>
-            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>新增事件</div>
-            <div style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>事件類型</label>
-                <select style={{ width: '100%', padding: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)' }}>
-                    <option>水災</option>
-                    <option>火災</option>
-                    <option>地震</option>
-                    <option>其他</option>
-                </select>
-            </div>
-            <div style={{ marginBottom: '12px' }}>
-                <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>描述</label>
-                <textarea style={{ width: '100%', padding: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)', minHeight: '80px' }} />
-            </div>
-            <button style={{ width: '100%', padding: '10px', background: 'rgba(195, 155, 111, 0.9)', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 600, cursor: 'pointer' }}>提交事件</button>
-        </div>
-    ),
 
     // Report 災情通報
     'report-form': (
@@ -1857,84 +1767,6 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
                     </div>
                 ))}
             </div>
-        </div>
-    ),
-
-    // Activities 活動動態
-    'activity-feed': (
-        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
-            {[
-                { user: '張志明', action: '完成了救援任務 #1024', time: '10 分鐘前', type: 'mission' },
-                { user: '李美玲', action: '發布了訓練公告', time: '30 分鐘前', type: 'announcement' },
-                { user: '王大偉', action: '更新了排班表', time: '1 小時前', type: 'schedule' },
-            ].map((item, i) => (
-                <div key={i} style={{
-                    display: 'flex',
-                    gap: '12px',
-                    padding: '12px',
-                    background: 'rgba(47, 54, 65, 0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                }}>
-                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(195, 155, 111, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-gold)' }}>
-                        {item.user.charAt(0)}
-                    </div>
-                    <div>
-                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>{item.user}</strong> {item.action}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{item.time}</div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    ),
-    'activity-calendar': (
-        <div style={{ height: '100%', padding: '12px', textAlign: 'center' }}>
-            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>📅 活動日曆</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>2026 年 1 月</div>
-            <div style={{ marginTop: '12px', fontSize: '48px' }}>12</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>星期日</div>
-        </div>
-    ),
-    'upcoming-events': (
-        <div style={{ height: '100%', padding: '12px' }}>
-            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>即將到來</div>
-            {['14:00 團隊會議', '16:30 訓練演習', '19:00 值班交接'].map((event, i) => (
-                <div key={i} style={{ padding: '8px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px', marginBottom: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>{event}</div>
-            ))}
-        </div>
-    ),
-
-    // Approvals 審批中心
-    'approval-queue': (
-        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
-            {[
-                { title: '志工申請 - 陳小明', type: '人員審核', status: 'pending' },
-                { title: '物資調撥 - 飲用水 x 100', type: '資源審核', status: 'pending' },
-                { title: '排班變更 - 3/15 晚班', type: '排班審核', status: 'approved' },
-            ].map((item, i) => (
-                <div key={i} style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    padding: '14px',
-                    background: 'rgba(47, 54, 65, 0.3)',
-                    borderRadius: '8px',
-                    marginBottom: '8px',
-                }}>
-                    <div style={{ flex: 1 }}>
-                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item.title}</div>
-                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{item.type}</div>
-                    </div>
-                    {item.status === 'pending' ? (
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                            <button style={{ padding: '6px 12px', background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '6px', color: '#22c55e', fontSize: '11px', cursor: 'pointer' }}>✓ 批准</button>
-                            <button style={{ padding: '6px 12px', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: '#ef4444', fontSize: '11px', cursor: 'pointer' }}>✗ 拒絕</button>
-                        </div>
-                    ) : (
-                        <span style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', fontSize: '10px' }}>已批准</span>
-                    )}
-                </div>
-            ))}
         </div>
     ),
 
