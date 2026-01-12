@@ -222,6 +222,8 @@ import { EventPublisherModule } from './common/services/event-publisher.module';
 import { StorageModule } from './common/storage';
 import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
 import { RequestLoggingMiddleware } from './common/middleware/request-logging.middleware';
+// v2.1 SSOT: 統一通報入口
+import { IntakeModule } from './modules/intake/intake.module';
 
 @Module({
     imports: [
@@ -269,6 +271,7 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
         NcdrAlertsModule,
         PublicResourcesModule,
         PublicModule, // 🌐 Level0 公開端點
+        IntakeModule, // 📥 v2.1 SSOT 統一通報入口
         ManualsModule,
         ReportsModule,
         VolunteersModule,
