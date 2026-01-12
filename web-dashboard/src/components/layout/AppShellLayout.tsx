@@ -265,16 +265,45 @@ export default function AppShellLayout({
                         </button>
                     </div>
                     <nav className="sbScroll">
-                        {visibleNavItems.map(item => {
-                            const IconComponent = ICON_MAP[item.icon];
+                        {visibleGroups.map(group => {
+                            const groupItems = getVisibleItemsByGroup(group.id);
+                            if (groupItems.length === 0) return null;
+
                             return (
-                                <NavItem
-                                    key={item.id}
-                                    icon={IconComponent ? <IconComponent size={20} /> : null}
-                                    label={item.label}
-                                    path={item.path}
-                                    expanded={sidebarExpanded}
-                                />
+                                <div key={group.id} style={{ marginBottom: '16px' }}>
+                                    {/* Group Header */}
+                                    {sidebarExpanded && (
+                                        <div style={{
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            gap: '8px',
+                                            padding: '8px 10px',
+                                            fontSize: '11px',
+                                            fontWeight: 600,
+                                            color: 'var(--text-muted)',
+                                            textTransform: 'uppercase',
+                                            letterSpacing: '0.5px',
+                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
+                                            marginBottom: '4px',
+                                        }}>
+                                            <span>{group.emoji}</span>
+                                            <span>{group.label}</span>
+                                        </div>
+                                    )}
+                                    {/* Group Items */}
+                                    {groupItems.map(item => {
+                                        const IconComponent = ICON_MAP[item.icon];
+                                        return (
+                                            <NavItem
+                                                key={item.id}
+                                                icon={IconComponent ? <IconComponent size={20} /> : null}
+                                                label={item.label}
+                                                path={item.path}
+                                                expanded={sidebarExpanded}
+                                            />
+                                        );
+                                    })}
+                                </div>
                             );
                         })}
                     </nav>
