@@ -25,7 +25,11 @@ export default function PageWrapper({
     const { user } = useAuth();
 
     // Map user role to PermissionLevel
-    const userLevel = (user?.roleLevel as PermissionLevel) ?? PermissionLevel.Guest;
+    // 🔧 DevMode: Use SystemOwner level to show all sidebar items
+    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    const userLevel = devModeEnabled
+        ? PermissionLevel.SystemOwner
+        : (user?.roleLevel as PermissionLevel) ?? PermissionLevel.Guest;
 
     // Auto-detect: if pageId has a widget config, use widgets mode
     const hasWidgetConfig = pageId in PAGE_WIDGET_CONFIGS;
