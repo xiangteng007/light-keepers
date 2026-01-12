@@ -2,7 +2,7 @@
  * geo-intel-hub.service.ts
  * Frontend Client for GeoIntelHub
  */
-import { api } from '../api';
+import api from '../api';
 
 export interface GeoAlert {
     id: string;

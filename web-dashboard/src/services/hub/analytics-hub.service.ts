@@ -2,7 +2,7 @@
  * analytics-hub.service.ts
  * Frontend Client for AnalyticsHub
  */
-import { api } from '../api';
+import api from '../api';
 
 export interface ReportRequest {
     type: 'incident' | 'volunteer' | 'resource' | 'aar';
@@ -21,5 +21,5 @@ export const analyticsHub = {
         api.get('/analytics/reports/recent'),
 
     downloadReport: (reportId: string) =>
-        api.get(`/analytics/reports/download/${reportId}`, { responseType: 'blob' }),
+        api.get(`/analytics/reports/download/${reportId}`),
 };

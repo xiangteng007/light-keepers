@@ -2,7 +2,7 @@
  * ai-hub.service.ts
  * Frontend Client for AIHub
  */
-import { api } from '../api';
+import api from '../api';
 
 export const aiHub = {
     predictTrend: (params: { dataType: string; days?: number }) =>

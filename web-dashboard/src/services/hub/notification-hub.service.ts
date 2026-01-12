@@ -2,7 +2,7 @@
  * notification-hub.service.ts
  * Frontend Client for NotificationHub
  */
-import { api } from '../api';
+import api from '../api';
 
 export interface NotificationPayload {
     title: string;
@@ -19,5 +19,5 @@ export const notificationHub = {
 
     // 取得歷史通知 (整合各種來源)
     getHistory: (params?: { limit?: number }) =>
-        api.get('/notifications/history', { params }),
+        api.get('/notifications/history', { params: params?.limit ? { limit: String(params.limit) } : undefined }),
 };

@@ -10,8 +10,9 @@ import {
     Filter, Search, CheckCircle, Clock, Zap, TrendingUp, TrendingDown,
     Brain, FileText, ScrollText, UserCog, Building, Settings, ToggleLeft,
     Shield, Mail, Phone, Calendar, Database, Activity, GitMerge, Home, Percent,
-    MessageSquare, Cloud, Radio, Cpu
-} from 'lucide-react';
+    MessageSquare, Cloud, Radio, Cpu, CloudRain
+}
+    from 'lucide-react';
 
 // ===== Phase 10: Hub Widgets (New) =====
 
@@ -1202,8 +1203,8 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
     'geo-summary': <GeoSummaryWidget />,
     'earthquake-monitor': <EarthquakeMonitorWidget />,
     'weather-card': <WeatherAlertWidget />,
-    'weather-radar': <WeatherAlertWidget />,  // Reuse weather widget for radar
-    'forecast-cards': <WeatherAlertWidget />, // Reuse for forecast
+    // 'weather-radar': <WeatherAlertWidget />,  // Reuse weather widget for radar
+    // 'forecast-cards': <WeatherAlertWidget />, // Reuse for forecast
     // Hub: Analytics
     'dashboard-stats': <DashboardStatsWidget />,
     'report-generator': <ReportGeneratorWidget />,

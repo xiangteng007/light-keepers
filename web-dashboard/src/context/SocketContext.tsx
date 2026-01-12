@@ -24,7 +24,8 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     const [socket, setSocket] = useState<Socket | null>(null);
     const [connected, setConnected] = useState(false);
     const [lastPing, setLastPing] = useState<Date | null>(null);
-    const { user, token } = useAuth(); // 假設 AuthContext 提供 token
+    const { user } = useAuth();
+    const token = typeof window !== 'undefined' ? (localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken')) : null;
 
     useEffect(() => {
         if (!user || !token) {
