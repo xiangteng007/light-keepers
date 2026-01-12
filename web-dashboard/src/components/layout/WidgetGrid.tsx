@@ -102,15 +102,7 @@ export function WidgetGrid({
                 ))}
             </GridComponent>
 
-            {/* Edit Mode Overlay */}
-            {isEditMode && (
-                <div className="widget-grid__edit-overlay">
-                    <span>編輯模式</span>
-                    <span className="widget-grid__edit-hint">
-                        拖曳移動 · 拉伸大小 · 點擊 ✏️ 編輯標題
-                    </span>
-                </div>
-            )}
+
         </div>
     );
 }

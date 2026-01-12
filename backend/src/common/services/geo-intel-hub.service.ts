@@ -233,6 +233,48 @@ export class GeoIntelHubService implements OnModuleInit {
         return imported;
     }
 
+    // ===== 外部 API 同步 (Phase 9) =====
+
+    /**
+     * 同步外部 API (Mock)
+     */
+    async syncWithExternalApis() {
+        this.logger.log('🔄 Syncing with external APIs...');
+
+        // 1. 消防署 119 (Mock)
+        const fireAlerts = [
+            {
+                id: `fire-119-${Date.now()}`,
+                source: 'ncdr', // 暫用 ncdr 類別
+                type: 'fire',
+                severity: 'critical',
+                title: '【119 派遣】工廠火警',
+                description: '新北市新莊區化成路... 工廠冒出黑煙',
+                location: '新北市新莊區',
+                latitude: 25.043,
+                longitude: 121.467,
+                startTime: new Date(),
+            }
+        ];
+        this.importFromNcdr(fireAlerts);
+
+        // 2. 氣象局 (Mock)
+        const weatherAlerts = [
+            {
+                id: `wx-${Date.now()}`,
+                type: 'rain',
+                severity: 'warning',
+                title: '豪雨特報',
+                description: '受到低壓帶影響，今日北部地區有局部豪雨...',
+                affectedAreas: ['台北市', '新北市', '基隆市'],
+                startTime: new Date(),
+            }
+        ];
+        this.importFromWeather(weatherAlerts);
+
+        return { synced: true, timestamp: new Date() };
+    }
+
     // ===== 定時清理 =====
 
     @Cron(CronExpression.EVERY_HOUR)

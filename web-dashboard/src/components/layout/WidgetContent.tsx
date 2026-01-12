@@ -9,8 +9,407 @@ import {
     MapPin, Users, Package, AlertTriangle, Layers, Navigation,
     Filter, Search, CheckCircle, Clock, Zap, TrendingUp, TrendingDown,
     Brain, FileText, ScrollText, UserCog, Building, Settings, ToggleLeft,
-    Shield, Mail, Phone, Calendar, Database, Activity, GitMerge, Home, Percent
+    Shield, Mail, Phone, Calendar, Database, Activity, GitMerge, Home, Percent,
+    MessageSquare, Cloud, Radio, Cpu
 } from 'lucide-react';
+
+// ===== Phase 10: Hub Widgets (New) =====
+
+const SocialFeedWidget = () => (
+    <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', fontWeight: 600 }}>社群情資</div>
+            <span style={{ fontSize: '11px', color: '#22c55e' }}>● Live</span>
+        </div>
+        {[
+            { platform: 'Facebook', content: '信義區積水嚴重，車輛無法通行...', time: '2m ago', urgency: 'high' },
+            { platform: 'Threads', content: '有人受困在地下室，請求支援！', time: '5m ago', urgency: 'critical' },
+            { platform: 'PTT', content: '目前風雨變大，請大家小心', time: '12m ago', urgency: 'low' },
+        ].map((post, i) => (
+            <div key={i} style={{
+                padding: '12px',
+                background: 'rgba(47, 54, 65, 0.3)',
+                borderRadius: '8px',
+                marginBottom: '8px',
+                borderLeft: `3px solid ${post.urgency === 'critical' ? '#ef4444' : post.urgency === 'high' ? '#f97316' : '#22c55e'}`,
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{post.platform}</span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{post.time}</span>
+                </div>
+                <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{post.content}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const WeatherAlertWidget = () => (
+    <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '16px' }}>
+            <CloudRain size={24} style={{ color: '#3B82F6' }} />
+            <div>
+                <div style={{ fontSize: '18px', fontWeight: 700, color: 'var(--text-primary)' }}>豪雨特報</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>台北市, 新北市</div>
+            </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', flex: 1 }}>
+            <div style={{ background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>雨量</div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#3B82F6' }}>120mm</div>
+            </div>
+            <div style={{ background: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>風速</div>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#eab308' }}>6級</div>
+            </div>
+        </div>
+    </div>
+);
+
+const NotificationCenterWidget = () => (
+    <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '8px', fontWeight: 600 }}>通知中心</div>
+        {[
+            { title: '系統公告', body: '將於今晚進行系統維護', time: '10:00' },
+            { title: '任務更新', body: '任務 #1234 已完成', time: '09:45' },
+        ].map((notif, i) => (
+            <div key={i} style={{
+                padding: '10px',
+                background: 'rgba(47, 54, 65, 0.3)',
+                borderRadius: '6px',
+                marginBottom: '6px',
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{notif.title}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{notif.time}</span>
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>{notif.body}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const AICommandWidget = () => (
+    <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: '13px', color: '#A855F7', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Brain size={16} />
+            AI 指揮輔助
+        </div>
+        <div style={{ flex: 1, overflow: 'auto' }}>
+            <div style={{ marginBottom: '12px', padding: '10px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '8px', borderLeft: '3px solid #A855F7' }}>
+                <div style={{ fontSize: '12px', fontWeight: 600, color: '#A855F7', marginBottom: '4px' }}>建議行動</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>建議增派 2 組志工前往信義區支援淹水災情。</div>
+            </div>
+            <button style={{
+                width: '100%',
+                padding: '8px',
+                background: 'rgba(168, 85, 247, 0.2)',
+                border: '1px solid rgba(168, 85, 247, 0.3)',
+                borderRadius: '6px',
+                color: '#A855F7',
+                fontSize: '12px',
+                cursor: 'pointer',
+            }}>
+                執行建議
+            </button>
+        </div>
+    </div>
+);
+
+// ===== Phase 11: Hub Page Widgets =====
+
+// Notification Hub Widgets
+const NotificationFeedWidget = () => (
+    <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+        {[
+            { type: 'LINE', title: '任務觸發通知', body: '您已被指派至信義區支援任務', time: '10:32', read: false },
+            { type: 'Push', title: '系統公告', body: '今晚 00:00-06:00 進行系統維護', time: '09:15', read: true },
+            { type: 'Telegram', title: '警報轉發', body: 'NCDR 豪雨特報已更新', time: '08:45', read: true },
+        ].map((n, i) => (
+            <div key={i} style={{
+                padding: '12px', marginBottom: '8px', background: n.read ? 'rgba(47, 54, 65, 0.2)' : 'rgba(195, 155, 111, 0.1)',
+                borderRadius: '8px', borderLeft: `3px solid ${n.read ? '#64748b' : '#C39B6F'}`,
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{n.title}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '8px' }}>{n.type} • {n.time}</span>
+                </div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{n.body}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const NotificationSummaryWidget = () => (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px' }}>
+        {[
+            { label: '今日通知', value: '47', color: '#C39B6F' },
+            { label: '未讀', value: '8', color: '#F97316' },
+            { label: 'LINE', value: '32', color: '#00C300' },
+            { label: 'Push', value: '15', color: '#3B82F6' },
+        ].map((m, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const ChannelStatusWidget = () => (
+    <div style={{ height: '100%', padding: '12px' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '10px' }}>頻道連線狀態</div>
+        {[
+            { name: 'LINE Messaging', status: 'online' },
+            { name: 'Telegram Bot', status: 'online' },
+            { name: 'Web Push', status: 'online' },
+            { name: 'Slack Webhook', status: 'offline' },
+        ].map((ch, i) => (
+            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{ch.name}</span>
+                <span style={{ fontSize: '11px', color: ch.status === 'online' ? '#22c55e' : '#ef4444' }}>● {ch.status === 'online' ? '連線中' : '離線'}</span>
+            </div>
+        ))}
+    </div>
+);
+
+// Geo-Intel Hub Widgets
+const GeoAlertFeedWidget = () => (
+    <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
+        {[
+            { source: 'NCDR', alert: '豪雨特報', region: '台北市、新北市', level: 'high', time: '10:00' },
+            { source: '氣象局', alert: '強風特報', region: '桃園市沿海', level: 'medium', time: '09:30' },
+            { source: '社群', alert: '淹水通報', region: '信義區松仁路', level: 'critical', time: '09:15' },
+        ].map((a, i) => (
+            <div key={i} style={{
+                padding: '12px', marginBottom: '8px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '8px',
+                borderLeft: `3px solid ${a.level === 'critical' ? '#ef4444' : a.level === 'high' ? '#f97316' : '#eab308'}`,
+            }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{a.alert}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{a.source} • {a.time}</span>
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>📍 {a.region}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const GeoSummaryWidget = () => (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px' }}>
+        {[
+            { label: '警報總數', value: '12', color: '#ef4444' },
+            { label: 'NCDR', value: '5', color: '#f97316' },
+            { label: '氣象局', value: '4', color: '#3b82f6' },
+            { label: '社群情資', value: '3', color: '#22c55e' },
+        ].map((m, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const EarthquakeMonitorWidget = () => (
+    <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌋</div>
+        <div style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>目前無地震</div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最後更新: 10:30</div>
+    </div>
+);
+
+// Analytics Hub Widgets
+const DashboardStatsWidget = () => (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px' }}>
+        {[
+            { label: '今日任務', value: '156', color: '#C39B6F' },
+            { label: '進行中', value: '42', color: '#3b82f6' },
+            { label: '已完成', value: '108', color: '#22c55e' },
+            { label: '待處理', value: '6', color: '#f97316' },
+        ].map((m, i) => (
+            <div key={i} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: '24px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
+            </div>
+        ))}
+    </div>
+);
+
+const ReportGeneratorWidget = () => (
+    <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>📄 報表生成</div>
+        <select style={{ padding: '8px', marginBottom: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px' }}>
+            <option>日報表</option>
+            <option>週報表</option>
+            <option>月報表</option>
+        </select>
+        <button style={{ padding: '10px', background: 'var(--accent-gold)', border: 'none', borderRadius: '6px', color: '#1a1f2e', fontWeight: 600, fontSize: '12px', cursor: 'pointer', marginTop: 'auto' }}>
+            生成報表
+        </button>
+    </div>
+);
+
+const ScheduledReportsWidget = () => (
+    <div style={{ height: '100%', padding: '8px', overflow: 'auto' }}>
+        {[
+            { name: '每日任務摘要', schedule: '每日 18:00', next: '今日 18:00' },
+            { name: '週志工服務時數', schedule: '每週一 09:00', next: '週一 09:00' },
+        ].map((r, i) => (
+            <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px' }}>
+                <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{r.name}</div>
+                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{r.schedule} → 下次: {r.next}</div>
+            </div>
+        ))}
+    </div>
+);
+
+// AI Hub Widgets
+const AITaskListWidget = () => (
+    <div style={{ height: '100%', padding: '8px', overflow: 'auto' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>執行中的 AI 任務</div>
+        {[
+            { name: '事件分類', status: 'running', progress: 75 },
+            { name: '資源配對', status: 'queued', progress: 0 },
+            { name: '趨勢預測', status: 'completed', progress: 100 },
+        ].map((t, i) => (
+            <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{t.name}</span>
+                    <span style={{ fontSize: '10px', color: t.status === 'running' ? '#3b82f6' : t.status === 'completed' ? '#22c55e' : '#94A3B8' }}>{t.status === 'running' ? '執行中' : t.status === 'completed' ? '完成' : '等待中'}</span>
+                </div>
+                <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${t.progress}%`, background: t.status === 'completed' ? '#22c55e' : '#3b82f6', transition: 'width 0.3s' }} />
+                </div>
+            </div>
+        ))}
+    </div>
+);
+
+const AIPredictionWidget = () => (
+    <div style={{ height: '100%', padding: '12px' }}>
+        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px' }}>🔮 趨勢預測</div>
+        <div style={{ padding: '12px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '8px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>未來 24 小時預測</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>降雨機率：80%、預估任務量：+25%</div>
+        </div>
+    </div>
+);
+
+const AISuggestionsWidget = () => (
+    <div style={{ height: '100%', padding: '12px', overflow: 'auto' }}>
+        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px' }}>💡 智慧建議</div>
+        {[
+            { suggestion: '建議增派物資至信義區', priority: 'high' },
+            { suggestion: '預警：松山區可能出現交通壅塞', priority: 'medium' },
+        ].map((s, i) => (
+            <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '6px', borderLeft: `3px solid ${s.priority === 'high' ? '#ef4444' : '#eab308'}` }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{s.suggestion}</div>
+            </div>
+        ))}
+    </div>
+);
+
+// Offline Hub Widgets
+const SyncStatusWidget = () => (
+    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px' }}>
+        <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>● 上線</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>網路狀態</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#C39B6F' }}>3</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>待同步</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#3b82f6' }}>10:35</div>
+            <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>最後同步</div>
+        </div>
+    </div>
+);
+
+const PendingQueueWidget = () => (
+    <div style={{ height: '100%', padding: '8px', overflow: 'auto' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>待同步操作</div>
+        {[
+            { action: '新增通報 #1234', time: '10:32', size: '1.2KB' },
+            { action: '更新任務狀態', time: '10:30', size: '0.5KB' },
+            { action: '上傳照片', time: '10:28', size: '3.4MB' },
+        ].map((q, i) => (
+            <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{q.action}</div>
+                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{q.time}</div>
+                </div>
+                <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{q.size}</span>
+            </div>
+        ))}
+    </div>
+);
+
+const MeshNetworkWidget = () => (
+    <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌐</div>
+        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>P2P 網路</div>
+        <div style={{ fontSize: '12px', color: '#22c55e', marginTop: '4px' }}>2 個節點連線中</div>
+    </div>
+);
+
+// Intake Widgets
+const IntakeFormWidget = () => (
+    <div style={{ height: '100%', padding: '16px', overflow: 'auto' }}>
+        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)', marginBottom: '16px' }}>📝 災情通報表單</div>
+        <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>災情類型</label>
+            <select style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px' }}>
+                <option>淹水</option>
+                <option>土石流</option>
+                <option>建物倒塌</option>
+                <option>其他</option>
+            </select>
+        </div>
+        <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>地點描述</label>
+            <input type="text" placeholder="請輸入地點" style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px' }} />
+        </div>
+        <div style={{ marginBottom: '12px' }}>
+            <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>災情描述</label>
+            <textarea placeholder="請描述災情狀況..." rows={4} style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px', resize: 'none' }} />
+        </div>
+        <button style={{ width: '100%', padding: '12px', background: 'var(--accent-gold)', border: 'none', borderRadius: '6px', color: '#1a1f2e', fontWeight: 600, fontSize: '13px', cursor: 'pointer' }}>
+            送出通報
+        </button>
+    </div>
+);
+
+const IntakeTipsWidget = () => (
+    <div style={{ height: '100%', padding: '12px' }}>
+        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>💡 通報提示</div>
+        <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
+            <li>請盡量提供精確的地址或GPS座標</li>
+            <li>拍照時請注意自身安全</li>
+            <li>若有人員受困，請同時撥打119</li>
+            <li>通報後請保持手機暢通</li>
+        </ul>
+    </div>
+);
+
+const RecentIntakesWidget = () => (
+    <div style={{ height: '100%', padding: '8px', overflow: 'auto' }}>
+        <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>近期通報</div>
+        {[
+            { id: '#1234', type: '淹水', location: '信義區', time: '10:30' },
+            { id: '#1233', type: '土石流', location: '北投區', time: '10:15' },
+        ].map((r, i) => (
+            <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{r.id} {r.type}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{r.time}</span>
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>📍 {r.location}</div>
+            </div>
+        ))}
+    </div>
+);
 
 // ===== Reusable Placeholder Components =====
 const CardPlaceholder = ({ title }: { title: string }) => (
@@ -786,6 +1185,45 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
 
     // Analytics
     'mission-stats': <KeyMetricsWidget />,
+
+    // Hub Widgets
+    'social-feed': <SocialFeedWidget />,
+    'weather-alert': <WeatherAlertWidget />,
+    'notification-center': <NotificationCenterWidget />,
+    'ai-command': <AICommandWidget />,
+
+    // Hub: Notification
+    'notification-feed': <NotificationFeedWidget />,
+    'notification-summary': <NotificationSummaryWidget />,
+    'channel-status': <ChannelStatusWidget />,
+
+    // Hub: Geo-Intel
+    'geo-alert-feed': <GeoAlertFeedWidget />,
+    'geo-summary': <GeoSummaryWidget />,
+    'earthquake-monitor': <EarthquakeMonitorWidget />,
+    'weather-card': <WeatherAlertWidget />,
+    'weather-radar': <WeatherAlertWidget />,  // Reuse weather widget for radar
+    'forecast-cards': <WeatherAlertWidget />, // Reuse for forecast
+    // Hub: Analytics
+    'dashboard-stats': <DashboardStatsWidget />,
+    'report-generator': <ReportGeneratorWidget />,
+    'scheduled-reports': <ScheduledReportsWidget />,
+
+    // Hub: AI
+    'ai-task-list': <AITaskListWidget />,
+    'ai-prediction': <AIPredictionWidget />,
+    'ai-suggestions': <AISuggestionsWidget />,
+
+    // Hub: Offline
+    'sync-status': <SyncStatusWidget />,
+    'pending-queue': <PendingQueueWidget />,
+    'mesh-network': <MeshNetworkWidget />,
+
+    // Intake
+    'intake-form': <IntakeFormWidget />,
+    'intake-tips': <IntakeTipsWidget />,
+    'recent-intakes': <RecentIntakesWidget />,
+
 
     // Volunteers
     'volunteer-grid': (

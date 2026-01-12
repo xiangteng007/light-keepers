@@ -201,14 +201,27 @@ export function WidgetEditControls({
 
     return (
         <div className="widget-edit-controls">
-            {/* Add Widget Button - Only in edit mode */}
-            {isEditMode && onAddWidget && (
-                <button
-                    className="widget-edit-controls__btn widget-edit-controls__btn--add"
-                    onClick={onAddWidget}
-                >
-                    + 新增 Widget
-                </button>
+            {/* Edit Mode Indicator & Add Button */}
+            {isEditMode && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                    <span style={{
+                        color: 'var(--accent-gold)',
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        letterSpacing: '0.5px',
+                        whiteSpace: 'nowrap'
+                    }}>
+                        編輯模式：拖曳移動 · 拉伸大小 · 點擊 ✏️ 編輯標題
+                    </span>
+                    {onAddWidget && (
+                        <button
+                            className="widget-edit-controls__btn widget-edit-controls__btn--add"
+                            onClick={onAddWidget}
+                        >
+                            + 新增 Widget
+                        </button>
+                    )}
+                </div>
             )}
 
             <button

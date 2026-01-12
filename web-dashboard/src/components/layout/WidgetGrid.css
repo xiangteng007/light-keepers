@@ -5,8 +5,9 @@
 .widget-grid {
     position: relative;
     width: 100%;
-    height: 100%;
-    padding: 12px;
+    min-height: min-content;
+    box-sizing: border-box;
+    /* Bottom spacing is handled by parent mainCol */
 }
 
 .widget-grid__toolbar {

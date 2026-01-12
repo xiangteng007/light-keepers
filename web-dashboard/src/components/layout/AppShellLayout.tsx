@@ -5,7 +5,7 @@
  * Level 5 users can edit, drag, resize, and hide widgets
  */
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User } from 'lucide-react';
+import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User, Plus, Minus } from 'lucide-react';
 import { WidgetGrid } from './WidgetGrid';
 import { Widget, WidgetEditControls } from './Widget';
 import { WidgetPicker } from './WidgetPicker';
@@ -33,6 +33,8 @@ export default function AppShellLayout({
         const saved = localStorage.getItem('sidebarExpanded');
         return saved === 'true';
     });
+    // Accordion state: track the single expanded group
+    const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
     const [isMobile, setIsMobile] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [sidebarSettingsOpen, setSidebarSettingsOpen] = useState(false);
@@ -74,12 +76,26 @@ export default function AppShellLayout({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
+    // Auto-expand group based on current path
+    useEffect(() => {
+        const currentPath = window.location.pathname;
+        const activeItem = navItems.find(item => item.path === currentPath);
+        if (activeItem) {
+            setExpandedGroupId(activeItem.group);
+        }
+    }, [navItems]);
+
     useEffect(() => {
         if (!isMobile) setDrawerOpen(false);
     }, [isMobile]);
 
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
     const closeDrawer = () => setDrawerOpen(false);
+
+    const toggleGroupExpansion = (groupId: string) => {
+        // Toggle: if clicked open group -> close it; if different -> open new one (closes others)
+        setExpandedGroupId(prev => (prev === groupId ? null : groupId));
+    };
 
     // Widget content is now provided by WIDGET_CONTENT_MAP
     const widgetContent = WIDGET_CONTENT_MAP;
@@ -269,15 +285,18 @@ export default function AppShellLayout({
                             const groupItems = getVisibleItemsByGroup(group.id);
                             if (groupItems.length === 0) return null;
 
+                            const isCollapsed = expandedGroupId !== group.id;
+
                             return (
                                 <div key={group.id} style={{ marginBottom: '16px' }}>
-                                    {/* Group Header */}
-                                    {sidebarExpanded && (
-                                        <div style={{
+                                    {/* Group Header - Adaptive for both expanded and collapsed sidebar */}
+                                    <div
+                                        onClick={() => toggleGroupExpansion(group.id)}
+                                        style={{
                                             display: 'flex',
                                             alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '8px 10px',
+                                            justifyContent: sidebarExpanded ? 'space-between' : 'center',
+                                            padding: sidebarExpanded ? '8px 10px' : '8px 0',
                                             fontSize: '11px',
                                             fontWeight: 600,
                                             color: 'var(--text-muted)',
@@ -285,24 +304,46 @@ export default function AppShellLayout({
                                             letterSpacing: '0.5px',
                                             borderBottom: '1px solid rgba(255,255,255,0.05)',
                                             marginBottom: '4px',
+                                            cursor: 'pointer',
+                                            userSelect: 'none',
+                                            background: (!isCollapsed && !sidebarExpanded) ? 'rgba(255,255,255,0.05)' : 'transparent',
+                                            borderRadius: sidebarExpanded ? '0' : '8px',
+                                        }}
+                                        title={sidebarExpanded ? (isCollapsed ? "展開" : "收合") : group.label}
+                                    >
+                                        {sidebarExpanded ? (
+                                            <>
+                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                    <span>{group.emoji}</span>
+                                                    <span>{group.label}</span>
+                                                </div>
+                                                {isCollapsed ? <Plus size={16} /> : <Minus size={16} />}
+                                            </>
+                                        ) : (
+                                            <span style={{ fontSize: '18px' }}>{group.emoji}</span>
+                                        )}
+                                    </div>
+
+                                    {/* Group Items - Strictly follow accordion state even when minimized */}
+                                    {!isCollapsed && (
+                                        <div style={{
+                                            overflow: 'hidden',
+                                            transition: 'height 0.3s ease',
                                         }}>
-                                            <span>{group.emoji}</span>
-                                            <span>{group.label}</span>
+                                            {groupItems.map(item => {
+                                                const IconComponent = ICON_MAP[item.icon];
+                                                return (
+                                                    <NavItem
+                                                        key={item.id}
+                                                        icon={IconComponent ? <IconComponent size={20} /> : null}
+                                                        label={item.label}
+                                                        path={item.path}
+                                                        expanded={sidebarExpanded}
+                                                    />
+                                                );
+                                            })}
                                         </div>
                                     )}
-                                    {/* Group Items */}
-                                    {groupItems.map(item => {
-                                        const IconComponent = ICON_MAP[item.icon];
-                                        return (
-                                            <NavItem
-                                                key={item.id}
-                                                icon={IconComponent ? <IconComponent size={20} /> : null}
-                                                label={item.label}
-                                                path={item.path}
-                                                expanded={sidebarExpanded}
-                                            />
-                                        );
-                                    })}
                                 </div>
                             );
                         })}

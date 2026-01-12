@@ -62,43 +62,80 @@ export interface WidgetEditState {
     resizeEnabled: boolean;
 }
 
-// Default widget configurations based on appshell-layout.md
+// Default widget configurations for Emergency Response Command Center (戰備系統)
+// Grid: 12 columns, rowHeight=80px, optimized for 1920x1080 viewport
 export const DEFAULT_WIDGETS: WidgetConfig[] = [
+    // ===== Row 1: Mission Stats Bar (Full Width) =====
+    {
+        id: 'mission-stats',
+        title: '任務統計',
+        region: 'header',
+        visible: true,
+        locked: false,
+        position: { x: 0, y: 0, w: 12, h: 1, minW: 6, minH: 1 },
+        style: 'glass',
+    },
+    // ===== Row 2-4: Main Content Area =====
+    // Left: Tactical Map (8 cols)
     {
         id: 'workspace',
         title: '戰情地圖',
         region: 'M-W',
         visible: true,
         locked: false,
-        position: { x: 0, y: 0, w: 8, h: 6, minW: 4, minH: 3 },
+        position: { x: 0, y: 1, w: 8, h: 4, minW: 6, minH: 3 },
         style: 'card',
     },
+    // Right Top: NCDR Alerts (4 cols, 2 rows)
+    {
+        id: 'ncdr-alerts',
+        title: 'NCDR 警報',
+        region: 'R-R1',
+        visible: true,
+        locked: false,
+        position: { x: 8, y: 1, w: 4, h: 2, minW: 3, minH: 2 },
+        style: 'card',
+    },
+    // Right Bottom: Disaster Reports (4 cols, 2 rows)
+    {
+        id: 'disaster-reports',
+        title: '災情通報',
+        region: 'R-R2',
+        visible: true,
+        locked: false,
+        position: { x: 8, y: 3, w: 4, h: 2, minW: 3, minH: 2 },
+        style: 'card',
+    },
+    // ===== Row 5: Bottom Status Bar =====
+    // Event Timeline (6 cols)
     {
         id: 'event-timeline',
         title: '事件時間線',
         region: 'M-R',
         visible: true,
         locked: false,
-        position: { x: 0, y: 6, w: 8, h: 2, minW: 4, minH: 1 },
+        position: { x: 0, y: 5, w: 6, h: 2, minW: 4, minH: 1 },
         style: 'glass',
     },
+    // Volunteer Status (3 cols)
     {
-        id: 'disaster-reports',
-        title: '災情通報',
-        region: 'R-R1',
+        id: 'volunteer-status',
+        title: '志工動態',
+        region: 'sidebar',
         visible: true,
         locked: false,
-        position: { x: 8, y: 0, w: 4, h: 4, minW: 3, minH: 2 },
+        position: { x: 6, y: 5, w: 3, h: 2, minW: 2, minH: 1 },
         style: 'card',
     },
+    // Quick Actions (3 cols) - Important: Visible on first viewport
     {
-        id: 'ncdr-alerts',
-        title: 'NCDR 警報',
-        region: 'R-R2',
+        id: 'quick-actions',
+        title: '快速操作',
+        region: 'footer',
         visible: true,
         locked: false,
-        position: { x: 8, y: 4, w: 4, h: 4, minW: 3, minH: 2 },
-        style: 'card',
+        position: { x: 9, y: 5, w: 3, h: 2, minW: 2, minH: 1 },
+        style: 'glass',
     },
 ];
 
@@ -157,6 +194,38 @@ export const AVAILABLE_WIDGET_MODULES: WidgetModule[] = [
     { id: 'settings-nav', title: '設定導航', description: '設定分類選單', icon: '⚙️', category: 'core', defaultSize: { w: 3, h: 6, minW: 2, minH: 4 } },
     { id: 'settings-panel', title: '設定面板', description: '設定選項內容', icon: '🔧', category: 'core', defaultSize: { w: 9, h: 6, minW: 6, minH: 4 } },
     { id: 'feature-flags', title: '功能開關', description: 'Feature Flags 管理', icon: '🚦', category: 'core', defaultSize: { w: 12, h: 5, minW: 8, minH: 4 } },
+
+    // ===== Hub Widgets (Phase 11) =====
+    // Notification Hub
+    { id: 'notification-feed', title: '通知動態', description: '即時通知列表 (LINE/Telegram/Push)', icon: '🔔', category: 'data', defaultSize: { w: 8, h: 6, minW: 6, minH: 4 } },
+    { id: 'notification-summary', title: '通知摘要', description: '今日通知統計', icon: '📊', category: 'analytics', defaultSize: { w: 4, h: 2, minW: 3, minH: 2 } },
+    { id: 'channel-status', title: '頻道狀態', description: 'LINE/Telegram/Slack 連線狀態', icon: '📡', category: 'tools', defaultSize: { w: 4, h: 4, minW: 3, minH: 3 } },
+
+    // Geo-Intel Hub
+    { id: 'geo-alert-feed', title: '警報動態', description: '整合 NCDR/氣象/社群警報', icon: '🚨', category: 'data', defaultSize: { w: 8, h: 6, minW: 6, minH: 4 } },
+    { id: 'geo-summary', title: '情資摘要', description: '警報來源分佈統計', icon: '📈', category: 'analytics', defaultSize: { w: 4, h: 2, minW: 3, minH: 2 } },
+    { id: 'weather-card', title: '天氣卡片', description: '當前天氣狀態', icon: '🌤️', category: 'map', defaultSize: { w: 4, h: 3, minW: 3, minH: 2 } },
+    { id: 'earthquake-monitor', title: '地震監控', description: '即時地震資訊', icon: '🌋', category: 'map', defaultSize: { w: 4, h: 3, minW: 3, minH: 2 } },
+
+    // Analytics Hub
+    { id: 'dashboard-stats', title: '儀表板統計', description: '核心 KPI 面板', icon: '📊', category: 'analytics', defaultSize: { w: 12, h: 2, minW: 8, minH: 2 } },
+    { id: 'report-generator', title: '報表生成', description: '一鍵生成報表', icon: '📄', category: 'tools', defaultSize: { w: 4, h: 4, minW: 3, minH: 3 } },
+    { id: 'scheduled-reports', title: '排程報表', description: '自動報表列表', icon: '📅', category: 'analytics', defaultSize: { w: 8, h: 4, minW: 6, minH: 3 } },
+
+    // AI Hub
+    { id: 'ai-task-list', title: 'AI 任務列表', description: '執行中的 AI 任務', icon: '🤖', category: 'data', defaultSize: { w: 6, h: 5, minW: 4, minH: 4 } },
+    { id: 'ai-prediction', title: 'AI 預測', description: '趨勢預測結果', icon: '🔮', category: 'analytics', defaultSize: { w: 6, h: 5, minW: 4, minH: 4 } },
+    { id: 'ai-suggestions', title: 'AI 建議', description: '智慧決策建議', icon: '💡', category: 'analytics', defaultSize: { w: 6, h: 4, minW: 4, minH: 3 } },
+
+    // Offline Hub
+    { id: 'sync-status', title: '同步狀態', description: '離線/上線同步進度', icon: '🔄', category: 'tools', defaultSize: { w: 6, h: 3, minW: 4, minH: 2 } },
+    { id: 'pending-queue', title: '待同步佇列', description: '離線操作列表', icon: '📋', category: 'data', defaultSize: { w: 6, h: 5, minW: 4, minH: 4 } },
+    { id: 'mesh-network', title: '網狀網路', description: 'P2P 連線狀態', icon: '🌐', category: 'tools', defaultSize: { w: 6, h: 4, minW: 4, minH: 3 } },
+
+    // Intake Widgets
+    { id: 'intake-form', title: '通報表單', description: '災情通報主表單', icon: '📝', category: 'tools', defaultSize: { w: 8, h: 8, minW: 6, minH: 6 } },
+    { id: 'intake-tips', title: '通報提示', description: '填表指引', icon: '💡', category: 'tools', defaultSize: { w: 4, h: 4, minW: 3, minH: 3 } },
+    { id: 'recent-intakes', title: '近期通報', description: '最新 5 筆通報', icon: '📋', category: 'data', defaultSize: { w: 4, h: 4, minW: 3, minH: 3 } },
 ];
 
 // ===== Page-Specific Widget Configurations =====
@@ -431,6 +500,132 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
         { id: 'profile-card', title: '個人資訊', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 4, h: 8, minW: 3, minH: 6 }, style: 'card' },
         { id: 'profile-settings', title: '帳戶設定', region: 'main', visible: true, locked: false, position: { x: 4, y: 0, w: 8, h: 4, minW: 6, minH: 3 }, style: 'card' },
         { id: 'profile-activity', title: '活動記錄', region: 'main', visible: true, locked: false, position: { x: 4, y: 4, w: 8, h: 4, minW: 6, minH: 3 }, style: 'card' },
+    ],
+
+    // ===== Hub Pages (Phase 11) =====
+
+    // Hub: Notifications
+    'hub-notifications': [
+        { id: 'notification-summary', title: '通知摘要', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'notification-feed', title: '通知動態', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'channel-status', title: '頻道狀態', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 3, minW: 3, minH: 2 }, style: 'card' },
+        { id: 'notification-settings', title: '通知設定', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 5, w: 4, h: 3, minW: 3, minH: 2 }, style: 'card' },
+    ],
+
+    // Hub: Geo-Alerts
+    'hub-geo-alerts': [
+        { id: 'geo-summary', title: '情資摘要', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'geo-alert-feed', title: '警報動態', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'earthquake-monitor', title: '地震監控', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 3, minW: 3, minH: 2 }, style: 'card' },
+        { id: 'ncdr-alerts', title: 'NCDR 警報', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 5, w: 4, h: 3, minW: 3, minH: 2 }, style: 'card' },
+    ],
+
+    // Hub: Weather
+    'hub-weather': [
+        { id: 'weather-card', title: '天氣總覽', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'weather-radar', title: '氣象雷達', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'forecast-cards', title: '預報資訊', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Hub: Analytics
+    'hub-analytics': [
+        { id: 'dashboard-stats', title: '儀表板統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'trends-chart', title: '趨勢圖表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 4, minW: 6, minH: 3 }, style: 'card' },
+        { id: 'report-generator', title: '報表生成', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
+        { id: 'scheduled-reports', title: '排程報表', region: 'footer', visible: true, locked: false, position: { x: 0, y: 6, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+    ],
+
+    // Hub: AI
+    'hub-ai': [
+        { id: 'dashboard-stats', title: 'AI 狀態', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'ai-task-list', title: 'AI 任務列表', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 6, h: 6, minW: 4, minH: 4 }, style: 'card' },
+        { id: 'ai-prediction', title: 'AI 預測', region: 'main', visible: true, locked: false, position: { x: 6, y: 2, w: 6, h: 3, minW: 4, minH: 2 }, style: 'card' },
+        { id: 'ai-suggestions', title: 'AI 建議', region: 'main', visible: true, locked: false, position: { x: 6, y: 5, w: 6, h: 3, minW: 4, minH: 2 }, style: 'card' },
+    ],
+
+    // Hub: Offline
+    'hub-offline': [
+        { id: 'sync-status', title: '同步狀態', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'pending-queue', title: '待同步佇列', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'mesh-network', title: '網狀網路', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Intake (統一通報入口)
+    'intake': [
+        { id: 'intake-form', title: '災情通報表單', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
+        { id: 'intake-tips', title: '通報提示', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 0, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
+        { id: 'recent-intakes', title: '近期通報', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 4, w: 4, h: 4, minW: 3, minH: 3 }, style: 'card' },
+    ],
+
+    // Map Ops (作戰地圖)
+    'map-ops': [
+        { id: 'map-layers', title: '圖層控制', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 3, h: 8, minW: 2, minH: 4 }, style: 'card' },
+        { id: 'tactical-map', title: '作戰地圖', region: 'main', visible: true, locked: false, position: { x: 3, y: 0, w: 9, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'event-timeline', title: '事件時間線', region: 'footer', visible: true, locked: false, position: { x: 3, y: 6, w: 9, h: 2, minW: 6, minH: 2 }, style: 'glass' },
+    ],
+
+    // Geo Alerts (警報中心)
+    'geo-alerts': [
+        { id: 'geo-summary', title: '警報摘要', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'ncdr-alerts', title: 'NCDR 警報', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Geo Weather (氣象預報)
+    'geo-weather': [
+        { id: 'weather-card', title: '天氣總覽', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'weather-radar', title: '氣象雷達', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'forecast-cards', title: '預報資訊', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Logistics Inventory (物資庫存)
+    'logistics-inventory': [
+        { id: 'resource-stats', title: '庫存統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'resource-table', title: '物資清單', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Logistics Equipment (裝備管理)
+    'logistics-equipment': [
+        { id: 'equipment-stats', title: '裝備統計', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'equipment-scanner', title: 'QR 掃描', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+        { id: 'equipment-grid', title: '裝備清單', region: 'main', visible: true, locked: false, position: { x: 4, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+    ],
+
+    // Workforce People (人員名冊)
+    'workforce-people': [
+        { id: 'search-panel', title: '搜尋志工', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 1 }, style: 'glass' },
+        { id: 'volunteer-grid', title: '志工名冊', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Workforce Shifts (排班日曆)
+    'workforce-shifts': [
+        { id: 'calendar-view', title: '排班日曆', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 9, h: 8, minW: 7, minH: 6 }, style: 'card' },
+        { id: 'shift-summary', title: '排班統計', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 0, w: 3, h: 4, minW: 2, minH: 3 }, style: 'card' },
+        { id: 'my-shifts', title: '我的班表', region: 'sidebar', visible: true, locked: false, position: { x: 9, y: 4, w: 3, h: 4, minW: 2, minH: 3 }, style: 'card' },
+    ],
+
+    // Workforce Performance (人員績效)
+    'workforce-performance': [
+        { id: 'key-metrics', title: '績效指標', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 2 }, style: 'glass' },
+        { id: 'top-volunteers', title: '排行榜', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
+        { id: 'my-ranking', title: '我的排名', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
+    ],
+
+    // Governance IAM (權限管理)
+    'governance-iam': [
+        { id: 'role-list', title: '角色列表', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 4, h: 8, minW: 3, minH: 6 }, style: 'card' },
+        { id: 'permission-matrix', title: '權限矩陣', region: 'main', visible: true, locked: false, position: { x: 4, y: 0, w: 8, h: 8, minW: 6, minH: 6 }, style: 'card' },
+    ],
+
+    // Governance Audit (審計日誌)
+    'governance-audit': [
+        { id: 'search-panel', title: '篩選器', region: 'header', visible: true, locked: false, position: { x: 0, y: 0, w: 12, h: 2, minW: 8, minH: 1 }, style: 'glass' },
+        { id: 'audit-table', title: '審計日誌', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 12, h: 6, minW: 8, minH: 4 }, style: 'card' },
+    ],
+
+    // Governance Settings (系統設定)
+    'governance-settings': [
+        { id: 'settings-nav', title: '設定分類', region: 'sidebar', visible: true, locked: false, position: { x: 0, y: 0, w: 3, h: 8, minW: 2, minH: 6 }, style: 'card' },
+        { id: 'settings-panel', title: '設定選項', region: 'main', visible: true, locked: false, position: { x: 3, y: 0, w: 9, h: 8, minW: 6, minH: 6 }, style: 'card' },
     ],
 };
 

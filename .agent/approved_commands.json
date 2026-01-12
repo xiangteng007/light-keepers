@@ -1,0 +1,13 @@
+{
+    "comment": "List of terminal commands approved for Agent execution",
+    "approved_commands": [
+        "npm run dev",
+        "npm run start:dev",
+        "npx tsc --noEmit",
+        "git add .",
+        "git commit",
+        "git push",
+        "$env:PORT='3001'; npm run start:dev",
+        "$env:PORT='3099'; $env:SYNC_TABLES='true'; npm run start:dev"
+    ]
+}

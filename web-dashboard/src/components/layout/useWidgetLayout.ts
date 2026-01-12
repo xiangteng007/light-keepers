@@ -49,8 +49,8 @@ export function useWidgetLayout({ userLevel, pageId = 'default' }: UseWidgetLayo
         return PAGE_WIDGET_CONFIGS[pageId] || DEFAULT_WIDGETS;
     };
 
-    // Permission check - only Level 5 can edit
-    const canEdit = userLevel >= PermissionLevel.SystemOwner;
+    // Permission check - Level 3+ (Manager) can edit widgets
+    const canEdit = userLevel >= PermissionLevel.Manager;
 
     // Widget state
     const [widgets, setWidgets] = useState<WidgetConfig[]>(() => {

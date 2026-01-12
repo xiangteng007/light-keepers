@@ -166,11 +166,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow-x: hidden;
+    overflow-y: auto;
     min-width: 0;
-    padding: var(--gutter);
-    padding-left: 0;
-    /* Sidebar already has border */
+    /* 🔧 36px padding on left, right, bottom; 12px on top */
+    padding: 12px 36px 36px 36px !important;
     /* 🔧 平滑內容切換 */
     transition: opacity 0.15s ease-out;
 }

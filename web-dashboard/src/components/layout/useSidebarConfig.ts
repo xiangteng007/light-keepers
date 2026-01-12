@@ -72,12 +72,13 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'intake', icon: 'FileText', label: '通報入口', path: '/intake', group: 'ops', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'incidents', icon: 'AlertTriangle', label: '事件列表', path: '/incidents', group: 'ops', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'tasks', icon: 'ClipboardList', label: '任務看板', path: '/tasks', group: 'ops', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/notifications', group: 'ops', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/hub/notifications', group: 'ops', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'offline', icon: 'HardDrive', label: '離線狀態', path: '/hub/offline', group: 'ops', order: 5, visible: true, minLevel: PermissionLevel.Anonymous },
 
     // ========== 🗺️ 情資地圖 (geo) - 3 items ==========
     { id: 'map-ops', icon: 'Map', label: '作戰地圖', path: '/geo/map-ops', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/geo/alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/geo/weather', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/hub/geo-alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
 
     // ========== 📦 資源後勤 (logistics) - 4 items ==========
     { id: 'inventory', icon: 'Package', label: '物資庫存', path: '/logistics/inventory', group: 'logistics', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
@@ -93,8 +94,9 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
 
     // ========== 📊 分析知識 (insights) - 4 items ==========
-    { id: 'analytics', icon: 'BarChart3', label: '分析儀表板', path: '/analytics', group: 'insights', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'analytics', icon: 'BarChart3', label: '分析儀表板', path: '/hub/analytics', group: 'insights', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'ai-tasks', icon: 'Brain', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 3, visible: true, minLevel: PermissionLevel.Anonymous },
 

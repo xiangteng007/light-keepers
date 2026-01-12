@@ -203,6 +203,14 @@ function App() {
           {/* Intake Route (統一通報入口) */}
           <Route path="/intake" element={<PageWrapper pageId="intake"><ReportPage /></PageWrapper>} />
 
+          {/* ===== Hub Routes (v4.0) ===== */}
+          <Route path="/hub/notifications" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="hub-notifications"><NotificationsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/hub/geo-alerts" element={<PageWrapper pageId="hub-geo-alerts"><NcdrAlertsPage /></PageWrapper>} />
+          <Route path="/hub/weather" element={<PageWrapper pageId="hub-weather"><ForecastPage /></PageWrapper>} />
+          <Route path="/hub/analytics" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-analytics"><AnalyticsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/hub/ai" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-ai" /></ProtectedRoute>} />
+          <Route path="/hub/offline" element={<PageWrapper pageId="hub-offline" />} />
+
           {/* ===== 舊路由保留 (未在 redirect 中處理的) ===== */}
           <Route path="/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
           <Route path="/manuals-v3" element={<PageWrapper pageId="manuals-v3"><ManualHomePage /></PageWrapper>} />

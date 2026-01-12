@@ -39,13 +39,15 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
         );
     }
 
+    // 🔧 DevMode 時跳過認證檢查並使用模擬 Level 5 權限（devModeEnabled 已宣告於上方）
+
     // 公開頁面 (Level 0) - 匿名訪客也可存取，不需要登入
     if (requiredLevel === 0) {
         return <>{children}</>;
     }
 
-    // Level 1+ 頁面：未登入導向登入頁
-    if (!isAuthenticated) {
+    // Level 1+ 頁面：未登入導向登入頁 (devMode 時跳過)
+    if (!isAuthenticated && !devModeEnabled) {
         return <Navigate to="/" state={{ from: location }} replace />;
     }
 
