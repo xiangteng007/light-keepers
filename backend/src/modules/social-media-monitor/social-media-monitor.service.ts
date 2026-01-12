@@ -1,14 +1,18 @@
 import { Injectable, Logger } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { GEO_EVENTS } from '../../common/events';
 
 /**
  * Social Media Monitor Service
- * Monitor social media for disaster-related keywords
+ * v2.0: Monitor social media for disaster-related keywords with event emission
  */
 @Injectable()
 export class SocialMediaMonitorService {
     private readonly logger = new Logger(SocialMediaMonitorService.name);
-    private keywords: string[] = ['災害', '地震', '颱風', '水災', '火災', '救災', '避難'];
+    private keywords: string[] = ['災害', '地震', '颱風', '水災', '火災', '救災', '避難', '土石流', '停電', '斷水', '道路中斷', '受困', '失蹤'];
     private monitoredPosts: Map<string, SocialPost> = new Map();
+
+    constructor(private readonly eventEmitter: EventEmitter2) { }
 
     /**
      * 設定關鍵字
@@ -48,6 +52,30 @@ export class SocialMediaMonitorService {
 
         if (matchedKeywords.length > 0) {
             this.monitoredPosts.set(post.id, { ...post, analysis: result });
+
+            // v2.0: 發送社群情資偵測事件
+            this.eventEmitter.emit(GEO_EVENTS.SOCIAL_INTEL_DETECTED, {
+                postId: post.id,
+                platform: post.platform,
+                keywords: matchedKeywords,
+                urgency,
+                location,
+                timestamp: new Date(),
+            });
+
+            // 高緊急度 (>=7) 發送警報事件
+            if (urgency >= 7) {
+                this.eventEmitter.emit(GEO_EVENTS.ALERT_RECEIVED, {
+                    source: 'social_media',
+                    postId: post.id,
+                    platform: post.platform,
+                    urgency,
+                    location,
+                    content: post.content.substring(0, 200),
+                    timestamp: new Date(),
+                });
+                this.logger.warn(`[HIGH URGENCY] Social post detected: ${post.id} (urgency: ${urgency})`);
+            }
         }
 
         return result;
@@ -157,10 +185,11 @@ export class SocialMediaMonitorService {
     }
 }
 
-// Types
-interface SocialPostInput { id: string; platform: string; content: string; author: string; createdAt: string; url?: string; }
-interface SocialPost extends SocialPostInput { analysis?: PostAnalysis; }
-interface PostAnalysis { postId: string; platform: string; matchedKeywords: string[]; sentiment: string; urgency: number; location: string | null; analyzedAt: Date; }
-interface PostFilter { platform?: string; minUrgency?: number; keyword?: string; limit?: number; }
-interface KeywordTrend { keyword: string; count: number; }
-interface MonitorStats { totalPosts: number; byPlatform: Record<string, number>; byUrgency: Record<string, number>; lastUpdated: Date; }
+// Types (exported)
+export interface SocialPostInput { id: string; platform: string; content: string; author: string; createdAt: string; url?: string; }
+export interface SocialPost extends SocialPostInput { analysis?: PostAnalysis; }
+export interface PostAnalysis { postId: string; platform: string; matchedKeywords: string[]; sentiment: string; urgency: number; location: string | null; analyzedAt: Date; }
+export interface PostFilter { platform?: string; minUrgency?: number; keyword?: string; limit?: number; }
+export interface KeywordTrend { keyword: string; count: number; }
+export interface MonitorStats { totalPosts: number; byPlatform: Record<string, number>; byUrgency: Record<string, number>; lastUpdated: Date; }
+

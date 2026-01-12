@@ -62,6 +62,7 @@ export const WORKFORCE_EVENTS = {
 export const GEO_EVENTS = {
     ALERT_RECEIVED: 'geo.alert.received',
     WEATHER_UPDATED: 'geo.weather.updated',
+    SOCIAL_INTEL_DETECTED: 'geo.social_intel.detected',
 } as const;
 
 // ============ Notification Domain ============
