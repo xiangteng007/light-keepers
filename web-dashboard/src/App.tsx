@@ -163,14 +163,68 @@ function App() {
           <Route path="/mental-health" element={<PageWrapper pageId="mental-health" />} />
 
           {/* ===== 根路由重導向 ===== */}
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/command-center" replace />} />
 
-          {/* ===== 公開頁面 (Level 0) - 使用 PageWrapper ===== */}
-          <Route path="/tactical-map" element={<PageWrapper pageId="tactical-map" />} />
-          <Route path="/ncdr-alerts" element={<PageWrapper pageId="ncdr"><NcdrAlertsPage /></PageWrapper>} />
-          <Route path="/map" element={<PageWrapper pageId="map"><MapPage /></PageWrapper>} />
-          <Route path="/forecast" element={<PageWrapper pageId="forecast"><ForecastPage /></PageWrapper>} />
-          <Route path="/manuals" element={<PageWrapper pageId="manuals"><ManualsPage /></PageWrapper>} />
+          {/* ===== v2.1 路由重導 (向後相容) ===== */}
+          <Route path="/dashboard" element={<Navigate to="/command-center" replace />} />
+          <Route path="/tactical-map" element={<Navigate to="/geo/map-ops" replace />} />
+          <Route path="/map" element={<Navigate to="/geo/map-ops" replace />} />
+          <Route path="/ncdr-alerts" element={<Navigate to="/geo/alerts" replace />} />
+          <Route path="/forecast" element={<Navigate to="/geo/weather" replace />} />
+          <Route path="/resources" element={<Navigate to="/logistics/inventory" replace />} />
+          <Route path="/domains/logistics/resource-overview" element={<Navigate to="/logistics/inventory" replace />} />
+          <Route path="/domains/logistics/equipment" element={<Navigate to="/logistics/equipment" replace />} />
+          <Route path="/volunteers" element={<Navigate to="/workforce/people" replace />} />
+          <Route path="/domains/workforce/shift-calendar" element={<Navigate to="/workforce/shifts" replace />} />
+          <Route path="/leaderboard" element={<Navigate to="/workforce/performance" replace />} />
+          <Route path="/domains/workforce/leaderboard" element={<Navigate to="/workforce/performance" replace />} />
+          <Route path="/domains/community/center" element={<Navigate to="/community/hub" replace />} />
+          <Route path="/activities" element={<Navigate to="/community/hub" replace />} />
+          <Route path="/report" element={<Navigate to="/intake" replace />} />
+          <Route path="/events" element={<Navigate to="/intake" replace />} />
+          <Route path="/domains/analytics/report-generator" element={<Navigate to="/analytics/reports" replace />} />
+          <Route path="/reports/admin" element={<Navigate to="/analytics/reports" replace />} />
+          <Route path="/audit" element={<Navigate to="/governance/audit" replace />} />
+          <Route path="/permissions" element={<Navigate to="/governance/iam" replace />} />
+          <Route path="/settings" element={<Navigate to="/governance/settings" replace />} />
+          <Route path="/manuals" element={<Navigate to="/knowledge/manuals" replace />} />
+
+          {/* ===== v2.1 新路由處理 ===== */}
+          {/* Geo Routes */}
+          <Route path="/geo/map-ops" element={<PageWrapper pageId="map-ops"><MapPage /></PageWrapper>} />
+          <Route path="/geo/alerts" element={<PageWrapper pageId="geo-alerts"><NcdrAlertsPage /></PageWrapper>} />
+          <Route path="/geo/weather" element={<PageWrapper pageId="geo-weather"><ForecastPage /></PageWrapper>} />
+
+          {/* Logistics Routes */}
+          <Route path="/logistics/inventory" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="logistics-inventory"><ResourcesPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-equipment" /></ProtectedRoute>} />
+          <Route path="/logistics/donations" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-donations"><DonationsPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Workforce Routes */}
+          <Route path="/workforce/people" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-people"><VolunteersPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/workforce/shifts" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-shifts" /></ProtectedRoute>} />
+          <Route path="/workforce/performance" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-performance"><LeaderboardPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Community Routes */}
+          <Route path="/community/hub" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community-hub"><CommunityCenterPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/community/mental-health" element={<PageWrapper pageId="mental-health" />} />
+
+          {/* Analytics Routes */}
+          <Route path="/analytics/reports" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-reports"><ReportsAdminPage /></PageWrapper></ProtectedRoute>} />
+
+          {/* Knowledge Routes */}
+          <Route path="/knowledge/manuals" element={<PageWrapper pageId="knowledge-manuals"><ManualsPage /></PageWrapper>} />
+          <Route path="/knowledge/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
+
+          {/* Governance Routes */}
+          <Route path="/governance/iam" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-iam"><PermissionsPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/governance/audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-audit" /></ProtectedRoute>} />
+          <Route path="/governance/settings" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-settings" /></ProtectedRoute>} />
+
+          {/* Intake Route (統一通報入口) */}
+          <Route path="/intake" element={<PageWrapper pageId="intake"><ReportPage /></PageWrapper>} />
+
+          {/* ===== 舊路由保留 (未在 redirect 中處理的) ===== */}
           <Route path="/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
           <Route path="/manuals-v3" element={<PageWrapper pageId="manuals-v3"><ManualHomePage /></PageWrapper>} />
 

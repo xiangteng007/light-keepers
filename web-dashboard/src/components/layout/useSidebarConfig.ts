@@ -29,14 +29,16 @@ import {
 } from 'lucide-react';
 import { PermissionLevel } from './widget.types';
 
-// Navigation group types
-export type NavGroup = 'c2' | 'geo' | 'log' | 'hr' | 'community' | 'analytics' | 'core';
+// Navigation group types - v2.1 Optimized (6 Groups)
+export type NavGroup = 'ops' | 'geo' | 'logistics' | 'workforce' | 'insights' | 'admin';
 
 export interface NavGroupConfig {
     id: NavGroup;
     label: string;
     icon: string;
+    emoji: string;
     order: number;
+    minLevel?: PermissionLevel;
 }
 
 export interface NavItemConfig {
@@ -51,80 +53,55 @@ export interface NavItemConfig {
     roles?: string[];
 }
 
-const STORAGE_KEY = 'lightkeepers-sidebar-config-v2';
+const STORAGE_KEY = 'lightkeepers-sidebar-config-v3';
 
-// Group definitions
+// Group definitions - v2.1 Optimized (6 Groups)
 export const NAV_GROUPS: NavGroupConfig[] = [
-    { id: 'c2', label: '指揮控制', icon: 'Zap', order: 0 },
-    { id: 'geo', label: '地理情資', icon: 'Map', order: 1 },
-    { id: 'log', label: '後勤資源', icon: 'Package', order: 2 },
-    { id: 'hr', label: '人力動員', icon: 'Users', order: 3 },
-    { id: 'community', label: '社區治理', icon: 'Building2', order: 4 },
-    { id: 'analytics', label: '分析報表', icon: 'BarChart3', order: 5 },
-    { id: 'core', label: '平台治理', icon: 'Settings', order: 6 },
+    { id: 'ops', label: '作戰中心', icon: 'Target', emoji: '🎯', order: 0 },
+    { id: 'geo', label: '情資地圖', icon: 'Map', emoji: '🗺️', order: 1 },
+    { id: 'logistics', label: '資源後勤', icon: 'Package', emoji: '📦', order: 2, minLevel: PermissionLevel.Volunteer },
+    { id: 'workforce', label: '人員動員', icon: 'Users', emoji: '👥', order: 3, minLevel: PermissionLevel.Volunteer },
+    { id: 'insights', label: '分析知識', icon: 'BarChart3', emoji: '📊', order: 4, minLevel: PermissionLevel.Supervisor },
+    { id: 'admin', label: '系統管理', icon: 'Settings', emoji: '⚙️', order: 5, minLevel: PermissionLevel.Manager },
 ];
 
-// Default navigation items - 33+ pages across 7 domains
+// Default navigation items - v2.1 Optimized (24 items across 6 groups)
 const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
-    // ========== C2 - 指揮控制 (7 items) ==========
-    { id: 'dashboard', icon: 'LayoutDashboard', label: '戰情儀表板', path: '/command-center', group: 'c2', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'incidents', icon: 'AlertTriangle', label: '事件中心', path: '/incidents', group: 'c2', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'tasks', icon: 'ClipboardList', label: '任務管理', path: '/tasks', group: 'c2', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'dispatch', icon: 'Zap', label: '智慧派遣', path: '/domains/mission-command/task-dispatch', group: 'c2', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'triage', icon: 'Activity', label: '分流站', path: '/domains/mission-command/triage', group: 'c2', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'drills', icon: 'Target', label: '演練模擬', path: '/drills', group: 'c2', order: 5, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'aar', icon: 'FileCheck', label: 'AAR 檢討', path: '/aar', group: 'c2', order: 6, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'events', icon: 'CalendarDays', label: '事件通報', path: '/events', group: 'c2', order: 7, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'report', icon: 'FileText', label: '災情通報', path: '/report', group: 'c2', order: 8, visible: true, minLevel: PermissionLevel.Volunteer },
+    // ========== 🎯 作戰中心 (ops) - 5 items ==========
+    { id: 'command-center', icon: 'LayoutDashboard', label: '戰情儀表板', path: '/command-center', group: 'ops', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'intake', icon: 'FileText', label: '通報入口', path: '/intake', group: 'ops', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'incidents', icon: 'AlertTriangle', label: '事件列表', path: '/incidents', group: 'ops', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'tasks', icon: 'ClipboardList', label: '任務看板', path: '/tasks', group: 'ops', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/notifications', group: 'ops', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
 
-    // ========== Geo - 地理情資 (6 items) ==========
-    { id: 'tactical-map', icon: 'Map', label: '戰術地圖', path: '/tactical-map', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/ncdr-alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'weather', icon: 'CloudRain', label: '氣象整合', path: '/forecast', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'drone-ops', icon: 'Plane', label: '無人機作業', path: '/domains/air-ops/drone-control', group: 'geo', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'routing', icon: 'Route', label: '路徑規劃', path: '/map', group: 'geo', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/manuals', group: 'geo', order: 5, visible: true, minLevel: PermissionLevel.Anonymous },
+    // ========== 🗺️ 情資地圖 (geo) - 3 items ==========
+    { id: 'map-ops', icon: 'Map', label: '作戰地圖', path: '/geo/map-ops', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/geo/alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/geo/weather', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
 
-    // ========== Log - 後勤資源 (5 items) ==========
-    { id: 'resource-overview', icon: 'Package', label: '資源總覽', path: '/domains/logistics/resource-overview', group: 'log', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'resources', icon: 'Package', label: '物資管理', path: '/resources', group: 'log', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'resource-matching', icon: 'GitMerge', label: '資源媒合', path: '/resource-matching', group: 'log', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'equipment', icon: 'QrCode', label: '裝備標籤', path: '/domains/logistics/equipment', group: 'log', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'donations', icon: 'Heart', label: '捐贈追蹤', path: '/donations', group: 'log', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
+    // ========== 📦 資源後勤 (logistics) - 4 items ==========
+    { id: 'inventory', icon: 'Package', label: '物資庫存', path: '/logistics/inventory', group: 'logistics', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'equipment', icon: 'QrCode', label: '裝備管理', path: '/logistics/equipment', group: 'logistics', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'donations', icon: 'Heart', label: '捐贈追蹤', path: '/logistics/donations', group: 'logistics', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'approvals', icon: 'CheckSquare', label: '審批中心', path: '/approvals', group: 'logistics', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
 
-    // ========== HR - 人力動員 (6 items) ==========
-    { id: 'personnel', icon: 'Users', label: '人員管理', path: '/domains/workforce/personnel', group: 'hr', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'volunteers', icon: 'Users', label: '志工名冊', path: '/volunteers', group: 'hr', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'schedule', icon: 'Calendar', label: '排班日曆', path: '/domains/workforce/shift-calendar', group: 'hr', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'attendance', icon: 'Clock', label: '出勤打卡', path: '/domains/workforce/attendance', group: 'hr', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'hr', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'rewards', icon: 'Award', label: '積分獎勵', path: '/domains/workforce/leaderboard', group: 'hr', order: 5, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'leaderboard', icon: 'Trophy', label: '排行榜', path: '/leaderboard', group: 'hr', order: 6, visible: true, minLevel: PermissionLevel.Volunteer },
+    // ========== 👥 人員動員 (workforce) - 5 items ==========
+    { id: 'people', icon: 'Users', label: '人員名冊', path: '/workforce/people', group: 'workforce', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'shifts', icon: 'Calendar', label: '排班日曆', path: '/workforce/shifts', group: 'workforce', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'performance', icon: 'Trophy', label: '績效中心', path: '/workforce/performance', group: 'workforce', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'community-hub', icon: 'Building2', label: '社區活動', path: '/community/hub', group: 'workforce', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
 
-    // ========== Community - 社區治理 (5 items) ==========
-    { id: 'community-center', icon: 'Building2', label: '社區中心', path: '/domains/community/center', group: 'community', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'community', icon: 'Building2', label: '社區韌性', path: '/community', group: 'community', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'reunification', icon: 'Home', label: '家庭團聚', path: '/reunification', group: 'community', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'psychological', icon: 'HeartHandshake', label: '心理支持', path: '/mental-health', group: 'community', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'activities', icon: 'PartyPopper', label: '活動動態', path: '/activities', group: 'community', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
+    // ========== 📊 分析知識 (insights) - 4 items ==========
+    { id: 'analytics', icon: 'BarChart3', label: '分析儀表板', path: '/analytics', group: 'insights', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 3, visible: true, minLevel: PermissionLevel.Anonymous },
 
-    // ========== Analytics - 分析報表 (4 items) ==========
-    { id: 'analytics', icon: 'BarChart3', label: '分析總覽', path: '/analytics', group: 'analytics', order: 0, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'report-generator', icon: 'FileSpreadsheet', label: '報表產生器', path: '/domains/analytics/report-generator', group: 'analytics', order: 1, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/reports/admin', group: 'analytics', order: 2, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'ai-summary', icon: 'Brain', label: 'AI 彙整', path: '/ai-summary', group: 'analytics', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-
-    // ========== Core - 平台治理 (6 items) ==========
-    { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/notifications', group: 'core', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'audit', icon: 'ScrollText', label: '審計日誌', path: '/audit', group: 'core', order: 1, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'accounts', icon: 'UserCog', label: '帳戶管理', path: '/accounts', group: 'core', order: 2, visible: true, minLevel: PermissionLevel.Admin },
-    { id: 'tenants', icon: 'Building', label: '租戶管理', path: '/tenants', group: 'core', order: 3, visible: true, minLevel: PermissionLevel.SystemOwner },
-    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/settings', group: 'core', order: 4, visible: true, minLevel: PermissionLevel.SystemOwner },
-    { id: 'features', icon: 'ToggleLeft', label: '功能開關', path: '/features', group: 'core', order: 5, visible: true, minLevel: PermissionLevel.SystemOwner },
-    { id: 'approvals', icon: 'CheckSquare', label: '審批中心', path: '/approvals', group: 'core', order: 6, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'permissions', icon: 'Lock', label: '權限管理', path: '/permissions', group: 'core', order: 7, visible: true, minLevel: PermissionLevel.Admin },
-    { id: 'backups', icon: 'HardDrive', label: '備份管理', path: '/backups', group: 'core', order: 8, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'profile', icon: 'User', label: '個人資料', path: '/profile', group: 'core', order: 9, visible: true, minLevel: PermissionLevel.Volunteer },
+    // ========== ⚙️ 系統管理 (admin) - 3 items ==========
+    { id: 'iam', icon: 'Lock', label: '權限管理', path: '/governance/iam', group: 'admin', order: 0, visible: true, minLevel: PermissionLevel.Manager },
+    { id: 'audit', icon: 'ScrollText', label: '審計日誌', path: '/governance/audit', group: 'admin', order: 1, visible: true, minLevel: PermissionLevel.Manager },
+    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 2, visible: true, minLevel: PermissionLevel.Admin },
 ];
 
 // Icon mapping for rendering
