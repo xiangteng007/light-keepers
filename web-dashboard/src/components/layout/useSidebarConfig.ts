@@ -10,18 +10,20 @@ import { useState, useEffect, useCallback } from 'react';
 import {
     // C2 - Command & Control
     LayoutDashboard, AlertTriangle, ClipboardList, Zap, Activity, Target, FileCheck,
+    CalendarDays, FileText,
     // Geo - Geographic Intel
-    Map, Bell, CloudRain, Plane, Route,
+    Map, Bell, CloudRain, Plane, Route, BookOpen,
     // Log - Logistics
     Package, GitMerge, QrCode, Heart,
     // HR - Human Resources
-    Users, Calendar, Clock, GraduationCap, Award,
+    Users, Calendar, Clock, GraduationCap, Award, Trophy,
     // Community
-    Building2, Home, HeartHandshake,
+    Building2, Home, HeartHandshake, PartyPopper,
     // Analytics
     BarChart3, FileSpreadsheet, Brain,
     // Core
     BellRing, ScrollText, UserCog, Building, Settings, ToggleLeft,
+    CheckSquare, Lock, HardDrive, User,
     // Utility
     LucideIcon
 } from 'lucide-react';
@@ -72,13 +74,16 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'triage', icon: 'Activity', label: '分流站', path: '/domains/mission-command/triage', group: 'c2', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'drills', icon: 'Target', label: '演練模擬', path: '/drills', group: 'c2', order: 5, visible: true, minLevel: PermissionLevel.Manager },
     { id: 'aar', icon: 'FileCheck', label: 'AAR 檢討', path: '/aar', group: 'c2', order: 6, visible: true, minLevel: PermissionLevel.Manager },
+    { id: 'events', icon: 'CalendarDays', label: '事件通報', path: '/events', group: 'c2', order: 7, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'report', icon: 'FileText', label: '災情通報', path: '/report', group: 'c2', order: 8, visible: true, minLevel: PermissionLevel.Volunteer },
 
-    // ========== Geo - 地理情資 (5 items) ==========
+    // ========== Geo - 地理情資 (6 items) ==========
     { id: 'tactical-map', icon: 'Map', label: '戰術地圖', path: '/tactical-map', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/ncdr-alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'weather', icon: 'CloudRain', label: '氣象整合', path: '/forecast', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'drone-ops', icon: 'Plane', label: '無人機作業', path: '/domains/air-ops/drone-control', group: 'geo', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'routing', icon: 'Route', label: '路徑規劃', path: '/map', group: 'geo', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/manuals', group: 'geo', order: 5, visible: true, minLevel: PermissionLevel.Anonymous },
 
     // ========== Log - 後勤資源 (5 items) ==========
     { id: 'resource-overview', icon: 'Package', label: '資源總覽', path: '/domains/logistics/resource-overview', group: 'log', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
@@ -94,12 +99,14 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'attendance', icon: 'Clock', label: '出勤打卡', path: '/domains/workforce/attendance', group: 'hr', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'hr', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'rewards', icon: 'Award', label: '積分獎勵', path: '/domains/workforce/leaderboard', group: 'hr', order: 5, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'leaderboard', icon: 'Trophy', label: '排行榜', path: '/leaderboard', group: 'hr', order: 6, visible: true, minLevel: PermissionLevel.Volunteer },
 
-    // ========== Community - 社區治理 (4 items) ==========
+    // ========== Community - 社區治理 (5 items) ==========
     { id: 'community-center', icon: 'Building2', label: '社區中心', path: '/domains/community/center', group: 'community', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'community', icon: 'Building2', label: '社區韌性', path: '/community', group: 'community', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'reunification', icon: 'Home', label: '家庭團聚', path: '/reunification', group: 'community', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'psychological', icon: 'HeartHandshake', label: '心理支持', path: '/mental-health', group: 'community', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'activities', icon: 'PartyPopper', label: '活動動態', path: '/activities', group: 'community', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
 
     // ========== Analytics - 分析報表 (4 items) ==========
     { id: 'analytics', icon: 'BarChart3', label: '分析總覽', path: '/analytics', group: 'analytics', order: 0, visible: true, minLevel: PermissionLevel.Manager },
@@ -114,24 +121,30 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'tenants', icon: 'Building', label: '租戶管理', path: '/tenants', group: 'core', order: 3, visible: true, minLevel: PermissionLevel.SystemOwner },
     { id: 'settings', icon: 'Settings', label: '系統設定', path: '/settings', group: 'core', order: 4, visible: true, minLevel: PermissionLevel.SystemOwner },
     { id: 'features', icon: 'ToggleLeft', label: '功能開關', path: '/features', group: 'core', order: 5, visible: true, minLevel: PermissionLevel.SystemOwner },
+    { id: 'approvals', icon: 'CheckSquare', label: '審批中心', path: '/approvals', group: 'core', order: 6, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'permissions', icon: 'Lock', label: '權限管理', path: '/permissions', group: 'core', order: 7, visible: true, minLevel: PermissionLevel.Admin },
+    { id: 'backups', icon: 'HardDrive', label: '備份管理', path: '/backups', group: 'core', order: 8, visible: true, minLevel: PermissionLevel.Manager },
+    { id: 'profile', icon: 'User', label: '個人資料', path: '/profile', group: 'core', order: 9, visible: true, minLevel: PermissionLevel.Volunteer },
 ];
 
 // Icon mapping for rendering
 export const ICON_MAP: Record<string, LucideIcon> = {
     // C2
     LayoutDashboard, AlertTriangle, ClipboardList, Zap, Activity, Target, FileCheck,
+    CalendarDays, FileText,
     // Geo
-    Map, Bell, CloudRain, Plane, Route,
+    Map, Bell, CloudRain, Plane, Route, BookOpen,
     // Log
     Package, GitMerge, QrCode, Heart,
     // HR
-    Users, Calendar, Clock, GraduationCap, Award,
+    Users, Calendar, Clock, GraduationCap, Award, Trophy,
     // Community
-    Building2, Home, HeartHandshake,
+    Building2, Home, HeartHandshake, PartyPopper,
     // Analytics
     BarChart3, FileSpreadsheet, Brain,
     // Core
     BellRing, ScrollText, UserCog, Building, Settings, ToggleLeft,
+    CheckSquare, Lock, HardDrive, User,
 };
 
 export function useSidebarConfig(userLevel: PermissionLevel = PermissionLevel.SystemOwner) {

@@ -1751,4 +1751,354 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
             }}>+ 發送祝福</button>
         </div>
     ),
+
+    // ===== 新增頁面 Widget 內容 =====
+
+    // Events 事件通報
+    'event-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>事件列表</div>
+            {[
+                { title: '台北市大安區水管破裂', type: '水災', time: '10:30', priority: 'high' },
+                { title: '新北市板橋區停電通報', type: '電力', time: '09:45', priority: 'medium' },
+                { title: '桃園市中壢區道路塌陷', type: '交通', time: '08:20', priority: 'critical' },
+            ].map((event, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    borderLeft: `3px solid ${event.priority === 'critical' ? '#ef4444' : event.priority === 'high' ? '#f97316' : '#eab308'}`,
+                }}>
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>{event.title}</div>
+                    <div style={{ display: 'flex', gap: '12px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <span>{event.type}</span>
+                        <span>{event.time}</span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ),
+    'event-form': (
+        <div style={{ height: '100%', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>新增事件</div>
+            <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>事件類型</label>
+                <select style={{ width: '100%', padding: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)' }}>
+                    <option>水災</option>
+                    <option>火災</option>
+                    <option>地震</option>
+                    <option>其他</option>
+                </select>
+            </div>
+            <div style={{ marginBottom: '12px' }}>
+                <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>描述</label>
+                <textarea style={{ width: '100%', padding: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)', minHeight: '80px' }} />
+            </div>
+            <button style={{ width: '100%', padding: '10px', background: 'rgba(195, 155, 111, 0.9)', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 600, cursor: 'pointer' }}>提交事件</button>
+        </div>
+    ),
+
+    // Report 災情通報
+    'report-form': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '16px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '20px', fontWeight: 600 }}>災情通報表單</div>
+            {['災情類型', '地點', '影響範圍', '描述'].map((field, i) => (
+                <div key={i} style={{ marginBottom: '16px' }}>
+                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '6px' }}>{field}</label>
+                    {i === 3 ? (
+                        <textarea style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)', minHeight: '100px' }} placeholder={`請輸入${field}...`} />
+                    ) : (
+                        <input type="text" style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)' }} placeholder={`請輸入${field}...`} />
+                    )}
+                </div>
+            ))}
+            <button style={{ width: '100%', padding: '12px', background: 'rgba(239, 68, 68, 0.8)', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>🚨 緊急通報</button>
+        </div>
+    ),
+    'recent-reports': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>近期通報</div>
+            {['水災通報 - 信義區', '停電通報 - 中山區', '道路封閉 - 內湖區'].map((report, i) => (
+                <div key={i} style={{ padding: '10px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px', marginBottom: '8px', fontSize: '12px', color: 'var(--text-secondary)' }}>{report}</div>
+            ))}
+        </div>
+    ),
+
+    // Manuals 作業手冊
+    'manual-categories': (
+        <div style={{ height: '100%', padding: '8px' }}>
+            {['🚒 消防', '🏥 醫療', '🚧 交通', '⚡ 電力', '📡 通訊'].map((cat, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: i === 0 ? 'rgba(195, 155, 111, 0.15)' : 'transparent',
+                    borderRadius: '8px',
+                    marginBottom: '4px',
+                    fontSize: '13px',
+                    color: i === 0 ? 'var(--accent-gold)' : 'var(--text-secondary)',
+                    cursor: 'pointer',
+                }}>{cat}</div>
+            ))}
+        </div>
+    ),
+    'manual-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '12px' }}>
+                {['火場救援SOP', '水災應變指南', '地震疏散流程', '停電處置程序'].map((manual, i) => (
+                    <div key={i} style={{
+                        padding: '16px',
+                        background: 'rgba(47, 54, 65, 0.3)',
+                        borderRadius: '10px',
+                        cursor: 'pointer',
+                    }}>
+                        <div style={{ fontSize: '24px', marginBottom: '8px' }}>📘</div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>{manual}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>v2.1 • 更新於 3 天前</div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    ),
+
+    // Activities 活動動態
+    'activity-feed': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            {[
+                { user: '張志明', action: '完成了救援任務 #1024', time: '10 分鐘前', type: 'mission' },
+                { user: '李美玲', action: '發布了訓練公告', time: '30 分鐘前', type: 'announcement' },
+                { user: '王大偉', action: '更新了排班表', time: '1 小時前', type: 'schedule' },
+            ].map((item, i) => (
+                <div key={i} style={{
+                    display: 'flex',
+                    gap: '12px',
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ width: '36px', height: '36px', borderRadius: '50%', background: 'rgba(195, 155, 111, 0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--accent-gold)' }}>
+                        {item.user.charAt(0)}
+                    </div>
+                    <div>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}><strong>{item.user}</strong> {item.action}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{item.time}</div>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ),
+    'activity-calendar': (
+        <div style={{ height: '100%', padding: '12px', textAlign: 'center' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>📅 活動日曆</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>2026 年 1 月</div>
+            <div style={{ marginTop: '12px', fontSize: '48px' }}>12</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>星期日</div>
+        </div>
+    ),
+    'upcoming-events': (
+        <div style={{ height: '100%', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>即將到來</div>
+            {['14:00 團隊會議', '16:30 訓練演習', '19:00 值班交接'].map((event, i) => (
+                <div key={i} style={{ padding: '8px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px', marginBottom: '6px', fontSize: '12px', color: 'var(--text-secondary)' }}>{event}</div>
+            ))}
+        </div>
+    ),
+
+    // Approvals 審批中心
+    'approval-queue': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            {[
+                { title: '志工申請 - 陳小明', type: '人員審核', status: 'pending' },
+                { title: '物資調撥 - 飲用水 x 100', type: '資源審核', status: 'pending' },
+                { title: '排班變更 - 3/15 晚班', type: '排班審核', status: 'approved' },
+            ].map((item, i) => (
+                <div key={i} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '12px',
+                    padding: '14px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item.title}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{item.type}</div>
+                    </div>
+                    {item.status === 'pending' ? (
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                            <button style={{ padding: '6px 12px', background: 'rgba(34, 197, 94, 0.2)', border: '1px solid rgba(34, 197, 94, 0.3)', borderRadius: '6px', color: '#22c55e', fontSize: '11px', cursor: 'pointer' }}>✓ 批准</button>
+                            <button style={{ padding: '6px 12px', background: 'rgba(239, 68, 68, 0.2)', border: '1px solid rgba(239, 68, 68, 0.3)', borderRadius: '6px', color: '#ef4444', fontSize: '11px', cursor: 'pointer' }}>✗ 拒絕</button>
+                        </div>
+                    ) : (
+                        <span style={{ padding: '4px 10px', borderRadius: '4px', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', fontSize: '10px' }}>已批准</span>
+                    )}
+                </div>
+            ))}
+        </div>
+    ),
+
+    // Permissions 權限管理
+    'role-list': (
+        <div style={{ height: '100%', padding: '8px' }}>
+            {[
+                { name: '系統擁有者', level: 5, color: '#A855F7' },
+                { name: '理事長', level: 4, color: '#3B82F6' },
+                { name: '常務理事', level: 3, color: '#22c55e' },
+                { name: '幹部', level: 2, color: '#eab308' },
+                { name: '志工', level: 1, color: '#C39B6F' },
+            ].map((role, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: i === 0 ? 'rgba(168, 85, 247, 0.15)' : 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '6px',
+                    cursor: 'pointer',
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: role.color }} />
+                        <span style={{ fontSize: '13px', color: i === 0 ? role.color : 'var(--text-primary)' }}>{role.name}</span>
+                        <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)' }}>Lv.{role.level}</span>
+                    </div>
+                </div>
+            ))}
+        </div>
+    ),
+    'permission-matrix': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>權限矩陣</div>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                <thead>
+                    <tr style={{ color: 'var(--text-muted)', textAlign: 'left' }}>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>功能</th>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>Lv.1</th>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>Lv.2</th>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>Lv.3</th>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>Lv.4</th>
+                        <th style={{ padding: '8px', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>Lv.5</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {['查看地圖', '編輯任務', '管理人員', '系統設定'].map((perm, i) => (
+                        <tr key={i}>
+                            <td style={{ padding: '8px', color: 'var(--text-secondary)' }}>{perm}</td>
+                            {[1, 2, 3, 4, 5].map(level => (
+                                <td key={level} style={{ padding: '8px', textAlign: 'center' }}>
+                                    {level >= i + 1 ? '✅' : '❌'}
+                                </td>
+                            ))}
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    ),
+
+    // Backups 備份管理
+    'backup-status': (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
+            <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '10px' }}>
+                <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>✓</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>上次備份成功</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>2h 前</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最近備份時間</div>
+            </div>
+            <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
+                <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>45.2 GB</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>總備份大小</div>
+            </div>
+        </div>
+    ),
+    'backup-list': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            {[
+                { name: 'backup_2026-01-12_10-00', size: '5.2 GB', status: 'complete' },
+                { name: 'backup_2026-01-11_22-00', size: '5.1 GB', status: 'complete' },
+                { name: 'backup_2026-01-11_10-00', size: '5.0 GB', status: 'complete' },
+            ].map((backup, i) => (
+                <div key={i} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ fontSize: '16px', marginRight: '12px' }}>💾</div>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ fontSize: '12px', color: 'var(--text-primary)', fontFamily: 'monospace' }}>{backup.name}</div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{backup.size}</div>
+                    </div>
+                    <button style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.2)', border: 'none', borderRadius: '6px', color: '#3B82F6', fontSize: '11px', cursor: 'pointer' }}>還原</button>
+                </div>
+            ))}
+        </div>
+    ),
+    'backup-actions': (
+        <div style={{ height: '100%', padding: '12px' }}>
+            <button style={{ width: '100%', padding: '12px', background: 'rgba(195, 155, 111, 0.9)', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 600, cursor: 'pointer', marginBottom: '12px' }}>立即備份</button>
+            <button style={{ width: '100%', padding: '12px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '8px', color: 'var(--text-primary)', fontSize: '13px', cursor: 'pointer', marginBottom: '12px' }}>排程設定</button>
+            <div style={{ padding: '12px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '8px' }}>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '8px' }}>自動備份</div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>每 12 小時</span>
+                    <span style={{ marginLeft: 'auto', padding: '2px 8px', borderRadius: '4px', background: 'rgba(34, 197, 94, 0.2)', color: '#22c55e', fontSize: '10px' }}>已啟用</span>
+                </div>
+            </div>
+        </div>
+    ),
+
+    // Profile 個人資料
+    'profile-card': (
+        <div style={{ height: '100%', padding: '16px', textAlign: 'center' }}>
+            <div style={{
+                width: '80px', height: '80px', borderRadius: '50%',
+                background: 'rgba(195, 155, 111, 0.2)', border: '3px solid var(--accent-gold)',
+                margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '32px', color: 'var(--accent-gold)',
+            }}>👤</div>
+            <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>使用者名稱</div>
+            <div style={{ fontSize: '12px', color: 'var(--accent-gold)', marginBottom: '16px' }}>系統擁有者</div>
+            <div style={{ padding: '12px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '8px', textAlign: 'left' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📧 電子郵件</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>user@example.com</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📱 電話</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>0912-345-678</div>
+            </div>
+        </div>
+    ),
+    'profile-settings': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '16px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>帳戶設定</div>
+            {['顯示名稱', '電子郵件', '電話號碼'].map((field, i) => (
+                <div key={i} style={{ marginBottom: '12px' }}>
+                    <label style={{ fontSize: '12px', color: 'var(--text-muted)', display: 'block', marginBottom: '4px' }}>{field}</label>
+                    <input type="text" style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.2)', borderRadius: '6px', color: 'var(--text-primary)' }} />
+                </div>
+            ))}
+            <button style={{ padding: '10px 20px', background: 'rgba(195, 155, 111, 0.9)', border: 'none', borderRadius: '8px', color: '#000', fontWeight: 600, cursor: 'pointer' }}>儲存變更</button>
+        </div>
+    ),
+    'profile-activity': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>活動記錄</div>
+            {['登入系統', '更新個人資料', '完成任務 #1023', '查看報表'].map((activity, i) => (
+                <div key={i} style={{
+                    padding: '10px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '6px',
+                    marginBottom: '6px',
+                    fontSize: '12px',
+                    color: 'var(--text-secondary)',
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                }}>
+                    <span>{activity}</span>
+                    <span style={{ color: 'var(--text-muted)' }}>{i === 0 ? '剛剛' : `${i * 2}h 前`}</span>
+                </div>
+            ))}
+        </div>
+    ),
 };
