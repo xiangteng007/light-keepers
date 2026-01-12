@@ -165,29 +165,8 @@ function App() {
           {/* ===== 根路由重導向 ===== */}
           <Route index element={<Navigate to="/command-center" replace />} />
 
-          {/* ===== v2.1 路由重導 (向後相容) ===== */}
-          <Route path="/dashboard" element={<Navigate to="/command-center" replace />} />
-          <Route path="/tactical-map" element={<Navigate to="/geo/map-ops" replace />} />
-          <Route path="/map" element={<Navigate to="/geo/map-ops" replace />} />
-          <Route path="/ncdr-alerts" element={<Navigate to="/geo/alerts" replace />} />
-          <Route path="/forecast" element={<Navigate to="/geo/weather" replace />} />
-          <Route path="/resources" element={<Navigate to="/logistics/inventory" replace />} />
-          <Route path="/domains/logistics/resource-overview" element={<Navigate to="/logistics/inventory" replace />} />
-          <Route path="/domains/logistics/equipment" element={<Navigate to="/logistics/equipment" replace />} />
-          <Route path="/volunteers" element={<Navigate to="/workforce/people" replace />} />
-          <Route path="/domains/workforce/shift-calendar" element={<Navigate to="/workforce/shifts" replace />} />
-          <Route path="/leaderboard" element={<Navigate to="/workforce/performance" replace />} />
-          <Route path="/domains/workforce/leaderboard" element={<Navigate to="/workforce/performance" replace />} />
-          <Route path="/domains/community/center" element={<Navigate to="/community/hub" replace />} />
-          <Route path="/activities" element={<Navigate to="/community/hub" replace />} />
-          <Route path="/report" element={<Navigate to="/intake" replace />} />
-          <Route path="/events" element={<Navigate to="/intake" replace />} />
-          <Route path="/domains/analytics/report-generator" element={<Navigate to="/analytics/reports" replace />} />
-          <Route path="/reports/admin" element={<Navigate to="/analytics/reports" replace />} />
-          <Route path="/audit" element={<Navigate to="/governance/audit" replace />} />
-          <Route path="/permissions" element={<Navigate to="/governance/iam" replace />} />
-          <Route path="/settings" element={<Navigate to="/governance/settings" replace />} />
-          <Route path="/manuals" element={<Navigate to="/knowledge/manuals" replace />} />
+
+          {/* ===== v2.2: 舊 redirect routes 已移除 (2026-01-12) ===== */}
 
           {/* ===== v2.1 新路由處理 ===== */}
           {/* Geo Routes */}
