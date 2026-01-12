@@ -47,6 +47,13 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
     // 初始化 Socket 連線
     useEffect(() => {
+        // 🔧 DevMode 時跳過 WebSocket 連接（本地開發不需要）
+        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        if (devModeEnabled) {
+            console.log('🔌 WebSocket skipped in dev mode');
+            return;
+        }
+
         const newSocket = io(`${WS_URL}/realtime`, {
             transports: ['websocket', 'polling'],
             reconnectionAttempts: 5,

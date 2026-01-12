@@ -62,6 +62,12 @@ const clearToken = (): void => {
 
 // Helper: 刷新 Access Token
 const refreshAccessToken = async (): Promise<string | null> => {
+    // 🔧 DevMode 時跳過 token refresh（使用模擬用戶）
+    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    if (devModeEnabled) {
+        return null;
+    }
+
     try {
         const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
         const response = await axios.post(
