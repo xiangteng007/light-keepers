@@ -160,7 +160,7 @@ function App() {
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
           <Route path="/dashboard" element={<CommandCenterPage />} />
           <Route path="/command-center" element={<CommandCenterPage />} />
-          <Route path="/mental-health" element={<MentalHealthPage />} />
+          <Route path="/mental-health" element={<PageWrapper pageId="mental-health" />} />
 
           {/* ===== 根路由重導向 ===== */}
           <Route index element={<Navigate to="/dashboard" replace />} />

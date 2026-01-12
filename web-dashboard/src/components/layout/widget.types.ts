@@ -389,5 +389,13 @@ export const PAGE_WIDGET_CONFIGS: Record<string, WidgetConfig[]> = {
         { id: 'personnel-grid', title: '人員名冊', region: 'main', visible: true, locked: false, position: { x: 0, y: 2, w: 8, h: 6, minW: 6, minH: 4 }, style: 'card' },
         { id: 'personnel-stats', title: '人員統計', region: 'sidebar', visible: true, locked: false, position: { x: 8, y: 2, w: 4, h: 6, minW: 3, minH: 4 }, style: 'card' },
     ],
+
+    // Mental Health (心理支持)
+    'mental-health': [
+        { id: 'mood-tracker', title: '心情記錄', region: 'main', visible: true, locked: false, position: { x: 0, y: 0, w: 6, h: 4, minW: 4, minH: 3 }, style: 'card' },
+        { id: 'phq9-assessment', title: '憂鬱評估 (PHQ-9)', region: 'main', visible: true, locked: false, position: { x: 6, y: 0, w: 6, h: 4, minW: 4, minH: 3 }, style: 'card' },
+        { id: 'gad7-assessment', title: '焦慮評估 (GAD-7)', region: 'main', visible: true, locked: false, position: { x: 0, y: 4, w: 6, h: 4, minW: 4, minH: 3 }, style: 'card' },
+        { id: 'blessing-wall', title: '祈福牆', region: 'sidebar', visible: true, locked: false, position: { x: 6, y: 4, w: 6, h: 4, minW: 4, minH: 3 }, style: 'card' },
+    ],
 };
 

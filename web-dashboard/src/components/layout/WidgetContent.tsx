@@ -1591,4 +1591,164 @@ export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
             ))}
         </div>
     ),
+
+    // ===== Mental Health Widgets =====
+    'mood-tracker': (
+        <div style={{ height: '100%', padding: '16px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '20px', fontWeight: 600 }}>今天感覺如何？</div>
+            <div style={{ fontSize: '64px', marginBottom: '16px' }}>😐</div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', maxWidth: '200px', marginBottom: '16px' }}>
+                <span>1</span>
+                <input type="range" min="1" max="10" defaultValue="5" style={{ flex: 1 }} />
+                <span>10</span>
+            </div>
+            <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>5 / 10</div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
+                {['放鬆', '忙碌', '疲倦', '焦慮', '開心'].map((tag, i) => (
+                    <span key={i} style={{
+                        padding: '6px 12px',
+                        borderRadius: '16px',
+                        background: i === 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(47, 54, 65, 0.5)',
+                        border: i === 0 ? '1px solid rgba(34, 197, 94, 0.3)' : '1px solid rgba(195, 155, 111, 0.2)',
+                        color: i === 0 ? '#22c55e' : 'var(--text-secondary)',
+                        fontSize: '12px',
+                        cursor: 'pointer',
+                    }}>{tag}</span>
+                ))}
+            </div>
+            <button style={{
+                marginTop: '20px',
+                padding: '10px 24px',
+                background: 'rgba(195, 155, 111, 0.9)',
+                border: 'none',
+                borderRadius: '8px',
+                color: '#000',
+                fontWeight: 600,
+                cursor: 'pointer',
+            }}>記錄心情</button>
+        </div>
+    ),
+    'phq9-assessment': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '16px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>
+                憂鬱症篩檢 (PHQ-9)
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                過去兩週內，您有多常受到以下問題困擾？
+            </div>
+            {['對事物缺乏興趣', '感到沮喪或絕望', '睡眠問題'].map((q, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '8px' }}>{i + 1}. {q}</div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {['完全沒有', '幾天', '超過一半', '幾乎每天'].map((opt, j) => (
+                            <span key={j} style={{
+                                padding: '4px 10px',
+                                borderRadius: '4px',
+                                background: j === 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(47, 54, 65, 0.5)',
+                                color: j === 0 ? '#22c55e' : 'var(--text-muted)',
+                                fontSize: '11px',
+                                cursor: 'pointer',
+                            }}>{opt}</span>
+                        ))}
+                    </div>
+                </div>
+            ))}
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <button style={{
+                    padding: '10px 24px',
+                    background: 'rgba(59, 130, 246, 0.8)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                }}>開始評估</button>
+            </div>
+        </div>
+    ),
+    'gad7-assessment': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '16px' }}>
+            <div style={{ fontSize: '14px', color: 'var(--accent-gold)', marginBottom: '16px', fontWeight: 600 }}>
+                焦慮症篩檢 (GAD-7)
+            </div>
+            <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '16px' }}>
+                過去兩週內，您有多常受到以下問題困擾？
+            </div>
+            {['感到緊張或焦慮', '無法控制擔心', '過度擔心各種事情'].map((q, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                }}>
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '8px' }}>{i + 1}. {q}</div>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                        {['完全沒有', '幾天', '超過一半', '幾乎每天'].map((opt, j) => (
+                            <span key={j} style={{
+                                padding: '4px 10px',
+                                borderRadius: '4px',
+                                background: j === 0 ? 'rgba(34, 197, 94, 0.2)' : 'rgba(47, 54, 65, 0.5)',
+                                color: j === 0 ? '#22c55e' : 'var(--text-muted)',
+                                fontSize: '11px',
+                                cursor: 'pointer',
+                            }}>{opt}</span>
+                        ))}
+                    </div>
+                </div>
+            ))}
+            <div style={{ textAlign: 'center', marginTop: '16px' }}>
+                <button style={{
+                    padding: '10px 24px',
+                    background: 'rgba(168, 85, 247, 0.8)',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#fff',
+                    fontWeight: 600,
+                    cursor: 'pointer',
+                }}>開始評估</button>
+            </div>
+        </div>
+    ),
+    'blessing-wall': (
+        <div style={{ height: '100%', overflow: 'auto', padding: '12px' }}>
+            <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', fontWeight: 600 }}>
+                🕯️ 祈福牆
+            </div>
+            {[
+                { name: '志工小明', msg: '願災區平安，大家加油！', likes: 12 },
+                { name: '匿名', msg: '希望受災民眾能早日重建家園', likes: 8 },
+                { name: '救援隊員', msg: '持續守護，不離不棄', likes: 15 },
+            ].map((blessing, i) => (
+                <div key={i} style={{
+                    padding: '12px',
+                    background: 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '8px',
+                    marginBottom: '8px',
+                    borderLeft: '3px solid rgba(195, 155, 111, 0.5)',
+                }}>
+                    <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '6px' }}>{blessing.name}</div>
+                    <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '8px' }}>{blessing.msg}</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <span style={{ cursor: 'pointer' }}>❤️ {blessing.likes}</span>
+                    </div>
+                </div>
+            ))}
+            <button style={{
+                width: '100%',
+                marginTop: '8px',
+                padding: '10px',
+                background: 'rgba(195, 155, 111, 0.2)',
+                border: '1px dashed rgba(195, 155, 111, 0.5)',
+                borderRadius: '8px',
+                color: 'var(--accent-gold)',
+                fontSize: '12px',
+                cursor: 'pointer',
+            }}>+ 發送祝福</button>
+        </div>
+    ),
 };
