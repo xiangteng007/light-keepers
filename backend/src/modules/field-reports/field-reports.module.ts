@@ -25,11 +25,12 @@ import { AuditService } from './audit.service';
 import { FieldReportsGateway } from './field-reports.gateway';
 import { GcsStorageService } from './gcs-storage.service';
 import { EmergencyNotificationService } from './emergency-notification.service';
+import { ReportDeduplicationService } from './report-deduplication.service';
+import { ReportSlaService } from './report-sla.service';
 import { AuthModule } from '../auth/auth.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { LineBotModule } from '../line-bot/line-bot.module';
 import { Account } from '../accounts/entities/account.entity';
-import { Role } from '../accounts/entities/role.entity';
 
 @Module({
     imports: [
@@ -66,6 +67,8 @@ import { Role } from '../accounts/entities/role.entity';
         FieldReportsGateway,
         GcsStorageService,
         EmergencyNotificationService,
+        ReportDeduplicationService,
+        ReportSlaService,
     ],
     exports: [
         TypeOrmModule, // Export TypeOrmModule so other modules can use FieldReport repository
@@ -77,6 +80,8 @@ import { Role } from '../accounts/entities/role.entity';
         AuditService,
         FieldReportsGateway,
         EmergencyNotificationService,
+        ReportDeduplicationService,
+        ReportSlaService,
     ],
 })
 export class FieldReportsModule { }
