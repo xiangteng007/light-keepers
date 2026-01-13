@@ -84,41 +84,43 @@ else {
 # ============================================
 Write-Host "[G3] Checking Public Surface Compliance..." -ForegroundColor Yellow
 
-$PublicSurfacePath = Join-Path $SecurityDir "public-surface.md"
+$PolicyJsonPath = Join-Path $RootDir "docs\policy\public-surface.policy.json"
 $PublicSurfaceCheckPath = Join-Path $SecurityDir "public-surface-check-report.json"
 
-if (Test-Path $PublicSurfacePath) {
-    $PublicSurfaceContent = Get-Content $PublicSurfacePath -Raw
-    
-    # Check policy is declared
-    if ($PublicSurfaceContent -match "Policy-[AB]") {
-        $passed += "G3a: Public surface policy declared"
+# Check policy JSON exists (SSOT)
+if (Test-Path $PolicyJsonPath) {
+    try {
+        $PolicyJson = Get-Content $PolicyJsonPath -Raw | ConvertFrom-Json
+        $policyName = $PolicyJson.policy
+        $endpointCount = @($PolicyJson.endpoints).Count
+        $passed += "G3a: Policy JSON exists ($policyName, $endpointCount endpoints)"
     }
-    else {
-        $failures += "G3a: No policy (A or B) declared in public-surface.md"
-    }
-    
-    # Check validation report exists
-    if (Test-Path $PublicSurfaceCheckPath) {
-        try {
-            $CheckReport = Get-Content $PublicSurfaceCheckPath -Raw | ConvertFrom-Json
-            if ($CheckReport.status -eq "PASS") {
-                $passed += "G3b: Public surface validation PASS"
-            }
-            else {
-                $failures += "G3b: Public surface validation FAIL ($($CheckReport.errors.Count) errors)"
-            }
-        }
-        catch {
-            $warnings += "G3b: Could not parse public-surface-check-report.json"
-        }
-    }
-    else {
-        $warnings += "G3b: public-surface-check-report.json not found (run validate-public-surface.ps1)"
+    catch {
+        $failures += "G3a: Could not parse public-surface.policy.json"
     }
 }
 else {
-    $failures += "G3: public-surface.md not found"
+    $failures += "G3a: public-surface.policy.json not found (SSOT required)"
+}
+
+# Check validation report exists and passed
+if (Test-Path $PublicSurfaceCheckPath) {
+    try {
+        $CheckReport = Get-Content $PublicSurfaceCheckPath -Raw | ConvertFrom-Json
+        if ($CheckReport.ok -eq $true) {
+            $passed += "G3b: Public surface validation PASS"
+        }
+        else {
+            $errorCount = if ($null -ne $CheckReport.errors) { $CheckReport.errors.Count } else { 0 }
+            $failures += "G3b: Public surface validation FAIL ($errorCount errors)"
+        }
+    }
+    catch {
+        $warnings += "G3b: Could not parse public-surface-check-report.json"
+    }
+}
+else {
+    $warnings += "G3b: public-surface-check-report.json not found (run validate-public-surface.ps1)"
 }
 
 # ============================================

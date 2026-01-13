@@ -1,25 +1,37 @@
 ﻿{
-    "passed":  [
-                   "STUB_KILL_SWITCH: Stub modules conditionally loaded (default: disabled)",
-                   "HEALTH_PUBLIC: health.controller.ts endpoints are accessible without guards",
-                   "PUBLIC_DECORATOR: @Public decorator exists",
-                   "POLICY_DECLARED: Policy-B is declared in public-surface.md",
-                   "STUB_DOCUMENTED: Stub modules attack surface documented",
-                   "THROTTLE_GLOBAL: ThrottlerGuard is globally configured"
-               ],
-    "warnings":  [
-
-                 ],
+    "ok":  true,
+    "summary":  {
+                    "policy":  "Policy-B",
+                    "policyEndpointsTotal":  0,
+                    "mappingRoutesTotal":  1108,
+                    "mappingUnprotectedTotal":  431,
+                    "mappingUnprotectedNotAllowlisted":  431,
+                    "errors":  0,
+                    "warnings":  1,
+                    "checkedAt":  "2026-01-13T17:35:44.0785276+08:00"
+                },
     "errors":  [
 
                ],
-    "generated":  "2026-01-13T16:47:28Z",
-    "summary":  {
-                    "totalChecks":  6,
-                    "errors":  0,
-                    "warnings":  0,
-                    "passRate":  100,
-                    "passed":  6
-                },
-    "status":  "PASS"
+    "warnings":  [
+                     {
+                         "code":  "UNPROTECTED_NOT_ALLOWLISTED",
+                         "message":  "Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:\n  - GET /health\n  - GET /health/live\n  - GET /health/ready\n  - GET /health/detailed\n  - POST /aerial-analysis/images\n  - GET /aerial-analysis/images/:param\n  - GET /aerial-analysis/images/mission/:param\n  - GET /aerial-analysis/images/pending\n  - POST /aerial-analysis/images/:param/analyze\n  - POST /aerial-analysis/images/batch-analyze\n  - POST /aerial-analysis/assessments\n  - GET /aerial-analysis/assessments\n  - GET /aerial-analysis/assessments/:param\n  - POST /aerial-analysis/compare\n  - GET /aerial-analysis/detections/persons\n  - POST /ar/markers\n  - GET /ar/markers/:param\n  - GET /ar/markers/floor/:param/:param\n  - PUT /ar/markers/:param\n  - DELETE /ar/markers/:param\n  - POST /ar/routes\n  - GET /ar/routes/:param\n  - POST /ar/routes/shortest\n  - POST /ar/routes/evacuation\n  - POST /ar/floor-plans\n  - GET /ar/floor-plans/:param\n  - GET /ar/floor-plans/building/:param\n  - POST /ar/sessions\n  - PUT /ar/sessions/:param/position\n  - GET /ar/sessions/:param",
+                         "endpoint":  null,
+                         "details":  {
+                                         "total":  431
+                                     }
+                     }
+                 ],
+    "inputs":  {
+                   "policyPath":  "docs/policy/public-surface.policy.json",
+                   "mappingPath":  "docs/proof/security/T1-routes-guards-mapping.json",
+                   "markdownPath":  "docs/proof/security/public-surface.md",
+                   "strict":  false
+               },
+    "checkedAt":  "2026-01-13T17:35:44.0785276+08:00",
+    "script":  {
+                   "name":  "validate-public-surface.ps1",
+                   "version":  "1.0.0"
+               }
 }

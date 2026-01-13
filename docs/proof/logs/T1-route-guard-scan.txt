@@ -1,6 +1,6 @@
 ﻿Route-Guard Scan Log
 ====================
-Generated: 2026-01-13T08:21:58.675Z
+Generated: 2026-01-13T09:34:31.483Z
 Script: scan-routes-guards.ps1
 
 SCAN RESULTS

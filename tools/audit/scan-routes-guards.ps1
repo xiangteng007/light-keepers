@@ -159,17 +159,21 @@ foreach ($controllerFile in $controllerFiles) {
                 if ($hasGuard) { $hasAnyGuard = $true }
                 
                 $routeInfo = [PSCustomObject]@{
-                    method       = $method.ToUpper()
-                    path         = $fullPath
-                    controller   = $relativePath
-                    lineNumber   = $i + 1
-                    guards       = $effectiveGuards
-                    requireLevel = $effectiveLevel
-                    roles        = $methodRoles
-                    isPublic     = $isPublic
-                    hasThrottle  = $hasThrottle
-                    hasGuard     = $hasGuard
-                    risk         = if (-not $hasGuard) { "HIGH" } elseif ($isPublic) { "LOW" } else { "MEDIUM" }
+                    method        = $method.ToUpper()
+                    path          = $fullPath
+                    controller    = $relativePath
+                    lineNumber    = $i + 1
+                    guards        = $effectiveGuards
+                    requireLevel  = $effectiveLevel
+                    requiredLevel = $effectiveLevel  # alias for validator
+                    roles         = $methodRoles
+                    isPublic      = $isPublic
+                    public        = $isPublic  # alias for validator
+                    hasThrottle   = $hasThrottle
+                    throttle      = if ($hasThrottle) { "decorator-present" } else { $null }
+                    hasGuard      = $hasGuard
+                    protected     = $hasGuard -and (-not $isPublic)  # protected if has guard and not public
+                    risk          = if (-not $hasGuard) { "HIGH" } elseif ($isPublic) { "LOW" } else { "MEDIUM" }
                 }
                 
                 $allRoutes += $routeInfo

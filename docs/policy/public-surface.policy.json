@@ -1,0 +1,35 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "policy": "Policy-B",
+    "description": "Public Surface Allowlist - SSOT for intentionally public endpoints. Phase 0: Minimal verified set only.",
+    "version": "1.0.0",
+    "lastUpdated": "2026-01-13",
+    "maintainer": "security-team",
+    "rules": {
+        "policyB": {
+            "description": "@Public() OR RequiredLevel(0) = public. Routes without guards are NOT considered public.",
+            "requireThrottle": true,
+            "requireDataExposure": true
+        }
+    },
+    "endpoints": [],
+    "notes": [
+        "Phase 0: Empty allowlist = all routes must be protected",
+        "Health endpoints are currently unprotected but will need @Public() decorator",
+        "Add endpoints here only after adding @Public() decorator to code",
+        "Run validate-public-surface.ps1 to check compliance"
+    ],
+    "stubModulesBlacklist": [
+        "ArFieldGuidanceModule",
+        "ArNavigationModule",
+        "VrCommandModule",
+        "DroneSwarmModule",
+        "SupplyChainBlockchainModule",
+        "AerialImageAnalysisModule"
+    ],
+    "phaseNotes": {
+        "phase0": "Empty allowlist - all unprotected routes reported as warnings",
+        "phase1": "Add @Public() decorator to health/auth endpoints, then add to allowlist",
+        "phase2": "Review and add remaining intentionally public endpoints"
+    }
+}
