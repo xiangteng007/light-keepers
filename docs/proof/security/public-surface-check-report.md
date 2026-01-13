@@ -1,6 +1,6 @@
 ﻿# Public Surface Check Report
 
-- CheckedAt: **2026-01-13T17:35:44.0785276+08:00**
+- CheckedAt: **2026-01-13T19:02:44.1281556+08:00**
 - Policy: **Policy-B**
 - OK: **True**
 

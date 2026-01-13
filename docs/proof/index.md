@@ -108,6 +108,16 @@
 - ✅ [`ci-gate-check.ps1`](../../tools/audit/ci-gate-check.ps1) - G1-G5 hard rules
 - ✅ [`validate-public-surface.ps1`](../../tools/audit/validate-public-surface.ps1) - Policy compliance
 
+### Policy-as-Code
+
+> **IMPORTANT**: `public-surface.md` is **AUTO-GENERATED**. Do NOT edit manually.
+
+| File | Type | Purpose |
+|------|------|---------|
+| `docs/policy/public-surface.policy.json` | **SSOT** | Allowlist source of truth |
+| `docs/proof/security/public-surface.md` | Generated | Human-readable (auto-generated) |
+| `tools/audit/generate-public-surface-md.ps1` | Generator | Creates md from policy.json |
+
 ### E3: Test Evidence
 
 - ⏳ [`public-surface-check-report.md`](security/public-surface-check-report.md) - Validation output
@@ -116,18 +126,25 @@
 
 - [ ] G1: Baseline SSOT exists (`T0-count-summary.json`)
 - [ ] G2: Guard mapping exists (`T1-routes-guards-mapping.json`)
-- [ ] G3: Public surface policy-compliant
+- [ ] G3: Policy JSON + SHA256 verified
 - [ ] G4: Stub modules disabled in production
 - [ ] G5: No new unprotected routes added
 
 ### Repro Commands
 
 ```powershell
-# Run all CI gate checks locally
+# 1. Generate public-surface.md from SSOT
+pwsh tools/audit/generate-public-surface-md.ps1
+
+# 2. Run all CI gate checks locally
 pwsh tools/audit/scan-baseline.ps1
 pwsh tools/audit/scan-routes-guards.ps1
 pwsh tools/audit/validate-public-surface.ps1
 pwsh tools/audit/ci-gate-check.ps1
+
+# 3. Strict mode (production)
+pwsh tools/audit/validate-public-surface.ps1 -Strict
+pwsh tools/audit/ci-gate-check.ps1 -Strict
 ```
 
 ---

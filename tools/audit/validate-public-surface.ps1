@@ -226,6 +226,40 @@ $mapping = $null
 try { $policy = Read-Json $policyAbs } catch { Add-Issue ([ref]$errors) "POLICY_MISSING" $_.Exception.Message $null; $policy = $null }
 try { $mapping = Read-Json $mappingAbs } catch { Add-Issue ([ref]$errors) "MAPPING_MISSING" $_.Exception.Message $null; $mapping = $null }
 
+# Drift guard: public-surface.md must match policy sha
+function Extract-PolicyShaFromMd([string]$mdPath) {
+    if (!(Test-Path $mdPath)) { return $null }
+    $txt = Get-Content $mdPath -Raw
+    $m = [regex]::Match($txt, "policySha256:\s*([a-f0-9]{64})", "IgnoreCase")
+    if ($m.Success) { return $m.Groups[1].Value.ToLower() }
+    return $null
+}
+
+if (Test-Path $policyAbs) {
+    $policySha = (Get-FileHash -Algorithm SHA256 -Path $policyAbs).Hash.ToLower()
+    $mdSha = Extract-PolicyShaFromMd $mdAbs
+  
+    if (-not $mdSha) {
+        if ($Strict) { 
+            Add-Issue ([ref]$errors) "PUBLIC_MD_MISSING_SHA" "public-surface.md missing policySha256 marker (must be auto-generated)" $null 
+        }
+        else { 
+            Add-Issue ([ref]$warnings) "PUBLIC_MD_MISSING_SHA" "public-surface.md missing policySha256 marker (non-strict)" $null 
+        }
+    }
+    elseif ($mdSha -ne $policySha) {
+        if ($Strict) { 
+            Add-Issue ([ref]$errors) "PUBLIC_MD_DRIFT" "public-surface.md policySha256 does not match policy.json (run generator)" $null @{ mdSha = $mdSha; policySha = $policySha } 
+        }
+        else { 
+            Add-Issue ([ref]$warnings) "PUBLIC_MD_DRIFT" "public-surface.md drift detected (non-strict)" $null @{ mdSha = $mdSha; policySha = $policySha } 
+        }
+    }
+    else {
+        # SHA matches - good
+    }
+}
+
 $policyName = $null
 $endpoints = @()
 if ($policy) {

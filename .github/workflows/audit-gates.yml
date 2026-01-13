@@ -46,6 +46,18 @@ jobs:
         run: |
           pwsh tools/audit/scan-routes-guards.ps1
 
+      # Generate public-surface.md from SSOT
+      - name: Generate Public Surface Markdown (SSOT -> md)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-public-surface-md.ps1
+
+      # Enforce no drift between policy.json and generated md
+      - name: Enforce public-surface.md is up-to-date (no drift)
+        shell: bash
+        run: |
+          git diff --exit-code docs/proof/security/public-surface.md || (echo "ERROR: public-surface.md is out of sync with policy.json. Run: pwsh tools/audit/generate-public-surface-md.ps1" && exit 1)
+
       # Public Surface Validation
       - name: Validate Public Surface
         shell: pwsh
