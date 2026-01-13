@@ -17,6 +17,7 @@
 - ✅ [`T0-modules-list.txt`](logs/T0-modules-list.txt) - 192 backend modules
 - ✅ [`T0-pages-list.txt`](logs/T0-pages-list.txt) - 114 frontend pages
 - ✅ [`T0-count-summary.json`](logs/T0-count-summary.json) - Machine-readable baseline
+- ✅ [`T0-delta-report.md`](logs/T0-delta-report.md) - Delta: actual vs expected (MATCH)
 
 ### E3: Test Evidence
 
@@ -32,6 +33,27 @@
 - [x] Page count verified: **114 pages**
 - [x] Counts from reproducible script
 - [x] JSON output with item lists
+- [x] Delta report generated (no discrepancy)
+
+---
+
+## Security Remediation (Commander Mode v1.2)
+
+**Status**: ✅ COMPLETE  
+**Commit**: `pending`
+
+### Dangerous Endpoints Removed
+
+| Endpoint | Issue | Action |
+|----------|-------|--------|
+| `GET /auth/diagnose/:email` | Unprotected | **REMOVED** |
+| `POST /auth/admin/reset-password` | Hardcoded key | **REMOVED** |
+| `POST /auth/admin/recreate-owner` | Hardcoded key | **REMOVED** |
+
+### Evidence
+
+- Code: `backend/src/modules/auth/auth.controller.ts` lines 86-99 (comment block)
+- Verify removed: `grep -r "LK_ADMIN_2026_RESET" backend/` returns 0 results
 
 ---
 

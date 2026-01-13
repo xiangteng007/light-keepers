@@ -84,39 +84,19 @@ export class AuthController {
         return this.authService.getAllRoles();
     }
 
-    /**
-     * 診斷帳號狀態（臨時 API）
-     * 用於排查角色問題
-     */
-    @Get('diagnose/:email')
-    async diagnoseAccount(@Param('email') email: string) {
-        return this.authService.diagnoseAccount(email);
-    }
-
-    /**
-     * 管理員密碼重設（臨時 API）
-     * 使用密鑰保護，用於緊急設定帳號密碼
-     */
-    @Post('admin/reset-password')
-    async adminResetPassword(@Body() body: { email: string; newPassword: string; adminKey: string }) {
-        // 簡單的密鑰驗證
-        if (body.adminKey !== 'LK_ADMIN_2026_RESET') {
-            throw new UnauthorizedException('Invalid admin key');
-        }
-        return this.authService.adminSetPassword(body.email, body.newPassword);
-    }
-
-    /**
-     * 管理員刪除並重建帳號（臨時 API）
-     * 使用密鑰保護，用於重建系統擁有者帳號
-     */
-    @Post('admin/recreate-owner')
-    async adminRecreateOwner(@Body() body: { email: string; password: string; adminKey: string }) {
-        if (body.adminKey !== 'LK_ADMIN_2026_RESET') {
-            throw new UnauthorizedException('Invalid admin key');
-        }
-        return this.authService.recreateOwnerAccount(body.email, body.password);
-    }
+    // =========================================
+    // REMOVED: Dangerous temporary admin endpoints
+    // =========================================
+    // The following endpoints were REMOVED for security:
+    // - GET /auth/diagnose/:email (unprotected, exposed account info)
+    // - POST /auth/admin/reset-password (hardcoded key: LK_ADMIN_2026_RESET)
+    // - POST /auth/admin/recreate-owner (hardcoded key: LK_ADMIN_2026_RESET)
+    //
+    // If admin functionality is needed, use:
+    // 1. @UseGuards(JwtAuthGuard) + @RequiredLevel(5)
+    // 2. Environment variable for admin key
+    // 3. Audit logging
+    // =========================================
 
     /**
      * LINE OAuth Callback

@@ -30,6 +30,7 @@
   - ✅ [`T0-modules-list.txt`](logs/T0-modules-list.txt) - 192 backend modules
   - ✅ [`T0-pages-list.txt`](logs/T0-pages-list.txt) - 114 frontend pages
   - ✅ [`T0-baseline-scan.txt`](logs/T0-baseline-scan.txt) - Scan log
+  - ✅ [`T0-delta-report.md`](logs/T0-delta-report.md) - Delta: actual vs expected (MATCH)
 - **Verification**: `pwsh tools/audit/scan-baseline.ps1`
 - **Status**: ✅ PASS
 
@@ -39,7 +40,7 @@
 - **Task(s)**: T1 (Integration Verification)
 - **Commit/PR**: `440f016` (PR-0)
 - **Evidence**:
-  - ✅ [`T1-routes-guards-mapping.json`](security/T1-routes-guards-mapping.json) - 1108 routes mapped
+  - ✅ [`T1-routes-guards-mapping.json`](security/T1-routes-guards-mapping.json) - 1105 routes mapped
   - ✅ [`T1-routes-guards-report.md`](security/T1-routes-guards-report.md) - Human-readable report
   - ✅ [`T1-route-guard-scan.txt`](logs/T1-route-guard-scan.txt) - Scan execution log
   - ⏳ [`T7a-smoke-tests.txt`](logs/T7a-smoke-tests.txt) - 10 endpoint smoke tests (pending)
@@ -68,6 +69,20 @@
   - `disaster-community.controller.ts` (21 routes)
   - `line-bot.controller.ts` (8 routes)
 - **Status**: ✅ PASS (guards added, smoke tests pending)
+
+### SEC-REMEDIATION: Dangerous Endpoint Removal
+
+- **Source**: Commander Mode Template v1.2 §5 (禁止事項)
+- **Task(s)**: T7a (Security Audit)
+- **Commit/PR**: `pending`
+- **Evidence**:
+  - ✅ `auth.controller.ts` lines 86-99 - Removal comment block
+  - ✅ 3 endpoints removed:
+    - `GET /auth/diagnose/:email` (unprotected)
+    - `POST /auth/admin/reset-password` (hardcoded key: LK_ADMIN_2026_RESET)
+    - `POST /auth/admin/recreate-owner` (hardcoded key: LK_ADMIN_2026_RESET)
+- **Verification**: `grep -r "LK_ADMIN_2026_RESET" backend/` returns 0 results
+- **Status**: ✅ PASS
 
 ### T7a-SCORE: Security Maturity Scoring
 
