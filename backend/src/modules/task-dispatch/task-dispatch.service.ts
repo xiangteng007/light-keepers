@@ -1,9 +1,33 @@
 import { Injectable, NotFoundException, BadRequestException, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { DispatchTask, TaskStatus, TaskPriority } from './entities/dispatch-task.entity';
 import { TaskAssignment, AssignmentStatus } from './entities/task-assignment.entity';
 import { CreateTaskDto, UpdateTaskDto, AssignTaskDto } from './dto';
+
+/**
+ * Task Dispatch Events
+ */
+export const TASK_EVENTS = {
+    CREATED: 'task.created',
+    ASSIGNED: 'task.assigned',
+    ACCEPTED: 'task.accepted',
+    STARTED: 'task.started',
+    COMPLETED: 'task.completed',
+    CANCELLED: 'task.cancelled',
+} as const;
+
+export interface TaskEventPayload {
+    taskId: string;
+    missionSessionId: string;
+    title: string;
+    priority: TaskPriority;
+    volunteerIds?: string[];
+    volunteerNames?: string[];
+    triggeredBy?: string;
+    timestamp: Date;
+}
 
 @Injectable()
 export class TaskDispatchService {
@@ -14,6 +38,7 @@ export class TaskDispatchService {
         private readonly taskRepo: Repository<DispatchTask>,
         @InjectRepository(TaskAssignment)
         private readonly assignmentRepo: Repository<TaskAssignment>,
+        private readonly eventEmitter: EventEmitter2,
     ) { }
 
     /**
@@ -135,6 +160,22 @@ export class TaskDispatchService {
             await this.taskRepo.save(task);
         }
 
+        // Emit task.assigned event for notification system
+        if (assignments.length > 0) {
+            const payload: TaskEventPayload = {
+                taskId,
+                missionSessionId: task.missionSessionId,
+                title: task.title,
+                priority: task.priority,
+                volunteerIds: dto.volunteerIds,
+                volunteerNames: Array.from(volunteerNames.values()),
+                triggeredBy: assignedBy,
+                timestamp: new Date(),
+            };
+            this.eventEmitter.emit(TASK_EVENTS.ASSIGNED, payload);
+            this.logger.log(`Emitted ${TASK_EVENTS.ASSIGNED} for task ${taskId}`);
+        }
+
         this.logger.log(`Task ${taskId} assigned to ${assignments.length} volunteers`);
         return assignments;
     }
@@ -203,7 +244,21 @@ export class TaskDispatchService {
         task.status = TaskStatus.IN_PROGRESS;
         task.startedAt = new Date();
 
-        return this.taskRepo.save(task);
+        const saved = await this.taskRepo.save(task);
+
+        // Emit task.started event
+        const payload: TaskEventPayload = {
+            taskId,
+            missionSessionId: task.missionSessionId,
+            title: task.title,
+            priority: task.priority,
+            triggeredBy: volunteerId,
+            timestamp: new Date(),
+        };
+        this.eventEmitter.emit(TASK_EVENTS.STARTED, payload);
+        this.logger.log(`Emitted ${TASK_EVENTS.STARTED} for task ${taskId}`);
+
+        return saved;
     }
 
     /**
@@ -233,7 +288,21 @@ export class TaskDispatchService {
             await this.assignmentRepo.save(assignment);
         }
 
-        return this.taskRepo.save(task);
+        const saved = await this.taskRepo.save(task);
+
+        // Emit task.completed event
+        const payload: TaskEventPayload = {
+            taskId,
+            missionSessionId: task.missionSessionId,
+            title: task.title,
+            priority: task.priority,
+            triggeredBy: volunteerId,
+            timestamp: new Date(),
+        };
+        this.eventEmitter.emit(TASK_EVENTS.COMPLETED, payload);
+        this.logger.log(`Emitted ${TASK_EVENTS.COMPLETED} for task ${taskId}`);
+
+        return saved;
     }
 
     /**

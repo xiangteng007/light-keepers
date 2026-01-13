@@ -11,12 +11,15 @@ import { IAPDocument } from './entities/iap-document.entity';
 import { SITREP } from './entities/sitrep.entity';
 import { DecisionLog } from './entities/decision-log.entity';
 import { AfterActionReview } from './entities/aar.entity';
+import { CommandChain } from './entities/command-chain.entity';
 import { IAPService } from './iap.service';
 import { IAPController } from './iap.controller';
 import { SITREPService } from './sitrep.service';
 import { SITREPController } from './sitrep.controller';
 import { AARService } from './aar.service';
 import { AARController } from './aar.controller';
+import { CommandChainService } from './command-chain.service';
+import { CommandChainController } from './command-chain.controller';
 import { MissionSessionGateway } from './mission-session.gateway';
 import { MissionReportService } from './mission-report.service';
 import { MissionReportController } from './mission-report.controller';
@@ -36,6 +39,7 @@ import { TasksModule } from '../tasks/tasks.module';
             SITREP,
             DecisionLog,
             AfterActionReview,
+            CommandChain,
         ]),
         forwardRef(() => AuthModule),
         forwardRef(() => FieldReportsModule),
@@ -46,6 +50,7 @@ import { TasksModule } from '../tasks/tasks.module';
         IAPController,
         SITREPController,
         AARController,
+        CommandChainController,
         MissionReportController,
     ],
     providers: [
@@ -53,6 +58,7 @@ import { TasksModule } from '../tasks/tasks.module';
         IAPService,
         SITREPService,
         AARService,
+        CommandChainService,
         MissionSessionGateway,
         MissionReportService,
     ],
@@ -62,9 +68,9 @@ import { TasksModule } from '../tasks/tasks.module';
         IAPService,
         SITREPService,
         AARService,
+        CommandChainService,
         MissionSessionGateway,
         MissionReportService,
     ],
 })
 export class MissionSessionsModule { }
-
