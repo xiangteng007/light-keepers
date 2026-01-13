@@ -1,5 +1,5 @@
 ﻿{
-    "generated_at":  "2026-01-13T12:03:19.088Z",
+    "generated_at":  "2026-01-13T12:52:34.790Z",
     "generated_by":  "scan-routes-guards.ps1",
     "version":  "1.0.0",
     "routes":  [
@@ -23275,6 +23275,7 @@
                     "total_routes":  1105,
                     "protected_routes":  676,
                     "controller_stats":  {
+                                             "excluded":  0,
                                              "withoutGuards":  50,
                                              "withGuards":  80,
                                              "total":  130

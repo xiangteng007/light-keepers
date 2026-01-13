@@ -1,19 +1,20 @@
-/**
-* Route-Guard Mapping Scanner
-* 
-* Purpose: Generate a mapping of all API routes to their guards/decorators
-* Strategy: Parse controller files for decorators (static analysis)
-* 
-* Output:
-* - /docs/proof/security/T1-routes-guards-mapping.json
-* - /docs/proof/security/T1-routes-guards-report.md
-* - /docs/proof/logs/T1-route-guard-scan.txt
-* 
-* Usage: pwsh tools/audit/scan-routes-guards.ps1
-*/
+<#
+.SYNOPSIS
+    Route-Guard Mapping Scanner
+.DESCRIPTION
+    Generate a mapping of all API routes to their guards/decorators (static analysis)
+.OUTPUTS
+    - /docs/proof/security/T1-routes-guards-mapping.json
+    - /docs/proof/security/T1-routes-guards-report.md  
+    - /docs/proof/logs/T1-route-guard-scan.txt
+.EXAMPLE
+    pwsh tools/audit/scan-routes-guards.ps1                  # Full scan
+    pwsh tools/audit/scan-routes-guards.ps1 -ProductionMode  # Excludes stub modules
+#>
 
 param(
-    [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot))
+    [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
+    [switch]$ProductionMode
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +23,27 @@ $ErrorActionPreference = "Stop"
 $BackendSrc = Join-Path $RootDir "backend\src"
 $OutputDir = Join-Path $RootDir "docs\proof\security"
 $LogsDir = Join-Path $RootDir "docs\proof\logs"
+$PolicyPath = Join-Path $RootDir "docs\policy\public-surface.policy.json"
+
+# Stub modules to exclude in ProductionMode (from policy SSOT)
+$stubModulesBlacklist = @(
+    "ar-field-guidance",
+    "ar-navigation",
+    "vr-command",
+    "drone-swarm",
+    "supply-chain-blockchain",
+    "aerial-image-analysis"
+)
+
+# Load from policy if available
+if (Test-Path $PolicyPath) {
+    $policy = Get-Content $PolicyPath -Raw | ConvertFrom-Json
+    if ($policy.stubModulesBlacklist) {
+        $stubModulesBlacklist = @($policy.stubModulesBlacklist | ForEach-Object {
+                $_.ToLower().Replace("module", "")
+            })
+    }
+}
 
 # Ensure output directories exist
 foreach ($dir in @($OutputDir, $LogsDir)) {
@@ -30,7 +52,9 @@ foreach ($dir in @($OutputDir, $LogsDir)) {
     }
 }
 
+$modeLabel = if ($ProductionMode) { "PRODUCTION MODE (stub modules excluded)" } else { "FULL SCAN (engineering debt view)" }
 Write-Host "Starting route-guard mapping scan..." -ForegroundColor Cyan
+Write-Host "   Mode: $modeLabel" -ForegroundColor Yellow
 Write-Host "   Backend: $BackendSrc"
 Write-Host ""
 
@@ -40,12 +64,32 @@ $controllerStats = @{
     total         = 0
     withGuards    = 0
     withoutGuards = 0
+    excluded      = 0
 }
 
 # Find all controller files
 $controllerFiles = Get-ChildItem -Path $BackendSrc -Recurse -Filter "*.controller.ts" -File |
 Where-Object { 
     $_.FullName -notmatch "\\(node_modules|dist|test|mock|deprecated)\\"
+}
+
+# Filter out stub modules in ProductionMode
+if ($ProductionMode) {
+    $preFilterCount = $controllerFiles.Count
+    $controllerFiles = $controllerFiles | Where-Object {
+        $fileName = $_.Name.ToLower()
+        $isStub = $false
+        foreach ($stub in $stubModulesBlacklist) {
+            $stubPattern = $stub.ToLower().Replace("-", "")
+            if ($fileName -match $stubPattern) {
+                $isStub = $true
+                break
+            }
+        }
+        -not $isStub
+    }
+    $controllerStats.excluded = $preFilterCount - $controllerFiles.Count
+    Write-Host "   Excluded stub modules: $($controllerStats.excluded) controllers" -ForegroundColor DarkGray
 }
 
 Write-Host "Found $($controllerFiles.Count) controller files" -ForegroundColor Yellow

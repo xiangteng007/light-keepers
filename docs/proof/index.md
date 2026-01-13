@@ -4,6 +4,14 @@
 > **Purpose**: Central index for all evidence collected during Commander Mode execution  
 > **Authority**: All counts reference [baseline-counting-spec.md](../audit/baseline-counting-spec.md)
 
+### Status Taxonomy
+
+| Status | Symbol | Meaning |
+|--------|:------:|---------|
+| IMPLEMENTED | 🟡 | Code complete, no runtime proof (E2/E3 missing) |
+| VERIFIED | 🔵 | Has runtime evidence (E2/E3) |
+| COMPLETE | ✅ | All E1-E5 produced and linked |
+
 ---
 
 ## T0: Repo Baseline Scanning
@@ -87,9 +95,11 @@
 
 ## T7a: Shift-left Security
 
-**Status**: ✅ COMPLETE (guards added)  
+**Status**: 🟡 IMPLEMENTED (no runtime proof yet)  
 **Gate**: Gate-Security  
 **Commit**: `30aeae9`
+
+> ⚠️ **Upgrade to VERIFIED**: Run smoke tests to produce E2/E3 evidence
 
 ### E1: Code Evidence
 

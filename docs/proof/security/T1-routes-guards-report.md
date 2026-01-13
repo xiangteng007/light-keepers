@@ -1,6 +1,6 @@
 ﻿# Route-Guard Mapping Report
 
-> **Generated**: 2026-01-13T12:03:19.088Z  
+> **Generated**: 2026-01-13T12:52:34.790Z  
 > **Script**: scan-routes-guards.ps1  
 > **Spec**: baseline-counting-spec.md@v1
 
