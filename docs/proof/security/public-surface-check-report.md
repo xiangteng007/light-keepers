@@ -1,6 +1,6 @@
 ﻿# Public Surface Check Report
 
-- CheckedAt: **2026-01-13T19:02:44.1281556+08:00**
+- CheckedAt: **2026-01-13T19:24:36.6536527+08:00**
 - Policy: **Policy-B**
 - OK: **True**
 
@@ -8,19 +8,18 @@
 
 | Metric | Value |
 |---|---:|
-| Policy endpoints | 0 |
+| Policy endpoints | 8 |
 | Mapping routes | 1108 |
-| Unprotected routes (unique) | 431 |
-| Unprotected not allowlisted | 431 |
+| Unprotected routes (unique) | 436 |
+| Unprotected not allowlisted | 428 |
 | Errors | 0 |
-| Warnings | 1 |
+| Warnings | 4 |
 
 ## Warnings
+- **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/ready (using first candidate for checks)
+- **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/live (using first candidate for checks)
+- **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health (using first candidate for checks)
 - **UNPROTECTED_NOT_ALLOWLISTED**: Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:
-  - GET /health
-  - GET /health/live
-  - GET /health/ready
-  - GET /health/detailed
   - POST /aerial-analysis/images
   - GET /aerial-analysis/images/:param
   - GET /aerial-analysis/images/mission/:param
@@ -47,6 +46,10 @@
   - POST /ar/sessions
   - PUT /ar/sessions/:param/position
   - GET /ar/sessions/:param
+  - GET /ar/sessions/active
+  - DELETE /ar/sessions/:param
+  - GET /ar/view
+  - POST /auth/reset-password
 
 ## Artifacts
 

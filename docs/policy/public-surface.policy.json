@@ -1,23 +1,114 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "policy": "Policy-B",
-    "description": "Public Surface Allowlist - SSOT for intentionally public endpoints. Phase 0: Minimal verified set only.",
-    "version": "1.0.0",
+    "description": "Public Surface Allowlist - SSOT for intentionally public endpoints with @Public() decorator",
+    "version": "1.1.0",
     "lastUpdated": "2026-01-13",
     "maintainer": "security-team",
     "rules": {
         "policyB": {
-            "description": "@Public() OR RequiredLevel(0) = public. Routes without guards are NOT considered public.",
+            "description": "@Public() OR @RequiredLevel(0) = public. All public endpoints must have throttling.",
             "requireThrottle": true,
             "requireDataExposure": true
         }
     },
-    "endpoints": [],
-    "notes": [
-        "Phase 0: Empty allowlist = all routes must be protected",
-        "Health endpoints are currently unprotected but will need @Public() decorator",
-        "Add endpoints here only after adding @Public() decorator to code",
-        "Run validate-public-surface.ps1 to check compliance"
+    "endpoints": [
+        {
+            "method": "GET",
+            "path": "/health",
+            "controller": "health.controller.ts",
+            "reason": "K8s liveness probe",
+            "dataExposure": "none",
+            "throttle": {
+                "limit": 120,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        },
+        {
+            "method": "GET",
+            "path": "/health/detailed",
+            "controller": "health.controller.ts",
+            "reason": "Ops monitoring",
+            "dataExposure": "low",
+            "throttle": {
+                "limit": 60,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        },
+        {
+            "method": "GET",
+            "path": "/health/live",
+            "controller": "health.controller.ts",
+            "reason": "K8s liveness probe",
+            "dataExposure": "none",
+            "throttle": {
+                "limit": 120,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        },
+        {
+            "method": "GET",
+            "path": "/health/ready",
+            "controller": "health.controller.ts",
+            "reason": "K8s readiness probe",
+            "dataExposure": "none",
+            "throttle": {
+                "limit": 120,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        },
+        {
+            "method": "POST",
+            "path": "/auth/login",
+            "controller": "auth.controller.ts",
+            "reason": "User authentication entry point",
+            "dataExposure": "medium",
+            "throttle": {
+                "limit": 10,
+                "ttl": 60000
+            },
+            "smokeRequired": true
+        },
+        {
+            "method": "POST",
+            "path": "/auth/register",
+            "controller": "auth.controller.ts",
+            "reason": "User registration",
+            "dataExposure": "medium",
+            "throttle": {
+                "limit": 5,
+                "ttl": 60000
+            },
+            "smokeRequired": true
+        },
+        {
+            "method": "POST",
+            "path": "/auth/refresh",
+            "controller": "auth.controller.ts",
+            "reason": "Token refresh (requires refresh token cookie)",
+            "dataExposure": "low",
+            "throttle": {
+                "limit": 30,
+                "ttl": 60000
+            },
+            "smokeRequired": true
+        },
+        {
+            "method": "POST",
+            "path": "/auth/forgot-password",
+            "controller": "auth.controller.ts",
+            "reason": "Password reset request",
+            "dataExposure": "none",
+            "throttle": {
+                "limit": 5,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        }
     ],
     "stubModulesBlacklist": [
         "ArFieldGuidanceModule",
@@ -27,9 +118,11 @@
         "SupplyChainBlockchainModule",
         "AerialImageAnalysisModule"
     ],
-    "phaseNotes": {
-        "phase0": "Empty allowlist - all unprotected routes reported as warnings",
-        "phase1": "Add @Public() decorator to health/auth endpoints, then add to allowlist",
-        "phase2": "Review and add remaining intentionally public endpoints"
-    }
+    "notes": [
+        "All endpoints in this file have @Public() decorator in code",
+        "Health endpoints are for K8s probes and monitoring",
+        "Auth endpoints are user-facing authentication flows",
+        "All endpoints have @Throttle() for rate limiting",
+        "Run validate-public-surface.ps1 -Strict to verify compliance"
+    ]
 }

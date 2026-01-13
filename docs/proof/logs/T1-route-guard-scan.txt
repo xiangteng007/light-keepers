@@ -1,25 +1,18 @@
 ﻿Route-Guard Scan Log
 ====================
-Generated: 2026-01-13T09:34:31.483Z
+Generated: 2026-01-13T11:24:24.500Z
 Script: scan-routes-guards.ps1
 
 SCAN RESULTS
 ------------
 Controllers Scanned: 130
 Total Routes Found: 1108
-Protected Routes: 672 (60.6%)
-Unprotected Routes: 436
-Public Routes: 1
+Protected Routes: 679 (61.3%)
+Unprotected Routes: 429
+Public Routes: 13
 
 HIGH-RISK ROUTES
 ----------------
-GET /health [backend/src/health-only.controller.ts:13]
-GET /health/live [backend/src/health-only.controller.ts:25]
-GET /health/ready [backend/src/health-only.controller.ts:30]
-GET /health [backend/src/health/health.controller.ts:36]
-GET /health/detailed [backend/src/health/health.controller.ts:44]
-GET /health/live [backend/src/health/health.controller.ts:67]
-GET /health/ready [backend/src/health/health.controller.ts:75]
 POST /aerial-analysis/images [backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts:11]
 GET /aerial-analysis/images/:id [backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts:17]
 GET /aerial-analysis/images/mission/:missionId [backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts:23]

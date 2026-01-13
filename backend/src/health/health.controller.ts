@@ -1,12 +1,16 @@
 /**
  * Health Check Controller
  * Provides system health monitoring endpoints
+ * 
+ * Security: All endpoints are @Public() with rate limiting (Policy-B)
  */
 
 import { Controller, Get } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource } from 'typeorm';
+import { Throttle } from '@nestjs/throttler';
 import { CacheService } from '../modules/cache/cache.service';
+import { Public } from '../modules/auth/decorators/public.decorator';
 
 interface HealthStatus {
     status: 'healthy' | 'degraded' | 'unhealthy';
@@ -32,7 +36,10 @@ export class HealthController {
 
     /**
      * Basic health check (for load balancers)
+     * @Public - K8s liveness probe, no auth required
      */
+    @Public()
+    @Throttle({ default: { limit: 120, ttl: 60000 } })
     @Get()
     async check(): Promise<{ status: string }> {
         return { status: 'ok' };
@@ -40,7 +47,10 @@ export class HealthController {
 
     /**
      * Detailed health check
+     * @Public - Ops monitoring, no auth required
      */
+    @Public()
+    @Throttle({ default: { limit: 60, ttl: 60000 } })
     @Get('detailed')
     async detailedCheck(): Promise<HealthStatus> {
         const checks = {
@@ -63,7 +73,10 @@ export class HealthController {
 
     /**
      * Liveness probe (for Kubernetes)
+     * @Public - K8s liveness probe, no auth required
      */
+    @Public()
+    @Throttle({ default: { limit: 120, ttl: 60000 } })
     @Get('live')
     async liveness(): Promise<{ alive: boolean }> {
         return { alive: true };
@@ -71,7 +84,10 @@ export class HealthController {
 
     /**
      * Readiness probe (for Kubernetes)
+     * @Public - K8s readiness probe, no auth required
      */
+    @Public()
+    @Throttle({ default: { limit: 120, ttl: 60000 } })
     @Get('ready')
     async readiness(): Promise<{ ready: boolean; reason?: string }> {
         const dbCheck = await this.checkDatabase();

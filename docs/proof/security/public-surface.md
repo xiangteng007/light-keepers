@@ -1,6 +1,6 @@
 ﻿<!-- AUTO-GENERATED FILE. DO NOT EDIT MANUALLY. -->
 <!-- source: docs/policy/public-surface.policy.json -->
-<!-- policySha256: eb9593be08533605795b7b10879653feabc73fc780cb8d788c7dd30c962a6716 -->
+<!-- policySha256: 2abefd5057f5ac9d46c9c7585a980ecc8b122cd8d847b3d3e909809ee2dbedd4 -->
 
 # Public Surface Inventory (AUTO-GENERATED)
 
@@ -8,9 +8,9 @@
 > Do NOT edit manually. Run `pwsh tools/audit/generate-public-surface-md.ps1` to regenerate.
 
 - Policy: **Policy-B**
-- Version: **1.0.0**
+- Version: **1.1.0**
 - SSOT: `docs/policy/public-surface.policy.json`
-- Endpoints: **0**
+- Endpoints: **8**
 
 ---
 
@@ -24,8 +24,16 @@
 
 ## Endpoints
 
-> **Phase 0**: No endpoints in allowlist. All unprotected routes are reported as warnings.
-> Add `@Public()` decorator to code, then add endpoint to policy.json.
+| Endpoint | Intent | Exposure | Throttle | Smoke |
+|----------|--------|----------|----------|-------|
+| `POST /auth/forgot-password` | Password reset request | none | 5/60000ms | optional |
+| `POST /auth/login` | User authentication entry point | medium | 10/60000ms | required |
+| `POST /auth/refresh` | Token refresh (requires refresh token cookie) | low | 30/60000ms | required |
+| `POST /auth/register` | User registration | medium | 5/60000ms | required |
+| `GET /health` | K8s liveness probe | none | 120/60000ms | optional |
+| `GET /health/detailed` | Ops monitoring | low | 60/60000ms | optional |
+| `GET /health/live` | K8s liveness probe | none | 120/60000ms | optional |
+| `GET /health/ready` | K8s readiness probe | none | 120/60000ms | optional |
 
 ---
 

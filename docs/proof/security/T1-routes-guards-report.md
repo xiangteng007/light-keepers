@@ -1,6 +1,6 @@
 ﻿# Route-Guard Mapping Report
 
-> **Generated**: 2026-01-13T09:34:31.483Z  
+> **Generated**: 2026-01-13T11:24:24.500Z  
 > **Script**: scan-routes-guards.ps1  
 > **Spec**: baseline-counting-spec.md@v1
 
@@ -11,10 +11,10 @@
 | Metric | Value |
 |--------|------:|
 | Total Routes | 1108 |
-| Protected Routes | 672 |
-| Unprotected Routes | 436 |
-| Public Routes | 1 |
-| **Coverage** | **60.6%** |
+| Protected Routes | 679 |
+| Unprotected Routes | 429 |
+| Public Routes | 13 |
+| **Coverage** | **61.3%** |
 
 ---
 
@@ -23,8 +23,8 @@
 | Metric | Value |
 |--------|------:|
 | Total Controllers | 130 |
-| With Guards | 78 |
-| Without Guards | 52 |
+| With Guards | 80 |
+| Without Guards | 50 |
 
 ---
 
@@ -32,13 +32,6 @@
 
 | Method | Path | Controller | Line |
 |--------|------|------------|-----:|
-| GET | `/health` | backend/src/health-only.controller.ts | 13 |
-| GET | `/health/live` | backend/src/health-only.controller.ts | 25 |
-| GET | `/health/ready` | backend/src/health-only.controller.ts | 30 |
-| GET | `/health` | backend/src/health/health.controller.ts | 36 |
-| GET | `/health/detailed` | backend/src/health/health.controller.ts | 44 |
-| GET | `/health/live` | backend/src/health/health.controller.ts | 67 |
-| GET | `/health/ready` | backend/src/health/health.controller.ts | 75 |
 | POST | `/aerial-analysis/images` | backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts | 11 |
 | GET | `/aerial-analysis/images/:id` | backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts | 17 |
 | GET | `/aerial-analysis/images/mission/:missionId` | backend/src/modules/aerial-image-analysis/aerial-image-analysis.controller.ts | 23 |
@@ -493,6 +486,18 @@
 
 ### Explicitly Public
 
+- `GET /health` -> @Public()
+- `GET /health/live` -> @Public()
+- `GET /health/ready` -> @Public()
+- `GET /health` -> @Public()
+- `GET /health/detailed` -> @Public()
+- `GET /health/live` -> @Public()
+- `GET /health/ready` -> @Public()
+- `POST /auth/register` -> @Public()
+- `POST /auth/login` -> @Public()
+- `POST /auth/forgot-password` -> @Public()
+- `POST /auth/reset-password` -> @Public()
+- `POST /auth/refresh` -> @Public()
 - `GET /intake` -> @Public()
 
 

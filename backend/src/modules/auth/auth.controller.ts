@@ -1,9 +1,11 @@
 import { Controller, Post, Body, Get, Patch, Delete, Param, UseGuards, Request, Res, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { Response } from 'express';
+import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { Public } from './decorators/public.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -12,11 +14,15 @@ export class AuthController {
         private readonly refreshTokenService: RefreshTokenService,
     ) { }
 
+    @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('register')
     async register(@Body() dto: RegisterDto) {
         return this.authService.register(dto);
     }
 
+    @Public()
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('login')
     async login(
         @Body() dto: LoginDto,
@@ -516,7 +522,10 @@ export class AuthController {
 
     /**
      * 忘記密碼 - 發送重設連結
+     * @Public - No auth required
      */
+    @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('forgot-password')
     async forgotPassword(@Body() body: { email?: string; phone?: string }) {
         return this.authService.requestPasswordReset(body.email, body.phone);
@@ -559,10 +568,13 @@ export class AuthController {
     /**
      * Refresh access token using httpOnly cookie
      * POST /auth/refresh
+     * @Public - No JWT required, validated via refresh token cookie
      * 
      * Cookie: refresh_token=<token>
      * Returns: new accessToken
      */
+    @Public()
+    @Throttle({ default: { limit: 30, ttl: 60000 } })
     @Post('refresh')
     async refreshToken(
         @Request() req: any,
