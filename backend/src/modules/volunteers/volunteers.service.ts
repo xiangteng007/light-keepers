@@ -42,6 +42,24 @@ export interface VolunteerFilter {
     approvalStatus?: 'pending' | 'approved' | 'rejected';
 }
 
+/**
+ * 志工篩選條件 (用於任務派遣)
+ */
+export interface EligibilityFilter {
+    /** 所需技能 (符合任一即可) */
+    skills?: string[];
+    /** 區域篩選 */
+    region?: string;
+    /** 是否有交通工具 */
+    hasVehicle?: boolean;
+    /** 排除已忙碌的志工 */
+    excludeBusy?: boolean;
+    /** 最大結果數 */
+    limit?: number;
+    /** 排除特定志工 ID */
+    excludeIds?: string[];
+}
+
 @Injectable()
 export class VolunteersService {
     private readonly logger = new Logger(VolunteersService.name);
@@ -167,6 +185,81 @@ export class VolunteersService {
             region,
             skill,
         });
+    }
+
+    /**
+     * 進階志工篩選 (用於任務派遣)
+     * 根據技能、區域、可用狀態等條件篩選符合資格的志工
+     */
+    async findEligible(filter: EligibilityFilter): Promise<Volunteer[]> {
+        const query = this.volunteersRepository.createQueryBuilder('volunteer');
+
+        // 只篩選已審核通過的志工
+        query.andWhere('volunteer.approvalStatus = :approvalStatus', { approvalStatus: 'approved' });
+
+        // 排除離線或忙碌狀態
+        if (filter.excludeBusy) {
+            query.andWhere('volunteer.status = :status', { status: 'available' });
+        } else {
+            query.andWhere('volunteer.status != :offlineStatus', { offlineStatus: 'offline' });
+        }
+
+        // 區域篩選
+        if (filter.region) {
+            query.andWhere('volunteer.region LIKE :region', { region: `%${filter.region}%` });
+        }
+
+        // 技能篩選 (符合任一即可)
+        if (filter.skills && filter.skills.length > 0) {
+            const skillConditions = filter.skills.map((_, index) =>
+                `volunteer.skills LIKE :skill${index}`
+            );
+            const skillParams = filter.skills.reduce((acc, skill, index) => {
+                acc[`skill${index}`] = `%${skill}%`;
+                return acc;
+            }, {} as Record<string, string>);
+
+            query.andWhere(`(${skillConditions.join(' OR ')})`, skillParams);
+        }
+
+        // 排除特定志工
+        if (filter.excludeIds && filter.excludeIds.length > 0) {
+            query.andWhere('volunteer.id NOT IN (:...excludeIds)', { excludeIds: filter.excludeIds });
+        }
+
+        // 排序：優先顯示服務時數較少的志工 (公平派遣)
+        query.orderBy('volunteer.taskCount', 'ASC');
+        query.addOrderBy('volunteer.serviceHours', 'ASC');
+
+        // 限制結果數
+        if (filter.limit) {
+            query.take(filter.limit);
+        }
+
+        const volunteers = await query.getMany();
+        this.logger.log(`Found ${volunteers.length} eligible volunteers with filter: ${JSON.stringify(filter)}`);
+
+        return volunteers;
+    }
+
+    /**
+     * 根據 LINE User ID 查詢志工
+     */
+    async findByLineUserId(lineUserId: string): Promise<Volunteer | null> {
+        return this.volunteersRepository.findOne({
+            where: { lineUserId },
+        });
+    }
+
+    /**
+     * 綁定 LINE User ID
+     */
+    async bindLineUserId(volunteerId: string, lineUserId: string): Promise<Volunteer> {
+        const volunteer = await this.findOne(volunteerId);
+        volunteer.lineUserId = lineUserId;
+        const updated = await this.volunteersRepository.save(volunteer);
+        this.logger.log(`Volunteer ${volunteerId} bound to LINE user ${lineUserId}`);
+        return updated;
     }
 
     // 增加服務統計

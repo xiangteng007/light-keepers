@@ -1,5 +1,12 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { MissionSession } from '../mission-sessions/entities/mission-session.entity';
+import { MissionEvent } from '../mission-sessions/entities/event.entity';
+import { Task } from '../mission-sessions/entities/task.entity';
+import { FieldReport } from '../field-reports/entities/field-report.entity';
+import { AttendanceRecord } from '../attendance/entities/attendance-record.entity';
 
 /**
  * AAR Analysis Service
@@ -10,7 +17,15 @@ export class AarAnalysisService {
     private readonly logger = new Logger(AarAnalysisService.name);
     private aarReports: Map<string, AarReport> = new Map();
 
-    constructor(private configService: ConfigService) { }
+    constructor(
+        private configService: ConfigService,
+        @InjectRepository(MissionSession)
+        private readonly sessionRepo: Repository<MissionSession>,
+        @InjectRepository(MissionEvent)
+        private readonly eventRepo: Repository<MissionEvent>,
+        @InjectRepository(Task)
+        private readonly taskRepo: Repository<Task>,
+    ) { }
 
     /**
      * Generate AAR report from mission data
@@ -54,6 +69,83 @@ export class AarAnalysisService {
 
         this.aarReports.set(report.id, report);
 
+        return report;
+    }
+
+    /**
+     * Generate AAR from Mission Session (auto-aggregate)
+     * 自動從任務場次聚合資料生成 AAR
+     */
+    async generateAarFromSession(missionSessionId: string): Promise<AarReport> {
+        this.logger.log(`Generating AAR from session: ${missionSessionId}`);
+
+        // 1. 取得任務場次
+        const session = await this.sessionRepo.findOne({
+            where: { id: missionSessionId },
+        });
+
+        if (!session) {
+            throw new Error(`Mission session ${missionSessionId} not found`);
+        }
+
+        // 2. 取得相關事件
+        const events = await this.eventRepo.find({
+            where: { sessionId: missionSessionId },
+            order: { createdAt: 'ASC' },
+        });
+
+        // 3. 取得相關任務
+        const tasks = await this.taskRepo.find({
+            where: { sessionId: missionSessionId },
+        });
+
+        // 4. 計算統計資料
+        const completedTasks = tasks.filter(t => t.status === 'completed');
+        const firstEvent = events[0];
+        const lastEvent = events[events.length - 1];
+
+        // 5. 建構 MissionData
+        const missionData: MissionData = {
+            name: session.title,
+            type: session.type || 'incident',
+            startTime: session.startedAt || session.createdAt,
+            endTime: session.endedAt,
+            firstResponseTime: firstEvent?.createdAt,
+            location: {
+                lat: session.location?.lat ?? 0,
+                lng: session.location?.lng ?? 0
+            },
+            personnel: [], // Would be populated from attendance records if integrated
+            resourcesUsed: [],
+            casualties: {
+                injured: 0,
+                missing: 0,
+                deceased: 0,
+                rescued: 0,
+            },
+            incidents: events.map(e => ({
+                time: e.createdAt,
+                description: e.title || String(e.type) || 'Event',
+            })),
+            communications: [],
+            equipmentIssues: [],
+        };
+
+        // 6. 生成報告
+        const report = await this.generateAar(missionSessionId, missionData);
+
+        // 7. 添加額外的session相關數據
+        report.metrics = {
+            ...report.metrics,
+            totalEvents: events.length,
+            totalTasks: tasks.length,
+            completedTasks: completedTasks.length,
+            taskCompletionRate: tasks.length > 0
+                ? Math.round((completedTasks.length / tasks.length) * 100)
+                : 0,
+        };
+
+        this.logger.log(`AAR generated: ${report.id}`);
         return report;
     }
 
