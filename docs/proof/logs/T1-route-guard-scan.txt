@@ -1,14 +1,14 @@
 ﻿Route-Guard Scan Log
 ====================
-Generated: 2026-01-13T02:08:26.330Z
+Generated: 2026-01-13T02:17:52.936Z
 Script: scan-routes-guards.ps1
 
 SCAN RESULTS
 ------------
 Controllers Scanned: 130
 Total Routes Found: 1108
-Protected Routes: 616 (55.6%)
-Unprotected Routes: 492
+Protected Routes: 672 (60.6%)
+Unprotected Routes: 436
 Public Routes: 1
 
 HIGH-RISK ROUTES
@@ -49,13 +49,6 @@ GET /ar/sessions/:id [backend/src/modules/ar-field-guidance/ar-field-guidance.co
 GET /ar/sessions/active [backend/src/modules/ar-field-guidance/ar-field-guidance.controller.ts:101]
 DELETE /ar/sessions/:id [backend/src/modules/ar-field-guidance/ar-field-guidance.controller.ts:107]
 GET /ar/view [backend/src/modules/ar-field-guidance/ar-field-guidance.controller.ts:113]
-POST /attendance/check-in/gps [backend/src/modules/attendance/attendance.controller.ts:10]
-POST /attendance/check-in/qr [backend/src/modules/attendance/attendance.controller.ts:24]
-PUT /attendance/check-out/:recordId [backend/src/modules/attendance/attendance.controller.ts:32]
-GET /attendance/volunteer/:volunteerId [backend/src/modules/attendance/attendance.controller.ts:44]
-GET /attendance/daily-summary [backend/src/modules/attendance/attendance.controller.ts:58]
-GET /attendance/monthly-report/:volunteerId [backend/src/modules/attendance/attendance.controller.ts:66]
-GET /attendance/generate-qr [backend/src/modules/attendance/attendance.controller.ts:78]
 POST /dashboard-analytics/kpis [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:13]
 GET /dashboard-analytics/kpis [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:19]
 GET /dashboard-analytics/kpis/current [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:25]
@@ -77,32 +70,6 @@ POST /dashboard-analytics/dashboards/:id/widgets [backend/src/modules/dashboard-
 DELETE /dashboard-analytics/dashboards/:dashboardId/widgets/:widgetId [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:125]
 GET /dashboard-analytics/data/aggregate [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:133]
 GET /dashboard-analytics/data/timeseries [backend/src/modules/dashboard-analytics/dashboard-analytics.controller.ts:143]
-POST /community/posts [backend/src/modules/disaster-community/disaster-community.controller.ts:11]
-GET /community/posts [backend/src/modules/disaster-community/disaster-community.controller.ts:17]
-GET /community/posts/:id [backend/src/modules/disaster-community/disaster-community.controller.ts:23]
-POST /community/posts/:id/like [backend/src/modules/disaster-community/disaster-community.controller.ts:29]
-PUT /community/posts/:id/verify [backend/src/modules/disaster-community/disaster-community.controller.ts:35]
-POST /community/posts/:postId/comments [backend/src/modules/disaster-community/disaster-community.controller.ts:41]
-GET /community/posts/:postId/comments [backend/src/modules/disaster-community/disaster-community.controller.ts:47]
-POST /community/articles [backend/src/modules/disaster-community/disaster-community.controller.ts:53]
-GET /community/articles/search [backend/src/modules/disaster-community/disaster-community.controller.ts:59]
-GET /community/articles/popular [backend/src/modules/disaster-community/disaster-community.controller.ts:65]
-GET /community/articles/:id [backend/src/modules/disaster-community/disaster-community.controller.ts:71]
-POST /community/organizations [backend/src/modules/disaster-community/disaster-community.controller.ts:77]
-GET /community/organizations [backend/src/modules/disaster-community/disaster-community.controller.ts:83]
-GET /community/organizations/:id [backend/src/modules/disaster-community/disaster-community.controller.ts:89]
-PUT /community/organizations/:id/verify [backend/src/modules/disaster-community/disaster-community.controller.ts:95]
-POST /community/collaborations [backend/src/modules/disaster-community/disaster-community.controller.ts:101]
-GET /community/collaborations/:id [backend/src/modules/disaster-community/disaster-community.controller.ts:107]
-GET /community/organizations/:orgId/collaborations [backend/src/modules/disaster-community/disaster-community.controller.ts:113]
-POST /community/collaborations/:id/accept [backend/src/modules/disaster-community/disaster-community.controller.ts:119]
-POST /community/collaborations/:id/complete [backend/src/modules/disaster-community/disaster-community.controller.ts:125]
-GET /community/stats [backend/src/modules/disaster-community/disaster-community.controller.ts:131]
-POST /api/donations [backend/src/modules/donation-tracking/donation-tracking.controller.ts:11]
-POST /api/donations/:id/allocate [backend/src/modules/donation-tracking/donation-tracking.controller.ts:17]
-GET /api/donations/:id/trail [backend/src/modules/donation-tracking/donation-tracking.controller.ts:23]
-GET /api/donations/donor/:id [backend/src/modules/donation-tracking/donation-tracking.controller.ts:29]
-GET /api/donations/public/stats [backend/src/modules/donation-tracking/donation-tracking.controller.ts:35]
 GET /api/drill/status [backend/src/modules/drill-simulation/drill.controller.ts:18]
 GET /api/drill/scenarios [backend/src/modules/drill-simulation/drill.controller.ts:33]
 GET /api/drill/scenarios/:id [backend/src/modules/drill-simulation/drill.controller.ts:43]
@@ -156,12 +123,6 @@ POST /event-ai/predictions/:areaId [backend/src/modules/event-ai/event-ai.contro
 POST /event-ai/estimate-resources [backend/src/modules/event-ai/event-ai.controller.ts:38]
 POST /event-ai/recommendations/:eventId [backend/src/modules/event-ai/event-ai.controller.ts:46]
 POST /event-ai/summary [backend/src/modules/event-ai/event-ai.controller.ts:55]
-POST /events [backend/src/modules/events/events.controller.ts:9]
-GET /events [backend/src/modules/events/events.controller.ts:14]
-GET /events/stats [backend/src/modules/events/events.controller.ts:19]
-GET /events/:id [backend/src/modules/events/events.controller.ts:24]
-PUT /events/:id [backend/src/modules/events/events.controller.ts:29]
-DELETE /events/:id [backend/src/modules/events/events.controller.ts:34]
 POST /excel/events [backend/src/modules/excel-export/excel-export.controller.ts:11]
 POST /excel/volunteers [backend/src/modules/excel-export/excel-export.controller.ts:19]
 POST /excel/attendance [backend/src/modules/excel-export/excel-export.controller.ts:27]
@@ -218,16 +179,6 @@ GET /api/public/transparency/resource/:resourceId [backend/src/modules/integrity
 GET /api/public/transparency/validate/:resourceId [backend/src/modules/integrity-ledger/public-audit.controller.ts:93]
 GET /api/public/transparency/stats [backend/src/modules/integrity-ledger/public-audit.controller.ts:109]
 GET /api/public/transparency/recent [backend/src/modules/integrity-ledger/public-audit.controller.ts:120]
-POST /line-bot/webhook [backend/src/modules/line-bot/line-bot.controller.ts:27]
-POST /line-bot/alert [backend/src/modules/line-bot/line-bot.controller.ts:271]
-POST /line-bot/broadcast [backend/src/modules/line-bot/line-bot.controller.ts:296]
-GET /line-bot/rich-menu-config [backend/src/modules/line-bot/line-bot.controller.ts:307]
-POST /line-bot/bind [backend/src/modules/line-bot/line-bot.controller.ts:325]
-POST /line-bot/unbind [backend/src/modules/line-bot/line-bot.controller.ts:332]
-GET /line-bot/binding-status/:lineUserId [backend/src/modules/line-bot/line-bot.controller.ts:339]
-GET /line-bot/stats [backend/src/modules/line-bot/line-bot.controller.ts:346]
-POST /line-bot/ncdr-broadcast [backend/src/modules/line-bot/line-bot.controller.ts:359]
-POST /line-bot/ncdr-broadcast/region [backend/src/modules/line-bot/line-bot.controller.ts:379]
 POST /ai/vision/analyze [backend/src/modules/line-bot/disaster-report/ai-vision.controller.ts:24]
 POST /ai/vision/flood-level [backend/src/modules/line-bot/disaster-report/ai-vision.controller.ts:49]
 POST /ai/vision/damage-assessment [backend/src/modules/line-bot/disaster-report/ai-vision.controller.ts:74]
@@ -320,13 +271,6 @@ GET /api/missions/:sessionId/map/eta [backend/src/modules/overlays/map-dispatch.
 GET /map-packages [backend/src/modules/overlays/map-packages.controller.ts:22]
 GET /map-packages/recommendations [backend/src/modules/overlays/map-packages.controller.ts:30]
 GET /map-packages/:id/manifest [backend/src/modules/overlays/map-packages.controller.ts:40]
-POST /payroll/calculate-shift [backend/src/modules/payroll/payroll.controller.ts:10]
-POST /payroll/calculate-monthly/:volunteerId [backend/src/modules/payroll/payroll.controller.ts:24]
-GET /payroll/records/:volunteerId [backend/src/modules/payroll/payroll.controller.ts:35]
-PUT /payroll/status/:recordId [backend/src/modules/payroll/payroll.controller.ts:43]
-GET /payroll/rates [backend/src/modules/payroll/payroll.controller.ts:54]
-PUT /payroll/rates [backend/src/modules/payroll/payroll.controller.ts:61]
-GET /payroll/report [backend/src/modules/payroll/payroll.controller.ts:70]
 POST /pdf/event-report [backend/src/modules/pdf-generator/pdf-generator.controller.ts:11]
 POST /pdf/attendance-report [backend/src/modules/pdf-generator/pdf-generator.controller.ts:19]
 POST /pdf/sitrep [backend/src/modules/pdf-generator/pdf-generator.controller.ts:27]

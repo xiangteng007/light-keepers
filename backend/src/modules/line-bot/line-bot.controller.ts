@@ -7,12 +7,16 @@ import {
     Res,
     HttpStatus,
     Logger,
+    UseGuards,
+    Param,
 } from '@nestjs/common';
 import { Response } from 'express';
 import * as crypto from 'crypto';
 import { LineBotService } from './line-bot.service';
 import { DisasterReportService } from './disaster-report';
 import { WebhookEvent, MessageEvent, TextEventMessage, ImageEventMessage, LocationEventMessage } from '@line/bot-sdk';
+import { CoreJwtGuard } from '../shared/guards/core-jwt.guard';
+import { UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards/unified-roles.guard';
 
 @Controller('line-bot')
 export class LineBotController {
@@ -269,6 +273,8 @@ export class LineBotController {
 
     // 發送災害警報
     @Post('alert')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async sendAlert(
         @Body() body: {
             userIds: string[];
@@ -294,6 +300,8 @@ export class LineBotController {
 
     // 發送廣播
     @Post('broadcast')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async broadcast(@Body() body: { message: string }) {
         if (!this.lineBotService.isEnabled()) {
             return { success: false, message: 'Bot not configured' };
@@ -323,6 +331,8 @@ export class LineBotController {
 
     // 執行帳號綁定（由前端呼叫）
     @Post('bind')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async bindAccount(@Body() body: { accountId: string; lineUserId: string }) {
         const success = await this.lineBotService.bindAccount(body.accountId, body.lineUserId);
         return { success, message: success ? '綁定成功' : '綁定失敗' };
@@ -330,6 +340,8 @@ export class LineBotController {
 
     // 解除帳號綁定
     @Post('unbind')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async unbindAccount(@Body() body: { accountId: string }) {
         const success = await this.lineBotService.unbindAccount(body.accountId);
         return { success, message: success ? '解除綁定成功' : '解除綁定失敗' };
@@ -357,6 +369,8 @@ export class LineBotController {
 
     // 手動推播 NCDR 示警（管理員用）
     @Post('ncdr-broadcast')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async broadcastNcdrAlert(@Body() body: {
         title: string;
         description: string;
@@ -377,6 +391,8 @@ export class LineBotController {
 
     // 推播給特定區域
     @Post('ncdr-broadcast/region')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async broadcastToRegion(@Body() body: {
         region: string;
         title: string;

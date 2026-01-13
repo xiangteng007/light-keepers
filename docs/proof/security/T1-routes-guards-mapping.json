@@ -1,5 +1,5 @@
 ﻿{
-    "generated_at":  "2026-01-13T02:08:26.330Z",
+    "generated_at":  "2026-01-13T02:17:52.936Z",
     "generated_by":  "scan-routes-guards.ps1",
     "version":  "1.0.0",
     "routes":  [
@@ -1717,120 +1717,127 @@
                        "method":  "POST",
                        "path":  "/attendance/check-in/gps",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  10,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  14,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/attendance/check-in/qr",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  24,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  28,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/attendance/check-out/:recordId",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  32,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  36,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/attendance/volunteer/:volunteerId",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  44,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  48,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/attendance/daily-summary",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  58,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  62,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/attendance/monthly-report/:volunteerId",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  66,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  70,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/attendance/generate-qr",
                        "controller":  "backend/src/modules/attendance/attendance.controller.ts",
-                       "lineNumber":  78,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  82,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
@@ -3537,443 +3544,469 @@
                        "method":  "POST",
                        "path":  "/community/posts",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  11,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  14,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/posts",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  17,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  21,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/posts/:id",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  23,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  28,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/posts/:id/like",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  29,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  35,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/community/posts/:id/verify",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  35,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  42,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/posts/:postId/comments",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  41,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  49,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/posts/:postId/comments",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  47,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  56,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/articles",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  53,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  63,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/articles/search",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  59,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  70,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/articles/popular",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  65,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  77,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/articles/:id",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  71,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  84,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/organizations",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  77,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  91,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/organizations",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  83,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  98,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/organizations/:id",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  89,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  105,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/community/organizations/:id/verify",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  95,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  112,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/collaborations",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  101,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  119,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/collaborations/:id",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  107,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  126,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/organizations/:orgId/collaborations",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  113,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  133,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/collaborations/:id/accept",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  119,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  140,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/community/collaborations/:id/complete",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  125,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  147,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/community/stats",
                        "controller":  "backend/src/modules/disaster-community/disaster-community.controller.ts",
-                       "lineNumber":  131,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  154,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/api/donations",
                        "controller":  "backend/src/modules/donation-tracking/donation-tracking.controller.ts",
-                       "lineNumber":  11,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  13,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/api/donations/:id/allocate",
                        "controller":  "backend/src/modules/donation-tracking/donation-tracking.controller.ts",
-                       "lineNumber":  17,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  22,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/api/donations/:id/trail",
                        "controller":  "backend/src/modules/donation-tracking/donation-tracking.controller.ts",
-                       "lineNumber":  23,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  31,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/api/donations/donor/:id",
                        "controller":  "backend/src/modules/donation-tracking/donation-tracking.controller.ts",
-                       "lineNumber":  29,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  40,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/api/donations/public/stats",
                        "controller":  "backend/src/modules/donation-tracking/donation-tracking.controller.ts",
-                       "lineNumber":  35,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  49,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
@@ -5345,103 +5378,109 @@
                        "method":  "POST",
                        "path":  "/events",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  9,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  15,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/events",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  14,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  22,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/events/stats",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  19,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  29,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/events/:id",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  24,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  36,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/events/:id",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  29,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  43,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "DELETE",
                        "path":  "/events/:id",
                        "controller":  "backend/src/modules/events/events.controller.ts",
-                       "lineNumber":  34,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  50,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
@@ -7148,171 +7187,181 @@
                        "method":  "POST",
                        "path":  "/line-bot/webhook",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  27,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  31,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/alert",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  271,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  275,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/broadcast",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  296,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  302,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/line-bot/rich-menu-config",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  307,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  315,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/bind",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  325,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  333,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/unbind",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  332,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  342,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/line-bot/binding-status/:lineUserId",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  339,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  351,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/line-bot/stats",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  346,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  358,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/ncdr-broadcast",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  359,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  371,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/line-bot/ncdr-broadcast/region",
                        "controller":  "backend/src/modules/line-bot/line-bot.controller.ts",
-                       "lineNumber":  379,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  393,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
@@ -10178,120 +10227,127 @@
                        "method":  "POST",
                        "path":  "/payroll/calculate-shift",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  10,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  14,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
                        "path":  "/payroll/calculate-monthly/:volunteerId",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  24,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  28,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/payroll/records/:volunteerId",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  35,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  39,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/payroll/status/:recordId",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  43,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  47,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/payroll/rates",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  54,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  58,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "PUT",
                        "path":  "/payroll/rates",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  61,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  66,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
                        "path":  "/payroll/report",
                        "controller":  "backend/src/modules/payroll/payroll.controller.ts",
-                       "lineNumber":  70,
-                       "guards":  {
-
-                                  },
+                       "lineNumber":  75,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
                        "requireLevel":  null,
                        "roles":  [
 
                                  ],
                        "isPublic":  false,
                        "hasThrottle":  false,
-                       "hasGuard":  false,
-                       "risk":  "HIGH"
+                       "hasGuard":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "POST",
@@ -18842,15 +18898,15 @@
                ],
     "summary":  {
                     "total_routes":  1108,
-                    "protected_routes":  616,
+                    "protected_routes":  672,
                     "controller_stats":  {
-                                             "withoutGuards":  58,
-                                             "withGuards":  72,
+                                             "withoutGuards":  52,
+                                             "withGuards":  78,
                                              "total":  130
                                          },
-                    "coverage_percent":  55.6,
-                    "high_risk_routes":  492,
+                    "coverage_percent":  60.6,
+                    "high_risk_routes":  436,
                     "public_routes":  1,
-                    "unprotected_routes":  492
+                    "unprotected_routes":  436
                 }
 }
