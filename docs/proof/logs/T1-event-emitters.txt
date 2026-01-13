@@ -1,0 +1,172 @@
+﻿ai-hub.service.ts:174 this.eventEmitter.emit('ai.task.completed', {
+ai-hub.service.ts:293 @OnEvent('incidents.created')
+ai-hub.service.ts:298 this.eventEmitter.emit('ai.incident.classified', {
+analytics-hub.service.ts:100 this.eventEmitter.emit(ANALYTICS_EVENTS.REPORT_JOB_COMPLETED, {
+event-publisher.service.ts:122 await this.eventEmitter.emitAsync(event.eventType, {
+geo-intel-hub.service.ts:131 @OnEvent(GEO_EVENTS.ALERT_RECEIVED)
+geo-intel-hub.service.ts:149 @OnEvent(GEO_EVENTS.WEATHER_UPDATED)
+geo-intel-hub.service.ts:168 @OnEvent(GEO_EVENTS.SOCIAL_INTEL_DETECTED)
+geo-intel-hub.service.ts:310 this.eventEmitter.emit('geo.intel.updated', {
+notification-hub.service.ts:94 this.eventEmitter.emit('notifications.batch.completed', {
+notification-hub.service.ts:283 @OnEvent(GEO_EVENTS.ALERT_RECEIVED)
+notification-hub.service.ts:294 @OnEvent(GEO_EVENTS.SOCIAL_INTEL_DETECTED)
+notification-hub.service.ts:307 @OnEvent('incidents.created')
+offline-hub.service.ts:94 this.eventEmitter.emit('offline.sync.conflict', {
+offline-hub.service.ts:113 this.eventEmitter.emit('offline.sync.completed', result);
+ai-vision.service.ts:155 this.eventEmitter.emit('ai.analysis', result);
+ai-vision.service.ts:268 this.eventEmitter.emit('ai.damageAssessment', assessment);
+scout-agent.service.ts:140 this.eventEmitter.emit('scout.urgent_detection', {
+scout-agent.service.ts:445 @OnEvent('drone.frame.received')
+scout-agent.service.ts:458 @OnEvent('drone.status.update')
+scout-agent.service.ts:480 this.eventEmitter.emit('mission.detection.report', detection);
+ar-navigation.service.ts:52 this.eventEmitter.emit('ar.session.created', session);
+ar-navigation.service.ts:72 this.eventEmitter.emit('ar.pose.updated', {
+ar-navigation.service.ts:128 this.eventEmitter.emit('ar.hazard.registered', {
+ar-navigation.service.ts:208 this.eventEmitter.emit('ar.session.ended', { sessionId });
+anomaly-detector.service.ts:102 this.eventEmitter.emit('security.anomaly', alert);
+anomaly-detector.service.ts:122 this.eventEmitter.emit('security.anomaly', alert);
+anomaly-detector.service.ts:146 this.eventEmitter.emit('security.anomaly', alert);
+anomaly-detector.service.ts:172 this.eventEmitter.emit('security.anomaly', alert);
+blockchain-tracking.service.ts:62 this.eventEmitter.emit('blockchain.resource.registered', transaction);
+blockchain-tracking.service.ts:111 this.eventEmitter.emit('blockchain.resource.transferred', transaction);
+blockchain-tracking.service.ts:159 this.eventEmitter.emit('blockchain.resource.distributed', transaction);
+blockchain-tracking.service.ts:285 this.eventEmitter.emit('blockchain.block.mined', block);
+bluetooth-audio.service.ts:90 this.eventEmitter.emit('bluetooth.device.connected', btDevice);
+bluetooth-audio.service.ts:104 this.eventEmitter.emit('bluetooth.device.disconnected', device);
+bluetooth-audio.service.ts:142 this.eventEmitter.emit('ptt.transmit.start', session);
+bluetooth-audio.service.ts:158 this.eventEmitter.emit('ptt.transmit.end', session);
+bluetooth-audio.service.ts:231 this.eventEmitter.emit('bluetooth.device.lowBattery', device);
+citizen-app.service.ts:92 this.eventEmitter.emit('citizen.report.submitted', report);
+crowd-reporting.service.ts:54 this.eventEmitter.emit('crowd.report.verified', crowdReport);
+crowd-reporting.service.ts:56 this.eventEmitter.emit('crowd.report.pending', crowdReport);
+crowd-reporting.service.ts:119 this.eventEmitter.emit(`crowd.report.${status}`, report);
+donation-tracking.service.ts:31 this.eventEmitter.emit('donation.received', donation);
+drill.service.ts:145 this.eventEmitter.emit('drill.started', {
+drill.service.ts:181 this.eventEmitter.emit('drill.stopped', { result });
+drill.service.ts:203 this.eventEmitter.emit('drill.event.responded', {
+drill.service.ts:250 this.eventEmitter.emit('drill.event.custom', { event, index });
+drill.service.ts:253 this.eventEmitter.emit('drill.event.triggered', { event, index });
+drill.service.ts:257 this.eventEmitter.emit('drill.sos.inject', {
+drill.service.ts:266 this.eventEmitter.emit('drill.report.inject', {
+drill.service.ts:276 this.eventEmitter.emit('drill.resource.inject', {
+drill.service.ts:286 this.eventEmitter.emit('drill.comm.failure', {
+drill.service.ts:294 this.eventEmitter.emit('drill.evacuation.inject', {
+drone-ops.service.ts:129 this.eventEmitter.emit('drone.lowBattery', {
+drone-ops.service.ts:135 this.eventEmitter.emit('drone.telemetry', drone);
+drone-ops.service.ts:179 this.eventEmitter.emit('drone.missionStart', mission);
+drone-ops.service.ts:195 this.eventEmitter.emit('drone.missionComplete', mission);
+drone-ops.service.ts:212 this.eventEmitter.emit('drone.missionAbort', { mission, reason });
+drone-ops.service.ts:238 this.eventEmitter.emit('drone.detection', newDetection);
+drone-ops.service.ts:257 this.eventEmitter.emit('drone.rth', { droneId });
+drone-ops.service.ts:267 this.eventEmitter.emit('drone.emergency', { droneId, command: 'land' });
+drone-swarm.service.ts:50 this.eventEmitter.emit('swarm.drone.registered', swarmDrone);
+drone-swarm.service.ts:100 this.eventEmitter.emit('swarm.mission.created', mission);
+drone-swarm.service.ts:126 this.eventEmitter.emit('swarm.drone.launched', {
+drone-swarm.service.ts:138 this.eventEmitter.emit('swarm.mission.started', mission);
+drone-swarm.service.ts:189 this.eventEmitter.emit('swarm.finding.reported', enrichedFinding);
+drone-swarm.service.ts:218 this.eventEmitter.emit('swarm.drone.converging', {
+drone-swarm.service.ts:244 this.eventEmitter.emit('swarm.drone.emergency-return', { droneId, battery: drone.battery });
+drone-swarm.service.ts:296 this.eventEmitter.emit('swarm.mission.ended', mission);
+emotion-analysis.service.ts:112 this.eventEmitter.emit('emotion.critical', { userId, result });
+expense-reimbursement.service.ts:28 this.eventEmitter.emit('expense.submitted', claim);
+expense-reimbursement.service.ts:56 this.eventEmitter.emit('expense.reviewed', claim);
+expense-reimbursement.service.ts:70 this.eventEmitter.emit('expense.paid', claim);
+fatigue-detection.service.ts:204 this.eventEmitter.emit('fatigue.critical', { volunteerId, record, score });
+fatigue-detection.service.ts:206 this.eventEmitter.emit('fatigue.high', { volunteerId, record, score });
+social-media-sentinel.service.ts:212 this.eventEmitter.emit('social.incident.detected', incident);
+social-media-sentinel.service.ts:216 this.eventEmitter.emit('alert.urgent', {
+social-media-sentinel.service.ts:362 //         this.eventEmitter.emit('map.overlay.create', {
+geofence-alert.service.ts:29 this.eventEmitter.emit('geofence.created', geofence);
+geofence-alert.service.ts:56 this.eventEmitter.emit('geofence.enter', { geofence, userId, location });
+geofence-alert.service.ts:61 this.eventEmitter.emit('geofence.exit', { geofence, userId, location });
+geofence-alert.service.ts:118 this.eventEmitter.emit('geofence.deactivated', geofence);
+ble-beacon-hardware.service.ts:161 this.eventEmitter.emit('ble.scan.result', {
+ble-beacon-hardware.service.ts:187 this.eventEmitter.emit('ble.beacon.detected', {
+indoor-positioning.service.ts:176 this.eventEmitter.emit('indoor.position', indoorPosition);
+intake.service.ts:60 this.eventEmitter.emit('incidents.created', {
+intake.service.ts:86 this.eventEmitter.emit('intake.submitted', {
+media-streaming.service.ts:121 this.eventEmitter.emit('stream.started', source);
+media-streaming.service.ts:138 this.eventEmitter.emit('stream.stopped', { sourceId });
+media-streaming.service.ts:172 this.eventEmitter.emit('room.sourceAdded', { roomId, sourceId });
+media-streaming.service.ts:241 this.eventEmitter.emit('room.recordingStarted', { roomId, path: room.recordingPath });
+media-streaming.service.ts:257 this.eventEmitter.emit('room.recordingStopped', { roomId, path });
+micro-task.service.ts:38 this.eventEmitter.emit('microtask.created', task);
+micro-task.service.ts:84 this.eventEmitter.emit('microtask.accepted', { task, assignment });
+micro-task.service.ts:106 this.eventEmitter.emit('microtask.submitted', {
+micro-task.service.ts:130 this.eventEmitter.emit('microtask.completed', {
+aar.service.ts:230 this.eventEmitter.emit(ANALYTICS_EVENTS.AAR_PUBLISHED, {
+nfc.service.ts:124 this.eventEmitter.emit('nfc.scan', scan);
+mesh-sync.service.ts:173 this.eventEmitter.emit('mesh.message.received', { message, packet });
+mesh-sync.service.ts:217 this.eventEmitter.emit('mesh.sos.detected', {
+meshtastic-hardware.service.ts:111 this.eventEmitter.emit('meshtastic.connected', { deviceId, port });
+meshtastic-hardware.service.ts:191 this.eventEmitter.emit('meshtastic.disconnected', { deviceId });
+meshtastic-hardware.service.ts:263 this.eventEmitter.emit('meshtastic.position', {
+meshtastic-hardware.service.ts:276 this.eventEmitter.emit('meshtastic.message', {
+meshtastic.service.ts:110 this.eventEmitter.emit('meshtastic.connected', this.connectionStatus);
+meshtastic.service.ts:126 this.eventEmitter.emit('meshtastic.disconnected');
+meshtastic.service.ts:156 this.eventEmitter.emit('meshtastic.message', message);
+meshtastic.service.ts:210 this.eventEmitter.emit('meshtastic.position', position);
+meshtastic.service.ts:235 this.eventEmitter.emit('meshtastic.nodeInfo', node);
+mood-tracker.service.ts:192 this.eventEmitter.emit('mood.alert.triggered', {
+psychological-tracking.service.ts:79 this.eventEmitter.emit('psych.high_risk', { profile, assessment });
+ptt-webrtc.service.ts:140 this.eventEmitter.emit('ptt.join', { userId, channelId });
+ptt-webrtc.service.ts:161 this.eventEmitter.emit('ptt.leave', { userId, channelId });
+ptt-webrtc.service.ts:192 this.eventEmitter.emit('ptt.start', session);
+ptt-webrtc.service.ts:222 this.eventEmitter.emit('ptt.stop', session);
+push-notification.service.ts:164 this.eventEmitter.emit('notification.inapp', { notification, recipientId });
+push-notification.service.ts:220 @OnEvent('geofence.enter')
+push-notification.service.ts:232 @OnEvent('geofence.exit')
+push-notification.service.ts:244 @OnEvent('emergency.broadcast')
+report-scheduler.service.ts:255 this.eventEmitter.emit('report.generated', {
+resource-matching.service.ts:123 this.eventEmitter.emit('resource.matched', match);
+resource-matching.service.ts:138 this.eventEmitter.emit('resource.match.confirmed', { match, confirmedBy });
+resource-matching.service.ts:153 this.eventEmitter.emit('resource.match.completed', { match, feedback });
+rewards.service.ts:44 this.eventEmitter.emit('rewards.points.awarded', { userId, amount, reason });
+rewards.service.ts:106 @OnEvent('crowd.report.verified')
+rewards.service.ts:113 @OnEvent('microtask.completed')
+rewards.service.ts:122 this.eventEmitter.emit('rewards.badge.earned', {
+robot-rescue.service.ts:70 this.eventEmitter.emit('robot.connected', { robotId });
+robot-rescue.service.ts:170 this.eventEmitter.emit('robot.mission.started', { missionId, robotId: robot.id });
+robot-rescue.service.ts:205 this.eventEmitter.emit('robot.command.executed', { robotId, command });
+robot-rescue.service.ts:230 this.eventEmitter.emit('robot.finding.reported', enrichedFinding);
+robot-rescue.service.ts:234 this.eventEmitter.emit('robot.victim.detected', {
+robot-rescue.service.ts:265 this.eventEmitter.emit('robot.battery.low', { robotId, battery: telemetry.battery });
+robot-rescue.service.ts:328 this.eventEmitter.emit('robot.mission.aborted', { missionId });
+robot-rescue.service.ts:344 this.eventEmitter.emit('robot.connection.lost', { robotId });
+satellite-comm.service.ts:54 this.eventEmitter.emit('satellite.starlink.connected');
+satellite-comm.service.ts:95 this.eventEmitter.emit('satellite.iridium.connected');
+satellite-comm.service.ts:161 this.eventEmitter.emit('satellite.sos.sent', {
+scheduled-tasks.service.ts:26 this.eventEmitter.emit('scheduled.ncdr.sync');
+scheduled-tasks.service.ts:34 this.eventEmitter.emit('scheduled.weather.update');
+scheduled-tasks.service.ts:41 this.eventEmitter.emit('scheduled.report.daily');
+scheduled-tasks.service.ts:48 this.eventEmitter.emit('scheduled.cleanup');
+scheduled-tasks.service.ts:55 this.eventEmitter.emit('scheduled.report.monthly');
+scheduled-tasks.service.ts:62 this.eventEmitter.emit('scheduled.fatigue.check');
+social-media-monitor.service.ts:90 this.eventEmitter.emit(GEO_EVENTS.SOCIAL_INTEL_DETECTED, {
+social-media-monitor.service.ts:101 this.eventEmitter.emit(GEO_EVENTS.ALERT_RECEIVED, {
+sdr-hardware.service.ts:235 this.eventEmitter.emit('sdr.sweep.complete', {
+sdr-hardware.service.ts:305 this.eventEmitter.emit('sdr.signal.detected', detection);
+spectrum-analysis.service.ts:131 this.eventEmitter.emit('spectrum.detection', signal);
+spectrum-analysis.service.ts:171 this.eventEmitter.emit('spectrum.sweep', sweep);
+spectrum-analysis.service.ts:208 this.eventEmitter.emit('spectrum.protectedRange', { signal, range });
+spectrum-analysis.service.ts:225 this.eventEmitter.emit('spectrum.jammerAlert', alert);
+geofence.service.ts:193 this.eventEmitter.emit('geofence.triggered', {
+voice-assistant.service.ts:89 this.eventEmitter.emit('voice.command.executed', {
+volunteer-certification.service.ts:292 this.eventEmitter.emit('certification.issued', certification);
+vr-command.service.ts:86 this.eventEmitter.emit('vr.user.joined', { sessionId, user: vrUser });
+vr-command.service.ts:106 this.eventEmitter.emit('vr.pose.updated', {
+vr-command.service.ts:140 this.eventEmitter.emit('vr.annotation.created', vrAnnotation);
+vr-command.service.ts:163 this.eventEmitter.emit('vr.terrain.loaded', {
+vr-command.service.ts:181 this.eventEmitter.emit('vr.stream.started', {
+vr-command.service.ts:216 this.eventEmitter.emit('vr.voice.activity', {
+vr-command.service.ts:234 this.eventEmitter.emit('vr.user.left', { sessionId: session.id, userId });
+vr-command.service.ts:260 this.eventEmitter.emit('vr.session.closed', { sessionId });
+wearable-integration.service.ts:149 this.eventEmitter.emit('wearable.fall.detected', {
+wearable-integration.service.ts:160 this.eventEmitter.emit('wearable.fall.unresponsive', {
+wearable-integration.service.ts:285 this.eventEmitter.emit('wearable.health.alert', {
+weather-radar.service.ts:129 this.eventEmitter.emit('weather.alert.critical', alert);
+webhook-dispatcher.service.ts:269 @OnEvent('alert.created')
+webhook-dispatcher.service.ts:277 @OnEvent('task.created')
+webhook-dispatcher.service.ts:285 @OnEvent('task.completed')
+webhook-dispatcher.service.ts:293 @OnEvent('mission.started')
+webhook-dispatcher.service.ts:301 @OnEvent('resource.low')

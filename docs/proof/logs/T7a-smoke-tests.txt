@@ -1,0 +1,38 @@
+﻿# T7a Security Smoke Test Results
+# Generated: 2026-01-14T07:28:29Z
+# Base URL: http://localhost:3000
+# Script: tools/audit/smoke-security.ps1
+
+## Summary
+| Metric | Value |
+|--------|------:|
+| Total Tests | 10 |
+| Passed | 0 |
+| Failed | 10 |
+| Pass Rate | 0% |
+
+## Test Results
+
+| Test Name | Token | Expected | Actual | Result |
+|-----------|-------|----------|--------|--------|
+| attendance/check-in/gps | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| attendance/check-in/qr | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| events/create | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| events/list | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| donations/record | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| payroll/calculate-shift | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| community/posts | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| community/articles | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| line-bot/broadcast (DIRECTOR) | NO_AUTH | 401 | 0 | 鉂?FAIL |
+| payroll/rates (READ) | NO_AUTH | 401 | 0 | 鉂?FAIL |
+
+## Notes
+- Tests run without tokens check for 401/403 (unauthorized/forbidden)
+- Tests with tokens check for appropriate access level
+- Some endpoints may return different success codes (200 vs 201)
+- Connection errors show as status 0
+
+## Evidence
+- Full API logs: docs/proof/api/T7a-requests-responses.txt
+- This summary: docs/proof/logs/T7a-smoke-tests.txt
+

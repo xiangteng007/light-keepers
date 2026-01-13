@@ -1,6 +1,6 @@
 ﻿Baseline Scan Report
 ====================
-Generated: 2026-01-13T12:02:54.363Z
+Generated: 2026-01-13T23:30:28.954Z
 Script: scan-baseline.ps1
 Spec Version: baseline-counting-spec.md@v1
 
