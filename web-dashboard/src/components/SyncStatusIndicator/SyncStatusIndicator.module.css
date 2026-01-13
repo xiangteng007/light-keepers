@@ -1,0 +1,91 @@
+/**
+ * Sync Status Indicator Styles
+ */
+
+.indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    color: #10B981;
+    cursor: default;
+    transition: all 0.15s;
+    user-select: none;
+}
+
+.indicator.offline {
+    background: rgba(107, 114, 128, 0.1);
+    border-color: rgba(107, 114, 128, 0.2);
+    color: #6B7280;
+}
+
+.indicator.pending {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: rgba(245, 158, 11, 0.2);
+    color: #F59E0B;
+    cursor: pointer;
+}
+
+.indicator.pending:hover {
+    background: rgba(245, 158, 11, 0.15);
+}
+
+.text {
+    font-weight: 500;
+}
+
+.onlineIcon {
+    color: #10B981;
+}
+
+.offlineIcon {
+    color: #6B7280;
+}
+
+.syncingIcon {
+    color: #3B82F6;
+    animation: spin 1s linear infinite;
+}
+
+.pendingIcon {
+    color: #F59E0B;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 4px;
+    background: #F59E0B;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 600;
+    color: #fff;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .text {
+        display: none;
+    }
+
+    .indicator {
+        padding: 6px 8px;
+    }
+}

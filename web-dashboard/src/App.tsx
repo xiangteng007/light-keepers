@@ -13,7 +13,7 @@ import ManualDetailPage from './pages/ManualDetailPage'
 import { ManualHomePage } from './pages/manual'
 import { ComponentShowcase } from './pages/ComponentShowcase'
 import ReportPage from './pages/ReportPage'
-import AccountPage from './pages/AccountPage'
+import { AccountPage } from './pages/account'
 import VolunteersPage from './pages/VolunteersPage'
 import VolunteerDetailPage from './pages/VolunteerDetailPage'
 import TrainingPage from './pages/TrainingPage'
@@ -45,6 +45,8 @@ import ReportSchedulePage from './pages/ReportSchedulePage'
 import BackupPage from './pages/BackupPage'
 import CommandCenterPage from './pages/CommandCenterPage'
 import MentalHealthPage from './pages/MentalHealthPage'
+import AuditLogPage from './pages/AuditLogPage'
+import { CommandPalette } from './components/CommandPalette'
 
 // Note: TacticalMapPage, ResourceMatchingPage, ReunificationPage, AISummaryPage, AuditLogPage,
 // AccountsPage, TenantsPage, SettingsPage, FeaturesPage now use PageWrapper + Widget system
@@ -100,6 +102,12 @@ import IncidentsPage from './pages/c2/IncidentsPage'
 import DrillsPage from './pages/c2/DrillsPage'
 import AARPage from './pages/c2/AARPage'
 
+// ===== v6.0 Feature Pages =====
+import AIChatPage from './pages/hub/AIChatPage'
+import SecurityPage from './pages/governance/SecurityPage'
+import WebhooksPage from './pages/governance/WebhooksPage'
+import BiometricPage from './pages/governance/BiometricPage'
+
 import './App.css'
 
 
@@ -149,6 +157,8 @@ function App() {
             </div>
           </div>
         )}
+        {/* Command Palette (Cmd+K) */}
+        <CommandPalette />
 
         <Routes>
           {/* ===== 獨立頁面 (無需 Layout 包裝) ===== */}
@@ -157,7 +167,7 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} />
-          <Route path="/account" element={<ProtectedRoute requiredLevel={0}><AccountPage /></ProtectedRoute>} />
+          <Route path="/account" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="account"><AccountPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
           <Route path="/dashboard" element={<CommandCenterPage />} />
@@ -170,9 +180,10 @@ function App() {
 
           {/* ===== v2.2: 舊 redirect routes 已移除 (2026-01-12) ===== */}
 
-          {/* ===== v2.1 新路由處理 ===== */}
-          {/* Geo Routes */}
-          <Route path="/geo/map-ops" element={<PageWrapper pageId="map-ops"><MapPage /></PageWrapper>} />
+          {/* Geo Routes - 整合後 */}
+          <Route path="/geo/map" element={<PageWrapper pageId="unified-map"><MapPage /></PageWrapper>} />
+          <Route path="/geo/map-ops" element={<Navigate to="/geo/map" replace />} />
+          <Route path="/geo/tactical-map" element={<Navigate to="/geo/map" replace />} />
           <Route path="/geo/alerts" element={<PageWrapper pageId="geo-alerts"><NcdrAlertsPage /></PageWrapper>} />
           <Route path="/geo/weather" element={<PageWrapper pageId="geo-weather"><ForecastPage /></PageWrapper>} />
 
@@ -199,8 +210,14 @@ function App() {
 
           {/* Governance Routes */}
           <Route path="/governance/iam" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-iam"><PermissionsPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/governance/audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-audit" /></ProtectedRoute>} />
+          <Route path="/governance/audit" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-audit"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/governance/security" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-security"><SecurityPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/governance/webhooks" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-webhooks"><WebhooksPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/governance/biometric" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-biometric"><BiometricPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/governance/settings" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-settings" /></ProtectedRoute>} />
+
+          {/* Admin Audit Route (alias) */}
+          <Route path="/admin/audit-logs" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="admin-audit-logs"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Intake Route (統一通報入口) */}
           <Route path="/intake" element={<PageWrapper pageId="intake"><ReportPage /></PageWrapper>} />
@@ -211,6 +228,7 @@ function App() {
           <Route path="/hub/weather" element={<PageWrapper pageId="hub-weather"><ForecastPage /></PageWrapper>} />
           <Route path="/hub/analytics" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-analytics"><AnalyticsPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/hub/ai" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-ai" /></ProtectedRoute>} />
+          <Route path="/hub/ai-chat" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="hub-ai-chat"><AIChatPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/hub/offline" element={<PageWrapper pageId="hub-offline" />} />
 
           {/* ===== 舊路由保留 (未在 redirect 中處理的) ===== */}

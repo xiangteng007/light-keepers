@@ -4,12 +4,16 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
+import { AuthOAuthController } from './auth-oauth.controller';
 import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
 import { RefreshToken } from './entities/refresh-token.entity';
 import { SmsService, OtpService, PasswordResetService, EmailService, FirebaseAdminService } from './services';
 import { RefreshTokenService } from './services/refresh-token.service';
+import { OAuthService } from './services/oauth.service';
+import { TwoFactorService } from './services/two-factor.service';
+import { TwoFactorController } from './two-factor.controller';
 import { LineBotModule } from '../line-bot/line-bot.module';
 
 @Module({
@@ -31,7 +35,7 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         }),
         LineBotModule,
     ],
-    controllers: [AuthController],
+    controllers: [AuthController, AuthOAuthController, TwoFactorController],
     providers: [
         AuthService,
         JwtAuthGuard,
@@ -42,8 +46,10 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         EmailService,
         FirebaseAdminService,
         RefreshTokenService,
+        OAuthService,
+        TwoFactorService,
     ],
-    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService],
+    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, OAuthService, TwoFactorService],
 })
 export class AuthModule { }
 

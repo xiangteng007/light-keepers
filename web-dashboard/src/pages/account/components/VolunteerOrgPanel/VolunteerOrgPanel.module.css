@@ -1,0 +1,347 @@
+/**
+ * VolunteerOrgPanel Styles
+ */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0 0 8px 0;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+/* Card */
+.card {
+    background: var(--account-card-bg, #111B2E);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.badgeCount {
+    margin-left: auto;
+    padding: 4px 10px;
+    background: var(--account-accent-gold-dim, rgba(212, 175, 55, 0.15));
+    border-radius: 99px;
+    color: var(--account-accent-gold, #D4AF37);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.cardContent {
+    padding: 20px;
+}
+
+/* Organization List */
+.orgList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.orgItem {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 10px;
+}
+
+.primaryOrg {
+    border-color: rgba(212, 175, 55, 0.3);
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.orgMain {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.orgMain h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.primaryBadge {
+    padding: 2px 8px;
+    background: rgba(212, 175, 55, 0.15);
+    border-radius: 4px;
+    color: var(--account-accent-gold, #D4AF37);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.orgMeta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 0.85rem;
+    color: var(--account-text-secondary, #94A3B8);
+    flex-wrap: wrap;
+}
+
+.orgDate {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: var(--account-text-muted, #64748B);
+}
+
+/* Certification List */
+.certList {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.certItem {
+    padding: 16px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 10px;
+}
+
+.certMain {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 8px;
+}
+
+.certMain h4 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.certStatus {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.statusValid {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+}
+
+.statusExpired {
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+}
+
+.statusPending {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+}
+
+.certMeta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 0.8rem;
+    color: var(--account-text-muted, #64748B);
+    flex-wrap: wrap;
+}
+
+.certMeta span {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+/* Filter Bar */
+.filterBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--account-text-muted, #64748B);
+}
+
+.filterBtn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.filterBtn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.filterBtn.active {
+    background: var(--account-accent-gold-dim, rgba(212, 175, 55, 0.15));
+    border-color: rgba(212, 175, 55, 0.3);
+    color: var(--account-accent-gold, #D4AF37);
+}
+
+.sortSelect {
+    padding: 6px 12px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 6px;
+    color: var(--account-text-primary, #F8FAFC);
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.sortSelect:focus {
+    outline: none;
+    border-color: var(--account-accent-gold, #D4AF37);
+}
+
+/* Badges Grid */
+.badgesGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+    padding: 20px;
+}
+
+.badgeCard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.badgeCard.earned:hover {
+    border-color: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+}
+
+.badgeCard.locked {
+    opacity: 0.6;
+}
+
+.badgeIcon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    margin-bottom: 12px;
+}
+
+.badgeInfo h5 {
+    margin: 0 0 6px 0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.badgeCategory {
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badgeDesc {
+    margin: 8px 0 0 0;
+    font-size: 0.8rem;
+    color: var(--account-text-secondary, #94A3B8);
+    line-height: 1.4;
+}
+
+.badgeDate {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    margin-top: 10px;
+    font-size: 0.75rem;
+    color: #10B981;
+}
+
+/* Empty State */
+.emptyState {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 40px 20px;
+    color: var(--account-text-muted, #64748B);
+    text-align: center;
+}
+
+.emptyState p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .badgesGrid {
+        grid-template-columns: repeat(2, 1fr);
+        padding: 16px;
+        gap: 12px;
+    }
+
+    .badgeCard {
+        padding: 16px;
+    }
+
+    .badgeIcon {
+        width: 48px;
+        height: 48px;
+    }
+
+    .filterBar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .sortSelect {
+        width: 100%;
+    }
+}

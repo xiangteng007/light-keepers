@@ -1,66 +1,47 @@
 /**
- * useSyncStatus Hook
- * Provides sync status and controls for offline data synchronization
+ * Sync Status Hook
+ * 
+ * React hook for monitoring offline sync status
+ * v1.0
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { syncManager } from '../services/syncManager';
-import type { SyncStatus, SyncResult } from '../services/syncManager';
+import { offlineService, SyncStatus } from '../services/offline/offline.service';
 
-export interface UseSyncStatusReturn {
-    status: SyncStatus;
-    sync: () => Promise<SyncResult>;
-    forceSync: () => Promise<SyncResult>;
-    isOnline: boolean;
-    isSyncing: boolean;
-    pendingCount: number;
-    lastSyncAt: Date | null;
-}
-
-/**
- * Hook for monitoring and controlling sync status
- */
-export function useSyncStatus(): UseSyncStatusReturn {
+export function useSyncStatus() {
     const [status, setStatus] = useState<SyncStatus>({
+        lastSyncAt: null,
+        pendingChanges: 0,
         isOnline: navigator.onLine,
         isSyncing: false,
-        lastSyncAt: null,
-        pendingCount: 0,
-        failedCount: 0,
-        syncProgress: 0,
     });
 
-    // Subscribe to sync status changes
     useEffect(() => {
-        const unsubscribe = syncManager.subscribe(setStatus);
+        // Get initial status
+        offlineService.getStatus().then(setStatus);
 
-        // Start sync manager when component mounts
-        syncManager.start();
+        // Subscribe to updates
+        const unsubscribe = offlineService.subscribe(setStatus);
 
         return () => {
             unsubscribe();
-            // Don't stop sync manager on unmount - it should run globally
         };
     }, []);
 
-    // Sync action
     const sync = useCallback(async () => {
-        return syncManager.sync();
+        return offlineService.attemptSync();
     }, []);
 
-    // Force sync action
-    const forceSync = useCallback(async () => {
-        return syncManager.forceSync();
+    const clearData = useCallback(async () => {
+        await offlineService.clearAllData();
+        const newStatus = await offlineService.getStatus();
+        setStatus(newStatus);
     }, []);
 
     return {
-        status,
+        ...status,
         sync,
-        forceSync,
-        isOnline: status.isOnline,
-        isSyncing: status.isSyncing,
-        pendingCount: status.pendingCount,
-        lastSyncAt: status.lastSyncAt ? new Date(status.lastSyncAt) : null,
+        clearData,
     };
 }
 

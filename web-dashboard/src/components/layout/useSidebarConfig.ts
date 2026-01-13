@@ -12,7 +12,7 @@ import {
     LayoutDashboard, AlertTriangle, ClipboardList, Zap, Activity, Target, FileCheck,
     CalendarDays, FileText,
     // Geo - Geographic Intel
-    Map, Bell, CloudRain, Plane, Route, BookOpen,
+    Map, Bell, CloudRain, Plane, Route, BookOpen, MapPin,
     // Log - Logistics
     Package, GitMerge, QrCode, Heart,
     // HR - Human Resources
@@ -20,10 +20,10 @@ import {
     // Community
     Building2, Home, HeartHandshake, PartyPopper,
     // Analytics
-    BarChart3, FileSpreadsheet, Brain,
+    BarChart3, FileSpreadsheet, Brain, MessageSquare, Bot,
     // Core
     BellRing, ScrollText, UserCog, Building, Settings, ToggleLeft,
-    CheckSquare, Lock, HardDrive, User,
+    CheckSquare, Lock, HardDrive, User, Webhook, Shield, Fingerprint,
     // Utility
     LucideIcon
 } from 'lucide-react';
@@ -75,8 +75,8 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/hub/notifications', group: 'ops', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'offline', icon: 'HardDrive', label: '離線狀態', path: '/hub/offline', group: 'ops', order: 5, visible: true, minLevel: PermissionLevel.Anonymous },
 
-    // ========== 🗺️ 情資地圖 (geo) - 3 items ==========
-    { id: 'map-ops', icon: 'Map', label: '作戰地圖', path: '/geo/map-ops', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
+    // ========== 🗺️ 情資地圖 (geo) - 3 items (整合後) ==========
+    { id: 'unified-map', icon: 'Map', label: '統一地圖', path: '/geo/map', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/hub/geo-alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
 
@@ -93,17 +93,21 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'community-hub', icon: 'Building2', label: '社區活動', path: '/community/hub', group: 'workforce', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
 
-    // ========== 📊 分析知識 (insights) - 4 items ==========
+    // ========== 📊 分析知識 (insights) - 6 items ==========
     { id: 'analytics', icon: 'BarChart3', label: '分析儀表板', path: '/hub/analytics', group: 'insights', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'ai-tasks', icon: 'Brain', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 3, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'ai-chat', icon: 'Bot', label: 'AI 助手', path: '/hub/ai-chat', group: 'insights', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 5, visible: true, minLevel: PermissionLevel.Anonymous },
 
-    // ========== ⚙️ 系統管理 (admin) - 3 items ==========
+    // ========== ⚙️ 系統管理 (admin) - 6 items ==========
     { id: 'iam', icon: 'Lock', label: '權限管理', path: '/governance/iam', group: 'admin', order: 0, visible: true, minLevel: PermissionLevel.Manager },
     { id: 'audit', icon: 'ScrollText', label: '審計日誌', path: '/governance/audit', group: 'admin', order: 1, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 2, visible: true, minLevel: PermissionLevel.Admin },
+    { id: 'security', icon: 'Shield', label: '安全中心', path: '/governance/security', group: 'admin', order: 2, visible: true, minLevel: PermissionLevel.Manager },
+    { id: 'webhooks', icon: 'Webhook', label: 'Webhook 管理', path: '/governance/webhooks', group: 'admin', order: 3, visible: true, minLevel: PermissionLevel.Admin },
+    { id: 'biometric', icon: 'Fingerprint', label: '生物辨識', path: '/governance/biometric', group: 'admin', order: 4, visible: true, minLevel: PermissionLevel.Admin },
+    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 5, visible: true, minLevel: PermissionLevel.Admin },
 ];
 
 // Icon mapping for rendering
@@ -112,7 +116,7 @@ export const ICON_MAP: Record<string, LucideIcon> = {
     LayoutDashboard, AlertTriangle, ClipboardList, Zap, Activity, Target, FileCheck,
     CalendarDays, FileText,
     // Geo
-    Map, Bell, CloudRain, Plane, Route, BookOpen,
+    Map, Bell, CloudRain, Plane, Route, BookOpen, MapPin,
     // Log
     Package, GitMerge, QrCode, Heart,
     // HR
@@ -120,10 +124,10 @@ export const ICON_MAP: Record<string, LucideIcon> = {
     // Community
     Building2, Home, HeartHandshake, PartyPopper,
     // Analytics
-    BarChart3, FileSpreadsheet, Brain,
+    BarChart3, FileSpreadsheet, Brain, MessageSquare, Bot,
     // Core
     BellRing, ScrollText, UserCog, Building, Settings, ToggleLeft,
-    CheckSquare, Lock, HardDrive, User,
+    CheckSquare, Lock, HardDrive, User, Webhook, Shield, Fingerprint,
 };
 
 export function useSidebarConfig(userLevel: PermissionLevel = PermissionLevel.SystemOwner) {

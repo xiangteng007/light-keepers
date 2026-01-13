@@ -1,0 +1,475 @@
+/**
+ * Account Page - Main Styles (CSS Module)
+ * 
+ * Design System: Tactical Deep Blue-Gray
+ * - Background: #0B1220
+ * - Card: #111B2E
+ * - Accent: #D4AF37 (Gold)
+ */
+
+/* ============ CSS Variables ============ */
+.accountPage {
+    --account-bg: #0B1220;
+    --account-card-bg: #111B2E;
+    --account-card-bg-hover: #152238;
+    --account-card-border: rgba(255, 255, 255, 0.06);
+    --account-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+    --account-accent-gold: #D4AF37;
+    --account-accent-gold-dim: rgba(212, 175, 55, 0.15);
+    --account-success: #10B981;
+    --account-warning: #F59E0B;
+    --account-danger: #EF4444;
+    --account-info: #3B82F6;
+    --account-text-primary: #F8FAFC;
+    --account-text-secondary: #94A3B8;
+    --account-text-muted: #64748B;
+    --account-radius-sm: 8px;
+    --account-radius-md: 12px;
+    --account-radius-lg: 16px;
+    --account-spacing-xs: 8px;
+    --account-spacing-sm: 12px;
+    --account-spacing-md: 16px;
+    --account-spacing-lg: 24px;
+    --account-spacing-xl: 32px;
+}
+
+/* ============ Page Container ============ */
+.accountPage {
+    min-height: 100%;
+    padding: var(--account-spacing-lg);
+    color: var(--account-text-primary);
+    background: var(--account-bg);
+}
+
+/* ============ Page Header ============ */
+.pageHeader {
+    margin-bottom: var(--account-spacing-xl);
+}
+
+.pageTitle {
+    display: flex;
+    align-items: center;
+    gap: var(--account-spacing-sm);
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin: 0 0 var(--account-spacing-xs) 0;
+    color: var(--account-text-primary);
+}
+
+.pageTitleIcon {
+    color: var(--account-accent-gold);
+}
+
+.pageSubtitle {
+    color: var(--account-text-secondary);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ============ Main Layout ============ */
+.mainLayout {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    gap: var(--account-spacing-lg);
+    align-items: start;
+}
+
+/* ============ Left Column (Summary) ============ */
+.leftColumn {
+    position: sticky;
+    top: var(--account-spacing-lg);
+}
+
+/* ============ Right Column (Tabs Content) ============ */
+.rightColumn {
+    min-width: 0;
+    /* Prevent overflow */
+}
+
+/* ============ Card Base Style ============ */
+.card {
+    background: var(--account-card-bg);
+    border: 1px solid var(--account-card-border);
+    border-radius: var(--account-radius-lg);
+    box-shadow: var(--account-card-shadow);
+    overflow: hidden;
+}
+
+.cardHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--account-spacing-md) var(--account-spacing-lg);
+    border-bottom: 1px solid var(--account-card-border);
+}
+
+.cardTitle {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--account-accent-gold);
+}
+
+.cardContent {
+    padding: var(--account-spacing-lg);
+}
+
+/* ============ Tab Navigation ============ */
+.tabNavigation {
+    display: flex;
+    gap: var(--account-spacing-xs);
+    padding: var(--account-spacing-md);
+    background: var(--account-card-bg);
+    border: 1px solid var(--account-card-border);
+    border-radius: var(--account-radius-lg);
+    margin-bottom: var(--account-spacing-lg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.tabNavigation::-webkit-scrollbar {
+    display: none;
+}
+
+.tabButton {
+    flex-shrink: 0;
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: var(--account-radius-sm);
+    color: var(--account-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.tabButton:hover {
+    background: var(--account-card-bg-hover);
+    color: var(--account-text-primary);
+}
+
+.tabButtonActive {
+    background: var(--account-accent-gold-dim);
+    border-color: rgba(212, 175, 55, 0.3);
+    color: var(--account-accent-gold);
+}
+
+/* ============ Tab Content ============ */
+.tabContent {
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============ Loading Skeleton ============ */
+.skeleton {
+    background: linear-gradient(90deg,
+            var(--account-card-bg) 25%,
+            var(--account-card-bg-hover) 50%,
+            var(--account-card-bg) 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+    border-radius: var(--account-radius-sm);
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}
+
+/* ============ Buttons ============ */
+.btnPrimary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--account-spacing-xs);
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: var(--account-accent-gold);
+    border: none;
+    border-radius: var(--account-radius-sm);
+    color: #0B1220;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnPrimary:hover {
+    background: #E5C158;
+    transform: translateY(-1px);
+}
+
+.btnPrimary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btnSecondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--account-spacing-xs);
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--account-card-border);
+    border-radius: var(--account-radius-sm);
+    color: var(--account-text-primary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnSecondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btnGhost {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--account-spacing-xs);
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: transparent;
+    border: none;
+    border-radius: var(--account-radius-sm);
+    color: var(--account-text-secondary);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnGhost:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--account-text-primary);
+}
+
+.btnDanger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--account-spacing-xs);
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: var(--account-radius-sm);
+    color: var(--account-danger);
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btnDanger:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+/* ============ Status Badges ============ */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badgeGold {
+    background: var(--account-accent-gold-dim);
+    border: 1px solid rgba(212, 175, 55, 0.4);
+    color: var(--account-accent-gold);
+}
+
+.badgeSuccess {
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--account-success);
+}
+
+.badgeWarning {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    color: var(--account-warning);
+}
+
+.badgeDanger {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: var(--account-danger);
+}
+
+.badgeMuted {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: var(--account-text-secondary);
+}
+
+/* ============ Form Elements ============ */
+.formGroup {
+    margin-bottom: var(--account-spacing-lg);
+}
+
+.formLabel {
+    display: block;
+    margin-bottom: var(--account-spacing-xs);
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--account-text-secondary);
+}
+
+.formInput {
+    width: 100%;
+    padding: var(--account-spacing-sm) var(--account-spacing-md);
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--account-card-border);
+    border-radius: var(--account-radius-sm);
+    color: var(--account-text-primary);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.formInput:focus {
+    outline: none;
+    border-color: var(--account-accent-gold);
+    box-shadow: 0 0 0 3px var(--account-accent-gold-dim);
+}
+
+.formInput:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.formInputError {
+    border-color: var(--account-danger);
+}
+
+.formError {
+    margin-top: var(--account-spacing-xs);
+    font-size: 0.8rem;
+    color: var(--account-danger);
+}
+
+.formHint {
+    margin-top: var(--account-spacing-xs);
+    font-size: 0.8rem;
+    color: var(--account-text-muted);
+}
+
+/* ============ Toggle Switch ============ */
+.toggle {
+    position: relative;
+    width: 48px;
+    height: 26px;
+    cursor: pointer;
+}
+
+.toggleInput {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggleSlider {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 26px;
+    transition: 0.3s;
+}
+
+.toggleSlider::before {
+    content: '';
+    position: absolute;
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+.toggleInput:checked+.toggleSlider {
+    background: var(--account-accent-gold);
+}
+
+.toggleInput:checked+.toggleSlider::before {
+    transform: translateX(22px);
+}
+
+/* ============ Responsive: Tablet ============ */
+@media (max-width: 1199px) {
+    .mainLayout {
+        grid-template-columns: 1fr;
+    }
+
+    .leftColumn {
+        position: static;
+    }
+
+    .stickyActions {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: var(--account-spacing-md) var(--account-spacing-lg);
+        background: var(--account-card-bg);
+        border-top: 1px solid var(--account-card-border);
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--account-spacing-sm);
+        z-index: 100;
+    }
+}
+
+/* ============ Responsive: Mobile ============ */
+@media (max-width: 767px) {
+    .accountPage {
+        padding: var(--account-spacing-md);
+    }
+
+    .pageTitle {
+        font-size: 1.5rem;
+    }
+
+    .tabNavigation {
+        margin: 0 calc(-1 * var(--account-spacing-md));
+        padding: var(--account-spacing-sm);
+        border-radius: 0;
+        border-left: none;
+        border-right: none;
+    }
+
+    .cardContent {
+        padding: var(--account-spacing-md);
+    }
+
+    .formInput {
+        padding: var(--account-spacing-md);
+        font-size: 16px;
+        /* Prevent zoom on iOS */
+    }
+}

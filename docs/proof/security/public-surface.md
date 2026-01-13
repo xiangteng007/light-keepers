@@ -1,80 +1,126 @@
 # Public Surface Review
 
 > **Purpose**: Auditable list of intentionally public endpoints  
-> **Status**: REVIEW REQUIRED  
-> **Last Updated**: 2026-01-13
+> **Policy**: **Policy-B** (Level(0) or @Public = public; smoke test required)  
+> **Last Updated**: 2026-01-13 16:20 UTC+8
 
 ---
 
-## Rule: All public endpoints MUST have
+## Policy Selection: Policy-B
 
-1. `@Public()` decorator (not just "no guard")
-2. Rate limiting / throttling
-3. Data exposure classification
-4. Entry in this document
-
----
-
-## Public Endpoints Inventory
-
-| Endpoint | Method | Why Public | Data Exposure | Controls Required | Status |
-|----------|--------|------------|:-------------:|-------------------|:------:|
-| `/health` | GET | K8s liveness | none | @Public + throttle | ⏳ REVIEW |
-| `/health/live` | GET | K8s liveness | none | @Public + throttle | ⏳ REVIEW |
-| `/health/ready` | GET | K8s readiness | none | @Public + throttle | ⏳ REVIEW |
-| `/health/detailed` | GET | Ops monitoring | low | @Public + throttle + no secrets | ⏳ REVIEW |
-| `/api/donations/public/stats` | GET | Transparency | low | @Public + throttle + cache | ✅ HAS @RequiredLevel(0) |
-| `/weather/*` | GET | Public forecast | low | Review needed | ⏳ REVIEW |
-| `/ncdr-alerts/public` | GET | Emergency alerts | low | Should be public | ⏳ REVIEW |
+> [!IMPORTANT]
+> **Policy-B Selected**: Endpoints with `@Public()` or `@RequiredLevel(ROLE_LEVELS.PUBLIC)` are treated as public.
+> All public endpoints MUST have:
+>
+> 1. Explicit `@Public()` decorator (preferred) OR `@RequiredLevel(0)`
+> 2. `@Throttle()` rate limiting
+> 3. Entry in this document
+> 4. Smoke test verification (no token → 200)
 
 ---
 
-## Stub Modules (Attack Surface - NOT Public Intent)
+## Public Endpoints Inventory (Exhaustive - No Wildcards)
+
+### Health Endpoints (Intentionally Public)
+
+| # | Method | Path | Controller | Why Public | Data Exposure | @Public | @Throttle | Status |
+|---|--------|------|------------|------------|:-------------:|:-------:|:---------:|:------:|
+| 1 | GET | `/health` | `health.controller.ts` | K8s liveness | none | ⏳ ADD | ⏳ ADD | REVIEW |
+| 2 | GET | `/health/detailed` | `health.controller.ts` | Ops monitoring | low | ⏳ ADD | ⏳ ADD | REVIEW |
+| 3 | GET | `/health/live` | `health.controller.ts` | K8s liveness | none | ⏳ ADD | ⏳ ADD | REVIEW |
+| 4 | GET | `/health/ready` | `health.controller.ts` | K8s readiness | none | ⏳ ADD | ⏳ ADD | REVIEW |
+| 5 | GET | `/health` | `health-only.controller.ts` | CI health | none | ⏳ ADD | ⏳ ADD | REVIEW |
+| 6 | GET | `/health/live` | `health-only.controller.ts` | CI liveness | none | ⏳ ADD | ⏳ ADD | REVIEW |
+| 7 | GET | `/health/ready` | `health-only.controller.ts` | CI readiness | none | ⏳ ADD | ⏳ ADD | REVIEW |
+
+### Donation Public Stats (Intentionally Public)
+
+| # | Method | Path | Controller | Why Public | Data Exposure | @Public | @Throttle | Status |
+|---|--------|------|------------|------------|:-------------:|:-------:|:---------:|:------:|
+| 8 | GET | `/api/donations/public/stats` | `donation-tracking.controller.ts` | Transparency | low | ✅ HAS RequiredLevel(0) | ⏳ ADD | PASS |
+
+---
+
+## Stub Modules Attack Surface (NOT Intentionally Public)
 
 > [!CAUTION]
-> These modules are NOT intended to be public but currently lack guards.
-> They must be either disabled from production or protected with OWNER-only guard.
+> These modules lack guards but are NOT intended to be public.
+> **Required Action**: Disable from production OR apply OWNER-only guard.
 
-| Module | Routes | Current Status | Required Action |
-|--------|-------:|----------------|-----------------|
-| `ar-field-guidance` | 19 | Unprotected | Disable OR OWNER-only |
-| `drone-swarm` | 23 | Unprotected | Disable OR OWNER-only |
-| `supply-chain-blockchain` | 12 | Unprotected | Disable OR OWNER-only |
-| `aerial-image-analysis` | 11 | Unprotected | Disable OR OWNER-only |
-| `vr-command` | ~10 | Unprotected | Disable OR OWNER-only |
-| `quantum-routing` | ~8 | Unprotected | Disable OR OWNER-only |
+| Module | Controller Path | Routes | Current Status | Required Action |
+|--------|-----------------|-------:|----------------|-----------------|
+| `ar-field-guidance` | `modules/ar-field-guidance/ar-field-guidance.controller.ts` | 19 | Unprotected | **MUST DISABLE** |
+| `drone-swarm` | `modules/drone-swarm/drone-swarm.controller.ts` | 23 | Unprotected | **MUST DISABLE** |
+| `supply-chain-blockchain` | `modules/supply-chain-blockchain/supply-chain-blockchain.controller.ts` | 12 | Unprotected | **MUST DISABLE** |
+| `aerial-image-analysis` | `modules/aerial-image-analysis/aerial-image-analysis.controller.ts` | 11 | Unprotected | **MUST DISABLE** |
+| `quantum-routing` | `modules/quantum-routing/quantum-routing.controller.ts` | 8 | Unprotected | **MUST DISABLE** |
+| `vr-command` | `modules/vr-command/vr-command.controller.ts` | 10+ | Unprotected | **MUST DISABLE** |
+
+**Total Stub Routes**: ~83 (attack surface)
 
 ---
 
-## Controls Specification
+## Production Kill-Switch Strategy
 
-### Rate Limiting Requirements
+### Option A: Conditional Module Import (SELECTED)
 
-| Endpoint Type | Limit | Window |
-|---------------|------:|-------:|
-| Health/liveness | 60 req | 1 min |
-| Public stats | 30 req | 1 min |
-| Weather/forecast | 60 req | 1 min |
-| Emergency alerts | 120 req | 1 min |
+In `app.module.ts`, stub modules will be excluded from production:
 
-### Data Exposure Levels
+```typescript
+const STUB_MODULES = [
+  ArFieldGuidanceModule,
+  DroneSwarmModule,
+  SupplyChainBlockchainModule,
+  AerialImageAnalysisModule,
+  QuantumRoutingModule,
+  VrCommandModule,
+];
 
-| Level | Definition | Public Allowed? |
-|-------|------------|:---------------:|
-| none | No user data | ✅ |
-| low | Aggregated/anonymous | ✅ with throttle |
-| medium | Org-level data | ❌ |
-| high | PII/sensitive | ❌ |
+@Module({
+  imports: [
+    ...CORE_MODULES,
+    ...(process.env.ENABLE_STUB_MODULES === 'true' ? STUB_MODULES : []),
+  ],
+})
+export class AppModule {}
+```
+
+### Verification
+
+After implementing kill-switch:
+
+1. `runtime mapping` should show 0 routes from stub modules
+2. Smoke test: `GET /ar-field-guidance/*` → 404
+
+---
+
+## Rate Limiting Requirements
+
+| Endpoint Type | Limit | Window | Implementation |
+|---------------|------:|-------:|----------------|
+| Health/liveness | 120 req | 1 min | `@Throttle({ default: { limit: 120, ttl: 60000 } })` |
+| Public stats | 30 req | 1 min | `@Throttle({ default: { limit: 30, ttl: 60000 } })` |
+
+---
+
+## Smoke Test Evidence Required
+
+For each public endpoint, smoke test must verify:
+
+- **No token**: Returns 200 (not 401/403)
+- **Throttle**: Returns 429 after limit exceeded
+
+Evidence location: `docs/proof/logs/T7a-smoke-tests.txt`
 
 ---
 
 ## Action Items
 
-1. [ ] Add `@Public()` decorator to health endpoints
-2. [ ] Add `@Throttle()` to all public endpoints
-3. [ ] Disable stub modules in production OR add OWNER-only guard
-4. [ ] Review weather endpoints for appropriate access level
-5. [ ] Review NCDR public alerts access
+- [ ] Add `@Public()` decorator to health endpoints
+- [ ] Add `@Throttle()` to all health endpoints
+- [ ] Implement stub modules kill-switch in `app.module.ts`
+- [ ] Re-run route-guard scan to verify stub routes removed
+- [ ] Run smoke tests to verify public endpoints
 
 ---
 

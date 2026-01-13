@@ -1,0 +1,221 @@
+.webhooks-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.webhooks-page__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.webhooks-page__header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #fff;
+}
+
+.webhooks-page__header p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.create-btn {
+    background: linear-gradient(135deg, #D4AF37, #B8960C);
+    border: none;
+    color: #0F172A;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.webhooks-page__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.webhook-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+
+.webhook-card.inactive {
+    opacity: 0.6;
+}
+
+.status-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.status-dot.active {
+    background: #10B981;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+}
+
+.status-dot.inactive {
+    background: #64748B;
+}
+
+.webhook-card__info {
+    flex: 1;
+}
+
+.webhook-card__info h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    color: #fff;
+}
+
+.webhook-url {
+    margin: 0 0 8px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+}
+
+.webhook-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.event-tag {
+    background: rgba(59, 130, 246, 0.2);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    color: #60A5FA;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 10px;
+    font-family: monospace;
+}
+
+.webhook-card__stats {
+    display: flex;
+    gap: 20px;
+}
+
+.webhook-card__stats .stat {
+    text-align: center;
+}
+
+.webhook-card__stats .value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.webhook-card__stats .value.success {
+    color: #10B981;
+}
+
+.webhook-card__stats .value.failure {
+    color: #EF4444;
+}
+
+.webhook-card__stats .label {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.webhook-card__actions {
+    display: flex;
+    gap: 8px;
+}
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.action-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal {
+    background: #1E293B;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 24px;
+    width: 100%;
+    max-width: 480px;
+}
+
+.modal h2 {
+    margin: 0 0 20px;
+    font-size: 20px;
+    color: #fff;
+}
+
+.modal label {
+    display: block;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal input,
+.modal select {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    margin-top: 6px;
+}
+
+.modal select {
+    height: 100px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.modal-actions button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.modal-actions button:not(.primary) {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.modal-actions button.primary {
+    background: #D4AF37;
+    border: none;
+    color: #0F172A;
+}

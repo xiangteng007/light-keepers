@@ -13,6 +13,8 @@ import {
     DisasterReportService,
 } from './disaster-report';
 import { AiVisionController } from './disaster-report/ai-vision.controller';
+import { RichMenuService } from './services/rich-menu.service';
+import { FlexMessageService } from './services/flex-message.service';
 
 @Global()
 @Module({
@@ -27,10 +29,18 @@ import { AiVisionController } from './disaster-report/ai-vision.controller';
         ImageUploadService,
         AiClassificationService,
         DisasterReportService,
-        // ReportsService is now imported from ReportsModule via forwardRef
+        RichMenuService,
+        FlexMessageService,
     ],
-    exports: [LineBotService, DisasterReportService, AiClassificationService],
+    exports: [
+        LineBotService,
+        DisasterReportService,
+        AiClassificationService,
+        RichMenuService,
+        FlexMessageService,
+    ],
 })
 export class LineBotModule { }
+
 
 

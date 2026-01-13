@@ -1,0 +1,218 @@
+/**
+ * ConnectedAccountsPanel Styles
+ */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.sectionDesc {
+    margin: 0 0 8px 0;
+    font-size: 0.9rem;
+    color: var(--account-text-secondary, #94A3B8);
+}
+
+.accountList {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Account Card */
+.accountCard {
+    background: var(--account-card-bg, #111B2E);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.2s ease;
+}
+
+.accountCard.connected {
+    border-color: rgba(16, 185, 129, 0.2);
+}
+
+.accountHeader {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+}
+
+.platformLogo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+}
+
+.platformInfo {
+    flex: 1;
+}
+
+.platformInfo h4 {
+    margin: 0 0 4px 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.platformInfo p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: var(--account-text-secondary, #94A3B8);
+}
+
+.statusBadge {
+    flex-shrink: 0;
+}
+
+.connectedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 99px;
+    color: #10B981;
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+.disconnectedBadge {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 99px;
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.8rem;
+    font-weight: 500;
+}
+
+/* Account Details (Connected State) */
+.accountDetails {
+    padding: 0 20px 20px;
+    border-top: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    margin-top: -1px;
+    padding-top: 16px;
+}
+
+.detailRow {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+}
+
+.detailRow:first-child {
+    padding-top: 0;
+}
+
+.detailLabel {
+    font-size: 0.85rem;
+    color: var(--account-text-muted, #64748B);
+}
+
+.detailValue {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.disconnectBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 12px;
+    margin-top: 16px;
+    background: transparent;
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 8px;
+    color: #EF4444;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.disconnectBtn:hover:not(:disabled) {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.disconnectBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Account Action (Disconnected State) */
+.accountAction {
+    padding: 0 20px 20px;
+}
+
+.connectBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    padding: 14px;
+    background: var(--account-accent-gold-dim, rgba(212, 175, 55, 0.15));
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: var(--account-accent-gold, #D4AF37);
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.connectBtn:hover:not(:disabled) {
+    background: rgba(212, 175, 55, 0.25);
+}
+
+.connectBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .accountHeader {
+        flex-wrap: wrap;
+    }
+
+    .statusBadge {
+        order: -1;
+        width: 100%;
+        margin-bottom: 12px;
+    }
+
+    .connectedBadge,
+    .disconnectedBadge {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .detailRow {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 4px;
+    }
+}

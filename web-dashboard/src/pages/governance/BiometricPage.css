@@ -1,0 +1,194 @@
+.biometric-page {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.biometric-page__header h1 {
+    margin: 0;
+    font-size: 24px;
+    color: #fff;
+}
+
+.biometric-page__header p {
+    margin: 4px 0 0;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 14px;
+}
+
+.info-card {
+    display: flex;
+    gap: 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.info-icon {
+    font-size: 32px;
+}
+
+.info-card h3 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    color: #60A5FA;
+}
+
+.info-card p {
+    margin: 0;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.section-header h2 {
+    margin: 0;
+    font-size: 18px;
+    color: #fff;
+}
+
+.register-btn {
+    background: linear-gradient(135deg, #D4AF37, #B8960C);
+    border: none;
+    color: #0F172A;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.register-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.credentials-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.credential-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 16px 20px;
+}
+
+.credential-icon {
+    font-size: 32px;
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.credential-info {
+    flex: 1;
+}
+
+.credential-info h4 {
+    margin: 0 0 4px;
+    font-size: 16px;
+    color: #fff;
+}
+
+.credential-info p {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.last-used {
+    display: block;
+    margin-top: 4px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.remove-btn {
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    color: #EF4444;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.remove-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+    background: rgba(30, 41, 59, 0.5);
+    border-radius: 12px;
+}
+
+.empty-state span {
+    font-size: 48px;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.empty-state p {
+    color: rgba(255, 255, 255, 0.6);
+    margin-bottom: 16px;
+}
+
+.empty-state button {
+    background: #D4AF37;
+    border: none;
+    color: #0F172A;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.biometric-page__support h3 {
+    margin: 0 0 12px;
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.support-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 12px;
+}
+
+.support-item {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 16px;
+    text-align: center;
+}
+
+.support-item span {
+    font-size: 28px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.support-item p {
+    margin: 0;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}

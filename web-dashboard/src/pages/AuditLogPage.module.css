@@ -1,0 +1,388 @@
+/**
+ * Audit Log Page Styles
+ */
+
+.page {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.headerLeft {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+    margin: 0;
+}
+
+.title svg {
+    color: #D4AF37;
+}
+
+.subtitle {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 14px;
+}
+
+.headerActions {
+    display: flex;
+    gap: 12px;
+}
+
+.actionButton {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.actionButton:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Filters */
+.filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.searchBox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 250px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.searchIcon {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.searchInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #fff;
+    font-size: 14px;
+}
+
+.searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.filterGroup {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filterLabel {
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 13px;
+}
+
+.filterSelect {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.filterSelect option {
+    background: #111B2E;
+    color: #fff;
+}
+
+/* Stats */
+.stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.statCard {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    min-width: 120px;
+}
+
+.statValue {
+    font-size: 24px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.statLabel {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.successText {
+    color: #10B981 !important;
+}
+
+.dangerText {
+    color: #EF4444 !important;
+}
+
+/* Table */
+.tableWrapper {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.table th {
+    text-align: left;
+    padding: 14px 16px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.5);
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.table td {
+    padding: 14px 16px;
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.8);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.row {
+    cursor: pointer;
+    transition: background 0.1s;
+}
+
+.row:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.rowExpanded {
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.expandCell {
+    width: 40px;
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.timeCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: rgba(255, 255, 255, 0.6);
+    white-space: nowrap;
+}
+
+.timeCell svg {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+.userCell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.userCell svg {
+    color: #D4AF37;
+}
+
+.actionBadge {
+    display: inline-block;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.actionLOGIN,
+.actionLOGOUT {
+    background: rgba(59, 130, 246, 0.2);
+    color: #60A5FA;
+}
+
+.actionCREATE,
+.actionAPPROVE {
+    background: rgba(16, 185, 129, 0.2);
+    color: #34D399;
+}
+
+.actionUPDATE,
+.actionSYNC {
+    background: rgba(245, 158, 11, 0.2);
+    color: #FBBF24;
+}
+
+.actionDELETE,
+.actionREJECT {
+    background: rgba(239, 68, 68, 0.2);
+    color: #F87171;
+}
+
+.resourceId {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 12px;
+}
+
+.statusBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    border-radius: 4px;
+}
+
+.statusBadge.success {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+}
+
+.statusBadge.failed {
+    background: rgba(239, 68, 68, 0.15);
+    color: #EF4444;
+}
+
+.ipCell {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+/* Detail Row */
+.detailRow td {
+    padding: 0;
+    background: rgba(0, 0, 0, 0.2);
+}
+
+.detailContent {
+    padding: 16px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.detailItem {
+    display: flex;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.detailLabel {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: rgba(255, 255, 255, 0.5);
+    min-width: 100px;
+}
+
+.detailCode {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: pre-wrap;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .headerActions {
+        width: 100%;
+    }
+
+    .actionButton {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .filters {
+        flex-direction: column;
+    }
+
+    .searchBox {
+        width: 100%;
+    }
+}
+
+@media (max-width: 768px) {
+    .page {
+        padding: 16px;
+    }
+
+    .stats {
+        flex-wrap: wrap;
+    }
+
+    .statCard {
+        flex: 1;
+        min-width: calc(50% - 8px);
+    }
+
+    .tableWrapper {
+        overflow-x: auto;
+    }
+
+    .table {
+        min-width: 800px;
+    }
+}

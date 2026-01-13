@@ -5,6 +5,7 @@
  * 1. WeatherService - 氣象雷達 (CWA radar tiles)
  * 2. WeatherForecastService - 天氣預報 (CWA OpenData)
  * 3. WeatherAlertIntegrationService - 氣象預警整合
+ * 4. CwaProvider - 中央氣象局 API 整合 (v6.0)
  * 
  * 此模組作為 facade，提供統一的 API 端點。
  */
@@ -15,6 +16,7 @@ import { WeatherForecastModule } from '../weather-forecast/weather-forecast.modu
 import { WeatherAlertIntegrationModule } from '../weather-alert-integration/weather-alert-integration.module';
 import { WeatherHubController } from './weather-hub.controller';
 import { WeatherHubService } from './weather-hub.service';
+import { CwaProvider } from './providers/cwa.provider';
 
 @Module({
     imports: [
@@ -23,7 +25,8 @@ import { WeatherHubService } from './weather-hub.service';
         forwardRef(() => WeatherAlertIntegrationModule),
     ],
     controllers: [WeatherHubController],
-    providers: [WeatherHubService],
-    exports: [WeatherHubService],
+    providers: [WeatherHubService, CwaProvider],
+    exports: [WeatherHubService, CwaProvider],
 })
 export class WeatherHubModule { }
+

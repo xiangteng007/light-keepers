@@ -1,0 +1,362 @@
+/**
+ * TacticalMap Styles
+ */
+
+.container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    background: var(--bg-secondary, #1E293B);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.mapContainer {
+    width: 100%;
+    height: 100%;
+}
+
+/* Static Map Fallback */
+.staticMap {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #334155 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.staticMap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.mapOverlay {
+    position: absolute;
+    inset: 0;
+}
+
+.mapCenter {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.centerIcon {
+    font-size: 32px;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: scale(1.1);
+        opacity: 1;
+    }
+}
+
+.coordinates {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    font-family: monospace;
+}
+
+.noMapboxMessage {
+    position: absolute;
+    bottom: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    background: rgba(0, 0, 0, 0.5);
+    padding: 12px 20px;
+    border-radius: 8px;
+    backdrop-filter: blur(8px);
+}
+
+.noMapboxMessage p {
+    margin: 0 0 4px;
+    font-size: 14px;
+}
+
+.noMapboxMessage span {
+    font-size: 11px;
+    opacity: 0.7;
+}
+
+/* Markers */
+.marker {
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    transform: translate(-50%, -50%);
+    z-index: 10;
+}
+
+.marker:hover {
+    transform: translate(-50%, -50%) scale(1.2);
+    z-index: 20;
+}
+
+/* Layer Panel */
+.layerPanel {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    min-width: 160px;
+    backdrop-filter: blur(10px);
+    z-index: 100;
+}
+
+.layerHeader {
+    padding: 10px 14px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #fff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.layerList {
+    padding: 8px;
+}
+
+.layerItem {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.8);
+    transition: background 0.15s;
+}
+
+.layerItem:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.layerItem input {
+    accent-color: #D4AF37;
+}
+
+.layerColor {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.layerName {
+    flex: 1;
+}
+
+.layerCount {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2px 6px;
+    border-radius: 8px;
+}
+
+/* Popup */
+.popup {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 12px;
+    min-width: 250px;
+    max-width: 350px;
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    animation: slideUp 0.2s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateX(-50%) translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(-50%) translateY(0);
+        opacity: 1;
+    }
+}
+
+.popupHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
+    color: #fff;
+}
+
+.popupClose {
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    font-size: 16px;
+    padding: 4px;
+}
+
+.popupClose:hover {
+    color: #fff;
+}
+
+.popupDesc {
+    padding: 12px 14px 8px;
+    margin: 0;
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+}
+
+.popupStatus,
+.popupPriority {
+    padding: 4px 14px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.popupStatus span,
+.popupPriority span {
+    color: #D4AF37;
+    font-weight: 500;
+}
+
+.popupPriority .low {
+    color: #3B82F6;
+}
+
+.popupPriority .medium {
+    color: #F59E0B;
+}
+
+.popupPriority .high {
+    color: #EF4444;
+}
+
+.popupPriority .critical {
+    color: #9333EA;
+}
+
+.popupCoords {
+    padding: 8px 14px 12px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.4);
+    font-family: monospace;
+}
+
+/* Controls */
+.controls {
+    position: absolute;
+    bottom: 60px;
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    z-index: 100;
+}
+
+.controlBtn {
+    width: 36px;
+    height: 36px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.controlBtn:hover {
+    background: rgba(212, 175, 55, 0.2);
+    border-color: rgba(212, 175, 55, 0.5);
+}
+
+/* Stats Bar */
+.statsBar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 36px;
+    background: rgba(15, 23, 42, 0.9);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.5);
+    z-index: 50;
+}
+
+/* Loading */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    gap: 16px;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top-color: #D4AF37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.mapPlaceholder,
+.mapReady {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: rgba(255, 255, 255, 0.6);
+}

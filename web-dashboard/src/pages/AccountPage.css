@@ -64,6 +64,15 @@
     padding: 24px;
 }
 
+/* Ensure profile card content is always centered */
+.profile-card .card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
 /* Profile Section (Left Column) */
 .profile-card {
     text-align: center;

@@ -125,6 +125,7 @@ import { ImageRecognitionModule } from './modules/image-recognition/image-recogn
 import { AerialImageAnalysisModule } from './modules/aerial-image-analysis/aerial-image-analysis.module';
 import { EmotionAnalysisModule } from './modules/emotion-analysis/emotion-analysis.module';
 import { EventAiModule } from './modules/event-ai/event-ai.module';
+import { AIModule } from './modules/ai/ai.module';
 import { AutoSummaryModule } from './modules/auto-summary/auto-summary.module';
 import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module';
 import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
@@ -158,7 +159,6 @@ import { MobileSyncModule } from './modules/mobile-sync/mobile-sync.module';
 import { DeviceManagementModule } from './modules/device-management/device-management.module';
 // Push Notifications
 import { PushNotificationModule } from './modules/push-notification/push-notification.module';
-import { PushNotificationV2Module } from './modules/push-notification-v2/push-notification-v2.module';
 // LINE & Social
 import { LineLiffModule } from './modules/line-liff/line-liff.module';
 import { LineNotifyModule } from './modules/line-notify/line-notify.module';
@@ -226,6 +226,22 @@ import { RequestLoggingMiddleware } from './common/middleware/request-logging.mi
 import { IntakeModule } from './modules/intake/intake.module';
 // v4.0: Hub 服務整合
 import { HubServicesModule } from './common/services/hub-services.module';
+
+// ==============================================
+// STUB MODULES (Disabled in production by default)
+// Set ENABLE_STUB_MODULES=true to enable
+// @see docs/proof/security/public-surface.md
+// ==============================================
+const STUB_MODULES = [
+    ArFieldGuidanceModule,
+    ArNavigationModule,
+    VrCommandModule,
+    DroneSwarmModule,
+    SupplyChainBlockchainModule,
+    AerialImageAnalysisModule,
+];
+
+const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
 
 @Module({
     imports: [
@@ -386,9 +402,10 @@ import { HubServicesModule } from './common/services/hub-services.module';
         AiPredictionModule, // 🔮 AI 預測
         AiVisionModule, // 👁️ AI 視覺
         ImageRecognitionModule, // 🖼️ 圖像辨識
-        AerialImageAnalysisModule, // 🛩️ 空拍分析
+        // AerialImageAnalysisModule - moved to STUB_MODULES (conditionally loaded)
         EmotionAnalysisModule, // 😊 情緒分析
         EventAiModule, // 🧠 事件 AI
+        AIModule, // 🤖 智慧派遣/物資預判
         AutoSummaryModule, // 📝 自動摘要
         ChatbotAssistantModule, // 💬 聊天機器人
         RagKnowledgeModule, // 📚 RAG 知識庫
@@ -409,10 +426,9 @@ import { HubServicesModule } from './common/services/hub-services.module';
         // ==============================================
         // Batch 5: Remaining Infrastructure Modules (FINAL)
         // ==============================================
-        // AR/VR
-        ArFieldGuidanceModule, // 📱 AR 現場指引
-        ArNavigationModule, // 🗺️ AR 導航
-        VrCommandModule, // 🥽 VR 指揮
+        // AR/VR (CONDITIONALLY LOADED - see STUB_MODULES)
+        // ArFieldGuidanceModule, ArNavigationModule, VrCommandModule
+        // are loaded conditionally below via ENABLE_STUB_MODULES
         // Offline & Mobile
         OfflineSyncModule, // 📴 離線同步
         OfflineMeshModule, // 🔗 Mesh 網路
@@ -422,14 +438,13 @@ import { HubServicesModule } from './common/services/hub-services.module';
         DeviceManagementModule, // 📲 裝置管理
         // Push Notifications
         PushNotificationModule, // 🔔 推播通知
-        PushNotificationV2Module, // 🔔 推播 V2
         // LINE & Social
         LineLiffModule, // 💚 LINE LIFF
         LineNotifyModule, // 📢 LINE Notify
         // Blockchain & Security
         BlockchainModule, // ⛓️ 區塊鏈
         IntegrityLedgerModule, // 📜 完整性帳本
-        SupplyChainBlockchainModule, // 📦 供應鏈區塊鏈
+        // SupplyChainBlockchainModule - moved to STUB_MODULES (conditionally loaded)
         BiometricAuthModule, // 👆 生物辨識
         TwoFactorAuthModule, // 🔐 雙因素驗證
         SecretRotationModule, // 🔄 密鑰輪換
@@ -445,7 +460,7 @@ import { HubServicesModule } from './common/services/hub-services.module';
         AarAnalysisModule, // 📊 AAR 分析
         BimIntegrationModule, // 🏗️ BIM 整合
         Cesium3dModule, // 🌍 Cesium 3D
-        DroneSwarmModule, // 🐝 無人機群
+        // DroneSwarmModule - moved to STUB_MODULES (conditionally loaded)
         InsaragModule, // 🏥 INSARAG
         RobotRescueModule, // 🤖 機器人救援
         SpectrumAnalysisModule, // 📡 頻譜分析
@@ -480,6 +495,12 @@ import { HubServicesModule } from './common/services/hub-services.module';
         MicroTaskModule, // ✅ 微任務
         FileUploadModule, // 📤 檔案上傳
         EmailTemplateModule, // 📧 郵件範本
+        // ==============================================
+        // STUB MODULES (Conditionally Loaded)
+        // Only enabled when ENABLE_STUB_MODULES=true
+        // @see docs/proof/security/public-surface.md
+        // ==============================================
+        ...(ENABLE_STUB_MODULES ? STUB_MODULES : [])
     ],
     providers: [
         CloudLoggerService,

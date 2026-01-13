@@ -3,7 +3,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Account, Role, PagePermission } from './entities';
 import { AccountsService } from './accounts.service';
 import { AccountsController } from './accounts.controller';
+import { DataExportController } from './data-export.controller';
 import { SeedService } from './seed.service';
+import { DataExportService } from './services/data-export.service';
 import { AuthModule } from '../auth/auth.module';
 
 /**
@@ -17,8 +19,9 @@ import { AuthModule } from '../auth/auth.module';
         // JwtModule is now provided globally by SharedAuthModule
         forwardRef(() => AuthModule),
     ],
-    controllers: [AccountsController],
-    providers: [AccountsService, SeedService],
-    exports: [AccountsService, TypeOrmModule],
+    controllers: [AccountsController, DataExportController],
+    providers: [AccountsService, SeedService, DataExportService],
+    exports: [AccountsService, TypeOrmModule, DataExportService],
 })
 export class AccountsModule { }
+

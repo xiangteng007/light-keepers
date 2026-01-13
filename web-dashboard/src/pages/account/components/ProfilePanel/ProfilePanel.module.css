@@ -1,0 +1,342 @@
+/**
+ * ProfilePanel Styles
+ */
+
+.panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+/* Section Header */
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sectionTitle {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.editBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--account-accent-gold-dim, rgba(212, 175, 55, 0.15));
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    color: var(--account-accent-gold, #D4AF37);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.editBtn:hover {
+    background: rgba(212, 175, 55, 0.25);
+}
+
+.editActions {
+    display: flex;
+    gap: 8px;
+}
+
+.cancelBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 8px;
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.cancelBtn:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.saveBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    background: var(--account-accent-gold, #D4AF37);
+    border: none;
+    border-radius: 8px;
+    color: #0B1220;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.saveBtn:hover:not(:disabled) {
+    background: #E5C158;
+}
+
+.saveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Card */
+.card {
+    background: var(--account-card-bg, #111B2E);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.cardHeader {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 20px;
+    background: rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.cardContent {
+    padding: 20px;
+}
+
+/* Form Grid */
+.formGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.formGroup {
+    display: flex;
+    flex-direction: column;
+}
+
+.label {
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--account-text-secondary, #94A3B8);
+}
+
+.required {
+    color: var(--account-danger, #EF4444);
+}
+
+.input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 8px;
+    color: var(--account-text-primary, #F8FAFC);
+    font-size: 0.95rem;
+    transition: all 0.2s ease;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--account-accent-gold, #D4AF37);
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.input::placeholder {
+    color: var(--account-text-muted, #64748B);
+}
+
+.inputError {
+    border-color: var(--account-danger, #EF4444);
+}
+
+.inputError:focus {
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15);
+}
+
+.errorText {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--account-danger, #EF4444);
+}
+
+.hint {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    color: var(--account-text-muted, #64748B);
+}
+
+/* Value Box (Read Mode) */
+.valueBox {
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 8px;
+    color: var(--account-text-primary, #F8FAFC);
+    font-size: 0.95rem;
+}
+
+.valueBoxWithAction {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 14px;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 8px;
+    gap: 12px;
+}
+
+.valueContent {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--account-text-primary, #F8FAFC);
+    font-size: 0.95rem;
+}
+
+.empty {
+    color: var(--account-text-muted, #64748B);
+    font-style: italic;
+}
+
+/* Verification Badges */
+.verifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(16, 185, 129, 0.15);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    border-radius: 4px;
+    color: #10B981;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.unverifiedBadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 8px;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    border-radius: 4px;
+    color: #F59E0B;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.resendBtn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 10px;
+    background: transparent;
+    border: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+    border-radius: 6px;
+    color: var(--account-text-secondary, #94A3B8);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+
+.resendBtn:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.resendBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Organization Items */
+.orgItem {
+    padding: 14px 0;
+    border-bottom: 1px solid var(--account-card-border, rgba(255, 255, 255, 0.06));
+}
+
+.orgItem:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.orgItem:first-child {
+    padding-top: 0;
+}
+
+.orgInfo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 4px;
+}
+
+.orgName {
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--account-text-primary, #F8FAFC);
+}
+
+.primaryBadge {
+    padding: 2px 8px;
+    background: var(--account-accent-gold-dim, rgba(212, 175, 55, 0.15));
+    border-radius: 4px;
+    color: var(--account-accent-gold, #D4AF37);
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.orgMeta {
+    font-size: 0.85rem;
+    color: var(--account-text-secondary, #94A3B8);
+}
+
+/* Responsive */
+@media (max-width: 767px) {
+    .formGrid {
+        grid-template-columns: 1fr;
+    }
+
+    .sectionHeader {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .editActions {
+        width: 100%;
+    }
+
+    .cancelBtn,
+    .saveBtn {
+        flex: 1;
+        justify-content: center;
+    }
+
+    .valueBoxWithAction {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .resendBtn {
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
+}

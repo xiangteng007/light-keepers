@@ -14,6 +14,9 @@ import { useWidgetLayout } from './useWidgetLayout';
 import { useSidebarConfig, ICON_MAP } from './useSidebarConfig';
 import { PermissionLevel } from './widget.types';
 import { WIDGET_CONTENT_MAP } from './WidgetContent';
+import { SyncStatusIndicator } from '../SyncStatusIndicator';
+import { Breadcrumb } from '../Breadcrumb';
+import { LanguageToggle } from '../LanguageSelector';
 import './AppShellLayout.css';
 
 interface AppShellLayoutProps {
@@ -135,6 +138,12 @@ export default function AppShellLayout({
                         onShowWidget={toggleWidgetVisibility}
                         onAddWidget={() => setPickerOpen(true)}
                     />
+
+                    {/* Sync Status Indicator */}
+                    <SyncStatusIndicator />
+
+                    {/* Language Toggle */}
+                    <LanguageToggle />
 
                     {/* Notification Icon */}
                     <div style={{ position: 'relative' }}>
@@ -370,6 +379,9 @@ export default function AppShellLayout({
 
                 {/* [M] MainColumn - Widget Grid */}
                 <main className="mainCol">
+                    {/* Breadcrumb Navigation */}
+                    <Breadcrumb />
+
                     {children || (
                         <WidgetGrid
                             widgets={widgets}

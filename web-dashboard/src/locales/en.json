@@ -1,0 +1,132 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "error": "Error occurred",
+        "success": "Success",
+        "cancel": "Cancel",
+        "confirm": "Confirm",
+        "save": "Save",
+        "delete": "Delete",
+        "edit": "Edit",
+        "add": "Add",
+        "search": "Search",
+        "filter": "Filter",
+        "reset": "Reset",
+        "close": "Close",
+        "back": "Back",
+        "next": "Next",
+        "previous": "Previous",
+        "submit": "Submit",
+        "logout": "Logout",
+        "login": "Login",
+        "yes": "Yes",
+        "no": "No"
+    },
+    "nav": {
+        "commandCenter": "Command Center",
+        "geoIntel": "Geo Intel",
+        "missionCommand": "Mission Command",
+        "workforce": "Workforce",
+        "logistics": "Logistics",
+        "community": "Community",
+        "analytics": "Analytics",
+        "knowledge": "Knowledge",
+        "governance": "Governance",
+        "account": "My Account"
+    },
+    "pages": {
+        "dashboard": {
+            "title": "Command Center",
+            "subtitle": "Real-time disaster response overview",
+            "widgets": {
+                "missionStats": "Mission Statistics",
+                "activeAlerts": "Active Alerts",
+                "resourceStatus": "Resource Status",
+                "personnelStatus": "Personnel Status"
+            }
+        },
+        "account": {
+            "title": "My Account",
+            "subtitle": "Manage your profile, security settings, and linked accounts",
+            "tabs": {
+                "profile": "Profile",
+                "volunteer": "Volunteer/Org",
+                "security": "Security",
+                "connected": "Connected Accounts",
+                "preferences": "Preferences"
+            },
+            "profile": {
+                "basicInfo": "Basic Information",
+                "contactInfo": "Contact Information",
+                "displayName": "Display Name",
+                "realName": "Real Name",
+                "nickname": "Nickname",
+                "email": "Email",
+                "phone": "Phone",
+                "verified": "Verified",
+                "unverified": "Unverified",
+                "editProfile": "Edit Profile",
+                "saveChanges": "Save Changes"
+            },
+            "security": {
+                "password": "Password Management",
+                "changePassword": "Change Password",
+                "twoFactor": "Two-Factor Authentication",
+                "enabled": "Enabled",
+                "disabled": "Disabled",
+                "sessions": "Login Sessions",
+                "currentDevice": "Current Device",
+                "revokeSession": "Revoke Session",
+                "dangerZone": "Danger Zone",
+                "deactivate": "Deactivate Account",
+                "deleteAccount": "Delete Account"
+            },
+            "connected": {
+                "title": "Connected Accounts",
+                "line": "LINE",
+                "google": "Google",
+                "linked": "Linked",
+                "notLinked": "Not Linked",
+                "connect": "Connect",
+                "disconnect": "Disconnect"
+            },
+            "preferences": {
+                "title": "Notification Preferences",
+                "channels": {
+                    "email": "Email",
+                    "sms": "SMS",
+                    "line": "LINE",
+                    "push": "Push"
+                },
+                "categories": {
+                    "system": "System Announcements",
+                    "tasks": "Task Assignments",
+                    "emergency": "Emergency Alerts"
+                },
+                "weeklyDigest": "Weekly Digest",
+                "restoreDefaults": "Restore Defaults"
+            }
+        }
+    },
+    "alerts": {
+        "saveSuccess": "Saved successfully",
+        "saveFailed": "Failed to save",
+        "deleteConfirm": "Are you sure you want to delete?",
+        "unsavedChanges": "You have unsaved changes"
+    },
+    "errors": {
+        "networkError": "Network error, please check your connection",
+        "unauthorized": "Authentication failed, please login again",
+        "forbidden": "You don't have permission to perform this action",
+        "notFound": "The requested resource was not found",
+        "serverError": "Server error, please try again later"
+    },
+    "time": {
+        "justNow": "Just now",
+        "minutesAgo": "{count} minutes ago",
+        "hoursAgo": "{count} hours ago",
+        "daysAgo": "{count} days ago",
+        "monthsAgo": "{count} months ago",
+        "yearsAgo": "{count} years ago"
+    }
+}

@@ -1,0 +1,132 @@
+{
+    "common": {
+        "loading": "載入中...",
+        "error": "發生錯誤",
+        "success": "成功",
+        "cancel": "取消",
+        "confirm": "確認",
+        "save": "儲存",
+        "delete": "刪除",
+        "edit": "編輯",
+        "add": "新增",
+        "search": "搜尋",
+        "filter": "篩選",
+        "reset": "重設",
+        "close": "關閉",
+        "back": "返回",
+        "next": "下一步",
+        "previous": "上一步",
+        "submit": "提交",
+        "logout": "登出",
+        "login": "登入",
+        "yes": "是",
+        "no": "否"
+    },
+    "nav": {
+        "commandCenter": "指揮中心",
+        "geoIntel": "地理情資",
+        "missionCommand": "任務指揮",
+        "workforce": "人力資源",
+        "logistics": "後勤物資",
+        "community": "社區服務",
+        "analytics": "數據分析",
+        "knowledge": "知識管理",
+        "governance": "系統管理",
+        "account": "我的帳戶"
+    },
+    "pages": {
+        "dashboard": {
+            "title": "指揮中心",
+            "subtitle": "即時災害應變資訊總覽",
+            "widgets": {
+                "missionStats": "任務統計",
+                "activeAlerts": "即時警報",
+                "resourceStatus": "資源狀態",
+                "personnelStatus": "人員狀態"
+            }
+        },
+        "account": {
+            "title": "我的帳戶",
+            "subtitle": "管理您的個人資料、安全設定與連結帳戶",
+            "tabs": {
+                "profile": "個人資料",
+                "volunteer": "志工/組織",
+                "security": "安全性",
+                "connected": "連結帳戶",
+                "preferences": "通知偏好"
+            },
+            "profile": {
+                "basicInfo": "基本資料",
+                "contactInfo": "聯絡資訊",
+                "displayName": "顯示名稱",
+                "realName": "真實姓名",
+                "nickname": "暱稱",
+                "email": "電子郵件",
+                "phone": "手機號碼",
+                "verified": "已驗證",
+                "unverified": "未驗證",
+                "editProfile": "編輯資料",
+                "saveChanges": "儲存變更"
+            },
+            "security": {
+                "password": "密碼管理",
+                "changePassword": "變更密碼",
+                "twoFactor": "兩步驟驗證",
+                "enabled": "已啟用",
+                "disabled": "未啟用",
+                "sessions": "登入裝置",
+                "currentDevice": "目前裝置",
+                "revokeSession": "撤銷登入",
+                "dangerZone": "危險區域",
+                "deactivate": "停用帳戶",
+                "deleteAccount": "刪除帳戶"
+            },
+            "connected": {
+                "title": "連結帳戶",
+                "line": "LINE",
+                "google": "Google",
+                "linked": "已連結",
+                "notLinked": "未連結",
+                "connect": "連結",
+                "disconnect": "解除連結"
+            },
+            "preferences": {
+                "title": "通知偏好",
+                "channels": {
+                    "email": "電子郵件",
+                    "sms": "簡訊",
+                    "line": "LINE",
+                    "push": "推播"
+                },
+                "categories": {
+                    "system": "系統公告",
+                    "tasks": "任務指派",
+                    "emergency": "緊急警報"
+                },
+                "weeklyDigest": "每週摘要",
+                "restoreDefaults": "恢復預設"
+            }
+        }
+    },
+    "alerts": {
+        "saveSuccess": "儲存成功",
+        "saveFailed": "儲存失敗",
+        "deleteConfirm": "確定要刪除嗎？",
+        "unsavedChanges": "您有未儲存的變更"
+    },
+    "errors": {
+        "networkError": "網路連線錯誤，請檢查網路狀態",
+        "unauthorized": "身分驗證失敗，請重新登入",
+        "forbidden": "您沒有權限執行此操作",
+        "notFound": "找不到請求的資源",
+        "serverError": "伺服器錯誤，請稍後再試"
+    },
+    "time": {
+        "justNow": "剛才",
+        "minutesAgo": "{count} 分鐘前",
+        "hoursAgo": "{count} 小時前",
+        "daysAgo": "{count} 天前",
+        "monthsAgo": "{count} 個月前",
+        "yearsAgo": "{count} 年前"
+    }
+}
