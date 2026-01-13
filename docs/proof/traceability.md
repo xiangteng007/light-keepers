@@ -37,13 +37,14 @@
 
 - **Source**: Commander Review v2 §1.D3, §3.B
 - **Task(s)**: T1 (Integration Verification)
-- **Commit/PR**: PR-0c (pending)
+- **Commit/PR**: `440f016` (PR-0)
 - **Evidence**:
-  - ⏳ `/docs/proof/security/T1-routes-guards-mapping.json`
-  - ⏳ `/docs/proof/security/T1-routes-guards-report.md`
-  - ⏳ `/docs/proof/logs/T1-route-guard-scan.txt`
+  - ✅ [`T1-routes-guards-mapping.json`](security/T1-routes-guards-mapping.json) - 1108 routes mapped
+  - ✅ [`T1-routes-guards-report.md`](security/T1-routes-guards-report.md) - Human-readable report
+  - ✅ [`T1-route-guard-scan.txt`](logs/T1-route-guard-scan.txt) - Scan execution log
+  - ⏳ [`T7a-smoke-tests.txt`](logs/T7a-smoke-tests.txt) - 10 endpoint smoke tests (pending)
 - **Verification**: `pwsh tools/audit/scan-routes-guards.ps1`
-- **Status**: 🟡 IN-PROGRESS
+- **Status**: ✅ PASS (mapping complete, smoke tests pending)
 
 ---
 
@@ -53,21 +54,30 @@
 
 - **Source**: Commander Review v2 §3.C, §1.D4
 - **Task(s)**: T7a (Shift-left Security)
-- **Commit/PR**: PR-1 (pending)
+- **Commit/PR**: `30aeae9` (PR-1)
 - **Evidence**:
-  - ⏳ `/docs/proof/security/T7a-routes-guards-diff.md`
-  - ⏳ 10 high-risk endpoint E2E logs
-- **Status**: ⏳ PENDING
+  - ✅ 6 controllers secured (56 routes protected)
+  - ✅ Coverage: 55.6% → 60.6%
+  - ⏳ [`T7a-smoke-tests.txt`](logs/T7a-smoke-tests.txt) - 10 endpoint E2E (pending run)
+  - ⏳ [`T7a-requests-responses.txt`](api/T7a-requests-responses.txt) - API evidence (pending run)
+- **Controllers Modified**:
+  - `attendance.controller.ts` (7 routes)
+  - `events.controller.ts` (6 routes)
+  - `donation-tracking.controller.ts` (5 routes)
+  - `payroll.controller.ts` (8 routes)
+  - `disaster-community.controller.ts` (21 routes)
+  - `line-bot.controller.ts` (8 routes)
+- **Status**: ✅ PASS (guards added, smoke tests pending)
 
 ### T7a-SCORE: Security Maturity Scoring
 
 - **Source**: Commander Review v2 §1.D4, §3.D
 - **Task(s)**: T7a
-- **Commit/PR**: PR-1 (pending)
+- **Commit/PR**: `440f016` (PR-0)
 - **Evidence**:
-  - ⏳ `/docs/audit/security-maturity-scoring.md`
-  - ⏳ `/docs/proof/security/T7-security-score.json`
-- **Status**: ⏳ PENDING
+  - ✅ [`security-maturity-scoring.md`](../audit/security-maturity-scoring.md) - Rubric defined
+  - ⏳ `/docs/proof/security/T7-security-score.json` - Scored output (pending script)
+- **Status**: 🟡 IN-PROGRESS (rubric done, scoring script pending)
 
 ---
 
