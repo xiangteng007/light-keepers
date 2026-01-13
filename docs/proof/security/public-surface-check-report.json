@@ -1,0 +1,25 @@
+﻿{
+    "passed":  [
+                   "STUB_KILL_SWITCH: Stub modules conditionally loaded (default: disabled)",
+                   "HEALTH_PUBLIC: health.controller.ts endpoints are accessible without guards",
+                   "PUBLIC_DECORATOR: @Public decorator exists",
+                   "POLICY_DECLARED: Policy-B is declared in public-surface.md",
+                   "STUB_DOCUMENTED: Stub modules attack surface documented",
+                   "THROTTLE_GLOBAL: ThrottlerGuard is globally configured"
+               ],
+    "warnings":  [
+
+                 ],
+    "errors":  [
+
+               ],
+    "generated":  "2026-01-13T16:47:28Z",
+    "summary":  {
+                    "totalChecks":  6,
+                    "errors":  0,
+                    "warnings":  0,
+                    "passRate":  100,
+                    "passed":  6
+                },
+    "status":  "PASS"
+}

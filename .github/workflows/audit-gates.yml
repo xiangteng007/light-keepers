@@ -1,0 +1,127 @@
+name: audit-gates
+
+on:
+  pull_request:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  NODE_VERSION: "20"
+
+jobs:
+  # Stage-1: Static analysis (no secrets needed)
+  audit-static:
+    runs-on: ubuntu-latest
+    name: "Audit Gates (Static)"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: backend
+        run: npm run build
+
+      # T0: Baseline Scan
+      - name: Run Baseline Scan (T0)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/scan-baseline.ps1
+
+      # T1a: Route-Guard Mapping
+      - name: Run Route-Guard Mapping (T1a)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/scan-routes-guards.ps1
+
+      # Public Surface Validation
+      - name: Validate Public Surface
+        shell: pwsh
+        run: |
+          pwsh tools/audit/validate-public-surface.ps1
+
+      # CI Gate Check (FAIL if policy violated)
+      - name: CI Gate Check
+        shell: pwsh
+        run: |
+          pwsh tools/audit/ci-gate-check.ps1
+
+      # Upload artifacts for review
+      - name: Upload Proof Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: proof-artifacts
+          path: |
+            docs/proof/logs/**
+            docs/proof/security/**
+          retention-days: 30
+
+  # Stage-2: Smoke tests (main branch only, requires secrets)
+  audit-smoke:
+    runs-on: ubuntu-latest
+    name: "Audit Gates (Smoke)"
+    needs: audit-static
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Backend Dependencies
+        working-directory: backend
+        run: npm ci
+
+      - name: Build Backend
+        working-directory: backend
+        run: npm run build
+
+      # Start backend in background (if test environment available)
+      - name: Start Backend
+        if: ${{ secrets.TEST_DATABASE_URL != '' }}
+        working-directory: backend
+        env:
+          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+          JWT_SECRET: ${{ secrets.TEST_JWT_SECRET }}
+        run: |
+          npm run start:prod &
+          sleep 10
+
+      # Run smoke tests
+      - name: Run Security Smoke Tests
+        if: ${{ secrets.TEST_DATABASE_URL != '' }}
+        shell: pwsh
+        env:
+          BASE_URL: "http://localhost:3000"
+        run: |
+          pwsh tools/audit/smoke-security.ps1 -BaseUrl $env:BASE_URL
+
+      # Upload smoke test artifacts
+      - name: Upload Smoke Test Artifacts
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: smoke-test-artifacts
+          path: |
+            docs/proof/logs/T7a-smoke-tests.txt
+            docs/proof/api/T7a-requests-responses.txt
+          retention-days: 30

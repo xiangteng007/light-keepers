@@ -96,6 +96,42 @@
 
 ---
 
+## CI Gate Automation
+
+**Status**: ✅ IMPLEMENTED  
+**Gate**: Gate-Security-ShiftLeft  
+**Workflow**: [`.github/workflows/audit-gates.yml`](../../.github/workflows/audit-gates.yml)
+
+### E1: Code Evidence
+
+- ✅ [`audit-gates.yml`](../../.github/workflows/audit-gates.yml) - CI workflow
+- ✅ [`ci-gate-check.ps1`](../../tools/audit/ci-gate-check.ps1) - G1-G5 hard rules
+- ✅ [`validate-public-surface.ps1`](../../tools/audit/validate-public-surface.ps1) - Policy compliance
+
+### E3: Test Evidence
+
+- ⏳ [`public-surface-check-report.md`](security/public-surface-check-report.md) - Validation output
+
+### E5: Acceptance Check (G1-G5)
+
+- [ ] G1: Baseline SSOT exists (`T0-count-summary.json`)
+- [ ] G2: Guard mapping exists (`T1-routes-guards-mapping.json`)
+- [ ] G3: Public surface policy-compliant
+- [ ] G4: Stub modules disabled in production
+- [ ] G5: No new unprotected routes added
+
+### Repro Commands
+
+```powershell
+# Run all CI gate checks locally
+pwsh tools/audit/scan-baseline.ps1
+pwsh tools/audit/scan-routes-guards.ps1
+pwsh tools/audit/validate-public-surface.ps1
+pwsh tools/audit/ci-gate-check.ps1
+```
+
+---
+
 ## Evidence Pack Legend
 
 | Category | Description |
@@ -117,7 +153,8 @@
 | Traceability | [`traceability.md`](traceability.md) |
 | Security Scoring | [`security-maturity-scoring.md`](../audit/security-maturity-scoring.md) |
 | Public Surface | [`public-surface.md`](security/public-surface.md) |
+| CI Workflow | [`audit-gates.yml`](../../.github/workflows/audit-gates.yml) |
 
 ---
 
-**Last Updated**: 2026-01-13 11:00 UTC+8
+**Last Updated**: 2026-01-13 16:40 UTC+8
