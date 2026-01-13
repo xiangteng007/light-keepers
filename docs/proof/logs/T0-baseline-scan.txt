@@ -1,0 +1,54 @@
+﻿Baseline Scan Report
+====================
+Generated: 2026-01-13T02:04:43.529Z
+Script: scan-baseline.ps1
+Spec Version: baseline-counting-spec.md@v1
+
+BACKEND MODULES
+---------------
+Total: 192
+Breakdown:
+  - root: 2
+  - health: 1
+  - core: 13
+  - common: 3
+  - modules: 173
+
+
+FRONTEND PAGES
+--------------
+Total: 114
+Breakdown:
+  - voice: 1
+  - root: 55
+  - manual: 1
+  - command: 4
+  - security: 1
+  - weather: 1
+  - notifications: 1
+  - domains: 24
+  - care: 1
+  - analytics: 2
+  - monitor: 1
+  - account: 1
+  - governance: 3
+  - resources: 5
+  - geo: 1
+  - public: 1
+  - c2: 3
+  - hub: 1
+  - admin: 7
+
+
+EXCLUSIONS APPLIED
+------------------
+  - node_modules
+  - dist
+  - test
+  - mock
+  - deprecated
+  - *.spec.ts
+  - *.test.ts(x)
+  - *.mock.ts
+  - *.stories.tsx
+  - *.deprecated.*

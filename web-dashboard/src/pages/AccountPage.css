@@ -333,17 +333,18 @@ input:checked+.slider:before {
     }
 
     .profile-card {
-        flex-direction: row;
-        text-align: left;
-        align-items: flex-start;
+        /* Keep flex-direction column to stack avatar above details */
+        /* flex-direction: row; */
+        /* text-align: left; */
+        /* align-items: flex-start; */
         padding: 24px;
     }
 
     .avatar-container {
-        width: 80px;
-        height: 80px;
-        margin-bottom: 0;
-        margin-right: 20px;
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        margin-right: 0;
     }
 
     .profile-details {
