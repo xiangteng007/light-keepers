@@ -34,6 +34,12 @@ jobs:
         working-directory: backend
         run: npm run build
 
+      # SSOT Duplicate Detection (must run first)
+      - name: Detect SSOT Duplicates
+        shell: pwsh
+        run: |
+          pwsh tools/audit/detect-ssot-duplicates.ps1
+
       # T0: Baseline Scan
       - name: Run Baseline Scan (T0)
         shell: pwsh
@@ -70,15 +76,43 @@ jobs:
         run: |
           pwsh tools/audit/ci-gate-check.ps1
 
-      # Upload artifacts for review
+      # Enforce strict gate on main (release readiness)
+      - name: CI Gate Check (Strict) - main only
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          pwsh tools/audit/ci-gate-check.ps1 -Strict
+
+      # Generate Proof Documents from SSOT
+      - name: Generate Proof Index (SSOT -> index.md)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-proof-index.ps1
+
+      - name: Generate Traceability (SSOT -> traceability.md)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-traceability.ps1
+
+      # Enforce no drift in proof documents
+      - name: Enforce proof documents are up-to-date (no drift)
+        shell: bash
+        run: |
+          git diff --exit-code docs/proof/index.md docs/proof/traceability.md || (echo "ERROR: Proof documents are out of sync. Run: pwsh tools/audit/generate-proof-index.ps1 && pwsh tools/audit/generate-traceability.ps1" && exit 1)
+
+      # Upload artifacts for review (complete audit pack)
       - name: Upload Proof Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: proof-artifacts
           path: |
+            docs/proof/index.md
+            docs/proof/traceability.md
+            docs/proof/gates/**
             docs/proof/logs/**
             docs/proof/security/**
+            docs/proof/api/**
           retention-days: 30
 
   # Stage-2: Smoke tests (main branch only, requires secrets)
@@ -109,23 +143,30 @@ jobs:
 
       # Start backend in background (if test environment available)
       - name: Start Backend
-        if: ${{ secrets.TEST_DATABASE_URL != '' }}
         working-directory: backend
         env:
           DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
           JWT_SECRET: ${{ secrets.TEST_JWT_SECRET }}
         run: |
-          npm run start:prod &
-          sleep 10
+          if [ -n "$DATABASE_URL" ]; then
+            npm run start:prod &
+            sleep 10
+          else
+            echo "Skipping: TEST_DATABASE_URL not configured"
+          fi
 
       # Run smoke tests
       - name: Run Security Smoke Tests
-        if: ${{ secrets.TEST_DATABASE_URL != '' }}
-        shell: pwsh
+        shell: bash
         env:
           BASE_URL: "http://localhost:3000"
+          HAS_TEST_DB: ${{ secrets.TEST_DATABASE_URL != '' }}
         run: |
-          pwsh tools/audit/smoke-security.ps1 -BaseUrl $env:BASE_URL
+          if [ "$HAS_TEST_DB" = "true" ]; then
+            pwsh tools/audit/smoke-security.ps1 -BaseUrl $BASE_URL
+          else
+            echo "Skipping smoke tests: TEST_DATABASE_URL not configured"
+          fi
 
       # Upload smoke test artifacts
       - name: Upload Smoke Test Artifacts
@@ -135,5 +176,7 @@ jobs:
           name: smoke-test-artifacts
           path: |
             docs/proof/logs/T7a-smoke-tests.txt
+            docs/proof/logs/runtime-start.log
             docs/proof/api/T7a-requests-responses.txt
+            docs/proof/security/T7a-smoke-test-output.txt
           retention-days: 30
