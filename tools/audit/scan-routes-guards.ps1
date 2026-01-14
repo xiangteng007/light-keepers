@@ -195,8 +195,15 @@ foreach ($controllerFile in $controllerFiles) {
                 $hasThrottle = $false
                 
                 $lookbackStart = [Math]::Max(0, $i - 15)
-                for ($j = $lookbackStart; $j -lt $i; $j++) {
+                for ($j = $i - 1; $j -ge $lookbackStart; $j--) {
                     $prevLine = $lines[$j]
+                    
+                    # Stop if we hit previous endpoint boundary (function definition or HTTP method)
+                    if ($prevLine -match '^\s*async\s+\w+\s*\(' -or 
+                        $prevLine -match '^\s*@(Get|Post|Put|Patch|Delete|All)\s*\(' -or
+                        $prevLine -match '^\s*\}\s*$') {
+                        break
+                    }
                     
                     $guardsMatch = [regex]::Match($prevLine, '@UseGuards\(([^)]+)\)')
                     if ($guardsMatch.Success) {

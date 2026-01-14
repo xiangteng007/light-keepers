@@ -4,11 +4,11 @@
                     "policy":  "Policy-B",
                     "policyEndpointsTotal":  10,
                     "mappingRoutesTotal":  1113,
-                    "mappingUnprotectedTotal":  11,
-                    "mappingUnprotectedNotAllowlisted":  1,
+                    "mappingUnprotectedTotal":  10,
+                    "mappingUnprotectedNotAllowlisted":  0,
                     "errors":  0,
-                    "warnings":  4,
-                    "checkedAt":  "2026-01-15T00:46:09.7429890+08:00"
+                    "warnings":  3,
+                    "checkedAt":  "2026-01-15T01:29:13.4092939+08:00"
                 },
     "errors":  [
 
@@ -70,23 +70,15 @@
                          "details":  {
                                          "count":  3
                                      }
-                     },
-                     {
-                         "code":  "UNPROTECTED_NOT_ALLOWLISTED",
-                         "message":  "Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:\n  - GET /auth/me/status",
-                         "endpoint":  null,
-                         "details":  {
-                                         "total":  1
-                                     }
                      }
                  ],
     "inputs":  {
                    "policyPath":  "docs/policy/public-surface.policy.json",
                    "mappingPath":  "docs/proof/security/T1-routes-guards-mapping.json",
                    "markdownPath":  "docs/proof/security/public-surface.md",
-                   "strict":  false
+                   "strict":  true
                },
-    "checkedAt":  "2026-01-15T00:46:09.7429890+08:00",
+    "checkedAt":  "2026-01-15T01:29:13.4092939+08:00",
     "script":  {
                    "name":  "validate-public-surface.ps1",
                    "version":  "1.0.0"

@@ -1,6 +1,6 @@
 ﻿Route-Guard Scan Log
 ====================
-Generated: 2026-01-14T17:19:12.513Z
+Generated: 2026-01-14T17:29:02.008Z
 Script: scan-routes-guards.ps1
 
 SCAN RESULTS
@@ -9,7 +9,7 @@ Controllers Scanned: 131
 Total Routes Found: 1113
 Protected Routes: 684 (61.5%)
 Unprotected Routes: 429
-Public Routes: 14
+Public Routes: 13
 
 HIGH-RISK ROUTES
 ----------------

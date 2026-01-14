@@ -1,5 +1,5 @@
 ﻿{
-    "generated_at":  "2026-01-14T17:19:12.513Z",
+    "generated_at":  "2026-01-14T17:29:02.008Z",
     "generated_by":  "scan-routes-guards.ps1",
     "version":  "1.0.0",
     "routes":  [
@@ -3328,19 +3328,19 @@
                        "method":  "GET",
                        "path":  "/auth/me/status",
                        "controller":  "backend/src/modules/auth/auth.controller.ts",
-                       "lineNumber":  532,
+                       "lineNumber":  533,
                        "guards":  "JwtAuthGuard",
                        "requireLevel":  null,
                        "requiredLevel":  null,
                        "roles":  [
 
                                  ],
-                       "isPublic":  true,
-                       "public":  true,
-                       "hasThrottle":  true,
-                       "throttle":  "decorator-present",
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
                        "hasGuard":  true,
-                       "protected":  false,
+                       "protected":  true,
                        "globalGuarded":  true,
                        "risk":  "LOW"
                    },
@@ -3348,7 +3348,7 @@
                        "method":  "POST",
                        "path":  "/auth/me/volunteer-profile-completed",
                        "controller":  "backend/src/modules/auth/auth.controller.ts",
-                       "lineNumber":  541,
+                       "lineNumber":  542,
                        "guards":  "JwtAuthGuard",
                        "requireLevel":  null,
                        "requiredLevel":  null,
@@ -24361,8 +24361,8 @@
                                       "JwtAuthGuard",
                                       "RolesGuard"
                                   ],
-                       "requireLevel":  4,
-                       "requiredLevel":  4,
+                       "requireLevel":  3,
+                       "requiredLevel":  3,
                        "roles":  [
 
                                  ],
@@ -24384,8 +24384,8 @@
                                       "JwtAuthGuard",
                                       "RolesGuard"
                                   ],
-                       "requireLevel":  5,
-                       "requiredLevel":  5,
+                       "requireLevel":  3,
+                       "requiredLevel":  3,
                        "roles":  [
 
                                  ],
@@ -24407,8 +24407,8 @@
                                       "JwtAuthGuard",
                                       "RolesGuard"
                                   ],
-                       "requireLevel":  4,
-                       "requiredLevel":  4,
+                       "requireLevel":  3,
+                       "requiredLevel":  3,
                        "roles":  [
 
                                  ],
@@ -24453,8 +24453,8 @@
                                       "JwtAuthGuard",
                                       "RolesGuard"
                                   ],
-                       "requireLevel":  4,
-                       "requiredLevel":  4,
+                       "requireLevel":  3,
+                       "requiredLevel":  3,
                        "roles":  [
 
                                  ],
@@ -24476,8 +24476,8 @@
                                       "JwtAuthGuard",
                                       "RolesGuard"
                                   ],
-                       "requireLevel":  4,
-                       "requiredLevel":  4,
+                       "requireLevel":  3,
+                       "requiredLevel":  3,
                        "roles":  [
 
                                  ],
@@ -24577,6 +24577,6 @@
                                                  "ThrottlerGuard",
                                                  "GlobalAuthGuard"
                                              ],
-                    "public_routes":  14
+                    "public_routes":  13
                 }
 }

@@ -1,6 +1,6 @@
 ﻿# Route-Guard Mapping Report
 
-> **Generated**: 2026-01-14T17:19:12.513Z  
+> **Generated**: 2026-01-14T17:29:02.008Z  
 > **Script**: scan-routes-guards.ps1  
 > **Spec**: baseline-counting-spec.md@v1
 
@@ -13,7 +13,7 @@
 | Total Routes | 1113 |
 | Protected Routes | 684 |
 | Unprotected Routes | 429 |
-| Public Routes | 14 |
+| Public Routes | 13 |
 | **Coverage** | **61.5%** |
 
 ---
@@ -42,12 +42,12 @@
 - `GET /webhooks/subscriptions/:id` -> Level 3
 - `POST /webhooks/subscriptions` -> Level 3
 - `PUT /webhooks/subscriptions/:id` -> Level 3
-- `DELETE /webhooks/subscriptions/:id` -> Level 4
-- `POST /webhooks/subscriptions/:id/regenerate-secret` -> Level 5
-- `POST /webhooks/subscriptions/:id/test` -> Level 4
+- `DELETE /webhooks/subscriptions/:id` -> Level 3
+- `POST /webhooks/subscriptions/:id/regenerate-secret` -> Level 3
+- `POST /webhooks/subscriptions/:id/test` -> Level 3
 - `POST /webhooks/subscriptions/:id/enable` -> Level 3
-- `POST /webhooks/subscriptions/:id/disable` -> Level 4
-- `GET /webhooks/event-types` -> Level 4
+- `POST /webhooks/subscriptions/:id/disable` -> Level 3
+- `GET /webhooks/event-types` -> Level 3
 - `GET /webhooks/logs` -> Level 3
 - `GET /webhooks/stats` -> Level 3
 - `POST /webhooks/dispatch` -> Level 3
@@ -66,7 +66,6 @@
 - `POST /auth/login` -> @Public()
 - `POST /auth/forgot-password` -> @Public()
 - `POST /auth/reset-password` -> @Public()
-- `GET /auth/me/status` -> @Public()
 - `POST /auth/refresh` -> @Public()
 - `POST /intake` -> @Public()
 

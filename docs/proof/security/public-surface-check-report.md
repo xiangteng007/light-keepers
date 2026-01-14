@@ -1,6 +1,6 @@
 ﻿# Public Surface Check Report
 
-- CheckedAt: **2026-01-15T00:46:09.7429890+08:00**
+- CheckedAt: **2026-01-15T01:29:13.4092939+08:00**
 - Policy: **Policy-B**
 - OK: **True**
 
@@ -10,17 +10,15 @@
 |---|---:|
 | Policy endpoints | 10 |
 | Mapping routes | 1113 |
-| Unprotected routes (unique) | 11 |
-| Unprotected not allowlisted | 1 |
+| Unprotected routes (unique) | 10 |
+| Unprotected not allowlisted | 0 |
 | Errors | 0 |
-| Warnings | 4 |
+| Warnings | 3 |
 
 ## Warnings
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/ready (using first candidate for checks)
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/live (using first candidate for checks)
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health (using first candidate for checks)
-- **UNPROTECTED_NOT_ALLOWLISTED**: Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:
-  - GET /auth/me/status
 
 ## Artifacts
 

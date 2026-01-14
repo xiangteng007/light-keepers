@@ -529,8 +529,8 @@ export class AuthController {
     /**
      * 獲取帳號完整狀態（包含審核狀態和志工資料狀態）
      */
-    @Get('me/status')
     @UseGuards(JwtAuthGuard)
+    @Get('me/status')
     async getAccountStatus(@Request() req: { user: { id: string } }) {
         return this.authService.getAccountStatus(req.user.id);
     }
@@ -538,8 +538,8 @@ export class AuthController {
     /**
      * 標記志工資料已完成
      */
-    @Post('me/volunteer-profile-completed')
     @UseGuards(JwtAuthGuard)
+    @Post('me/volunteer-profile-completed')
     async markVolunteerProfileCompleted(@Request() req: { user: { id: string } }) {
         return this.authService.markVolunteerProfileCompleted(req.user.id);
     }
