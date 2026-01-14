@@ -1,6 +1,7 @@
 ﻿{
-    "generatedAt":  "2026-01-15T01:21:41+08:00",
-    "totalUnprotected":  14,
+    "totalUnprotected":  13,
+    "generatedAt":  "2026-01-15T01:31:28+08:00",
+    "generator":  "scan-routes-guards.ps1@1.2.0",
     "routes":  [
                    {
                        "isPublic":  true,
@@ -8,7 +9,6 @@
                        "path":  "/health",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -17,7 +17,6 @@
                        "path":  "/health/live",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -26,7 +25,6 @@
                        "path":  "/health/ready",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -35,7 +33,6 @@
                        "path":  "/health",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -44,7 +41,6 @@
                        "path":  "/health/detailed",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -53,7 +49,6 @@
                        "path":  "/health/live",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -62,7 +57,6 @@
                        "path":  "/health/ready",
                        "method":  "GET",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -71,7 +65,6 @@
                        "path":  "/auth/register",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -80,7 +73,6 @@
                        "path":  "/auth/login",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -89,7 +81,6 @@
                        "path":  "/auth/forgot-password",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -98,17 +89,7 @@
                        "path":  "/auth/reset-password",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
-                   },
-                   {
-                       "isPublic":  true,
-                       "controller":  "backend/src/modules/auth/auth.controller.ts",
-                       "path":  "/auth/me/status",
-                       "method":  "GET",
-                       "hasThrottle":  true,
-                       "falsePositive":  true,
-                       "allowlisted":  false
                    },
                    {
                        "isPublic":  true,
@@ -116,7 +97,6 @@
                        "path":  "/auth/refresh",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    },
                    {
@@ -125,11 +105,8 @@
                        "path":  "/intake",
                        "method":  "POST",
                        "hasThrottle":  true,
-                       "falsePositive":  false,
                        "allowlisted":  true
                    }
                ],
-    "notes":  [
-                  "Route /auth/me/status flagged as scanner false positive - has @UseGuards(JwtAuthGuard) after @Get decorator"
-              ]
+    "allAllowlisted":  true
 }
