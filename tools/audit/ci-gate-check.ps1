@@ -1,6 +1,6 @@
 # CI Gate Check Script
 # Purpose: Enforce hard rules for CI - blocks merge if any rule violated
-# Rules: G1-G5 per Gate Playbook v1.0, G2a/G2b for SEC-T9
+# Rules: G1-G6 per Gate Playbook v1.1
 # Exit Code: 0 = PASS, 1 = FAIL
 # SEMANTICS: In -Strict mode, overall = strictMode (no PASS if strictMode!=PASS)
 
@@ -245,6 +245,35 @@ if (Test-Path $T1MappingPath) {
 }
 else {
     $warnings += "G5: Skipped (no mapping file)"
+}
+
+# ============================================
+# G6: Domain Map Integrity (SSOT)
+# ============================================
+Write-Host "[G6] Checking Domain Map Integrity..." -ForegroundColor Yellow
+
+$T0DomainMapCheckPath = Join-Path $LogsDir "T0-domain-map-check.json"
+if (Test-Path $T0DomainMapCheckPath) {
+    try {
+        $dm = Get-Content $T0DomainMapCheckPath -Raw | ConvertFrom-Json
+        if ($dm.ok -eq $true) {
+            $refMods = if ($null -ne $dm.counts.referencedModules) { $dm.counts.referencedModules } else { "?" }
+            $refPages = if ($null -ne $dm.counts.referencedPages) { $dm.counts.referencedPages } else { "?" }
+            $passed += "G6: Domain Map Integrity PASS (modules: $refMods, pages: $refPages)"
+        }
+        else {
+            $missMods = if ($null -ne $dm.counts.missingModules) { $dm.counts.missingModules } else { 0 }
+            $missPages = if ($null -ne $dm.counts.missingPages) { $dm.counts.missingPages } else { 0 }
+            $missRoutes = if ($null -ne $dm.counts.missingKeyRoutes) { $dm.counts.missingKeyRoutes } else { 0 }
+            $failures += "G6: Domain Map Integrity FAIL (missing: $missMods modules, $missPages pages, $missRoutes keyRoutes)"
+        }
+    }
+    catch {
+        $failures += "G6: Could not parse T0-domain-map-check.json"
+    }
+}
+else {
+    $failures += "G6: T0-domain-map-check.json not found (run check-domain-map.ps1)"
 }
 
 # ============================================

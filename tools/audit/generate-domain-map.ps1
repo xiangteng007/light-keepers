@@ -1,13 +1,16 @@
-# tools/audit/generate-domain-map.ps1
-# v1.1.0
-# Purpose:
+# ============================================
+# FILE: tools/audit/generate-domain-map.ps1
+# VERSION: 1.1.1
+# PURPOSE:
 # - Normalize domain-map.yaml header metadata to a single canonical block
 # - Remove duplicated metadata keys (lastUpdated/generatedAt/generator/commitSha)
 # - Remove UTF-8 BOM if present (avoid cross-platform diffs)
+# - DETERMINISTIC: uses git commit time, not Get-Date (enables CI drift lock)
+# ============================================
 
 param(
     [string]$DomainMapPath = "docs/architecture/domain-map.yaml",
-    [string]$GeneratorId = "tools/audit/generate-domain-map.ps1@1.1.0"
+    [string]$GeneratorId = "tools/audit/generate-domain-map.ps1@1.1.1"
 )
 
 Set-StrictMode -Version Latest
@@ -17,8 +20,11 @@ if (!(Test-Path $DomainMapPath)) {
     throw "Missing domain map file: $DomainMapPath"
 }
 
+# DETERMINISTIC: use git commit time instead of Get-Date
 $commitSha = (git rev-parse HEAD).Trim()
-$nowIso = (Get-Date).ToString("o")
+$commitIso = (git log -1 --format=%cI HEAD).Trim()
+if (-not $commitIso) { $commitIso = (Get-Date).ToString("o") } # fallback only
+$nowIso = $commitIso
 
 # Read raw (remove BOM if present)
 $raw = Get-Content $DomainMapPath -Raw -Encoding UTF8
@@ -58,10 +64,11 @@ $verVal = ($verLine -replace '^version:\s*', '').Trim()
 $verVal = $verVal.Trim('"')
 $filtered[$versionIdx] = "version: `"$verVal`""
 
-# 4) Update "# Generated: YYYY-MM-DD" if present
+# 4) Update "# Generated: YYYY-MM-DD" if present (deterministic by commit date)
+$dateTag = $nowIso.Substring(0, 10)
 for ($i = 0; $i -lt $filtered.Count; $i++) {
     if ($filtered[$i] -match '^#\s*Generated:\s*\d{4}-\d{2}-\d{2}\s*$') {
-        $filtered[$i] = "# Generated: $((Get-Date).ToString('yyyy-MM-dd'))"
+        $filtered[$i] = "# Generated: $dateTag"
     }
 }
 
@@ -80,13 +87,18 @@ foreach ($m in $meta) {
     $insertPos++
 }
 
-# 6) Write back as UTF-8 NO BOM (stable)
+# 6) Normalize keyRoutes to strip /api/v1 prefix (if present)
+for ($i = 0; $i -lt $filtered.Count; $i++) {
+    $filtered[$i] = $filtered[$i] -replace '(^\s*-\s*"?)/api/v1(/[^"]*"?$)', '$1$2'
+}
+
+# 7) Write back as UTF-8 NO BOM (stable)
 $utf8NoBom = New-Object System.Text.UTF8Encoding($false)
 $outText = ($filtered -join "`n").TrimEnd() + "`n"
 [System.IO.File]::WriteAllText($DomainMapPath, $outText, $utf8NoBom)
 
-Write-Host "Domain map metadata normalized:"
+Write-Host "Domain map metadata normalized (DETERMINISTIC):"
 Write-Host " - $DomainMapPath"
 Write-Host " - version=$verVal"
-Write-Host " - generatedAt=$nowIso"
+Write-Host " - generatedAt=$nowIso (commit time)"
 Write-Host " - commitSha=$commitSha"

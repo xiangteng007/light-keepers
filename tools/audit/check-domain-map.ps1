@@ -5,6 +5,8 @@
 # - Validate domain-map.yaml references: modules/pages MUST exist
 # - Validate keyRoutes MUST exist (prefix-match) in route-mapping (if available)
 # - Path canonicalization: handles /api/v1 prefix and trailing slashes
+# - DETERMINISTIC: uses git commit time (enables CI drift lock)
+# - UTF-8 NO BOM output
 # OUTPUT:
 # - docs/proof/logs/T0-domain-map-check.json/.md
 # ============================================
@@ -24,13 +26,22 @@ function Ensure-Dir([string]$p) {
     if (!(Test-Path $p)) { New-Item -ItemType Directory -Path $p -Force | Out-Null }
 }
 
+function Get-GitCommitIso {
+    try {
+        $iso = (git log -1 --format=%cI HEAD).Trim()
+        if ($iso) { return $iso }
+    }
+    catch {}
+    return (Get-Date).ToString("o")
+}
+
 function Canonicalize-Path([string]$p) {
     if ([string]::IsNullOrWhiteSpace($p)) { return "" }
     $x = $p.Trim()
     if (-not $x.StartsWith("/")) { $x = "/$x" }
 
     # strip /api/v1 prefix if present
-    if ($x.StartsWith("/api/v1/")) { $x = $x.Substring(7) }  # "/api/v1" length = 7
+    if ($x.StartsWith("/api/v1/")) { $x = $x.Substring(7) }
     if ($x -eq "/api/v1") { $x = "/" }
 
     # normalize trailing slash (keep "/" only)
@@ -43,7 +54,6 @@ function Expand-Path-Variants([string]$p) {
     $c = Canonicalize-Path $p
     if (![string]::IsNullOrWhiteSpace($c)) { $v.Add($c) | Out-Null }
 
-    # also keep original (trimmed) for diagnostics
     $o = $p.Trim()
     if (![string]::IsNullOrWhiteSpace($o)) {
         if ($o.Length -gt 1) { $o = $o.TrimEnd("/") }
@@ -101,7 +111,6 @@ function Get-RoutePathsFromMapping([string]$mappingPath) {
         elseif ($null -ne $r.url) { $paths += "$($r.url)" }
     }
 
-    # Expand with canonicalized variants
     $expanded = New-Object System.Collections.Generic.HashSet[string]
     foreach ($p in $paths) {
         foreach ($vv in (Expand-Path-Variants $p)) {
@@ -159,7 +168,6 @@ function Parse-DomainMapReferences([string]$yamlText) {
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+modules:\s*$') { $currentList = "modules"; continue }
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+pages:\s*$') { $currentList = "pages"; continue }
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+keyRoutes:\s*$') { $currentList = "keyRoutes"; continue }
-        # Skip non-list fields
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+(name|description):\s*') { $currentList = "skip"; continue }
 
         if ($block -in @("domains", "crossDomains") -and $currentList -in @("modules", "pages", "keyRoutes") -and $line -match '^\s+-\s+(.+?)\s*$') {
@@ -190,6 +198,8 @@ if (!(Test-Path $DomainMapPath)) {
 }
 
 Ensure-Dir $OutDir
+
+$commitTime = Get-GitCommitIso
 
 $pagesRoot = Resolve-FrontendPagesRoot
 $backendModules = Get-BackendModules $BackendModulesRoot
@@ -226,14 +236,15 @@ if ($routeMappingAvailable) {
     }
 }
 
-$ok = ($missingModules.Count -eq 0 -and $missingPages.Count -eq 0 -and (($routeMappingAvailable -and $missingKeyRoutes.Count -eq 0) -or (-not $routeMappingAvailable)))
+$ok = ($missingModules.Count -eq 0 -and $missingPages.Count -eq 0 -and $missingKeyRoutes.Count -eq 0)
 
 $outJson = Join-Path $OutDir "T0-domain-map-check.json"
 $outMd = Join-Path $OutDir "T0-domain-map-check.md"
 
 $payload = [pscustomobject]@{
     version               = "1.1.1"
-    generatedAt           = (Get-Date).ToString("o")
+    ok                    = $ok
+    commitTime            = $commitTime
     domainMapPath         = $DomainMapPath
     backendModulesRoot    = $BackendModulesRoot
     frontendPagesRoot     = $pagesRoot
@@ -255,12 +266,9 @@ $payload = [pscustomobject]@{
         pages     = ($missingPages | Sort-Object)
         keyRoutes = ($missingKeyRoutes | Sort-Object)
     }
-    ok                    = $ok
 }
 
-$payload | ConvertTo-Json -Depth 10 | Set-Content -Path $outJson -Encoding UTF8
-
-@"
+$mdContent = @"
 # Domain Map Check Report (Evidence)
 
 - DomainMap: ``$DomainMapPath``
@@ -268,7 +276,7 @@ $payload | ConvertTo-Json -Depth 10 | Set-Content -Path $outJson -Encoding UTF8
 - FrontendPagesRoot: ``$pagesRoot``
 - RouteMappingPath: ``$RouteMappingPath``
 - RouteMappingAvailable: **$routeMappingAvailable**
-- GeneratedAt: ``$($payload.generatedAt)``
+- CommitTime: ``$commitTime``
 - OK: **$ok**
 
 ## Counts
@@ -285,28 +293,24 @@ $payload | ConvertTo-Json -Depth 10 | Set-Content -Path $outJson -Encoding UTF8
 | missingKeyRoutes | $($payload.counts.missingKeyRoutes) |
 
 ## Missing Modules
-$(
-  if ($missingModules.Count -eq 0) { "- (none)" }
-  else { ($missingModules | Sort-Object | ForEach-Object { "- $_" }) -join "`n" }
-)
+$(if ($missingModules.Count -eq 0) { "- (none)" } else { ($missingModules | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
 
 ## Missing Pages
-$(
-  if ($missingPages.Count -eq 0) { "- (none)" }
-  else { ($missingPages | Sort-Object | ForEach-Object { "- $_" }) -join "`n" }
-)
+$(if ($missingPages.Count -eq 0) { "- (none)" } else { ($missingPages | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
 
 ## Missing KeyRoutes
-$(
-  if (-not $routeMappingAvailable) { "- (skipped: route mapping not found)" }
-  elseif ($missingKeyRoutes.Count -eq 0) { "- (none)" }
-  else { ($missingKeyRoutes | Sort-Object | ForEach-Object { "- $_" }) -join "`n" }
-)
-"@ | Set-Content -Path $outMd -Encoding UTF8
+$(if (-not $routeMappingAvailable) { "- (skipped: route mapping not found)" } elseif ($missingKeyRoutes.Count -eq 0) { "- (none)" } else { ($missingKeyRoutes | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
+"@
 
-Write-Host "Domain map check written:"
+# UTF-8 NO BOM output
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($outJson, ($payload | ConvertTo-Json -Depth 10), $utf8NoBom)
+[System.IO.File]::WriteAllText($outMd, $mdContent, $utf8NoBom)
+
+Write-Host "Domain map check written (DETERMINISTIC):"
 Write-Host " - $outMd"
 Write-Host " - $outJson"
 Write-Host " - OK: $ok"
+Write-Host " - CommitTime: $commitTime"
 
 if ($ok) { exit 0 } else { exit 1 }

@@ -59,11 +59,16 @@ jobs:
           pwsh tools/audit/scan-routes-guards.ps1
 
       # Check Domain Map (after route scan so keyRoutes can be validated)
-      - name: Check Domain Map (SSOT validity + keyRoutes)
+      - name: T0c - Validate Domain Map SSOT
         shell: pwsh
         run: |
           pwsh tools/audit/check-domain-map.ps1 -RouteMappingPath "docs/proof/security/T1-routes-guards-mapping.json"
-        continue-on-error: true
+
+      # T9 - Domain Map drift check (deterministic artifacts)
+      - name: T9 - Assert no drift (domain-map + proof logs)
+        shell: bash
+        run: |
+          git diff --exit-code docs/architecture/domain-map.yaml docs/proof/logs/T0-domain-map-check.md docs/proof/logs/T0-domain-map-check.json || (echo "ERROR: Domain map artifacts have drifted. Run: pwsh tools/audit/generate-domain-map.ps1 && pwsh tools/audit/check-domain-map.ps1" && exit 1)
 
       # Generate public-surface.md from SSOT
       - name: Generate Public Surface Markdown (SSOT -> md)
