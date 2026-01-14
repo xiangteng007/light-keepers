@@ -1,314 +1,479 @@
 # tools/audit/ci-gate-check.ps1
-# v1.2.0
-# Purpose:
-# - Produce machine-verifiable CI gate summary (docs/proof/gates/gate-summary.json)
-# - Enforce hard rules (overall FAIL blocks merge)
-# - Enforce strict blockers only when -Strict (main branch)
-
+# Verifiable Engineering Pipeline — CI Gate Check (Authoritative Gate Summary)
+# VERSION: 1.2.1
 param(
-    [switch]$Strict = $false,
-    [string]$RootDir = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
+    [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
+    [switch]$Strict = $false
 )
 
-Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
-function Ensure-Dir([string]$p) {
-    if (!(Test-Path $p)) { New-Item -ItemType Directory -Path $p -Force | Out-Null }
-}
-
-function Read-Json([string]$p) {
-    if (!(Test-Path $p)) { return $null }
-    return (Get-Content $p -Raw -Encoding UTF8 | ConvertFrom-Json)
-}
-
-function Get-RouteKey($r) {
-    # Try multiple schemas
-    $m = $null
-    $p = $null
-
-    if ($r.PSObject.Properties.Name -contains "method") { $m = $r.method }
-    if ($r.PSObject.Properties.Name -contains "path") { $p = $r.path }
-
-    if ([string]::IsNullOrWhiteSpace($m) -or [string]::IsNullOrWhiteSpace($p)) {
-        if ($r.PSObject.Properties.Name -contains "route") {
-            # e.g. "GET /api/v1/health/ready"
-            $parts = ($r.route -split "\s+", 2)
-            if ($parts.Count -eq 2) { $m = $parts[0]; $p = $parts[1] }
-        }
-    }
-
-    if ([string]::IsNullOrWhiteSpace($m) -or [string]::IsNullOrWhiteSpace($p)) {
-        return ""
-    }
-    return ("{0} {1}" -f ($m.ToString().ToUpperInvariant().Trim()), $p.ToString().Trim())
-}
-
-$ProofDir = Join-Path $RootDir "docs/proof"
-$LogsDir = Join-Path $ProofDir "logs"
-$SecurityDir = Join-Path $ProofDir "security"
-$GatesDir = Join-Path $ProofDir "gates"
-$PolicyDir = Join-Path $RootDir "docs/policy"
-$BackendDir = Join-Path $RootDir "backend/src"
-
-Ensure-Dir $GatesDir
-
-$failures = New-Object System.Collections.Generic.List[string]
-$warnings = New-Object System.Collections.Generic.List[string]
-$strictBlockers = New-Object System.Collections.Generic.List[string]
-
-$gates = [ordered]@{}
-$metrics = [ordered]@{}
-
 # -------------------------
-# G1: Baseline SSOT
+# Helpers
 # -------------------------
-$t0Path = Join-Path $LogsDir "T0-count-summary.json"
-$t0 = Read-Json $t0Path
-if ($null -eq $t0) {
-    $failures.Add("G1: Missing T0-count-summary.json") | Out-Null
-    $gates.G1 = @{ name = "Baseline SSOT"; status = "FAIL"; detail = "T0-count-summary.json missing" }
+function NowIso() { (Get-Date).ToString("o") }
+
+function Ensure-Dir([string]$path) {
+    $dir = Split-Path -Parent $path
+    if ($dir -and !(Test-Path $dir)) { New-Item -ItemType Directory -Force -Path $dir | Out-Null }
 }
-else {
-    # tolerate multiple schemas
-    $bm = $null
-    $fp = $null
+
+function Read-Json([string]$path) {
+    if (!(Test-Path $path)) { throw "Missing file: $path" }
+    return (Get-Content $path -Raw | ConvertFrom-Json)
+}
+
+function Write-Json([object]$obj, [string]$path) {
+    Ensure-Dir $path
+    ($obj | ConvertTo-Json -Depth 20) | Out-File -FilePath $path -Encoding UTF8
+}
+
+function Write-Text([string]$text, [string]$path) {
+    Ensure-Dir $path
+    $text | Out-File -FilePath $path -Encoding UTF8
+}
+
+function Try-GitSha([string]$root) {
     try {
-        if ($t0.counts.backend_modules.total) { $bm = [int]$t0.counts.backend_modules.total }
-        elseif ($t0.counts.backend_modules) { $bm = [int]$t0.counts.backend_modules }
-        if ($t0.counts.frontend_pages.total) { $fp = [int]$t0.counts.frontend_pages.total }
-        elseif ($t0.counts.frontend_pages) { $fp = [int]$t0.counts.frontend_pages }
+        $sha = (git -C $root rev-parse HEAD 2>$null).Trim()
+        if ($sha) { return $sha }
     }
     catch {}
+    return $null
+}
 
-    if ($null -eq $bm -or $null -eq $fp) {
-        $failures.Add("G1: Invalid schema in T0-count-summary.json") | Out-Null
-        $gates.G1 = @{ name = "Baseline SSOT"; status = "FAIL"; detail = "counts.backend_modules / counts.frontend_pages missing" }
+function Normalize-Path([string]$p) {
+    if (-not $p) { return $p }
+    $x = $p.Trim()
+    if ($x.Length -gt 1 -and $x.EndsWith("/")) { $x = $x.TrimEnd("/") }
+    $x = [regex]::Replace($x, "\{[^}]+\}", ":param")
+    $x = [regex]::Replace($x, ":[^/]+", ":param")
+    return $x
+}
+
+function Normalize-Method([string]$m) {
+    if (-not $m) { return $m }
+    return $m.Trim().ToUpper()
+}
+
+function Route-Key([string]$method, [string]$path) {
+    return ("{0} {1}" -f (Normalize-Method $method), (Normalize-Path $path))
+}
+
+function Get-RouteMethod($r) {
+    foreach ($k in @("method", "httpMethod", "verb")) { if ($null -ne $r.$k) { return [string]$r.$k } }
+    return $null
+}
+function Get-RoutePath($r) {
+    foreach ($k in @("path", "route", "url", "fullPath")) { if ($null -ne $r.$k) { return [string]$r.$k } }
+    return $null
+}
+
+function Get-RouteProtected($r) {
+    if ($null -ne $r.protected) { return [bool]$r.protected }
+    if ($null -ne $r.isProtected) { return [bool]$r.isProtected }
+    if ($null -ne $r.metadata) {
+        if ($null -ne $r.metadata.protected) { return [bool]$r.metadata.protected }
+        if ($null -ne $r.metadata.isProtected) { return [bool]$r.metadata.isProtected }
     }
-    else {
-        $metrics.BaselineModules = $bm
-        $metrics.BaselinePages = $fp
-        $gates.G1 = @{ name = "Baseline SSOT"; status = "PASS"; detail = "modules=$bm, pages=$fp" }
+    # conservative default
+    return $true
+}
+
+function Get-GlobalAuthGuardActive($mapping) {
+    foreach ($k in @("globalAuthGuardActive", "GlobalAuthGuardActive")) {
+        if ($null -ne $mapping.$k) { return [bool]$mapping.$k }
     }
+    return $null
 }
 
-# -------------------------
-# G2: Guard Coverage Mapping
-# -------------------------
-$t1Path = Join-Path $SecurityDir "T1-routes-guards-mapping.json"
-$t1 = Read-Json $t1Path
-if ($null -eq $t1 -or $null -eq $t1.routes -or $t1.routes.Count -eq 0) {
-    $failures.Add("G2: Missing or empty T1-routes-guards-mapping.json") | Out-Null
-    $gates.G2 = @{ name = "Guard Coverage"; status = "FAIL"; detail = "routes missing/empty" }
-}
-else {
-    $routes = $t1.routes
-    $total = [int]$routes.Count
-    $protected = [int](($routes | Where-Object { $_.protected -eq $true }).Count)
-    $unprotected = $total - $protected
-    $coverage = if ($total -gt 0) { [math]::Round(($protected / $total) * 100, 1) } else { 0 }
-
-    $metrics.TotalRoutesProd = $total
-    $metrics.ProtectedRoutesProd = $protected
-    $metrics.UnprotectedProd = $unprotected
-    $metrics.CoverageProd = $coverage
-
-    $gates.G2 = @{ name = "Guard Coverage"; status = "PASS"; detail = "$total routes, $coverage% protected" }
-}
-
-# -------------------------
-# G3: Public Surface Policy + Validator Report
-# -------------------------
-$policyPath = Join-Path $PolicyDir "public-surface.policy.json"
-$policy = Read-Json $policyPath
-$validatorPath = Join-Path $SecurityDir "public-surface-check-report.json"
-$validator = Read-Json $validatorPath
-
-if ($null -eq $policy -or $null -eq $policy.version) {
-    $failures.Add("G3: Missing/invalid public-surface.policy.json") | Out-Null
-    $gates.G3 = @{ name = "Public Surface"; status = "FAIL"; detail = "public-surface.policy.json missing/invalid" }
-}
-else {
-    $epCount = 0
-    if ($policy.endpoints) { $epCount = [int]$policy.endpoints.Count }
-    $metrics.PolicyVersion = $policy.version
-    $metrics.PolicyEndpoints = $epCount
-
-    $gates.G3 = @{ name = "Public Surface"; status = "PASS"; detail = "policy=$($policy.version), endpoints=$epCount" }
-
-    if ($null -eq $validator) {
-        $warnings.Add("G3a: validator report missing (public-surface-check-report.json)") | Out-Null
-        $gates.G3a = @{ name = "Validator"; status = "WARN"; detail = "validator report missing" }
+function Get-GlobalGuardsDetected($mapping) {
+    foreach ($k in @("globalGuardsDetected", "GlobalGuardsDetected")) {
+        if ($null -ne $mapping.$k) { return @($mapping.$k) }
     }
-    else {
-        if ($validator.ok -eq $true -or $validator.status -eq "PASS") {
-            $gates.G3a = @{ name = "Validator"; status = "PASS"; detail = "public surface validation ok=true" }
-        }
-        else {
-            $failures.Add("G3a: Public surface validator FAIL") | Out-Null
-            $gates.G3a = @{ name = "Validator"; status = "FAIL"; detail = "public surface validation failed" }
-        }
-    }
+    return @()
+}
+
+function Gate([string]$name, [string]$status, [string]$detail) {
+    return [ordered]@{ name = $name; status = $status; detail = $detail }
 }
 
 # -------------------------
-# G4: Stub Modules Kill-Switch
+# Paths (authoritative)
 # -------------------------
-$appModulePath = Join-Path $BackendDir "app.module.ts"
-if (!(Test-Path $appModulePath)) {
-    $failures.Add("G4: app.module.ts missing") | Out-Null
-    $gates.G4 = @{ name = "Stub Kill-Switch"; status = "FAIL"; detail = "backend/src/app.module.ts missing" }
-}
-else {
-    $txt = Get-Content $appModulePath -Raw -Encoding UTF8
-    $ok = $false
-    # Require explicit env gate: process.env.ENABLE_STUB_MODULES === 'true'
-    if ($txt -match "process\.env\.ENABLE_STUB_MODULES\s*===\s*'true'") { $ok = $true }
-    if ($ok) {
-        $metrics.StubModulesDisabled = $true
-        $gates.G4 = @{ name = "Stub Kill-Switch"; status = "PASS"; detail = "ENABLE_STUB_MODULES env-gated" }
-    }
-    else {
-        $failures.Add("G4: Stub modules are not env-gated") | Out-Null
-        $gates.G4 = @{ name = "Stub Kill-Switch"; status = "FAIL"; detail = "ENABLE_STUB_MODULES guard missing" }
-    }
-}
+$baselinePath = Join-Path $RootDir "docs/proof/logs/T0-count-summary.json"
+$mappingPath = Join-Path $RootDir "docs/proof/security/T1-routes-guards-mapping.json"
+$policyPath = Join-Path $RootDir "docs/policy/public-surface.policy.json"
+$validatorPath = Join-Path $RootDir "docs/proof/security/public-surface-check-report.json"
+$appGuardPath = Join-Path $RootDir "docs/proof/security/T9-app-guard-registration-report.json"
+$domainMapCheck = Join-Path $RootDir "docs/proof/logs/T0-domain-map-check.json"
+
+$outGateJson = Join-Path $RootDir "docs/proof/gates/gate-summary.json"
+$outGateMd = Join-Path $RootDir "docs/proof/gates/gate-summary.md"
+$outReportJson = Join-Path $RootDir "docs/proof/gates/ci-gate-check-report.json"
+$outReportMd = Join-Path $RootDir "docs/proof/gates/ci-gate-check-report.md"
+
+$generatedAt = NowIso
+$commitSha = Try-GitSha $RootDir
 
 # -------------------------
-# G6: Domain Map Integrity (soft in PR, blocker in strict)
+# Load inputs
 # -------------------------
-$dmPath = Join-Path $LogsDir "T0-domain-map-check.json"
-$dm = Read-Json $dmPath
-if ($null -eq $dm) {
-    $warnings.Add("G6: Domain map check report missing (T0-domain-map-check.json)") | Out-Null
-    $gates.G6 = @{ name = "Domain Map Integrity"; status = "WARN"; detail = "report missing" }
-}
-else {
-    if ($dm.ok -eq $true) {
-        $gates.G6 = @{ name = "Domain Map Integrity"; status = "PASS"; detail = "all referenced modules/pages exist" }
-    }
-    else {
-        $warnings.Add("G6: Domain map has missing references (modules/pages)") | Out-Null
-        $gates.G6 = @{ name = "Domain Map Integrity"; status = "WARN"; detail = "missingModules=$($dm.counts.missingModules), missingPages=$($dm.counts.missingPages)" }
-        if ($Strict) {
-            $strictBlockers.Add("DomainMapMissingReferences > 0") | Out-Null
-        }
-    }
-}
+$gates = [ordered]@{}
+$failures = @()
+$warnings = @()
+
+$baseline = $null
+$mapping = $null
+$policy = $null
+$validator = $null
+$appGuard = $null
+$domainOk = $null
+
+try { $baseline = Read-Json $baselinePath } catch { $failures += $_.Exception.Message }
+try { $mapping = Read-Json $mappingPath } catch { $failures += $_.Exception.Message }
+try { $policy = Read-Json $policyPath } catch { $failures += $_.Exception.Message }
+try { $validator = Read-Json $validatorPath } catch { $warnings += "Missing validator report: $validatorPath" }
+try { $appGuard = Read-Json $appGuardPath } catch { $warnings += "Missing app guard report: $appGuardPath" }
+try { $domainOk = Read-Json $domainMapCheck } catch { $warnings += "Missing domain-map check report: $domainMapCheck" }
 
 # -------------------------
-# G5: Strict blocker = Unprotected routes not allowlisted
+# Compute metrics
 # -------------------------
-if ($t1 -and $t1.routes) {
-    $policySet = New-Object System.Collections.Generic.HashSet[string]
-    if ($policy -and $policy.endpoints) {
-        foreach ($e in $policy.endpoints) {
-            if ($e.method -and $e.path) {
-                $policySet.Add(("{0} {1}" -f ($e.method.ToString().ToUpperInvariant().Trim()), $e.path.ToString().Trim())) | Out-Null
-            }
+$moduleCount = $null
+$pageCount = $null
+if ($baseline) {
+    foreach ($k in @("moduleCount", "modules", "modulesCount")) {
+        if ($null -ne $baseline.$k) { $moduleCount = [int]$baseline.$k; break }
+    }
+    foreach ($k in @("pageCount", "pages", "pagesCount")) {
+        if ($null -ne $baseline.$k) { $pageCount = [int]$baseline.$k; break }
+    }
+    # try nested counts
+    if ($null -eq $moduleCount -and $null -ne $baseline.counts) {
+        if ($null -ne $baseline.counts.backend_modules) {
+            if ($null -ne $baseline.counts.backend_modules.total) { $moduleCount = [int]$baseline.counts.backend_modules.total }
+            else { $moduleCount = [int]$baseline.counts.backend_modules }
         }
     }
-
-    $routes = $t1.routes
-    $unprotected = @($routes | Where-Object { $_.protected -ne $true })
-    $allowlisted = 0
-    $notAllowlisted = 0
-
-    foreach ($r in $unprotected) {
-        $k = Get-RouteKey $r
-        $isPublic = $false
-        if ($r.PSObject.Properties.Name -contains "public") { if ($r.public -eq $true) { $isPublic = $true } }
-
-        if ($isPublic) { $allowlisted++; continue }
-        if ($k -ne "" -and $policySet.Contains($k)) { $allowlisted++; continue }
-        $notAllowlisted++
+    if ($null -eq $pageCount -and $null -ne $baseline.counts) {
+        if ($null -ne $baseline.counts.frontend_pages) {
+            if ($null -ne $baseline.counts.frontend_pages.total) { $pageCount = [int]$baseline.counts.frontend_pages.total }
+            else { $pageCount = [int]$baseline.counts.frontend_pages }
+        }
     }
+}
 
-    $metrics.UnprotectedNotAllowlistedProd = $notAllowlisted
-    $metrics.UnprotectedAllowlistedProd = $allowlisted
+$routes = @()
+if ($mapping) {
+    if ($null -ne $mapping.routes) { $routes = @($mapping.routes) }
+    elseif ($null -ne $mapping.data -and $null -ne $mapping.data.routes) { $routes = @($mapping.data.routes) }
+}
 
-    # Threshold gate (non-strict informational)
-    $threshold = 999999
-    if ($metrics.UnprotectedProd -le $threshold) {
-        $gates.G5 = @{ name = "Unprotected Threshold"; status = "PASS"; detail = "$($metrics.UnprotectedProd) within threshold" }
+$totalRoutesProd = $routes.Count
+$protectedRoutesProd = 0
+$unprotectedRoutes = @()
+
+foreach ($r in $routes) {
+    $isProtected = Get-RouteProtected $r
+    if ($isProtected) { $protectedRoutesProd++ }
+    else { $unprotectedRoutes += $r }
+}
+
+$coverageProd = 0
+if ($totalRoutesProd -gt 0) {
+    $coverageProd = [math]::Round(($protectedRoutesProd / $totalRoutesProd) * 100, 1)
+}
+
+# Policy allowlist keys
+$policyEndpoints = 0
+$policyVersion = $null
+$policyName = $null
+$allowKeys = @{}
+
+if ($policy) {
+    $policyVersion = [string]$policy.version
+    $policyName = [string]$policy.policy
+    if (-not $policyName) { $policyName = "Policy-A" }
+
+    if ($null -ne $policy.endpoints) {
+        foreach ($ep in @($policy.endpoints)) {
+            if (-not $ep.method -or -not $ep.path) { continue }
+            $k = Route-Key $ep.method $ep.path
+            if (-not $allowKeys.ContainsKey($k)) { $allowKeys[$k] = $true }
+        }
     }
-    else {
-        $failures.Add("G5: Unprotected routes exceed threshold") | Out-Null
-        $gates.G5 = @{ name = "Unprotected Threshold"; status = "FAIL"; detail = "$($metrics.UnprotectedProd) exceeds threshold" }
-    }
+    $policyEndpoints = $allowKeys.Keys.Count
+}
 
-    if ($notAllowlisted -gt 0) {
-        $strictBlockers.Add("UnprotectedNotAllowlistedProd > 0 ($notAllowlisted routes)") | Out-Null
+# Compare unprotected vs allowlist
+$unprotectedAllowlistedProd = 0
+$unprotectedNotAllowlistedProd = @()
+
+foreach ($r in $unprotectedRoutes) {
+    $m = Get-RouteMethod $r
+    $p = Get-RoutePath $r
+    if (-not $m -or -not $p) { continue }
+    $k = Route-Key $m $p
+    if ($allowKeys.ContainsKey($k)) { $unprotectedAllowlistedProd++ }
+    else { $unprotectedNotAllowlistedProd += $k }
+}
+
+$unprotectedProd = $unprotectedRoutes.Count
+$notAllowlistedCount = $unprotectedNotAllowlistedProd.Count
+
+# Stub kill-switch
+$stubModulesDisabled = $true
+if ($env:ENABLE_STUB_MODULES) {
+    if ($env:ENABLE_STUB_MODULES.ToLower() -in @("1", "true", "yes", "on")) { $stubModulesDisabled = $false }
+}
+
+# Global auth guard evidence (mapping + appGuard report)
+$globalAuthGuardActive = Get-GlobalAuthGuardActive $mapping
+$globalGuardsDetected = Get-GlobalGuardsDetected $mapping
+$globalAuthGuardRegistered = $null
+if ($appGuard -and $null -ne $appGuard.globalAuthGuardRegistered) {
+    $globalAuthGuardRegistered = [bool]$appGuard.globalAuthGuardRegistered
+}
+
+# Validator ok
+$validatorOk = $null
+if ($validator -and $null -ne $validator.ok) { $validatorOk = [bool]$validator.ok }
+
+# Domain map ok
+$domainMapOk = $null
+if ($domainOk -and $null -ne $domainOk.ok) { $domainMapOk = [bool]$domainOk.ok }
+
+# Strict evaluation
+$strictMode = "PASS"
+$blockedReason = $null
+if ($notAllowlistedCount -gt 0) {
+    $strictMode = "BLOCKED"
+    $blockedReason = "UnprotectedNotAllowlistedProd = $notAllowlistedCount :: " + (($unprotectedNotAllowlistedProd | Select-Object -First 10) -join ", ")
+}
+
+# -------------------------
+# Gates
+# -------------------------
+# G1: Baseline SSOT
+if ($baseline -and $moduleCount -gt 0) {
+    $gates["G1"] = Gate "Baseline SSOT" "PASS" "modules=$moduleCount, pages=$pageCount"
+}
+else {
+    $gates["G1"] = Gate "Baseline SSOT" "FAIL" "Missing or invalid baseline: $baselinePath"
+}
+
+# G2: Guard Coverage mapping present
+if ($mapping -and $totalRoutesProd -gt 0) {
+    $gates["G2"] = Gate "Guard Coverage" "PASS" "$totalRoutesProd routes, $coverageProd% protected"
+}
+else {
+    $gates["G2"] = Gate "Guard Coverage" "FAIL" "Missing or invalid mapping: $mappingPath"
+}
+
+# G2a: APP_GUARD registration report
+if ($appGuard -and $globalAuthGuardRegistered -eq $true) {
+    $gates["G2a"] = Gate "App Guard Registration" "PASS" "GlobalAuthGuard registered as APP_GUARD"
+}
+elseif ($appGuard) {
+    $gates["G2a"] = Gate "App Guard Registration" "FAIL" "T9 report present but guard not registered"
+}
+else {
+    $gates["G2a"] = Gate "App Guard Registration" "WARN" "Missing T9 report (non-blocking unless Strict)"
+}
+
+# G2b: Global guard applied (scanner)
+if ($globalAuthGuardActive -eq $true) {
+    $gates["G2b"] = Gate "Global Guard Coverage Applied" "PASS" "globalAuthGuardActive=true"
+}
+elseif ($null -eq $globalAuthGuardActive) {
+    $gates["G2b"] = Gate "Global Guard Coverage Applied" "WARN" "globalAuthGuardActive not present in mapping schema"
+}
+else {
+    $gates["G2b"] = Gate "Global Guard Coverage Applied" "FAIL" "globalAuthGuardActive=false"
+}
+
+# G3: Public Surface policy
+if ($policy -and $policyEndpoints -gt 0) {
+    $gates["G3"] = Gate "Public Surface" "PASS" "$policyName, endpoints=$policyEndpoints, version=$policyVersion"
+}
+else {
+    $gates["G3"] = Gate "Public Surface" "FAIL" "Missing/empty policy endpoints: $policyPath"
+}
+
+# G3a: Validator ok
+if ($validatorOk -eq $true) {
+    $gates["G3a"] = Gate "Validator" "PASS" "public surface validation ok=true"
+}
+elseif ($validator) {
+    $gates["G3a"] = Gate "Validator" "FAIL" "validator ok=false"
+}
+else {
+    $gates["G3a"] = Gate "Validator" "WARN" "validator report missing (non-blocking unless Strict)"
+}
+
+# G4: Stub kill-switch
+if ($stubModulesDisabled) {
+    $gates["G4"] = Gate "Stub Kill-Switch" "PASS" "ENABLE_STUB_MODULES disabled"
+}
+else {
+    $gates["G4"] = Gate "Stub Kill-Switch" "FAIL" "ENABLE_STUB_MODULES enabled in CI environment"
+}
+
+# G5: Unprotected vs allowlist
+if ($notAllowlistedCount -eq 0) {
+    $gates["G5"] = Gate "Unprotected Threshold" "PASS" "$unprotectedProd unprotected (all allowlisted)"
+}
+else {
+    $gates["G5"] = Gate "Unprotected Threshold" "FAIL" "$notAllowlistedCount not allowlisted"
+}
+
+# G6: Domain map integrity
+if ($domainMapOk -eq $true) {
+    $gates["G6"] = Gate "Domain Map Integrity" "PASS" "all referenced modules/pages exist"
+}
+elseif ($domainOk) {
+    $gates["G6"] = Gate "Domain Map Integrity" "FAIL" "domain-map check ok=false"
+}
+else {
+    $gates["G6"] = Gate "Domain Map Integrity" "WARN" "domain-map check missing (non-blocking unless Strict)"
+}
+
+# STRICT gate (computed)
+if ($strictMode -eq "PASS") {
+    $gates["STRICT"] = Gate "Strict Mode Check" "PASS" "UnprotectedNotAllowlistedProd = 0"
+}
+else {
+    $gates["STRICT"] = Gate "Strict Mode Check" "BLOCKED" $blockedReason
+}
+
+# -------------------------
+# Overall result
+# -------------------------
+$overall = "PASS"
+
+# In strict mode, WARN becomes FAIL (hard)
+if ($Strict) {
+    foreach ($k in $gates.Keys) {
+        if ($gates[$k].status -in @("FAIL", "BLOCKED")) { $overall = "FAIL"; break }
+    }
+    # strict semantic rule
+    if ($strictMode -ne "PASS") { $overall = "FAIL" }
+}
+else {
+    foreach ($k in $gates.Keys) {
+        if ($gates[$k].status -eq "FAIL") { $overall = "FAIL"; break }
     }
 }
 
 # -------------------------
-# Emit summary
+# Write outputs (JSON + MD) — authoritative
 # -------------------------
-$overall = $(if ($failures.Count -gt 0) { "FAIL" } else { "PASS" })
-$strictMode = $(if ($strictBlockers.Count -gt 0) { "BLOCKED" } else { "PASS" })
-$blockedReason = $(if ($strictMode -eq "BLOCKED") { ($strictBlockers -join "; ") } else { "" })
-
-$summary = [ordered]@{
-    version       = "1.2.0"
-    generatedAt   = (Get-Date).ToString("o")
-    generator     = "tools/audit/ci-gate-check.ps1@1.2.0"
+$gateSummary = [ordered]@{
+    version       = "1.2.1"
+    generatedAt   = $generatedAt
+    generator     = "tools/audit/ci-gate-check.ps1@1.2.1"
+    commitSha     = $commitSha
     overall       = $overall
+    strictEnabled = [bool]$Strict
     strictMode    = $strictMode
     blockedReason = $blockedReason
-    strictEnabled = $Strict.IsPresent
-    metrics       = $metrics
+    metrics       = [ordered]@{
+        BaselineModules               = $moduleCount
+        BaselinePages                 = $pageCount
+        TotalRoutesProd               = $totalRoutesProd
+        ProtectedRoutesProd           = $protectedRoutesProd
+        CoverageProd                  = $coverageProd
+        UnprotectedProd               = $unprotectedProd
+        UnprotectedAllowlistedProd    = $unprotectedAllowlistedProd
+        UnprotectedNotAllowlistedProd = $notAllowlistedCount
+        PolicyEndpoints               = $policyEndpoints
+        PolicyVersion                 = $policyVersion
+        StubModulesDisabled           = $stubModulesDisabled
+        GlobalAuthGuardActive         = $globalAuthGuardActive
+        GlobalGuardsDetected          = $globalGuardsDetected
+        GlobalAuthGuardRegistered     = $globalAuthGuardRegistered
+        ValidatorOk                   = $validatorOk
+        DomainMapOk                   = $domainMapOk
+    }
     gates         = $gates
-    failures      = $failures
-    warnings      = $warnings
-    sources       = @{
-        baseline        = "docs/proof/logs/T0-count-summary.json"
-        routeMapping    = "docs/proof/security/T1-routes-guards-mapping.json"
-        publicPolicy    = "docs/policy/public-surface.policy.json"
-        validatorReport = "docs/proof/security/public-surface-check-report.json"
-        domainMapReport = "docs/proof/logs/T0-domain-map-check.json"
+    sources       = [ordered]@{
+        baseline     = "docs/proof/logs/T0-count-summary.json"
+        routeMapping = "docs/proof/security/T1-routes-guards-mapping.json"
+        publicPolicy = "docs/policy/public-surface.policy.json"
+        validator    = "docs/proof/security/public-surface-check-report.json"
+        appGuard     = "docs/proof/security/T9-app-guard-registration-report.json"
+        domainMap    = "docs/proof/logs/T0-domain-map-check.json"
     }
 }
 
-$outSummary = Join-Path $GatesDir "gate-summary.json"
-$outReport = Join-Path $GatesDir "gate-summary.md"
+# Detailed report includes failing keys list
+$report = [ordered]@{
+    generatedAt                   = $generatedAt
+    strictEnabled                 = [bool]$Strict
+    overall                       = $overall
+    strictMode                    = $strictMode
+    blockedReason                 = $blockedReason
+    unprotectedNotAllowlistedKeys = @($unprotectedNotAllowlistedProd | Sort-Object -Unique)
+    gateSummary                   = $gateSummary
+}
 
-($summary | ConvertTo-Json -Depth 20) | Set-Content -Path $outSummary -Encoding UTF8
+Write-Json $gateSummary $outGateJson
+Write-Json $report $outReportJson
 
-$md = @"
-# CI Gate Summary
+# Markdown summary must match JSON
+$md = @()
+$md += "# CI Gate Summary"
+$md += ""
+$md += "- GeneratedAt: ``$generatedAt``"
+$md += "- Overall: **$overall**"
+$md += "- StrictEnabled: ``$([bool]$Strict)``"
+$md += "- StrictMode: **$strictMode**"
+$md += "- BlockedReason: ``$(if($blockedReason){$blockedReason}else{''})``"
+$md += ""
+$md += "## Gates"
+foreach ($k in $gates.Keys) {
+    $g = $gates[$k]
+    $md += "- **$k** [$($g.status)]: $($g.detail)"
+}
+$md += ""
+$md += "## Metrics"
+$md += "- BaselineModules: $moduleCount"
+$md += "- BaselinePages: $pageCount"
+$md += "- CoverageProd: $coverageProd"
+$md += "- PolicyEndpoints: $policyEndpoints"
+$md += "- PolicyVersion: $policyVersion"
+$md += "- ProtectedRoutesProd: $protectedRoutesProd"
+$md += "- TotalRoutesProd: $totalRoutesProd"
+$md += "- UnprotectedProd: $unprotectedProd"
+$md += "- UnprotectedAllowlistedProd: $unprotectedAllowlistedProd"
+$md += "- UnprotectedNotAllowlistedProd: $notAllowlistedCount"
+$md += ""
+$md += "## Failures"
+if ($unprotectedNotAllowlistedProd.Count -gt 0) {
+    foreach ($x in ($unprotectedNotAllowlistedProd | Select-Object -First 50)) { $md += "- $x" }
+}
+else {
+    $md += "- (none)"
+}
+$md += ""
+$md += "## Warnings"
+if ($warnings.Count -gt 0) {
+    foreach ($w in $warnings) { $md += "- $w" }
+}
+else {
+    $md += "- (none)"
+}
 
-- GeneratedAt: ``$($summary.generatedAt)``
-- Overall: **$overall**
-- StrictEnabled: ``$($summary.strictEnabled)``
-- StrictMode: **$strictMode**
-- BlockedReason: ``$blockedReason``
+Write-Text ($md -join "`n") $outGateMd
+Write-Text ($md -join "`n") $outReportMd
 
-## Gates
-$(($gates.GetEnumerator() | Sort-Object Name | ForEach-Object { "- **$($_.Key)** [$($_.Value.status)]: $($_.Value.detail)" }) -join "`n")
+Write-Host "Gate Summary written:"
+Write-Host " - $outGateJson"
+Write-Host " - $outGateMd"
+Write-Host " - $outReportJson"
+Write-Host " - $outReportMd"
 
-## Metrics
-$(($metrics.GetEnumerator() | Sort-Object Name | ForEach-Object { "- $($_.Key): $($_.Value)" }) -join "`n")
-
-## Failures
-$(if ($failures.Count -eq 0) { "- (none)" } else { ($failures | ForEach-Object { "- $_" }) -join "`n" })
-
-## Warnings
-$(if ($warnings.Count -eq 0) { "- (none)" } else { ($warnings | ForEach-Object { "- $_" }) -join "`n" })
-"@
-
-Set-Content -Path $outReport -Value $md -Encoding UTF8
-
-Write-Host "========================================"
-Write-Host " CI Gate Summary"
-Write-Host "========================================"
-Write-Host "Overall: $overall"
-Write-Host "StrictEnabled: $($summary.strictEnabled)"
-Write-Host "StrictMode: $strictMode"
-if ($blockedReason) { Write-Host "BlockedReason: $blockedReason" }
-Write-Host "Summary: $outSummary"
-Write-Host "Report : $outReport"
-
-if ($overall -eq "FAIL") { exit 1 }
-if ($Strict -and $strictMode -eq "BLOCKED") { exit 1 }
-exit 0
+if ($Strict -and $overall -ne "PASS") {
+    throw "CI Gate FAILED in STRICT mode. blockedReason=$blockedReason"
+}

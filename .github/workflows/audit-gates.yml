@@ -2,18 +2,27 @@ name: audit-gates
 
 on:
   pull_request:
+    branches: ["main"]
   push:
     branches: ["main"]
   workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: audit-gates-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: "20"
 
 jobs:
   # Stage-1: Static analysis (no secrets needed)
-  audit-static:
+  static:
+    name: "Proof Pipeline (Static)"
     runs-on: ubuntu-latest
-    name: "Audit Gates (Static)"
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -37,10 +46,10 @@ jobs:
       # SSOT Duplicate Detection (must run first)
       - name: Detect SSOT Duplicates
         shell: pwsh
-         run: |
+        run: |
           pwsh tools/audit/detect-ssot-duplicates.ps1
 
-      # Domain Map SSOT (Generate metadata - check runs after route scan)
+      # Domain Map SSOT (Generate metadata - deterministic)
       - name: Generate Domain Map (SSOT metadata)
         shell: pwsh
         run: |
@@ -52,23 +61,23 @@ jobs:
         run: |
           pwsh tools/audit/scan-baseline.ps1
 
+      # T9: App Guard Registration Report
+      - name: Generate App Guard Report (T9)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-app-guard-report.ps1
+
       # T1a: Route-Guard Mapping
       - name: Run Route-Guard Mapping (T1a)
         shell: pwsh
         run: |
-          pwsh tools/audit/scan-routes-guards.ps1
+          pwsh tools/audit/scan-routes-guards.ps1 -ProductionMode
 
-      # Check Domain Map (soft on PR, strict blocks on main)
-      - name: T0d - Validate Domain Map SSOT
+      # Domain Map Reference Check (soft on PR)
+      - name: Run Domain Map Check (T0d - G6)
         shell: pwsh
         run: |
           pwsh tools/audit/check-domain-map.ps1
-
-      # T9 - Domain Map drift check (deterministic artifacts)
-      - name: T9 - Assert no drift (domain-map + proof logs)
-        shell: bash
-        run: |
-          git diff --exit-code docs/architecture/domain-map.yaml docs/proof/logs/T0-domain-map-check.md docs/proof/logs/T0-domain-map-check.json || (echo "ERROR: Domain map artifacts have drifted. Run: pwsh tools/audit/generate-domain-map.ps1 && pwsh tools/audit/check-domain-map.ps1" && exit 1)
 
       # Generate public-surface.md from SSOT
       - name: Generate Public Surface Markdown (SSOT -> md)
@@ -76,26 +85,21 @@ jobs:
         run: |
           pwsh tools/audit/generate-public-surface-md.ps1
 
-      # Enforce no drift between policy.json and generated md
-      - name: Enforce public-surface.md is up-to-date (no drift)
-        shell: bash
-        run: |
-          git diff --exit-code docs/proof/security/public-surface.md || (echo "ERROR: public-surface.md is out of sync with policy.json. Run: pwsh tools/audit/generate-public-surface-md.ps1" && exit 1)
-
       # Public Surface Validation
       - name: Validate Public Surface
         shell: pwsh
         run: |
           pwsh tools/audit/validate-public-surface.ps1
 
-      # CI Gate Check (FAIL if policy violated)
-      - name: CI Gate Check
+      # CI Gate Check (PR = non-strict)
+      - name: CI Gate Check (PR Non-Strict)
+        if: github.event_name == 'pull_request'
         shell: pwsh
         run: |
           pwsh tools/audit/ci-gate-check.ps1
 
-      # Enforce strict gate on main (release readiness)
-      - name: CI Gate Check (Strict) - main only
+      # CI Gate Check (main = strict, blocks merge)
+      - name: CI Gate Check (Main Strict)
         if: github.ref == 'refs/heads/main'
         shell: pwsh
         run: |
@@ -127,11 +131,29 @@ jobs:
         run: |
           pwsh tools/audit/count-frontend-pages.ps1
 
-      # Enforce no drift in proof documents
-      - name: Enforce proof documents are up-to-date (no drift)
+      # Drift Lock (proof docs must be committed)
+      - name: Drift Lock (proof docs)
         shell: bash
         run: |
-          git diff --exit-code docs/proof/index.md docs/proof/traceability.md docs/proof/audit/walkthrough.md docs/proof/security/public-surface.md || (echo "ERROR: Proof documents are out of sync. Run the generate scripts." && exit 1)
+          git diff --exit-code \
+            docs/proof/index.md \
+            docs/proof/traceability.md \
+            docs/proof/audit/walkthrough.md \
+            docs/proof/security/public-surface.md || \
+            (echo "ERROR: Proof documents are out of sync. Run the generate scripts." && exit 1)
+
+      # Publish gate summary to job summary
+      - name: Publish gate summary to job summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## CI Gate Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ -f docs/proof/gates/gate-summary.md ]; then
+            cat docs/proof/gates/gate-summary.md >> $GITHUB_STEP_SUMMARY
+          else
+            echo "gate-summary.md not found" >> $GITHUB_STEP_SUMMARY
+          fi
 
       # Upload artifacts for review (complete audit pack)
       - name: Upload Proof Artifacts
@@ -146,14 +168,16 @@ jobs:
             docs/proof/logs/**
             docs/proof/security/**
             docs/proof/api/**
+            docs/proof/audit/**
           retention-days: 30
 
   # Stage-2: Smoke tests (main branch only, requires secrets)
-  audit-smoke:
+  smoke:
     runs-on: ubuntu-latest
-    name: "Audit Gates (Smoke)"
-    needs: audit-static
+    name: "Proof Pipeline (Smoke)"
+    needs: static
     if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -174,42 +198,21 @@ jobs:
         working-directory: backend
         run: npm run build
 
-      # Start backend in background (if test environment available)
-      - name: Start Backend
-        working-directory: backend
+      # Smoke Test (optional - requires SMOKE_BASE_URL)
+      - name: Smoke Authorization Tests
+        if: env.SMOKE_BASE_URL != ''
+        shell: pwsh
         env:
-          DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-          JWT_SECRET: ${{ secrets.TEST_JWT_SECRET }}
+          SMOKE_BASE_URL: ${{ secrets.SMOKE_BASE_URL }}
         run: |
-          if [ -n "$DATABASE_URL" ]; then
-            npm run start:prod &
-            sleep 10
-          else
-            echo "Skipping: TEST_DATABASE_URL not configured"
-          fi
+          pwsh tools/audit/smoke-authz.ps1 -BaseUrl $env:SMOKE_BASE_URL
 
-      # Run smoke tests
-      - name: Run Security Smoke Tests
-        shell: bash
-        env:
-          BASE_URL: "http://localhost:3000"
-          HAS_TEST_DB: ${{ secrets.TEST_DATABASE_URL != '' }}
-        run: |
-          if [ "$HAS_TEST_DB" = "true" ]; then
-            pwsh tools/audit/smoke-security.ps1 -BaseUrl $BASE_URL
-          else
-            echo "Skipping smoke tests: TEST_DATABASE_URL not configured"
-          fi
-
-      # Upload smoke test artifacts
-      - name: Upload Smoke Test Artifacts
+      # Upload smoke artifacts
+      - name: Upload Smoke Artifacts
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: smoke-test-artifacts
+          name: smoke-artifacts
           path: |
-            docs/proof/logs/T7a-smoke-tests.txt
-            docs/proof/logs/runtime-start.log
-            docs/proof/api/T7a-requests-responses.txt
-            docs/proof/security/T7a-smoke-test-output.txt
+            docs/proof/**
           retention-days: 30

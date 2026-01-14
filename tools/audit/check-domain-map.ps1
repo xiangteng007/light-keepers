@@ -1,11 +1,13 @@
 # tools/audit/check-domain-map.ps1
-# v1.1.0
-# Validates domain-map.yaml references:
-# - modules must exist in backend/src/modules
-# - pages must exist in known frontend pages roots
-# - default is SOFT mode (report only), strict mode blocks CI
+# Domain Map Integrity Gate (G6)
+# v1.2.0
+# - Validates module/page references exist in codebase
+# - Outputs to docs/proof/logs/T0-domain-map-check.json
+# - Soft mode (default): WARN on missing, exit 0
+# - Strict mode: FAIL on missing, exit 1
 
 param(
+    [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
     [string]$DomainMapPath = "docs/architecture/domain-map.yaml",
     [string]$OutDir = "docs/proof/logs",
     [string]$BackendModulesRoot = "backend/src/modules",
@@ -21,7 +23,7 @@ function Ensure-Dir([string]$p) {
 }
 
 function Resolve-FrontendPagesRoot() {
-    if (![string]::IsNullOrWhiteSpace($FrontendPagesRoot) -and (Test-Path $FrontendPagesRoot)) {
+    if (![string]::IsNullOrWhiteSpace($FrontendPagesRoot) -and (Test-Path (Join-Path $RootDir $FrontendPagesRoot))) {
         return $FrontendPagesRoot
     }
     foreach ($c in @(
@@ -31,83 +33,49 @@ function Resolve-FrontendPagesRoot() {
             "apps/web/src/pages",
             "src/pages"
         )) {
-        if (Test-Path $c) { return $c }
+        if (Test-Path (Join-Path $RootDir $c)) { return $c }
     }
     return ""
 }
 
 function Get-BackendModules([string]$root) {
-    if (!(Test-Path $root)) { return @() }
-    return (Get-ChildItem $root -Directory | Select-Object -ExpandProperty Name)
+    $absRoot = Join-Path $RootDir $root
+    if (!(Test-Path $absRoot)) { return @() }
+    return (Get-ChildItem $absRoot -Directory | Select-Object -ExpandProperty Name)
 }
 
 function Get-FrontendPages([string]$root) {
     if ([string]::IsNullOrWhiteSpace($root)) { return @() }
-    if (!(Test-Path $root)) { return @() }
-    $files = Get-ChildItem $root -Recurse -File | Where-Object { $_.Extension -in @(".tsx", ".jsx") }
+    $absRoot = Join-Path $RootDir $root
+    if (!(Test-Path $absRoot)) { return @() }
+    $files = Get-ChildItem $absRoot -Recurse -File | Where-Object { $_.Extension -in @(".tsx", ".jsx") }
     return ($files | ForEach-Object { $_.BaseName } | Sort-Object -Unique)
 }
 
 function Parse-DomainMapReferences([string]$yamlText) {
     $refs = [ordered]@{
-        domains      = @{}
-        crossDomains = @{}
-        allModules   = New-Object System.Collections.Generic.HashSet[string]
-        allPages     = New-Object System.Collections.Generic.HashSet[string]
+        allModules = New-Object System.Collections.Generic.HashSet[string]
+        allPages   = New-Object System.Collections.Generic.HashSet[string]
     }
 
     $block = ""
-    $currentKey = ""
     $currentList = ""
     $lines = $yamlText -split "`r?`n"
 
     foreach ($line in $lines) {
-        if ($line -match '^\s*domains:\s*$') {
-            $block = "domains"; $currentKey = ""; $currentList = ""; continue
-        }
-        if ($line -match '^\s*crossDomain:\s*$' -or $line -match '^\s*crossDomains:\s*$') {
-            $block = "crossDomains"; $currentKey = ""; $currentList = ""; continue
-        }
+        if ($line -match '^\s*domains:\s*$') { $block = "domains"; $currentList = ""; continue }
+        if ($line -match '^\s*crossDomain:\s*$' -or $line -match '^\s*crossDomains:\s*$') { $block = "crossDomains"; $currentList = ""; continue }
 
-        # Domain key under domains/crossDomains (2 spaces indent)
-        if ($block -in @("domains", "crossDomains") -and $line -match '^\s{2}([a-zA-Z0-9_-]+):\s*$') {
-            $currentKey = $Matches[1]
-            $currentList = ""
-            if ($block -eq "domains") {
-                if (-not $refs.domains.ContainsKey($currentKey)) {
-                    $refs.domains[$currentKey] = [ordered]@{ modules = @(); pages = @() }
-                }
-            }
-            else {
-                if (-not $refs.crossDomains.ContainsKey($currentKey)) {
-                    $refs.crossDomains[$currentKey] = [ordered]@{ modules = @(); pages = @() }
-                }
-            }
-            continue
-        }
-
-        # list selector
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+modules:\s*$') { $currentList = "modules"; continue }
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+pages:\s*$') { $currentList = "pages"; continue }
-
-        # Skip keyRoutes/description/name
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+keyRoutes:\s*$') { $currentList = "skip"; continue }
-        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+description:\s*') { $currentList = "skip"; continue }
-        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+name:\s*') { $currentList = "skip"; continue }
+        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+(name|description):\s*') { $currentList = "skip"; continue }
 
-        # list item (only modules/pages)
         if ($block -in @("domains", "crossDomains") -and $currentList -in @("modules", "pages") -and $line -match '^\s+-\s+(.+?)\s*$') {
             $item = $Matches[1].Trim()
             if ([string]::IsNullOrWhiteSpace($item)) { continue }
-
-            if ($block -eq "domains") {
-                if ($currentList -eq "modules") { $refs.domains[$currentKey].modules += $item; $refs.allModules.Add($item) | Out-Null }
-                if ($currentList -eq "pages") { $refs.domains[$currentKey].pages += $item; $refs.allPages.Add($item) | Out-Null }
-            }
-            else {
-                if ($currentList -eq "modules") { $refs.crossDomains[$currentKey].modules += $item; $refs.allModules.Add($item) | Out-Null }
-                if ($currentList -eq "pages") { $refs.crossDomains[$currentKey].pages += $item; $refs.allPages.Add($item) | Out-Null }
-            }
+            if ($currentList -eq "modules") { $refs.allModules.Add($item) | Out-Null }
+            if ($currentList -eq "pages") { $refs.allPages.Add($item) | Out-Null }
         }
     }
 
@@ -117,14 +85,17 @@ function Parse-DomainMapReferences([string]$yamlText) {
 # -----------------------------
 # Main
 # -----------------------------
-if (!(Test-Path $DomainMapPath)) { throw "Missing domain map: $DomainMapPath" }
-Ensure-Dir $OutDir
+$absMapPath = Join-Path $RootDir $DomainMapPath
+if (!(Test-Path $absMapPath)) { throw "Missing domain map: $absMapPath" }
+
+$absOutDir = Join-Path $RootDir $OutDir
+Ensure-Dir $absOutDir
 
 $pagesRoot = Resolve-FrontendPagesRoot
 $backendModules = Get-BackendModules $BackendModulesRoot
 $frontendPages = Get-FrontendPages $pagesRoot
 
-$yamlText = Get-Content $DomainMapPath -Raw -Encoding UTF8
+$yamlText = Get-Content $absMapPath -Raw -Encoding UTF8
 $refs = Parse-DomainMapReferences $yamlText
 
 $missingModules = @()
@@ -134,13 +105,13 @@ $missingPages = @()
 foreach ($p in $refs.allPages) { if ($frontendPages -notcontains $p) { $missingPages += $p } }
 
 $ok = ($missingModules.Count -eq 0 -and $missingPages.Count -eq 0)
-$status = $(if ($ok) { "PASS" } else { "FAIL" })
+$status = if ($ok) { "PASS" } else { if ($Strict) { "FAIL" } else { "WARN" } }
 
-$outJson = Join-Path $OutDir "T0-domain-map-check.json"
-$outMd = Join-Path $OutDir "T0-domain-map-check.md"
+$outJson = Join-Path $absOutDir "T0-domain-map-check.json"
+$outMd = Join-Path $absOutDir "T0-domain-map-check.md"
 
 $payload = [pscustomobject]@{
-    version            = "1.1.0"
+    version            = "1.2.0"
     generatedAt        = (Get-Date).ToString("o")
     status             = $status
     strictMode         = $Strict.IsPresent
