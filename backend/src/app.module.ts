@@ -239,6 +239,7 @@ const STUB_MODULES = [
     DroneSwarmModule,
     SupplyChainBlockchainModule,
     AerialImageAnalysisModule,
+    MockDataModule, // T8: Mock data should not load in production
 ];
 
 const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
@@ -381,7 +382,7 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         VolunteerCertificationModule, // 🎓 志工認證
         // Equipment & Misc
         EquipmentQrModule, // 📱 裝備 QR 碼
-        MockDataModule, // 🧪 模擬資料
+        // MockDataModule - moved to STUB_MODULES (T8: not loaded in production)
         I18nApiModule, // 🌐 多語系 API
         SwaggerAutoDocsModule, // 📚 Swagger 文件
         SystemModule, // ⚙️ 系統管理
