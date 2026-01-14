@@ -4,6 +4,12 @@ description: 監視 Cloud Run 部署狀態並修正錯誤
 
 # 部署監控工作流程
 
+> [!IMPORTANT]
+> **部署架構**: 所有 Cloud Run 部署都透過 **GitHub Actions** 執行，不使用 Cloud Build 觸發器。
+>
+> - Dashboard 部署: `.github/workflows/deploy.yml` → `deploy-dashboard` job
+> - API 部署: `.github/workflows/deploy.yml` → `deploy-api` job
+
 ## 何時使用
 
 每次 `git push` 後，執行此工作流程監視部署狀態。
