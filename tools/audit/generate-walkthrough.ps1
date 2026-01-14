@@ -1,0 +1,157 @@
+param(
+    [string]$GateSummaryPath = "docs/proof/gates/gate-summary.json",
+    [string]$OutPath = "docs/proof/audit/walkthrough.md"
+)
+
+Set-StrictMode -Version Latest
+$ErrorActionPreference = "Stop"
+
+if (!(Test-Path $GateSummaryPath)) {
+    throw "Missing gate summary: $GateSummaryPath"
+}
+
+# Git identity
+$sha = (git rev-parse HEAD).Trim()
+$ref = (git rev-parse --abbrev-ref HEAD).Trim()
+$commitTime = (git show -s --format=%cI HEAD).Trim()
+
+# Evidence hash
+$gateHash = (Get-FileHash -Algorithm SHA256 $GateSummaryPath).Hash.ToLowerInvariant()
+
+# Parse gate summary
+$gate = Get-Content $GateSummaryPath -Raw | ConvertFrom-Json
+
+# Safe access helpers
+function GetVal($obj, $path, $fallback = $null) {
+    try {
+        $cur = $obj
+        foreach ($p in $path.Split('.')) { $cur = $cur.$p }
+        if ($null -eq $cur) { return $fallback }
+        return $cur
+    }
+    catch { return $fallback }
+}
+
+$overall = GetVal $gate "overall" "UNKNOWN"
+$strictMode = GetVal $gate "strictMode" "UNKNOWN"
+$blockedReason = GetVal $gate "blockedReason" $null
+
+$totalRoutesProd = GetVal $gate "metrics.TotalRoutesProd" "?"
+$coverageProd = GetVal $gate "metrics.CoverageProd" "?"
+$unprotectedProd = GetVal $gate "metrics.UnprotectedProd" "?"
+$unprotectedNotAllowlistedProd = GetVal $gate "metrics.UnprotectedNotAllowlistedProd" "?"
+$policyVersion = GetVal $gate "metrics.PolicyVersion" "?"
+$policyEndpoints = GetVal $gate "metrics.PolicyEndpoints" "?"
+
+# Optional extras if present
+$globalAuthGuardActive = GetVal $gate "globalAuthGuardActive" (GetVal $gate "GlobalAuthGuardActive" $null)
+$globalGuardsDetected = GetVal $gate "metrics.GlobalGuardsDetected" $null
+
+$dir = Split-Path -Parent $OutPath
+if ($dir -and !(Test-Path $dir)) { New-Item -ItemType Directory -Path $dir -Force | Out-Null }
+
+$blockedLine = if ($blockedReason) { $blockedReason } else { "null" }
+$globalActiveLine = if ($null -ne $globalAuthGuardActive) { "$globalAuthGuardActive" } else { "n/a" }
+$globalGuardsLine = if ($globalGuardsDetected) { ($globalGuardsDetected -join ", ") } else { "n/a" }
+
+@"
+# Commander Walkthrough — Proof Automation (Evidence-First)
+
+> Authoritative truth is the machine artifacts under ``docs/proof/**``.
+> Any claim without evidence paths is non-authoritative.
+
+---
+
+## 1) Build Identity (AUTO-DERIVED)
+- Branch/Ref: ``$ref``
+- Commit SHA: ``$sha``
+- Commit Time (ISO8601): ``$commitTime``
+- Workflow: ``.github/workflows/audit-gates.yml``
+
+---
+
+## 2) Objective
+Maintain a verifiable security proof pipeline:
+- Default-deny via GlobalAuthGuard (APP_GUARD)
+- Explicit public surface via policy allowlist + @Public/@RequiredLevel(0)
+- CI gates emit machine artifacts + drift-lock proof docs
+
+---
+
+## 3) Gate Snapshot (AUTO-DERIVED — DO NOT EDIT)
+**Source**: ``$GateSummaryPath``  
+**SHA256**: ``$gateHash``
+
+| Metric | Value |
+|--------|-------|
+| overall | ``$overall`` |
+| strictMode | ``$strictMode`` |
+| blockedReason | ``$blockedLine`` |
+| TotalRoutesProd | ``$totalRoutesProd`` |
+| CoverageProd | ``$coverageProd`` |
+| UnprotectedProd | ``$unprotectedProd`` |
+| UnprotectedNotAllowlistedProd | ``$unprotectedNotAllowlistedProd`` |
+| PolicyVersion | ``$policyVersion`` |
+| PolicyEndpoints | ``$policyEndpoints`` |
+| GlobalAuthGuardActive | ``$globalActiveLine`` |
+| GlobalGuardsDetected | ``$globalGuardsLine`` |
+
+**Hard interpretation:**
+- **PASS**: strict release-ready
+- **BLOCKED**: engineering thresholds not met (pipeline valid)
+- **FAIL**: tooling/policy parsing/missing artifacts (pipeline invalid)
+
+---
+
+## 4) Repro Commands (Repo Root)
+``````bash
+pwsh tools/audit/detect-ssot-duplicates.ps1
+pwsh tools/audit/scan-baseline.ps1
+pwsh tools/audit/scan-routes-guards.ps1 -ProductionMode
+pwsh tools/audit/generate-public-surface-md.ps1
+pwsh tools/audit/validate-public-surface.ps1 -Strict
+pwsh tools/audit/ci-gate-check.ps1 -Strict
+pwsh tools/audit/generate-proof-index.ps1
+pwsh tools/audit/generate-traceability.ps1
+pwsh tools/audit/generate-walkthrough.ps1
+git diff --exit-code docs/proof/index.md docs/proof/traceability.md docs/proof/audit/walkthrough.md docs/proof/security/public-surface.md
+``````
+
+---
+
+## 5) Evidence Pack (Required Artifacts)
+
+### Gates
+- ``docs/proof/gates/gate-summary.json``
+- ``docs/proof/gates/ci-gate-check-report.json``
+- ``docs/proof/gates/ci-gate-check-report.md``
+
+### Proof Docs
+- ``docs/proof/index.md``
+- ``docs/proof/traceability.md``
+- ``docs/proof/audit/walkthrough.md`` (this file)
+
+### Public Surface
+- SSOT: ``docs/policy/public-surface.policy.json``
+- Inventory: ``docs/proof/security/public-surface.md``
+- Validator: ``docs/proof/security/public-surface-check-report.json``
+
+### Route/Guard Mapping
+- ``docs/proof/security/T1-routes-guards-mapping.json``
+- ``docs/proof/security/T1-routes-guards-report.md``
+
+---
+
+## 6) Next Actions
+- If strictMode != PASS: reduce ``UnprotectedNotAllowlistedProd`` to 0 via guards OR explicit allowlist for true public endpoints.
+- Ensure drift-lock stays green: any proof doc mismatch must fail CI.
+
+---
+
+> **Generated by**: ``tools/audit/generate-walkthrough.ps1``  
+> **Timestamp**: $(Get-Date -Format "yyyy-MM-ddTHH:mm:ssK")
+"@ | Set-Content -Path $OutPath -Encoding UTF8
+
+Write-Host "[generate-walkthrough] Generated: $OutPath"
+Write-Host "[generate-walkthrough] Gate SHA256: $gateHash"
+Write-Host "[generate-walkthrough] Overall: $overall | StrictMode: $strictMode"

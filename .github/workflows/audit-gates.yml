@@ -94,11 +94,26 @@ jobs:
         run: |
           pwsh tools/audit/generate-traceability.ps1
 
+      - name: Generate Walkthrough (Evidence-First, AUTO)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-walkthrough.ps1
+
+      - name: Export Stack Versions (SSOT)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/export-stack-versions.ps1
+
+      - name: Count Frontend Pages (SSOT)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/count-frontend-pages.ps1
+
       # Enforce no drift in proof documents
       - name: Enforce proof documents are up-to-date (no drift)
         shell: bash
         run: |
-          git diff --exit-code docs/proof/index.md docs/proof/traceability.md || (echo "ERROR: Proof documents are out of sync. Run: pwsh tools/audit/generate-proof-index.ps1 && pwsh tools/audit/generate-traceability.ps1" && exit 1)
+          git diff --exit-code docs/proof/index.md docs/proof/traceability.md docs/proof/audit/walkthrough.md docs/proof/security/public-surface.md || (echo "ERROR: Proof documents are out of sync. Run the generate scripts." && exit 1)
 
       # Upload artifacts for review (complete audit pack)
       - name: Upload Proof Artifacts

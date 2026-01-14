@@ -34,3 +34,22 @@ build/
 # Secrets
 **/serviceAccountKey.json
 **/firebase-adminsdk*.json
+
+# ===========================================
+# CI-Generated Dynamic Reports (DO NOT COMMIT)
+# ===========================================
+# These files contain timestamps and are regenerated each CI run.
+# They should be uploaded as artifacts, not committed to repo.
+# Committing them causes "evidence timestamp drift" audit issues.
+#
+# SSOT files that ARE committed:
+#   - docs/policy/public-surface.policy.json (stable allowlist)
+#   - docs/proof/security/public-surface.md (generated from policy)
+#
+# Dynamic reports that should NOT be committed:
+docs/proof/gates/ci-gate-check-report.json
+docs/proof/gates/ci-gate-check-report.md
+docs/proof/gates/gate-summary.json
+docs/proof/gates/gate-summary.md
+docs/proof/logs/runtime-start.log
+docs/proof/api/T7a-requests-responses.txt

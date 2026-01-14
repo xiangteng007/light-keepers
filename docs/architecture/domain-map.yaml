@@ -1,0 +1,245 @@
+# Light Keepers Platform - Domain Map (SSOT)
+# This file maps 7 workflow domains to their backend modules, frontend pages, and key routes.
+# Generated: 2026-01-15
+
+version: "1.0"
+lastUpdated: "2026-01-15T03:40:00+08:00"
+
+domains:
+  # ============================================================
+  # C2 - Command & Control (指揮控制)
+  # ============================================================
+  c2:
+    name: 指揮控制
+    description: 事件管理、任務派遣、檢傷分類、任務指揮
+    modules:
+      - events
+      - tasks
+      - task-dispatch
+      - triage
+      - mission-sessions
+      - field-reports
+      - auto-dispatch
+      - drill-simulation
+    pages:
+      - CommandCenterPage
+      - EventsPage
+      - TasksPage
+      - TriagePage
+      - MissionCommandPage
+      - EmergencyResponsePage
+    keyRoutes:
+      - /api/v1/events
+      - /api/v1/tasks
+      - /api/v1/triage
+      - /api/v1/mission-sessions
+      - /api/v1/task-dispatch
+
+  # ============================================================
+  # Geo - Geographic Intelligence (地理情資)
+  # ============================================================
+  geo:
+    name: 地理情資
+    description: 戰術地圖、圖層疊加、POI 標記、路線規劃
+    modules:
+      - tactical-maps
+      - overlays
+      - location
+      - geofence-alert
+      - routing
+      - indoor-positioning
+      - offline-map-cache
+      - offline-tiles
+    pages:
+      - TacticalMapPage
+      - MapPage
+      - CommandPostMapPage
+    keyRoutes:
+      - /api/v1/tactical-maps
+      - /api/v1/overlays
+      - /api/v1/location
+      - /api/v1/geofence-alert
+
+  # ============================================================
+  # Log - Logistics & Resources (後勤資源)
+  # ============================================================
+  log:
+    name: 後勤資源
+    description: 物資管理、設備追蹤、捐贈管理、車輛調度
+    modules:
+      - resources
+      - equipment
+      - donations
+      - donation-tracking
+      - water-resources
+      - resource-matching
+      - resource-optimization
+    pages:
+      - ResourcesPage
+      - EquipmentPage
+      - DonationsPage
+      - VehicleManagementPage
+    keyRoutes:
+      - /api/v1/resources
+      - /api/v1/equipment
+      - /api/v1/donations
+
+  # ============================================================
+  # HR - Human Resources (人力動員)
+  # ============================================================
+  hr:
+    name: 人力動員
+    description: 志工管理、排班、出勤、訓練、組織圖
+    modules:
+      - volunteers
+      - volunteer-certification
+      - volunteer-points
+      - training
+      - attendance
+      - shift-calendar
+      - org-chart
+      - scheduler
+      - smart-scheduling
+      - payroll
+    pages:
+      - VolunteersPage
+      - VolunteerDetailPage
+      - TrainingPage
+      - AttendancePage
+      - ShiftCalendarPage
+      - OrgChartPage
+      - VolunteerSchedulePage
+    keyRoutes:
+      - /api/v1/volunteers
+      - /api/v1/training
+      - /api/v1/attendance
+      - /api/v1/shift-calendar
+
+  # ============================================================
+  # Community - Community Governance (社區治理)
+  # ============================================================
+  community:
+    name: 社區治理
+    description: 社區聯繫、家屬團聚、心理健康
+    modules:
+      - community
+      - community-resilience
+      - disaster-community
+      - family-reunification
+      - reunification
+      - psychological-support
+      - psychological-tracking
+    pages:
+      - CommunityPage
+      - ReunificationPage
+      - MentalHealthPage
+    keyRoutes:
+      - /api/v1/community
+      - /api/v1/reunification
+      - /api/v1/psychological-support
+
+  # ============================================================
+  # Analytics - Analytics & Reporting (分析報表)
+  # ============================================================
+  analytics:
+    name: 分析報表
+    description: 數據分析、報表產生、排行榜
+    modules:
+      - analytics
+      - dashboard-analytics
+      - reports
+      - reports-export
+      - report-builder
+      - report-scheduler
+      - heatmap-analytics
+      - trend-prediction
+      - performance-report
+    pages:
+      - AnalyticsPage
+      - ReportPage
+      - LeaderboardPage
+      - PointsReportPage
+      - ReportsAdminPage
+      - ReportsExportPage
+    keyRoutes:
+      - /api/v1/analytics
+      - /api/v1/reports
+      - /api/v1/reports-export
+
+  # ============================================================
+  # Core - Platform Governance (平台治理)
+  # ============================================================
+  core:
+    name: 平台治理
+    description: 認證、權限管理、系統備份、審計
+    modules:
+      - auth
+      - accounts
+      - tenants
+      - backup
+      - audit
+      - audit-log
+      - access-log
+      - notifications
+      - system
+      - two-factor-auth
+      - integrations
+      - webhooks
+    pages:
+      - ProfilePage
+      - PermissionsPage
+      - BackupPage
+      - AuditLogPage
+      - AccountPage
+      - TwoFactorSetupPage
+    keyRoutes:
+      - /api/v1/auth
+      - /api/v1/accounts
+      - /api/v1/backup
+      - /api/v1/audit-log
+
+# ============================================================
+# Cross-Domain Services (跨領域服務)
+# ============================================================
+crossDomain:
+  ai:
+    modules:
+      - ai
+      - ai-queue
+      - ai-prediction
+      - ai-vision
+      - event-ai
+      - chatbot-assistant
+      - voice-assistant
+      - auto-summary
+    description: AI 服務、預測、自然語言處理
+
+  realtime:
+    modules:
+      - realtime
+      - realtime-chat
+      - ptt
+      - voice
+      - offline-mesh
+    description: 即時通訊、對講機、離線網狀網路
+
+  integrations:
+    modules:
+      - line-bot
+      - line-notify
+      - line-liff
+      - ncdr-alerts
+      - weather-forecast
+      - weather-hub
+      - tccip-climate
+      - ngo-integration
+    description: 外部整合、LINE Bot、災害預警
+
+  media:
+    modules:
+      - drone-ops
+      - drone-swarm
+      - air-ops
+      - aerial-image-analysis
+      - media-streaming
+    description: 無人機、空拍、媒體串流
