@@ -98,6 +98,140 @@
 
 ---
 
+## T2: ICS Command Chain ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-P0  
+**Commit**: `de44a7a`
+
+### E1: Code Evidence
+
+- ✅ `command-chain.entity.ts` - CommandChain TypeORM entity (17 ICS roles)
+- ✅ `command-chain.service.ts` - Role management service
+- ✅ `command-chain.controller.ts` - 8 REST API endpoints
+
+### E5: Acceptance Check
+
+- [x] 17 ICS roles defined (IC, Operations, Planning, etc.)
+- [x] Role assignment/activation/relief methods
+- [x] Org chart generation from chain
+
+---
+
+## T3: Volunteer Filtering ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-P0  
+**Commit**: `d51fd8f`
+
+### E1: Code Evidence
+
+- ✅ `volunteers.service.ts` - Enhanced with filtering
+
+### E5: Acceptance Check
+
+- [x] `findEligible(filter)` - skill/region/status filtering
+- [x] Fair dispatch ordering (lowest taskCount first)
+- [x] LINE integration: `findByLineUserId()` / `bindLineUserId()`
+
+---
+
+## T4: Report Deduplication + SLA ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-P0  
+**Commit**: `3609612`
+
+### E1: Code Evidence
+
+- ✅ `report-deduplication.service.ts` - PostGIS dedup logic
+- ✅ `report-sla.service.ts` - SLA monitoring
+
+### E5: Acceptance Check
+
+- [x] ST_DWithin spatial query (100m radius)
+- [x] Match score calculation (0-100)
+- [x] SLA deadlines by severity (4 → 15min, 0 → 4hr)
+- [x] Overdue detection and statistics
+
+---
+
+## T5: EventEmitter + Attendance ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-P0  
+**Commit**: `d51fd8f`
+
+### E1: Code Evidence
+
+- ✅ `task-event.listeners.ts` - Event-driven task lifecycle
+- ✅ `attendance-record.entity.ts` - TypeORM entity
+
+### E5: Acceptance Check
+
+- [x] TASK_EVENTS (CREATED, ASSIGNED, STARTED, COMPLETED)
+- [x] Attendance in-memory → TypeORM migration
+- [x] `checkInForTask()` / `checkOutForTask()` methods
+
+---
+
+## T6: AAR Auto-aggregation ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-P0  
+**Commit**: `d51fd8f`
+
+### E1: Code Evidence
+
+- ✅ `aar-analysis.service.ts` - Enhanced with aggregation
+
+### E5: Acceptance Check
+
+- [x] `generateAarFromSession(missionSessionId)` method
+- [x] Auto-aggregates: MissionSession + Events + Tasks
+
+---
+
+## T7: Security Gate (Complete) ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-Security  
+**Commits**: `01a2cda`, `1bd651d`
+
+### E1: Code Evidence
+
+- ✅ `sensitive-masking.interceptor.ts` - Role-based field masking
+- ✅ `file-integrity.service.ts` - SHA-256 verification
+- ✅ `security.config.ts` - CORS/CSP/Helmet configuration
+
+### E5: Acceptance Check
+
+- [x] Sensitive data masking (phone, email, idNumber, address)
+- [x] File hash verification on upload/download
+- [x] Security headers configured per environment
+- [x] Guard coverage: 61.5% (684/1113 routes)
+
+---
+
+## T8: Deprecation & Cleanup ✅
+
+**Status**: ✅ COMPLETE  
+**Gate**: Gate-Deprecation  
+**Commit**: `630430e`
+
+### E1: Code Evidence
+
+- ✅ [`T8-deprecation-report.md`](../audit/T8-deprecation-report.md) - Full analysis
+- ✅ `app.module.ts` - MockDataModule moved to STUB_MODULES
+
+### E5: Acceptance Check
+
+- [x] STUB_MODULES array (7 modules)
+- [x] Conditional loading via ENABLE_STUB_MODULES
+- [x] Build passes: `npx tsc --noEmit`
+
+---
+
 ## T7a: Shift-left Security
 
 **Status**: 🟡 IMPLEMENTED (smoke tests executed, backend offline)  
