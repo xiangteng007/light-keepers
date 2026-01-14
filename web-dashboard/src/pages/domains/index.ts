@@ -17,7 +17,7 @@ export { default as MissionCommandPage } from '../MissionCommandPage';
 // ============================================================
 // Geo Domain - 地理情資
 // ============================================================
-export { default as TacticalMapPage } from '../TacticalMapPage';
+export { default as TacticalMapPage } from '../geo/TacticalMapPage';
 export { default as MapPage } from '../MapPage';
 
 // ============================================================

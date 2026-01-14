@@ -12,31 +12,53 @@ description: 監視 Cloud Run 部署狀態並修正錯誤
 
 // turbo-all
 
-### 1. 檢查最新 Cloud Build 狀態
+### 1. 檢查 GitHub Actions 工作流程狀態
+
+打開瀏覽器查看最新的 workflow runs:
+
+```
+https://github.com/xiangteng007/light-keepers/actions
+```
+
+或使用 GitHub CLI (若已安裝):
+
+```powershell
+gh run list --limit 5
+```
+
+### 2. 檢查最新 Cloud Build 狀態
 
 ```powershell
 gcloud builds list --limit=3 --format="table(id,status,createTime,duration)"
 ```
 
-### 2. 若有 FAILURE，查看詳細日誌
+### 3. 若有 FAILURE，查看詳細日誌
+
+**GitHub Actions:**
+
+```powershell
+gh run view RUN_ID --log-failed
+```
+
+**Cloud Build:**
 
 ```powershell
 gcloud builds log BUILD_ID --stream
 ```
 
-### 3. 檢查 Cloud Run 服務狀態
+### 4. 檢查 Cloud Run 服務狀態
 
 ```powershell
 gcloud run services describe light-keepers-dashboard --region=asia-east1 --format="yaml(status)"
 ```
 
-### 4. 查看服務日誌 (最近 50 條)
+### 5. 查看服務日誌 (最近 50 條)
 
 ```powershell
 gcloud logs read "resource.type=cloud_run_revision AND resource.labels.service_name=light-keepers-dashboard" --limit=50 --format="table(timestamp,severity,textPayload)"
 ```
 
-### 5. 常見錯誤修復
+### 6. 常見錯誤修復
 
 | 錯誤 | 可能原因 | 修復方式 |
 |------|----------|----------|
@@ -44,9 +66,19 @@ gcloud logs read "resource.type=cloud_run_revision AND resource.labels.service_n
 | `PORT 8080 timeout` | 啟動失敗 | 檢查 main.ts 端口設定 |
 | `password authentication failed` | DB 密碼錯誤 | 更新 Secret Manager |
 | `502 Bad Gateway` | 容器崩潰 | 查看 stdout 日誌 |
+| `npm ERR! peer dep` | 依賴衝突 | 檢查 package-lock.json |
 
-### 6. 強制重新部署 (若需要)
+### 7. 強制重新部署 (若需要)
 
 ```powershell
 gcloud run services update light-keepers-dashboard --region=asia-east1 --no-traffic --tag=debug
 ```
+
+## GitHub Workflows
+
+| Workflow | 用途 |
+|----------|------|
+| `ci-cd.yml` | CI/CD 主流程 |
+| `deploy.yml` | 部署到 Cloud Run |
+| `audit-gates.yml` | 安全審計 gates |
+| `docker-health-check.yml` | Docker 健康檢查 |
