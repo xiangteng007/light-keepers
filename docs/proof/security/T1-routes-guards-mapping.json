@@ -1,5 +1,5 @@
 ﻿{
-    "generated_at":  "2026-01-13T23:30:32.030Z",
+    "generated_at":  "2026-01-14T00:01:23.237Z",
     "generated_by":  "scan-routes-guards.ps1",
     "version":  "1.0.0",
     "routes":  [
@@ -9681,6 +9681,182 @@
                        "hasGuard":  false,
                        "protected":  false,
                        "risk":  "HIGH"
+                   },
+                   {
+                       "method":  "GET",
+                       "path":  "/mission-sessions/:sessionId/command-chain",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  28,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "GET",
+                       "path":  "/mission-sessions/:sessionId/command-chain/history",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  37,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "GET",
+                       "path":  "/mission-sessions/:sessionId/command-chain/org-chart",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  46,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "POST",
+                       "path":  "/mission-sessions/:sessionId/command-chain",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  55,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "PUT",
+                       "path":  "/mission-sessions/:sessionId/command-chain/:assignmentId/activate",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  72,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "PUT",
+                       "path":  "/mission-sessions/:sessionId/command-chain/:assignmentId/relief",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  81,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "GET",
+                       "path":  "/mission-sessions/:sessionId/command-chain/my-roles",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  97,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
+                   },
+                   {
+                       "method":  "GET",
+                       "path":  "/mission-sessions/:sessionId/command-chain/am-i-commander",
+                       "controller":  "backend/src/modules/mission-sessions/command-chain.controller.ts",
+                       "lineNumber":  113,
+                       "guards":  [
+                                      "CoreJwtGuard",
+                                      "UnifiedRolesGuard"
+                                  ],
+                       "requireLevel":  null,
+                       "requiredLevel":  null,
+                       "roles":  [
+
+                                 ],
+                       "isPublic":  false,
+                       "public":  false,
+                       "hasThrottle":  false,
+                       "throttle":  null,
+                       "hasGuard":  true,
+                       "protected":  true,
+                       "risk":  "MEDIUM"
                    },
                    {
                        "method":  "GET",
@@ -23272,15 +23448,15 @@
                    }
                ],
     "summary":  {
-                    "total_routes":  1105,
-                    "protected_routes":  676,
+                    "total_routes":  1113,
+                    "protected_routes":  684,
                     "controller_stats":  {
                                              "excluded":  0,
                                              "withoutGuards":  50,
-                                             "withGuards":  80,
-                                             "total":  130
+                                             "withGuards":  81,
+                                             "total":  131
                                          },
-                    "coverage_percent":  61.2,
+                    "coverage_percent":  61.5,
                     "high_risk_routes":  429,
                     "public_routes":  13,
                     "unprotected_routes":  429

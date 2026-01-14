@@ -1,6 +1,6 @@
 ﻿# Route-Guard Mapping Report
 
-> **Generated**: 2026-01-13T23:30:32.030Z  
+> **Generated**: 2026-01-14T00:01:23.237Z  
 > **Script**: scan-routes-guards.ps1  
 > **Spec**: baseline-counting-spec.md@v1
 
@@ -10,11 +10,11 @@
 
 | Metric | Value |
 |--------|------:|
-| Total Routes | 1105 |
-| Protected Routes | 676 |
+| Total Routes | 1113 |
+| Protected Routes | 684 |
 | Unprotected Routes | 429 |
 | Public Routes | 13 |
-| **Coverage** | **61.2%** |
+| **Coverage** | **61.5%** |
 
 ---
 
@@ -22,8 +22,8 @@
 
 | Metric | Value |
 |--------|------:|
-| Total Controllers | 130 |
-| With Guards | 80 |
+| Total Controllers | 131 |
+| With Guards | 81 |
 | Without Guards | 50 |
 
 ---
