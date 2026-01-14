@@ -1,32 +1,26 @@
-{
-    "version":  "1.1.1",
-    "ok":  true,
-    "commitTime":  "2026-01-15T06:30:03+08:00",
+﻿{
+    "version":  "1.1.0",
+    "generatedAt":  "2026-01-15T07:24:22.1379965+08:00",
+    "status":  "PASS",
+    "strictMode":  false,
     "domainMapPath":  "docs/architecture/domain-map.yaml",
     "backendModulesRoot":  "backend/src/modules",
     "frontendPagesRoot":  "web-dashboard/src/pages",
-    "routeMappingPath":  "docs/proof/security/T1-routes-guards-mapping.json",
-    "routeMappingAvailable":  true,
     "counts":  {
-                   "referencedPages":  35,
+                   "missingModules":  0,
                    "scannedBackendModules":  175,
-                   "scannedMappedPaths":  937,
                    "referencedModules":  87,
-                   "scannedFrontendPages":  104,
-                   "missingKeyRoutes":  0,
-                   "missingPages":  0,
-                   "referencedKeyRoutes":  20,
-                   "missingModules":  0
+                   "scannedFrontendPages":  101,
+                   "referencedPages":  35,
+                   "missingPages":  0
                },
     "missing":  {
                     "modules":  {
 
                                 },
-                    "keyRoutes":  {
-
-                                  },
                     "pages":  {
 
                               }
-                }
+                },
+    "ok":  true
 }

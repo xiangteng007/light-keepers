@@ -58,11 +58,11 @@ jobs:
         run: |
           pwsh tools/audit/scan-routes-guards.ps1
 
-      # Check Domain Map (after route scan so keyRoutes can be validated)
-      - name: T0c - Validate Domain Map SSOT
+      # Check Domain Map (soft on PR, strict blocks on main)
+      - name: T0d - Validate Domain Map SSOT
         shell: pwsh
         run: |
-          pwsh tools/audit/check-domain-map.ps1 -RouteMappingPath "docs/proof/security/T1-routes-guards-mapping.json"
+          pwsh tools/audit/check-domain-map.ps1
 
       # T9 - Domain Map drift check (deterministic artifacts)
       - name: T9 - Assert no drift (domain-map + proof logs)

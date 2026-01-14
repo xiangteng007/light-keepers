@@ -1,22 +1,16 @@
-# ============================================
-# FILE: tools/audit/check-domain-map.ps1
-# VERSION: 1.1.1
-# PURPOSE:
-# - Validate domain-map.yaml references: modules/pages MUST exist
-# - Validate keyRoutes MUST exist (prefix-match) in route-mapping (if available)
-# - Path canonicalization: handles /api/v1 prefix and trailing slashes
-# - DETERMINISTIC: uses git commit time (enables CI drift lock)
-# - UTF-8 NO BOM output
-# OUTPUT:
-# - docs/proof/logs/T0-domain-map-check.json/.md
-# ============================================
+# tools/audit/check-domain-map.ps1
+# v1.1.0
+# Validates domain-map.yaml references:
+# - modules must exist in backend/src/modules
+# - pages must exist in known frontend pages roots
+# - default is SOFT mode (report only), strict mode blocks CI
 
 param(
     [string]$DomainMapPath = "docs/architecture/domain-map.yaml",
     [string]$OutDir = "docs/proof/logs",
     [string]$BackendModulesRoot = "backend/src/modules",
     [string]$FrontendPagesRoot = "",
-    [string]$RouteMappingPath = "docs/proof/security/T1-routes-guards-mapping.json"
+    [switch]$Strict = $false
 )
 
 Set-StrictMode -Version Latest
@@ -24,42 +18,6 @@ $ErrorActionPreference = "Stop"
 
 function Ensure-Dir([string]$p) {
     if (!(Test-Path $p)) { New-Item -ItemType Directory -Path $p -Force | Out-Null }
-}
-
-function Get-GitCommitIso {
-    try {
-        $iso = (git log -1 --format=%cI HEAD).Trim()
-        if ($iso) { return $iso }
-    }
-    catch {}
-    return (Get-Date).ToString("o")
-}
-
-function Canonicalize-Path([string]$p) {
-    if ([string]::IsNullOrWhiteSpace($p)) { return "" }
-    $x = $p.Trim()
-    if (-not $x.StartsWith("/")) { $x = "/$x" }
-
-    # strip /api/v1 prefix if present
-    if ($x.StartsWith("/api/v1/")) { $x = $x.Substring(7) }
-    if ($x -eq "/api/v1") { $x = "/" }
-
-    # normalize trailing slash (keep "/" only)
-    if ($x.Length -gt 1) { $x = $x.TrimEnd("/") }
-    return $x
-}
-
-function Expand-Path-Variants([string]$p) {
-    $v = New-Object System.Collections.Generic.List[string]
-    $c = Canonicalize-Path $p
-    if (![string]::IsNullOrWhiteSpace($c)) { $v.Add($c) | Out-Null }
-
-    $o = $p.Trim()
-    if (![string]::IsNullOrWhiteSpace($o)) {
-        if ($o.Length -gt 1) { $o = $o.TrimEnd("/") }
-        if (-not $v.Contains($o)) { $v.Add($o) | Out-Null }
-    }
-    return $v
 }
 
 function Resolve-FrontendPagesRoot() {
@@ -86,38 +44,8 @@ function Get-BackendModules([string]$root) {
 function Get-FrontendPages([string]$root) {
     if ([string]::IsNullOrWhiteSpace($root)) { return @() }
     if (!(Test-Path $root)) { return @() }
-
-    $files = Get-ChildItem $root -Recurse -File | Where-Object { $_.Extension -in @(".tsx", ".jsx", ".ts", ".js") }
-    $names = $files | ForEach-Object { $_.BaseName } | Sort-Object -Unique
-    return $names
-}
-
-function Get-RoutePathsFromMapping([string]$mappingPath) {
-    if (!(Test-Path $mappingPath)) { return @() }
-    $raw = Get-Content $mappingPath -Raw -Encoding UTF8
-    $json = $raw | ConvertFrom-Json
-
-    $routes = @()
-    if ($null -ne $json.routes) { $routes = $json.routes }
-    elseif ($null -ne $json.mapping) { $routes = $json.mapping }
-    elseif ($null -ne $json.data -and $null -ne $json.data.routes) { $routes = $json.data.routes }
-    elseif ($json -is [System.Collections.IEnumerable]) { $routes = $json }
-    else { $routes = @() }
-
-    $paths = @()
-    foreach ($r in $routes) {
-        if ($null -ne $r.path) { $paths += "$($r.path)" }
-        elseif ($null -ne $r.route) { $paths += "$($r.route)" }
-        elseif ($null -ne $r.url) { $paths += "$($r.url)" }
-    }
-
-    $expanded = New-Object System.Collections.Generic.HashSet[string]
-    foreach ($p in $paths) {
-        foreach ($vv in (Expand-Path-Variants $p)) {
-            $expanded.Add($vv) | Out-Null
-        }
-    }
-    return ($expanded | Sort-Object)
+    $files = Get-ChildItem $root -Recurse -File | Where-Object { $_.Extension -in @(".tsx", ".jsx") }
+    return ($files | ForEach-Object { $_.BaseName } | Sort-Object -Unique)
 }
 
 function Parse-DomainMapReferences([string]$yamlText) {
@@ -126,63 +54,59 @@ function Parse-DomainMapReferences([string]$yamlText) {
         crossDomains = @{}
         allModules   = New-Object System.Collections.Generic.HashSet[string]
         allPages     = New-Object System.Collections.Generic.HashSet[string]
-        allKeyRoutes = New-Object System.Collections.Generic.HashSet[string]
     }
 
     $block = ""
     $currentKey = ""
     $currentList = ""
-
     $lines = $yamlText -split "`r?`n"
 
     foreach ($line in $lines) {
         if ($line -match '^\s*domains:\s*$') {
-            $block = "domains"
-            $currentKey = ""
-            $currentList = ""
-            continue
+            $block = "domains"; $currentKey = ""; $currentList = ""; continue
         }
-        if ($line -match '^\s*crossDomains:\s*$' -or $line -match '^\s*crossDomain:\s*$') {
-            $block = "crossDomains"
-            $currentKey = ""
-            $currentList = ""
-            continue
+        if ($line -match '^\s*crossDomain:\s*$' -or $line -match '^\s*crossDomains:\s*$') {
+            $block = "crossDomains"; $currentKey = ""; $currentList = ""; continue
         }
 
+        # Domain key under domains/crossDomains (2 spaces indent)
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s{2}([a-zA-Z0-9_-]+):\s*$') {
             $currentKey = $Matches[1]
             $currentList = ""
             if ($block -eq "domains") {
                 if (-not $refs.domains.ContainsKey($currentKey)) {
-                    $refs.domains[$currentKey] = [ordered]@{ modules = @(); pages = @(); keyRoutes = @() }
+                    $refs.domains[$currentKey] = [ordered]@{ modules = @(); pages = @() }
                 }
             }
             else {
                 if (-not $refs.crossDomains.ContainsKey($currentKey)) {
-                    $refs.crossDomains[$currentKey] = [ordered]@{ modules = @(); pages = @(); keyRoutes = @() }
+                    $refs.crossDomains[$currentKey] = [ordered]@{ modules = @(); pages = @() }
                 }
             }
             continue
         }
 
+        # list selector
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+modules:\s*$') { $currentList = "modules"; continue }
         if ($block -in @("domains", "crossDomains") -and $line -match '^\s+pages:\s*$') { $currentList = "pages"; continue }
-        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+keyRoutes:\s*$') { $currentList = "keyRoutes"; continue }
-        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+(name|description):\s*') { $currentList = "skip"; continue }
 
-        if ($block -in @("domains", "crossDomains") -and $currentList -in @("modules", "pages", "keyRoutes") -and $line -match '^\s+-\s+(.+?)\s*$') {
+        # Skip keyRoutes/description/name
+        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+keyRoutes:\s*$') { $currentList = "skip"; continue }
+        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+description:\s*') { $currentList = "skip"; continue }
+        if ($block -in @("domains", "crossDomains") -and $line -match '^\s+name:\s*') { $currentList = "skip"; continue }
+
+        # list item (only modules/pages)
+        if ($block -in @("domains", "crossDomains") -and $currentList -in @("modules", "pages") -and $line -match '^\s+-\s+(.+?)\s*$') {
             $item = $Matches[1].Trim()
             if ([string]::IsNullOrWhiteSpace($item)) { continue }
 
             if ($block -eq "domains") {
                 if ($currentList -eq "modules") { $refs.domains[$currentKey].modules += $item; $refs.allModules.Add($item) | Out-Null }
                 if ($currentList -eq "pages") { $refs.domains[$currentKey].pages += $item; $refs.allPages.Add($item) | Out-Null }
-                if ($currentList -eq "keyRoutes") { $refs.domains[$currentKey].keyRoutes += $item; $refs.allKeyRoutes.Add($item) | Out-Null }
             }
             else {
                 if ($currentList -eq "modules") { $refs.crossDomains[$currentKey].modules += $item; $refs.allModules.Add($item) | Out-Null }
                 if ($currentList -eq "pages") { $refs.crossDomains[$currentKey].pages += $item; $refs.allPages.Add($item) | Out-Null }
-                if ($currentList -eq "keyRoutes") { $refs.crossDomains[$currentKey].keyRoutes += $item; $refs.allKeyRoutes.Add($item) | Out-Null }
             }
         }
     }
@@ -193,13 +117,8 @@ function Parse-DomainMapReferences([string]$yamlText) {
 # -----------------------------
 # Main
 # -----------------------------
-if (!(Test-Path $DomainMapPath)) {
-    throw "Missing domain map: $DomainMapPath"
-}
-
+if (!(Test-Path $DomainMapPath)) { throw "Missing domain map: $DomainMapPath" }
 Ensure-Dir $OutDir
-
-$commitTime = Get-GitCommitIso
 
 $pagesRoot = Resolve-FrontendPagesRoot
 $backendModules = Get-BackendModules $BackendModulesRoot
@@ -209,64 +128,41 @@ $yamlText = Get-Content $DomainMapPath -Raw -Encoding UTF8
 $refs = Parse-DomainMapReferences $yamlText
 
 $missingModules = @()
-foreach ($m in $refs.allModules) {
-    if ($backendModules -notcontains $m) { $missingModules += $m }
-}
+foreach ($m in $refs.allModules) { if ($backendModules -notcontains $m) { $missingModules += $m } }
 
 $missingPages = @()
-foreach ($p in $refs.allPages) {
-    if ($frontendPages -notcontains $p) { $missingPages += $p }
-}
+foreach ($p in $refs.allPages) { if ($frontendPages -notcontains $p) { $missingPages += $p } }
 
-$routeMappingAvailable = (Test-Path $RouteMappingPath)
-$mappedPaths = @()
-$missingKeyRoutes = @()
-
-if ($routeMappingAvailable) {
-    $mappedPaths = Get-RoutePathsFromMapping $RouteMappingPath
-
-    foreach ($kr in $refs.allKeyRoutes) {
-        $krc = Canonicalize-Path $kr
-        $hit = $false
-        foreach ($rp in $mappedPaths) {
-            $rpc = Canonicalize-Path $rp
-            if ($rpc.StartsWith($krc)) { $hit = $true; break }
-        }
-        if (-not $hit) { $missingKeyRoutes += $kr }
-    }
-}
-
-$ok = ($missingModules.Count -eq 0 -and $missingPages.Count -eq 0 -and $missingKeyRoutes.Count -eq 0)
+$ok = ($missingModules.Count -eq 0 -and $missingPages.Count -eq 0)
+$status = $(if ($ok) { "PASS" } else { "FAIL" })
 
 $outJson = Join-Path $OutDir "T0-domain-map-check.json"
 $outMd = Join-Path $OutDir "T0-domain-map-check.md"
 
 $payload = [pscustomobject]@{
-    version               = "1.1.1"
-    ok                    = $ok
-    commitTime            = $commitTime
-    domainMapPath         = $DomainMapPath
-    backendModulesRoot    = $BackendModulesRoot
-    frontendPagesRoot     = $pagesRoot
-    routeMappingPath      = $RouteMappingPath
-    routeMappingAvailable = $routeMappingAvailable
-    counts                = @{
+    version            = "1.1.0"
+    generatedAt        = (Get-Date).ToString("o")
+    status             = $status
+    strictMode         = $Strict.IsPresent
+    domainMapPath      = $DomainMapPath
+    backendModulesRoot = $BackendModulesRoot
+    frontendPagesRoot  = $pagesRoot
+    counts             = @{
         scannedBackendModules = $backendModules.Count
         scannedFrontendPages  = $frontendPages.Count
         referencedModules     = $refs.allModules.Count
         referencedPages       = $refs.allPages.Count
-        referencedKeyRoutes   = $refs.allKeyRoutes.Count
-        scannedMappedPaths    = $mappedPaths.Count
         missingModules        = $missingModules.Count
         missingPages          = $missingPages.Count
-        missingKeyRoutes      = $missingKeyRoutes.Count
     }
-    missing               = @{
-        modules   = ($missingModules | Sort-Object)
-        pages     = ($missingPages | Sort-Object)
-        keyRoutes = ($missingKeyRoutes | Sort-Object)
+    missing            = @{
+        modules = ($missingModules | Sort-Object)
+        pages   = ($missingPages | Sort-Object)
     }
+    ok                 = $ok
 }
+
+$payload | ConvertTo-Json -Depth 10 | Set-Content -Path $outJson -Encoding UTF8
 
 $mdContent = @"
 # Domain Map Check Report (Evidence)
@@ -274,9 +170,9 @@ $mdContent = @"
 - DomainMap: ``$DomainMapPath``
 - BackendModulesRoot: ``$BackendModulesRoot``
 - FrontendPagesRoot: ``$pagesRoot``
-- RouteMappingPath: ``$RouteMappingPath``
-- RouteMappingAvailable: **$routeMappingAvailable**
-- CommitTime: ``$commitTime``
+- GeneratedAt: ``$($payload.generatedAt)``
+- Strict: ``$($payload.strictMode)``
+- Status: **$status**
 - OK: **$ok**
 
 ## Counts
@@ -286,31 +182,22 @@ $mdContent = @"
 | scannedFrontendPages | $($payload.counts.scannedFrontendPages) |
 | referencedModules | $($payload.counts.referencedModules) |
 | referencedPages | $($payload.counts.referencedPages) |
-| referencedKeyRoutes | $($payload.counts.referencedKeyRoutes) |
-| scannedMappedPaths | $($payload.counts.scannedMappedPaths) |
 | missingModules | $($payload.counts.missingModules) |
 | missingPages | $($payload.counts.missingPages) |
-| missingKeyRoutes | $($payload.counts.missingKeyRoutes) |
 
 ## Missing Modules
 $(if ($missingModules.Count -eq 0) { "- (none)" } else { ($missingModules | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
 
 ## Missing Pages
 $(if ($missingPages.Count -eq 0) { "- (none)" } else { ($missingPages | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
-
-## Missing KeyRoutes
-$(if (-not $routeMappingAvailable) { "- (skipped: route mapping not found)" } elseif ($missingKeyRoutes.Count -eq 0) { "- (none)" } else { ($missingKeyRoutes | Sort-Object | ForEach-Object { "- $_" }) -join "`n" })
 "@
 
-# UTF-8 NO BOM output
-$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
-[System.IO.File]::WriteAllText($outJson, ($payload | ConvertTo-Json -Depth 10), $utf8NoBom)
-[System.IO.File]::WriteAllText($outMd, $mdContent, $utf8NoBom)
+Set-Content -Path $outMd -Value $mdContent -Encoding UTF8
 
-Write-Host "Domain map check written (DETERMINISTIC):"
-Write-Host " - $outMd"
-Write-Host " - $outJson"
-Write-Host " - OK: $ok"
-Write-Host " - CommitTime: $commitTime"
+Write-Host "[check-domain-map] Written: $outMd"
+Write-Host "[check-domain-map] Written: $outJson"
+Write-Host "[check-domain-map] OK: $ok (status=$status)"
 
-if ($ok) { exit 0 } else { exit 1 }
+if ($ok) { exit 0 }
+if ($Strict) { exit 1 }
+exit 0

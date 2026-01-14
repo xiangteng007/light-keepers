@@ -1,31 +1,25 @@
-# Domain Map Check Report (Evidence)
+﻿# Domain Map Check Report (Evidence)
 
 - DomainMap: `docs/architecture/domain-map.yaml`
 - BackendModulesRoot: `backend/src/modules`
 - FrontendPagesRoot: `web-dashboard/src/pages`
-- RouteMappingPath: `docs/proof/security/T1-routes-guards-mapping.json`
-- RouteMappingAvailable: **True**
-- CommitTime: `2026-01-15T06:30:03+08:00`
+- GeneratedAt: `2026-01-15T07:24:22.1379965+08:00`
+- Strict: `False`
+- Status: **PASS**
 - OK: **True**
 
 ## Counts
 | Metric | Value |
 |--------|-------|
 | scannedBackendModules | 175 |
-| scannedFrontendPages | 104 |
+| scannedFrontendPages | 101 |
 | referencedModules | 87 |
 | referencedPages | 35 |
-| referencedKeyRoutes | 20 |
-| scannedMappedPaths | 937 |
 | missingModules | 0 |
 | missingPages | 0 |
-| missingKeyRoutes | 0 |
 
 ## Missing Modules
 - (none)
 
 ## Missing Pages
-- (none)
-
-## Missing KeyRoutes
 - (none)
