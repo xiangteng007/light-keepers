@@ -1,15 +1,18 @@
 ﻿# Light Keepers Platform - Domain Map (SSOT)
 # This file maps 7 workflow domains to their backend modules, frontend pages, and key routes.
-# Generated: 2026-01-15
-version: "1.0"
-lastUpdated: "2026-01-15T05:07:53.0537564+08:00"
-generatedAt: "2026-01-15T05:07:53.0537564+08:00"
+# Route paths match T1-routes-guards-mapping.json format (without /api/v1 prefix)
+
+version: "1.1"
+lastUpdated: "2026-01-15T05:42:57.8460981+08:00"
+generatedAt: "2026-01-15T05:42:57.8460981+08:00"
 generator: "tools/audit/generate-domain-map.ps1@1.0.0"
-commitSha: "ee84355736563c41b6e73e9b9a2c3f02afb4b9e7"
-lastUpdated: "2026-01-15T03:40:00+08:00"
-generatedAt: "2026-01-15T05:07:53.0537564+08:00"
+commitSha: "dfa5f432554e67807fb64682f6a5bee5ee8c8d33"
+lastUpdated: "2026-01-15T05:40:00+08:00"
+generatedAt: "2026-01-15T05:42:57.8460981+08:00"
 generator: "tools/audit/generate-domain-map.ps1@1.0.0"
-commitSha: "ee84355736563c41b6e73e9b9a2c3f02afb4b9e7"
+commitSha: "dfa5f432554e67807fb64682f6a5bee5ee8c8d33"
+generator: "tools/audit/generate-domain-map.ps1@1.0.0"
+commitSha: "dfa5f432554e67807fb64682f6a5bee5ee8c8d33"
 
 domains:
   # ============================================================
@@ -35,11 +38,11 @@ domains:
       - MissionCommandPage
       - EmergencyResponsePage
     keyRoutes:
-      - /api/v1/events
-      - /api/v1/tasks
-      - /api/v1/triage
-      - /api/v1/mission-sessions
-      - /api/v1/task-dispatch
+      - /events
+      - /tasks
+      - /triage
+      - /mission-sessions
+      - /task-dispatch
 
   # ============================================================
   # Geo - Geographic Intelligence (地理情資)
@@ -61,10 +64,10 @@ domains:
       - MapPage
       - CommandPostMapPage
     keyRoutes:
-      - /api/v1/tactical-maps
-      - /api/v1/overlays
-      - /api/v1/location
-      - /api/v1/geofence-alert
+      - /tactical-maps
+      - /overlays
+      - /location
+      - /geofence-alert
 
   # ============================================================
   # Log - Logistics & Resources (後勤資源)
@@ -86,9 +89,9 @@ domains:
       - DonationsPage
       - VehicleManagementPage
     keyRoutes:
-      - /api/v1/resources
-      - /api/v1/equipment
-      - /api/v1/donations
+      - /resources
+      - /equipment
+      - /donations
 
   # ============================================================
   # HR - Human Resources (人力動員)
@@ -116,10 +119,10 @@ domains:
       - OrgChartPage
       - VolunteerSchedulePage
     keyRoutes:
-      - /api/v1/volunteers
-      - /api/v1/training
-      - /api/v1/attendance
-      - /api/v1/shift-calendar
+      - /volunteers
+      - /training
+      - /attendance
+      - /shift-calendar
 
   # ============================================================
   # Community - Community Governance (社區治理)
@@ -140,9 +143,9 @@ domains:
       - ReunificationPage
       - MentalHealthPage
     keyRoutes:
-      - /api/v1/community
-      - /api/v1/reunification
-      - /api/v1/psychological-support
+      - /community
+      - /reunification
+      - /psychological-support
 
   # ============================================================
   # Analytics - Analytics & Reporting (分析報表)
@@ -168,9 +171,9 @@ domains:
       - ReportsAdminPage
       - ReportsExportPage
     keyRoutes:
-      - /api/v1/analytics
-      - /api/v1/reports
-      - /api/v1/reports-export
+      - /analytics
+      - /reports
+      - /reports-export
 
   # ============================================================
   # Core - Platform Governance (平台治理)
@@ -199,10 +202,10 @@ domains:
       - AccountPage
       - TwoFactorSetupPage
     keyRoutes:
-      - /api/v1/auth
-      - /api/v1/accounts
-      - /api/v1/backup
-      - /api/v1/audit-log
+      - /auth
+      - /accounts
+      - /backup
+      - /audit-log
 
 # ============================================================
 # Cross-Domain Services (跨領域服務)

@@ -1,11 +1,17 @@
-# tools/audit/smoke-authz.ps1
-# Runtime AuthZ + Throttle Smoke Verification
-# Validates: Protected endpoints require auth, Public endpoints bypass, Throttle works
+# ============================================
+# FILE: tools/audit/smoke-authz.ps1
+# VERSION: 1.1.0
+# PURPOSE: Runtime AuthZ + Throttle Smoke Verification (Evidence-first)
+# OUTPUT:
+# - docs/proof/logs/T7a-authz-smoke.<timestamp>.json/.txt
+# - docs/proof/logs/T7a-authz-smoke.latest.json/.txt   (stable reference)
+# ============================================
 
 param(
     [string]$BaseUrl = "http://localhost:3000",
     [string]$PublicPath = "/health/ready",
     [string]$ProtectedPath = "",
+    [string]$ProtectedMethod = "GET",
     [string]$RouteMappingPath = "docs/proof/security/T1-routes-guards-mapping.json",
 
     [int]$ThrottleBurst = 40,
@@ -148,7 +154,7 @@ function Try-Resolve-ProtectedPathFromMapping([string]$MappingPath) {
         if (!(Is-Protected $r)) { continue }
 
         $candidate = $p
-        if ($p -notmatch "[:{]") { break }
+        if ($p -notmatch "[:{]") { break } # prefer non-parameterized
     }
 
     if ($null -eq $candidate) { return "" }
@@ -165,16 +171,20 @@ if ([string]::IsNullOrWhiteSpace($ProtectedPath)) {
     $ProtectedPath = Try-Resolve-ProtectedPathFromMapping $RouteMappingPath
 }
 $ProtectedPath = Normalize-Path $ProtectedPath
+$ProtectedMethod = "$ProtectedMethod".ToUpperInvariant()
 
 Ensure-Dir $OutDir
 
 $now = Get-Date
 $runId = $now.ToString("yyyyMMdd-HHmmss")
+
 $outJson = Join-Path $OutDir "T7a-authz-smoke.$runId.json"
 $outTxt = Join-Path $OutDir "T7a-authz-smoke.$runId.txt"
 
-$client = New-HttpClient
+$outJsonLatest = Join-Path $OutDir "T7a-authz-smoke.latest.json"
+$outTxtLatest = Join-Path $OutDir "T7a-authz-smoke.latest.txt"
 
+$client = New-HttpClient
 $results = New-Object System.Collections.Generic.List[object]
 $failures = New-Object System.Collections.Generic.List[string]
 
@@ -187,33 +197,33 @@ function Add-Check($name, $obj) {
 "BaseUrl: $BaseUrl" | Out-File $outTxt -Encoding UTF8 -Append
 "PublicPath: $PublicPath" | Out-File $outTxt -Encoding UTF8 -Append
 "ProtectedPath: $ProtectedPath" | Out-File $outTxt -Encoding UTF8 -Append
+"ProtectedMethod: $ProtectedMethod" | Out-File $outTxt -Encoding UTF8 -Append
 "" | Out-File $outTxt -Encoding UTF8 -Append
 
 if ([string]::IsNullOrWhiteSpace($ProtectedPath)) {
-    $msg = "WARN: ProtectedPath not resolved. Skipping protected endpoint tests."
+    $msg = "FAIL: ProtectedPath not resolved. Provide -ProtectedPath explicitly or ensure $RouteMappingPath contains protected GET routes."
+    $failures.Add($msg) | Out-Null
     $msg | Out-File $outTxt -Encoding UTF8 -Append
-    Write-Host $msg
 }
 else {
-    # 1) Protected endpoint without token => 401
     $u1 = "$BaseUrl$ProtectedPath"
-    $r1 = Invoke-Http -Client $client -Method "GET" -Url $u1 -BearerToken ""
-    Add-Check "protected_no_token_should_401" $r1
 
+    # 1) Protected endpoint without token => 401
+    $r1 = Invoke-Http -Client $client -Method $ProtectedMethod -Url $u1 -BearerToken ""
+    Add-Check "protected_no_token_should_401" $r1
     if ($r1.status -ne 401) {
         $failures.Add("protected_no_token_should_401: expected 401, got $($r1.status) @ $u1") | Out-Null
     }
 
-    # 2) Protected endpoint with invalid token => 401
-    $r2 = Invoke-Http -Client $client -Method "GET" -Url $u1 -BearerToken "this.is.not.a.valid.jwt"
-    Add-Check "protected_invalid_token_should_401" $r2
-
-    if ($r2.status -ne 401) {
-        $failures.Add("protected_invalid_token_should_401: expected 401, got $($r2.status) @ $u1") | Out-Null
+    # 2) Protected endpoint with invalid token => 401 (allow 403 in some deployments)
+    $r2 = Invoke-Http -Client $client -Method $ProtectedMethod -Url $u1 -BearerToken "this.is.not.a.valid.jwt"
+    Add-Check "protected_invalid_token_should_401_or_403" $r2
+    if (($r2.status -ne 401) -and ($r2.status -ne 403)) {
+        $failures.Add("protected_invalid_token_should_401_or_403: expected 401/403, got $($r2.status) @ $u1") | Out-Null
     }
 }
 
-# 3) Public endpoint without token => NOT 401 (prefer 200-399)
+# 3) Public endpoint without token => NOT 401 (prefer 200-399; allow 4xx except 401)
 $u3 = "$BaseUrl$PublicPath"
 $r3 = Invoke-Http -Client $client -Method "GET" -Url $u3 -BearerToken ""
 Add-Check "public_no_token_should_not_401" $r3
@@ -222,35 +232,40 @@ if ($r3.status -eq 401 -or $r3.status -lt 200 -or $r3.status -ge 500) {
     $failures.Add("public_no_token_should_not_401: expected 2xx/3xx/4xx(non-401), got $($r3.status) @ $u3") | Out-Null
 }
 
-# 4) Throttling burst => expect at least one 429
+# 4) Throttling burst => expect at least one 429 (best-effort)
 $found429 = $false
-if (![string]::IsNullOrWhiteSpace($ProtectedPath)) {
-    $targetUrl = "$BaseUrl$ProtectedPath"
-}
-else {
-    $targetUrl = "$BaseUrl$PublicPath"
-}
+$targetUrl = if (![string]::IsNullOrWhiteSpace($ProtectedPath)) { "$BaseUrl$ProtectedPath" } else { "$BaseUrl$PublicPath" }
 
 "--- Throttle Burst ($ThrottleBurst) on $targetUrl ---" | Out-File $outTxt -Encoding UTF8 -Append
 
-$burstStatuses = @()
-for ($i = 1; $i -le $ThrottleBurst; $i++) {
-    $ri = Invoke-Http -Client $client -Method "GET" -Url $targetUrl -BearerToken ""
-    Add-Check "throttle_burst_request_$i" $ri
+$burstStart = Get-Date
+$attempt = 0
 
-    $burstStatuses += $ri.status
-    if ($ri.status -eq 429) { $found429 = $true }
+while ($true) {
+    $attempt++
+    for ($i = 1; $i -le $ThrottleBurst; $i++) {
+        $ri = Invoke-Http -Client $client -Method "GET" -Url $targetUrl -BearerToken ""
+        Add-Check "throttle_burst_attempt_${attempt}_request_$i" $ri
+        if ($ri.status -eq 429) { $found429 = $true; break }
+    }
+
+    if ($found429) { break }
+
+    $elapsed = (New-TimeSpan -Start $burstStart -End (Get-Date)).TotalSeconds
+    if ($elapsed -ge $ThrottleMaxWaitSeconds) { break }
+
+    Start-Sleep -Seconds 1
 }
 
 if (-not $found429) {
-    $msg = "WARN: No 429 detected in throttle burst. Threshold may be high or throttling disabled."
+    $msg = "WARN: No 429 detected within burst window ($ThrottleMaxWaitSeconds s). Threshold may be high or throttling disabled."
     $msg | Out-File $outTxt -Encoding UTF8 -Append
     if ($FailOnNo429) {
         $failures.Add("throttle_expected_429_but_not_found") | Out-Null
     }
 }
 else {
-    "PASS: 429 detected in burst." | Out-File $outTxt -Encoding UTF8 -Append
+    "PASS: 429 detected in burst window." | Out-File $outTxt -Encoding UTF8 -Append
 }
 
 # Summary output
@@ -258,16 +273,18 @@ else {
 "=== Summary ===" | Out-File $outTxt -Encoding UTF8 -Append
 
 $summary = [pscustomobject]@{
-    version          = "1.0.0"
-    generatedAt      = (Get-Date).ToString("o")
-    baseUrl          = $BaseUrl
-    publicPath       = $PublicPath
-    protectedPath    = $ProtectedPath
-    routeMappingPath = $RouteMappingPath
-    throttleBurst    = $ThrottleBurst
-    found429         = $found429
-    failures         = $failures
-    ok               = ($failures.Count -eq 0)
+    version                = "1.1.0"
+    generatedAt            = (Get-Date).ToString("o")
+    baseUrl                = $BaseUrl
+    publicPath             = $PublicPath
+    protectedPath          = $ProtectedPath
+    protectedMethod        = $ProtectedMethod
+    routeMappingPath       = $RouteMappingPath
+    throttleBurst          = $ThrottleBurst
+    throttleMaxWaitSeconds = $ThrottleMaxWaitSeconds
+    found429               = $found429
+    failures               = $failures
+    ok                     = ($failures.Count -eq 0)
 }
 
 ("OK: " + $summary.ok) | Out-File $outTxt -Encoding UTF8 -Append
@@ -276,19 +293,19 @@ if ($failures.Count -gt 0) {
     $failures | ForEach-Object { " - $_" } | Out-File $outTxt -Encoding UTF8 -Append
 }
 
-# Write JSON
+# Write JSON + stable latest copies
 [pscustomobject]@{
     summary = $summary
     checks  = $results
 } | ConvertTo-Json -Depth 12 | Set-Content -Path $outJson -Encoding UTF8
 
-Write-Host "[smoke-authz] Written: $outTxt"
-Write-Host "[smoke-authz] Written: $outJson"
-Write-Host "[smoke-authz] OK: $($summary.ok)"
+Copy-Item -Force $outJson $outJsonLatest
+Copy-Item -Force $outTxt  $outTxtLatest
 
-if ($summary.ok) {
-    exit 0
-}
-else {
-    exit 1
-}
+Write-Host "AuthZ smoke written:"
+Write-Host " - $outTxt"
+Write-Host " - $outJson"
+Write-Host " - $outTxtLatest"
+Write-Host " - $outJsonLatest"
+
+if ($summary.ok) { exit 0 } else { exit 1 }

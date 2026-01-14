@@ -37,20 +37,14 @@ jobs:
       # SSOT Duplicate Detection (must run first)
       - name: Detect SSOT Duplicates
         shell: pwsh
-        run: |
+         run: |
           pwsh tools/audit/detect-ssot-duplicates.ps1
 
-      # Domain Map SSOT (Generate + Check)
+      # Domain Map SSOT (Generate metadata - check runs after route scan)
       - name: Generate Domain Map (SSOT metadata)
         shell: pwsh
         run: |
           pwsh tools/audit/generate-domain-map.ps1
-
-      - name: Check Domain Map (SSOT validity)
-        shell: pwsh
-        run: |
-          pwsh tools/audit/check-domain-map.ps1
-        continue-on-error: true
 
       # T0: Baseline Scan
       - name: Run Baseline Scan (T0)
@@ -63,6 +57,13 @@ jobs:
         shell: pwsh
         run: |
           pwsh tools/audit/scan-routes-guards.ps1
+
+      # Check Domain Map (after route scan so keyRoutes can be validated)
+      - name: Check Domain Map (SSOT validity + keyRoutes)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/check-domain-map.ps1 -RouteMappingPath "docs/proof/security/T1-routes-guards-mapping.json"
+        continue-on-error: true
 
       # Generate public-surface.md from SSOT
       - name: Generate Public Surface Markdown (SSOT -> md)
