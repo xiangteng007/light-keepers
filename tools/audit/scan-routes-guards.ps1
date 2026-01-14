@@ -58,6 +58,37 @@ Write-Host "   Mode: $modeLabel" -ForegroundColor Yellow
 Write-Host "   Backend: $BackendSrc"
 Write-Host ""
 
+# ========================================
+# Detect Global APP_GUARD Registration
+# ========================================
+$AppModulePath = Join-Path $RootDir "backend/src/app.module.ts"
+$globalGuards = @()
+$globalAuthGuardActive = $false
+
+if (Test-Path $AppModulePath) {
+    $appModuleContent = Get-Content $AppModulePath -Raw
+    $guardPattern = "provide:\s*APP_GUARD[\s\S]*?useClass:\s*(\w+)"
+    $guardMatches = [regex]::Matches($appModuleContent, $guardPattern)
+    
+    foreach ($match in $guardMatches) {
+        $guardName = $match.Groups[1].Value
+        $globalGuards += $guardName
+        if ($guardName -eq "GlobalAuthGuard") {
+            $globalAuthGuardActive = $true
+        }
+    }
+    
+    if ($globalAuthGuardActive) {
+        Write-Host "   [G2b] GlobalAuthGuard detected as APP_GUARD" -ForegroundColor Green
+    }
+    else {
+        Write-Host "   [WARN] GlobalAuthGuard NOT in APP_GUARD" -ForegroundColor Yellow
+    }
+}
+else {
+    Write-Host "   [WARN] app.module.ts not found" -ForegroundColor Yellow
+}
+
 # Result storage
 $allRoutes = @()
 $controllerStats = @{
@@ -216,8 +247,10 @@ foreach ($controllerFile in $controllerFiles) {
                     hasThrottle   = $hasThrottle
                     throttle      = if ($hasThrottle) { "decorator-present" } else { $null }
                     hasGuard      = $hasGuard
-                    protected     = $hasGuard -and (-not $isPublic)  # protected if has guard and not public
-                    risk          = if (-not $hasGuard) { "HIGH" } elseif ($isPublic) { "LOW" } else { "MEDIUM" }
+                    # If GlobalAuthGuard is APP_GUARD, treat non-@Public as protected
+                    protected     = if ($globalAuthGuardActive -and (-not $isPublic)) { $true } elseif ($hasGuard -and (-not $isPublic)) { $true } else { $false }
+                    globalGuarded = $globalAuthGuardActive
+                    risk          = if ($globalAuthGuardActive -and (-not $isPublic)) { "LOW" } elseif (-not $hasGuard) { "HIGH" } elseif ($isPublic) { "LOW" } else { "MEDIUM" }
                 }
                 
                 $allRoutes += $routeInfo
@@ -262,13 +295,15 @@ $mapping = @{
     generated_at = $timestamp
     generated_by = "scan-routes-guards.ps1"
     summary      = @{
-        total_routes       = $totalRoutes
-        protected_routes   = $protectedRoutes
-        unprotected_routes = $unprotectedRoutes
-        public_routes      = $publicRoutes
-        high_risk_routes   = $highRiskRoutes.Count
-        coverage_percent   = $coverage
-        controller_stats   = $controllerStats
+        total_routes          = $totalRoutes
+        protected_routes      = $protectedRoutes
+        unprotected_routes    = $unprotectedRoutes
+        public_routes         = $publicRoutes
+        high_risk_routes      = $highRiskRoutes.Count
+        coverage_percent      = $coverage
+        controller_stats      = $controllerStats
+        globalGuardsDetected  = $globalGuards
+        globalAuthGuardActive = $globalAuthGuardActive
     }
     routes       = $allRoutes
 }

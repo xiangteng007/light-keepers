@@ -15,4 +15,5 @@ export {
     RESOURCE_OWNER_KEY,
 } from './resource-owner.guard';
 export { Public, IS_PUBLIC_KEY } from './public.decorator';
+export { GlobalAuthGuard } from './global-auth.guard';
 

@@ -1,7 +1,8 @@
 # CI Gate Check Script
 # Purpose: Enforce hard rules for CI - blocks merge if any rule violated
-# Rules: G1-G5 per Gate Playbook v1.0
+# Rules: G1-G5 per Gate Playbook v1.0, G2a/G2b for SEC-T9
 # Exit Code: 0 = PASS, 1 = FAIL
+# SEMANTICS: In -Strict mode, overall = strictMode (no PASS if strictMode!=PASS)
 
 param(
     [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
@@ -77,6 +78,66 @@ if (Test-Path $T1MappingPath) {
 }
 else {
     $failures += "G2: T1-routes-guards-mapping.json not found"
+}
+
+# ============================================
+# G2a: App Guard Registration (SEC-T9)
+# ============================================
+Write-Host "[G2a] Checking GlobalAuthGuard APP_GUARD Registration..." -ForegroundColor Yellow
+
+$T9ReportPath = Join-Path $SecurityDir "T9-app-guard-registration-report.json"
+if (Test-Path $T9ReportPath) {
+    try {
+        $T9Report = Get-Content $T9ReportPath -Raw | ConvertFrom-Json
+        if ($T9Report.globalAuthGuardRegistered -eq $true) {
+            $passed += "G2a: GlobalAuthGuard registered as APP_GUARD"
+        }
+        else {
+            $failures += "G2a: GlobalAuthGuard NOT registered as APP_GUARD"
+        }
+    }
+    catch {
+        $failures += "G2a: T9-app-guard-registration-report.json is invalid"
+    }
+}
+else {
+    # Check app.module.ts directly as fallback
+    $AppModulePath = Join-Path $BackendDir "app.module.ts"
+    if (Test-Path $AppModulePath) {
+        $appContent = Get-Content $AppModulePath -Raw
+        if ($appContent -match "provide:\s*APP_GUARD[\s\S]*?useClass:\s*GlobalAuthGuard") {
+            $passed += "G2a: GlobalAuthGuard in APP_GUARD (direct check)"
+        }
+        else {
+            $failures += "G2a: GlobalAuthGuard NOT in APP_GUARD"
+        }
+    }
+    else {
+        $failures += "G2a: Cannot verify GlobalAuthGuard (no report or app.module.ts)"
+    }
+}
+
+# ============================================
+# G2b: Global Guard Coverage Applied (SEC-T9)
+# ============================================
+Write-Host "[G2b] Checking Global Guard Coverage in Mapping..." -ForegroundColor Yellow
+
+if (Test-Path $T1MappingPath) {
+    try {
+        $T1Mapping = Get-Content $T1MappingPath -Raw | ConvertFrom-Json
+        if ($T1Mapping.summary.globalAuthGuardActive -eq $true) {
+            $passed += "G2b: Scanner detected GlobalAuthGuard active"
+        }
+        else {
+            $warnings += "G2b: Scanner did not detect GlobalAuthGuard active"
+        }
+    }
+    catch {
+        $warnings += "G2b: Could not parse mapping for global guard check"
+    }
+}
+else {
+    $warnings += "G2b: Skipped (no mapping file)"
 }
 
 # ============================================
@@ -187,6 +248,42 @@ else {
 }
 
 # ============================================
+# Strict Mode: Unprotected Not Allowlisted
+# ============================================
+$strictBlocked = $false
+$strictReason = ""
+
+if ($Strict) {
+    Write-Host "[STRICT] Checking UnprotectedNotAllowlistedProd..." -ForegroundColor Yellow
+    
+    if (Test-Path $PublicSurfaceCheckPath) {
+        try {
+            $CheckReport = Get-Content $PublicSurfaceCheckPath -Raw | ConvertFrom-Json
+            $unprotectedNotAllowlisted = $CheckReport.mappingUnprotectedNotAllowlisted
+            
+            if ($unprotectedNotAllowlisted -gt 0) {
+                $strictBlocked = $true
+                $strictReason = "UnprotectedNotAllowlistedProd = $unprotectedNotAllowlisted (must be 0)"
+                $failures += "STRICT: $strictReason"
+            }
+            else {
+                $passed += "STRICT: UnprotectedNotAllowlistedProd = 0 (release-ready)"
+            }
+        }
+        catch {
+            $failures += "STRICT: Could not parse public-surface-check-report.json"
+            $strictBlocked = $true
+            $strictReason = "Cannot verify UnprotectedNotAllowlistedProd"
+        }
+    }
+    else {
+        $failures += "STRICT: public-surface-check-report.json required for strict mode"
+        $strictBlocked = $true
+        $strictReason = "Missing public-surface-check-report.json"
+    }
+}
+
+# ============================================
 # Summary
 # ============================================
 Write-Host ""
@@ -219,14 +316,32 @@ if ($failures.Count -gt 0) {
 Write-Host ""
 Write-Host "========================================" -ForegroundColor Cyan
 
-if ($failures.Count -eq 0) {
-    Write-Host " CI GATE CHECK: PASS $([char]0x2705)" -ForegroundColor Green
-    Write-Host "========================================" -ForegroundColor Cyan
-    exit 0
+# Calculate final status
+$finalStatus = "PASS"
+$exitCode = 0
+
+if ($failures.Count -gt 0) {
+    $finalStatus = "FAIL"
+    $exitCode = 1
+}
+
+# In strict mode: if strictBlocked, overall cannot be PASS
+if ($Strict -and $strictBlocked) {
+    $finalStatus = "BLOCKED"
+    $exitCode = 1
+}
+
+if ($finalStatus -eq "PASS") {
+    Write-Host " CI GATE CHECK: PASS" -ForegroundColor Green
+}
+elseif ($finalStatus -eq "BLOCKED") {
+    Write-Host " CI GATE CHECK: BLOCKED (strict mode)" -ForegroundColor Yellow
+    Write-Host " Reason: $strictReason" -ForegroundColor Yellow
 }
 else {
-    Write-Host " CI GATE CHECK: FAIL $([char]0x274C)" -ForegroundColor Red
+    Write-Host " CI GATE CHECK: FAIL" -ForegroundColor Red
     Write-Host " $($failures.Count) rule(s) violated - merge blocked" -ForegroundColor Red
-    Write-Host "========================================" -ForegroundColor Cyan
-    exit 1
 }
+
+Write-Host "========================================" -ForegroundColor Cyan
+exit $exitCode

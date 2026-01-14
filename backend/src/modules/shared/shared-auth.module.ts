@@ -3,6 +3,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { CoreJwtGuard } from './guards/core-jwt.guard';
 import { UnifiedRolesGuard } from './guards/unified-roles.guard';
+import { GlobalAuthGuard } from './guards/global-auth.guard';
 
 // Re-export all guards, decorators, and types
 export * from './guards';
@@ -53,8 +54,8 @@ export * from './guards';
             }),
         }),
     ],
-    providers: [CoreJwtGuard, UnifiedRolesGuard],
-    exports: [JwtModule, CoreJwtGuard, UnifiedRolesGuard],
+    providers: [CoreJwtGuard, UnifiedRolesGuard, GlobalAuthGuard],
+    exports: [JwtModule, CoreJwtGuard, UnifiedRolesGuard, GlobalAuthGuard],
 })
 export class SharedAuthModule { }
 

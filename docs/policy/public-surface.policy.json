@@ -108,6 +108,30 @@
                 "ttl": 60000
             },
             "smokeRequired": false
+        },
+        {
+            "method": "POST",
+            "path": "/auth/reset-password",
+            "controller": "auth.controller.ts",
+            "reason": "Password reset completion (uses reset token for verification)",
+            "dataExposure": "none",
+            "throttle": {
+                "limit": 5,
+                "ttl": 60000
+            },
+            "smokeRequired": false
+        },
+        {
+            "method": "POST",
+            "path": "/intake",
+            "controller": "intake.controller.ts",
+            "reason": "Anonymous incident reporting (public form)",
+            "dataExposure": "low",
+            "throttle": {
+                "limit": 10,
+                "ttl": 60000
+            },
+            "smokeRequired": false
         }
     ],
     "stubModulesBlacklist": [

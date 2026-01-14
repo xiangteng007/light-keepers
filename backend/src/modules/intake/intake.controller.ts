@@ -9,6 +9,7 @@ import {
     HttpStatus,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { IntakeService } from './intake.service';
 import { CreateIntakeDto, IntakeResponseDto } from './dto/intake.dto';
 import { IntakeReport, IntakeReportStatus, IntakeReportType } from './entities/intake-report.entity';
@@ -23,8 +24,9 @@ export class IntakeController {
      * 建立通報（統一入口）
      * 公開 API - 允許匿名通報
      */
-    @Post()
     @Public()
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
+    @Post()
     @ApiOperation({ summary: '建立通報（統一入口）' })
     @ApiResponse({
         status: HttpStatus.CREATED,

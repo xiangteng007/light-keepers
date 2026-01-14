@@ -4,7 +4,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { DatabaseModule } from './modules/database/database.module';
-import { SharedAuthModule } from './modules/shared/shared-auth.module';
+import { SharedAuthModule, GlobalAuthGuard } from './modules/shared/shared-auth.module';
 import { HealthModule } from './modules/health/health.module';
 import { AuthModule } from './modules/auth/auth.module';
 import { AccountsModule } from './modules/accounts/accounts.module';
@@ -512,6 +512,13 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         {
             provide: APP_GUARD,
             useClass: ThrottlerGuard,
+        },
+        // T7 Strict Gate Compliance: All routes protected by default
+        // Use @Public() decorator on endpoints that should be public
+        // @see docs/policy/public-surface.policy.json
+        {
+            provide: APP_GUARD,
+            useClass: GlobalAuthGuard,
         },
     ],
     exports: [CloudLoggerService],

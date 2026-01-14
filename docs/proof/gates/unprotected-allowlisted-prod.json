@@ -1,0 +1,135 @@
+﻿{
+    "generatedAt":  "2026-01-15T01:21:41+08:00",
+    "totalUnprotected":  14,
+    "routes":  [
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health-only.controller.ts",
+                       "path":  "/health",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health-only.controller.ts",
+                       "path":  "/health/live",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health-only.controller.ts",
+                       "path":  "/health/ready",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health/health.controller.ts",
+                       "path":  "/health",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health/health.controller.ts",
+                       "path":  "/health/detailed",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health/health.controller.ts",
+                       "path":  "/health/live",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/health/health.controller.ts",
+                       "path":  "/health/ready",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/register",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/login",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/forgot-password",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/reset-password",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/me/status",
+                       "method":  "GET",
+                       "hasThrottle":  true,
+                       "falsePositive":  true,
+                       "allowlisted":  false
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/auth/auth.controller.ts",
+                       "path":  "/auth/refresh",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   },
+                   {
+                       "isPublic":  true,
+                       "controller":  "backend/src/modules/intake/intake.controller.ts",
+                       "path":  "/intake",
+                       "method":  "POST",
+                       "hasThrottle":  true,
+                       "falsePositive":  false,
+                       "allowlisted":  true
+                   }
+               ],
+    "notes":  [
+                  "Route /auth/me/status flagged as scanner false positive - has @UseGuards(JwtAuthGuard) after @Get decorator"
+              ]
+}

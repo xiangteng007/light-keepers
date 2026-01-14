@@ -513,7 +513,10 @@ export class AuthController {
 
     /**
      * 重設密碼
+     * @Public - No auth required (uses reset token for verification)
      */
+    @Public()
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('reset-password')
     async resetPassword(@Body() body: { token: string; newPassword: string }) {
         return this.authService.resetPassword(body.token, body.newPassword);

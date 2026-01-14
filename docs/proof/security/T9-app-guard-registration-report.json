@@ -1,0 +1,39 @@
+﻿{
+    "checkedAt":  "2026-01-14T22:52:31+08:00",
+    "guardOrder":  [
+                       "ThrottlerGuard",
+                       "GlobalAuthGuard"
+                   ],
+    "evidence":  [
+                     {
+                         "found":  true,
+                         "description":  "GlobalAuthGuard import statement",
+                         "type":  "import_check"
+                     },
+                     {
+                         "correct":  true,
+                         "description":  "ThrottlerGuard (index 0) before GlobalAuthGuard (index 1)",
+                         "type":  "guard_order"
+                     }
+                 ],
+    "globalAuthGuardRegistered":  true,
+    "name":  "App Guard Registration Check",
+    "task":  "T9",
+    "guards":  [
+                   {
+                       "lineNumber":  511,
+                       "name":  "ThrottlerGuard",
+                       "order":  0,
+                       "snippet":  "provide: APP_GUARD, useClass: ThrottlerGuard"
+                   },
+                   {
+                       "lineNumber":  518,
+                       "name":  "GlobalAuthGuard",
+                       "order":  1,
+                       "snippet":  "provide: APP_GUARD, useClass: GlobalAuthGuard"
+                   }
+               ],
+    "appModulePath":  "backend/src/app.module.ts",
+    "status":  "PASS",
+    "throttlerGuardRegistered":  true
+}

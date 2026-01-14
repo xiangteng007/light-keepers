@@ -1,6 +1,6 @@
 ﻿<!-- AUTO-GENERATED FILE. DO NOT EDIT MANUALLY. -->
 <!-- source: docs/policy/public-surface.policy.json -->
-<!-- policySha256: 2abefd5057f5ac9d46c9c7585a980ecc8b122cd8d847b3d3e909809ee2dbedd4 -->
+<!-- policySha256: c57d1ef395ba7955f09f9e5393665a455f9cc718a02eaec4515360c3aba121a8 -->
 
 # Public Surface Inventory (AUTO-GENERATED)
 
@@ -10,7 +10,7 @@
 - Policy: **Policy-B**
 - Version: **1.1.0**
 - SSOT: `docs/policy/public-surface.policy.json`
-- Endpoints: **8**
+- Endpoints: **10**
 
 ---
 
@@ -30,10 +30,12 @@
 | `POST /auth/login` | User authentication entry point | medium | 10/60000ms | required |
 | `POST /auth/refresh` | Token refresh (requires refresh token cookie) | low | 30/60000ms | required |
 | `POST /auth/register` | User registration | medium | 5/60000ms | required |
+| `POST /auth/reset-password` | Password reset completion (uses reset token for verification) | none | 5/60000ms | optional |
 | `GET /health` | K8s liveness probe | none | 120/60000ms | optional |
 | `GET /health/detailed` | Ops monitoring | low | 60/60000ms | optional |
 | `GET /health/live` | K8s liveness probe | none | 120/60000ms | optional |
 | `GET /health/ready` | K8s readiness probe | none | 120/60000ms | optional |
+| `POST /intake` | Anonymous incident reporting (public form) | low | 10/60000ms | optional |
 
 ---
 

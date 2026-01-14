@@ -2,13 +2,13 @@
     "ok":  true,
     "summary":  {
                     "policy":  "Policy-B",
-                    "policyEndpointsTotal":  8,
-                    "mappingRoutesTotal":  1105,
-                    "mappingUnprotectedTotal":  436,
-                    "mappingUnprotectedNotAllowlisted":  428,
+                    "policyEndpointsTotal":  10,
+                    "mappingRoutesTotal":  1113,
+                    "mappingUnprotectedTotal":  11,
+                    "mappingUnprotectedNotAllowlisted":  1,
                     "errors":  0,
                     "warnings":  4,
-                    "checkedAt":  "2026-01-13T20:52:47.5598934+08:00"
+                    "checkedAt":  "2026-01-15T00:46:09.7429890+08:00"
                 },
     "errors":  [
 
@@ -73,10 +73,10 @@
                      },
                      {
                          "code":  "UNPROTECTED_NOT_ALLOWLISTED",
-                         "message":  "Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:\n  - POST /aerial-analysis/images\n  - GET /aerial-analysis/images/:param\n  - GET /aerial-analysis/images/mission/:param\n  - GET /aerial-analysis/images/pending\n  - POST /aerial-analysis/images/:param/analyze\n  - POST /aerial-analysis/images/batch-analyze\n  - POST /aerial-analysis/assessments\n  - GET /aerial-analysis/assessments\n  - GET /aerial-analysis/assessments/:param\n  - POST /aerial-analysis/compare\n  - GET /aerial-analysis/detections/persons\n  - POST /ar/markers\n  - GET /ar/markers/:param\n  - GET /ar/markers/floor/:param/:param\n  - PUT /ar/markers/:param\n  - DELETE /ar/markers/:param\n  - POST /ar/routes\n  - GET /ar/routes/:param\n  - POST /ar/routes/shortest\n  - POST /ar/routes/evacuation\n  - POST /ar/floor-plans\n  - GET /ar/floor-plans/:param\n  - GET /ar/floor-plans/building/:param\n  - POST /ar/sessions\n  - PUT /ar/sessions/:param/position\n  - GET /ar/sessions/:param\n  - GET /ar/sessions/active\n  - DELETE /ar/sessions/:param\n  - GET /ar/view\n  - POST /auth/reset-password",
+                         "message":  "Found unprotected routes not allowlisted (non-strict). CI gate will likely fail later. Sample up to 30:\n  - GET /auth/me/status",
                          "endpoint":  null,
                          "details":  {
-                                         "total":  428
+                                         "total":  1
                                      }
                      }
                  ],
@@ -86,7 +86,7 @@
                    "markdownPath":  "docs/proof/security/public-surface.md",
                    "strict":  false
                },
-    "checkedAt":  "2026-01-13T20:52:47.5598934+08:00",
+    "checkedAt":  "2026-01-15T00:46:09.7429890+08:00",
     "script":  {
                    "name":  "validate-public-surface.ps1",
                    "version":  "1.0.0"
