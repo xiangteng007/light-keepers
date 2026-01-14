@@ -42,6 +42,8 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff,woff2}'],
+        // Allow larger files (3MB) for main bundle - default is 2MB
+        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         // Exclude Firebase reserved URLs from navigation fallback
         navigateFallbackDenylist: [/^\/__\/.*/],
         runtimeCaching: [
