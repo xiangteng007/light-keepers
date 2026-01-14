@@ -40,6 +40,18 @@ jobs:
         run: |
           pwsh tools/audit/detect-ssot-duplicates.ps1
 
+      # Domain Map SSOT (Generate + Check)
+      - name: Generate Domain Map (SSOT metadata)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/generate-domain-map.ps1
+
+      - name: Check Domain Map (SSOT validity)
+        shell: pwsh
+        run: |
+          pwsh tools/audit/check-domain-map.ps1
+        continue-on-error: true
+
       # T0: Baseline Scan
       - name: Run Baseline Scan (T0)
         shell: pwsh

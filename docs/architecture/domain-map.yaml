@@ -1,9 +1,15 @@
-# Light Keepers Platform - Domain Map (SSOT)
+﻿# Light Keepers Platform - Domain Map (SSOT)
 # This file maps 7 workflow domains to their backend modules, frontend pages, and key routes.
 # Generated: 2026-01-15
-
 version: "1.0"
+lastUpdated: "2026-01-15T05:07:53.0537564+08:00"
+generatedAt: "2026-01-15T05:07:53.0537564+08:00"
+generator: "tools/audit/generate-domain-map.ps1@1.0.0"
+commitSha: "ee84355736563c41b6e73e9b9a2c3f02afb4b9e7"
 lastUpdated: "2026-01-15T03:40:00+08:00"
+generatedAt: "2026-01-15T05:07:53.0537564+08:00"
+generator: "tools/audit/generate-domain-map.ps1@1.0.0"
+commitSha: "ee84355736563c41b6e73e9b9a2c3f02afb4b9e7"
 
 domains:
   # ============================================================
@@ -243,3 +249,4 @@ crossDomain:
       - aerial-image-analysis
       - media-streaming
     description: 無人機、空拍、媒體串流
+

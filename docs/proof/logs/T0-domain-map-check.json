@@ -1,0 +1,24 @@
+﻿{
+    "version":  "1.0.0",
+    "generatedAt":  "2026-01-15T05:08:43.4042129+08:00",
+    "domainMapPath":  "docs/architecture/domain-map.yaml",
+    "backendModulesRoot":  "backend/src/modules",
+    "frontendPagesRoot":  "web-dashboard/src/pages",
+    "counts":  {
+                   "missingModules":  0,
+                   "scannedBackendModules":  175,
+                   "referencedModules":  87,
+                   "scannedFrontendPages":  101,
+                   "referencedPages":  35,
+                   "missingPages":  0
+               },
+    "missing":  {
+                    "modules":  {
+
+                                },
+                    "pages":  {
+
+                              }
+                },
+    "ok":  true
+}
