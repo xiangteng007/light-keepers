@@ -5,7 +5,7 @@
 - FrontendPagesRoot: `web-dashboard/src/pages`
 - RouteMappingPath: `docs/proof/security/T1-routes-guards-mapping.json`
 - RouteMappingAvailable: **True**
-- GeneratedAt: `2026-01-15T05:42:58.3486527+08:00`
+- GeneratedAt: `2026-01-15T06:03:42.7911598+08:00`
 - OK: **False**
 
 ## Counts

@@ -1,9 +1,10 @@
 # ============================================
 # FILE: tools/audit/check-domain-map.ps1
-# VERSION: 1.1.0
+# VERSION: 1.1.1
 # PURPOSE:
 # - Validate domain-map.yaml references: modules/pages MUST exist
 # - Validate keyRoutes MUST exist (prefix-match) in route-mapping (if available)
+# - Path canonicalization: handles /api/v1 prefix and trailing slashes
 # OUTPUT:
 # - docs/proof/logs/T0-domain-map-check.json/.md
 # ============================================
@@ -21,6 +22,34 @@ $ErrorActionPreference = "Stop"
 
 function Ensure-Dir([string]$p) {
     if (!(Test-Path $p)) { New-Item -ItemType Directory -Path $p -Force | Out-Null }
+}
+
+function Canonicalize-Path([string]$p) {
+    if ([string]::IsNullOrWhiteSpace($p)) { return "" }
+    $x = $p.Trim()
+    if (-not $x.StartsWith("/")) { $x = "/$x" }
+
+    # strip /api/v1 prefix if present
+    if ($x.StartsWith("/api/v1/")) { $x = $x.Substring(7) }  # "/api/v1" length = 7
+    if ($x -eq "/api/v1") { $x = "/" }
+
+    # normalize trailing slash (keep "/" only)
+    if ($x.Length -gt 1) { $x = $x.TrimEnd("/") }
+    return $x
+}
+
+function Expand-Path-Variants([string]$p) {
+    $v = New-Object System.Collections.Generic.List[string]
+    $c = Canonicalize-Path $p
+    if (![string]::IsNullOrWhiteSpace($c)) { $v.Add($c) | Out-Null }
+
+    # also keep original (trimmed) for diagnostics
+    $o = $p.Trim()
+    if (![string]::IsNullOrWhiteSpace($o)) {
+        if ($o.Length -gt 1) { $o = $o.TrimEnd("/") }
+        if (-not $v.Contains($o)) { $v.Add($o) | Out-Null }
+    }
+    return $v
 }
 
 function Resolve-FrontendPagesRoot() {
@@ -72,7 +101,14 @@ function Get-RoutePathsFromMapping([string]$mappingPath) {
         elseif ($null -ne $r.url) { $paths += "$($r.url)" }
     }
 
-    return ($paths | Sort-Object -Unique)
+    # Expand with canonicalized variants
+    $expanded = New-Object System.Collections.Generic.HashSet[string]
+    foreach ($p in $paths) {
+        foreach ($vv in (Expand-Path-Variants $p)) {
+            $expanded.Add($vv) | Out-Null
+        }
+    }
+    return ($expanded | Sort-Object)
 }
 
 function Parse-DomainMapReferences([string]$yamlText) {
@@ -180,10 +216,11 @@ if ($routeMappingAvailable) {
     $mappedPaths = Get-RoutePathsFromMapping $RouteMappingPath
 
     foreach ($kr in $refs.allKeyRoutes) {
-        # Prefix match allows /api/v1/events to match /api/v1/events/:id etc.
+        $krc = Canonicalize-Path $kr
         $hit = $false
         foreach ($rp in $mappedPaths) {
-            if ($rp.StartsWith($kr)) { $hit = $true; break }
+            $rpc = Canonicalize-Path $rp
+            if ($rpc.StartsWith($krc)) { $hit = $true; break }
         }
         if (-not $hit) { $missingKeyRoutes += $kr }
     }
@@ -195,7 +232,7 @@ $outJson = Join-Path $OutDir "T0-domain-map-check.json"
 $outMd = Join-Path $OutDir "T0-domain-map-check.md"
 
 $payload = [pscustomobject]@{
-    version               = "1.1.0"
+    version               = "1.1.1"
     generatedAt           = (Get-Date).ToString("o")
     domainMapPath         = $DomainMapPath
     backendModulesRoot    = $BackendModulesRoot
@@ -270,5 +307,6 @@ $(
 Write-Host "Domain map check written:"
 Write-Host " - $outMd"
 Write-Host " - $outJson"
+Write-Host " - OK: $ok"
 
 if ($ok) { exit 0 } else { exit 1 }
