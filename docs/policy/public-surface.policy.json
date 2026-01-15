@@ -2,14 +2,16 @@
     "$schema": "https://json-schema.org/draft/2020-12/schema",
     "policy": "Policy-B",
     "description": "Public Surface Allowlist - SSOT for intentionally public endpoints with @Public() decorator",
-    "version": "1.1.0",
-    "lastUpdated": "2026-01-13",
+    "version": "1.2.0",
+    "lastUpdated": "2026-01-15",
     "maintainer": "security-team",
     "rules": {
         "policyB": {
             "description": "@Public() OR @RequiredLevel(0) = public. All public endpoints must have throttling.",
             "requireThrottle": true,
-            "requireDataExposure": true
+            "requireDataExposure": true,
+            "requireOwner": true,
+            "requireReason": true
         }
     },
     "endpoints": [
@@ -18,120 +20,140 @@
             "path": "/health",
             "controller": "health.controller.ts",
             "reason": "K8s liveness probe",
+            "owner": "platform-team",
             "dataExposure": "none",
             "throttle": {
                 "limit": 120,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "GET",
             "path": "/health/detailed",
             "controller": "health.controller.ts",
             "reason": "Ops monitoring",
+            "owner": "platform-team",
             "dataExposure": "low",
             "throttle": {
                 "limit": 60,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "GET",
             "path": "/health/live",
             "controller": "health.controller.ts",
             "reason": "K8s liveness probe",
+            "owner": "platform-team",
             "dataExposure": "none",
             "throttle": {
                 "limit": 120,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "GET",
             "path": "/health/ready",
             "controller": "health.controller.ts",
             "reason": "K8s readiness probe",
+            "owner": "platform-team",
             "dataExposure": "none",
             "throttle": {
                 "limit": 120,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/auth/login",
             "controller": "auth.controller.ts",
             "reason": "User authentication entry point",
+            "owner": "security-team",
             "dataExposure": "medium",
             "throttle": {
                 "limit": 10,
                 "ttl": 60000
             },
-            "smokeRequired": true
+            "smokeRequired": true,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/auth/register",
             "controller": "auth.controller.ts",
             "reason": "User registration",
+            "owner": "security-team",
             "dataExposure": "medium",
             "throttle": {
                 "limit": 5,
                 "ttl": 60000
             },
-            "smokeRequired": true
+            "smokeRequired": true,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/auth/refresh",
             "controller": "auth.controller.ts",
             "reason": "Token refresh (requires refresh token cookie)",
+            "owner": "security-team",
             "dataExposure": "low",
             "throttle": {
                 "limit": 30,
                 "ttl": 60000
             },
-            "smokeRequired": true
+            "smokeRequired": true,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/auth/forgot-password",
             "controller": "auth.controller.ts",
             "reason": "Password reset request",
+            "owner": "security-team",
             "dataExposure": "none",
             "throttle": {
                 "limit": 5,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/auth/reset-password",
             "controller": "auth.controller.ts",
             "reason": "Password reset completion (uses reset token for verification)",
+            "owner": "security-team",
             "dataExposure": "none",
             "throttle": {
                 "limit": 5,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         },
         {
             "method": "POST",
             "path": "/intake",
             "controller": "intake.controller.ts",
             "reason": "Anonymous incident reporting (public form)",
+            "owner": "c2-team",
             "dataExposure": "low",
             "throttle": {
                 "limit": 10,
                 "ttl": 60000
             },
-            "smokeRequired": false
+            "smokeRequired": false,
+            "expiryDate": null
         }
     ],
     "stubModulesBlacklist": [
@@ -147,6 +169,8 @@
         "Health endpoints are for K8s probes and monitoring",
         "Auth endpoints are user-facing authentication flows",
         "All endpoints have @Throttle() for rate limiting",
-        "Run validate-public-surface.ps1 -Strict to verify compliance"
+        "Run validate-public-surface.ps1 -Strict to verify compliance",
+        "Required fields per endpoint: method, path, reason, owner, throttle",
+        "expiryDate is optional (null = permanent exposure)"
     ]
 }

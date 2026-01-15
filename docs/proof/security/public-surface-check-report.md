@@ -1,6 +1,6 @@
 ﻿# Public Surface Check Report
 
-- CheckedAt: **2026-01-15T01:29:13.4092939+08:00**
+- CheckedAt: **2026-01-15T08:16:28.9467781+08:00**
 - Policy: **Policy-B**
 - OK: **True**
 
@@ -13,9 +13,10 @@
 | Unprotected routes (unique) | 10 |
 | Unprotected not allowlisted | 0 |
 | Errors | 0 |
-| Warnings | 3 |
+| Warnings | 4 |
 
 ## Warnings
+- **PUBLIC_MD_DRIFT**: public-surface.md drift detected (non-strict)
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/ready (using first candidate for checks)
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health/live (using first candidate for checks)
 - **MAPPING_DUPLICATE_KEY**: Multiple routes share the same normalized key: GET /health (using first candidate for checks)

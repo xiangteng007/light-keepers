@@ -172,10 +172,14 @@ function Validate-PolicyEndpointShape($ep, [ref]$errors, [ref]$warnings, [switch
 
     # Required fields in strict mode
     if ($StrictMode) {
+        if (-not $ep.reason) { Add-Issue $errors "POLICY_MISSING_REASON" "Policy endpoint missing reason" $ep; return $false }
+        if (-not $ep.owner) { Add-Issue $errors "POLICY_MISSING_OWNER" "Policy endpoint missing owner" $ep; return $false }
         if (-not $ep.dataExposure) { Add-Issue $errors "POLICY_MISSING_EXPOSURE" "Policy endpoint missing dataExposure" $ep; return $false }
         if (-not $ep.throttle) { Add-Issue $errors "POLICY_MISSING_THROTTLE" "Policy endpoint missing throttle" $ep; return $false }
     }
     else {
+        if (-not $ep.reason) { Add-Issue $warnings "POLICY_MISSING_REASON" "Policy endpoint missing reason (non-strict)" $ep }
+        if (-not $ep.owner) { Add-Issue $warnings "POLICY_MISSING_OWNER" "Policy endpoint missing owner (non-strict)" $ep }
         if (-not $ep.dataExposure) { Add-Issue $warnings "POLICY_MISSING_EXPOSURE" "Policy endpoint missing dataExposure (non-strict)" $ep }
         if (-not $ep.throttle) { Add-Issue $warnings "POLICY_MISSING_THROTTLE" "Policy endpoint missing throttle (non-strict)" $ep }
     }

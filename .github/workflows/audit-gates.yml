@@ -105,6 +105,13 @@ jobs:
         run: |
           pwsh tools/audit/ci-gate-check.ps1 -Strict
 
+      # Negative Test Gate - Verify that strict mode actually fails on bad data (main only)
+      - name: Self-Test Gate (Negative Test)
+        if: github.ref == 'refs/heads/main'
+        shell: pwsh
+        run: |
+          pwsh tools/audit/selftest-ci-gate.ps1
+
       # Generate Proof Documents from SSOT
       - name: Generate Proof Index (SSOT -> index.md)
         shell: pwsh

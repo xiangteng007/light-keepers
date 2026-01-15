@@ -7,13 +7,22 @@
                     "mappingUnprotectedTotal":  10,
                     "mappingUnprotectedNotAllowlisted":  0,
                     "errors":  0,
-                    "warnings":  3,
-                    "checkedAt":  "2026-01-15T01:29:13.4092939+08:00"
+                    "warnings":  4,
+                    "checkedAt":  "2026-01-15T08:16:28.9467781+08:00"
                 },
     "errors":  [
 
                ],
     "warnings":  [
+                     {
+                         "code":  "PUBLIC_MD_DRIFT",
+                         "message":  "public-surface.md drift detected (non-strict)",
+                         "endpoint":  null,
+                         "details":  {
+                                         "mdSha":  "c57d1ef395ba7955f09f9e5393665a455f9cc718a02eaec4515360c3aba121a8",
+                                         "policySha":  "ebb40317e95703f9621abbd0ccc46c289e31783102415b83ea5080354a57f69f"
+                                     }
+                     },
                      {
                          "code":  "MAPPING_DUPLICATE_KEY",
                          "message":  "Multiple routes share the same normalized key: GET /health/ready (using first candidate for checks)",
@@ -22,12 +31,14 @@
                                           "path":  "/health/ready",
                                           "controller":  "health.controller.ts",
                                           "reason":  "K8s readiness probe",
+                                          "owner":  "platform-team",
                                           "dataExposure":  "none",
                                           "throttle":  {
                                                            "limit":  120,
                                                            "ttl":  60000
                                                        },
-                                          "smokeRequired":  false
+                                          "smokeRequired":  false,
+                                          "expiryDate":  null
                                       },
                          "details":  {
                                          "count":  3
@@ -41,12 +52,14 @@
                                           "path":  "/health/live",
                                           "controller":  "health.controller.ts",
                                           "reason":  "K8s liveness probe",
+                                          "owner":  "platform-team",
                                           "dataExposure":  "none",
                                           "throttle":  {
                                                            "limit":  120,
                                                            "ttl":  60000
                                                        },
-                                          "smokeRequired":  false
+                                          "smokeRequired":  false,
+                                          "expiryDate":  null
                                       },
                          "details":  {
                                          "count":  3
@@ -60,12 +73,14 @@
                                           "path":  "/health",
                                           "controller":  "health.controller.ts",
                                           "reason":  "K8s liveness probe",
+                                          "owner":  "platform-team",
                                           "dataExposure":  "none",
                                           "throttle":  {
                                                            "limit":  120,
                                                            "ttl":  60000
                                                        },
-                                          "smokeRequired":  false
+                                          "smokeRequired":  false,
+                                          "expiryDate":  null
                                       },
                          "details":  {
                                          "count":  3
@@ -76,9 +91,9 @@
                    "policyPath":  "docs/policy/public-surface.policy.json",
                    "mappingPath":  "docs/proof/security/T1-routes-guards-mapping.json",
                    "markdownPath":  "docs/proof/security/public-surface.md",
-                   "strict":  true
+                   "strict":  false
                },
-    "checkedAt":  "2026-01-15T01:29:13.4092939+08:00",
+    "checkedAt":  "2026-01-15T08:16:28.9467781+08:00",
     "script":  {
                    "name":  "validate-public-surface.ps1",
                    "version":  "1.0.0"

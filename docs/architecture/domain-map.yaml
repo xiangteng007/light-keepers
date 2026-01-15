@@ -3,10 +3,10 @@
 # Route paths match T1-routes-guards-mapping.json format (without /api/v1 prefix)
 
 version: "1.1"
-lastUpdated: "2026-01-15T07:53:45+08:00"
-generatedAt: "2026-01-15T07:53:45+08:00"
+lastUpdated: "2026-01-15T08:07:34+08:00"
+generatedAt: "2026-01-15T08:07:34+08:00"
 generator: "tools/audit/generate-domain-map.ps1@1.2.0"
-commitSha: "c451dbc922d3cfd0544d50a230a6b39b56c11a62"
+commitSha: "f91407fdf3cd1d5cd3fa3880d75d592f892e918e"
 
 domains:
   # ============================================================
