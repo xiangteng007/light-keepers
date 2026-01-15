@@ -1,0 +1,41 @@
+{
+    "scriptName": "soft-delete-proof",
+    "timestamp": "2026-01-15T18:25:00+08:00",
+    "status": "WARN",
+    "recommendation": "Consider adding @DeleteDateColumn to core entities for unified soft-delete",
+    "checks": [
+        {
+            "name": "Entities with Soft-Delete",
+            "passed": false,
+            "details": {
+                "count": 0,
+                "entities": []
+            }
+        },
+        {
+            "name": "Entities without Soft-Delete",
+            "passed": true,
+            "details": {
+                "count": "Multiple core entities",
+                "note": "Info only - not blocking"
+            }
+        },
+        {
+            "name": "TypeORM Soft Delete Usage",
+            "passed": false,
+            "details": "softRemove/softDelete methods not found in services"
+        }
+    ],
+    "nextSprint": {
+        "priority": "P0",
+        "action": "Add @DeleteDateColumn to core entities",
+        "targetEntities": [
+            "Report",
+            "Volunteer",
+            "Task",
+            "MissionSession",
+            "DispatchTask"
+        ]
+    },
+    "risk": "Deleted data may still appear in join/relation queries without soft-delete"
+}

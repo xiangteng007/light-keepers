@@ -1,0 +1,54 @@
+{
+    "scriptName": "offline-sop-proof",
+    "timestamp": "2026-01-15T18:25:00+08:00",
+    "status": "PASS",
+    "checks": [
+        {
+            "name": "Offline SOP Service File",
+            "passed": true,
+            "details": "web-dashboard/src/services/offlineSOP.ts exists"
+        },
+        {
+            "name": "IndexedDB Integration",
+            "passed": true,
+            "details": "idb library imported with openDB"
+        },
+        {
+            "name": "Network Status Listeners",
+            "passed": true,
+            "details": {
+                "onlineListener": true,
+                "offlineListener": true
+            }
+        },
+        {
+            "name": "API Integration",
+            "passed": true,
+            "details": "fetch('/api/v1/sops') calls found"
+        },
+        {
+            "name": "React Hook Export",
+            "passed": true,
+            "details": "useOfflineSOP hook exported"
+        },
+        {
+            "name": "Cache Strategy",
+            "passed": true,
+            "details": "Network-first with IndexedDB fallback"
+        }
+    ],
+    "implementation": {
+        "file": "web-dashboard/src/services/offlineSOP.ts",
+        "features": [
+            "IndexedDB storage with idb library",
+            "SOPDocument and SOPListItem types",
+            "getSOPList() with network-first strategy",
+            "getSOP(id) with cache fallback",
+            "preloadSOPs() for prefetching",
+            "getSyncStatus() with 24h stale threshold",
+            "forceSync() for manual refresh",
+            "clearCache() for storage reset"
+        ],
+        "reactHook": "useOfflineSOP"
+    }
+}

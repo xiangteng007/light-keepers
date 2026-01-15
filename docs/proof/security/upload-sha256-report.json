@@ -1,0 +1,44 @@
+{
+    "scriptName": "upload-sha256-proof",
+    "timestamp": "2026-01-15T18:25:00+08:00",
+    "status": "PASS",
+    "checks": [
+        {
+            "name": "Uploads Service File",
+            "passed": true,
+            "details": "backend/src/modules/uploads/uploads.service.ts exists"
+        },
+        {
+            "name": "Crypto Module Import",
+            "passed": true,
+            "details": "import * as crypto from 'crypto'"
+        },
+        {
+            "name": "SHA-256 Hash Calculation",
+            "passed": true,
+            "details": "crypto.createHash('sha256') used"
+        },
+        {
+            "name": "Hash in UploadResult",
+            "passed": true,
+            "details": "sha256Hash: string field in UploadResult interface"
+        },
+        {
+            "name": "Hash Returned in Response",
+            "passed": true,
+            "details": "sha256Hash included in upload return object"
+        }
+    ],
+    "implementation": {
+        "file": "backend/src/modules/uploads/uploads.service.ts",
+        "algorithm": "SHA-256",
+        "features": [
+            "Hash calculated from file buffer before storage",
+            "Hash included in UploadResult interface",
+            "uploadToLocal() returns sha256Hash",
+            "uploadToGcs() accepts and propagates sha256Hash",
+            "Authoritative hash from backend (not client-provided)"
+        ],
+        "securityBenefit": "File integrity verification, tamper detection"
+    }
+}

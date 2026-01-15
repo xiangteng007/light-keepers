@@ -1,0 +1,60 @@
+{
+    "scriptName": "timeline-api-contract-proof",
+    "timestamp": "2026-01-15T18:25:00+08:00",
+    "status": "PASS",
+    "checks": [
+        {
+            "name": "Timeline Component File",
+            "passed": true,
+            "details": "web-dashboard/src/components/timeline/TimelineView.tsx exists"
+        },
+        {
+            "name": "Timeline API Integration",
+            "passed": true,
+            "details": "fetch('/api/v1/timeline') with query params"
+        },
+        {
+            "name": "Time Scale Selector",
+            "passed": true,
+            "details": "TimeScale type with 1h/6h/24h/7d options"
+        },
+        {
+            "name": "Event Filtering",
+            "passed": true,
+            "details": {
+                "typeFilter": true,
+                "severityFilter": true
+            }
+        },
+        {
+            "name": "Detail Panel",
+            "passed": true,
+            "details": "timeline-detail-panel with event details"
+        },
+        {
+            "name": "Timeline CSS",
+            "passed": true,
+            "details": "TimelineView.css exists with tactical theme"
+        }
+    ],
+    "apiContract": {
+        "endpoint": "GET /api/v1/timeline",
+        "queryParams": {
+            "sessionId": "optional, filter by mission session",
+            "hours": "number, time window (default 24)"
+        },
+        "response": {
+            "events": "TimelineEvent[]"
+        }
+    },
+    "timelineEventSchema": {
+        "id": "string",
+        "ts": "ISO8601 timestamp",
+        "type": "task_dispatch | field_report | sitrep | aar | decision | checkin",
+        "title": "string",
+        "severity": "low | medium | high | critical (optional)",
+        "location": "{ lat, lng, name } (optional)",
+        "actor": "string (optional)",
+        "ref": "string (optional)"
+    }
+}

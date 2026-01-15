@@ -1,0 +1,55 @@
+{
+    "scriptName": "offline-sync-conflict-proof",
+    "timestamp": "2026-01-15T18:25:00+08:00",
+    "status": "PASS",
+    "checks": [
+        {
+            "name": "Offline Sync Service File",
+            "passed": true,
+            "details": "web-dashboard/src/services/offlineSync.ts exists"
+        },
+        {
+            "name": "Conflict Handler",
+            "passed": true,
+            "details": "handleConflict() method with ConflictDetails type"
+        },
+        {
+            "name": "Timestamp Tracking",
+            "passed": true,
+            "details": {
+                "clientTs": true,
+                "serverTs": true
+            }
+        },
+        {
+            "name": "Last-Write-Wins Strategy",
+            "passed": true,
+            "details": "Resolution based on timestamp comparison"
+        },
+        {
+            "name": "Conflict Logging",
+            "passed": true,
+            "details": "ConflictEvent stored in IndexedDB conflictLog store"
+        },
+        {
+            "name": "React Hook Export",
+            "passed": true,
+            "details": "useOfflineSync hook exported"
+        }
+    ],
+    "implementation": {
+        "file": "web-dashboard/src/services/offlineSync.ts",
+        "conflictStrategy": "last-write-wins",
+        "features": [
+            "OfflineOperation queue with pending/synced/conflict/failed status",
+            "ConflictEvent logging for audit trail",
+            "Auto-sync on network recovery",
+            "queueOperation() for offline writes",
+            "processQueue() for batch sync",
+            "handleConflict() with LWW resolution",
+            "forceSync() for conflict override",
+            "getConflictLog() for replay capability"
+        ],
+        "reactHook": "useOfflineSync"
+    }
+}
