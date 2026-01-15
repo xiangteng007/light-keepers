@@ -1,6 +1,6 @@
 ﻿# Soft-delete Verification Report (SEC-SD.1)
 
-**Generated**: 2026-01-15 23:44:32  
+**Generated**: 2026-01-16 00:15:56  
 **Status**: WARN
 
 ---
@@ -13,7 +13,7 @@
 | Default list excludes deleted | 鉁?PASS (TypeORM auto) |
 | GetById excludes deleted | 鉁?PASS (TypeORM auto) |
 | includeDeleted requires Admin | 鉁?Documented |
-| DELETE is soft-delete | 鈿狅笍 WARN |
+| DELETE is soft-delete | 鉁?PASS |
 
 ---
 
@@ -25,4 +25,4 @@
 
 ## Notes
 
-- Consider using repository.softRemove() or softDelete() for DELETE operations - R3 includeDeleted: Requires Admin/Owner role check in controllers (design pattern)
+- R3 includeDeleted: Requires Admin/Owner role check in controllers (design pattern)

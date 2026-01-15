@@ -311,20 +311,23 @@ export class ReportsService {
         };
     }
 
-    // 刪除回報及關聯任務
+    // 刪除回報及關聯任務 (SEC-SD.1: Soft-delete)
     async delete(id: string): Promise<void> {
-        // 先刪除關聯的任務 (以 eventId 關聯)
-        const deletedTasks = await this.taskRepository.delete({ eventId: id });
-        if (deletedTasks.affected && deletedTasks.affected > 0) {
-            this.logger.log(`Deleted ${deletedTasks.affected} orphaned tasks for report ${id}`);
-        }
-
-        // 然後刪除回報本身
-        const result = await this.reportsRepository.delete(id);
-        if (result.affected === 0) {
+        // 先檢查回報是否存在
+        const report = await this.reportsRepository.findOne({ where: { id } });
+        if (!report) {
             throw new NotFoundException(`Report ${id} not found`);
         }
-        this.logger.log(`Report ${id} deleted`);
+
+        // 先軟刪除關聯的任務 (以 eventId 關聯)
+        const deletedTasks = await this.taskRepository.softDelete({ eventId: id });
+        if (deletedTasks.affected && deletedTasks.affected > 0) {
+            this.logger.log(`Soft-deleted ${deletedTasks.affected} orphaned tasks for report ${id}`);
+        }
+
+        // SEC-SD.1 R4: 使用 softDelete 而非 hard delete
+        await this.reportsRepository.softDelete(id);
+        this.logger.log(`Report ${id} soft-deleted`);
     }
 
     // 災情熱點分析 - 使用網格聚合

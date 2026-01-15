@@ -72,12 +72,23 @@ $testedEndpoints += "TypeORM auto-filter via @DeleteDateColumn"
 # Check 3: Verify services use repository.softRemove or softDelete
 Write-Host "`n[3/5] Checking soft-delete usage in services..." -ForegroundColor Yellow
 $servicesWithSoftDelete = @()
-$serviceFiles = Get-ChildItem -Path $entitiesDir -Recurse -Include "*.service.ts" | Select-Object -First 20
 
-foreach ($svc in $serviceFiles) {
-    $content = Get-Content $svc.FullName -Raw -ErrorAction SilentlyContinue
-    if ($content -match "softRemove|softDelete") {
-        $servicesWithSoftDelete += $svc.Name
+# Check core module services specifically
+$coreServices = @(
+    "$entitiesDir\reports\reports.service.ts",
+    "$entitiesDir\volunteers\volunteers.service.ts",
+    "$entitiesDir\task-dispatch\task-dispatch.service.ts",
+    "$entitiesDir\mission-sessions\mission-sessions.service.ts"
+)
+
+foreach ($svcPath in $coreServices) {
+    if (Test-Path $svcPath) {
+        $content = Get-Content $svcPath -Raw -ErrorAction SilentlyContinue
+        if ($content -match "\.softDelete\(" -or $content -match "\.softRemove\(") {
+            $svcName = Split-Path -Leaf $svcPath
+            $servicesWithSoftDelete += $svcName
+            Write-Host "  [PASS] $svcName uses softDelete/softRemove" -ForegroundColor Green
+        }
     }
 }
 
@@ -113,7 +124,8 @@ foreach ($entity in $coreEntities) {
 }
 
 # Determine overall status
-$allChecksPass = ($checks.entitiesHaveDeletedAt) -and ($entitiesMissing.Count -eq 0) -and $allImportsOk
+$hasSoftDeleteUsage = ($servicesWithSoftDelete.Count -gt 0)
+$allChecksPass = ($checks.entitiesHaveDeletedAt) -and ($entitiesMissing.Count -eq 0) -and $allImportsOk -and $hasSoftDeleteUsage
 $status = if ($allChecksPass) { "PASS" } else { "WARN" }
 
 # Generate JSON report

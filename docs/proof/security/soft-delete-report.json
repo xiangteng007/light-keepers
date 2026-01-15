@@ -2,7 +2,8 @@
     "version":  "1.0.0",
     "details":  {
                     "servicesWithSoftDelete":  [
-
+                                                   "reports.service.ts",
+                                                   "volunteers.service.ts"
                                                ],
                     "coreEntitiesChecked":  [
                                                 "reports\\reports.entity.ts",
@@ -17,7 +18,6 @@
                                             "TypeORM auto-filter via @DeleteDateColumn"
                                         ],
                     "notes":  [
-                                  "Consider using repository.softRemove() or softDelete() for DELETE operations",
                                   "R3 includeDeleted: Requires Admin/Owner role check in controllers (design pattern)"
                               ]
                 },
@@ -25,10 +25,10 @@
                    "entitiesHaveDeletedAt":  true,
                    "includeDeletedRequiresAdmin":  true,
                    "getByIdExcludesDeleted":  true,
-                   "deleteIsSoftDelete":  false,
+                   "deleteIsSoftDelete":  true,
                    "defaultListExcludesDeleted":  true
                },
     "ok":  false,
-    "generatedAt":  "2026-01-15T23:44:32.9312997+08:00",
+    "generatedAt":  "2026-01-16T00:15:56.7235325+08:00",
     "status":  "WARN"
 }

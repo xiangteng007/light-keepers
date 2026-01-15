@@ -304,13 +304,17 @@ export class VolunteersService {
         };
     }
 
-    // 刪除志工
+    // 刪除志工 (SEC-SD.1: Soft-delete)
     async delete(id: string): Promise<void> {
-        const result = await this.volunteersRepository.delete(id);
-        if (result.affected === 0) {
+        // 先檢查志工是否存在
+        const volunteer = await this.volunteersRepository.findOne({ where: { id } });
+        if (!volunteer) {
             throw new NotFoundException(`Volunteer ${id} not found`);
         }
-        this.logger.log(`Volunteer ${id} deleted`);
+
+        // SEC-SD.1 R4: 使用 softDelete 而非 hard delete
+        await this.volunteersRepository.softDelete(id);
+        this.logger.log(`Volunteer ${id} soft-deleted`);
     }
 
     // ===== 審核相關方法 =====
