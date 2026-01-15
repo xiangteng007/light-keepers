@@ -1,6 +1,9 @@
 # tools/audit/ci-gate-check.ps1
 # Verifiable Engineering Pipeline — CI Gate Check (Authoritative Gate Summary)
-# VERSION: 1.2.1
+# VERSION: 1.2.2
+# SEC-T9.1 Hardening:
+# - R1: Strict mode fail-on-WARN (any WARN = overall FAIL)
+# - R4: protected field missing = fail-closed (UnknownProtectionCount)
 param(
     [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
     [switch]$Strict = $false
@@ -69,6 +72,7 @@ function Get-RoutePath($r) {
     return $null
 }
 
+# SEC-T9.1 R4: protected field missing = fail-closed (return $null to indicate missing)
 function Get-RouteProtected($r) {
     if ($null -ne $r.protected) { return [bool]$r.protected }
     if ($null -ne $r.isProtected) { return [bool]$r.isProtected }
@@ -76,20 +80,34 @@ function Get-RouteProtected($r) {
         if ($null -ne $r.metadata.protected) { return [bool]$r.metadata.protected }
         if ($null -ne $r.metadata.isProtected) { return [bool]$r.metadata.isProtected }
     }
-    # conservative default
-    return $true
+    # SEC-T9.1 R4: return $null to indicate missing (fail-closed = treated as unprotected)
+    return $null
 }
 
 function Get-GlobalAuthGuardActive($mapping) {
+    # Check top level first
     foreach ($k in @("globalAuthGuardActive", "GlobalAuthGuardActive")) {
         if ($null -ne $mapping.$k) { return [bool]$mapping.$k }
+    }
+    # Check summary subobject (scan-routes-guards.ps1 outputs it there)
+    if ($null -ne $mapping.summary) {
+        foreach ($k in @("globalAuthGuardActive", "GlobalAuthGuardActive")) {
+            if ($null -ne $mapping.summary.$k) { return [bool]$mapping.summary.$k }
+        }
     }
     return $null
 }
 
 function Get-GlobalGuardsDetected($mapping) {
+    # Check top level first
     foreach ($k in @("globalGuardsDetected", "GlobalGuardsDetected")) {
         if ($null -ne $mapping.$k) { return @($mapping.$k) }
+    }
+    # Check summary subobject
+    if ($null -ne $mapping.summary) {
+        foreach ($k in @("globalGuardsDetected", "GlobalGuardsDetected")) {
+            if ($null -ne $mapping.summary.$k) { return @($mapping.summary.$k) }
+        }
     }
     return @()
 }
@@ -173,11 +191,21 @@ if ($mapping) {
 $totalRoutesProd = $routes.Count
 $protectedRoutesProd = 0
 $unprotectedRoutes = @()
+$unknownProtectionCount = 0  # SEC-T9.1 R4: count routes with missing protected field
 
 foreach ($r in $routes) {
     $isProtected = Get-RouteProtected $r
-    if ($isProtected) { $protectedRoutesProd++ }
-    else { $unprotectedRoutes += $r }
+    if ($null -eq $isProtected) {
+        # SEC-T9.1 R4: fail-closed = treat as unprotected
+        $unknownProtectionCount++
+        $unprotectedRoutes += $r
+    }
+    elseif ($isProtected) {
+        $protectedRoutesProd++
+    }
+    else {
+        $unprotectedRoutes += $r
+    }
 }
 
 $coverageProd = 0
@@ -282,11 +310,12 @@ else {
     $gates["G2a"] = Gate "App Guard Registration" "WARN" "Missing T9 report (non-blocking unless Strict)"
 }
 
-# G2b: Global guard applied (scanner)
+# G2b: Global guard applied (scanner) - SEC-T9.1 R3
 if ($globalAuthGuardActive -eq $true) {
     $gates["G2b"] = Gate "Global Guard Coverage Applied" "PASS" "globalAuthGuardActive=true"
 }
 elseif ($null -eq $globalAuthGuardActive) {
+    # SEC-T9.1 R3: missing field = WARN (in Strict mode, fail-on-warn will catch this)
     $gates["G2b"] = Gate "Global Guard Coverage Applied" "WARN" "globalAuthGuardActive not present in mapping schema"
 }
 else {
@@ -328,6 +357,14 @@ else {
     $gates["G5"] = Gate "Unprotected Threshold" "FAIL" "$notAllowlistedCount not allowlisted"
 }
 
+# G5a: Unknown Protection Count - SEC-T9.1 R4
+if ($unknownProtectionCount -eq 0) {
+    $gates["G5a"] = Gate "Protection Field Integrity" "PASS" "all routes have protected field"
+}
+else {
+    $gates["G5a"] = Gate "Protection Field Integrity" "WARN" "$unknownProtectionCount routes missing protected field (fail-closed)"
+}
+
 # G6: Domain map integrity
 if ($domainMapOk -eq $true) {
     $gates["G6"] = Gate "Domain Map Integrity" "PASS" "all referenced modules/pages exist"
@@ -348,21 +385,28 @@ else {
 }
 
 # -------------------------
-# Overall result
+# Overall result - SEC-T9.1 R1: Strict fail-on-WARN
 # -------------------------
 $overall = "PASS"
 
-# In strict mode, WARN becomes FAIL (hard)
 if ($Strict) {
+    # SEC-T9.1 R1: In strict mode, any non-PASS (WARN/FAIL/BLOCKED) = overall FAIL
     foreach ($k in $gates.Keys) {
-        if ($gates[$k].status -in @("FAIL", "BLOCKED")) { $overall = "FAIL"; break }
+        if ($gates[$k].status -ne "PASS") {
+            $overall = "FAIL"
+            break
+        }
     }
     # strict semantic rule
     if ($strictMode -ne "PASS") { $overall = "FAIL" }
 }
 else {
+    # Non-strict: only FAIL/BLOCKED causes overall FAIL (WARN is allowed)
     foreach ($k in $gates.Keys) {
-        if ($gates[$k].status -eq "FAIL") { $overall = "FAIL"; break }
+        if ($gates[$k].status -in @("FAIL", "BLOCKED")) {
+            $overall = "FAIL"
+            break
+        }
     }
 }
 
@@ -370,9 +414,9 @@ else {
 # Write outputs (JSON + MD) — authoritative
 # -------------------------
 $gateSummary = [ordered]@{
-    version       = "1.2.1"
+    version       = "1.2.2"
     generatedAt   = $generatedAt
-    generator     = "tools/audit/ci-gate-check.ps1@1.2.1"
+    generator     = "tools/audit/ci-gate-check.ps1@1.2.2"
     commitSha     = $commitSha
     overall       = $overall
     strictEnabled = [bool]$Strict
@@ -387,6 +431,7 @@ $gateSummary = [ordered]@{
         UnprotectedProd               = $unprotectedProd
         UnprotectedAllowlistedProd    = $unprotectedAllowlistedProd
         UnprotectedNotAllowlistedProd = $notAllowlistedCount
+        UnknownProtectionCount        = $unknownProtectionCount
         PolicyEndpoints               = $policyEndpoints
         PolicyVersion                 = $policyVersion
         StubModulesDisabled           = $stubModulesDisabled
@@ -448,6 +493,7 @@ $md += "- TotalRoutesProd: $totalRoutesProd"
 $md += "- UnprotectedProd: $unprotectedProd"
 $md += "- UnprotectedAllowlistedProd: $unprotectedAllowlistedProd"
 $md += "- UnprotectedNotAllowlistedProd: $notAllowlistedCount"
+$md += "- UnknownProtectionCount: $unknownProtectionCount"
 $md += ""
 $md += "## Failures"
 if ($unprotectedNotAllowlistedProd.Count -gt 0) {
@@ -473,6 +519,7 @@ Write-Host " - $outGateJson"
 Write-Host " - $outGateMd"
 Write-Host " - $outReportJson"
 Write-Host " - $outReportMd"
+Write-Host "Overall: $overall | StrictEnabled: $([bool]$Strict) | StrictMode: $strictMode"
 
 if ($Strict -and $overall -ne "PASS") {
     throw "CI Gate FAILED in STRICT mode. blockedReason=$blockedReason"
