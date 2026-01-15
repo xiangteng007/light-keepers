@@ -1,0 +1,29 @@
+﻿{
+    "version":  "1.0.0",
+    "details":  {
+                    "migrationName":  "1768494672978-AddDeletedAtColumns.ts",
+                    "requiredTables":  [
+                                           "reports",
+                                           "volunteers",
+                                           "dispatch_tasks",
+                                           "mission_sessions"
+                                       ],
+                    "affectedTables":  [
+                                           "reports",
+                                           "volunteers",
+                                           "dispatch_tasks",
+                                           "mission_sessions"
+                                       ],
+                    "missingTables":  [
+
+                                      ]
+                },
+    "checks":  {
+                   "rollbackSupported":  true,
+                   "allTablesHaveDeletedAt":  true,
+                   "migrationFileExists":  true
+               },
+    "ok":  true,
+    "generatedAt":  "2026-01-16T00:32:56.0945656+08:00",
+    "status":  "PASS"
+}

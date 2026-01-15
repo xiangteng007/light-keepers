@@ -205,9 +205,14 @@ export class ReportsService {
         return intersection.size / union.size;
     }
 
-    // 取得所有回報
-    async findAll(filter: ReportFilter = {}): Promise<Report[]> {
+    // 取得所有回報 (SEC-SD.2: 支援 withDeleted 查詢已刪資料)
+    async findAll(filter: ReportFilter = {}, withDeleted: boolean = false): Promise<Report[]> {
         const query = this.reportsRepository.createQueryBuilder('report');
+
+        // SEC-SD.2: Admin 可查詢已刪除資料
+        if (withDeleted) {
+            query.withDeleted();
+        }
 
         if (filter.status) {
             query.andWhere('report.status = :status', { status: filter.status });

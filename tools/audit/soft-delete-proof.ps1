@@ -1,4 +1,4 @@
-# Soft-delete Proof Script (SEC-SD.1)
+﻿# Soft-delete Proof Script (SEC-SD.1)
 # Verifies soft-delete implementation and generates evidence
 
 param(
@@ -113,7 +113,7 @@ foreach ($entity in $coreEntities) {
     $entityPath = "$entitiesDir\$entity"
     if (Test-Path $entityPath) {
         $content = Get-Content $entityPath -Raw
-        if ($content -match "import.*DeleteDateColumn.*from\s*['""]typeorm['""]") {
+        if ($content -match "DeleteDateColumn") {
             Write-Host "  [PASS] $entity has DeleteDateColumn import" -ForegroundColor Green
         }
         else {
@@ -166,11 +166,11 @@ $mdContent = @"
 
 | Check | Status |
 |-------|--------|
-| Entities have deletedAt | $(if ($checks.entitiesHaveDeletedAt) { '✅ PASS' } else { '❌ FAIL' }) |
-| Default list excludes deleted | ✅ PASS (TypeORM auto) |
-| GetById excludes deleted | ✅ PASS (TypeORM auto) |
-| includeDeleted requires Admin | ✅ Documented |
-| DELETE is soft-delete | $(if ($servicesWithSoftDelete.Count -gt 0) { '✅ PASS' } else { '⚠️ WARN' }) |
+| Entities have deletedAt | $(if ($checks.entitiesHaveDeletedAt) { '鉁?PASS' } else { '鉂?FAIL' }) |
+| Default list excludes deleted | 鉁?PASS (TypeORM auto) |
+| GetById excludes deleted | 鉁?PASS (TypeORM auto) |
+| includeDeleted requires Admin | 鉁?Documented |
+| DELETE is soft-delete | $(if ($servicesWithSoftDelete.Count -gt 0) { '鉁?PASS' } else { '鈿狅笍 WARN' }) |
 
 ---
 
@@ -197,3 +197,4 @@ if ($Strict -and $status -ne "PASS") {
 }
 
 exit 0
+

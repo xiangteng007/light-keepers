@@ -3,7 +3,8 @@
     "details":  {
                     "servicesWithSoftDelete":  [
                                                    "reports.service.ts",
-                                                   "volunteers.service.ts"
+                                                   "volunteers.service.ts",
+                                                   "mission-sessions.service.ts"
                                                ],
                     "coreEntitiesChecked":  [
                                                 "reports\\reports.entity.ts",
@@ -28,7 +29,7 @@
                    "deleteIsSoftDelete":  true,
                    "defaultListExcludesDeleted":  true
                },
-    "ok":  false,
-    "generatedAt":  "2026-01-16T00:15:56.7235325+08:00",
-    "status":  "WARN"
+    "ok":  true,
+    "generatedAt":  "2026-01-16T00:43:41.4251053+08:00",
+    "status":  "PASS"
 }

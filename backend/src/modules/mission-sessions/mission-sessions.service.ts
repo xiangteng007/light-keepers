@@ -67,11 +67,13 @@ export class MissionSessionsService {
         return this.findSessionById(id);
     }
 
+    // SEC-SD.2 P0-3: Soft-delete
     async deleteSession(id: string): Promise<void> {
-        const result = await this.missionSessionRepo.delete(id);
-        if (result.affected === 0) {
+        const session = await this.missionSessionRepo.findOne({ where: { id } });
+        if (!session) {
             throw new NotFoundException(`Mission session ${id} not found`);
         }
+        await this.missionSessionRepo.softDelete(id);
     }
 
     // Event CRUD
@@ -109,11 +111,13 @@ export class MissionSessionsService {
         return task;
     }
 
+    // SEC-SD.2 P0-3: Soft-delete
     async deleteTask(id: string): Promise<void> {
-        const result = await this.taskRepo.delete(id);
-        if (result.affected === 0) {
+        const task = await this.taskRepo.findOne({ where: { id } });
+        if (!task) {
             throw new NotFoundException(`Task ${id} not found`);
         }
+        await this.taskRepo.softDelete(id);
     }
 
     // Statistics

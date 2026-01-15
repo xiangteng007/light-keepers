@@ -1,7 +1,7 @@
 ﻿# Soft-delete Verification Report (SEC-SD.1)
 
-**Generated**: 2026-01-16 00:15:56  
-**Status**: WARN
+**Generated**: 2026-01-16 00:43:41  
+**Status**: PASS
 
 ---
 

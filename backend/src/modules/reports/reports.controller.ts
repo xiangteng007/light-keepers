@@ -9,6 +9,7 @@ import {
     Query,
     UseGuards,
     Request,
+    ForbiddenException,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
 import { ReportsService, CreateReportDto, ReviewReportDto, ReportFilter } from './reports.service';
@@ -71,6 +72,7 @@ export class ReportsController {
 
     /**
      * 取得所有回報 (需要幹部權限)
+     * SEC-SD.2: includeDeleted=true 僅限 Admin/Owner (DIRECTOR 以上)
      */
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @RequiredLevel(ROLE_LEVELS.OFFICER)
@@ -81,7 +83,18 @@ export class ReportsController {
         @Query('severity') severity?: ReportSeverity,
         @Query('limit') limit?: string,
         @Query('offset') offset?: string,
+        @Query('includeDeleted') includeDeleted?: string,
+        @Request() req?: { user?: { roleLevel?: number } },
     ) {
+        // SEC-SD.2 R3: includeDeleted=true 需要 DIRECTOR 以上權限
+        const wantDeleted = includeDeleted === 'true';
+        if (wantDeleted) {
+            const userLevel = req?.user?.roleLevel ?? 0;
+            if (userLevel < ROLE_LEVELS.DIRECTOR) {
+                throw new ForbiddenException('只有總幹事或更高權限可查詢已刪除資料');
+            }
+        }
+
         const filter: ReportFilter = {
             status,
             type,
@@ -90,7 +103,7 @@ export class ReportsController {
             offset: offset ? parseInt(offset, 10) : undefined,
         };
 
-        const reports = await this.reportsService.findAll(filter);
+        const reports = await this.reportsService.findAll(filter, wantDeleted);
         return {
             success: true,
             data: reports,
