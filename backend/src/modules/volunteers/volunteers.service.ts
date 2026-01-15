@@ -58,6 +58,11 @@ export interface EligibilityFilter {
     limit?: number;
     /** 排除特定志工 ID */
     excludeIds?: string[];
+    /** 🆕 位置篩選 - 中心點經緯度 */
+    centerLat?: number;
+    centerLng?: number;
+    /** 🆕 最大距離 (公尺) */
+    maxDistanceMeters?: number;
 }
 
 @Injectable()

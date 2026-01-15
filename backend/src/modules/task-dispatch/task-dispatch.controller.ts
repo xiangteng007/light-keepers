@@ -164,4 +164,38 @@ export class TaskDispatchController {
     async getStats(@Param('missionSessionId') missionSessionId: string) {
         return this.taskService.getMissionStats(missionSessionId);
     }
+
+    /**
+     * 🆕 Check-in to a task with GPS validation
+     */
+    @Post(':id/checkin')
+    @MinLevel(RoleLevel.VOLUNTEER)
+    async checkIn(
+        @Param('id') id: string,
+        @Body() dto: { latitude: number; longitude: number; note?: string },
+        @Request() req: any,
+    ) {
+        return this.taskService.checkIn(id, req.user.id, {
+            latitude: dto.latitude,
+            longitude: dto.longitude,
+            note: dto.note,
+        });
+    }
+
+    /**
+     * 🆕 Check-out from a task
+     */
+    @Post(':id/checkout')
+    @MinLevel(RoleLevel.VOLUNTEER)
+    async checkOut(
+        @Param('id') id: string,
+        @Body() dto: { latitude?: number; longitude?: number; notes?: string },
+        @Request() req: any,
+    ) {
+        return this.taskService.checkOut(id, req.user.id, {
+            latitude: dto.latitude,
+            longitude: dto.longitude,
+            notes: dto.notes,
+        });
+    }
 }

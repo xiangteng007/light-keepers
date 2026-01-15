@@ -9,7 +9,7 @@ import {
     Query,
     UseGuards,
 } from '@nestjs/common';
-import { VolunteersService, CreateVolunteerDto, UpdateVolunteerDto, VolunteerFilter } from './volunteers.service';
+import { VolunteersService, CreateVolunteerDto, UpdateVolunteerDto, VolunteerFilter, EligibilityFilter } from './volunteers.service';
 import { VolunteerStatus } from './volunteers.entity';
 // Use unified guards from SharedAuthModule
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
@@ -28,6 +28,23 @@ export class VolunteersController {
             success: true,
             message: '志工註冊成功',
             data: volunteer,
+        };
+    }
+
+    // 🆕 進階篩選 - 用於任務派遣 (支援 PostGIS 距離篩選)
+    @Post('find-eligible')
+    async findEligible(@Body() filter: EligibilityFilter) {
+        const volunteers = await this.volunteersService.findEligible(filter);
+        return {
+            success: true,
+            data: volunteers,
+            count: volunteers.length,
+            filter: {
+                skills: filter.skills,
+                region: filter.region,
+                maxDistanceMeters: filter.maxDistanceMeters,
+                hasLocation: !!(filter.centerLat && filter.centerLng),
+            },
         };
     }
 

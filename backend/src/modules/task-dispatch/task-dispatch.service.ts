@@ -370,4 +370,156 @@ export class TaskDispatchService {
             byPriority,
         };
     }
+
+    /**
+     * 🆕 Check-in to a task with GPS validation
+     */
+    async checkIn(
+        taskId: string,
+        volunteerId: string,
+        location: { latitude: number; longitude: number; note?: string },
+    ): Promise<{ success: boolean; assignment: TaskAssignment; message: string }> {
+        const task = await this.getTaskById(taskId);
+        const assignment = await this.assignmentRepo.findOne({
+            where: { taskId, volunteerId },
+        });
+
+        if (!assignment) {
+            throw new NotFoundException('Assignment not found');
+        }
+
+        if (assignment.status !== AssignmentStatus.ACCEPTED) {
+            throw new BadRequestException('Assignment must be accepted before check-in');
+        }
+
+        // Calculate distance to task location (if available)
+        let distanceMeters: number | null = null;
+        let isWithinRange = true;
+        const MAX_CHECKIN_DISTANCE_METERS = 500; // 500m radius
+
+        if (task.location) {
+            const taskCoords = (task.location as any).coordinates;
+            if (taskCoords && Array.isArray(taskCoords) && taskCoords.length === 2) {
+                distanceMeters = this.calculateDistance(
+                    location.latitude,
+                    location.longitude,
+                    taskCoords[1], // lat
+                    taskCoords[0], // lng
+                );
+                isWithinRange = distanceMeters <= MAX_CHECKIN_DISTANCE_METERS;
+            }
+        }
+
+        // Update assignment with check-in data
+        assignment.metadata = {
+            ...assignment.metadata,
+            checkedInAt: new Date().toISOString(),
+            checkinLocation: { lat: location.latitude, lng: location.longitude },
+            checkinDistanceMeters: distanceMeters,
+            checkinNote: location.note || null,
+            isWithinRange,
+        };
+
+        const saved = await this.assignmentRepo.save(assignment);
+
+        // Emit check-in event
+        this.eventEmitter.emit('task.checkedIn', {
+            taskId,
+            volunteerId,
+            missionSessionId: task.missionSessionId,
+            location,
+            distanceMeters,
+            isWithinRange,
+            timestamp: new Date(),
+        });
+
+        this.logger.log(`Volunteer ${volunteerId} checked in to task ${taskId}, distance: ${distanceMeters}m`);
+
+        return {
+            success: true,
+            assignment: saved,
+            message: isWithinRange
+                ? '簽到成功'
+                : `簽到成功 (距離 ${Math.round(distanceMeters || 0)} 公尺，超出範圍)`,
+        };
+    }
+
+    /**
+     * 🆕 Check-out from a task
+     */
+    async checkOut(
+        taskId: string,
+        volunteerId: string,
+        data: { latitude?: number; longitude?: number; notes?: string },
+    ): Promise<{ success: boolean; assignment: TaskAssignment; durationMinutes: number }> {
+        const task = await this.getTaskById(taskId);
+        const assignment = await this.assignmentRepo.findOne({
+            where: { taskId, volunteerId },
+        });
+
+        if (!assignment) {
+            throw new NotFoundException('Assignment not found');
+        }
+
+        if (!assignment.metadata?.checkedInAt) {
+            throw new BadRequestException('Must check-in before check-out');
+        }
+
+        const checkedInAt = new Date(assignment.metadata.checkedInAt);
+        const checkedOutAt = new Date();
+        const durationMinutes = Math.round((checkedOutAt.getTime() - checkedInAt.getTime()) / 1000 / 60);
+
+        // Update assignment with check-out data
+        assignment.metadata = {
+            ...assignment.metadata,
+            checkedOutAt: checkedOutAt.toISOString(),
+            checkoutLocation: data.latitude && data.longitude
+                ? { lat: data.latitude, lng: data.longitude }
+                : null,
+            durationMinutes,
+            checkoutNotes: data.notes || null,
+        };
+
+        // Mark as completed
+        assignment.status = AssignmentStatus.COMPLETED;
+        assignment.completedAt = checkedOutAt;
+        assignment.completionNotes = data.notes || null;
+
+        const saved = await this.assignmentRepo.save(assignment);
+
+        // Emit check-out event
+        this.eventEmitter.emit('task.checkedOut', {
+            taskId,
+            volunteerId,
+            missionSessionId: task.missionSessionId,
+            durationMinutes,
+            timestamp: checkedOutAt,
+        });
+
+        this.logger.log(`Volunteer ${volunteerId} checked out from task ${taskId}, duration: ${durationMinutes}min`);
+
+        return {
+            success: true,
+            assignment: saved,
+            durationMinutes,
+        };
+    }
+
+    /**
+     * Calculate distance between two coordinates (Haversine formula)
+     */
+    private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+        const R = 6371000; // Earth's radius in meters
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+        const a =
+            Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return Math.round(R * c); // Distance in meters
+    }
 }

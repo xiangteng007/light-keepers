@@ -63,6 +63,148 @@ export class ReportsService {
         return saved;
     }
 
+    /**
+     * 🆕 檢查重複回報
+     * 根據時間窗口、地理鄰近度和文字相似度判斷
+     */
+    async checkDuplicate(dto: {
+        latitude: number;
+        longitude: number;
+        title: string;
+        description?: string;
+        type?: ReportType;
+        timeWindowMinutes?: number;
+        maxDistanceMeters?: number;
+        minSimilarity?: number;
+    }): Promise<{
+        hasDuplicate: boolean;
+        duplicates: Array<{
+            id: string;
+            title: string;
+            similarity: number;
+            distanceMeters: number;
+            createdAt: Date;
+        }>;
+        suggestion: 'create' | 'merge' | 'link';
+    }> {
+        const timeWindowMinutes = dto.timeWindowMinutes || 30;
+        const maxDistanceMeters = dto.maxDistanceMeters || 100;
+        const minSimilarity = dto.minSimilarity || 0.6;
+
+        const since = new Date();
+        since.setMinutes(since.getMinutes() - timeWindowMinutes);
+
+        // 取得時間窗口內的回報
+        const recentReports = await this.reportsRepository
+            .createQueryBuilder('report')
+            .where('report.createdAt >= :since', { since })
+            .andWhere('report.latitude IS NOT NULL')
+            .andWhere('report.longitude IS NOT NULL')
+            .andWhere('report.status != :rejected', { rejected: 'rejected' })
+            .orderBy('report.createdAt', 'DESC')
+            .getMany();
+
+        // 計算距離和相似度
+        const duplicates: Array<{
+            id: string;
+            title: string;
+            similarity: number;
+            distanceMeters: number;
+            createdAt: Date;
+        }> = [];
+
+        for (const report of recentReports) {
+            const lat = Number(report.latitude);
+            const lng = Number(report.longitude);
+            const distanceMeters = this.calculateDistance(dto.latitude, dto.longitude, lat, lng);
+
+            if (distanceMeters <= maxDistanceMeters) {
+                // 計算標題相似度 (簡化的 Jaccard 相似度)
+                const similarity = this.calculateTextSimilarity(dto.title, report.title);
+
+                if (similarity >= minSimilarity) {
+                    duplicates.push({
+                        id: report.id,
+                        title: report.title,
+                        similarity: Math.round(similarity * 100) / 100,
+                        distanceMeters: Math.round(distanceMeters),
+                        createdAt: report.createdAt,
+                    });
+                }
+            }
+        }
+
+        // 排序：先按相似度，再按距離
+        duplicates.sort((a, b) => {
+            if (Math.abs(a.similarity - b.similarity) > 0.1) {
+                return b.similarity - a.similarity;
+            }
+            return a.distanceMeters - b.distanceMeters;
+        });
+
+        // 判斷建議操作
+        let suggestion: 'create' | 'merge' | 'link' = 'create';
+        if (duplicates.length > 0) {
+            const topMatch = duplicates[0];
+            if (topMatch.similarity >= 0.8 && topMatch.distanceMeters <= 50) {
+                suggestion = 'merge';
+            } else {
+                suggestion = 'link';
+            }
+        }
+
+        this.logger.log(`Duplicate check: found ${duplicates.length} potential duplicates, suggestion: ${suggestion}`);
+
+        return {
+            hasDuplicate: duplicates.length > 0,
+            duplicates: duplicates.slice(0, 5), // 最多返回 5 筆
+            suggestion,
+        };
+    }
+
+    /**
+     * 計算兩點間距離 (Haversine formula)
+     */
+    private calculateDistance(lat1: number, lng1: number, lat2: number, lng2: number): number {
+        const R = 6371000; // Earth's radius in meters
+        const φ1 = (lat1 * Math.PI) / 180;
+        const φ2 = (lat2 * Math.PI) / 180;
+        const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+        const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+        const a =
+            Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+            Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+        return R * c;
+    }
+
+    /**
+     * 計算文字相似度 (Jaccard similarity based on bigrams)
+     */
+    private calculateTextSimilarity(text1: string, text2: string): number {
+        const getBigrams = (text: string): Set<string> => {
+            const normalized = text.toLowerCase().replace(/\s+/g, '');
+            const bigrams = new Set<string>();
+            for (let i = 0; i < normalized.length - 1; i++) {
+                bigrams.add(normalized.slice(i, i + 2));
+            }
+            return bigrams;
+        };
+
+        const bigrams1 = getBigrams(text1);
+        const bigrams2 = getBigrams(text2);
+
+        if (bigrams1.size === 0 && bigrams2.size === 0) return 1;
+        if (bigrams1.size === 0 || bigrams2.size === 0) return 0;
+
+        const intersection = new Set([...bigrams1].filter(x => bigrams2.has(x)));
+        const union = new Set([...bigrams1, ...bigrams2]);
+
+        return intersection.size / union.size;
+    }
+
     // 取得所有回報
     async findAll(filter: ReportFilter = {}): Promise<Report[]> {
         const query = this.reportsRepository.createQueryBuilder('report');

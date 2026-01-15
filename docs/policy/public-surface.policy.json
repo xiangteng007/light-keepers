@@ -1,176 +1,155 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "schemaVersion": "1.0.0",
     "policy": "Policy-B",
-    "description": "Public Surface Allowlist - SSOT for intentionally public endpoints with @Public() decorator",
-    "version": "1.2.0",
-    "lastUpdated": "2026-01-15",
-    "maintainer": "security-team",
-    "rules": {
-        "policyB": {
-            "description": "@Public() OR @RequiredLevel(0) = public. All public endpoints must have throttling.",
-            "requireThrottle": true,
-            "requireDataExposure": true,
-            "requireOwner": true,
-            "requireReason": true
-        }
+    "scope": {
+        "service": "backend-api",
+        "environment": "prod"
+    },
+    "defaults": {
+        "throttleProfile": "strict"
     },
     "endpoints": [
         {
+            "id": "health-root",
             "method": "GET",
             "path": "/health",
-            "controller": "health.controller.ts",
-            "reason": "K8s liveness probe",
-            "owner": "platform-team",
-            "dataExposure": "none",
+            "reason": "Kubernetes/Cloud Run health check endpoint for service availability monitoring.",
+            "owner": "Platform Team",
             "throttle": {
-                "limit": 120,
-                "ttl": 60000
+                "profile": "health"
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "health-detailed",
             "method": "GET",
             "path": "/health/detailed",
-            "controller": "health.controller.ts",
-            "reason": "Ops monitoring",
-            "owner": "platform-team",
-            "dataExposure": "low",
+            "reason": "Operations monitoring endpoint providing detailed service health metrics.",
+            "owner": "Platform Team",
             "throttle": {
-                "limit": 60,
-                "ttl": 60000
+                "profile": "health"
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "health-live",
             "method": "GET",
             "path": "/health/live",
-            "controller": "health.controller.ts",
-            "reason": "K8s liveness probe",
-            "owner": "platform-team",
-            "dataExposure": "none",
+            "reason": "Kubernetes liveness probe endpoint required for container orchestration.",
+            "owner": "Platform Team",
             "throttle": {
-                "limit": 120,
-                "ttl": 60000
+                "profile": "health"
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "health-ready",
             "method": "GET",
             "path": "/health/ready",
-            "controller": "health.controller.ts",
-            "reason": "K8s readiness probe",
-            "owner": "platform-team",
-            "dataExposure": "none",
+            "reason": "Kubernetes readiness probe endpoint for traffic routing decisions.",
+            "owner": "Platform Team",
             "throttle": {
-                "limit": 120,
-                "ttl": 60000
+                "profile": "health"
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "auth-login",
             "method": "POST",
             "path": "/auth/login",
-            "controller": "auth.controller.ts",
-            "reason": "User authentication entry point",
-            "owner": "security-team",
-            "dataExposure": "medium",
+            "reason": "User authentication entry point - must be publicly accessible for login flow.",
+            "owner": "Security Team",
             "throttle": {
-                "limit": 10,
-                "ttl": 60000
+                "profile": "strict",
+                "requestsPerMinute": 10,
+                "burst": 20
             },
-            "smokeRequired": true,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "medium"
         },
         {
+            "id": "auth-register",
             "method": "POST",
             "path": "/auth/register",
-            "controller": "auth.controller.ts",
-            "reason": "User registration",
-            "owner": "security-team",
-            "dataExposure": "medium",
+            "reason": "User registration endpoint for new account creation in disaster response system.",
+            "owner": "Security Team",
             "throttle": {
-                "limit": 5,
-                "ttl": 60000
+                "profile": "strict",
+                "requestsPerMinute": 5,
+                "burst": 10
             },
-            "smokeRequired": true,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "medium"
         },
         {
+            "id": "auth-refresh",
             "method": "POST",
             "path": "/auth/refresh",
-            "controller": "auth.controller.ts",
-            "reason": "Token refresh (requires refresh token cookie)",
-            "owner": "security-team",
-            "dataExposure": "low",
+            "reason": "Token refresh endpoint for session continuity - requires refresh token cookie.",
+            "owner": "Security Team",
             "throttle": {
-                "limit": 30,
-                "ttl": 60000
+                "profile": "standard",
+                "requestsPerMinute": 30,
+                "burst": 60
             },
-            "smokeRequired": true,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "low"
         },
         {
+            "id": "auth-forgot-password",
             "method": "POST",
             "path": "/auth/forgot-password",
-            "controller": "auth.controller.ts",
-            "reason": "Password reset request",
-            "owner": "security-team",
-            "dataExposure": "none",
+            "reason": "Password reset request endpoint for account recovery workflow.",
+            "owner": "Security Team",
             "throttle": {
-                "limit": 5,
-                "ttl": 60000
+                "profile": "strict",
+                "requestsPerMinute": 5,
+                "burst": 10
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "auth-reset-password",
             "method": "POST",
             "path": "/auth/reset-password",
-            "controller": "auth.controller.ts",
-            "reason": "Password reset completion (uses reset token for verification)",
-            "owner": "security-team",
-            "dataExposure": "none",
+            "reason": "Password reset completion endpoint - uses reset token for verification.",
+            "owner": "Security Team",
             "throttle": {
-                "limit": 5,
-                "ttl": 60000
+                "profile": "strict",
+                "requestsPerMinute": 5,
+                "burst": 10
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         },
         {
+            "id": "intake-anonymous",
             "method": "POST",
             "path": "/intake",
-            "controller": "intake.controller.ts",
-            "reason": "Anonymous incident reporting (public form)",
-            "owner": "c2-team",
-            "dataExposure": "low",
+            "reason": "Anonymous incident reporting form for public disaster response submissions.",
+            "owner": "C2 Team",
             "throttle": {
-                "limit": 10,
-                "ttl": 60000
+                "profile": "standard",
+                "requestsPerMinute": 10,
+                "burst": 20
             },
-            "smokeRequired": false,
-            "expiryDate": null
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "low"
         }
-    ],
-    "stubModulesBlacklist": [
-        "ArFieldGuidanceModule",
-        "ArNavigationModule",
-        "VrCommandModule",
-        "DroneSwarmModule",
-        "SupplyChainBlockchainModule",
-        "AerialImageAnalysisModule"
-    ],
-    "notes": [
-        "All endpoints in this file have @Public() decorator in code",
-        "Health endpoints are for K8s probes and monitoring",
-        "Auth endpoints are user-facing authentication flows",
-        "All endpoints have @Throttle() for rate limiting",
-        "Run validate-public-surface.ps1 -Strict to verify compliance",
-        "Required fields per endpoint: method, path, reason, owner, throttle",
-        "expiryDate is optional (null = permanent exposure)"
     ]
 }

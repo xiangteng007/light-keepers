@@ -1,0 +1,209 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://light-keepers.local/schema/public-surface.schema.json",
+    "title": "Light Keepers Public Surface Policy Schema",
+    "description": "Schema for validating public surface allowlist (intentionally unprotected endpoints)",
+    "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "schemaVersion",
+        "policy",
+        "scope",
+        "endpoints"
+    ],
+    "properties": {
+        "schemaVersion": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+            "description": "Schema版本，用於validator相容性判斷。"
+        },
+        "policy": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 64,
+            "description": "Policy名稱，例如 Policy-B（Production strict allowlist）。"
+        },
+        "scope": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "service",
+                "environment"
+            ],
+            "properties": {
+                "service": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 64,
+                    "description": "服務名稱，例如 backend-api。"
+                },
+                "environment": {
+                    "type": "string",
+                    "enum": [
+                        "dev",
+                        "staging",
+                        "prod"
+                    ],
+                    "description": "政策適用環境。"
+                }
+            }
+        },
+        "defaults": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "throttleProfile": {
+                    "type": "string",
+                    "enum": [
+                        "strict",
+                        "standard",
+                        "health",
+                        "none"
+                    ],
+                    "default": "strict"
+                }
+            }
+        },
+        "endpoints": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+                "$ref": "#/$defs/endpoint"
+            },
+            "description": "允許公開的 endpoints allowlist。"
+        }
+    },
+    "$defs": {
+        "httpMethod": {
+            "type": "string",
+            "enum": [
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "HEAD",
+                "OPTIONS"
+            ]
+        },
+        "pathString": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 256,
+            "pattern": "^\\/([A-Za-z0-9._~\\-]+|\\{[A-Za-z0-9_]+\\}|:[A-Za-z0-9_]+)(\\/([A-Za-z0-9._~\\-]+|\\{[A-Za-z0-9_]+\\}|:[A-Za-z0-9_]+))*$",
+            "not": {
+                "pattern": "\\*"
+            },
+            "description": "禁止 wildcard；允許 /users/:id 或 /users/{id} 格式。"
+        },
+        "ownerString": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 120,
+            "pattern": "^[A-Za-z0-9._\\-@ ]+$",
+            "description": "owner 建議為 email 或 team 名稱，例如 security@org 或 Platform Team。"
+        },
+        "reasonString": {
+            "type": "string",
+            "minLength": 12,
+            "maxLength": 500,
+            "description": "必須可稽核的理由（不可寫 TODO）。"
+        },
+        "throttle": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "profile"
+            ],
+            "properties": {
+                "profile": {
+                    "type": "string",
+                    "enum": [
+                        "strict",
+                        "standard",
+                        "health",
+                        "none"
+                    ],
+                    "description": "節流策略 profile。prod strict 不建議 none，health 可使用 health。"
+                },
+                "requestsPerMinute": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 6000,
+                    "description": "可選，若 profile=custom 類型時使用（目前先保留）。"
+                },
+                "burst": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 6000
+                }
+            }
+        },
+        "endpoint": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "method",
+                "path",
+                "reason",
+                "owner",
+                "throttle"
+            ],
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "minLength": 3,
+                    "maxLength": 64,
+                    "pattern": "^[A-Za-z0-9._\\-]+$",
+                    "description": "可選：穩定識別碼（建議提供）。"
+                },
+                "method": {
+                    "$ref": "#/$defs/httpMethod"
+                },
+                "path": {
+                    "$ref": "#/$defs/pathString"
+                },
+                "reason": {
+                    "$ref": "#/$defs/reasonString"
+                },
+                "owner": {
+                    "$ref": "#/$defs/ownerString"
+                },
+                "throttle": {
+                    "$ref": "#/$defs/throttle"
+                },
+                "expiryDate": {
+                    "type": [
+                        "string",
+                        "null"
+                    ],
+                    "format": "date-time",
+                    "description": "可選：到期日。若已過期，Strict 必須 FAIL。"
+                },
+                "dataClassification": {
+                    "type": "string",
+                    "enum": [
+                        "public",
+                        "internal",
+                        "restricted",
+                        "pii"
+                    ],
+                    "default": "public"
+                },
+                "risk": {
+                    "type": "string",
+                    "enum": [
+                        "low",
+                        "medium",
+                        "high"
+                    ],
+                    "default": "low"
+                },
+                "notes": {
+                    "type": "string",
+                    "maxLength": 500
+                }
+            }
+        }
+    }
+}
