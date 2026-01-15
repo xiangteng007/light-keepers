@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface UploadResult {
@@ -9,6 +10,8 @@ export interface UploadResult {
     filename: string;
     mimetype: string;
     size: number;
+    /** 🆕 SHA-256 檔案雜湊 */
+    sha256Hash: string;
 }
 
 @Injectable()
@@ -32,6 +35,13 @@ export class UploadsService {
     }
 
     /**
+     * 計算 SHA-256 雜湊
+     */
+    private calculateSha256(buffer: Buffer): string {
+        return crypto.createHash('sha256').update(buffer).digest('hex');
+    }
+
+    /**
      * 上傳檔案 (Base64)
      */
     async uploadBase64(
@@ -52,11 +62,13 @@ export class UploadsService {
         const ext = this.getExtensionFromMime(mimetype);
         const filename = `${uuidv4()}.${ext}`;
 
+        // 計算 SHA-256 雜湊
+        const sha256Hash = this.calculateSha256(buffer);
+
         if (this.useGcs) {
-            // TODO: 實作 GCS 上傳
-            return this.uploadToGcs(buffer, folder, filename, mimetype);
+            return this.uploadToGcs(buffer, folder, filename, mimetype, sha256Hash);
         } else {
-            return this.uploadToLocal(buffer, folder, filename, mimetype);
+            return this.uploadToLocal(buffer, folder, filename, mimetype, sha256Hash);
         }
     }
 
@@ -68,6 +80,7 @@ export class UploadsService {
         folder: string,
         filename: string,
         mimetype: string,
+        sha256Hash: string,
     ): Promise<UploadResult> {
         const folderPath = path.join(this.uploadDir, folder);
         if (!fs.existsSync(folderPath)) {
@@ -77,13 +90,14 @@ export class UploadsService {
         const filePath = path.join(folderPath, filename);
         fs.writeFileSync(filePath, buffer);
 
-        this.logger.log(`Uploaded file: ${filePath} (${buffer.length} bytes)`);
+        this.logger.log(`Uploaded file: ${filePath} (${buffer.length} bytes, hash: ${sha256Hash.slice(0, 16)}...)`);
 
         return {
             url: `${this.baseUrl}/uploads/${folder}/${filename}`,
             filename,
             mimetype,
             size: buffer.length,
+            sha256Hash,
         };
     }
 
@@ -95,6 +109,7 @@ export class UploadsService {
         folder: string,
         filename: string,
         mimetype: string,
+        sha256Hash: string,
     ): Promise<UploadResult> {
         // TODO: 安裝 @google-cloud/storage 並實作
         // const { Storage } = require('@google-cloud/storage');
@@ -105,6 +120,7 @@ export class UploadsService {
 
         throw new Error('GCS upload not yet implemented. Set STORAGE_TYPE=local');
     }
+
 
     /**
      * 刪除本地檔案

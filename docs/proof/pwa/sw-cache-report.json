@@ -1,0 +1,42 @@
+﻿{
+    "timestamp":  "2026-01-15T17:45:37.6032620+08:00",
+    "scriptName":  "pwa-cache-proof",
+    "status":  "PASS",
+    "checks":  [
+                   {
+                       "details":  "VitePWA plugin found in vite.config.ts",
+                       "name":  "VitePWA Plugin Configured",
+                       "passed":  true
+                   },
+                   {
+                       "details":  {
+                                       "runtimeCaching":  true,
+                                       "globPatterns":  true,
+                                       "workboxBlock":  true
+                                   },
+                       "name":  "Workbox Configuration",
+                       "passed":  true
+                   },
+                   {
+                       "details":  {
+                                       "networkFirst":  true,
+                                       "cacheFirst":  true
+                                   },
+                       "name":  "Caching Strategies",
+                       "passed":  true
+                   },
+                   {
+                       "details":  {
+                                       "icons":  true,
+                                       "manifest":  true
+                                   },
+                       "name":  "PWA Manifest",
+                       "passed":  true
+                   },
+                   {
+                       "details":  "API cache configured with \u0027api-cache\u0027 name",
+                       "name":  "API Cache Configuration",
+                       "passed":  true
+                   }
+               ]
+}
