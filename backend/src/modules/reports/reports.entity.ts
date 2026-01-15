@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
 
 export type ReportType = 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other';
 export type ReportStatus = 'pending' | 'confirmed' | 'rejected';
@@ -80,4 +80,8 @@ export class Report {
 
     @UpdateDateColumn()
     updatedAt: Date;
+
+    // Soft-delete support (SEC-SD.1)
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+    deletedAt?: Date;
 }

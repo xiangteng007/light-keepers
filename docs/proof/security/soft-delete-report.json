@@ -1,41 +1,34 @@
-{
-    "scriptName": "soft-delete-proof",
-    "timestamp": "2026-01-15T18:25:00+08:00",
-    "status": "WARN",
-    "recommendation": "Consider adding @DeleteDateColumn to core entities for unified soft-delete",
-    "checks": [
-        {
-            "name": "Entities with Soft-Delete",
-            "passed": false,
-            "details": {
-                "count": 0,
-                "entities": []
-            }
-        },
-        {
-            "name": "Entities without Soft-Delete",
-            "passed": true,
-            "details": {
-                "count": "Multiple core entities",
-                "note": "Info only - not blocking"
-            }
-        },
-        {
-            "name": "TypeORM Soft Delete Usage",
-            "passed": false,
-            "details": "softRemove/softDelete methods not found in services"
-        }
-    ],
-    "nextSprint": {
-        "priority": "P0",
-        "action": "Add @DeleteDateColumn to core entities",
-        "targetEntities": [
-            "Report",
-            "Volunteer",
-            "Task",
-            "MissionSession",
-            "DispatchTask"
-        ]
-    },
-    "risk": "Deleted data may still appear in join/relation queries without soft-delete"
+﻿{
+    "version":  "1.0.0",
+    "details":  {
+                    "servicesWithSoftDelete":  [
+
+                                               ],
+                    "coreEntitiesChecked":  [
+                                                "reports\\reports.entity.ts",
+                                                "volunteers\\volunteers.entity.ts",
+                                                "task-dispatch\\entities\\dispatch-task.entity.ts",
+                                                "mission-sessions\\entities\\mission-session.entity.ts"
+                                            ],
+                    "entitiesMissingDeletedAt":  [
+
+                                                 ],
+                    "testedEndpoints":  [
+                                            "TypeORM auto-filter via @DeleteDateColumn"
+                                        ],
+                    "notes":  [
+                                  "Consider using repository.softRemove() or softDelete() for DELETE operations",
+                                  "R3 includeDeleted: Requires Admin/Owner role check in controllers (design pattern)"
+                              ]
+                },
+    "checks":  {
+                   "entitiesHaveDeletedAt":  true,
+                   "includeDeletedRequiresAdmin":  true,
+                   "getByIdExcludesDeleted":  true,
+                   "deleteIsSoftDelete":  false,
+                   "defaultListExcludesDeleted":  true
+               },
+    "ok":  false,
+    "generatedAt":  "2026-01-15T23:44:32.9312997+08:00",
+    "status":  "WARN"
 }

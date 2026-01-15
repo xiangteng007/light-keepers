@@ -1,9 +1,10 @@
 # tools/audit/ci-gate-check.ps1
 # Verifiable Engineering Pipeline — CI Gate Check (Authoritative Gate Summary)
-# VERSION: 1.2.2
-# SEC-T9.1 Hardening:
+# VERSION: 1.3.0
+# SEC-T9.1 Hardening + SEC-SD.1 Soft-delete:
 # - R1: Strict mode fail-on-WARN (any WARN = overall FAIL)
 # - R4: protected field missing = fail-closed (UnknownProtectionCount)
+# - SEC-SD.1: Soft-delete gate (G7) - strict mode requires PASS
 param(
     [string]$RootDir = (Split-Path -Parent (Split-Path -Parent $PSScriptRoot)),
     [switch]$Strict = $false
@@ -125,6 +126,7 @@ $policyPath = Join-Path $RootDir "docs/policy/public-surface.policy.json"
 $validatorPath = Join-Path $RootDir "docs/proof/security/public-surface-check-report.json"
 $appGuardPath = Join-Path $RootDir "docs/proof/security/T9-app-guard-registration-report.json"
 $domainMapCheck = Join-Path $RootDir "docs/proof/logs/T0-domain-map-check.json"
+$softDeletePath = Join-Path $RootDir "docs/proof/security/soft-delete-report.json"
 
 $outGateJson = Join-Path $RootDir "docs/proof/gates/gate-summary.json"
 $outGateMd = Join-Path $RootDir "docs/proof/gates/gate-summary.md"
@@ -154,6 +156,7 @@ try { $policy = Read-Json $policyPath } catch { $failures += $_.Exception.Messag
 try { $validator = Read-Json $validatorPath } catch { $warnings += "Missing validator report: $validatorPath" }
 try { $appGuard = Read-Json $appGuardPath } catch { $warnings += "Missing app guard report: $appGuardPath" }
 try { $domainOk = Read-Json $domainMapCheck } catch { $warnings += "Missing domain-map check report: $domainMapCheck" }
+try { $softDelete = Read-Json $softDeletePath } catch { $warnings += "Missing soft-delete report: $softDeletePath"; $softDelete = $null }
 
 # -------------------------
 # Compute metrics
@@ -376,6 +379,23 @@ else {
     $gates["G6"] = Gate "Domain Map Integrity" "WARN" "domain-map check missing (non-blocking unless Strict)"
 }
 
+# G7: Soft-delete (SEC-SD.1)
+$softDeleteStatus = $null
+if ($softDelete) { $softDeleteStatus = $softDelete.status }
+
+if ($softDeleteStatus -eq "PASS") {
+    $gates["G7"] = Gate "Soft-delete (SEC-SD.1)" "PASS" "Core entities have deletedAt, soft-delete verified"
+}
+elseif ($softDeleteStatus -eq "WARN") {
+    $gates["G7"] = Gate "Soft-delete (SEC-SD.1)" "WARN" "Soft-delete report status=WARN (needs softRemove usage)"
+}
+elseif ($softDelete) {
+    $gates["G7"] = Gate "Soft-delete (SEC-SD.1)" "FAIL" "Soft-delete report status=$softDeleteStatus"
+}
+else {
+    $gates["G7"] = Gate "Soft-delete (SEC-SD.1)" "WARN" "soft-delete report missing (non-blocking unless Strict)"
+}
+
 # STRICT gate (computed)
 if ($strictMode -eq "PASS") {
     $gates["STRICT"] = Gate "Strict Mode Check" "PASS" "UnprotectedNotAllowlistedProd = 0"
@@ -414,9 +434,9 @@ else {
 # Write outputs (JSON + MD) — authoritative
 # -------------------------
 $gateSummary = [ordered]@{
-    version       = "1.2.2"
+    version       = "1.3.0"
     generatedAt   = $generatedAt
-    generator     = "tools/audit/ci-gate-check.ps1@1.2.2"
+    generator     = "tools/audit/ci-gate-check.ps1@1.3.0"
     commitSha     = $commitSha
     overall       = $overall
     strictEnabled = [bool]$Strict
@@ -449,6 +469,7 @@ $gateSummary = [ordered]@{
         validator    = "docs/proof/security/public-surface-check-report.json"
         appGuard     = "docs/proof/security/T9-app-guard-registration-report.json"
         domainMap    = "docs/proof/logs/T0-domain-map-check.json"
+        softDelete   = "docs/proof/security/soft-delete-report.json"
     }
 }
 

@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, DeleteDateColumn, OneToOne, JoinColumn } from 'typeorm';
 import { EncryptedColumnTransformer } from '../../common/crypto.util';
 
 // 志工狀態
@@ -192,4 +192,8 @@ export class Volunteer {
 
     @UpdateDateColumn({ name: 'updated_at' })
     updatedAt: Date;
+
+    // Soft-delete support (SEC-SD.1)
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+    deletedAt?: Date;
 }

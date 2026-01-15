@@ -4,6 +4,7 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
+    DeleteDateColumn,
     OneToMany,
 } from 'typeorm';
 import { MissionEvent } from './event.entity';
@@ -117,6 +118,10 @@ export class MissionSession {
 
     @Column({ name: 'ended_at', type: 'timestamp', nullable: true })
     endedAt: Date;
+
+    // Soft-delete support (SEC-SD.1)
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+    deletedAt?: Date;
 
     // Relations
     @OneToMany(() => MissionEvent, (event) => event.session, { cascade: true })

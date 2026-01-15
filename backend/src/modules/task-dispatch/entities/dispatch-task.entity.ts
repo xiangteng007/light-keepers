@@ -4,6 +4,7 @@ import {
     Column,
     CreateDateColumn,
     UpdateDateColumn,
+    DeleteDateColumn,
     ManyToOne,
     OneToMany,
     JoinColumn,
@@ -131,4 +132,8 @@ export class DispatchTask {
 
     @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
     updatedAt: Date;
+
+    // Soft-delete support (SEC-SD.1)
+    @DeleteDateColumn({ name: 'deleted_at', type: 'timestamptz', nullable: true })
+    deletedAt?: Date;
 }
