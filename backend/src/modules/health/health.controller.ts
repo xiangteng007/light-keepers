@@ -1,6 +1,7 @@
 import { Controller, Get } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
+import { Public } from '../shared/shared-auth.module';
 
 /**
  * Health Controller for Cloud Run
@@ -9,7 +10,10 @@ import { DataSource } from 'typeorm';
  * - /health (liveness): Always 200, no dependency check
  * - /health/live: Minimal liveness check
  * - /health/ready: Readiness probe - checks DB but returns 200 with degraded status if unavailable
+ * 
+ * @Public() - Required for Cloud Run startup/liveness probes which don't have JWT tokens
  */
+@Public()
 @Controller('health')
 export class HealthController {
     private startTime: Date;
