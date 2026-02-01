@@ -44,11 +44,14 @@ jobs:
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
             --timeout=300 \
             --cpu-boost \
-            --memory=512Mi \
+            --memory=1Gi \
             --min-instances=0 \
             --max-instances=10 \
             --concurrency=80 \
             --port=8080 \
+            --execution-environment=gen2 \
+            --cpu-throttling \
+            --startup-cpu-boost \
             --quiet
       
       # IAM Policy 備註：
