@@ -123,22 +123,20 @@ import { LineNotifyModule } from './modules/line-notify/line-notify.module';
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
 import { SupplyChainBlockchainModule } from './modules/supply-chain-blockchain/supply-chain-blockchain.module';
-import { GdprComplianceModule } from './modules/gdpr-compliance/gdpr-compliance.module';
+// REMOVED: GdprComplianceModule - consolidated to audit module
 // Simulation & Training
 import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module';
-import { EvacuationSimModule } from './modules/evacuation-sim/evacuation-sim.module';
+// REMOVED: EvacuationSimModule - stub module deleted
 import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module';
 // Specialty
-import { AarAnalysisModule } from './modules/aar-analysis/aar-analysis.module';
-import { BimIntegrationModule } from './modules/bim-integration/bim-integration.module';
-import { InsaragModule } from './modules/insarag/insarag.module';
+// REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
 import { RobotRescueModule } from './modules/robot-rescue/robot-rescue.module';
 import { SpectrumAnalysisModule } from './modules/spectrum-analysis/spectrum-analysis.module';
 import { WaterResourcesModule } from './modules/water-resources/water-resources.module';
 import { WearableModule } from './modules/wearable/wearable.module';
 // Communication
 import { PttModule } from './modules/ptt/ptt.module';
-import { BluetoothAudioModule } from './modules/bluetooth-audio/bluetooth-audio.module';
+// REMOVED: BluetoothAudioModule - hardware dependent, use native app
 import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module';
 import { RealtimeChatModule } from './modules/realtime-chat/realtime-chat.module';
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
@@ -313,20 +311,19 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Blockchain & Security
         BlockchainModule, // ⛓️ 區塊鏈
         IntegrityLedgerModule, // 📜 完整性帳本
-        // SupplyChainBlockchainModule - moved to STUB_MODULES (conditionally loaded)        GdprComplianceModule, // 🇪🇺 GDPR 合規        DrillSimulationModule, // 🎯 演習模擬
-        EvacuationSimModule, // 🏃 疏散模擬
+        // SupplyChainBlockchainModule - moved to STUB_MODULES (conditionally loaded)
+        DrillSimulationModule, // 🎯 演習模擬
+        // REMOVED: EvacuationSimModule, GdprComplianceModule - stub modules deleted
         DamageSimulationModule, // 💥 損害模擬
         // Specialty
-        AarAnalysisModule, // 📊 AAR 分析
-        BimIntegrationModule, // 🏗️ BIM 整合        //- moved to STUB_MODULES (conditionally loaded)
-        InsaragModule, // 🏥 INSARAG
+        // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
         RobotRescueModule, // 🤖 機器人救援
         SpectrumAnalysisModule, // 📡 頻譜分析
         WaterResourcesModule, // 💧 水資源
         WearableModule, // ⌚ 穿戴裝置
         // Communication
         PttModule, // 📻 PTT 對講
-        BluetoothAudioModule, // 🎧 藍牙音訊
+        // REMOVED: BluetoothAudioModule - hardware dependent
         MediaStreamingModule, // 📺 媒體串流
         RealtimeChatModule, // 💬 即時聊天
         SpeechToTextModule, // 🎤 語音轉文字

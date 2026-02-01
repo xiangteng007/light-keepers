@@ -15,12 +15,23 @@ import {
 import { AiVisionController } from './disaster-report/ai-vision.controller';
 import { RichMenuService } from './services/rich-menu.service';
 import { FlexMessageService } from './services/flex-message.service';
+// Consolidated from line-notify and line-liff modules
+import { LineNotifyService } from '../line-notify/line-notify.service';
+import { LineLiffService } from '../line-liff/line-liff.service';
 
+/**
+ * LINE Bot Module - Consolidated LINE Integration
+ * 
+ * Consolidates:
+ * - line-bot: Core LINE Messaging API integration
+ * - line-notify: LINE Notify API (group notifications)
+ * - line-liff: LINE Front-end Framework (mini-apps)
+ */
 @Global()
 @Module({
     imports: [
         TypeOrmModule.forFeature([Account, Report, Task]),
-        forwardRef(() => ReportsModule), // Use forwardRef to break circular dependency
+        forwardRef(() => ReportsModule),
     ],
     controllers: [LineBotController, AiVisionController],
     providers: [
@@ -31,6 +42,9 @@ import { FlexMessageService } from './services/flex-message.service';
         DisasterReportService,
         RichMenuService,
         FlexMessageService,
+        // Consolidated services
+        LineNotifyService,
+        LineLiffService,
     ],
     exports: [
         LineBotService,
@@ -38,9 +52,9 @@ import { FlexMessageService } from './services/flex-message.service';
         AiClassificationService,
         RichMenuService,
         FlexMessageService,
+        // Consolidated exports
+        LineNotifyService,
+        LineLiffService,
     ],
 })
 export class LineBotModule { }
-
-
-
