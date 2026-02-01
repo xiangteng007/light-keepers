@@ -6,7 +6,7 @@ export interface ChartDataset {
     label: string;
     data: number[];
     color?: string;
-    backgroundColor?: string;
+    backgroundColor?: string | string[];
 }
 
 export interface ChartConfig {

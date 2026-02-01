@@ -1,10 +1,7 @@
 /**
  * Infrastructure Core Module - 基礎設施
  * 
- * 整合模組: database, health, cache, redis-cache, uploads,
- *           file-upload, files, mock-data, i18n-api, swagger-auto-docs,
- *           offline-sync, offline-mesh, mobile-sync, device-management,
- *           media-streaming
+ * 整合模組: database, health, cache, files, metrics
  * 
  * 職責:
  * - 資料庫連線管理
@@ -17,17 +14,17 @@
 import { Module } from '@nestjs/common';
 import { DatabaseModule } from '../../modules/database/database.module';
 import { HealthModule } from '../../modules/health/health.module';
-import { UploadsModule } from '../../modules/uploads/uploads.module';
+import { FilesModule } from '../../modules/files/files.module';
 import { MetricsModule } from '../../modules/metrics/metrics.module';
 
 @Module({
     imports: [
         DatabaseModule.forRoot(),
         HealthModule,
-        UploadsModule,
+        FilesModule,
         MetricsModule,
-        // 未來整合: CacheModule, I18nModule, etc.
     ],
-    exports: [HealthModule, UploadsModule, MetricsModule],
+    exports: [HealthModule, FilesModule, MetricsModule],
 })
 export class InfrastructureCoreModule { }
+

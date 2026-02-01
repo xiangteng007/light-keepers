@@ -12,17 +12,12 @@
  */
 
 import { Module } from '@nestjs/common';
-import { WeatherForecastModule } from '../../modules/weather-forecast/weather-forecast.module';
-import { WeatherHubModule } from '../../modules/weather-hub/weather-hub.module';
 import { NcdrAlertsModule } from '../../modules/ncdr-alerts/ncdr-alerts.module';
 
 @Module({
-    imports: [
-        WeatherForecastModule,
-        WeatherHubModule,
-        NcdrAlertsModule,
+    imports: [NcdrAlertsModule,
         // 未來整合: ClimateModule, etc.
     ],
-    exports: [WeatherForecastModule, WeatherHubModule, NcdrAlertsModule],
+    exports: [NcdrAlertsModule],
 })
 export class EnvironmentCoreModule { }

@@ -154,7 +154,8 @@ class OfflineSOPService {
         }
 
         // 離線回退：從 IndexedDB 取得
-        return this.db!.get('sops', id) || null;
+        const cachedSop = await this.db!.get('sops', id);
+        return cachedSop ?? null;
     }
 
     /**

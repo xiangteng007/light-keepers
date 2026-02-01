@@ -16,17 +16,14 @@
 import { Module } from '@nestjs/common';
 import { TenantModule } from '../../modules/tenants/tenant.module';
 import { MenuConfigModule } from '../../modules/menu-config/menu-config.module';
-import { AccessLogModule } from '../../modules/access-log/access-log.module';
 import { BackupModule } from '../../modules/backup/backup.module';
 
 @Module({
     imports: [
         TenantModule,
-        MenuConfigModule,
-        AccessLogModule,
-        BackupModule,
+        MenuConfigModule,BackupModule,
         // 未來整合: AuditModule, OrgChartModule, etc.
     ],
-    exports: [TenantModule, MenuConfigModule, AccessLogModule, BackupModule],
+    exports: [TenantModule, MenuConfigModule,BackupModule],
 })
 export class AdminCoreModule { }

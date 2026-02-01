@@ -46,15 +46,12 @@ import { SharedJwtModule } from '../shared/shared-jwt.module';
 // Import AccountsModule for permission sync
 import { AccountsModule } from '../accounts/accounts.module';
 
-// Import AccessLogModule for audit logging
-import { AccessLogModule } from '../access-log/access-log.module';
+// Importfor audit logging
 
 @Module({
     imports: [
         SharedJwtModule, // Provides JwtAuthGuard without full AuthModule dependencies
-        AccountsModule,  // ✅ Provides AccountsService for permission sync
-        AccessLogModule, // ✅ Provides AccessLogService for audit logging
-        TypeOrmModule.forFeature([
+        AccountsModule,  // ✅ Provides AccountsService for permission sync        TypeOrmModule.forFeature([
             // Core entities
             Volunteer,
             VolunteerAssignment,
@@ -68,9 +65,7 @@ import { AccessLogModule } from '../access-log/access-log.module';
             // Recognition entities
             VolunteerBadge,
             VolunteerEarnedBadge,
-            VolunteerRecognition,
-        ]),
-    ],
+            VolunteerRecognition])],
     controllers: [
         VolunteersController,
         VolunteersAdminController,
@@ -85,8 +80,7 @@ import { AccessLogModule } from '../access-log/access-log.module';
         // Recognition Controller
         RecognitionController,
         // Location tracking
-        VolunteerLocationController,
-    ],
+        VolunteerLocationController],
     providers: [
         VolunteersService,
         AssignmentsService,
@@ -98,8 +92,7 @@ import { AccessLogModule } from '../access-log/access-log.module';
         CheckInService,
         ExpiryNotificationService,
         // Recognition Service
-        RecognitionService,
-    ],
+        RecognitionService],
     exports: [
         VolunteersService,
         AssignmentsService,
@@ -107,8 +100,7 @@ import { AccessLogModule } from '../access-log/access-log.module';
         VehicleService,
         InsuranceService,
         PointsService,
-        RecognitionService,
-    ],
+        RecognitionService],
 })
 export class VolunteersModule { }
 
