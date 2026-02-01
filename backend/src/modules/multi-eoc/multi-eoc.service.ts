@@ -145,11 +145,195 @@ export class MultiEocService {
         this.logger.warn(`Federation alert broadcast: ${alert.title}`);
     }
 
+    /**
+     * P1: Transfer command authority between EOCs
+     */
+    async transferCommand(
+        missionId: string,
+        fromEocId: string,
+        toEocId: string,
+        reason: string,
+    ): Promise<{ success: boolean; transferredAt?: Date }> {
+        const mission = this.federatedMissions.get(missionId);
+        if (!mission) throw new Error('Mission not found');
+
+        const fromEoc = this.eocRegistry.get(fromEocId);
+        const toEoc = this.eocRegistry.get(toEocId);
+        
+        if (!fromEoc || !toEoc) {
+            throw new Error('Invalid EOC ID');
+        }
+
+        if (mission.leadEocId !== fromEocId) {
+            throw new Error('Only lead EOC can transfer command');
+        }
+
+        const now = new Date();
+        
+        // Record transfer
+        if (!mission.commandTransfers) {
+            mission.commandTransfers = [];
+        }
+        mission.commandTransfers.push({
+            from: fromEocId,
+            to: toEocId,
+            reason,
+            transferredAt: now,
+        });
+        
+        // Update lead
+        mission.leadEocId = toEocId;
+        
+        // Notify all participating EOCs
+        for (const eocId of mission.participatingEocs) {
+            await this.notifyEoc(eocId, 'command.transferred', {
+                missionId,
+                newLeadEocId: toEocId,
+                previousLeadEocId: fromEocId,
+                reason,
+            });
+        }
+
+        this.logger.log(`Command transferred: ${fromEoc.name} → ${toEoc.name} for mission ${missionId}`);
+
+        return { success: true, transferredAt: now };
+    }
+
+    /**
+     * P1: Merge Common Operational Picture (COP) from multiple EOCs
+     */
+    mergeOperationalPicture(eocIds: string[]): CommonOperationalPicture {
+        const incidents: any[] = [];
+        const resources: SharedResource[] = [];
+        const personnel: any[] = [];
+        const boundaries: any[] = [];
+
+        for (const eocId of eocIds) {
+            const eoc = this.eocRegistry.get(eocId);
+            if (!eoc) continue;
+
+            // Add EOC's shared resources
+            const eocResources = this.resourcePool.get(eocId) || [];
+            resources.push(...eocResources);
+
+            // Add EOC boundary
+            boundaries.push({
+                eocId,
+                eocName: eoc.name,
+                jurisdiction: eoc.jurisdiction,
+            });
+        }
+
+        // Merge active missions
+        for (const mission of this.federatedMissions.values()) {
+            if (eocIds.includes(mission.leadEocId) || 
+                mission.participatingEocs.some(id => eocIds.includes(id))) {
+                incidents.push({
+                    missionId: mission.id,
+                    name: mission.name,
+                    type: mission.incidentType,
+                    leadEoc: mission.leadEocId,
+                    status: mission.status,
+                    affectedArea: mission.affectedArea,
+                });
+            }
+        }
+
+        return {
+            generatedAt: new Date(),
+            eocCount: eocIds.length,
+            incidents,
+            resources,
+            personnel,
+            boundaries,
+            legend: {
+                resourceTypes: [...new Set(resources.map(r => r.type))],
+            },
+        };
+    }
+
+    /**
+     * P1: Share resources between specific EOCs
+     */
+    shareResourcesBetweenEocs(
+        fromEocId: string,
+        toEocId: string,
+        resources: SharedResource[],
+    ): { success: boolean; transferred: number } {
+        const fromEoc = this.eocRegistry.get(fromEocId);
+        const toEoc = this.eocRegistry.get(toEocId);
+
+        if (!fromEoc || !toEoc) {
+            return { success: false, transferred: 0 };
+        }
+
+        let transferred = 0;
+        const fromPool = this.resourcePool.get(fromEocId) || [];
+        const toPool = this.resourcePool.get(toEocId) || [];
+
+        for (const resource of resources) {
+            const index = fromPool.findIndex(r => r.id === resource.id);
+            if (index !== -1) {
+                const [transferredResource] = fromPool.splice(index, 1);
+                transferredResource.eocId = toEocId;
+                transferredResource.sharedAt = new Date();
+                toPool.push(transferredResource);
+                transferred++;
+            }
+        }
+
+        this.resourcePool.set(fromEocId, fromPool);
+        this.resourcePool.set(toEocId, toPool);
+
+        this.logger.log(`Transferred ${transferred} resources: ${fromEoc.name} → ${toEoc.name}`);
+
+        return { success: true, transferred };
+    }
+
+    /**
+     * P1: Request mutual aid from neighboring EOCs
+     */
+    async requestMutualAid(
+        requestingEocId: string,
+        aidRequest: MutualAidRequest,
+    ): Promise<MutualAidResponse[]> {
+        const requestingEoc = this.eocRegistry.get(requestingEocId);
+        if (!requestingEoc) throw new Error('Requesting EOC not found');
+
+        const responses: MutualAidResponse[] = [];
+
+        // Find nearby EOCs by region
+        for (const [eocId, eoc] of this.eocRegistry.entries()) {
+            if (eocId === requestingEocId) continue;
+            
+            // Check if EOC has requested capability
+            if (aidRequest.requiredCapabilities.some(cap => eoc.capabilities.includes(cap))) {
+                await this.notifyEoc(eocId, 'mutual_aid.request', {
+                    requestingEocId,
+                    requestingEocName: requestingEoc.name,
+                    ...aidRequest,
+                });
+
+                responses.push({
+                    eocId,
+                    eocName: eoc.name,
+                    status: 'pending',
+                    estimatedResponseTime: null,
+                });
+            }
+        }
+
+        this.logger.log(`Mutual aid request from ${requestingEoc.name}: ${aidRequest.incidentType}`);
+
+        return responses;
+    }
+
     // Private
     private async notifyEoc(eocId: string, event: string, data: any): Promise<void> {
         const eoc = this.eocRegistry.get(eocId);
         if (!eoc) return;
         // Would send webhook/API call to EOC endpoint
+        this.logger.debug(`Notifying EOC ${eocId}: ${event}`);
     }
 
     private async queryEocResources(eocId: string, type: string): Promise<SharedResource[]> {
@@ -188,6 +372,12 @@ interface FederatedMission extends FederatedMissionConfig {
     sharedResources: SharedResource[];
     communications: any[];
     createdAt: Date;
+    commandTransfers?: Array<{
+        from: string;
+        to: string;
+        reason: string;
+        transferredAt: Date;
+    }>;
 }
 
 interface ResourceRequest {
@@ -230,3 +420,38 @@ interface FederationAlert {
     severity: 'info' | 'warning' | 'critical';
     affectedRegions: string[];
 }
+
+// P1: New interfaces for enhanced coordination
+
+interface CommonOperationalPicture {
+    generatedAt: Date;
+    eocCount: number;
+    incidents: any[];
+    resources: SharedResource[];
+    personnel: any[];
+    boundaries: any[];
+    legend: {
+        resourceTypes: string[];
+    };
+}
+
+interface MutualAidRequest {
+    incidentType: string;
+    requiredCapabilities: string[];
+    requiredResources: Array<{
+        type: string;
+        quantity: number;
+    }>;
+    urgency: 'low' | 'medium' | 'high' | 'critical';
+    duration?: string;
+    location: { lat: number; lng: number };
+}
+
+interface MutualAidResponse {
+    eocId: string;
+    eocName: string;
+    status: 'pending' | 'accepted' | 'rejected';
+    estimatedResponseTime: number | null;
+    offeredResources?: SharedResource[];
+}
+

@@ -1,11 +1,22 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { IcsFormsService, IcsFormType, Ics201Data, Ics214Data, IcsFormData } from './services/ics-forms.service';
+import { 
+    IcsFormsService, 
+    IcsFormType, 
+    Ics201Data, 
+    Ics202Data,
+    Ics203Data,
+    Ics205Data,
+    Ics214Data, 
+    IcsFormData 
+} from './services/ics-forms.service';
 import { HxlExportService, HxlDataset, HxlExportOptions } from './services/hxl-export.service';
 import { OchaIntegrationService, ThreeWRecord, ClusterReport } from './services/ocha-integration.service';
 import { SphereStandardsService, SphereStandard, SphereIndicator, ComplianceReport } from './services/sphere-standards.service';
 
 /**
  * International Standards Service (Unified Facade)
+ * 
+ * P1 跨機關協作：完整 ICS/NIMS 表單支援
  */
 @Injectable()
 export class InternationalStandardsService {
@@ -22,6 +33,27 @@ export class InternationalStandardsService {
 
     generateIcs201(data: Ics201Data): IcsFormData {
         return this.icsForms.generateIcs201(data);
+    }
+
+    /**
+     * 生成 ICS-202 事件目標
+     */
+    generateIcs202(data: Ics202Data): IcsFormData {
+        return this.icsForms.generateIcs202(data);
+    }
+
+    /**
+     * 生成 ICS-203 組織分配
+     */
+    generateIcs203(data: Ics203Data): IcsFormData {
+        return this.icsForms.generateIcs203(data);
+    }
+
+    /**
+     * 生成 ICS-205 通訊計劃
+     */
+    generateIcs205(data: Ics205Data): IcsFormData {
+        return this.icsForms.generateIcs205(data);
     }
 
     generateIcs214(data: Ics214Data): IcsFormData {

@@ -70,6 +70,67 @@ export interface Ics214Data {
 }
 
 /**
+ * ICS-202 事件目標
+ */
+export interface Ics202Data {
+    incidentName: string;
+    incidentNumber?: string;
+    operationalPeriod: { from: Date; to: Date };
+    objectives: string[];
+    generalControlObjectives: string;
+    weatherForecast: string;
+    safetyMessage: string;
+    attachments?: string[];
+    preparedBy: string;
+    approvedBy: string;
+}
+
+/**
+ * ICS-203 組織分配
+ */
+export interface Ics203Data {
+    incidentName: string;
+    operationalPeriod: { from: Date; to: Date };
+    incidentCommander: { name: string; agency: string };
+    deputyIc?: { name: string; agency: string };
+    safetyOfficer?: { name: string; agency: string };
+    infoOfficer?: { name: string; agency: string };
+    liaisonOfficer?: { name: string; agency: string };
+    operationsChief?: { name: string; agency: string };
+    planningChief?: { name: string; agency: string };
+    logisticsChief?: { name: string; agency: string };
+    financeChief?: { name: string; agency: string };
+    branches?: Array<{
+        name: string;
+        director: string;
+        divisions: Array<{ name: string; supervisor: string }>;
+    }>;
+    preparedBy: string;
+}
+
+/**
+ * ICS-205 通訊計劃
+ */
+export interface Ics205Data {
+    incidentName: string;
+    operationalPeriod: { from: Date; to: Date };
+    basicRadioChannels: Array<{
+        zone: string;
+        channel: string;
+        function: string;
+        assignment: string;
+        rxFreq: string;
+        rxTone?: string;
+        txFreq: string;
+        txTone?: string;
+        mode: 'A' | 'D' | 'M'; // Analog, Digital, Mixed
+        remarks?: string;
+    }>;
+    specialInstructions?: string;
+    preparedBy: string;
+}
+
+/**
  * ICS Forms Service
  * 
  * 提供 NIMS/ICS 標準表單功能：
@@ -121,6 +182,62 @@ export class IcsFormsService {
     }
 
     /**
+     * 生成 ICS-202 事件目標
+     */
+    generateIcs202(data: Ics202Data): IcsFormData {
+        const form: IcsFormData = {
+            formType: IcsFormType.ICS_202,
+            incidentName: data.incidentName,
+            incidentNumber: data.incidentNumber,
+            operationalPeriod: data.operationalPeriod,
+            preparedBy: data.preparedBy,
+            approvedBy: data.approvedBy,
+            data,
+            createdAt: new Date(),
+        };
+
+        this.forms.set(`${form.formType}-${Date.now()}`, form);
+        this.logger.log(`Generated ICS-202 for ${data.incidentName}`);
+        return form;
+    }
+
+    /**
+     * 生成 ICS-203 組織分配
+     */
+    generateIcs203(data: Ics203Data): IcsFormData {
+        const form: IcsFormData = {
+            formType: IcsFormType.ICS_203,
+            incidentName: data.incidentName,
+            operationalPeriod: data.operationalPeriod,
+            preparedBy: data.preparedBy,
+            data,
+            createdAt: new Date(),
+        };
+
+        this.forms.set(`${form.formType}-${Date.now()}`, form);
+        this.logger.log(`Generated ICS-203 for ${data.incidentName}`);
+        return form;
+    }
+
+    /**
+     * 生成 ICS-205 通訊計劃
+     */
+    generateIcs205(data: Ics205Data): IcsFormData {
+        const form: IcsFormData = {
+            formType: IcsFormType.ICS_205,
+            incidentName: data.incidentName,
+            operationalPeriod: data.operationalPeriod,
+            preparedBy: data.preparedBy,
+            data,
+            createdAt: new Date(),
+        };
+
+        this.forms.set(`${form.formType}-${Date.now()}`, form);
+        this.logger.log(`Generated ICS-205 for ${data.incidentName}`);
+        return form;
+    }
+
+    /**
      * 取得表單範本
      */
     getFormTemplate(formType: IcsFormType): Record<string, any> {
@@ -143,10 +260,37 @@ export class IcsFormsService {
             },
             [IcsFormType.ICS_202]: {
                 incidentName: '',
+                incidentNumber: '',
+                operationalPeriod: { from: null, to: null },
                 objectives: [],
                 generalControlObjectives: '',
                 weatherForecast: '',
                 safetyMessage: '',
+                attachments: [],
+                preparedBy: '',
+                approvedBy: '',
+            },
+            [IcsFormType.ICS_203]: {
+                incidentName: '',
+                operationalPeriod: { from: null, to: null },
+                incidentCommander: { name: '', agency: '' },
+                deputyIc: { name: '', agency: '' },
+                safetyOfficer: { name: '', agency: '' },
+                infoOfficer: { name: '', agency: '' },
+                liaisonOfficer: { name: '', agency: '' },
+                operationsChief: { name: '', agency: '' },
+                planningChief: { name: '', agency: '' },
+                logisticsChief: { name: '', agency: '' },
+                financeChief: { name: '', agency: '' },
+                branches: [],
+                preparedBy: '',
+            },
+            [IcsFormType.ICS_205]: {
+                incidentName: '',
+                operationalPeriod: { from: null, to: null },
+                basicRadioChannels: [],
+                specialInstructions: '',
+                preparedBy: '',
             },
             [IcsFormType.ICS_214]: {
                 incidentName: '',
@@ -156,10 +300,8 @@ export class IcsFormsService {
                 homeAgency: '',
                 activityLog: [],
             },
-            // 其他表單範本...
-            [IcsFormType.ICS_203]: {},
+            // 其他表單範本 (尚未完整實作)
             [IcsFormType.ICS_204]: {},
-            [IcsFormType.ICS_205]: {},
             [IcsFormType.ICS_206]: {},
             [IcsFormType.ICS_207]: {},
             [IcsFormType.ICS_208]: {},
