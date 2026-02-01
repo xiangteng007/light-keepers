@@ -1,12 +1,16 @@
 # Light Keepers Platform - Domain Map (SSOT)
 # This file maps 7 workflow domains to their backend modules, frontend pages, and key routes.
 # Route paths match T1-routes-guards-mapping.json format (without /api/v1 prefix)
+#
+# ⚠️ IMPORTANT: This file is validated by CI/CD audit-gates (G6).
+# Before adding module references, ensure the module exists in backend/src/modules/
+# Run: pwsh tools/audit/check-domain-map.ps1 to verify locally
 
-version: "1.1"
-lastUpdated: "2026-01-15T08:07:34+08:00"
-generatedAt: "2026-01-15T08:07:34+08:00"
+version: "1.2"
+lastUpdated: "2026-02-01T10:00:00+08:00"
+generatedAt: "2026-02-01T10:00:00+08:00"
 generator: "tools/audit/generate-domain-map.ps1@1.2.0"
-commitSha: "f91407fdf3cd1d5cd3fa3880d75d592f892e918e"
+commitSha: "6389c1b"
 
 domains:
   # ============================================================
@@ -22,7 +26,6 @@ domains:
       - triage
       - mission-sessions
       - field-reports
-      - auto-dispatch
       - drill-simulation
     pages:
       - CommandCenterPage
@@ -47,11 +50,7 @@ domains:
       - tactical-maps
       - overlays
       - location
-      - geofence-alert
       - routing
-      - indoor-positioning
-      - offline-map-cache
-      - offline-tiles
     pages:
       - TacticalMapPage
       - MapPage
@@ -70,7 +69,6 @@ domains:
       - resources
       - equipment
       - donations
-      - donation-tracking
       - water-resources
       - resource-matching
       - resource-optimization
@@ -99,7 +97,6 @@ domains:
       - shift-calendar
       - org-chart
       - scheduler
-      - smart-scheduling
       - payroll
     pages:
       - VolunteersPage
@@ -123,12 +120,8 @@ domains:
     description: 社區聯繫、家屬團聚、心理健康
     modules:
       - community
-      - community-resilience
-      - disaster-community
-      - family-reunification
       - reunification
       - psychological-support
-      - psychological-tracking
     pages:
       - CommunityPage
       - ReunificationPage
@@ -145,12 +138,8 @@ domains:
     description: 數據分析、報表產生、排行榜
     modules:
       - analytics
-      - dashboard-analytics
       - reports
-      - reports-export
-      - report-builder
-      - report-scheduler
-      - heatmap-analytics
+      - reporting-engine
       - trend-prediction
       - performance-report
     pages:
@@ -159,11 +148,9 @@ domains:
       - LeaderboardPage
       - PointsReportPage
       - ReportsAdminPage
-      - ReportsExportPage
     keyRoutes:
       - /analytics
       - /reports
-      - /reports-export
 
   # ============================================================
   # Core - Platform Governance (平台治理)
@@ -177,11 +164,8 @@ domains:
       - tenants
       - backup
       - audit
-      - audit-log
-      - access-log
       - notifications
       - system
-      - two-factor-auth
       - integrations
       - webhooks
     pages:
@@ -201,14 +185,10 @@ domains:
 crossDomain:
   ai:
     modules:
-      - ai
+      - ai-platform
       - ai-queue
-      - ai-prediction
-      - ai-vision
-      - event-ai
       - chatbot-assistant
       - voice-assistant
-      - auto-summary
     description: AI 服務、預測、自然語言處理
 
   realtime:
@@ -226,17 +206,12 @@ crossDomain:
       - line-notify
       - line-liff
       - ncdr-alerts
-      - weather-forecast
-      - weather-hub
+      - weather-service
       - tccip-climate
-      - ngo-integration
     description: 外部整合、LINE Bot、災害預警
 
   media:
     modules:
       - drone-ops
-      - drone-swarm
-      - air-ops
-      - aerial-image-analysis
       - media-streaming
-    description: 無人機、空拍、媒體串流
+    description: 無人機、媒體串流

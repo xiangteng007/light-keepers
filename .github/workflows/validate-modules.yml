@@ -1,0 +1,41 @@
+# Module Reference Validation - GitHub Actions Workflow
+# 
+# 這個工作流程會在每次 PR 時驗證模組參考的完整性
+# 確保所有導入和配置都指向存在的模組
+
+name: validate-modules
+
+on:
+  pull_request:
+    branches: ["main"]
+    paths:
+      - 'backend/src/**/*.ts'
+      - 'docs/architecture/domain-map.yaml'
+  push:
+    branches: ["main"]
+    paths:
+      - 'backend/src/**/*.ts'
+      - 'docs/architecture/domain-map.yaml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    name: Validate Module References
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate Module References
+        shell: pwsh
+        run: |
+          pwsh tools/pre-commit/validate-module-references.ps1 -Strict
+
+      - name: Check Domain Map
+        shell: pwsh
+        run: |
+          pwsh tools/audit/check-domain-map.ps1 -Strict

@@ -1,6 +1,6 @@
 ﻿{
     "version":  "1.2.0",
-    "generatedAt":  "2026-01-15T08:16:27.5976891+08:00",
+    "generatedAt":  "2026-02-01T10:01:53.0514171+08:00",
     "status":  "PASS",
     "strictMode":  false,
     "domainMapPath":  "docs/architecture/domain-map.yaml",
@@ -8,10 +8,10 @@
     "frontendPagesRoot":  "web-dashboard/src/pages",
     "counts":  {
                    "missingModules":  0,
-                   "scannedBackendModules":  175,
-                   "referencedModules":  87,
+                   "scannedBackendModules":  120,
+                   "referencedModules":  60,
                    "scannedFrontendPages":  101,
-                   "referencedPages":  35,
+                   "referencedPages":  34,
                    "missingPages":  0
                },
     "missing":  {
