@@ -4,9 +4,18 @@
  * Sidebar navigation configuration with workflow-based grouping
  * Supports: editing names, reordering, RBAC filtering, persistence
  * 
- * v2.0 - 7 Workflow Domains + RBAC Integration
+ * v2.1 - Optimized 6-Group Navigation with Version-based Config Reset
+ * 
+ * CHANGELOG:
+ * - v2.1: Fix localStorage override bug, add config versioning
+ * - v2.0: 7 Workflow Domains + RBAC Integration
  */
 import { useState, useEffect, useCallback } from 'react';
+
+// Config version - increment when nav structure changes to force localStorage reset
+const CONFIG_VERSION = 2;
+const STORAGE_KEY = 'lk-sidebar-config';
+const VERSION_KEY = 'lk-sidebar-version';
 import {
     // C2 - Command & Control
     LayoutDashboard, AlertTriangle, ClipboardList, Zap, Activity, Target, FileCheck,
@@ -53,7 +62,7 @@ export interface NavItemConfig {
     roles?: string[];
 }
 
-const STORAGE_KEY = 'lightkeepers-sidebar-config-v3';
+
 
 // Group definitions - v2.1 Optimized (6 Groups)
 export const NAV_GROUPS: NavGroupConfig[] = [
@@ -139,18 +148,39 @@ export function useSidebarConfig(userLevel: PermissionLevel = PermissionLevel.Sy
     const [navItems, setNavItems] = useState<NavItemConfig[]>(DEFAULT_NAV_ITEMS);
     const [isLoaded, setIsLoaded] = useState(false);
 
-    // Load from localStorage on mount
+    // Load from localStorage on mount with version check
     useEffect(() => {
         try {
-            const saved = localStorage.getItem(STORAGE_KEY);
-            if (saved) {
-                const parsed = JSON.parse(saved) as NavItemConfig[];
-                // Merge with defaults to add any new items
-                const merged = DEFAULT_NAV_ITEMS.map(defaultItem => {
-                    const savedItem = parsed.find(p => p.id === defaultItem.id);
-                    return savedItem ? { ...defaultItem, ...savedItem } : defaultItem;
-                });
-                setNavItems(merged);
+            const savedVersion = localStorage.getItem(VERSION_KEY);
+            const currentVersion = CONFIG_VERSION.toString();
+            
+            // If version mismatch, clear old config and use defaults
+            if (savedVersion !== currentVersion) {
+                console.log(`[Sidebar] Config version changed (${savedVersion} -> ${currentVersion}), resetting to defaults`);
+                localStorage.removeItem(STORAGE_KEY);
+                localStorage.setItem(VERSION_KEY, currentVersion);
+                // Keep default items - no need to set state
+            } else {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    const parsed = JSON.parse(saved) as NavItemConfig[];
+                    // Merge with defaults, but NEVER override visibility from defaults
+                    // Only merge user customizations like order and label
+                    const merged = DEFAULT_NAV_ITEMS.map(defaultItem => {
+                        const savedItem = parsed.find(p => p.id === defaultItem.id);
+                        if (savedItem) {
+                            // Keep default visibility and minLevel, only override order/label if customized
+                            return {
+                                ...defaultItem,
+                                order: savedItem.order ?? defaultItem.order,
+                                label: savedItem.label ?? defaultItem.label,
+                                // visible is ALWAYS from defaults to prevent hidden items bug
+                            };
+                        }
+                        return defaultItem;
+                    });
+                    setNavItems(merged);
+                }
             }
         } catch (e) {
             console.warn('Failed to load sidebar config:', e);
