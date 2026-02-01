@@ -94,7 +94,7 @@ import { SystemModule } from './modules/system/system.module';
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { Fire119Module } from './modules/fire-119/fire-119.module';
 import { CitizenAppModule } from './modules/citizen-app/citizen-app.module';
-import { SatelliteCommModule } from './modules/satellite-comm/satellite-comm.module';
+// REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
 import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module';
 import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module';
@@ -130,10 +130,9 @@ import { DrillSimulationModule } from './modules/drill-simulation/drill-simulati
 import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module';
 // Specialty
 // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
-import { RobotRescueModule } from './modules/robot-rescue/robot-rescue.module';
-import { SpectrumAnalysisModule } from './modules/spectrum-analysis/spectrum-analysis.module';
+// REMOVED: RobotRescueModule, SpectrumAnalysisModule - R&D/specialized equipment
 import { WaterResourcesModule } from './modules/water-resources/water-resources.module';
-import { WearableModule } from './modules/wearable/wearable.module';
+// REMOVED: WearableModule - hardware dependent, use third-party API
 // Communication
 import { PttModule } from './modules/ptt/ptt.module';
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
@@ -144,7 +143,7 @@ import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.
 // Infrastructure
 import { SentryModule } from './modules/sentry/sentry.module';
 import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module';
-import { NfcModule } from './modules/nfc/nfc.module';
+// REMOVED: NfcModule - hardware dependent, use QR instead
 // Note: GeoIntelModule has no module file (only agents subfolder)
 // Resource Management
 import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module';
@@ -152,7 +151,7 @@ import { ResourceOptimizationModule } from './modules/resource-optimization/reso
 import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module';
 // Admin & Finance
 import { MultiEocModule } from './modules/multi-eoc/multi-eoc.module';
-import { MultiTenantModule } from './modules/multi-tenant/multi-tenant.module';
+// REMOVED: MultiTenantModule - consolidated to tenants module
 import { PublicFinanceModule } from './modules/public-finance/public-finance.module';
 import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module';
 import { PowerBiModule } from './modules/power-bi/power-bi.module';
@@ -294,7 +293,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Webhooks & Integrations
         WebhooksModule, // 🔗 Webhook 接收        Fire119Module, // 🚒 119 消防整合
         CitizenAppModule, // 📱 市民 App
-        SatelliteCommModule, // 🛰️ 衛星通訊        //- moved to STUB_MODULES (conditionally loaded)        DisasterSummaryModule, // 📊 災情摘要
+        // REMOVED: SatelliteCommModule - requires specialized equipment
+        DisasterSummaryModule, // 📊 災情摘要
         FatigueDetectionModule, // 😴 疲勞偵測
         DocumentOcrModule, // 📄 文件 OCR
         TranslationModule, // 🌐 翻譯服務
@@ -317,10 +317,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         DamageSimulationModule, // 💥 損害模擬
         // Specialty
         // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
-        RobotRescueModule, // 🤖 機器人救援
-        SpectrumAnalysisModule, // 📡 頻譜分析
+        // REMOVED: RobotRescueModule, SpectrumAnalysisModule, WearableModule - R&D/hardware dependent
         WaterResourcesModule, // 💧 水資源
-        WearableModule, // ⌚ 穿戴裝置
         // Communication
         PttModule, // 📻 PTT 對講
         // REMOVED: BluetoothAudioModule - hardware dependent
@@ -330,11 +328,12 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         VoiceAssistantModule, // 🗣️ 語音助理
         // Infrastructure        SentryModule, // 🐛 Sentry 監控
         QrScannerModule, // 📱 QR 掃描
-        NfcModule, // 📲 NFC        ResourceMatchingModule, // 🎯 資源媒合
+        // REMOVED: NfcModule - hardware dependent, use QR instead
+        ResourceMatchingModule, // 🎯 資源媒合
         ResourceOptimizationModule, // ⚡ 資源優化        PredictiveMaintenanceModule, // 🔧 預測維護
         // Admin & Finance
         MultiEocModule, // 🏢 多 EOC
-        MultiTenantModule, // 🏢 多租戶
+        // REMOVED: MultiTenantModule - consolidated to tenants
         PublicFinanceModule, // 💰 公共財務
         ExpenseReimbursementModule, // 💳 費用報銷
         PowerBiModule, // 📊 Power BI
