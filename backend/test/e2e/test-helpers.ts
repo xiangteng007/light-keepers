@@ -156,6 +156,7 @@ export class TestClient {
     asDirector = () => this.as(TEST_USERS.director);
     asPresident = () => this.as(TEST_USERS.president);
     asOwner = () => this.as(TEST_USERS.owner);
+    asAdmin = () => this.as(TEST_USERS.owner); // Alias for asOwner
 }
 
 /**
