@@ -18,6 +18,14 @@ export const TASK_EVENTS = {
     CANCELLED: 'task.cancelled',
 } as const;
 
+/**
+ * Generate a unique correlation ID for event tracing
+ * Format: task_{taskId}_{eventType}_{timestamp}
+ */
+export function generateCorrelationId(taskId: string, eventType: string): string {
+    return `task_${taskId}_${eventType}_${Date.now()}`;
+}
+
 export interface TaskEventPayload {
     taskId: string;
     missionSessionId: string;
@@ -27,6 +35,10 @@ export interface TaskEventPayload {
     volunteerNames?: string[];
     triggeredBy?: string;
     timestamp: Date;
+    /** Unique correlation ID for tracing notifications */
+    correlationId?: string;
+    /** Idempotency key to prevent duplicate processing */
+    idempotencyKey?: string;
 }
 
 @Injectable()
@@ -162,6 +174,7 @@ export class TaskDispatchService {
 
         // Emit task.assigned event for notification system
         if (assignments.length > 0) {
+            const correlationId = generateCorrelationId(taskId, 'assigned');
             const payload: TaskEventPayload = {
                 taskId,
                 missionSessionId: task.missionSessionId,
@@ -171,9 +184,11 @@ export class TaskDispatchService {
                 volunteerNames: Array.from(volunteerNames.values()),
                 triggeredBy: assignedBy,
                 timestamp: new Date(),
+                correlationId,
+                idempotencyKey: `assign_${taskId}_${dto.volunteerIds.sort().join('_')}`,
             };
             this.eventEmitter.emit(TASK_EVENTS.ASSIGNED, payload);
-            this.logger.log(`Emitted ${TASK_EVENTS.ASSIGNED} for task ${taskId}`);
+            this.logger.log(`Emitted ${TASK_EVENTS.ASSIGNED} for task ${taskId} [${correlationId}]`);
         }
 
         this.logger.log(`Task ${taskId} assigned to ${assignments.length} volunteers`);
