@@ -28,6 +28,9 @@ import {
         credentials: true,
     },
     namespace: '/api/v1',
+    // Phase 3: Heartbeat configuration for connection health
+    pingInterval: 25000, // 25 seconds
+    pingTimeout: 10000,  // 10 seconds timeout
 })
 export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
     @WebSocketServer() server: Server;
@@ -35,14 +38,20 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
     // 追蹤線上使用者: userId -> Set<socketId>
     private activeUsers = new Map<string, Set<string>>();
+    // 追蹤連線時間
+    private connectionTimes = new Map<string, Date>();
 
     afterInit(server: Server) {
-        this.logger.log('WebSocket Gateway Initialized');
+        this.logger.log('WebSocket Gateway Initialized with heartbeat (25s interval, 10s timeout)');
     }
 
     async handleConnection(client: Socket) {
         // Guard 會處理驗證，這裡記錄連線
         const userId = client.handshake.query.userId as string;
+        
+        // Track connection time
+        this.connectionTimes.set(client.id, new Date());
+        
         if (userId) {
             if (!this.activeUsers.has(userId)) {
                 this.activeUsers.set(userId, new Set());
@@ -60,6 +69,10 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
 
     handleDisconnect(client: Socket) {
         const userId = client.handshake.query.userId as string;
+        
+        // Remove connection time tracking
+        this.connectionTimes.delete(client.id);
+        
         if (userId && this.activeUsers.has(userId)) {
             const userSockets = this.activeUsers.get(userId)!;
             userSockets.delete(client.id);
@@ -69,6 +82,17 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
             }
         }
         this.logger.debug(`Client disconnected: ${client.id}`);
+    }
+
+    /**
+     * Get connection statistics
+     */
+    getConnectionStats(): { totalConnections: number; activeUsers: number; uptime: number } {
+        return {
+            totalConnections: this.connectionTimes.size,
+            activeUsers: this.activeUsers.size,
+            uptime: Date.now() - (this.connectionTimes.values().next().value?.getTime() || Date.now()),
+        };
     }
 
     // ===== 事件訂閱 =====
