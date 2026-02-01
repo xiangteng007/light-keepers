@@ -114,6 +114,11 @@ import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-
 import { HumanitarianStandardsModule } from './modules/humanitarian-standards/humanitarian-standards.module';
 import { StaffSecurityModule } from './modules/staff-security/staff-security.module';
 // ==============================================
+// v5.1: Extended NGO Features
+// ==============================================
+import { ClusterCoordinationModule } from './modules/cluster-coordination/cluster-coordination.module';
+import { DonorReportingModule } from './modules/donor-reporting/donor-reporting.module';
+// ==============================================
 // Batch 5: Remaining Infrastructure Modules (FINAL)
 // ==============================================
 // AR/VR
@@ -248,6 +253,11 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // ==============================================
         HumanitarianStandardsModule, // 🌍 人道主義標準 (HXL, IATI, 3W, Sphere)
         StaffSecurityModule, // 🛡️ 人員安全管理
+        // ==============================================
+        // v5.1: Extended NGO Features
+        // ==============================================
+        ClusterCoordinationModule, // 🤝 OCHA Cluster 協調 (4W)
+        DonorReportingModule, // 💰 捐助者報告與補助款管理
         // PR3: 緊急應變核心模組
         MissionSessionsModule, // 🚨 任務場次 (ICS C2)
         FieldReportsModule, // 📡 現場回報 (GPS)
