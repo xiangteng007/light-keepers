@@ -50,5 +50,5 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=60s --retries=3 \
 EXPOSE 8080
 
 # 直接執行 Node.js - 不使用 npm start 減少一層 process
-CMD ["node", "dist/src/main.js"]
+CMD ["node", "dist/main.js"]
 
