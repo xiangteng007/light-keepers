@@ -51,7 +51,6 @@ jobs:
             --port=8080 \
             --execution-environment=gen2 \
             --cpu-throttling \
-            --startup-cpu-boost \
             --quiet
       
       # IAM Policy 備註：

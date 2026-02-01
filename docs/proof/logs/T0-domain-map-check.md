@@ -3,7 +3,7 @@
 - DomainMap: `docs/architecture/domain-map.yaml`
 - BackendModulesRoot: `backend/src/modules`
 - FrontendPagesRoot: `web-dashboard/src/pages`
-- GeneratedAt: `2026-02-01T10:01:53.0514171+08:00`
+- GeneratedAt: `2026-02-01T10:14:15.9974726+08:00`
 - Strict: `False`
 - Status: **PASS**
 - OK: **True**
