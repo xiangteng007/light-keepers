@@ -34,51 +34,58 @@ export class DatabaseModule {
             imports: [
                 TypeOrmModule.forRootAsync({
                     imports: [ConfigModule],
-                    useFactory: (configService: ConfigService) => {
-                        const isProduction = configService.get('NODE_ENV') === 'production';
-                        const dbHost = configService.get('DB_HOST');
+                    useFactory: () => {
+                        // CRITICAL: Use process.env directly to avoid ConfigService sync gap
+                        // This pattern was confirmed to fix Cloud Run PORT 8080 timeout
+                        // @see knowledge/senteng_erp_master/artifacts/engineering/infrastructure_and_ops.md
+                        const isProduction = process.env.NODE_ENV === 'production';
+                        const dbHost = process.env.DB_HOST;
 
-                        console.log(`[TypeORM] Environment: ${isProduction ? 'production' : 'development'}`);
-                        console.log(`[TypeORM] DB Host: ${dbHost || '(not configured)'}`);
-
-                        // Production environment must have DB_HOST explicitly set
-                        if (isProduction && !dbHost) {
-                            console.error('[TypeORM] CRITICAL: DB_HOST not configured in production!');
-                            console.error('[TypeORM] Please set DB_HOST to Cloud SQL Unix socket path:');
-                            console.error('[TypeORM] Example: /cloudsql/PROJECT_ID:REGION:INSTANCE_NAME');
-                            // Don't throw - allow container to start but /ready will return degraded status
-                        }
+                        console.log('[TypeORM EARLY BOOT]', JSON.stringify({
+                            NODE_ENV: process.env.NODE_ENV,
+                            DB_HOST: dbHost,
+                            DB_DATABASE: process.env.DB_DATABASE,
+                            timestamp: new Date().toISOString()
+                        }));
 
                         // Check if DB_HOST is a Unix socket path (Cloud SQL)
-                        const isUnixSocket = dbHost && dbHost.startsWith('/');
+                        const isUnixSocket = dbHost && dbHost.startsWith('/cloudsql/');
+
+                        if (isProduction && !dbHost) {
+                            console.error('[TypeORM] CRITICAL: DB_HOST not configured in production!');
+                        }
 
                         const config: any = {
                             type: 'postgres',
-                            username: configService.get('DB_USERNAME', 'postgres'),
-                            password: configService.get('DB_PASSWORD'),
-                            database: configService.get('DB_DATABASE', 'lightkeepers'),
+                            username: process.env.DB_USERNAME || 'postgres',
+                            password: process.env.DB_PASSWORD,
+                            database: process.env.DB_DATABASE || 'lightkeepers',
                             autoLoadEntities: true,
-                            // Only sync tables when explicitly requested via SYNC_TABLES=true
                             synchronize: process.env.SYNC_TABLES === 'true',
                             logging: !isProduction ? ['error', 'warn', 'query'] : ['error'],
-                            // Cloud Run optimization: more retries but don't block startup
                             retryAttempts: isProduction ? 5 : 3,
                             retryDelay: isProduction ? 5000 : 3000,
                         };
 
                         // Configure connection based on host type
                         if (isUnixSocket) {
-                            // Cloud SQL Unix socket connection
+                            // Cloud SQL Unix socket connection - MANDATORY settings:
+                            // 1. host = socket path
+                            // 2. port = undefined (CRITICAL: pg driver fails with numeric port on socket)
+                            // 3. ssl = false (Unix sockets don't need SSL)
                             console.log(`[TypeORM] Using Unix socket: ${dbHost}`);
+                            config.host = dbHost;
+                            config.port = undefined;
+                            config.ssl = false;
                             config.extra = {
-                                host: dbHost, // Unix socket path goes in extra.host for pg library
                                 max: 10,
-                                connectionTimeoutMillis: 30000,
+                                connectionTimeoutMillis: 15000,
                                 idleTimeoutMillis: 30000,
                             };
                         } else {
                             // TCP connection (development or direct IP)
                             config.host = dbHost || 'localhost';
+                            config.port = parseInt(process.env.DB_PORT || '5432', 10);
                             config.extra = {
                                 max: 10,
                                 connectionTimeoutMillis: 30000,
@@ -86,14 +93,9 @@ export class DatabaseModule {
                             };
                         }
 
-                        // Only set port for non-production (local development)
-                        if (!isProduction) {
-                            config.port = configService.get('DB_PORT', 5432);
-                        }
-
                         return config;
                     },
-                    inject: [ConfigService],
+                    // IMPORTANT: No inject array - using process.env directly
                 }),
             ],
             exports: [TypeOrmModule],

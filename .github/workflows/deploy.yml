@@ -35,10 +35,14 @@ jobs:
           # 部署時不指定 allow-unauthenticated 或 no-allow-unauthenticated
           # 這樣可以避免 setIamPolicy 權限問題
           # IAM 設定由有權限的管理員另行處理
+          # Generate unique revision suffix to prevent revision ID collision
+          REVISION_SUFFIX=$(echo "${{ github.sha }}" | cut -c1-8)-$(date +%H%M%S)
+          
           gcloud run deploy ${{ env.API_SERVICE }} \
             --source ./backend \
             --region ${{ env.REGION }} \
             --platform managed \
+            --revision-suffix=${REVISION_SUFFIX} \
             --add-cloudsql-instances=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db \
             --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }}" \
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
