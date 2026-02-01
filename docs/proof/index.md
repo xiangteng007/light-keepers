@@ -16,8 +16,8 @@ POLICY:
 ## Build Identity (Required)
 - Repo: `https://github.com/xiangteng007/light-keepers.git`
 - Branch/Ref: `main`
-- Commit SHA: `833d950a87ca7c618cfd3f34d44b20cb152c34f8`
-- GeneratedAt (ISO8601): `2026-01-15T01:07:47+08:00`
+- Commit SHA: `4515b66e6cf71da0c05863df3520f1fd15b5962c`
+- GeneratedAt (ISO8601): `2026-02-02T01:29:17+08:00`
 - Generator: `tools/audit/generate-proof-index.ps1@1.0.0`
 - Runtime: `v24.11.1`, `npm 11.6.2`, `PowerShell 5.1.26100.7462`
 
@@ -27,8 +27,8 @@ POLICY:
 
 ### Public Surface (SSOT)
 - SSOT file: `docs/policy/public-surface.policy.json`
-- Policy version: `1.1.0`
-- Policy SHA256: `C57D1EF395BA7955F09F9E5393665A455F9CC718A02EAEC4515360C3ABA121A8`
+- Policy version: `unknown`
+- Policy SHA256: `F4CC6C0907CEF24E02CBA04170ACC79D5FD832F81AD0E445D45C648D69EE41C2`
 - Generated inventory (AUTO): `docs/proof/security/public-surface.md`
 - Validation reports:
   - `docs/proof/security/public-surface-check-report.json`
@@ -89,10 +89,10 @@ pwsh tools/audit/generate-traceability.ps1
 - **BlockedReason**: 
 - Key metrics (must match JSON):
   - TotalRoutesProd: `1113`
-  - CoverageProd: `98.7%` (1099/1113)
+  - CoverageProd: `98.8%` (1100/1113)
   - UnprotectedNotAllowlistedProd: `0`
-  - PolicyEndpoints: `10` (Policy-B, v1.1.0)
-  - SmokeArtifactsPresent: `true`
+  - PolicyEndpoints: `10` (Policy-B, v)
+  - SmokeArtifactsPresent: `false`
   - BaselineModules: `192`
   - BaselinePages: `114`
   - StubModulesDisabled: `true`
@@ -131,7 +131,7 @@ pwsh tools/audit/generate-traceability.ps1
 - **Gate**: Security
 - **Commit**: `440f016`
 - **Artifacts**:
-  - Mapping: `docs/proof/security/T1-routes-guards-mapping.json` (sha256=212EFBA4FA362681...)
+  - Mapping: `docs/proof/security/T1-routes-guards-mapping.json` (sha256=D6905241A8E0A2BF...)
   - Report: `docs/proof/security/T1-routes-guards-report.md`
   - Logs: `docs/proof/logs/T1-route-guard-scan.txt`
 - **Repro**:
@@ -144,7 +144,7 @@ pwsh tools/audit/generate-traceability.ps1
   - [x] E2: runtime mapping OR reason documented 鈥?static analysis
   - [x] E3: scan logs exist and match mapping JSON counts
   - [x] E4: rollback plan 鈥?N/A (audit only)
-  - [x] E5: prod metrics in gate-summary.json (1113 routes, 98.7%)
+  - [x] E5: prod metrics in gate-summary.json (1113 routes, 98.8%)
 
 ---
 
@@ -154,7 +154,7 @@ pwsh tools/audit/generate-traceability.ps1
 - **Gate**: Security
 - **Commit**: `341c111`
 - **SSOT**:
-  - `docs/policy/public-surface.policy.json` (version=1.1.0, sha256=C57D1EF395BA7955...)
+  - `docs/policy/public-surface.policy.json` (version=unknown, sha256=F4CC6C0907CEF24E...)
 - **Artifacts**:
   - Inventory (AUTO): `docs/proof/security/public-surface.md`
   - Validator JSON: `docs/proof/security/public-surface-check-report.json`
@@ -218,7 +218,7 @@ pwsh tools/audit/generate-traceability.ps1
 ---
 
 ## Change Log (Manual Allowed)
-- 2026-01-14 `833d950`: Auto-generated Evidence Pack index
+- 2026-01-14 `4515b66`: Auto-generated Evidence Pack index
 - 2026-01-14 `833d950`: Upgrade to SSOT-driven Evidence Pack format
 - 2026-01-13 `440f016`: T0/T1 Complete - Baseline + Route-Guard Mapping
 - 2026-01-13 `341c111`: T7 Public Surface Policy + Validator
@@ -238,4 +238,4 @@ pwsh tools/audit/generate-traceability.ps1
 
 ---
 
-**Last Updated**: 2026-01-15T01:07:47+08:00
+**Last Updated**: 2026-02-02T01:29:17+08:00
