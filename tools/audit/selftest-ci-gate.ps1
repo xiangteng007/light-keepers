@@ -63,22 +63,51 @@ $testResults = @()
 $allPassed = $true
 
 # ============================================
-# Test 1: Inject UnknownProtectionCount = 1
+# Test 1: Inject route with missing protected field
+# This triggers UnknownProtectionCount > 0, causing G5a to WARN
+# In -Strict mode, any WARN = overall FAIL
 # ============================================
 Write-Host ""
 Write-Host "[Test 1] Injecting UnknownProtectionCount = 1 ..." -ForegroundColor Yellow
 
-if (Test-Path $gateSummaryPath) {
-    $gs = Get-Content $gateSummaryPath -Raw | ConvertFrom-Json
-    $gs.metrics.UnknownProtectionCount = 1
-    $gs.gates.G5a.status = "WARN"
-    $gs.gates.G5a.detail = "1 routes missing protected field (fail-closed)"
-    ($gs | ConvertTo-Json -Depth 20) | Out-File -FilePath $gateSummaryPath -Encoding UTF8
+$routesMappingPath = Join-Path $RootDir "docs/proof/security/T1-routes-guards-mapping.json"
+
+if (Test-Path $routesMappingPath) {
+    # Backup the routes mapping file
+    $routesBackupPath = "$routesMappingPath$backupSuffix"
+    Copy-Item $routesMappingPath $routesBackupPath -Force
+    $backups[$routesMappingPath] = $routesBackupPath
+    Write-Host "Backed up: $routesMappingPath" -ForegroundColor DarkGray
+
+    $routesMapping = Get-Content $routesMappingPath -Raw | ConvertFrom-Json
+    
+    # Add a fake route WITHOUT the 'protected' field to trigger UnknownProtectionCount
+    $badRoute = [ordered]@{
+        method     = "GET"
+        path       = "/api/v1/selftest-bad-route"
+        controller = "SelftestController"
+        handler    = "badHandler"
+        guards     = @()
+        # NOTE: Intentionally omitting 'protected' field to trigger fail-closed behavior
+    }
+    
+    # Inject into routes array
+    if ($null -ne $routesMapping.routes) {
+        $routesMapping.routes = @($routesMapping.routes) + $badRoute
+    }
+    elseif ($null -ne $routesMapping.data -and $null -ne $routesMapping.data.routes) {
+        $routesMapping.data.routes = @($routesMapping.data.routes) + $badRoute
+    }
+    else {
+        $routesMapping | Add-Member -NotePropertyName "routes" -NotePropertyValue @($badRoute) -Force
+    }
+    
+    ($routesMapping | ConvertTo-Json -Depth 20) | Out-File -FilePath $routesMappingPath -Encoding UTF8
 
     $result = Run-StrictGateCheck
 
     if ($result.ExitCode -ne 0) {
-        Write-Host "   PASS: Gate correctly FAILED on UnknownProtectionCount=1" -ForegroundColor Green
+        Write-Host "   PASS: Gate correctly FAILED on UnknownProtectionCount injection" -ForegroundColor Green
         $testResults += @{ Name = "UnknownProtectionCount Injection"; Passed = $true }
     }
     else {
@@ -87,23 +116,16 @@ if (Test-Path $gateSummaryPath) {
         $allPassed = $false
     }
 
-    # Restore for next test
-    Restore-Backups
-    foreach ($f in $filesToTest) {
-        if (Test-Path "$f$backupSuffix") { }
-        elseif ($backups.ContainsKey($f)) {
-            Copy-Item $backups[$f] "$f$backupSuffix" -Force -ErrorAction SilentlyContinue
-        }
-    }
-    # Re-backup for next test
-    foreach ($f in $filesToTest) {
-        if (Test-Path $f) {
-            Copy-Item $f "$f$backupSuffix" -Force
-        }
+    # Restore routes mapping
+    if (Test-Path $routesBackupPath) {
+        Copy-Item $routesBackupPath $routesMappingPath -Force
+        Remove-Item $routesBackupPath -Force
+        $backups.Remove($routesMappingPath)
+        Write-Host "Restored: $routesMappingPath" -ForegroundColor DarkGray
     }
 }
 else {
-    Write-Host "   SKIP: gate-summary.json not found" -ForegroundColor DarkGray
+    Write-Host "   SKIP: T1-routes-guards-mapping.json not found" -ForegroundColor DarkGray
     $testResults += @{ Name = "UnknownProtectionCount Injection"; Passed = $true; Skipped = $true }
 }
 
