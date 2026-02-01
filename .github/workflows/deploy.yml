@@ -55,6 +55,7 @@ jobs:
             --port=8080 \
             --execution-environment=gen2 \
             --cpu-throttling \
+            --startup-probe=httpGet.path=/api/v1/health/live,timeoutSeconds=240,periodSeconds=30,failureThreshold=10 \
             --quiet
       
       # IAM Policy 備註：
