@@ -3,7 +3,7 @@
 - DomainMap: `docs/architecture/domain-map.yaml`
 - BackendModulesRoot: `backend/src/modules`
 - FrontendPagesRoot: `web-dashboard/src/pages`
-- GeneratedAt: `2026-02-01T10:14:15.9974726+08:00`
+- GeneratedAt: `2026-02-01T23:52:18.2613958+08:00`
 - Strict: `False`
 - Status: **PASS**
 - OK: **True**
@@ -11,7 +11,7 @@
 ## Counts
 | Metric | Value |
 |--------|-------|
-| scannedBackendModules | 120 |
+| scannedBackendModules | 106 |
 | scannedFrontendPages | 101 |
 | referencedModules | 60 |
 | referencedPages | 34 |

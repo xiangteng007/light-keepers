@@ -7,10 +7,10 @@
 # Run: pwsh tools/audit/check-domain-map.ps1 to verify locally
 
 version: "1.2"
-lastUpdated: "2026-02-01T10:00:00+08:00"
-generatedAt: "2026-02-01T10:00:00+08:00"
+lastUpdated: "2026-02-01T23:44:45+08:00"
+generatedAt: "2026-02-01T23:44:45+08:00"
 generator: "tools/audit/generate-domain-map.ps1@1.2.0"
-commitSha: "6389c1b"
+commitSha: "27d02b313fc5e597f920e077d99cca58d783458f"
 
 domains:
   # ============================================================
