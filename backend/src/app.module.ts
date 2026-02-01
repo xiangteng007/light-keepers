@@ -109,6 +109,11 @@ import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module
 import { TrendPredictionModule } from './modules/trend-prediction/trend-prediction.module';
 import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-media-monitor.module';
 // ==============================================
+// P0: International NGO Standards (v5.0)
+// ==============================================
+import { HumanitarianStandardsModule } from './modules/humanitarian-standards/humanitarian-standards.module';
+import { StaffSecurityModule } from './modules/staff-security/staff-security.module';
+// ==============================================
 // Batch 5: Remaining Infrastructure Modules (FINAL)
 // ==============================================
 // AR/VR
@@ -238,6 +243,11 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         IntegrationsModule, // 🔗 外部 API 整合
         BackupModule, // 💾 數據備份
         TenantModule, // 🏢 多租戶
+        // ==============================================
+        // P0: International NGO Standards (v5.0)
+        // ==============================================
+        HumanitarianStandardsModule, // 🌍 人道主義標準 (HXL, IATI, 3W, Sphere)
+        StaffSecurityModule, // 🛡️ 人員安全管理
         // PR3: 緊急應變核心模組
         MissionSessionsModule, // 🚨 任務場次 (ICS C2)
         FieldReportsModule, // 📡 現場回報 (GPS)
