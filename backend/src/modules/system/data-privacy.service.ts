@@ -172,7 +172,7 @@ export class DataPrivacyService {
     /**
      * Delete all user data
      */
-    private async deleteUserData(userId: string): Promise<void> {
+    async deleteUserData(userId: string): Promise<void> {
         const tables = [
             'sos_signals',
             'field_reports',
@@ -198,7 +198,7 @@ export class DataPrivacyService {
     /**
      * Anonymize user data (keep records but remove PII)
      */
-    private async anonymizeUserData(userId: string): Promise<void> {
+    async anonymizeUserData(userId: string): Promise<void> {
         const anonymousId = `anon-${Date.now()}`;
 
         // Anonymize account
