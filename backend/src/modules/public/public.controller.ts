@@ -9,8 +9,13 @@
  * - 禁止回傳敏感資訊
  */
 
-import { Controller, Get, Query, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { Controller, Get, Query, Logger } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { AnnouncementsService } from '../announcements/announcements.service';
+import { PublicResourcesService } from '../public-resources/public-resources.service';
+import { NcdrAlertsService } from '../ncdr-alerts/ncdr-alerts.service';
+import { WeatherService } from '../weather-service/weather.service';
+import { Public } from '../shared/shared-auth.module';
 
 // 公開公告 DTO (已遮罩)
 interface PublicAnnouncement {
@@ -57,8 +62,17 @@ interface PublicWeather {
 }
 
 @ApiTags('Public (Level 0)')
+@Public()
 @Controller('public')
 export class PublicController {
+    private readonly logger = new Logger(PublicController.name);
+
+    constructor(
+        private readonly announcementsService: AnnouncementsService,
+        private readonly publicResourcesService: PublicResourcesService,
+        private readonly ncdrAlertsService: NcdrAlertsService,
+        private readonly weatherService: WeatherService,
+    ) {}
 
     /**
      * 取得公開公告列表
@@ -72,12 +86,26 @@ export class PublicController {
         @Query('limit') limit?: number,
         @Query('category') category?: string,
     ): Promise<{ data: PublicAnnouncement[]; total: number }> {
-        // TODO: 注入 AnnouncementsService 並查詢公開公告
-        // 目前返回空陣列，待模組整合完成
-        return {
-            data: [],
-            total: 0,
-        };
+        try {
+            const announcements = await this.announcementsService.findPublished({
+                category: category as any,
+                limit: limit || 20,
+            });
+
+            const data: PublicAnnouncement[] = announcements.map(a => ({
+                id: a.id,
+                title: a.title,
+                content: a.content || '',
+                category: a.category || 'general',
+                publishedAt: a.publishedAt?.toISOString() || new Date().toISOString(),
+                expiresAt: a.expireAt?.toISOString(),
+            }));
+
+            return { data, total: data.length };
+        } catch (error) {
+            this.logger.error('Failed to fetch announcements', error);
+            return { data: [], total: 0 };
+        }
     }
 
     /**
@@ -96,11 +124,39 @@ export class PublicController {
         @Query('radius') radius?: number,
         @Query('type') type?: string,
     ): Promise<{ data: PublicShelter[]; total: number }> {
-        // TODO: 注入 PublicResourcesService 並查詢避難所
-        return {
-            data: [],
-            total: 0,
-        };
+        try {
+            let shelters;
+            if (lat && lng) {
+                shelters = await this.publicResourcesService.findNearbyShelters(
+                    Number(lat),
+                    Number(lng),
+                    Number(radius) || 5,
+                );
+            } else {
+                shelters = await this.publicResourcesService.getShelters();
+            }
+
+            // Type filter
+            if (type) {
+                shelters = shelters.filter(s => s.type === type);
+            }
+
+            const data: PublicShelter[] = shelters.map(s => ({
+                id: s.id,
+                name: s.name,
+                address: s.address,
+                latitude: s.latitude,
+                longitude: s.longitude,
+                capacity: s.capacity,
+                type: s.type,
+                phone: s.phone,
+            }));
+
+            return { data, total: data.length };
+        } catch (error) {
+            this.logger.error('Failed to fetch shelters', error);
+            return { data: [], total: 0 };
+        }
     }
 
     /**
@@ -117,11 +173,23 @@ export class PublicController {
         @Query('lng') lng?: number,
         @Query('radius') radius?: number,
     ): Promise<{ data: any[]; total: number }> {
-        // TODO: 注入 PublicResourcesService 並查詢 AED
-        return {
-            data: [],
-            total: 0,
-        };
+        try {
+            let aedLocations;
+            if (lat && lng) {
+                aedLocations = await this.publicResourcesService.findNearbyAed(
+                    Number(lat),
+                    Number(lng),
+                    Number(radius) || 2,
+                );
+            } else {
+                aedLocations = await this.publicResourcesService.getAedLocations();
+            }
+
+            return { data: aedLocations, total: aedLocations.length };
+        } catch (error) {
+            this.logger.error('Failed to fetch AED locations', error);
+            return { data: [], total: 0 };
+        }
     }
 
     /**
@@ -136,11 +204,42 @@ export class PublicController {
         @Query('severity') severity?: string,
         @Query('category') category?: string,
     ): Promise<{ data: PublicAlert[]; total: number }> {
-        // TODO: 注入 NcdrAlertsService 並查詢有效預警
-        return {
-            data: [],
-            total: 0,
-        };
+        try {
+            const result = await this.ncdrAlertsService.findAll({
+                activeOnly: true,
+                limit: 50,
+            });
+
+            // Parse affectedAreas JSON and map to public DTO
+            const data: PublicAlert[] = result.data.map(alert => {
+                let areas: string[] = [];
+                try {
+                    areas = alert.affectedAreas ? JSON.parse(alert.affectedAreas) : [];
+                } catch {
+                    areas = [];
+                }
+                return {
+                    id: alert.id,
+                    title: alert.title,
+                    description: alert.description || '',
+                    severity: alert.severity || 'unknown',
+                    category: alert.alertTypeName || 'general',
+                    effectiveAt: alert.publishedAt?.toISOString() || new Date().toISOString(),
+                    expiresAt: alert.expiresAt?.toISOString(),
+                    affectedAreas: areas,
+                };
+            });
+
+            // Filter by severity if provided
+            const filteredData = severity
+                ? data.filter(a => a.severity === severity)
+                : data;
+
+            return { data: filteredData, total: filteredData.length };
+        } catch (error) {
+            this.logger.error('Failed to fetch alerts', error);
+            return { data: [], total: 0 };
+        }
     }
 
     /**
@@ -152,9 +251,33 @@ export class PublicController {
     @ApiQuery({ name: 'location', required: false, type: String })
     async getPublicWeather(
         @Query('location') location?: string,
-    ): Promise<PublicWeather | null> {
-        // TODO: 注入 WeatherForecastService 並查詢氣象
-        return null;
+    ): Promise<PublicWeather | { data: PublicWeather[]; total: number }> {
+        try {
+            const weatherData = this.weatherService.getCurrentWeather(location);
+
+            if (weatherData.length === 0) {
+                return { data: [], total: 0 };
+            }
+
+            const data: PublicWeather[] = weatherData.map(w => ({
+                location: w.locationName || 'Unknown',
+                temperature: w.temperature,
+                description: w.description || '',
+                humidity: w.humidity,
+                windSpeed: w.windSpeed,
+                updatedAt: w.updatedAt?.toISOString() || new Date().toISOString(),
+            }));
+
+            // If location specified, return single result
+            if (location && data.length > 0) {
+                return data[0];
+            }
+
+            return { data, total: data.length };
+        } catch (error) {
+            this.logger.error('Failed to fetch weather', error);
+            return { data: [], total: 0 } as any;
+        }
     }
 
     /**

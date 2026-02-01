@@ -5,6 +5,7 @@
  * - 公開公告
  * - 公開地圖資訊 (避難所、AED)
  * - 公開預警資訊
+ * - 公開氣象資訊
  * 
  * 安全規範：
  * - 禁止回傳任何個資
@@ -18,15 +19,18 @@ import { PublicController } from './public.controller';
 import { AnnouncementsModule } from '../announcements/announcements.module';
 import { PublicResourcesModule } from '../public-resources/public-resources.module';
 import { NcdrAlertsModule } from '../ncdr-alerts/ncdr-alerts.module';
+import { WeatherServiceModule } from '../weather-service/weather-service.module';
 
 @Module({
     imports: [
         forwardRef(() => AnnouncementsModule),
         forwardRef(() => PublicResourcesModule),
         forwardRef(() => NcdrAlertsModule),
+        forwardRef(() => WeatherServiceModule),
     ],
     controllers: [PublicController],
     exports: [],
 })
 export class PublicModule { }
+
 
