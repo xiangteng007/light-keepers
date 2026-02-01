@@ -207,12 +207,16 @@ jobs:
 
       # Smoke Test (optional - requires SMOKE_BASE_URL secret)
       - name: Smoke Authorization Tests
-        if: ${{ secrets.SMOKE_BASE_URL != '' }}
+        if: always()
         shell: pwsh
         env:
           SMOKE_BASE_URL: ${{ secrets.SMOKE_BASE_URL }}
         run: |
-          pwsh tools/audit/smoke-authz.ps1 -BaseUrl $env:SMOKE_BASE_URL
+          if ($env:SMOKE_BASE_URL) {
+            pwsh tools/audit/smoke-authz.ps1 -BaseUrl $env:SMOKE_BASE_URL
+          } else {
+            Write-Host "SMOKE_BASE_URL not set, skipping smoke tests"
+          }
 
       # Upload smoke artifacts
       - name: Upload Smoke Artifacts
