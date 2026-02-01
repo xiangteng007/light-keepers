@@ -83,9 +83,9 @@ import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-poin
 import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module';
 // Equipment & Misc
 import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module';
-import { MockDataModule } from './modules/mock-data/mock-data.module';
+// REMOVED: MockDataModule - deleted
 import { I18nApiModule } from './modules/i18n-api/i18n-api.module';
-import { SwaggerAutoDocsModule } from './modules/swagger-auto-docs/swagger-auto-docs.module';
+// REMOVED: SwaggerAutoDocsModule - Swagger handled by decorators
 import { SystemModule } from './modules/system/system.module';
 // ==============================================
 // Batch 4: High Side-Effect Modules
@@ -122,7 +122,7 @@ import { LineNotifyModule } from './modules/line-notify/line-notify.module';
 // Blockchain & Security
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
-import { SupplyChainBlockchainModule } from './modules/supply-chain-blockchain/supply-chain-blockchain.module';
+// REMOVED: SupplyChainBlockchainModule - use traditional database
 // REMOVED: GdprComplianceModule - consolidated to audit module
 // Simulation & Training
 import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module';
@@ -172,8 +172,8 @@ import { HubServicesModule } from './common/services/hub-services.module';
 // Set ENABLE_STUB_MODULES=true to enable
 // @see docs/proof/security/public-surface.md
 // ==============================================
-const STUB_MODULES = [SupplyChainBlockchainModule,MockDataModule, // T8: Mock data should not load in production
-];
+// REMOVED: STUB_MODULES - all stub modules deleted
+const STUB_MODULES: any[] = [];
 
 const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
 
@@ -284,9 +284,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         VolunteerCertificationModule, // 🎓 志工認證
         // Equipment & Misc
         EquipmentQrModule, // 📱 裝備 QR 碼
-        // MockDataModule - moved to STUB_MODULES (T8: not loaded in production)
+        // REMOVED: MockDataModule, SwaggerAutoDocsModule - deleted
         I18nApiModule, // 🌐 多語系 API
-        SwaggerAutoDocsModule, // 📚 Swagger 文件
         SystemModule, // ⚙️ 系統管理        // ==============================================
         // Batch 4: High Side-Effect Modules
         // ==============================================
