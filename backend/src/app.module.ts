@@ -136,7 +136,7 @@ import { WaterResourcesModule } from './modules/water-resources/water-resources.
 import { PttModule } from './modules/ptt/ptt.module';
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
 import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module';
-import { RealtimeChatModule } from './modules/realtime-chat/realtime-chat.module';
+// RealtimeChatModule - CONSOLIDATED into RealtimeModule
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
 // Infrastructure
@@ -320,7 +320,7 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         PttModule, // 📻 PTT 對講
         // REMOVED: BluetoothAudioModule - hardware dependent
         MediaStreamingModule, // 📺 媒體串流
-        RealtimeChatModule, // 💬 即時聊天
+        // RealtimeChatModule - CONSOLIDATED into RealtimeModule
         SpeechToTextModule, // 🎤 語音轉文字
         VoiceAssistantModule, // 🗣️ 語音助理
         // Infrastructure        SentryModule, // 🐛 Sentry 監控
