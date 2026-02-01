@@ -60,7 +60,7 @@ import { FeaturesModule } from './modules/features/features.module';
 import { FilesModule } from './modules/files/files.module';
 import { AuditModule } from './modules/audit/audit.module';
 import { CacheModule as AppCacheModule } from './modules/cache/cache.module';
-import { ErrorTrackingModule } from './modules/error-tracking/error-tracking.module';
+// REMOVED: ErrorTrackingModule - consolidated to SentryModule
 import { PrometheusModule } from './modules/prometheus/prometheus.module';
 // ==============================================
 // Batch 3: Low Side-Effect Modules (CRUD-only)
@@ -268,7 +268,7 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         FilesModule, // 📁 檔案管理
         AuditModule, // 📝 稽核日誌
         AppCacheModule, // ⚡ 快取服務
-        ErrorTrackingModule, // 🐛 錯誤追蹤
+        // REMOVED: ErrorTrackingModule - consolidated to SentryModule
         PrometheusModule, // 📊 Prometheus 監控
         // ==============================================
         // Batch 3: Low Side-Effect Modules (CRUD-only)
