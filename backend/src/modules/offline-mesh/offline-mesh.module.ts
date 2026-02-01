@@ -6,6 +6,7 @@
  * - 優先同步佇列
  * - 衝突解決
  * - Mesh 通訊
+ * - 節點健康監控 (Phase 4)
  */
 
 import { Module } from '@nestjs/common';
@@ -25,6 +26,9 @@ import { OfflineAuthService } from './offline-auth.service';
 import { PrioritySyncService } from './priority-sync.service';
 import { ConflictResolverService } from './conflict-resolver.service';
 
+// Phase 4 進階功能
+import { MeshHealthService } from './mesh-health.service';
+
 @Module({
     imports: [
         TypeOrmModule.forFeature([MeshMessage, MeshNode]),
@@ -43,6 +47,8 @@ import { ConflictResolverService } from './conflict-resolver.service';
         OfflineAuthService,
         PrioritySyncService,
         ConflictResolverService,
+        // Phase 4: Advanced
+        MeshHealthService,
     ],
     exports: [
         MeshSyncService,
@@ -51,8 +57,10 @@ import { ConflictResolverService } from './conflict-resolver.service';
         OfflineAuthService,
         PrioritySyncService,
         ConflictResolverService,
+        MeshHealthService,
     ],
 })
 export class OfflineMeshModule { }
+
 
 
