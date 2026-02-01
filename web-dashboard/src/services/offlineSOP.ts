@@ -46,7 +46,7 @@ interface SOPDBSchema extends DBSchema {
     };
     syncMeta: {
         key: string;
-        value: { lastSync: string; version: string };
+        value: { key: string; lastSync: string; version: string };
     };
 }
 

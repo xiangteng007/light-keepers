@@ -50,22 +50,22 @@ import { AccountsModule } from '../accounts/accounts.module';
 
 @Module({
     imports: [
-        SharedJwtModule, // Provides JwtAuthGuard without full AuthModule dependencies
-        AccountsModule,  // ✅ Provides AccountsService for permission sync        TypeOrmModule.forFeature([
-            // Core entities
+        SharedJwtModule,
+        AccountsModule,
+        TypeOrmModule.forFeature([
             Volunteer,
             VolunteerAssignment,
-            // VMS entities
             Skill,
             VolunteerSkill,
             VolunteerCertificate,
             VolunteerVehicle,
             VolunteerInsurance,
             PointsRecord,
-            // Recognition entities
             VolunteerBadge,
             VolunteerEarnedBadge,
-            VolunteerRecognition])],
+            VolunteerRecognition,
+        ]),
+    ],
     controllers: [
         VolunteersController,
         VolunteersAdminController,

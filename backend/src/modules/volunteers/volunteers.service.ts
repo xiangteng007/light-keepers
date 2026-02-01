@@ -2,7 +2,6 @@ import { Injectable, NotFoundException, Logger, Inject, forwardRef } from '@nest
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Volunteer, VolunteerStatus } from './volunteers.entity';
-import { AccessLogService } from '../access-log/access-log.service';
 import { AccountsService } from '../accounts/accounts.service';
 import { CryptoUtil } from '../../common/crypto.util';
 
@@ -72,7 +71,6 @@ export class VolunteersService {
     constructor(
         @InjectRepository(Volunteer)
         private volunteersRepository: Repository<Volunteer>,
-        private accessLogService: AccessLogService,
         @Inject(forwardRef(() => AccountsService))
         private accountsService: AccountsService,
     ) { }
@@ -150,18 +148,13 @@ export class VolunteersService {
     async findOneFull(id: string, accessedBy?: { userId?: string; userName?: string; ipAddress?: string }): Promise<Volunteer> {
         const volunteer = await this.findOne(id);
 
-        // 記錄敏感資料存取
-        await this.accessLogService.log({
-            userId: accessedBy?.userId,
-            userName: accessedBy?.userName,
-            action: 'VIEW',
-            targetTable: 'volunteers',
-            targetId: id,
-            sensitiveFieldsAccessed: ['phone', 'address', 'emergencyContact', 'emergencyPhone'],
-            ipAddress: accessedBy?.ipAddress,
-        });
+        // 記錄敏感資料存取 (使用 logger 替代已移除的 AccessLogService)
+        this.logger.log(
+            `AUDIT: Sensitive data accessed - volunteer:${id} ` +
+            `fields:[phone,address,emergencyContact,emergencyPhone] ` +
+            `by:${accessedBy?.userName || 'unknown'} ip:${accessedBy?.ipAddress || 'unknown'}`
+        );
 
-        this.logger.log(`Full volunteer data accessed: ${id} by ${accessedBy?.userName || 'unknown'}`);
         return volunteer;
     }
 
