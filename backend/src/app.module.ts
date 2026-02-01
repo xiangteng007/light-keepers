@@ -116,9 +116,8 @@ import { SocialMediaMonitorModule } from './modules/social-media-monitor/social-
 import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module';
 import { DeviceManagementModule } from './modules/device-management/device-management.module';
 // Push Notifications
-// LINE & Social
-import { LineLiffModule } from './modules/line-liff/line-liff.module';
-import { LineNotifyModule } from './modules/line-notify/line-notify.module';
+// LINE & Social - CONSOLIDATED into LineBotModule
+// LineLiffModule and LineNotifyModule services are now provided by LineBotModule
 // Blockchain & Security
 import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
@@ -304,9 +303,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // ==============================================
         // AR/VR (CONDITIONALLY LOADED - see STUB_MODULES)
         //        // Offline & Mobile        OfflineMeshModule, // 🔗 Mesh 網路        DeviceManagementModule, // 📲 裝置管理
-        // Push Notifications        // LINE & Social
-        LineLiffModule, // 💚 LINE LIFF
-        LineNotifyModule, // 📢 LINE Notify
+        // Push Notifications
+        // LINE & Social - CONSOLIDATED: LineLiffModule and LineNotifyModule merged into LineBotModule
         // Blockchain & Security
         BlockchainModule, // ⛓️ 區塊鏈
         IntegrityLedgerModule, // 📜 完整性帳本
