@@ -119,6 +119,7 @@ import { StaffSecurityModule } from './modules/staff-security/staff-security.mod
 import { ClusterCoordinationModule } from './modules/cluster-coordination/cluster-coordination.module';
 import { DonorReportingModule } from './modules/donor-reporting/donor-reporting.module';
 import { IcsFormsModule } from './modules/ics-forms/ics-forms.module';
+import { InteroperabilityAdaptersModule } from './modules/interoperability-adapters/interoperability-adapters.module';
 // ==============================================
 // Batch 5: Remaining Infrastructure Modules (FINAL)
 // ==============================================
@@ -260,6 +261,7 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         ClusterCoordinationModule, // 🤝 OCHA Cluster 協調 (4W)
         DonorReportingModule, // 💰 捐助者報告與補助款管理
         IcsFormsModule, // 📋 P0-1 FEMA ICS Forms (ICS-201 to ICS-214)
+        InteroperabilityAdaptersModule, // 🔗 P1-3 Multi-Agency (CAP 1.2, EDXL-DE 2.0, NIEM)
         // PR3: 緊急應變核心模組
         MissionSessionsModule, // 🚨 任務場次 (ICS C2)
         FieldReportsModule, // 📡 現場回報 (GPS)
