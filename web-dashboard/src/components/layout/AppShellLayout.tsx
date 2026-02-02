@@ -445,9 +445,58 @@ export default function AppShellLayout({
 
             {/* [D] Drawer */}
             <aside className={`drawer ${drawerOpen ? 'open' : ''}`}>
-                <div className="drawerTop">[D-T]</div>
-                <nav className="drawerScroll">[D-M]</nav>
-                <div className="drawerBottom">[D-B]</div>
+                {/* Drawer Top - User Info */}
+                <div className="drawerTop">
+                    <div className="drawer-user">
+                        <User size={40} className="drawer-user-avatar" />
+                        <div className="drawer-user-info">
+                            <div className="drawer-user-name">光守護者</div>
+                            <div className="drawer-user-level">Level {userLevel} 管理員</div>
+                        </div>
+                    </div>
+                    <button className="drawer-close" onClick={closeDrawer} title="關閉選單">
+                        <X size={24} />
+                    </button>
+                </div>
+                
+                {/* Drawer Middle - Navigation */}
+                <nav className="drawerScroll">
+                    {visibleGroups.map(group => (
+                        <div key={group.id} className="drawer-group">
+                            <div className="drawer-group-header">
+                                {group.emoji} {group.label}
+                            </div>
+                            {getVisibleItemsByGroup(group.id).map(item => {
+                                const Icon = ICON_MAP[item.icon] || ICON_MAP.default;
+                                return (
+                                    <a
+                                        key={item.id}
+                                        href={item.path}
+                                        className={`drawer-nav-item ${location.pathname === item.path ? 'active' : ''}`}
+                                        onClick={closeDrawer}
+                                    >
+                                        <Icon size={18} />
+                                        <span>{item.label}</span>
+                                    </a>
+                                );
+                            })}
+                        </div>
+                    ))}
+                </nav>
+                
+                {/* Drawer Bottom - Settings */}
+                <div className="drawerBottom">
+                    <button 
+                        className="drawer-settings-btn"
+                        onClick={() => {
+                            setSidebarSettingsOpen(true);
+                            closeDrawer();
+                        }}
+                    >
+                        <Settings size={18} />
+                        <span>側邊欄設定</span>
+                    </button>
+                </div>
             </aside>
 
             {/* Widget Picker Modal */}
