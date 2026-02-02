@@ -31,6 +31,7 @@ import PermissionsPage from './pages/PermissionsPage'
 import BindLinePage from './pages/BindLinePage'
 import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
 import ForecastPage from './pages/ForecastPage'
+import EmergencyResponsePage from './pages/EmergencyResponsePage'
 import DonationsPage from './pages/DonationsPage'
 import ResourcesPublicPage from './pages/ResourcesPublicPage'
 import ApprovalCenterPage from './pages/ApprovalCenterPage'
@@ -181,6 +182,14 @@ function App() {
           <Route path="/dashboard" element={<CommandCenterPage />} />
           <Route path="/command-center" element={<CommandCenterPage />} />
           <Route path="/mental-health" element={<PageWrapper pageId="mental-health" />} />
+
+          {/* ===== Emergency 緊急快捷 Routes (Expert Council v3.0) ===== */}
+          <Route path="/emergency/sos" element={<PageWrapper pageId="emergency-sos"><EmergencyResponsePage /></PageWrapper>} />
+          <Route path="/emergency/evacuation" element={<PageWrapper pageId="emergency-evacuation"><EmergencyResponsePage /></PageWrapper>} />
+          <Route path="/emergency/hotline" element={<PageWrapper pageId="emergency-hotline"><EmergencyResponsePage /></PageWrapper>} />
+          
+          {/* ===== Command IC Dashboard (IC 儀表板) ===== */}
+          <Route path="/command/ic" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="command-ic"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== 根路由重導向 ===== */}
           <Route index element={<Navigate to="/command-center" replace />} />
