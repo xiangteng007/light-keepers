@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList } from 'lucide-react';
 import { createVolunteer } from '../api/services';
@@ -26,6 +27,7 @@ const SKILL_OPTIONS = [
 ];
 
 export default function ProfilePage() {
+    const navigate = useNavigate();
     const { user, logout, refreshUser } = useAuth();
     const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'notifications' | 'volunteer'>('profile');
     const [isEditing, setIsEditing] = useState(false);
@@ -432,7 +434,10 @@ export default function ProfilePage() {
                         ))}
                         <button
                             className="profile-nav-item profile-nav-item--danger"
-                            onClick={logout}
+                            onClick={async () => {
+                                await logout();
+                                navigate('/login');
+                            }}
                         >
                             <LogOut size={18} />
                             登出

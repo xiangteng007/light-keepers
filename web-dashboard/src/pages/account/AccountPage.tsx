@@ -8,7 +8,7 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 
@@ -37,6 +37,7 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 const AccountPage: React.FC = () => {
+    const navigate = useNavigate();
     const { user, logout } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -109,8 +110,9 @@ const AccountPage: React.FC = () => {
     const handleLogout = useCallback(async () => {
         if (window.confirm('確定要登出嗎？')) {
             await logout();
+            navigate('/login');
         }
-    }, [logout]);
+    }, [logout, navigate]);
 
     // Profile panel handlers
     const handleSaveProfile = useCallback(async (formData: ProfileFormData) => {

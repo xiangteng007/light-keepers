@@ -50,10 +50,10 @@ export default function Sidebar() {
         }
     };
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
         setIsUserMenuOpen(false);
-        navigate('/');
+        await logout();
+        navigate('/login');
     };
 
     return (
