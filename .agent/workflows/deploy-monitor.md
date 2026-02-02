@@ -2,89 +2,75 @@
 description: 監視 Cloud Run 部署狀態並修正錯誤
 ---
 
-# 部署監控工作流程
+# 部署監視流程 (Deploy Monitor)
 
-> [!IMPORTANT]
-> **部署架構**: 所有 Cloud Run 部署都透過 **GitHub Actions** 執行，不使用 Cloud Build 觸發器。
->
-> - Dashboard 部署: `.github/workflows/deploy.yml` → `deploy-dashboard` job
-> - API 部署: `.github/workflows/deploy.yml` → `deploy-api` job
+每次推送到 GitHub 後必須執行此流程，確保部署成功。
 
-## 何時使用
+## 📋 必執行步驟
 
-每次 `git push` 後，執行此工作流程監視部署狀態。
-
-## 步驟
-
-// turbo-all
-
-### 1. 檢查 GitHub Actions 工作流程狀態
-
-打開瀏覽器查看最新的 workflow runs:
-
+### 1. 推送代碼後
+```bash
+git push origin main
 ```
+
+// turbo
+### 2. 立即開啟瀏覽器監視 GitHub Actions
+```
+使用 browser_subagent 工具導航到:
 https://github.com/xiangteng007/light-keepers/actions
+
+查看並記錄:
+- 最新的 workflow run 狀態
+- 是否有任何失敗或排隊中的任務
+- 部署進度 (queued → in_progress → success/failure)
 ```
 
-或使用 GitHub CLI (若已安裝):
-
-```powershell
-gh run list --limit 5
+// turbo
+### 3. 等待部署完成
+```
+每 30 秒刷新頁面，直到:
+- ✅ 所有 workflow 顯示綠色勾勾 (success)
+- ❌ 或發現紅色叉叉 (failure)
 ```
 
-### 2. 檢查最新 Cloud Build 狀態
-
-```powershell
-gcloud builds list --limit=3 --format="table(id,status,createTime,duration)"
+### 4. 如果部署失敗
+```
+1. 點擊失敗的 workflow run
+2. 查看錯誤日誌
+3. 截圖記錄錯誤
+4. 分析錯誤原因
+5. 修正代碼並重新推送
+6. 回到步驟 2 繼續監視
 ```
 
-### 3. 若有 FAILURE，查看詳細日誌
+// turbo
+### 5. 部署成功後驗證
+```
+驗證前端: 
+curl -s https://lightkeepers.ngo | Select-String "LIGHTKEEPERS"
 
-**GitHub Actions:**
-
-```powershell
-gh run view RUN_ID --log-failed
+驗證後端:
+Invoke-WebRequest -Uri "https://light-keepers-api-955234851806.asia-east1.run.app/api/v1/health" -UseBasicParsing
 ```
 
-**Cloud Build:**
+### 6. 回報結果
+向用戶報告:
+- ✅ 部署成功 + 驗證結果
+- ❌ 部署失敗 + 錯誤原因 + 修正計畫
 
-```powershell
-gcloud builds log BUILD_ID --stream
-```
+---
 
-### 4. 檢查 Cloud Run 服務狀態
+## 🔗 相關 URLs
 
-```powershell
-gcloud run services describe light-keepers-dashboard --region=asia-east1 --format="yaml(status)"
-```
+| 服務 | URL |
+|------|-----|
+| GitHub Actions | https://github.com/xiangteng007/light-keepers/actions |
+| Frontend (Vercel) | https://lightkeepers.ngo |
+| Backend (Cloud Run) | https://light-keepers-api-955234851806.asia-east1.run.app |
 
-### 5. 查看服務日誌 (最近 50 條)
+## ⚠️ 重要提醒
 
-```powershell
-gcloud logs read "resource.type=cloud_run_revision AND resource.labels.service_name=light-keepers-dashboard" --limit=50 --format="table(timestamp,severity,textPayload)"
-```
-
-### 6. 常見錯誤修復
-
-| 錯誤 | 可能原因 | 修復方式 |
-|------|----------|----------|
-| `MODULE_NOT_FOUND` | 缺少依賴 | 檢查 package.json |
-| `PORT 8080 timeout` | 啟動失敗 | 檢查 main.ts 端口設定 |
-| `password authentication failed` | DB 密碼錯誤 | 更新 Secret Manager |
-| `502 Bad Gateway` | 容器崩潰 | 查看 stdout 日誌 |
-| `npm ERR! peer dep` | 依賴衝突 | 檢查 package-lock.json |
-
-### 7. 強制重新部署 (若需要)
-
-```powershell
-gcloud run services update light-keepers-dashboard --region=asia-east1 --no-traffic --tag=debug
-```
-
-## GitHub Workflows
-
-| Workflow | 用途 |
-|----------|------|
-| `ci-cd.yml` | CI/CD 主流程 |
-| `deploy.yml` | 部署到 Cloud Run |
-| `audit-gates.yml` | 安全審計 gates |
-| `docker-health-check.yml` | Docker 健康檢查 |
+1. **每次 `git push` 後必須執行此流程**
+2. 不要假設部署會成功，一定要親眼驗證
+3. 如果 browser_subagent 失敗，使用 curl/Invoke-WebRequest 替代方案
+4. 記錄所有部署失敗的原因到 walkthrough.md

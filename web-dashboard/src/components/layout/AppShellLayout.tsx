@@ -36,8 +36,18 @@ export default function AppShellLayout({
         const saved = localStorage.getItem('sidebarExpanded');
         return saved === 'true';
     });
-    // Accordion state: track the single expanded group
-    const [expandedGroupId, setExpandedGroupId] = useState<string | null>(null);
+    // Multi-expand state: track all expanded groups (no accordion)
+    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
+        const saved = localStorage.getItem('expandedGroups');
+        if (saved) {
+            try {
+                return new Set(JSON.parse(saved));
+            } catch {
+                return new Set();
+            }
+        }
+        return new Set();
+    });
     const [isMobile, setIsMobile] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [sidebarSettingsOpen, setSidebarSettingsOpen] = useState(false);
@@ -87,10 +97,15 @@ export default function AppShellLayout({
         const currentPath = window.location.pathname;
         const activeItem = navItems.find(item => item.path === currentPath);
         if (activeItem) {
-            setExpandedGroupId(activeItem.group);
+            setExpandedGroups(prev => new Set([...prev, activeItem.group]));
             initialExpandDone.current = true;
         }
     }, [navItems]);
+
+    // Persist expanded groups to localStorage
+    useEffect(() => {
+        localStorage.setItem('expandedGroups', JSON.stringify([...expandedGroups]));
+    }, [expandedGroups]);
 
     useEffect(() => {
         if (!isMobile) setDrawerOpen(false);
@@ -100,8 +115,16 @@ export default function AppShellLayout({
     const closeDrawer = () => setDrawerOpen(false);
 
     const toggleGroupExpansion = (groupId: string) => {
-        // Toggle: if clicked open group -> close it; if different -> open new one (closes others)
-        setExpandedGroupId(prev => (prev === groupId ? null : groupId));
+        // Toggle: add or remove group from expanded set (multi-expand, no accordion)
+        setExpandedGroups(prev => {
+            const next = new Set(prev);
+            if (next.has(groupId)) {
+                next.delete(groupId);
+            } else {
+                next.add(groupId);
+            }
+            return next;
+        });
     };
 
     // Widget content is now provided by WIDGET_CONTENT_MAP
@@ -298,7 +321,7 @@ export default function AppShellLayout({
                             const groupItems = getVisibleItemsByGroup(group.id);
                             if (groupItems.length === 0) return null;
 
-                            const isCollapsed = expandedGroupId !== group.id;
+                            const isCollapsed = !expandedGroups.has(group.id);
 
                             return (
                                 <div key={group.id} style={{ marginBottom: '16px' }}>
