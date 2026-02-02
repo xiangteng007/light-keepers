@@ -122,9 +122,9 @@ const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
     { id: 'shelters', icon: 'Building', label: '避難所管理', path: '/rescue/shelters', group: 'rescue', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'triage', icon: 'Stethoscope', label: '傷患分類', path: '/rescue/triage', group: 'rescue', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'reunification', icon: 'Users2', label: '家庭重聚', path: '/rescue/reunification', group: 'rescue', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'search-rescue', icon: 'Search', label: '搜救任務', path: '/rescue/sar', group: 'rescue', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'medical-transport', icon: 'Truck', label: '醫療後送', path: '/rescue/transport', group: 'rescue', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'field-comms', icon: 'Radio', label: '現地通訊', path: '/rescue/comms', group: 'rescue', order: 5, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'search-rescue', icon: 'Search', label: '搜救任務', path: '/rescue/search-rescue', group: 'rescue', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'medical-transport', icon: 'Truck', label: '醫療後送', path: '/rescue/medical-transport', group: 'rescue', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'field-comms', icon: 'Radio', label: '現地通訊', path: '/rescue/field-comms', group: 'rescue', order: 5, visible: true, minLevel: PermissionLevel.Supervisor },
 
     // ========== 📦 資源後勤 (logistics) - 5 items ==========
     { id: 'inventory', icon: 'Package', label: '物資庫存', path: '/logistics/inventory', group: 'logistics', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },

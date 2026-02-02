@@ -48,7 +48,21 @@ import BackupPage from './pages/BackupPage'
 import CommandCenterPage from './pages/CommandCenterPage'
 import MentalHealthPage from './pages/MentalHealthPage'
 import AuditLogPage from './pages/AuditLogPage'
+import OfflinePrepPage from './pages/OfflinePrepPage'
+import ReunificationPage from './pages/ReunificationPage'
+import EquipmentPage from './pages/EquipmentPage'
+import SearchRescuePage from './pages/SearchRescuePage'
+import MedicalTransportPage from './pages/MedicalTransportPage'
+import FieldCommsPage from './pages/FieldCommsPage'
+import ICSFormsPage from './pages/ICSFormsPage'
+import AITasksPage from './pages/AITasksPage'
+import UnifiedResourcesPage from './pages/UnifiedResourcesPage'
+import UnifiedReportingPage from './pages/UnifiedReportingPage'
+import SimulationPage from './pages/SimulationPage'
+import InteroperabilityPage from './pages/InteroperabilityPage'
+import SettingsPage from './pages/governance/SettingsPage'
 import { CommandPalette } from './components/CommandPalette'
+
 
 // Note: TacticalMapPage, ResourceMatchingPage, ReunificationPage, AISummaryPage, AuditLogPage,
 // AccountsPage, TenantsPage, SettingsPage, FeaturesPage now use PageWrapper + Widget system
@@ -181,7 +195,7 @@ function App() {
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
           <Route path="/dashboard" element={<CommandCenterPage />} />
           <Route path="/command-center" element={<CommandCenterPage />} />
-          <Route path="/mental-health" element={<PageWrapper pageId="mental-health" />} />
+          <Route path="/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
 
           {/* ===== Emergency 緊急快捷 Routes (Expert Council v3.0) ===== */}
           <Route path="/emergency/sos" element={<PageWrapper pageId="emergency-sos"><EmergencyResponsePage /></PageWrapper>} />
@@ -203,20 +217,22 @@ function App() {
           <Route path="/geo/tactical-map" element={<Navigate to="/geo/map" replace />} />
           <Route path="/geo/alerts" element={<PageWrapper pageId="geo-alerts"><NcdrAlertsPage /></PageWrapper>} />
           <Route path="/geo/weather" element={<PageWrapper pageId="geo-weather"><ForecastPage /></PageWrapper>} />
+          <Route path="/geo/shelters" element={<PageWrapper pageId="geo-shelters"><SheltersPage /></PageWrapper>} />
 
           {/* Logistics Routes */}
           <Route path="/logistics/inventory" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="logistics-inventory"><ResourcesPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-equipment" /></ProtectedRoute>} />
+          <Route path="/logistics/equipment" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-equipment"><EquipmentPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/logistics/donations" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-donations"><DonationsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Workforce Routes */}
           <Route path="/workforce/people" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-people"><VolunteersPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/workforce/shifts" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-shifts" /></ProtectedRoute>} />
+          <Route path="/workforce/shifts" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-shifts"><WorkforceShiftCalendarPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/workforce/performance" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-performance"><LeaderboardPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/workforce/mobilization" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="workforce-mobilization"><VolunteersPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Community Routes */}
           <Route path="/community/hub" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community-hub"><CommunityCenterPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/community/mental-health" element={<PageWrapper pageId="mental-health" />} />
+          <Route path="/community/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
 
           {/* Analytics Routes */}
           <Route path="/analytics/reports" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-reports"><ReportsAdminPage /></PageWrapper></ProtectedRoute>} />
@@ -231,21 +247,21 @@ function App() {
           <Route path="/governance/security" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-security"><SecurityPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/governance/webhooks" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-webhooks"><WebhooksPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/governance/biometric" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-biometric"><BiometricPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/governance/settings" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-settings" /></ProtectedRoute>} />
+          <Route path="/governance/settings" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-settings"><SettingsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* Admin Audit Route (alias) */}
           <Route path="/admin/audit-logs" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="admin-audit-logs"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Ops Routes (for sidebar items) ===== */}
-          <Route path="/ops/ics-forms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ops-ics-forms" /></ProtectedRoute>} />
+          <Route path="/ops/ics-forms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ops-ics-forms"><ICSFormsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Rescue Routes (Expert Council Navigation v3.0) ===== */}
           <Route path="/rescue/shelters" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-shelters"><SheltersPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/rescue/triage" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/rescue/search-rescue" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-search" /></ProtectedRoute>} />
-          <Route path="/rescue/reunification" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-reunification" /></ProtectedRoute>} />
-          <Route path="/rescue/medical-transport" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-medical" /></ProtectedRoute>} />
-          <Route path="/rescue/field-comms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-comms" /></ProtectedRoute>} />
+          <Route path="/rescue/search-rescue" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-search"><SearchRescuePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/rescue/reunification" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-reunification"><ReunificationPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/rescue/medical-transport" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-medical"><MedicalTransportPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/rescue/field-comms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-comms"><FieldCommsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== ICS Section Dashboard (Expert Council Navigation v3.0) ===== */}
           <Route path="/ics" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-dashboard"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
@@ -254,14 +270,14 @@ function App() {
           <Route path="/ics/205" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-205"><ICS205CommsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Additional Logistics Routes ===== */}
-          <Route path="/logistics/unified-resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-unified-resources" /></ProtectedRoute>} />
+          <Route path="/logistics/unified-resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-unified-resources"><UnifiedResourcesPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Additional Analytics Routes ===== */}
-          <Route path="/analytics/unified-reporting" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-unified-reporting" /></ProtectedRoute>} />
-          <Route path="/analytics/simulation" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-simulation" /></ProtectedRoute>} />
+          <Route path="/analytics/unified-reporting" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-unified-reporting"><UnifiedReportingPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/analytics/simulation" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-simulation"><SimulationPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Additional Governance Routes ===== */}
-          <Route path="/governance/interoperability" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-interoperability" /></ProtectedRoute>} />
+          <Route path="/governance/interoperability" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-interoperability"><InteroperabilityPage /></PageWrapper></ProtectedRoute>} />
 
 
           {/* Intake Route (統一通報入口) */}
@@ -272,9 +288,9 @@ function App() {
           <Route path="/hub/geo-alerts" element={<PageWrapper pageId="hub-geo-alerts"><NcdrAlertsPage /></PageWrapper>} />
           <Route path="/hub/weather" element={<PageWrapper pageId="hub-weather"><ForecastPage /></PageWrapper>} />
           <Route path="/hub/analytics" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-analytics"><AnalyticsPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/hub/ai" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-ai" /></ProtectedRoute>} />
+          <Route path="/hub/ai" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="hub-ai"><AITasksPage /></PageWrapper></ProtectedRoute>} />
           <Route path="/hub/ai-chat" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="hub-ai-chat"><AIChatPage /></PageWrapper></ProtectedRoute>} />
-          <Route path="/hub/offline" element={<PageWrapper pageId="hub-offline" />} />
+          <Route path="/hub/offline" element={<PageWrapper pageId="hub-offline"><OfflinePrepPage /></PageWrapper>} />
 
           {/* ===== 舊路由保留 (未在 redirect 中處理的) ===== */}
           <Route path="/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
