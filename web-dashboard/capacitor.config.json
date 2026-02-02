@@ -1,0 +1,58 @@
+{
+    "appId": "app.lightkeepers.disaster",
+    "appName": "光守護者",
+    "webDir": "build",
+    "bundledWebRuntime": false,
+    "server": {
+        "hostname": "localhost",
+        "androidScheme": "https"
+    },
+    "plugins": {
+        "SplashScreen": {
+            "launchShowDuration": 2000,
+            "backgroundColor": "#1a1a2e",
+            "showSpinner": true,
+            "spinnerColor": "#fbbf24"
+        },
+        "StatusBar": {
+            "style": "Dark",
+            "backgroundColor": "#1a1a2e"
+        },
+        "Keyboard": {
+            "resize": "body",
+            "resizeOnFullScreen": true
+        },
+        "PushNotifications": {
+            "presentationOptions": ["badge", "sound", "alert"]
+        },
+        "Geolocation": {
+            "enableHighAccuracy": true,
+            "timeout": 10000,
+            "maximumAge": 0
+        },
+        "Camera": {
+            "allowEditing": false,
+            "correctOrientation": true,
+            "saveToGallery": false
+        },
+        "LocalNotifications": {
+            "smallIcon": "ic_stat_notif",
+            "iconColor": "#fbbf24"
+        },
+        "BackgroundTask": {
+            "windowDuration": 25
+        }
+    },
+    "android": {
+        "allowMixedContent": false,
+        "captureInput": true,
+        "webContentsDebuggingEnabled": false,
+        "backgroundColor": "#1a1a2e"
+    },
+    "ios": {
+        "contentInset": "automatic",
+        "preferredContentMode": "mobile",
+        "scheme": "Light Keepers",
+        "backgroundColor": "#1a1a2e"
+    }
+}
