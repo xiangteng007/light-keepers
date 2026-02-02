@@ -79,12 +79,16 @@ export default function AppShellLayout({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Auto-expand group based on current path
+    // Auto-expand group based on current path - ONLY on initial load
+    // Use ref to track initialization to prevent resetting on navigation
+    const initialExpandDone = React.useRef(false);
     useEffect(() => {
+        if (initialExpandDone.current) return; // Skip if already initialized
         const currentPath = window.location.pathname;
         const activeItem = navItems.find(item => item.path === currentPath);
         if (activeItem) {
             setExpandedGroupId(activeItem.group);
+            initialExpandDone.current = true;
         }
     }, [navItems]);
 
