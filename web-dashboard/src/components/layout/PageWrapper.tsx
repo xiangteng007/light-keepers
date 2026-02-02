@@ -32,8 +32,12 @@ export default function PageWrapper({
         : (user?.roleLevel as PermissionLevel) ?? PermissionLevel.Guest;
 
     // Auto-detect: if pageId has a widget config, use widgets mode
+    // BUT: if children are explicitly provided, prioritize rendering them (legacy mode)
     const hasWidgetConfig = pageId in PAGE_WIDGET_CONFIGS;
-    const shouldUseWidgets = useWidgets ?? hasWidgetConfig;
+    const hasChildren = children !== undefined && children !== null;
+    
+    // Priority: children > explicit useWidgets prop > hasWidgetConfig
+    const shouldUseWidgets = hasChildren ? false : (useWidgets ?? hasWidgetConfig);
 
     // If using widgets mode, don't pass children to let AppShellLayout render WidgetGrid
     if (shouldUseWidgets) {
