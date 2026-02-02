@@ -219,6 +219,20 @@ function App() {
           {/* Admin Audit Route (alias) */}
           <Route path="/admin/audit-logs" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="admin-audit-logs"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
 
+          {/* ===== Ops Routes (for sidebar items) ===== */}
+          <Route path="/ops/ics-forms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ops-ics-forms" /></ProtectedRoute>} />
+
+          {/* ===== Additional Logistics Routes ===== */}
+          <Route path="/logistics/unified-resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-unified-resources" /></ProtectedRoute>} />
+
+          {/* ===== Additional Analytics Routes ===== */}
+          <Route path="/analytics/unified-reporting" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-unified-reporting" /></ProtectedRoute>} />
+          <Route path="/analytics/simulation" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-simulation" /></ProtectedRoute>} />
+
+          {/* ===== Additional Governance Routes ===== */}
+          <Route path="/governance/interoperability" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-interoperability" /></ProtectedRoute>} />
+
+
           {/* Intake Route (統一通報入口) */}
           <Route path="/intake" element={<PageWrapper pageId="intake"><ReportPage /></PageWrapper>} />
 
