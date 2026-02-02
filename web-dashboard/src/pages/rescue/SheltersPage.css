@@ -1,0 +1,326 @@
+/**
+ * SheltersPage.css
+ * 
+ * Expert Council Navigation Design v3.0
+ * 避難所管理頁面樣式
+ */
+
+.shelters-page {
+    padding: 24px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Header */
+.shelters-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+}
+
+.shelters-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #E5E7EB;
+}
+
+.shelters-title h1 {
+    font-size: 24px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.shelters-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #D4AF37 0%, #C39B2F 100%);
+    color: #0F1218;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.shelters-add-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
+}
+
+/* Stats */
+.shelters-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px;
+    background: #13171F;
+    border: 1px solid #1F2937;
+    border-radius: 12px;
+}
+
+.stat-icon {
+    width: 48px;
+    height: 48px;
+    padding: 12px;
+    background: rgba(212, 175, 55, 0.1);
+    color: #D4AF37;
+    border-radius: 10px;
+}
+
+.stat-icon.warning {
+    background: rgba(245, 158, 11, 0.1);
+    color: #F59E0B;
+}
+
+.stat-content {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: #E5E7EB;
+}
+
+.stat-label {
+    font-size: 13px;
+    color: #6B7280;
+}
+
+/* Filters */
+.shelters-filters {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.search-box,
+.filter-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #13171F;
+    border: 1px solid #1F2937;
+    border-radius: 8px;
+    color: #94A3B8;
+}
+
+.search-box {
+    flex: 1;
+}
+
+.search-box input,
+.filter-box select {
+    flex: 1;
+    background: transparent;
+    border: none;
+    color: #E5E7EB;
+    font-size: 14px;
+    outline: none;
+}
+
+.filter-box select {
+    cursor: pointer;
+}
+
+/* Shelter List */
+.shelters-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 20px;
+}
+
+.shelter-card {
+    background: #13171F;
+    border: 1px solid #1F2937;
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 150ms ease;
+}
+
+.shelter-card:hover {
+    border-color: #374151;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+}
+
+.shelter-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid #1F2937;
+}
+
+.shelter-card-header h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: #E5E7EB;
+}
+
+.shelter-status {
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.shelter-status.bg-green {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+}
+
+.shelter-status.bg-blue {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3B82F6;
+}
+
+.shelter-status.bg-orange {
+    background: rgba(245, 158, 11, 0.15);
+    color: #F59E0B;
+}
+
+.shelter-status.bg-gray {
+    background: rgba(107, 114, 128, 0.15);
+    color: #6B7280;
+}
+
+.shelter-card-body {
+    padding: 16px;
+}
+
+.shelter-info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9CA3AF;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.shelter-occupancy {
+    margin: 16px 0;
+}
+
+.occupancy-header {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #9CA3AF;
+    margin-bottom: 6px;
+}
+
+.occupancy-bar {
+    height: 6px;
+    background: #1F2937;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.occupancy-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 300ms ease;
+}
+
+.occupancy-fill.green { background: #10B981; }
+.occupancy-fill.orange { background: #F59E0B; }
+.occupancy-fill.red { background: #EF4444; }
+
+.shelter-facilities {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.facility-tag {
+    padding: 4px 8px;
+    background: rgba(59, 130, 246, 0.1);
+    color: #93C5FD;
+    font-size: 11px;
+    border-radius: 4px;
+}
+
+.shelter-card-footer {
+    display: flex;
+    gap: 12px;
+    padding: 16px;
+    border-top: 1px solid #1F2937;
+}
+
+.btn-primary,
+.btn-secondary {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.btn-primary {
+    background: #D4AF37;
+    color: #0F1218;
+}
+
+.btn-primary:hover {
+    background: #E5C158;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #94A3B8;
+    border: 1px solid #374151;
+}
+
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    .shelters-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .shelters-page {
+        padding: 16px;
+    }
+    
+    .shelters-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .shelters-stats {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .shelters-filters {
+        flex-direction: column;
+    }
+    
+    .shelters-list {
+        grid-template-columns: 1fr;
+    }
+}

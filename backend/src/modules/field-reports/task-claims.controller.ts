@@ -1,7 +1,6 @@
 import { Controller, Post, Get, Body, Param, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { TaskClaimsService } from './task-claims.service';
@@ -26,12 +25,12 @@ class AddProgressDto {
 @ApiTags('Task Claims')
 @ApiBearerAuth()
 @Controller('tasks')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class TaskClaimsController {
     constructor(private taskClaimsService: TaskClaimsService) { }
 
     @Post(':taskId/claim')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Claim a task' })
     async claimTask(
         @Param('taskId') taskId: string,
@@ -47,7 +46,7 @@ export class TaskClaimsController {
     }
 
     @Post(':taskId/release')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Release a claimed task' })
     async releaseTask(
         @Param('taskId') taskId: string,
@@ -59,7 +58,7 @@ export class TaskClaimsController {
     }
 
     @Post(':taskId/progress')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Add progress update to task' })
     async addProgress(
         @Param('taskId') taskId: string,
@@ -81,14 +80,14 @@ export class TaskClaimsController {
     }
 
     @Get(':taskId/progress')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Get progress updates for task' })
     async getProgress(@Param('taskId') taskId: string) {
         return this.taskClaimsService.getProgress(taskId);
     }
 
     @Get(':taskId/claim')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Get current claim for task' })
     async getCurrentClaim(@Param('taskId') taskId: string) {
         const claim = await this.taskClaimsService.getCurrentClaim(taskId);

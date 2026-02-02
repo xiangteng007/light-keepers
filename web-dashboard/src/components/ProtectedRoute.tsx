@@ -7,10 +7,12 @@ interface ProtectedRouteProps {
 }
 
 /**
- * 受保護路由元件
- * - Level 0 頁面允許匿名訪客存取
- * - Level 1+ 頁面未登入者導向登入頁
- * - 已登入但權限不足者顯示錯誤
+ * 受保護路由元件（含 Auth Ready Gating）
+ * 
+ * 問題修復：
+ * - 權限載入完成前不做 redirect，避免「閃跳」
+ * - 保留 intended route，登入後可回跳
+ * - 區分 401（未登入）vs 403（權限不足）
  * 
  * requiredLevel 對應：
  * 0 = 公開 (匿名訪客可存取)
@@ -21,39 +23,56 @@ interface ProtectedRouteProps {
  * 5 = 系統擁有者
  */
 export default function ProtectedRoute({ children, requiredLevel = 1 }: ProtectedRouteProps) {
-    const { isAuthenticated, isLoading, user } = useAuth();
+    const { isAuthenticated, user, authReady } = useAuth();
     const location = useLocation();
 
-    // 快速判斷: 如果 devMode 開啟或已有用戶，跳過加載畫面（減少閃爍）
+    // DevMode 完整跳過認證（開發測試用）
     const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
-    const shouldSkipLoading = devModeEnabled || user !== null;
 
-    // 等待驗證完成 - 只有在真正需要等待時才顯示（且使用最小化指示）
-    if (isLoading && !shouldSkipLoading) {
+    // 🔐 Auth Ready Gating：權限載入完成前不做任何 redirect 決策
+    // 這解決了「isLoading 期間誤導頁」的問題
+    if (!authReady && !devModeEnabled) {
+        // 顯示極簡載入畫面（無閃爍、無 spinner）
         return (
-            <div style={{
-                width: '100vw',
-                height: '100vh',
-                background: 'var(--layout-bg, #0b111b)',
-            }} />
+            <div 
+                style={{
+                    width: '100vw',
+                    height: '100vh',
+                    background: 'var(--layout-bg, #0b111b)',
+                }}
+                aria-busy="true"
+                aria-label="正在驗證身份..."
+            />
         );
     }
 
-    // 🔧 DevMode 時跳過認證檢查並使用模擬 Level 5 權限（devModeEnabled 已宣告於上方）
+    // DevMode 時跳過所有認證檢查
+    if (devModeEnabled) {
+        return <>{children}</>;
+    }
 
     // 公開頁面 (Level 0) - 匿名訪客也可存取，不需要登入
     if (requiredLevel === 0) {
         return <>{children}</>;
     }
 
-    // Level 1+ 頁面：未登入導向登入頁 (devMode 時跳過)
-    if (!isAuthenticated && !devModeEnabled) {
-        return <Navigate to="/" state={{ from: location }} replace />;
+    // 🔐 Auth Ready 後才判斷：Level 1+ 頁面需要登入
+    // 此時 authReady = true，isAuthenticated 是最終確定的值
+    if (!isAuthenticated) {
+        // 401 行為：未登入 → 導向登入頁，保留 intended route
+        return (
+            <Navigate 
+                to="/" 
+                state={{ from: location, reason: 'unauthenticated' }} 
+                replace 
+            />
+        );
     }
 
-    // 檢查權限等級（匿名用戶 = Level 0）
+    // 檢查權限等級（登入用戶）
     const userLevel = user?.roleLevel ?? 0;
     if (userLevel < requiredLevel) {
+        // 403 行為：權限不足 → 顯示無權限頁面（不 redirect）
         return (
             <div className="access-denied">
                 <div className="access-denied__content">
@@ -62,6 +81,8 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
                     <p>您的權限等級不足以訪問此頁面</p>
                     <p className="access-denied__info">
                         您的身份：<strong>{user?.roleDisplayName || '訪客'}</strong>
+                        <br />
+                        <small>需要權限等級：{requiredLevel}，您的等級：{userLevel}</small>
                     </p>
                     <a href="/dashboard" className="lk-btn lk-btn--primary">
                         返回儀表板

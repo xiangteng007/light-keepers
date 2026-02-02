@@ -5,7 +5,7 @@
 
 import { Controller, Get, Post, Put, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { ReunificationService } from './reunification.service';
 import { MissingPerson, MissingPersonStatus } from './entities';
 
@@ -25,7 +25,7 @@ export class ReunificationController {
     // ============ 管理端 API ============
 
     @Post('reports')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '新增失蹤者報案' })
     async createReport(@Body() data: Partial<MissingPerson>) {
@@ -33,7 +33,7 @@ export class ReunificationController {
     }
 
     @Get('missions/:missionSessionId')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '取得任務的失蹤者列表' })
     @ApiParam({ name: 'missionSessionId' })
@@ -42,7 +42,7 @@ export class ReunificationController {
     }
 
     @Get('missions/:missionSessionId/stats')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '取得統計' })
     @ApiParam({ name: 'missionSessionId' })
@@ -51,7 +51,7 @@ export class ReunificationController {
     }
 
     @Put(':id/found')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '標記已尋獲' })
     @ApiParam({ name: 'id' })
@@ -68,7 +68,7 @@ export class ReunificationController {
     }
 
     @Put(':id/reunited')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '標記已團聚' })
     @ApiParam({ name: 'id' })

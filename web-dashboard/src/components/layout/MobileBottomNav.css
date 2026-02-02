@@ -1,67 +1,213 @@
 /**
  * MobileBottomNav.css
  * 
- * Styles for mobile bottom navigation bar.
+ * Expert Council Navigation Design v3.0
+ * Mobile bottom navigation bar styling
+ * Per expert_council_navigation_design.md §3.1
  */
 
-.mobile-nav {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    height: 100%;
-    padding: 0 8px;
-    box-sizing: border-box;
+/* ==========================================
+   Design Tokens (Mobile)
+   ========================================== */
+:root {
+    --mobile-nav-height: 64px;
+    --mobile-nav-bg: #0F1218;
+    --mobile-nav-border: #1F2937;
 }
 
-.mobile-nav__item {
+/* ==========================================
+   SOS Floating Action Button
+   ========================================== */
+.mobile-fab-sos {
+    display: none;
+    position: fixed;
+    bottom: calc(var(--mobile-nav-height) + 16px);
+    right: 16px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+    color: white;
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+    z-index: 110;
+    align-items: center;
+    justify-content: center;
+    animation: pulse-sos 2s ease-in-out infinite;
+    text-decoration: none;
+}
+
+@keyframes pulse-sos {
+    0%, 100% { 
+        box-shadow: 0 4px 20px rgba(239, 68, 68, 0.5);
+        transform: scale(1);
+    }
+    50% { 
+        box-shadow: 0 4px 30px rgba(239, 68, 68, 0.7);
+        transform: scale(1.05);
+    }
+}
+
+.mobile-fab-sos:hover {
+    background: linear-gradient(135deg, #F87171 0%, #EF4444 100%);
+}
+
+/* ==========================================
+   Bottom Navigation Bar
+   ========================================== */
+.mobile-bottom-nav {
+    display: none;
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: var(--mobile-nav-height);
+    background: var(--mobile-nav-bg);
+    border-top: 1px solid var(--mobile-nav-border);
+    z-index: 100;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0 8px;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.mobile-nav-item {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 2px;
-    color: var(--text-secondary, #9aa0a6);
+    gap: 4px;
+    color: #94A3B8;
     text-decoration: none;
     font-size: 10px;
-    padding: 8px 16px;
+    font-weight: 500;
+    padding: 8px 12px;
     border-radius: 12px;
-    transition: all 0.2s ease;
-    min-width: 60px;
-    min-height: 48px;
+    transition: all 150ms ease;
+    min-width: 56px;
+    min-height: 48px; /* Touch target */
+    background: transparent;
+    border: none;
+    cursor: pointer;
 }
 
-.mobile-nav__item:hover {
-    color: var(--text-primary, #e8eaed);
+.mobile-nav-item:hover {
+    color: #CBD5E1;
     background: rgba(255, 255, 255, 0.05);
 }
 
-.mobile-nav__item--active,
-.mobile-nav__item.active {
-    color: var(--accent-gold, #d4a84b);
-    background: rgba(212, 168, 75, 0.15);
+.mobile-nav-item.active {
+    color: #D4AF37;
+    background: rgba(212, 175, 55, 0.15);
 }
 
-.mobile-nav__icon {
+/* ==========================================
+   More Menu Overlay
+   ========================================== */
+.mobile-more-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 105;
+    align-items: flex-end;
+    justify-content: center;
+    padding-bottom: calc(var(--mobile-nav-height) + 16px);
+    animation: fadeIn 150ms ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.mobile-more-menu {
+    width: calc(100% - 32px);
+    max-width: 400px;
+    background: #13171F;
+    border: 1px solid var(--mobile-nav-border);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: slideUp 200ms ease-out;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.mobile-more-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    border-bottom: 1px solid var(--mobile-nav-border);
+    font-size: 14px;
+    font-weight: 600;
+    color: #E5E7EB;
+}
+
+.mobile-more-close {
+    width: 32px;
+    height: 32px;
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 24px;
-    height: 24px;
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    cursor: pointer;
+    border-radius: 8px;
 }
 
-.mobile-nav__label {
-    font-weight: 500;
-    white-space: nowrap;
+.mobile-more-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #E5E7EB;
 }
 
-/* Extra small screens - hide labels */
-@media (max-width: 375px) {
-    .mobile-nav__item {
-        padding: 8px 12px;
-        min-width: 48px;
+.mobile-more-items {
+    display: flex;
+    flex-direction: column;
+    padding: 8px;
+}
+
+.mobile-more-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    color: #CBD5E1;
+    text-decoration: none;
+    font-size: 14px;
+    border-radius: 10px;
+    transition: all 150ms ease;
+}
+
+.mobile-more-item:hover {
+    background: rgba(212, 175, 55, 0.1);
+    color: #E5E7EB;
+}
+
+.mobile-more-item.active {
+    background: rgba(212, 175, 55, 0.2);
+    color: #D4AF37;
+}
+
+/* ==========================================
+   Show on Mobile Only (≤767px)
+   ========================================== */
+@media (max-width: 767px) {
+    .mobile-fab-sos,
+    .mobile-bottom-nav,
+    .mobile-more-overlay {
+        display: flex;
     }
-    
-    .mobile-nav__label {
+}
+
+/* Extra small screens */
+@media (max-width: 375px) {
+    .mobile-nav-item {
+        padding: 8px 8px;
+        min-width: 48px;
         font-size: 9px;
     }
 }

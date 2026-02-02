@@ -1,9 +1,8 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { EventsService } from './events.service';
 import { CreateEventDto, UpdateEventDto, EventQueryDto } from './dto/event.dto';
-import { CoreJwtGuard } from '../shared/guards/core-jwt.guard';
-import { UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards/unified-roles.guard';
 
 @ApiTags('事件管理')
 @Controller('events')

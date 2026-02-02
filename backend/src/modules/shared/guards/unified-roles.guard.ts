@@ -20,6 +20,8 @@ export type RoleLevelType = typeof ROLE_LEVELS[keyof typeof ROLE_LEVELS];
 // Metadata keys
 const REQUIRED_LEVEL_KEY = 'requiredLevel';
 const REQUIRED_ROLES_KEY = 'requiredRoles';
+// Legacy metadata key for backward compatibility
+const MIN_LEVEL_KEY = 'minLevel';
 
 /**
  * RequiredLevel Decorator
@@ -67,11 +69,19 @@ export class UnifiedRolesGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) { }
 
     canActivate(context: ExecutionContext): boolean {
-        // 取得 decorator 設定
-        const requiredLevel = this.reflector.getAllAndOverride<RoleLevelType>(
+        // 取得 decorator 設定 (支援新舊兩種 metadata key)
+        let requiredLevel = this.reflector.getAllAndOverride<RoleLevelType>(
             REQUIRED_LEVEL_KEY,
             [context.getHandler(), context.getClass()],
         );
+
+        // 如果沒有 requiredLevel，嘗試讀取 legacy minLevel (for backward compatibility)
+        if (requiredLevel === undefined) {
+            requiredLevel = this.reflector.getAllAndOverride<RoleLevelType>(
+                MIN_LEVEL_KEY,
+                [context.getHandler(), context.getClass()],
+            );
+        }
 
         const requiredRoles = this.reflector.getAllAndOverride<string[]>(
             REQUIRED_ROLES_KEY,

@@ -115,25 +115,26 @@ export class Fire119Service {
 }
 
 // Types
-interface Fire119Response {
+export interface Fire119Response {
     success: boolean; incidents?: FireIncident[];
     error?: string; message?: string;
     requiredEnvVars?: string[]; pendingSpecs?: string[];
 }
-interface FireIncident {
+export interface FireIncident {
     id: string; type: string; reportedAt: Date;
     location: { lat: number; lng: number; address: string };
     status: string; severity: string;
 }
-interface IncidentDetails extends FireIncident {
+export interface IncidentDetails extends FireIncident {
     typeName: string; units: { type: string; count: number }[]; description: string;
 }
-interface FireUnitLocation {
+export interface FireUnitLocation {
     unitId: string; lat: number; lng: number; status: string; stationName: string;
 }
-interface SubscriptionResult { success: boolean; error?: string; message?: string; pendingSpecs?: string[]; }
-interface IncidentStats {
+export interface SubscriptionResult { success: boolean; error?: string; message?: string; pendingSpecs?: string[]; }
+export interface IncidentStats {
     region: string; period: string; totalIncidents: number;
     byType: Record<string, number>; avgResponseTime: number;
     peakHours: number[]; trend: string;
 }
+

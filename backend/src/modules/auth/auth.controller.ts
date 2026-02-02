@@ -1,10 +1,10 @@
 import { Controller, Post, Body, Get, Patch, Delete, Param, UseGuards, Request, Res, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { Public } from './decorators/public.decorator';
 
 @Controller('auth')
@@ -44,7 +44,7 @@ export class AuthController {
     }
 
     @Get('me')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; lineUserId?: string; googleId?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
         // 從資料庫獲取最新帳號資料（包含綁定狀態）
         const account = await this.authService.getAccountById(req.user.id);
@@ -93,7 +93,7 @@ export class AuthController {
     // - POST /auth/admin/recreate-owner (hardcoded key: LK_ADMIN_2026_RESET)
     //
     // If admin functionality is needed, use:
-    // 1. @UseGuards(JwtAuthGuard) + @RequiredLevel(5)
+    // 1. @UseGuards(CoreJwtGuard, UnifiedRolesGuard) + @RequiredLevel(5)
     // 2. Environment variable for admin key
     // 3. Audit logging
     // =========================================
@@ -162,7 +162,7 @@ export class AuthController {
      * 已登入用戶綁定 LINE 帳號
      */
     @Post('line/bind')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindLine(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
         const lineProfile = await this.authService.verifyLineToken(body.accessToken);
         await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
@@ -174,7 +174,7 @@ export class AuthController {
      * 從 OAuth 回調中用 code 換取 token 並綁定
      */
     @Post('line/bind-callback')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindLineCallback(
         @Request() req: { user: { id: string } },
         @Body() body: { code: string; redirectUri: string }
@@ -281,7 +281,7 @@ export class AuthController {
      * 已登入用戶綁定 Google 帳號
      */
     @Post('google/bind')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindGoogle(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
         const googleProfile = await this.authService.verifyGoogleToken(body.accessToken);
         await this.authService.bindGoogleAccount(req.user.id, googleProfile.id, googleProfile.email);
@@ -293,7 +293,7 @@ export class AuthController {
      * 從 OAuth 回調中用 code 換取 token 並綁定
      */
     @Post('google/bind-callback')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindGoogleCallback(
         @Request() req: { user: { id: string } },
         @Body() body: { code: string; redirectUri: string }
@@ -344,7 +344,7 @@ export class AuthController {
      * 更新個人資料
      */
     @Patch('profile')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async updateProfile(
         @Request() req: { user: { id: string } },
         @Body() dto: UpdateProfileDto
@@ -356,7 +356,7 @@ export class AuthController {
      * 變更密碼
      */
     @Post('change-password')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async changePassword(
         @Request() req: { user: { id: string } },
         @Body() dto: ChangePasswordDto
@@ -369,7 +369,7 @@ export class AuthController {
      * 只有透過 LINE/Google 登入且尚未設定密碼的帳號可用
      */
     @Post('set-password')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async setPassword(
         @Request() req: { user: { id: string } },
         @Body() body: { newPassword: string }
@@ -381,7 +381,7 @@ export class AuthController {
      * 檢查是否已設定密碼
      */
     @Get('has-password')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async hasPassword(@Request() req: { user: { id: string } }) {
         return this.authService.hasPassword(req.user.id);
     }
@@ -390,7 +390,7 @@ export class AuthController {
      * 獲取通知偏好設定
      */
     @Get('preferences')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async getPreferences(@Request() req: { user: { id: string } }) {
         return this.authService.getPreferences(req.user.id);
     }
@@ -399,7 +399,7 @@ export class AuthController {
      * 更新通知偏好設定
      */
     @Patch('preferences')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async updatePreferences(
         @Request() req: { user: { id: string } },
         @Body() dto: UpdatePreferencesDto
@@ -423,7 +423,7 @@ export class AuthController {
      * 發送 LINE OTP 驗證碼
      */
     @Post('send-line-otp')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async sendLineOtp(@Request() req: { user: { lineUserId?: string } }) {
         if (!req.user.lineUserId) {
             throw new BadRequestException('請先綁定 LINE 帳號');
@@ -435,7 +435,7 @@ export class AuthController {
      * 驗證 LINE OTP
      */
     @Post('verify-line-otp')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async verifyLineOtp(
         @Request() req: { user: { lineUserId?: string } },
         @Body() body: { code: string }
@@ -529,7 +529,7 @@ export class AuthController {
     /**
      * 獲取帳號完整狀態（包含審核狀態和志工資料狀態）
      */
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @Get('me/status')
     async getAccountStatus(@Request() req: { user: { id: string } }) {
         return this.authService.getAccountStatus(req.user.id);
@@ -538,7 +538,7 @@ export class AuthController {
     /**
      * 標記志工資料已完成
      */
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @Post('me/volunteer-profile-completed')
     async markVolunteerProfileCompleted(@Request() req: { user: { id: string } }) {
         return this.authService.markVolunteerProfileCompleted(req.user.id);
@@ -615,7 +615,7 @@ export class AuthController {
      * GET /auth/sessions
      */
     @Get('sessions')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async getSessions(@Request() req: { user: { id: string } }) {
         const sessions = await this.refreshTokenService.getActiveSessions(req.user.id);
         return { success: true, data: sessions };
@@ -626,7 +626,7 @@ export class AuthController {
      * DELETE /auth/sessions/:id
      */
     @Delete('sessions/:id')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async revokeSession(
         @Request() req: { user: { id: string } },
         @Param('id') sessionId: string,
@@ -645,7 +645,7 @@ export class AuthController {
      * POST /auth/logout-all
      */
     @Post('logout-all')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async logoutAll(
         @Request() req: { user: { id: string } },
         @Res({ passthrough: true }) res: Response,

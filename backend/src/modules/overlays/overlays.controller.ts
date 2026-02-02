@@ -12,7 +12,7 @@ import {
     ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
-import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OverlaysService } from './overlays.service';
@@ -26,12 +26,12 @@ import {
 @ApiTags('Overlays')
 @ApiBearerAuth()
 @Controller('mission-sessions/:sessionId/overlays')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class OverlaysController {
     constructor(private readonly overlaysService: OverlaysService) { }
 
     @Get()
-    @MinLevel(RoleLevel.VOLUNTEER) // Level 1+
+    @RequiredLevel(RoleLevel.VOLUNTEER) // Level 1+
     @ApiOperation({ summary: 'List overlays for a session' })
     @ApiResponse({ status: 200, description: 'List of overlays', type: [OverlayDto] })
     async findAll(
@@ -42,7 +42,7 @@ export class OverlaysController {
     }
 
     @Get(':id')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Get a single overlay' })
     @ApiResponse({ status: 200, type: OverlayDto })
     async findOne(
@@ -52,7 +52,7 @@ export class OverlaysController {
     }
 
     @Post()
-    @MinLevel(RoleLevel.OFFICER) // Level 2+
+    @RequiredLevel(RoleLevel.OFFICER) // Level 2+
     @ApiOperation({ summary: 'Create a new overlay' })
     @ApiResponse({ status: 201, type: OverlayDto })
     async create(
@@ -64,7 +64,7 @@ export class OverlaysController {
     }
 
     @Patch(':id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Update an overlay (with optimistic locking)' })
     @ApiHeader({ name: 'if-match', description: 'Expected version number', required: true })
     @ApiResponse({ status: 200, type: OverlayDto })
@@ -80,7 +80,7 @@ export class OverlaysController {
     }
 
     @Post(':id/publish')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Publish a draft overlay' })
     @ApiResponse({ status: 200, type: OverlayDto })
     async publish(
@@ -91,7 +91,7 @@ export class OverlaysController {
     }
 
     @Delete(':id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Soft delete an overlay' })
     @ApiResponse({ status: 204, description: 'Overlay removed' })
     async remove(
@@ -103,7 +103,7 @@ export class OverlaysController {
 
     // Lock endpoints
     @Post(':id/lock')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Acquire a lock on an overlay' })
     @ApiResponse({ status: 200, description: 'Lock acquired' })
     @ApiResponse({ status: 409, description: 'Lock held by another user' })
@@ -115,7 +115,7 @@ export class OverlaysController {
     }
 
     @Delete(':id/lock')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Release a lock on an overlay' })
     @ApiResponse({ status: 200, description: 'Lock released' })
     async releaseLock(

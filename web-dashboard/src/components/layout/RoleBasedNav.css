@@ -1,0 +1,137 @@
+/**
+ * RoleBasedNav.css
+ * 
+ * Expert Council Navigation Design v3.0
+ * Styling for role-based navigation components
+ */
+
+/* ===== Role Based Nav (Compact) ===== */
+.role-based-nav {
+    padding: 12px;
+    margin: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-left: 3px solid var(--section-color, #D4AF37);
+    border-radius: 8px;
+}
+
+.rbn-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+    color: var(--section-color, #D4AF37);
+}
+
+.rbn-label {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.rbn-duty-badge {
+    margin-left: auto;
+    padding: 2px 8px;
+    background: rgba(16, 185, 129, 0.15);
+    color: #10B981;
+    font-size: 10px;
+    font-weight: 600;
+    border-radius: 4px;
+}
+
+.rbn-routes {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.rbn-route {
+    display: block;
+    padding: 8px 10px;
+    color: #9CA3AF;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: all 150ms ease;
+}
+
+.rbn-route:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+}
+
+.rbn-route.active {
+    background: rgba(212, 175, 55, 0.1);
+    color: #D4AF37;
+    font-weight: 500;
+}
+
+/* ===== ICS Quick Nav (Horizontal) ===== */
+.ics-quick-nav {
+    display: flex;
+    gap: 8px;
+    padding: 8px 16px;
+    background: rgba(0, 0, 0, 0.2);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.ics-quick-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.icsqn-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 6px;
+    color: #9CA3AF;
+    font-size: 12px;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: all 150ms ease;
+}
+
+.icsqn-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: var(--section-color, #D4AF37);
+    color: #E5E7EB;
+}
+
+.icsqn-item.active {
+    background: color-mix(in srgb, var(--section-color) 15%, transparent);
+    border-color: var(--section-color);
+    color: var(--section-color);
+}
+
+.icsqn-item svg {
+    color: var(--section-color);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .role-based-nav {
+        margin: 4px 8px;
+        padding: 10px;
+    }
+    
+    .rbn-routes {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+    
+    .rbn-route {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    .icsqn-item span {
+        display: none;
+    }
+}

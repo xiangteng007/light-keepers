@@ -9,8 +9,7 @@ import {
     ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard, RolesGuard } from '../auth/guards';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { AiJobsService } from './ai-jobs.service';
@@ -20,12 +19,12 @@ import { AiJobStatus } from './entities';
 @ApiTags('AI Queue')
 @ApiBearerAuth()
 @Controller('ai/jobs')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class AiJobsController {
     constructor(private aiJobsService: AiJobsService) { }
 
     @Post()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Create a new AI job' })
     async createJob(
         @Body() dto: CreateAiJobDto,
@@ -43,7 +42,7 @@ export class AiJobsController {
     }
 
     @Get(':jobId')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Get AI job status and result' })
     async getJob(
         @Param('jobId', ParseUUIDPipe) jobId: string,
@@ -52,7 +51,7 @@ export class AiJobsController {
     }
 
     @Post(':jobId/cancel')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Cancel a queued AI job' })
     async cancelJob(
         @Param('jobId', ParseUUIDPipe) jobId: string,
@@ -68,7 +67,7 @@ export class AiJobsController {
     }
 
     @Get()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'List AI jobs for a mission' })
     @ApiQuery({ name: 'missionSessionId', required: true })
     @ApiQuery({ name: 'status', required: false, enum: AiJobStatus })

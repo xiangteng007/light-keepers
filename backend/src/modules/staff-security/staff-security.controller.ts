@@ -5,14 +5,14 @@
  */
 import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 import { SecurityIncidentService, CreateIncidentDto } from './services/security-incident.service';
 import { StaffCheckInService, CheckInDto, CheckInType } from './services/staff-checkin.service';
 import { EvacuationPlanService } from './services/evacuation-plan.service';
 
 @ApiTags('Staff Security')
 @Controller('api/v1/staff-security')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class StaffSecurityController {
     constructor(

@@ -19,6 +19,9 @@ import { PointsRecord } from './entities/points-record.entity';
 // Recognition Entities
 import { VolunteerBadge, VolunteerEarnedBadge, VolunteerRecognition } from './entities/recognition.entity';
 
+// Mobilization Entities
+import { VolunteerMobilization, MobilizationResponse } from './entities/mobilization.entity';
+
 // VMS Services
 import { SkillService } from './entities/skill.service';
 import { VehicleService } from './entities/vehicle.service';
@@ -28,6 +31,9 @@ import { CheckInService } from './entities/checkin.service';
 import { ExpiryNotificationService } from './entities/expiry-notification.service';
 import { RecognitionService } from './entities/recognition.service';
 
+// Mobilization Service
+import { MobilizationService } from './mobilization.service';
+
 // VMS Controllers
 import {
     SkillsController, VehiclesController, InsuranceController, PointsController,
@@ -36,6 +42,9 @@ import {
 
 // Recognition Controller
 import { RecognitionController } from './recognition.controller';
+
+// Mobilization Controller
+import { MobilizationController } from './mobilization.controller';
 
 // Location tracking
 import { VolunteerLocationController } from './volunteer-location.controller';
@@ -64,6 +73,9 @@ import { AccountsModule } from '../accounts/accounts.module';
             VolunteerBadge,
             VolunteerEarnedBadge,
             VolunteerRecognition,
+            // Mobilization
+            VolunteerMobilization,
+            MobilizationResponse,
         ]),
     ],
     controllers: [
@@ -79,6 +91,8 @@ import { AccountsModule } from '../accounts/accounts.module';
         ExpiryNotificationController,
         // Recognition Controller
         RecognitionController,
+        // Mobilization Controller
+        MobilizationController,
         // Location tracking
         VolunteerLocationController],
     providers: [
@@ -92,7 +106,9 @@ import { AccountsModule } from '../accounts/accounts.module';
         CheckInService,
         ExpiryNotificationService,
         // Recognition Service
-        RecognitionService],
+        RecognitionService,
+        // Mobilization Service
+        MobilizationService],
     exports: [
         VolunteersService,
         AssignmentsService,
@@ -100,7 +116,7 @@ import { AccountsModule } from '../accounts/accounts.module';
         VehicleService,
         InsuranceService,
         PointsService,
-        RecognitionService],
+        RecognitionService,
+        MobilizationService],
 })
 export class VolunteersModule { }
-

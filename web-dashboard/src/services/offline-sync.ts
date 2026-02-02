@@ -169,7 +169,7 @@ export class OfflineSyncManager {
      * Sync individual item to server
      */
     private async syncItem(item: SyncQueueItem): Promise<void> {
-        const baseUrl = process.env.REACT_APP_API_URL || '/api/v1';
+        const baseUrl = import.meta.env.VITE_API_URL || '/api/v1';
         const endpoint = `${baseUrl}/${item.entity}`;
 
         const response = await fetch(endpoint, {

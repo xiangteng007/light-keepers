@@ -1,7 +1,7 @@
 import { Controller, Get, Param, Patch, Delete, Body, UseGuards, Request } from '@nestjs/common';
 import { IsArray, IsString, IsNumber, IsBoolean, IsOptional } from 'class-validator';
 import { AccountsService } from './accounts.service';
-import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from './entities/role.entity';
 
 // DTOs
@@ -34,8 +34,8 @@ export class AccountsController {
     constructor(private readonly accountsService: AccountsService) { }
 
     @Get()
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.OFFICER)
     findAll() {
         return this.accountsService.findAll();
     }
@@ -54,15 +54,15 @@ export class AccountsController {
      * 獲取帳號列表（管理用）- 需要幹部權限
      */
     @Get('admin')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.OFFICER)
     getAccountsForAdmin() {
         return this.accountsService.getAccountsForAdmin();
     }
 
     @Get(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OFFICER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.OFFICER)
     findOne(@Param('id') id: string) {
         return this.accountsService.findById(id);
     }
@@ -71,8 +71,8 @@ export class AccountsController {
      * 設定用戶角色 - 需要理事長或以上權限
      */
     @Patch(':id/roles')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     async setRoles(
         @Param('id') id: string,
         @Body() body: SetRolesDto,
@@ -102,8 +102,8 @@ export class AccountsController {
      * 更新頁面權限配置 - 需要 Owner 權限
      */
     @Patch('page-permissions/:pageKey')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.OWNER)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.OWNER)
     async updatePagePermission(
         @Param('pageKey') pageKey: string,
         @Body() body: UpdatePagePermissionDto,
@@ -121,8 +121,8 @@ export class AccountsController {
      * 獲取待審核帳號列表 - 需要理事長或以上權限
      */
     @Get('pending')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     getPendingAccounts() {
         return this.accountsService.getPendingAccounts();
     }
@@ -131,8 +131,8 @@ export class AccountsController {
      * 審批帳號 - 需要理事長或以上權限
      */
     @Patch(':id/approve')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     async approveAccount(
         @Param('id') id: string,
         @Request() req: { user: { id: string } }
@@ -144,8 +144,8 @@ export class AccountsController {
      * 拒絕帳號 - 需要理事長或以上權限
      */
     @Patch(':id/reject')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     async rejectAccount(
         @Param('id') id: string,
         @Body() body: { reason?: string },
@@ -158,8 +158,8 @@ export class AccountsController {
      * 刪除帳號 - 僅限一般民眾 (level 0)
      */
     @Delete(':id')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     async deleteAccount(
         @Param('id') id: string,
         @Request() req: { user: { roleLevel: number } }
@@ -171,8 +171,8 @@ export class AccountsController {
      * 加入黑名單 - 僅限一般民眾 (level 0)
      */
     @Patch(':id/blacklist')
-    @UseGuards(JwtAuthGuard, RolesGuard)
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     async blacklistAccount(
         @Param('id') id: string,
         @Body() body: { reason?: string },

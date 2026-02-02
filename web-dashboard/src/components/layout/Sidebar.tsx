@@ -1,28 +1,26 @@
+/**
+ * Sidebar.tsx
+ * 
+ * Expert Council Navigation Design v3.0
+ * 8-Group Collapsible Sidebar with Emergency Quick Actions
+ * Per expert_council_navigation_design.md
+ * 
+ * Features:
+ * - Emergency quick actions (always visible)
+ * - 8 collapsible navigation groups
+ * - RBAC filtering via useSidebarConfig
+ * - User menu with profile/logout
+ * - Responsive design ready
+ */
 import { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import {
-    LayoutDashboard,
-    Radio,
-    Package,
-    Users,
-    Map as MapIcon,
-    Settings,
-    User,
-    LogOut,
-    ChevronUp
-} from 'lucide-react';
+import { ChevronDown, ChevronRight, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSidebarConfig, NAV_GROUPS, ICON_MAP } from './useSidebarConfig';
+import { PermissionLevel } from './widget.types';
+import EmergencyQuickActions from './EmergencyQuickActions';
 import LoginModal from '../auth/LoginModal';
-
-// ===== Nav Data =====
-export const NAV_ITEMS = [
-    { id: 'dashboard', path: '/dashboard', icon: LayoutDashboard, label: '指揮艙' },
-    { id: 'map', path: '/map', icon: MapIcon, label: '戰術地圖' },
-    { id: 'events', path: '/events', icon: Radio, label: '災情通報' },
-    { id: 'resources', path: '/resources', icon: Package, label: '物資庫房' },
-    { id: 'team', path: '/volunteers', icon: Users, label: '部隊管理' },
-    { id: 'settings', path: '/settings', icon: Settings, label: '系統設定' },
-];
+import './Sidebar.css';
 
 export default function Sidebar() {
     const location = useLocation();
@@ -30,6 +28,19 @@ export default function Sidebar() {
     const { user, logout } = useAuth();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+    // Get user permission level (default to Volunteer for logged in, Anonymous otherwise)
+    const userLevel = user 
+        ? (user.roleLevel ?? PermissionLevel.Volunteer)
+        : PermissionLevel.Anonymous;
+
+    // Get filtered nav items and groups
+    const {
+        navGroups,
+        groupedItems,
+        collapsedGroups,
+        toggleGroup,
+    } = useSidebarConfig(userLevel);
 
     const handleAvatarClick = () => {
         if (!user) {
@@ -47,64 +58,106 @@ export default function Sidebar() {
 
     return (
         <>
-            <aside className="v2-nav-rail">
-                <div className="v2-logo" title="Light Keepers Tactical V2">
-                    LK
+            <aside className="v3-sidebar">
+                {/* Logo */}
+                <div className="v3-logo" title="Light Keepers Tactical V3">
+                    <span className="v3-logo-icon">LK</span>
+                    <span className="v3-logo-text">光守護者</span>
                 </div>
 
-                <nav className="v2-nav-items">
-                    {NAV_ITEMS.map(item => {
-                        const Icon = item.icon;
-                        const isActive = location.pathname.startsWith(item.path);
-                        return (
-                            <Link
-                                key={item.id}
-                                to={item.path}
-                                className={`v2-nav-item ${isActive ? 'active' : ''}`}
-                                title={item.label}
-                            >
-                                <Icon strokeWidth={1.5} size={24} />
-                            </Link>
-                        );
-                    })}
+                {/* Emergency Quick Actions */}
+                <EmergencyQuickActions />
+
+                {/* Navigation Groups */}
+                <nav className="v3-nav-groups">
+                    {navGroups
+                        .filter(group => group.id !== 'emergency') // Emergency is handled separately
+                        .map(group => {
+                            const items = groupedItems[group.id] || [];
+                            if (items.length === 0) return null;
+
+                            const isCollapsed = collapsedGroups.has(group.id);
+                            const GroupIcon = ICON_MAP[group.icon] || User;
+
+                            return (
+                                <div key={group.id} className="v3-nav-group">
+                                    <button
+                                        className="v3-nav-group-header"
+                                        onClick={() => toggleGroup(group.id)}
+                                        aria-expanded={!isCollapsed}
+                                    >
+                                        <span className="v3-nav-group-icon">
+                                            <GroupIcon size={16} strokeWidth={1.5} />
+                                        </span>
+                                        <span className="v3-nav-group-label">{group.label}</span>
+                                        <span className="v3-nav-group-chevron">
+                                            {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+                                        </span>
+                                    </button>
+
+                                    {!isCollapsed && (
+                                        <div className="v3-nav-group-items">
+                                            {items.map(item => {
+                                                const ItemIcon = ICON_MAP[item.icon] || User;
+                                                const isActive = location.pathname === item.path ||
+                                                    location.pathname.startsWith(item.path + '/');
+
+                                                return (
+                                                    <Link
+                                                        key={item.id}
+                                                        to={item.path}
+                                                        className={`v3-nav-item ${isActive ? 'active' : ''}`}
+                                                        title={item.label}
+                                                    >
+                                                        <ItemIcon size={18} strokeWidth={1.5} />
+                                                        <span>{item.label}</span>
+                                                    </Link>
+                                                );
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
+                            );
+                        })}
                 </nav>
 
-                <div className="relative">
+                {/* User Section */}
+                <div className="v3-user-section">
                     {/* User Menu Popover */}
                     {isUserMenuOpen && user && (
-                        <div className="absolute bottom-full left-4 mb-2 w-48 bg-[#1D2635] border border-[#2F3641] rounded-md shadow-xl overflow-hidden z-50 animate-in fade-in slide-in-from-bottom-2">
-                            <div className="px-4 py-3 border-b border-[#2F3641]/50 bg-[#13171F]/50">
-                                <p className="text-xs text-white font-bold truncate">{user.displayName || 'Operator'}</p>
-                                <p className="text-[10px] text-gray-500 font-mono truncate">{user.email}</p>
+                        <div className="v3-user-menu">
+                            <div className="v3-user-menu-header">
+                                <p className="v3-user-name">{user.displayName || 'Operator'}</p>
+                                <p className="v3-user-email">{user.email}</p>
                             </div>
                             <button
                                 onClick={() => { setIsUserMenuOpen(false); navigate('/profile'); }}
-                                className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-[#2F3641] hover:text-white transition-colors flex items-center gap-2"
+                                className="v3-user-menu-item"
                             >
-                                <User size={14} /> Profile
+                                <User size={14} />
+                                個人檔案
                             </button>
                             <button
                                 onClick={handleLogout}
-                                className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-[#2F3641] hover:text-red-300 transition-colors flex items-center gap-2"
+                                className="v3-user-menu-item v3-user-menu-item--danger"
                             >
-                                <LogOut size={14} /> Logout
+                                <LogOut size={14} />
+                                登出
                             </button>
                         </div>
                     )}
 
                     <button
-                        className={`v2-nav-user ${isUserMenuOpen ? 'ring-2 ring-[#C39B6F]' : ''}`}
+                        className={`v3-user-avatar ${isUserMenuOpen ? 'active' : ''}`}
                         onClick={handleAvatarClick}
-                        title={user ? "User Menu" : "Login"}
+                        title={user ? "使用者選單" : "登入"}
                     >
                         {user?.avatarUrl ? (
-                            <img src={user.avatarUrl} alt="User" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                            <img src={user.avatarUrl} alt="User" />
                         ) : (
-                            <User size={24} color="#94A3B8" style={{ margin: 'auto' }} />
+                            <User size={20} strokeWidth={1.5} />
                         )}
-                        {user && (
-                            <div className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-green-500 rounded-full border border-[#0F1218]"></div>
-                        )}
+                        {user && <span className="v3-user-status online" />}
                     </button>
                 </div>
             </aside>
@@ -114,3 +167,6 @@ export default function Sidebar() {
         </>
     );
 }
+
+// Export NAV_ITEMS for backward compatibility
+export { NAV_GROUPS as NAV_ITEMS };

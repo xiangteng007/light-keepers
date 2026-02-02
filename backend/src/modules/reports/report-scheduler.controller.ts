@@ -18,11 +18,11 @@ import {
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReportSchedulerService, ScheduledReport } from './services/report-scheduler.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Report Scheduler')
 @Controller('reports/scheduler')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class ReportSchedulerController {
     constructor(private readonly schedulerService: ReportSchedulerService) { }

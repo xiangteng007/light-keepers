@@ -220,7 +220,7 @@ export const translations = {
  * Get translation by key
  */
 export function t(key: TranslationKey, locale: Locale = DEFAULT_LOCALE, params?: Record<string, string | number>): string {
-    let text = translations[locale]?.[key] || translations[DEFAULT_LOCALE][key] || key;
+    let text: string = translations[locale]?.[key] || translations[DEFAULT_LOCALE][key] || key;
     
     // Replace parameters
     if (params) {

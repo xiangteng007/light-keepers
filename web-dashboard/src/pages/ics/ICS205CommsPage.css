@@ -1,0 +1,309 @@
+/**
+ * ICS205CommsPage.css
+ * 
+ * ICS Form 205 - Communications Plan styling
+ */
+
+.ics205-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #0F172A;
+    color: #E5E7EB;
+}
+
+/* Header */
+.ics205-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ics205-header-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.ics205-back {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 150ms ease;
+}
+
+.ics205-back:hover {
+    color: #D4AF37;
+}
+
+.ics205-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ics205-title svg {
+    color: #3B82F6;
+}
+
+.ics205-title h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.ics205-title p {
+    margin: 0;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.ics205-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ics205-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics205-btn.primary {
+    background: #D4AF37;
+    color: #0F172A;
+}
+
+.ics205-btn.primary:hover {
+    background: #E8C547;
+}
+
+.ics205-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ics205-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Content */
+.ics205-content {
+    flex: 1;
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.ics205-section {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+}
+
+.ics205-section h2 {
+    margin: 0 0 16px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #3B82F6;
+}
+
+.ics205-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.ics205-section-header h2 {
+    margin: 0;
+}
+
+.ics205-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.ics205-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ics205-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.ics205-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ics205-field input,
+.ics205-field textarea,
+.ics205-field select {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #E5E7EB;
+    font-size: 14px;
+    transition: all 150ms ease;
+}
+
+.ics205-field input:focus,
+.ics205-field textarea:focus {
+    outline: none;
+    border-color: #3B82F6;
+    background: rgba(59, 130, 246, 0.05);
+}
+
+/* Table */
+.ics205-table-container {
+    overflow-x: auto;
+}
+
+.ics205-channels-table {
+    width: 100%;
+    min-width: 900px;
+    border-collapse: collapse;
+}
+
+.ics205-channels-table th {
+    text-align: left;
+    padding: 10px 8px;
+    background: rgba(59, 130, 246, 0.1);
+    font-size: 11px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ics205-channels-table td {
+    padding: 6px 4px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.ics205-channels-table input,
+.ics205-channels-table select {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 4px;
+    color: #E5E7EB;
+    font-size: 13px;
+}
+
+.ics205-channels-table input:focus,
+.ics205-channels-table select:focus {
+    outline: none;
+    border-color: #3B82F6;
+}
+
+.ics205-channels-table select {
+    cursor: pointer;
+}
+
+.ics205-add-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+    border-radius: 6px;
+    color: #3B82F6;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics205-add-btn:hover {
+    background: rgba(59, 130, 246, 0.2);
+}
+
+.ics205-delete-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics205-delete-btn:hover {
+    background: rgba(239, 68, 68, 0.1);
+    color: #EF4444;
+}
+
+/* Footer */
+.ics205-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 12px;
+    color: #6B7280;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ics205-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .ics205-form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .ics205-page {
+        background: white;
+        color: black;
+    }
+    
+    .ics205-header,
+    .ics205-footer,
+    .ics205-add-btn,
+    .ics205-delete-btn {
+        display: none;
+    }
+}

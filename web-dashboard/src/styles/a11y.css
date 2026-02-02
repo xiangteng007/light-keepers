@@ -222,3 +222,41 @@ small,
 .text-sm {
     font-size: max(14px, 0.875rem);
 }
+
+/* ===== 鍵盤導航增強 (Tab/Arrow) ===== */
+.v3-nav-groups:focus-within {
+    outline: none;
+}
+
+.v3-nav-group-header:focus-visible {
+    outline: 2px solid var(--color-gold-400, #D4AF37);
+    outline-offset: -2px;
+    background: rgba(212, 175, 55, 0.1);
+}
+
+.v3-nav-item:focus-visible {
+    outline: 2px solid var(--color-gold-400, #D4AF37);
+    outline-offset: -2px;
+    background: rgba(212, 175, 55, 0.15);
+}
+
+/* Tab sequence visual indicator */
+[data-focus-scope]:focus-within::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--color-gold-400, #D4AF37);
+    border-radius: 0 2px 2px 0;
+}
+
+/* Keyboard mode indicator */
+body.keyboard-nav *:focus {
+    outline-style: solid !important;
+}
+
+body.keyboard-nav *:focus:not(:focus-visible) {
+    outline: none !important;
+}

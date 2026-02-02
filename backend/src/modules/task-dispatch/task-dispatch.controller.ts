@@ -10,8 +10,7 @@ import {
     UseGuards,
     Request,
 } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard, MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { TaskDispatchService } from './task-dispatch.service';
 import {
@@ -25,7 +24,7 @@ import {
 import { TaskStatus, TaskPriority } from './entities/dispatch-task.entity';
 
 @Controller('tasks')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class TaskDispatchController {
     constructor(private readonly taskService: TaskDispatchService) { }
 
@@ -33,7 +32,7 @@ export class TaskDispatchController {
      * Create a new task
      */
     @Post()
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     async createTask(@Body() dto: CreateTaskDto, @Request() req: any) {
         const task = await this.taskService.createTask(dto, req.user.id);
         return task;
@@ -43,7 +42,7 @@ export class TaskDispatchController {
      * Get tasks for a mission (via query param)
      */
     @Get()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async getTasks(
         @Query('missionSessionId') missionSessionId: string,
         @Query('status') status?: TaskStatus,
@@ -60,7 +59,7 @@ export class TaskDispatchController {
      * Get tasks assigned to current user
      */
     @Get('my')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async getMyTasks(@Request() req: any) {
         return this.taskService.getVolunteerTasks(req.user.id);
     }
@@ -69,7 +68,7 @@ export class TaskDispatchController {
      * Get a single task
      */
     @Get(':id')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async getTask(@Param('id') id: string) {
         return this.taskService.getTaskById(id);
     }
@@ -78,7 +77,7 @@ export class TaskDispatchController {
      * Update a task
      */
     @Patch(':id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     async updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
         return this.taskService.updateTask(id, dto);
     }
@@ -87,7 +86,7 @@ export class TaskDispatchController {
      * Assign task to volunteers
      */
     @Post(':id/assign')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     async assignTask(
         @Param('id') id: string,
         @Body() dto: AssignTaskDto,
@@ -103,7 +102,7 @@ export class TaskDispatchController {
      * Accept a task assignment
      */
     @Post(':id/accept')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async acceptTask(
         @Param('id') id: string,
         @Body() dto: AcceptTaskDto,
@@ -116,7 +115,7 @@ export class TaskDispatchController {
      * Decline a task assignment
      */
     @Post(':id/decline')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async declineTask(
         @Param('id') id: string,
         @Body() dto: DeclineTaskDto,
@@ -129,7 +128,7 @@ export class TaskDispatchController {
      * Start working on a task
      */
     @Post(':id/start')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async startTask(@Param('id') id: string, @Request() req: any) {
         return this.taskService.startTask(id, req.user.id);
     }
@@ -138,7 +137,7 @@ export class TaskDispatchController {
      * Complete a task
      */
     @Post(':id/complete')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async completeTask(
         @Param('id') id: string,
         @Body() dto: CompleteTaskDto,
@@ -151,7 +150,7 @@ export class TaskDispatchController {
      * Cancel a task
      */
     @Delete(':id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     async cancelTask(@Param('id') id: string, @Query('reason') reason?: string) {
         return this.taskService.cancelTask(id, reason);
     }
@@ -160,7 +159,7 @@ export class TaskDispatchController {
      * Get task statistics for a mission
      */
     @Get('stats/:missionSessionId')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async getStats(@Param('missionSessionId') missionSessionId: string) {
         return this.taskService.getMissionStats(missionSessionId);
     }
@@ -169,7 +168,7 @@ export class TaskDispatchController {
      * 🆕 Check-in to a task with GPS validation
      */
     @Post(':id/checkin')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async checkIn(
         @Param('id') id: string,
         @Body() dto: { latitude: number; longitude: number; note?: string },
@@ -186,7 +185,7 @@ export class TaskDispatchController {
      * 🆕 Check-out from a task
      */
     @Post(':id/checkout')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     async checkOut(
         @Param('id') id: string,
         @Body() dto: { latitude?: number; longitude?: number; notes?: string },

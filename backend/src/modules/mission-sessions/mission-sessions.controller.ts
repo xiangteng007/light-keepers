@@ -12,98 +12,98 @@ import { MissionSessionsService } from './mission-sessions.service';
 import { CreateMissionSessionDto, UpdateMissionSessionDto } from './dto/mission-session.dto';
 import { CreateEventDto } from './dto/event.dto';
 import { CreateTaskDto, UpdateTaskDto } from './dto/task.dto';
-import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 
 @Controller('mission-sessions')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class MissionSessionsController {
     constructor(private readonly service: MissionSessionsService) { }
 
     // Mission Session endpoints - Level 2 (Officer) and above can create
     @Post()
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     createSession(@Body() dto: CreateMissionSessionDto) {
         return this.service.createSession(dto);
     }
 
     @Get()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     findAllSessions() {
         return this.service.findAllSessions();
     }
 
     @Get(':id')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     findSession(@Param('id') id: string) {
         return this.service.findSessionById(id);
     }
 
     @Put(':id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     updateSession(@Param('id') id: string, @Body() dto: UpdateMissionSessionDto) {
         return this.service.updateSession(id, dto);
     }
 
     @Post(':id/start')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     startSession(@Param('id') id: string) {
         return this.service.startSession(id);
     }
 
     @Post(':id/end')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     endSession(@Param('id') id: string) {
         return this.service.endSession(id);
     }
 
     @Delete(':id')
-    @MinLevel(RoleLevel.CHAIRMAN)
+    @RequiredLevel(RoleLevel.CHAIRMAN)
     deleteSession(@Param('id') id: string) {
         return this.service.deleteSession(id);
     }
 
     // Event endpoints
     @Post('events')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     createEvent(@Body() dto: CreateEventDto) {
         return this.service.createEvent(dto);
     }
 
     @Get(':sessionId/events')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     findEvents(@Param('sessionId') sessionId: string) {
         return this.service.findEventsBySession(sessionId);
     }
 
     // Task endpoints
     @Post('tasks')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     createTask(@Body() dto: CreateTaskDto) {
         return this.service.createTask(dto);
     }
 
     @Get(':sessionId/tasks')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     findTasks(@Param('sessionId') sessionId: string) {
         return this.service.findTasksBySession(sessionId);
     }
 
     @Put('tasks/:id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     updateTask(@Param('id') id: string, @Body() dto: UpdateTaskDto) {
         return this.service.updateTask(id, dto);
     }
 
     @Delete('tasks/:id')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     deleteTask(@Param('id') id: string) {
         return this.service.deleteTask(id);
     }
 
     // Statistics
     @Get(':id/stats')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     getStats(@Param('id') id: string) {
         return this.service.getSessionStats(id);
     }

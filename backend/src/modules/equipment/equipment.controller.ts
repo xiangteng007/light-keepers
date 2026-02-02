@@ -5,13 +5,13 @@
 
 import { Controller, Get, Post, Put, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { EquipmentService } from './equipment.service';
 import { Equipment, EquipmentCategory, EquipmentStatus } from './entities';
 
 @ApiTags('equipment')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('equipment')
 export class EquipmentController {
     constructor(private readonly equipmentService: EquipmentService) { }

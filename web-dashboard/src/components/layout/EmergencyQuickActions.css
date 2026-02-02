@@ -1,0 +1,118 @@
+/**
+ * EmergencyQuickActions.css
+ * 
+ * Expert Council Navigation Design v3.0
+ * Emergency section styling with high-contrast colors
+ */
+
+.emergency-quick-actions {
+    padding: 8px;
+    margin-bottom: 8px;
+    border-bottom: 1px solid rgba(239, 68, 68, 0.3);
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+}
+
+.emergency-label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #ef4444;
+    padding: 4px 8px;
+    margin-bottom: 6px;
+}
+
+.pulse-dot {
+    width: 6px;
+    height: 6px;
+    background-color: #ef4444;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.2); }
+}
+
+.emergency-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.emergency-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 10px 4px;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 150ms ease;
+    border: 1px solid transparent;
+}
+
+.emergency-btn-label {
+    font-size: 10px;
+    font-weight: 500;
+}
+
+/* Critical (Red) */
+.emergency-btn--critical {
+    background: rgba(239, 68, 68, 0.15);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.3);
+}
+
+.emergency-btn--critical:hover {
+    background: rgba(239, 68, 68, 0.25);
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.emergency-btn--critical.active {
+    background: #ef4444;
+    color: #ffffff;
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
+}
+
+/* Warning (Orange) */
+.emergency-btn--warning {
+    background: rgba(245, 158, 11, 0.15);
+    color: #fcd34d;
+    border-color: rgba(245, 158, 11, 0.3);
+}
+
+.emergency-btn--warning:hover {
+    background: rgba(245, 158, 11, 0.25);
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.emergency-btn--warning.active {
+    background: #f59e0b;
+    color: #000000;
+}
+
+/* Info (Blue) */
+.emergency-btn--info {
+    background: rgba(59, 130, 246, 0.15);
+    color: #93c5fd;
+    border-color: rgba(59, 130, 246, 0.3);
+}
+
+.emergency-btn--info:hover {
+    background: rgba(59, 130, 246, 0.25);
+    color: #ffffff;
+    transform: scale(1.02);
+}
+
+.emergency-btn--info.active {
+    background: #3b82f6;
+    color: #ffffff;
+}

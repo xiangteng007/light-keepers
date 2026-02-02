@@ -41,6 +41,9 @@ import { MetricsModule } from './modules/metrics/metrics.module';
 import { TriageModule } from './modules/triage/triage.module';
 import { LocationModule } from './modules/location/location.module';
 import { TaskDispatchModule } from './modules/task-dispatch/task-dispatch.module';
+// E2E Scenario Modules
+import { SheltersModule } from './modules/shelters/shelters.module';
+import { StructuralAssessmentModule } from './modules/structural-assessment/structural-assessment.module';
 // Core Domains 聚合模組
 import { CoreDomainsModule } from './core/core-domains.module';
 // ==============================================
@@ -274,6 +277,9 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         TaskDispatchModule, // 🔄 智慧任務派遣
         // Core Domains 聚合
         CoreDomainsModule, // 🏛️ 核心領域聚合
+        // E2E Scenario Modules
+        SheltersModule, // 🏠 避難所管理
+        StructuralAssessmentModule, // 🏗️ 建物結構評估
         // ==============================================
         // Batch 2: E2E Closed Loop Modules
         // ==============================================

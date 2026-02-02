@@ -5,7 +5,7 @@
 
 import { Controller, Get, Post, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoutingService, RouteRequest, RoadBlock, GeoPoint } from './routing.service';
 
 class AddRoadBlockDto {
@@ -28,7 +28,7 @@ class CalculateRouteDto {
 
 @ApiTags('routing')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('routing')
 export class RoutingController {
     constructor(private readonly routingService: RoutingService) { }

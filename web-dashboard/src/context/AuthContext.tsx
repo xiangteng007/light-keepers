@@ -28,6 +28,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isAnonymous: boolean;
     isLoading: boolean;
+    authReady: boolean;  // 🔐 Auth Ready Gating：權限狀態已確定
     login: (token: string, remember?: boolean) => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
@@ -211,6 +212,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated,
         isAnonymous,
         isLoading,
+        authReady: !isLoading,  // 🔐 Auth Ready = 載入完成
         login,
         logout,
         refreshUser,

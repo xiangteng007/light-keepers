@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Light Keepers</string>
+    <string name="title_activity_main">Light Keepers</string>
+    <string name="package_name">org.lightkeepers.disaster</string>
+    <string name="custom_url_scheme">org.lightkeepers.disaster</string>
+</resources>

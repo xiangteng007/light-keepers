@@ -142,5 +142,4 @@ export function validateAssessment(assessment: Partial<TriageAssessment>): boole
     if (!assessment.canWalk && assessment.isBreathing === undefined) return false;
     return true;
 }
-</Parameter>
-<parameter name="Complexity">5
+

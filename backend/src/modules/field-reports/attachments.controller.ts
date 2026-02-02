@@ -1,20 +1,19 @@
 import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { AttachmentsService } from './attachments.service';
 import { InitiateUploadDto, CompleteUploadDto, PhotoEvidenceQueryDto } from './dto';
 
 @ApiTags('Attachments')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller()
 export class AttachmentsController {
     constructor(private readonly service: AttachmentsService) { }
 
     @Post('reports/:reportId/attachments/initiate')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Initiate attachment upload' })
     async initiate(
         @Param('reportId') reportId: string,
@@ -26,7 +25,7 @@ export class AttachmentsController {
     }
 
     @Post('reports/:reportId/attachments/:attachmentId/complete')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Complete attachment upload' })
     async complete(
         @Param('attachmentId') attachmentId: string,
@@ -36,7 +35,7 @@ export class AttachmentsController {
     }
 
     @Get('mission-sessions/:missionSessionId/photo-evidence')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Get photo evidence for map layer' })
     async getPhotoEvidence(
         @Param('missionSessionId') missionSessionId: string,

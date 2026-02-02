@@ -20,9 +20,9 @@ import {
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { OAuthService } from './services/oauth.service';
 import { AuthService } from './auth.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { ConfigService } from '@nestjs/config';
 
 @ApiTags('OAuth')
@@ -103,7 +103,7 @@ export class AuthOAuthController {
     }
 
     @Post('link/line')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Link LINE account to current user' })
     @ApiQuery({ name: 'code', required: true, description: 'LINE authorization code' })
@@ -129,7 +129,7 @@ export class AuthOAuthController {
     }
 
     @Delete('link/line')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Unlink LINE account from current user' })
     async unlinkLine(@Req() req: Request) {
@@ -205,7 +205,7 @@ export class AuthOAuthController {
     }
 
     @Post('link/google')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Link Google account to current user' })
     @ApiQuery({ name: 'code', required: true, description: 'Google authorization code' })
@@ -231,7 +231,7 @@ export class AuthOAuthController {
     }
 
     @Delete('link/google')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: 'Unlink Google account from current user' })
     async unlinkGoogle(@Req() req: Request) {

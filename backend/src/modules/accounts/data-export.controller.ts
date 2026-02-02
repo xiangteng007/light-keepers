@@ -19,11 +19,11 @@ import {
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
 import { DataExportService } from './services/data-export.service';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Data Export')
 @Controller('account/export')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class DataExportController {
     constructor(private readonly dataExportService: DataExportService) { }

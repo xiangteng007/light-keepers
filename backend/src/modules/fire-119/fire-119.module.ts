@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { Fire119Service } from './fire-119.service';
 import { Fire119DeepIntegrationService } from './fire-119-deep.service';
+import { Fire119Controller } from './fire-119.controller';
 
 /**
  * Fire 119 Module
@@ -19,6 +20,7 @@ import { Fire119DeepIntegrationService } from './fire-119-deep.service';
         ConfigModule,
         EventEmitterModule.forRoot(),
     ],
+    controllers: [Fire119Controller],
     providers: [
         Fire119Service,
         Fire119DeepIntegrationService,
@@ -29,4 +31,5 @@ import { Fire119DeepIntegrationService } from './fire-119-deep.service';
     ],
 })
 export class Fire119Module { }
+
 

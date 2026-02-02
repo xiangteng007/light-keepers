@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { login as apiLogin } from '../../api/services';
 import { ShieldCheck, Activity, AlertTriangle, X } from 'lucide-react';
@@ -8,14 +9,26 @@ interface LoginModalProps {
     onClose: () => void;
 }
 
+/**
+ * Login Modal Component
+ * 
+ * 🔐 PR-04: Deep Link Protection
+ * - 登入成功後自動導回 intended route（來自 ProtectedRoute 的 state.from）
+ * - 若無 intended route，則停留在當前頁面
+ */
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const { login } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     if (!isOpen) return null;
+
+    // 🔐 PR-04: 從 location.state 取得 intended route
+    const intendedRoute = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,6 +43,11 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             if (response.data && response.data.accessToken) {
                 await login(response.data.accessToken);
                 onClose(); // Close modal on success
+                
+                // 🔐 PR-04: 登入成功後導回 intended route
+                if (intendedRoute && intendedRoute !== '/') {
+                    navigate(intendedRoute, { replace: true });
+                }
             } else {
                 throw new Error('No access token received');
             }
@@ -63,6 +81,8 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     <button
                         onClick={onClose}
                         className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
+                        aria-label="關閉登入視窗"
+                        title="關閉"
                     >
                         <X size={20} />
                     </button>

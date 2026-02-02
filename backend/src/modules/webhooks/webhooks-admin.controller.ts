@@ -19,9 +19,7 @@ import {
     Logger,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiQuery, ApiBody } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { RequireLevel } from '../auth/decorators/require-level.decorator';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import {
     WebhookSubscriptionService,
     CreateSubscriptionDto,
@@ -32,7 +30,7 @@ import { WebhookEventType } from './entities/webhook-subscription.entity';
 
 @ApiTags('Webhooks')
 @Controller('webhooks')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class WebhooksController {
     private readonly logger = new Logger(WebhooksController.name);
@@ -46,7 +44,7 @@ export class WebhooksController {
 
     @Get('subscriptions')
     @ApiOperation({ summary: 'List all webhook subscriptions' })
-    @RequireLevel(3)
+    @RequiredLevel(3)
     async listSubscriptions(@Query('tenantId') tenantId?: string) {
         const subscriptions = await this.subscriptionService.findAll(tenantId);
         return {
@@ -58,7 +56,7 @@ export class WebhooksController {
 
     @Get('subscriptions/:id')
     @ApiOperation({ summary: 'Get a webhook subscription by ID' })
-    @RequireLevel(3)
+    @RequiredLevel(3)
     async getSubscription(@Param('id') id: string) {
         const subscription = await this.subscriptionService.findById(id);
         return {
@@ -69,7 +67,7 @@ export class WebhooksController {
 
     @Post('subscriptions')
     @ApiOperation({ summary: 'Create a new webhook subscription' })
-    @RequireLevel(4)
+    @RequiredLevel(4)
     @ApiBody({
         schema: {
             type: 'object',
@@ -93,7 +91,7 @@ export class WebhooksController {
 
     @Put('subscriptions/:id')
     @ApiOperation({ summary: 'Update a webhook subscription' })
-    @RequireLevel(4)
+    @RequiredLevel(4)
     async updateSubscription(
         @Param('id') id: string,
         @Body() dto: UpdateSubscriptionDto,
@@ -108,7 +106,7 @@ export class WebhooksController {
 
     @Delete('subscriptions/:id')
     @ApiOperation({ summary: 'Delete a webhook subscription' })
-    @RequireLevel(5)
+    @RequiredLevel(5)
     async deleteSubscription(@Param('id') id: string) {
         await this.subscriptionService.delete(id);
         return {
@@ -119,7 +117,7 @@ export class WebhooksController {
 
     @Post('subscriptions/:id/regenerate-secret')
     @ApiOperation({ summary: 'Regenerate webhook secret' })
-    @RequireLevel(4)
+    @RequiredLevel(4)
     async regenerateSecret(@Param('id') id: string) {
         const newSecret = await this.subscriptionService.regenerateSecret(id);
         return {
@@ -131,7 +129,7 @@ export class WebhooksController {
 
     @Post('subscriptions/:id/test')
     @ApiOperation({ summary: 'Test a webhook endpoint' })
-    @RequireLevel(3)
+    @RequiredLevel(3)
     async testSubscription(@Param('id') id: string) {
         const result = await this.subscriptionService.testEndpoint(id);
         return {
@@ -143,7 +141,7 @@ export class WebhooksController {
 
     @Post('subscriptions/:id/enable')
     @ApiOperation({ summary: 'Enable a webhook subscription' })
-    @RequireLevel(4)
+    @RequiredLevel(4)
     async enableSubscription(@Param('id') id: string) {
         const subscription = await this.subscriptionService.update(id, { active: true });
         return {
@@ -155,7 +153,7 @@ export class WebhooksController {
 
     @Post('subscriptions/:id/disable')
     @ApiOperation({ summary: 'Disable a webhook subscription' })
-    @RequireLevel(4)
+    @RequiredLevel(4)
     async disableSubscription(@Param('id') id: string) {
         const subscription = await this.subscriptionService.update(id, { active: false });
         return {
@@ -169,7 +167,7 @@ export class WebhooksController {
 
     @Get('event-types')
     @ApiOperation({ summary: 'List all available webhook event types' })
-    @RequireLevel(2)
+    @RequiredLevel(2)
     async getEventTypes() {
         const eventTypes = Object.values(WebhookEventType);
         return {
@@ -213,7 +211,7 @@ export class WebhooksController {
     @ApiOperation({ summary: 'Get webhook delivery logs' })
     @ApiQuery({ name: 'subscriptionId', required: false })
     @ApiQuery({ name: 'limit', required: false, type: Number })
-    @RequireLevel(3)
+    @RequiredLevel(3)
     async getDeliveryLogs(
         @Query('subscriptionId') subscriptionId?: string,
         @Query('limit') limit?: number,
@@ -228,7 +226,7 @@ export class WebhooksController {
 
     @Get('stats')
     @ApiOperation({ summary: 'Get webhook statistics' })
-    @RequireLevel(3)
+    @RequiredLevel(3)
     async getStats(@Query('subscriptionId') subscriptionId?: string) {
         const [subStats, deliveryStats] = await Promise.all([
             this.subscriptionService.getStats(),
@@ -248,7 +246,7 @@ export class WebhooksController {
 
     @Post('dispatch')
     @ApiOperation({ summary: 'Manually dispatch a webhook event (testing)' })
-    @RequireLevel(5)
+    @RequiredLevel(5)
     @ApiBody({
         schema: {
             type: 'object',

@@ -5,7 +5,7 @@
  */
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { HxlExportService, HxlExportOptions } from './services/hxl-export.service';
 import { IatiReportingService } from './services/iati-reporting.service';
 import { ThreeWMatrixService } from './services/three-w-matrix.service';
@@ -13,7 +13,7 @@ import { SphereStandardsService, SphereStandardCategory } from './services/spher
 
 @ApiTags('Humanitarian Standards')
 @Controller('api/v1/humanitarian-standards')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class HumanitarianStandardsController {
     constructor(

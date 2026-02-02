@@ -1,0 +1,400 @@
+/**
+ * ICS201BriefingPage.css
+ * 
+ * ICS Form 201 - Incident Briefing styling
+ */
+
+.ics201-page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background: #0F172A;
+    color: #E5E7EB;
+}
+
+/* Header */
+.ics201-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ics201-header-left {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.ics201-back {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 13px;
+    transition: color 150ms ease;
+}
+
+.ics201-back:hover {
+    color: #D4AF37;
+}
+
+.ics201-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.ics201-title svg {
+    color: #D4AF37;
+}
+
+.ics201-title h1 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.ics201-title p {
+    margin: 0;
+    font-size: 12px;
+    color: #9CA3AF;
+}
+
+.ics201-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.ics201-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics201-btn.primary {
+    background: #D4AF37;
+    color: #0F172A;
+}
+
+.ics201-btn.primary:hover {
+    background: #E8C547;
+}
+
+.ics201-btn.secondary {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ics201-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Section Navigation */
+.ics201-sections-nav {
+    display: flex;
+    gap: 4px;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    overflow-x: auto;
+}
+
+.ics201-section-tab {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    border-radius: 6px;
+    color: #9CA3AF;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 150ms ease;
+}
+
+.ics201-section-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+}
+
+.ics201-section-tab.active {
+    background: rgba(212, 175, 55, 0.1);
+    color: #D4AF37;
+}
+
+.ics201-section-tab:focus-visible {
+    outline: 2px solid #D4AF37;
+    outline-offset: 2px;
+}
+
+/* Form Content */
+.ics201-content {
+    flex: 1;
+    padding: 24px;
+    max-width: 1000px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.ics201-form-section h2 {
+    margin: 0 0 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: #D4AF37;
+}
+
+.ics201-form-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+}
+
+.ics201-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ics201-field.full-width {
+    grid-column: 1 / -1;
+}
+
+.ics201-field label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ics201-field input,
+.ics201-field textarea,
+.ics201-field select {
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #E5E7EB;
+    font-size: 14px;
+    transition: all 150ms ease;
+}
+
+.ics201-field input:focus,
+.ics201-field textarea:focus {
+    outline: none;
+    border-color: #D4AF37;
+    background: rgba(212, 175, 55, 0.05);
+}
+
+.ics201-field textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Map Placeholder */
+.ics201-map-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 48px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 2px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    color: #6B7280;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics201-map-placeholder:hover {
+    border-color: #D4AF37;
+    color: #D4AF37;
+}
+
+/* Objectives List */
+.ics201-objectives-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ics201-objective-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.ics201-obj-num {
+    width: 24px;
+    text-align: right;
+    font-weight: 600;
+    color: #D4AF37;
+}
+
+.ics201-objective-item input {
+    flex: 1;
+    padding: 10px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #E5E7EB;
+    font-size: 14px;
+}
+
+.ics201-add-btn {
+    align-self: flex-start;
+    padding: 8px 16px;
+    background: transparent;
+    border: 1px dashed rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: #9CA3AF;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 150ms ease;
+}
+
+.ics201-add-btn:hover {
+    border-color: #D4AF37;
+    color: #D4AF37;
+}
+
+/* Organization Chart */
+.ics201-org-chart {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.ics201-org-row {
+    display: grid;
+    grid-template-columns: 200px 1fr 1fr;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 6px;
+}
+
+.ics201-org-position {
+    font-weight: 500;
+    color: #D4AF37;
+    align-self: center;
+}
+
+.ics201-org-name,
+.ics201-org-contact {
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    color: #E5E7EB;
+    font-size: 14px;
+}
+
+/* Resources Table */
+.ics201-resources-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+}
+
+.ics201-resources-table th {
+    text-align: left;
+    padding: 12px;
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 12px;
+    font-weight: 600;
+    color: #9CA3AF;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ics201-resources-table td {
+    padding: 8px;
+}
+
+.ics201-resources-table input {
+    width: 100%;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    color: #E5E7EB;
+    font-size: 13px;
+}
+
+/* Footer */
+.ics201-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    font-size: 12px;
+    color: #6B7280;
+}
+
+.ics201-footer-left {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ics201-header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+    }
+    
+    .ics201-form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .ics201-org-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .ics201-org-position {
+        font-size: 12px;
+    }
+}
+
+/* Print Styles */
+@media print {
+    .ics201-page {
+        background: white;
+        color: black;
+    }
+    
+    .ics201-header,
+    .ics201-sections-nav,
+    .ics201-footer {
+        display: none;
+    }
+    
+    .ics201-content {
+        padding: 0;
+    }
+}

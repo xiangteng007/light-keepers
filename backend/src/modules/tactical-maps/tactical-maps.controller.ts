@@ -5,13 +5,13 @@
 
 import { Controller, Get, Post, Put, Delete, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { TacticalMapsService, Building3D } from './tactical-maps.service';
 import { TacticalMarker } from './entities';
 
 @ApiTags('tactical-maps')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('tactical-maps')
 export class TacticalMapsController {
     constructor(private readonly tacticalMapsService: TacticalMapsService) { }

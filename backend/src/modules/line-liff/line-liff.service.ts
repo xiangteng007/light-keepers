@@ -355,12 +355,12 @@ export class LineLiffService {
 // ==========================================
 // 類型定義
 // ==========================================
-interface LiffConfig {
+export interface LiffConfig {
     liffId: string;
     withLoginOnExternalBrowser: boolean;
 }
 
-interface RichMenuStructure {
+export interface RichMenuStructure {
     size: { width: number; height: number };
     selected: boolean;
     name: string;
@@ -368,18 +368,18 @@ interface RichMenuStructure {
     areas: RichMenuArea[];
 }
 
-interface RichMenuArea {
+export interface RichMenuArea {
     bounds: { x: number; y: number; width: number; height: number };
     action: { type: string; uri?: string; data?: string; label: string };
 }
 
-interface FlexMessage {
+export interface FlexMessage {
     type: 'flex';
     altText: string;
     contents: any;
 }
 
-interface AlertData {
+export interface AlertData {
     id: string;
     type: string;
     title: string;
@@ -389,14 +389,14 @@ interface AlertData {
     issuedAt: Date;
 }
 
-interface ReportData {
+export interface ReportData {
     id: string;
     caseNumber: string;
     type: string;
     description: string;
 }
 
-interface ShelterData {
+export interface ShelterData {
     id: string;
     name: string;
     address: string;
@@ -407,8 +407,9 @@ interface ShelterData {
     currentOccupancy: number;
 }
 
-interface CheckinData {
+export interface CheckinData {
     volunteerName: string;
     location: string;
     checkinTime: Date;
 }
+

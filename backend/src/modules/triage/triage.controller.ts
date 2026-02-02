@@ -15,7 +15,7 @@ import {
     Request,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { TriageService } from './triage.service';
 import { CreateVictimDto, UpdateTriageDto, StartTransportDto, AddMedicalLogDto } from './dto/triage.dto';
 import { Request as ExpressRequest } from 'express';
@@ -26,7 +26,7 @@ interface AuthenticatedRequest extends ExpressRequest {
 
 @ApiTags('triage')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('triage')
 export class TriageController {
     constructor(private readonly triageService: TriageService) { }

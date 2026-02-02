@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SosService } from './sos.service';
@@ -9,13 +8,13 @@ import { CreateSosDto, AckSosDto, ResolveSosDto } from './dto';
 
 @ApiTags('SOS')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller()
 export class SosController {
     constructor(private readonly service: SosService) { }
 
     @Post('mission-sessions/:missionSessionId/sos')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Trigger SOS signal' })
     async trigger(
         @Param('missionSessionId') missionSessionId: string,
@@ -26,7 +25,7 @@ export class SosController {
     }
 
     @Post('sos/:sosId/ack')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Acknowledge SOS signal' })
     async ack(
         @Param('sosId') sosId: string,
@@ -37,7 +36,7 @@ export class SosController {
     }
 
     @Post('sos/:sosId/resolve')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Resolve SOS signal' })
     async resolve(
         @Param('sosId') sosId: string,
@@ -48,7 +47,7 @@ export class SosController {
     }
 
     @Get('mission-sessions/:missionSessionId/sos/active')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Get active SOS signals' })
     async getActive(
         @Param('missionSessionId') missionSessionId: string,

@@ -108,7 +108,7 @@ export const SkipToContent: React.FC<{ targetId?: string }> = ({ targetId = 'mai
 /**
  * Visually hidden component for screen readers
  */
-export const VisuallyHidden: React.FC<{ children: React.ReactNode; as?: keyof JSX.IntrinsicElements }> = ({ 
+export const VisuallyHidden: React.FC<{ children: React.ReactNode; as?: React.ElementType }> = ({ 
     children, 
     as: Component = 'span' 
 }) => {

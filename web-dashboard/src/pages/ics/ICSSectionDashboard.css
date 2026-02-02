@@ -1,0 +1,241 @@
+/**
+ * ICSSectionDashboard.css
+ * 
+ * Expert Council Navigation Design v3.0
+ * ICS Section Dashboard styling
+ */
+
+.ics-dashboard {
+    padding: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Error State */
+.ics-dashboard__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 64px;
+    color: #9CA3AF;
+    text-align: center;
+}
+
+.ics-dashboard__error a {
+    color: #D4AF37;
+    text-decoration: none;
+}
+
+/* Header */
+.ics-dashboard__header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.ics-dashboard__title {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+}
+
+.ics-dashboard__icon {
+    color: var(--section-color, #D4AF37);
+    flex-shrink: 0;
+}
+
+.ics-dashboard__title h1 {
+    margin: 0 0 4px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #E5E7EB;
+}
+
+.ics-dashboard__title p {
+    margin: 0;
+    font-size: 14px;
+    color: #9CA3AF;
+}
+
+.ics-dashboard__incident-badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+}
+
+/* Section Navigation */
+.ics-dashboard__nav {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 4px;
+    background: rgba(255, 255, 255, 0.02);
+    border-radius: 10px;
+    overflow-x: auto;
+}
+
+.ics-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 8px;
+    color: #9CA3AF;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+    transition: all 150ms ease;
+}
+
+.ics-nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #E5E7EB;
+}
+
+.ics-nav-item.active {
+    background: color-mix(in srgb, var(--nav-color) 15%, transparent);
+    color: var(--nav-color);
+}
+
+.ics-nav-item svg {
+    color: var(--nav-color);
+}
+
+/* Metrics */
+.ics-dashboard__metrics {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.ics-metric-card {
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    text-align: center;
+}
+
+.ics-metric-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: var(--section-color, #D4AF37);
+    margin-bottom: 4px;
+}
+
+.ics-metric-label {
+    font-size: 13px;
+    color: #9CA3AF;
+}
+
+/* Quick Links */
+.ics-dashboard__links {
+    margin-bottom: 32px;
+}
+
+.ics-dashboard__links h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #9CA3AF;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ics-links-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.ics-link-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: #E5E7EB;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 150ms ease;
+}
+
+.ics-link-card:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border-color: #D4AF37;
+    color: #D4AF37;
+}
+
+.ics-link-card svg {
+    opacity: 0.5;
+    transition: all 150ms ease;
+}
+
+.ics-link-card:hover svg {
+    opacity: 1;
+    transform: translateX(4px);
+}
+
+/* Activity */
+.ics-dashboard__activity h3 {
+    font-size: 14px;
+    font-weight: 600;
+    color: #9CA3AF;
+    margin: 0 0 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ics-activity-list {
+    min-height: 120px;
+    padding: 24px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+}
+
+.ics-activity-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    color: #6B7280;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .ics-dashboard {
+        padding: 16px;
+    }
+    
+    .ics-dashboard__header {
+        flex-direction: column;
+    }
+    
+    .ics-dashboard__metrics {
+        grid-template-columns: 1fr;
+    }
+    
+    .ics-nav-item span {
+        display: none;
+    }
+}

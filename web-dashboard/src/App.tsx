@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { useRegisterSW } from 'virtual:pwa-register/react'
 import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
+import { EmergencyProvider } from './context/useEmergencyContext'
 import ProtectedRoute from './components/ProtectedRoute'
 import PageWrapper from './components/layout/PageWrapper'
 import EventsPage from './pages/EventsPage'
@@ -65,6 +66,12 @@ import {
   MissionCommandPage,
   TriagePage,
 } from './pages/domains/mission-command'
+
+// ===== Rescue Module (Expert Council Navigation v3.0) =====
+import { SheltersPage } from './pages/rescue'
+
+// ===== ICS Section Dashboard (Expert Council Navigation v3.0) =====
+import { ICSSectionDashboard, ICS201BriefingPage, ICS205CommsPage } from './pages/ics'
 
 import {
   EquipmentPage as LogisticsEquipmentPage,
@@ -136,6 +143,7 @@ function App() {
   return (
     <RealtimeProvider>
       <AuthProvider>
+        <EmergencyProvider>
         {/* PWA Update Prompt */}
         {needRefresh && (
           <div className="pwa-update-prompt">
@@ -221,6 +229,20 @@ function App() {
 
           {/* ===== Ops Routes (for sidebar items) ===== */}
           <Route path="/ops/ics-forms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ops-ics-forms" /></ProtectedRoute>} />
+
+          {/* ===== Rescue Routes (Expert Council Navigation v3.0) ===== */}
+          <Route path="/rescue/shelters" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-shelters"><SheltersPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/rescue/triage" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/rescue/search-rescue" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-search" /></ProtectedRoute>} />
+          <Route path="/rescue/reunification" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-reunification" /></ProtectedRoute>} />
+          <Route path="/rescue/medical-transport" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-medical" /></ProtectedRoute>} />
+          <Route path="/rescue/field-comms" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-comms" /></ProtectedRoute>} />
+
+          {/* ===== ICS Section Dashboard (Expert Council Navigation v3.0) ===== */}
+          <Route path="/ics" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-dashboard"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
+          <Route path="/ics/:section" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-section"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
+          <Route path="/ics/201" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-201"><ICS201BriefingPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/ics/205" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="ics-205"><ICS205CommsPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Additional Logistics Routes ===== */}
           <Route path="/logistics/unified-resources" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="logistics-unified-resources" /></ProtectedRoute>} />
@@ -339,6 +361,7 @@ function App() {
           {/* Air Ops Domain */}
           <Route path="/domains/air-ops/drone-control" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="drone-control" /></ProtectedRoute>} />
         </Routes>
+        </EmergencyProvider>
       </AuthProvider>
     </RealtimeProvider>
   )

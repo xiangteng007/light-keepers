@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Patch, Delete, Param, Body, Query, Headers, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiHeader } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { FieldReportsService } from './field-reports.service';
@@ -9,13 +8,13 @@ import { CreateFieldReportDto, UpdateFieldReportDto, FieldReportQueryDto } from 
 
 @ApiTags('Field Reports')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('mission-sessions/:missionSessionId/reports')
 export class FieldReportsController {
     constructor(private readonly service: FieldReportsService) { }
 
     @Post()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Create a new field report' })
     async create(
         @Param('missionSessionId') missionSessionId: string,
@@ -26,7 +25,7 @@ export class FieldReportsController {
     }
 
     @Get()
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'List field reports with filters' })
     async findAll(
         @Param('missionSessionId') missionSessionId: string,
@@ -36,7 +35,7 @@ export class FieldReportsController {
     }
 
     @Patch(':reportId')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Update a field report (triage/status)' })
     @ApiHeader({ name: 'If-Match', description: 'Version for optimistic locking' })
     async update(
@@ -50,7 +49,7 @@ export class FieldReportsController {
     }
 
     @Delete(':reportId')
-    @MinLevel(RoleLevel.DIRECTOR)
+    @RequiredLevel(RoleLevel.DIRECTOR)
     @HttpCode(HttpStatus.NO_CONTENT)
     @ApiOperation({ summary: 'Soft delete a field report' })
     async delete(

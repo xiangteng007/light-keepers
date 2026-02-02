@@ -6,6 +6,7 @@ import App from './App.tsx'
 import './i18n' // 多語系支援
 import './styles/theme.css'
 import './styles/a11y.css' // 無障礙樣式
+import './styles/EmergencyTheme.css' // 緊急模式主題
 import './index.css'
 
 // Skip React rendering for Firebase Auth handler routes

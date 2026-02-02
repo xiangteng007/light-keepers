@@ -1,0 +1,155 @@
+/**
+ * EmergencyStatusBar.css
+ * 
+ * Expert Council Navigation Design v3.0
+ * Emergency status bar styling
+ */
+
+.emergency-status-bar {
+    width: 100%;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    z-index: 1000;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* Level variants */
+.emergency-status-bar.warning {
+    background: linear-gradient(90deg, #92400E 0%, #D97706 50%, #92400E 100%);
+    color: #FEF3C7;
+}
+
+.emergency-status-bar.emergency {
+    background: linear-gradient(90deg, #991B1B 0%, #DC2626 50%, #991B1B 100%);
+    color: #FEE2E2;
+}
+
+.emergency-status-bar.critical {
+    background: linear-gradient(90deg, #581C87 0%, #9333EA 50%, #581C87 100%);
+    color: #F3E8FF;
+    animation: slideDown 0.3s ease, criticalPulse 2s ease-in-out infinite;
+}
+
+@keyframes criticalPulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.85; }
+}
+
+.status-bar-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.status-bar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.status-icon {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+}
+
+.status-icon.pulse {
+    animation: iconPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+.status-level {
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.status-divider {
+    opacity: 0.5;
+    flex-shrink: 0;
+}
+
+.status-incident {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.status-location {
+    opacity: 0.8;
+}
+
+.status-bar-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-shrink: 0;
+}
+
+.status-count {
+    opacity: 0.8;
+    font-size: 12px;
+}
+
+.status-action {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 4px;
+    color: inherit;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 150ms ease;
+}
+
+.status-action:hover {
+    background: rgba(255, 255, 255, 0.25);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .emergency-status-bar {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .status-bar-content {
+        flex-wrap: wrap;
+    }
+    
+    .status-incident {
+        max-width: 200px;
+    }
+    
+    .status-count {
+        display: none;
+    }
+    
+    .status-action span {
+        display: none;
+    }
+}

@@ -5,12 +5,12 @@
  */
 import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { DonorReportingService, Grant, FundingType, GrantStatus } from './donor-reporting.service';
 
 @ApiTags('Donor Reporting')
 @Controller('api/v1/donors')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class DonorReportingController {
     constructor(private readonly donorService: DonorReportingService) { }

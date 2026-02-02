@@ -1,8 +1,8 @@
 import { Controller, Post, Get, Body, UseGuards, Req, HttpCode, HttpStatus } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiResponse } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { Request } from 'express';
 import { HeartbeatService } from './heartbeat.service';
-import { JwtAuthGuard } from './guards';
 import { BreakGlassDto, CommanderStatusDto, HeartbeatResponseDto } from './dto/heartbeat.dto';
 
 interface AuthenticatedRequest extends Request {
@@ -19,7 +19,7 @@ export class HeartbeatController {
      * Update commander heartbeat timestamp
      */
     @Post('heartbeat')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: '更新指揮官心跳' })
@@ -33,7 +33,7 @@ export class HeartbeatController {
      * Get commander online status
      */
     @Get('commander-status')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @ApiOperation({ summary: '查詢指揮官在線狀態' })
     @ApiResponse({ status: 200, description: '指揮官狀態', type: [CommanderStatusDto] })
@@ -47,7 +47,7 @@ export class HeartbeatController {
      * Only the designated emergency successor can invoke this
      */
     @Post('break-glass')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: '緊急接管程序 (Break-Glass)' })
@@ -66,7 +66,7 @@ export class HeartbeatController {
      * Configure break-glass settings (commander only)
      */
     @Post('configure-break-glass')
-    @UseGuards(JwtAuthGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @ApiBearerAuth()
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: '設定 Break-Glass 參數' })

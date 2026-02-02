@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { MinLevel } from '../auth/guards/roles.guard';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { LocationShareService } from './location-share.service';
@@ -9,13 +8,13 @@ import { StartLocationShareDto, UpdateLocationDto } from './dto';
 
 @ApiTags('Location Share')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @Controller('mission-sessions/:missionSessionId')
 export class LocationShareController {
     constructor(private readonly service: LocationShareService) { }
 
     @Post('location-share/start')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Start location sharing' })
     async start(
         @Param('missionSessionId') missionSessionId: string,
@@ -26,7 +25,7 @@ export class LocationShareController {
     }
 
     @Post('location-share/stop')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Stop location sharing' })
     async stop(
         @Param('missionSessionId') missionSessionId: string,
@@ -36,7 +35,7 @@ export class LocationShareController {
     }
 
     @Post('location/update')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Update location (alternative to WebSocket)' })
     async updateLocation(
         @Param('missionSessionId') missionSessionId: string,
@@ -48,7 +47,7 @@ export class LocationShareController {
     }
 
     @Get('live-locations')
-    @MinLevel(RoleLevel.OFFICER)
+    @RequiredLevel(RoleLevel.OFFICER)
     @ApiOperation({ summary: 'Get live locations for map layer' })
     async getLiveLocations(
         @Param('missionSessionId') missionSessionId: string,

@@ -13,9 +13,8 @@ import {
     UseGuards,
     Request,
 } from '@nestjs/common';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { CommandChainService, AssignRoleDto, ReliefDto } from './command-chain.service';
-import { CoreJwtGuard } from '../shared/guards/core-jwt.guard';
-import { UnifiedRolesGuard, RequiredLevel } from '../shared/guards/unified-roles.guard';
 
 @Controller('mission-sessions/:sessionId/command-chain')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)

@@ -49,7 +49,7 @@ Authorization: Bearer <your_jwt_token>
 }
 \`\`\`
         `)
-        .setVersion('2.0.0')
+        .setVersion('2.1.0')
         .setContact(
             '光守護者技術團隊',
             'https://lightkeepers.org',
@@ -76,6 +76,7 @@ Authorization: Bearer <your_jwt_token>
             },
             'API-Key'
         )
+        // Core Modules
         .addTag('auth', '認證與授權')
         .addTag('users', '使用者管理')
         .addTag('reports', '災情回報')
@@ -88,9 +89,22 @@ Authorization: Bearer <your_jwt_token>
         .addTag('analytics', 'AI 分析')
         .addTag('webhooks', 'Webhook 管理')
         .addTag('system', '系統設定')
+        // Integration Modules
         .addTag('line', 'LINE 整合')
+        .addTag('line-liff', 'LINE LIFF Mini App')
         .addTag('weather', '氣象資料')
         .addTag('voice', '語音通話')
+        .addTag('fire-119', '消防署 119 整合')
+        // Disaster Response Modules
+        .addTag('shelters', '避難所管理')
+        .addTag('mobilization', '志工動員')
+        .addTag('triage', '傷患分類')
+        .addTag('structural-assessment', '建物結構評估')
+        .addTag('reunification', '家庭重聚')
+        .addTag('dispatch', '派遣管理')
+        // Governance Modules
+        .addTag('audit', '稽核日誌')
+        .addTag('approvals', '審批管理')
         .build();
 
     const document = SwaggerModule.createDocument(app, config, {

@@ -18,8 +18,8 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { TwoFactorService } from './services/two-factor.service';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 class VerifyTokenDto {
     secret: string;
@@ -36,7 +36,7 @@ class DisableDto {
 
 @ApiTags('Two-Factor Authentication')
 @Controller('auth/2fa')
-@UseGuards(JwtAuthGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @ApiBearerAuth()
 export class TwoFactorController {
     constructor(private readonly twoFactorService: TwoFactorService) { }

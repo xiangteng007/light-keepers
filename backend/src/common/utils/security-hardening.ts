@@ -5,7 +5,7 @@
  */
 
 import { createHash } from 'crypto';
-import * as DOMPurify from 'isomorphic-dompurify';
+import DOMPurify from 'isomorphic-dompurify';
 
 /**
  * PII Masking for Logs

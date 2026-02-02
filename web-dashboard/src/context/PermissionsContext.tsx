@@ -2,11 +2,14 @@ import { createContext, useContext, useState, useEffect, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import { getPagePermissions } from '../api/services';
 import type { PagePermission } from '../api/services';
+import { PAGE_POLICIES } from '../config/page-policy';
 
 /**
  * PermissionsContext - RBAC 權限配置的單一事實來源
  * 
- * 此 Context 從後端 API 載入頁面權限配置，取代前端硬編碼的 requiredLevel。
+ * 🔐 PR-03: 現在從 page-policy.ts 讀取預設權限配置
+ * 
+ * 此 Context 從後端 API 載入頁面權限配置，若 API 不可用則使用 page-policy.ts 預設值。
  * 這解決了前後端權限定義分散的問題（M1. 前後端權限等級定義分散）。
  * 
  * 使用方式：
@@ -25,27 +28,16 @@ interface PermissionsContextType {
 
 const PermissionsContext = createContext<PermissionsContextType | undefined>(undefined);
 
-// 預設權限配置（作為 fallback）
-const DEFAULT_PERMISSIONS: Record<string, number> = {
-    'dashboard': 0,
-    'ncdr-alerts': 0,
-    'map': 0,
-    'forecast': 0,
-    'manuals': 0,
-    'events': 1,
-    'report': 1,
-    'training': 1,
-    'profile': 1,
-    'tasks': 2,
-    'volunteers': 2,
-    'resources': 2,
-    'approvals': 2,
-    'admin-reports': 2,
-    'reports-export': 3,
-    'analytics': 3,
-    'permissions': 4,
-    'donations': 5,
+// 🔐 PR-03: 從集中式 page-policy.ts 取得預設權限
+const getDefaultPermissions = (): Record<string, number> => {
+    const defaults: Record<string, number> = {};
+    PAGE_POLICIES.forEach(p => {
+        defaults[p.pageKey] = p.requiredLevel;
+    });
+    return defaults;
 };
+
+const DEFAULT_PERMISSIONS = getDefaultPermissions();
 
 export function PermissionsProvider({ children }: { children: ReactNode }) {
     const [permissions, setPermissions] = useState<PagePermission[]>([]);
@@ -144,15 +136,8 @@ export function usePermissions() {
 }
 
 /**
- * 角色等級常數（與後端一致）
+ * 🔐 PR-03: 從 page-policy.ts 重新導出 ROLE_LEVELS
+ * 這確保全應用使用同一份權限定義
  */
-export const ROLE_LEVELS = {
-    PUBLIC: 0,       // 一般民眾
-    VOLUNTEER: 1,    // 志工
-    OFFICER: 2,      // 幹部
-    DIRECTOR: 3,     // 常務理事
-    CHAIRMAN: 4,     // 理事長
-    OWNER: 5,        // 系統擁有者
-} as const;
-
-export type RoleLevel = typeof ROLE_LEVELS[keyof typeof ROLE_LEVELS];
+export { ROLE_LEVELS } from '../config/page-policy';
+export type { RoleLevel } from '../config/page-policy';

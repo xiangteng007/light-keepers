@@ -7,7 +7,7 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard, RolesGuard, MinLevel } from '../auth/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { LocationsService } from './locations.service';
 import {
@@ -20,12 +20,12 @@ import {
 @ApiTags('Locations')
 @ApiBearerAuth()
 @Controller('locations')
-@UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class LocationsController {
     constructor(private readonly locationsService: LocationsService) { }
 
     @Get('search')
-    @MinLevel(RoleLevel.VOLUNTEER) // Level 1+
+    @RequiredLevel(RoleLevel.VOLUNTEER) // Level 1+
     @ApiOperation({ summary: 'Search locations by name/address with optional bbox' })
     @ApiResponse({ status: 200, type: [LocationDto] })
     async search(@Query() query: SearchLocationsDto): Promise<LocationDto[]> {
@@ -33,7 +33,7 @@ export class LocationsController {
     }
 
     @Get('changes')
-    @MinLevel(RoleLevel.VOLUNTEER)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     @ApiOperation({ summary: 'Get location changes since timestamp' })
     @ApiResponse({ status: 200, type: [LocationDto] })
     async getChanges(@Query() query: GetLocationChangesDto): Promise<LocationDto[]> {
@@ -41,7 +41,7 @@ export class LocationsController {
     }
 
     @Post('import')
-    @MinLevel(RoleLevel.DIRECTOR) // Level 3+
+    @RequiredLevel(RoleLevel.DIRECTOR) // Level 3+
     @ApiOperation({ summary: 'Import locations from external source' })
     @ApiResponse({ status: 201, description: 'Import count' })
     async import(@Body() dto: ImportLocationsDto): Promise<{ count: number }> {

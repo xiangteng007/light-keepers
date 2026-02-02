@@ -35,6 +35,11 @@
     "src"
   ],
   "exclude": [
+    "src/test",
+    "src/**/*.test.ts",
+    "src/**/*.test.tsx",
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
     "src/hooks/useRxDB.ts",
     "src/hooks/useOfflineSync.ts",
     "src/services/rxdbSyncService.ts",
