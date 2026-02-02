@@ -1,0 +1,234 @@
+/**
+ * Offline Indicator Styles
+ */
+
+.offline-indicator {
+    position: fixed;
+    bottom: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    font-family: var(--font-sans, 'Inter', sans-serif);
+}
+
+.offline-indicator__main {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Offline state */
+.offline-indicator--offline .offline-indicator__main {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* Syncing state */
+.offline-indicator--syncing .offline-indicator__main {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.offline-indicator__icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.offline-indicator__icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+.offline-indicator__text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.offline-indicator__status {
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.offline-indicator__count {
+    font-size: 12px;
+    opacity: 0.8;
+}
+
+.offline-indicator__badge {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 10px;
+    background-color: currentColor;
+    color: white;
+}
+
+.offline-indicator--offline .offline-indicator__badge {
+    background-color: #d97706;
+}
+
+.offline-indicator--syncing .offline-indicator__badge {
+    background-color: #2563eb;
+}
+
+/* Details Panel */
+.offline-indicator__details {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin-bottom: 8px;
+    width: 280px;
+    max-width: calc(100vw - 32px);
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    padding: 12px;
+    animation: slideUp 0.2s ease;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(8px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.offline-indicator__details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.offline-indicator__retry-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #2563eb;
+    background: #dbeafe;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.offline-indicator__retry-btn:hover {
+    background: #bfdbfe;
+}
+
+.offline-indicator__empty {
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: center;
+    padding: 12px 0;
+}
+
+.offline-indicator__queue {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.offline-indicator__queue-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.offline-indicator__queue-item:last-child {
+    border-bottom: none;
+}
+
+.offline-indicator__queue-type {
+    font-size: 13px;
+    font-weight: 500;
+    color: #334155;
+}
+
+.offline-indicator__queue-time {
+    font-size: 12px;
+    color: #94a3b8;
+}
+
+.offline-indicator__queue-more {
+    font-size: 12px;
+    color: #64748b;
+    padding: 8px 0;
+    font-style: italic;
+}
+
+.offline-indicator__last-sync {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 8px;
+    text-align: center;
+}
+
+/* Dark theme */
+[data-theme="dark"] .offline-indicator--offline .offline-indicator__main {
+    background-color: #451a03;
+    color: #fcd34d;
+}
+
+[data-theme="dark"] .offline-indicator--syncing .offline-indicator__main {
+    background-color: #1e3a5f;
+    color: #93c5fd;
+}
+
+[data-theme="dark"] .offline-indicator__details {
+    background: #1f2937;
+}
+
+[data-theme="dark"] .offline-indicator__queue-type {
+    color: #e5e7eb;
+}
+
+[data-theme="dark"] .offline-indicator__queue-item {
+    border-color: #374151;
+}
+
+/* Mobile adjustments */
+@media (max-width: 375px) {
+    .offline-indicator {
+        bottom: 8px;
+        left: 8px;
+        right: 8px;
+        transform: none;
+    }
+    
+    .offline-indicator__main {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .offline-indicator__details {
+        left: 0;
+        right: 0;
+        transform: none;
+        width: auto;
+    }
+}

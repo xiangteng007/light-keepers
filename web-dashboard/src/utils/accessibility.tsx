@@ -1,38 +1,14 @@
 /**
- * 無障礙工具和 hooks
- * Accessibility utilities and hooks
+ * Accessibility (a11y) Utilities
+ * 
+ * Collection of accessibility helpers and hooks.
  */
-import { useEffect, useCallback, useRef } from 'react';
 
-// ===== 跳過導航連結 =====
-export function SkipLink() {
-    return (
-        <a href="#main-content" className="skip-link">
-            跳至主要內容
-        </a>
-    );
-}
+import React, { useEffect, useRef, useCallback } from 'react';
 
-// ===== ARIA Live 區域宣告 =====
-interface AnnouncerProps {
-    message: string;
-    politeness?: 'polite' | 'assertive';
-}
-
-export function LiveAnnouncer({ message, politeness = 'polite' }: AnnouncerProps) {
-    return (
-        <div
-            role="status"
-            aria-live={politeness}
-            aria-atomic="true"
-            className="sr-only"
-        >
-            {message}
-        </div>
-    );
-}
-
-// ===== 焦點陷阱 Hook（Modal 用）=====
+/**
+ * Focus trap hook - keeps focus within a container
+ */
 export function useFocusTrap(isActive: boolean) {
     const containerRef = useRef<HTMLDivElement>(null);
 
@@ -43,134 +19,191 @@ export function useFocusTrap(isActive: boolean) {
         const focusableElements = container.querySelectorAll<HTMLElement>(
             'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
         );
-
-        if (focusableElements.length === 0) return;
-
+        
         const firstElement = focusableElements[0];
         const lastElement = focusableElements[focusableElements.length - 1];
-
-        // 自動聚焦第一個元素
-        firstElement.focus();
 
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key !== 'Tab') return;
 
             if (e.shiftKey) {
-                // Shift + Tab
                 if (document.activeElement === firstElement) {
                     e.preventDefault();
-                    lastElement.focus();
+                    lastElement?.focus();
                 }
             } else {
-                // Tab
                 if (document.activeElement === lastElement) {
                     e.preventDefault();
-                    firstElement.focus();
+                    firstElement?.focus();
                 }
             }
         };
 
         container.addEventListener('keydown', handleKeyDown);
+        firstElement?.focus();
+
         return () => container.removeEventListener('keydown', handleKeyDown);
     }, [isActive]);
 
     return containerRef;
 }
 
-// ===== 鍵盤導航 Hook =====
-export function useKeyboardNavigation(
-    items: HTMLElement[],
-    options?: {
-        orientation?: 'horizontal' | 'vertical' | 'both';
-        loop?: boolean;
-    }
+/**
+ * Announce to screen readers
+ */
+export function useAnnounce() {
+    const announce = useCallback((message: string, priority: 'polite' | 'assertive' = 'polite') => {
+        const region = document.createElement('div');
+        region.setAttribute('role', 'status');
+        region.setAttribute('aria-live', priority);
+        region.setAttribute('aria-atomic', 'true');
+        region.style.cssText = `
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        `;
+        
+        document.body.appendChild(region);
+        
+        // Delay to ensure screen reader picks up the change
+        setTimeout(() => {
+            region.textContent = message;
+        }, 100);
+
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(region);
+        }, 1000);
+    }, []);
+
+    return announce;
+}
+
+/**
+ * Skip to main content link
+ */
+export const SkipToContent: React.FC<{ targetId?: string }> = ({ targetId = 'main-content' }) => {
+    return (
+        <a 
+            href={`#${targetId}`}
+            className="skip-to-content"
+            onClick={(e) => {
+                e.preventDefault();
+                const target = document.getElementById(targetId);
+                target?.focus();
+                target?.scrollIntoView();
+            }}
+        >
+            跳至主要內容
+        </a>
+    );
+};
+
+/**
+ * Visually hidden component for screen readers
+ */
+export const VisuallyHidden: React.FC<{ children: React.ReactNode; as?: keyof JSX.IntrinsicElements }> = ({ 
+    children, 
+    as: Component = 'span' 
+}) => {
+    return (
+        <Component
+            style={{
+                position: 'absolute',
+                width: '1px',
+                height: '1px',
+                padding: 0,
+                margin: '-1px',
+                overflow: 'hidden',
+                clip: 'rect(0, 0, 0, 0)',
+                whiteSpace: 'nowrap',
+                border: 0,
+            }}
+        >
+            {children}
+        </Component>
+    );
+};
+
+/**
+ * Reduce motion hook
+ */
+export function usePrefersReducedMotion(): boolean {
+    const mediaQuery = typeof window !== 'undefined' 
+        ? window.matchMedia('(prefers-reduced-motion: reduce)')
+        : null;
+    
+    return mediaQuery?.matches ?? false;
+}
+
+/**
+ * Keyboard navigation hook
+ */
+export function useKeyboardNavigation<T extends HTMLElement>(
+    items: T[],
+    options: { orientation?: 'horizontal' | 'vertical'; loop?: boolean } = {}
 ) {
-    const { orientation = 'vertical', loop = true } = options || {};
+    const { orientation = 'vertical', loop = true } = options;
 
-    const handleKeyDown = useCallback((e: KeyboardEvent) => {
-        const currentIndex = items.findIndex(item => item === document.activeElement);
-        if (currentIndex === -1) return;
+    const handleKeyDown = useCallback((e: React.KeyboardEvent, currentIndex: number) => {
+        const prevKey = orientation === 'vertical' ? 'ArrowUp' : 'ArrowLeft';
+        const nextKey = orientation === 'vertical' ? 'ArrowDown' : 'ArrowRight';
 
-        let nextIndex = currentIndex;
+        let newIndex: number | null = null;
 
         switch (e.key) {
-            case 'ArrowDown':
-                if (orientation !== 'horizontal') {
-                    e.preventDefault();
-                    nextIndex = currentIndex + 1;
+            case prevKey:
+                e.preventDefault();
+                newIndex = currentIndex - 1;
+                if (newIndex < 0) {
+                    newIndex = loop ? items.length - 1 : 0;
                 }
                 break;
-            case 'ArrowUp':
-                if (orientation !== 'horizontal') {
-                    e.preventDefault();
-                    nextIndex = currentIndex - 1;
-                }
-                break;
-            case 'ArrowRight':
-                if (orientation !== 'vertical') {
-                    e.preventDefault();
-                    nextIndex = currentIndex + 1;
-                }
-                break;
-            case 'ArrowLeft':
-                if (orientation !== 'vertical') {
-                    e.preventDefault();
-                    nextIndex = currentIndex - 1;
+            case nextKey:
+                e.preventDefault();
+                newIndex = currentIndex + 1;
+                if (newIndex >= items.length) {
+                    newIndex = loop ? 0 : items.length - 1;
                 }
                 break;
             case 'Home':
                 e.preventDefault();
-                nextIndex = 0;
+                newIndex = 0;
                 break;
             case 'End':
                 e.preventDefault();
-                nextIndex = items.length - 1;
+                newIndex = items.length - 1;
                 break;
         }
 
-        // 處理循環
-        if (loop) {
-            if (nextIndex < 0) nextIndex = items.length - 1;
-            if (nextIndex >= items.length) nextIndex = 0;
-        } else {
-            nextIndex = Math.max(0, Math.min(nextIndex, items.length - 1));
-        }
-
-        if (nextIndex !== currentIndex) {
-            items[nextIndex]?.focus();
+        if (newIndex !== null && items[newIndex]) {
+            items[newIndex].focus();
         }
     }, [items, orientation, loop]);
 
     return handleKeyDown;
 }
 
-// ===== Escape 鍵關閉 Hook =====
-export function useEscapeKey(onEscape: () => void, isActive: boolean = true) {
-    useEffect(() => {
-        if (!isActive) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onEscape();
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        return () => document.removeEventListener('keydown', handleKeyDown);
-    }, [onEscape, isActive]);
+// CSS for skip link
+export const skipLinkStyles = `
+.skip-to-content {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: #000;
+    color: #fff;
+    padding: 8px 16px;
+    z-index: 10000;
+    transition: top 0.2s;
 }
 
-// ===== 減少動態偵測 =====
-export function usePrefersReducedMotion(): boolean {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+.skip-to-content:focus {
+    top: 0;
 }
-
-// ===== 高對比模式偵測 =====
-export function usePrefersHighContrast(): boolean {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(prefers-contrast: more)').matches;
-}
-
-// ===== 視覺隱藏但螢幕閱讀器可見的類別 =====
-// CSS: .sr-only { ... } 在 a11y.css 中定義
+`;
