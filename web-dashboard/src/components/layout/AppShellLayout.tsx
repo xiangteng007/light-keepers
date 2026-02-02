@@ -17,6 +17,7 @@ import { WIDGET_CONTENT_MAP } from './WidgetContent';
 import { SyncStatusIndicator } from '../SyncStatusIndicator';
 import { Breadcrumb } from '../Breadcrumb';
 import { LanguageToggle } from '../LanguageSelector';
+import MobileBottomNav from './MobileBottomNav';
 import './AppShellLayout.css';
 
 interface AppShellLayoutProps {
@@ -142,7 +143,7 @@ export default function AppShellLayout({
                         LIGHTKEEPERS
                     </span>
                     {canEdit && (
-                        <span style={{
+                        <span className="level-badge" style={{
                             marginLeft: '12px',
                             padding: '2px 8px',
                             background: 'rgba(212, 168, 75, 0.2)',
@@ -434,8 +435,10 @@ export default function AppShellLayout({
                 {/* Desktop: Right column removed - now part of widget grid */}
             </div>
 
-            {/* [MB] MobileBottom */}
-            <nav className="mobileBottom">[MB] Mobile Nav</nav>
+            {/* [MB] MobileBottom - Functional Navigation */}
+            <nav className="mobileBottom">
+                <MobileBottomNav />
+            </nav>
 
             {/* [SC] Scrim */}
             <div className={`scrim ${drawerOpen ? 'visible' : ''}`} onClick={closeDrawer} />

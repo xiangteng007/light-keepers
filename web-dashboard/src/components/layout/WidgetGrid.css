@@ -144,3 +144,52 @@
         linear-gradient(90deg, rgba(212, 168, 75, 0.05) 1px, transparent 1px);
     background-size: 80px 80px;
 }
+
+/* ===== Mobile Widget Stacking ===== */
+@media (max-width: 768px) {
+    .widget-grid__layout {
+        /* Disable grid layout on mobile */
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px;
+    }
+    
+    .react-grid-item {
+        /* Override react-grid-layout positioning */
+        position: relative !important;
+        transform: none !important;
+        width: 100% !important;
+        left: 0 !important;
+        top: auto !important;
+        height: auto !important;
+        min-height: 200px;
+    }
+    
+    /* Ensure widgets have proper height */
+    .react-grid-item > div {
+        height: 100%;
+        min-height: 200px;
+    }
+}
+
+/* ===== Small Mobile Adjustments ===== */
+@media (max-width: 480px) {
+    .widget-grid__toolbar {
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+    
+    .widget-grid__add-btn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .react-grid-item {
+        min-height: 180px;
+    }
+    
+    .widget-grid__edit-overlay {
+        padding: 8px 16px;
+        font-size: 12px;
+    }
+}
