@@ -1,6 +1,7 @@
 /**
- * 深色模式管理 Hook
- * 支援自動偵測系統設定、localStorage 儲存、手動切換
+ * Theme Management Hook
+ * Light theme is the default professional design
+ * Users can switch to dark mode if preferred
  */
 import { useState, useEffect, useCallback } from 'react';
 
@@ -14,12 +15,13 @@ function getSystemTheme(): 'light' | 'dark' {
 }
 
 function getStoredTheme(): ThemeMode {
-    if (typeof window === 'undefined') return 'system';
+    if (typeof window === 'undefined') return 'light';
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored === 'light' || stored === 'dark' || stored === 'system') {
         return stored;
     }
-    return 'system';
+    // Default to light theme for the professional Light Keepers design
+    return 'light';
 }
 
 function applyTheme(theme: 'light' | 'dark') {
