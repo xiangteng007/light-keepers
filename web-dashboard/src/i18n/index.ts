@@ -5,6 +5,8 @@
  * - 東北亞: zh-TW, zh-CN, ja, ko
  * - 東南亞: vi, th, id, ms, fil, km, my, lo
  * - 國際: en
+ * 
+ * @version 2.0.0 - 2026-02-03 13 語言全支援
  */
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
