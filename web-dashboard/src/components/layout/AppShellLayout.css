@@ -5,7 +5,7 @@
  * Provides the foundational CSS variables and layout grid
  */
 
-/* ===== Design Tokens ===== */
+/* ===== Design Tokens (Light Theme) ===== */
 :root {
   --header-h: 52px;
   --mobile-bottom-h: 72px;
@@ -17,13 +17,13 @@
   --right-col-min: 280px;
   --right-col-max: 420px;
 
-  /* Base Colors */
-  --layout-bg: #0b111b;
-  --text-primary: #e8eaed;
-  --text-secondary: #9aa0a6;
-  --text-muted: #5f6368;
-  --accent-gold: #d4a84b;
-  --border-subtle: rgba(255, 255, 255, 0.08);
+  /* Base Colors (Light Theme) */
+  --layout-bg: #FFFFFF;
+  --text-primary: #1F2937;
+  --text-secondary: #6B7280;
+  --text-muted: #9CA3AF;
+  --accent-gold: #D97706;
+  --border-subtle: #E2E8F0;
 }
 
 /* ===== AppShell Container ===== */
@@ -50,10 +50,11 @@
   align-items: center;
   height: var(--header-h);
   padding: 0 var(--gutter);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--layout-bg);
   border-bottom: 1px solid var(--border-subtle);
   flex-shrink: 0;
   z-index: 100;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .headerLeft {
@@ -97,7 +98,7 @@
   display: flex;
   flex-direction: column;
   width: var(--sidebar-w-collapsed);
-  background: rgba(0, 0, 0, 0.2);
+  background: #F8FAFC;
   border-right: 1px solid var(--border-subtle);
   transition: width 0.3s ease;
   flex-shrink: 0;
@@ -182,7 +183,7 @@
   width: var(--right-col-w);
   min-width: var(--right-col-min);
   max-width: var(--right-col-max);
-  background: rgba(0, 0, 0, 0.15);
+  background: #F8FAFC;
   border-left: 1px solid var(--border-subtle);
   flex-shrink: 0;
 }
@@ -218,7 +219,7 @@
   font-size: 12px;
   font-weight: 500;
   color: var(--text-secondary);
-  background: rgba(0, 0, 0, 0.2);
+  background: #F1F5F9;
   border-bottom: 1px solid var(--border-subtle);
 }
 
@@ -236,12 +237,13 @@
 .mobileBottom {
   display: none;
   height: var(--mobile-bottom-h);
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--layout-bg);
   border-top: 1px solid var(--border-subtle);
   flex-shrink: 0;
   align-items: center;
   justify-content: space-around;
   padding: 0 16px;
+  box-shadow: 0 -1px 3px rgba(0, 0, 0, 0.05);
 }
 
 /* ===== [SC] Scrim ===== */
