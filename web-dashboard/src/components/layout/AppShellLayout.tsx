@@ -16,7 +16,7 @@ import { PermissionLevel } from './widget.types';
 import { WIDGET_CONTENT_MAP } from './WidgetContent';
 import { SyncStatusIndicator } from '../SyncStatusIndicator';
 import { Breadcrumb } from '../Breadcrumb';
-import { LanguageToggle } from '../LanguageSelector';
+import { LanguageSelector } from '../LanguageSelector';
 import MobileBottomNav from './MobileBottomNav';
 import './AppShellLayout.css';
 
@@ -170,8 +170,8 @@ export default function AppShellLayout({
                     {/* Sync Status Indicator */}
                     <SyncStatusIndicator />
 
-                    {/* Language Toggle */}
-                    <LanguageToggle />
+                    {/* Language Selector Dropdown */}
+                    <LanguageSelector />
 
                     {/* Notification Icon */}
                     <div style={{ position: 'relative' }}>

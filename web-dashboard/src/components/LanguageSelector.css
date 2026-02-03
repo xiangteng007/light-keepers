@@ -63,14 +63,33 @@
     top: 100%;
     right: 0;
     margin-top: 8px;
-    min-width: 150px;
+    min-width: 180px;
+    max-height: 400px;
+    overflow-y: auto;
     background: var(--bg-card, #ffffff);
     border: 1px solid var(--border-color, #e5e7eb);
     border-radius: 10px;
     box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     z-index: 1000;
     animation: slideDown 0.2s ease;
+}
+
+/* Custom scrollbar for dropdown */
+.language-selector__menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.language-selector__menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.language-selector__menu::-webkit-scrollbar-thumb {
+    background: rgba(128, 128, 128, 0.3);
+    border-radius: 3px;
+}
+
+.language-selector__menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(128, 128, 128, 0.5);
 }
 
 @keyframes slideDown {
