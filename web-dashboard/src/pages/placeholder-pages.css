@@ -1,0 +1,247 @@
+/**
+ * placeholder-pages.css
+ * 
+ * Common styles for placeholder pages
+ * (SearchRescuePage, MedicalTransportPage, FieldCommsPage, etc.)
+ */
+
+.placeholder-page {
+    padding: 24px;
+    color: var(--text-primary);
+}
+
+.placeholder-page__title {
+    font-size: 24px;
+    font-weight: 600;
+    margin-bottom: 16px;
+    color: var(--accent-gold);
+}
+
+.placeholder-page__subtitle {
+    color: var(--text-muted);
+    margin-bottom: 24px;
+}
+
+.placeholder-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px;
+}
+
+.placeholder-page__card {
+    padding: 20px;
+    background: rgba(47, 54, 65, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(195, 155, 111, 0.2);
+}
+
+.placeholder-page__card-icon {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.placeholder-page__card-value {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--accent-gold);
+}
+
+.placeholder-page__card-value--blue {
+    color: #3b82f6;
+}
+
+.placeholder-page__card-value--green {
+    color: #22c55e;
+}
+
+.placeholder-page__card-value--red {
+    color: #ef4444;
+}
+
+.placeholder-page__card-value--orange {
+    color: #f59e0b;
+}
+
+.placeholder-page__card-value--purple {
+    color: #8b5cf6;
+}
+
+.placeholder-page__card-label {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* List styles */
+.placeholder-page__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.placeholder-page__list-item {
+    padding: 16px;
+    background: rgba(47, 54, 65, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(195, 155, 111, 0.15);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.placeholder-page__list-icon {
+    font-size: 24px;
+}
+
+.placeholder-page__list-content {
+    flex: 1;
+}
+
+.placeholder-page__list-title {
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 4px;
+}
+
+.placeholder-page__list-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+}
+
+/* Triage color cards (MedicalTransportPage) */
+.placeholder-page__triage-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.placeholder-page__triage-card {
+    padding: 16px;
+    border-radius: 12px;
+    color: white;
+}
+
+.placeholder-page__triage-card--red {
+    background: #dc2626;
+}
+
+.placeholder-page__triage-card--orange {
+    background: #f97316;
+}
+
+.placeholder-page__triage-card--green {
+    background: #22c55e;
+}
+
+.placeholder-page__triage-card--black {
+    background: #374151;
+}
+
+.placeholder-page__triage-label {
+    font-size: 14px;
+    margin-bottom: 4px;
+}
+
+.placeholder-page__triage-value {
+    font-size: 32px;
+    font-weight: 700;
+}
+
+/* Simulation cards (SimulationPage) */
+.placeholder-page__card-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--accent-gold);
+}
+
+/* ICS Forms Page specific */
+.placeholder-page__form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+}
+
+.placeholder-page__form-link {
+    padding: 20px;
+    background: rgba(47, 54, 65, 0.5);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    transition: all 0.2s;
+}
+
+.placeholder-page__form-link--available {
+    border: 1px solid rgba(195, 155, 111, 0.4);
+}
+
+.placeholder-page__form-link--disabled {
+    border: 1px solid rgba(100, 100, 100, 0.3);
+    opacity: 0.6;
+}
+
+.placeholder-page__form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.placeholder-page__form-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--accent-gold);
+}
+
+.placeholder-page__form-name--disabled {
+    color: var(--text-muted);
+}
+
+.placeholder-page__form-status {
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: white;
+}
+
+.placeholder-page__form-status--available {
+    background: #22c55e;
+}
+
+.placeholder-page__form-status--dev {
+    background: #6b7280;
+}
+
+.placeholder-page__form-description {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Settings page specific */
+.placeholder-page__settings-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 600px;
+}
+
+.placeholder-page__settings-item {
+    padding: 20px;
+    background: rgba(47, 54, 65, 0.5);
+    border-radius: 12px;
+    border: 1px solid rgba(195, 155, 111, 0.2);
+}
+
+.placeholder-page__settings-label {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.placeholder-page__settings-value {
+    font-size: 14px;
+    color: var(--text-muted);
+}
+
+

@@ -3,8 +3,8 @@
  * 
  * ICS表單目錄頁面 - 顯示所有可用的ICS表單
  */
-import React from 'react';
 import { Link } from 'react-router-dom';
+import './placeholder-pages.css';
 
 const ICS_FORMS = [
     { id: '201', name: 'ICS 201 - 事件簡報', description: '初始事件簡報、資源概況、組織圖', path: '/ics/201', status: '可用' },
@@ -21,73 +21,38 @@ const ICS_FORMS = [
 
 export default function ICSFormsPage() {
     return (
-        <div style={{
-            padding: '24px',
-            color: 'var(--text-primary)',
-        }}>
-            <h1 style={{
-                fontSize: '24px',
-                fontWeight: 600,
-                marginBottom: '8px',
-                color: 'var(--accent-gold)',
-            }}>
-                📋 ICS 表單
-            </h1>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '24px' }}>
+        <div className="placeholder-page">
+            <h1 className="placeholder-page__title">📋 ICS 表單</h1>
+            <p className="placeholder-page__subtitle">
                 事件指揮系統標準表單 (Incident Command System Forms)
             </p>
 
-            <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
-                gap: '16px',
-            }}>
+            <div className="placeholder-page__form-grid">
                 {ICS_FORMS.map((form) => (
                     <Link
                         key={form.id}
                         to={form.path}
-                        style={{
-                            padding: '20px',
-                            background: 'rgba(47, 54, 65, 0.5)',
-                            borderRadius: '12px',
-                            border: form.status === '可用' 
-                                ? '1px solid rgba(195, 155, 111, 0.4)' 
-                                : '1px solid rgba(100, 100, 100, 0.3)',
-                            textDecoration: 'none',
-                            color: 'inherit',
-                            display: 'block',
-                            transition: 'all 0.2s',
-                            opacity: form.status === '可用' ? 1 : 0.6,
-                        }}
+                        className={`placeholder-page__form-link ${
+                            form.status === '可用' 
+                                ? 'placeholder-page__form-link--available' 
+                                : 'placeholder-page__form-link--disabled'
+                        }`}
                     >
-                        <div style={{
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'flex-start',
-                            marginBottom: '8px',
-                        }}>
-                            <span style={{
-                                fontSize: '16px',
-                                fontWeight: 600,
-                                color: form.status === '可用' ? 'var(--accent-gold)' : 'var(--text-muted)',
-                            }}>
+                        <div className="placeholder-page__form-header">
+                            <span className={`placeholder-page__form-name ${
+                                form.status !== '可用' ? 'placeholder-page__form-name--disabled' : ''
+                            }`}>
                                 {form.name}
                             </span>
-                            <span style={{
-                                fontSize: '11px',
-                                padding: '2px 8px',
-                                borderRadius: '4px',
-                                background: form.status === '可用' ? '#22c55e' : '#6b7280',
-                                color: 'white',
-                            }}>
+                            <span className={`placeholder-page__form-status ${
+                                form.status === '可用' 
+                                    ? 'placeholder-page__form-status--available' 
+                                    : 'placeholder-page__form-status--dev'
+                            }`}>
                                 {form.status}
                             </span>
                         </div>
-                        <p style={{
-                            fontSize: '13px',
-                            color: 'var(--text-muted)',
-                            margin: 0,
-                        }}>
+                        <p className="placeholder-page__form-description">
                             {form.description}
                         </p>
                     </Link>

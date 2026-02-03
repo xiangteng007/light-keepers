@@ -51,7 +51,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             } else {
                 throw new Error('No access token received');
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
             console.error('Login failed:', err);
             setError('ACCESS DENIED: Invalid credentials');
         } finally {

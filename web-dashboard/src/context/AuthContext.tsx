@@ -144,7 +144,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             setUser(response.data);
         } catch (error) {
             const isTimeout = error instanceof Error && error.message === 'API timeout';
-            const isAuthError = (error as any)?.response?.status === 401;
+            const isAuthError = error instanceof Error && 
+                'response' in error && 
+                (error as { response?: { status?: number } }).response?.status === 401;
 
             console.error('[AuthContext] Failed to load user profile:', error);
 
