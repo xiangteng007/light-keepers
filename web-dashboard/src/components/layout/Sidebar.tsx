@@ -84,7 +84,7 @@ export default function Sidebar() {
                                     <button
                                         className="v3-nav-group-header"
                                         onClick={() => toggleGroup(group.id)}
-                                        aria-expanded={!isCollapsed}
+                                        aria-expanded={!isCollapsed ? "true" : "false"}
                                     >
                                         <span className="v3-nav-group-icon">
                                             <GroupIcon size={16} strokeWidth={1.5} />

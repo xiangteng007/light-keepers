@@ -202,8 +202,9 @@ export default function ICS205CommsPage() {
                             />
                         </div>
                         <div className="ics205-field">
-                            <label>作業期間起始</label>
+                            <label htmlFor="operationalPeriodFrom">作業期間起始</label>
                             <input
+                                id="operationalPeriodFrom"
                                 type="datetime-local"
                                 value={plan.operationalPeriod.from}
                                 onChange={e => updateField('operationalPeriod', {
@@ -213,8 +214,9 @@ export default function ICS205CommsPage() {
                             />
                         </div>
                         <div className="ics205-field">
-                            <label>作業期間結束</label>
+                            <label htmlFor="operationalPeriodTo">作業期間結束</label>
                             <input
+                                id="operationalPeriodTo"
                                 type="datetime-local"
                                 value={plan.operationalPeriod.to}
                                 onChange={e => updateField('operationalPeriod', {
@@ -277,6 +279,7 @@ export default function ICS205CommsPage() {
                                                 value={channel.zone}
                                                 onChange={e => updateChannel(channel.id, 'zone', e.target.value)}
                                                 placeholder="-"
+                                                aria-label="Zone"
                                             />
                                         </td>
                                         <td>
@@ -284,6 +287,7 @@ export default function ICS205CommsPage() {
                                                 type="text"
                                                 value={channel.channelName}
                                                 onChange={e => updateChannel(channel.id, 'channelName', e.target.value)}
+                                                aria-label="頻道名稱"
                                             />
                                         </td>
                                         <td>
@@ -291,6 +295,7 @@ export default function ICS205CommsPage() {
                                                 type="text"
                                                 value={channel.function}
                                                 onChange={e => updateChannel(channel.id, 'function', e.target.value)}
+                                                aria-label="功能"
                                             />
                                         </td>
                                         <td>
@@ -317,6 +322,7 @@ export default function ICS205CommsPage() {
                                                 type="text"
                                                 value={channel.assignment}
                                                 onChange={e => updateChannel(channel.id, 'assignment', e.target.value)}
+                                                aria-label="分配單位"
                                             />
                                         </td>
                                         <td>
@@ -324,6 +330,7 @@ export default function ICS205CommsPage() {
                                                 type="text"
                                                 value={channel.remarks}
                                                 onChange={e => updateChannel(channel.id, 'remarks', e.target.value)}
+                                                aria-label="備註"
                                             />
                                         </td>
                                         <td>

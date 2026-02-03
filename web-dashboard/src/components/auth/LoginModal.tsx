@@ -142,10 +142,6 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                             type="submit"
                             disabled={isLoading}
                             className="w-full bg-[#C39B6F] hover:bg-[#D4AF37] text-[#0F1218] font-bold py-3 rounded-sm tracking-wide transition-all uppercase flex items-center justify-center gap-2"
-                            style={{
-                                backgroundColor: '#C39B6F !important',
-                                color: '#0F1218 !important'
-                            }}
                         >
                             {isLoading ? (
                                 <Activity className="animate-spin" size={20} />

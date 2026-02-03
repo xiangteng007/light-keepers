@@ -161,7 +161,7 @@ export default function ICS201BriefingPage() {
                     <button
                         key={section.id}
                         role="tab"
-                        aria-selected={activeSection === section.id}
+                        aria-selected={activeSection === section.id ? "true" : "false"}
                         className={`ics201-section-tab ${activeSection === section.id ? 'active' : ''}`}
                         onClick={() => setActiveSection(section.id)}
                     >
@@ -269,6 +269,7 @@ export default function ICS201BriefingPage() {
                                             value={obj}
                                             onChange={e => updateObjective(idx, e.target.value)}
                                             placeholder="輸入目標..."
+                                            aria-label={`目標 ${idx + 1}`}
                                         />
                                     </div>
                                 ))}
@@ -310,6 +311,7 @@ export default function ICS201BriefingPage() {
                                         onChange={e => updateOrgAssignment(idx, 'name', e.target.value)}
                                         placeholder="姓名"
                                         className="ics201-org-name"
+                                        aria-label={`${assignment.position} 姓名`}
                                     />
                                     <input
                                         type="text"
@@ -317,6 +319,7 @@ export default function ICS201BriefingPage() {
                                         onChange={e => updateOrgAssignment(idx, 'contact', e.target.value)}
                                         placeholder="聯絡方式"
                                         className="ics201-org-contact"
+                                        aria-label={`${assignment.position} 聯絡方式`}
                                     />
                                 </div>
                             ))}
@@ -350,6 +353,7 @@ export default function ICS201BriefingPage() {
                                                     updateField('resourcesSummary', newResources);
                                                 }}
                                                 placeholder="例：消防車"
+                                                aria-label={`資源類型 ${idx + 1}`}
                                             />
                                         </td>
                                         <td>
@@ -361,6 +365,7 @@ export default function ICS201BriefingPage() {
                                                     newResources[idx] = { ...newResources[idx], quantity: parseInt(e.target.value) || 0 };
                                                     updateField('resourcesSummary', newResources);
                                                 }}
+                                                aria-label={`資源數量 ${idx + 1}`}
                                             />
                                         </td>
                                         <td>
@@ -373,6 +378,7 @@ export default function ICS201BriefingPage() {
                                                     updateField('resourcesSummary', newResources);
                                                 }}
                                                 placeholder="位置"
+                                                aria-label={`資源位置 ${idx + 1}`}
                                             />
                                         </td>
                                         <td>
@@ -385,6 +391,7 @@ export default function ICS201BriefingPage() {
                                                     updateField('resourcesSummary', newResources);
                                                 }}
                                                 placeholder="已到達"
+                                                aria-label={`預計抵達 ${idx + 1}`}
                                             />
                                         </td>
                                     </tr>

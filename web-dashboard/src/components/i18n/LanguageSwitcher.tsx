@@ -26,7 +26,7 @@ export default function LanguageSwitcher() {
             <button
                 className="lang-switcher-btn"
                 onClick={() => setIsOpen(!isOpen)}
-                aria-expanded={isOpen}
+                aria-expanded={isOpen ? "true" : "false"}
                 aria-label="切換語言"
             >
                 <Globe size={16} />
