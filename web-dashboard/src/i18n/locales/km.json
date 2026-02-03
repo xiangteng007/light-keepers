@@ -1,0 +1,216 @@
+{
+    "common": {
+        "appName": "វេទិកាឆ្លើយតបគ្រោះមហន្តរាយ Light Keepers",
+        "loading": "កំពុងផ្ទុក...",
+        "error": "មានកំហុសកើតឡើង",
+        "success": "ជោគជ័យ",
+        "save": "រក្សាទុក",
+        "cancel": "បោះបង់",
+        "confirm": "បញ្ជាក់",
+        "delete": "លុប",
+        "edit": "កែសម្រួល",
+        "add": "បន្ថែម",
+        "search": "ស្វែងរក",
+        "filter": "ច្រោះ",
+        "refresh": "ផ្ទុកឡើងវិញ",
+        "back": "ត្រឡប់",
+        "next": "បន្ទាប់",
+        "previous": "មុន",
+        "submit": "ដាក់ស្នើ",
+        "close": "បិទ",
+        "yes": "បាទ/ចាស",
+        "no": "ទេ",
+        "all": "ទាំងអស់",
+        "none": "គ្មាន",
+        "required": "ចាំបាច់",
+        "optional": "ជម្រើស"
+    },
+    "nav": {
+        "dashboard": "ផ្ទាំងគ្រប់គ្រង",
+        "map": "ផែនទីគ្រោះមហន្តរាយ",
+        "reports": "របាយការណ៍គ្រោះមហន្តរាយ",
+        "volunteers": "គ្រប់គ្រងអ្នកស្ម័គ្រចិត្ត",
+        "resources": "គ្រប់គ្រងធនធាន",
+        "events": "គ្រប់គ្រងព្រឹត្តិការណ៍",
+        "activities": "ការចុះឈ្មោះសកម្មភាព",
+        "announcements": "សេចក្តីប្រកាស",
+        "settings": "ការកំណត់",
+        "permissions": "គ្រប់គ្រងការអនុញ្ញាត",
+        "profile": "ប្រវត្តិរូប",
+        "logout": "ចាកចេញ"
+    },
+    "auth": {
+        "login": "ចូល",
+        "logout": "ចាកចេញ",
+        "register": "ចុះឈ្មោះ",
+        "email": "អ៊ីមែល",
+        "password": "ពាក្យសម្ងាត់",
+        "confirmPassword": "បញ្ជាក់ពាក្យសម្ងាត់",
+        "forgotPassword": "ភ្លេចពាក្យសម្ងាត់?",
+        "rememberMe": "ចងចាំខ្ញុំ",
+        "loginWithGoogle": "ចូលដោយប្រើ Google",
+        "loginWithLine": "ចូលដោយប្រើ LINE",
+        "loginSuccess": "ចូលបានជោគជ័យ",
+        "loginFailed": "ការចូលបរាជ័យ",
+        "logoutSuccess": "បានចាកចេញ"
+    },
+    "dashboard": {
+        "title": "ផ្ទាំងគ្រប់គ្រង",
+        "welcome": "សូមស្វាគមន៍មកវិញ",
+        "overview": "ទិដ្ឋភាពទូទៅ",
+        "todayReports": "របាយការណ៍ថ្ងៃនេះ",
+        "activeVolunteers": "អ្នកស្ម័គ្រចិត្តសកម្ម",
+        "totalResources": "ធនធានសរុប",
+        "pendingTasks": "ភារកិច្ចដែលកំពុងរង់ចាំ",
+        "recentActivity": "សកម្មភាពថ្មីៗ",
+        "quickActions": "សកម្មភាពរហ័ស",
+        "newReport": "របាយការណ៍ថ្មី",
+        "viewMap": "មើលផែនទី"
+    },
+    "reports": {
+        "title": "របាយការណ៍គ្រោះមហន្តរាយ",
+        "new": "របាយការណ៍ថ្មី",
+        "list": "បញ្ជីរបាយការណ៍",
+        "status": {
+            "pending": "កំពុងរង់ចាំ",
+            "confirmed": "បានបញ្ជាក់",
+            "rejected": "បានបដិសេធ",
+            "resolved": "បានដោះស្រាយ"
+        },
+        "type": {
+            "flood": "ជំនន់ទឹកភ្លៀង",
+            "debris": "ដីបាក់បែក",
+            "fire": "អគ្គិភ័យ",
+            "accident": "គ្រោះថ្នាក់",
+            "other": "ផ្សេងៗ"
+        },
+        "severity": {
+            "low": "ស្រាល",
+            "medium": "មធ្យម",
+            "high": "ធ្ងន់ធ្ងរ",
+            "critical": "បន្ទាន់"
+        },
+        "fields": {
+            "title": "ចំណងជើង",
+            "description": "ការពិពណ៌នា",
+            "location": "ទីតាំង",
+            "photos": "រូបថត",
+            "contact": "ទំនាក់ទំនង"
+        }
+    },
+    "volunteers": {
+        "title": "គ្រប់គ្រងអ្នកស្ម័គ្រចិត្ត",
+        "list": "បញ្ជីអ្នកស្ម័គ្រចិត្ត",
+        "add": "បន្ថែមអ្នកស្ម័គ្រចិត្ត",
+        "status": {
+            "available": "មាន",
+            "busy": "រវល់",
+            "offline": "គ្មានអ៊ីនធឺណិត"
+        },
+        "fields": {
+            "name": "ឈ្មោះ",
+            "phone": "ទូរស័ព្ទ",
+            "region": "តំបន់បម្រើ",
+            "skills": "ជំនាញ",
+            "hours": "ម៉ោងបម្រើ",
+            "points": "ពិន្ទុ"
+        },
+        "recognition": {
+            "badges": "ផ្លាកសញ្ញា",
+            "awards": "រង្វាន់",
+            "milestones": "ព្រឹត្តិការណ៍សំខាន់",
+            "leaderboard": "តារាងចំណាត់ថ្នាក់"
+        }
+    },
+    "resources": {
+        "title": "គ្រប់គ្រងធនធាន",
+        "list": "បញ្ជីធនធាន",
+        "add": "បន្ថែមធនធាន",
+        "status": {
+            "available": "គ្រប់គ្រាន់",
+            "low": "ទាប",
+            "depleted": "អស់ស្តុក"
+        },
+        "fields": {
+            "name": "ឈ្មោះ",
+            "category": "ប្រភេទ",
+            "quantity": "បរិមាណ",
+            "unit": "ឯកតា",
+            "location": "ទីតាំង",
+            "expiresAt": "ផុតកំណត់"
+        }
+    },
+    "activities": {
+        "title": "ការចុះឈ្មោះសកម្មភាព",
+        "list": "បញ្ជីសកម្មភាព",
+        "create": "បង្កើតសកម្មភាព",
+        "register": "ចុះឈ្មោះ",
+        "status": {
+            "draft": "ព្រាង",
+            "open": "កំពុងបើក",
+            "closed": "បានបិទ",
+            "cancelled": "បានលុបចោល",
+            "completed": "បានបញ្ចប់"
+        },
+        "fields": {
+            "title": "ឈ្មោះសកម្មភាព",
+            "description": "ការពិពណ៌នា",
+            "date": "កាលបរិច្ឆេទ",
+            "location": "ទីតាំង",
+            "participants": "ចំនួនអ្នកចូលរួម"
+        }
+    },
+    "sos": {
+        "title": "SOS បន្ទាន់",
+        "send": "ផ្ញើសញ្ញា SOS",
+        "status": {
+            "active": "សកម្ម",
+            "acknowledged": "បានទទួល",
+            "resolved": "បានដោះស្រាយ"
+        }
+    },
+    "settings": {
+        "title": "ការកំណត់",
+        "theme": {
+            "title": "ស្បែក",
+            "light": "របៀបភ្លឺ",
+            "dark": "របៀបងងឹត",
+            "system": "តាមប្រព័ន្ធ"
+        },
+        "language": {
+            "title": "ភាសា",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ko": "한국어",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia",
+            "km": "ភាសាខ្មែរ",
+            "my": "မြန်မာဘာသာ",
+            "lo": "ພາສາລາວ"
+        },
+        "notifications": {
+            "title": "ការកំណត់ការជូនដំណឹង",
+            "push": "ការជូនដំណឹង Push",
+            "email": "ការជូនដំណឹងអ៊ីមែល"
+        }
+    },
+    "errors": {
+        "notFound": "រកមិនឃើញទំព័រ",
+        "unauthorized": "ត្រូវការការផ្ទៀងផ្ទាត់",
+        "forbidden": "មិនមានសិទ្ធិចូល",
+        "serverError": "កំហុសម៉ាស៊ីនមេ",
+        "networkError": "កំហុសបណ្តាញ",
+        "timeout": "អស់ពេល"
+    },
+    "offline": {
+        "title": "របៀបគ្មានអ៊ីនធឺណិត",
+        "message": "អ្នកបច្ចុប្បន្នមិនមានអ៊ីនធឺណិត។ មុខងារមួយចំនួនអាចមានកំណត់។",
+        "pending": "កំពុងរង់ចាំសមកាលកម្ម",
+        "sync": "សមកាលកម្ម"
+    }
+}

@@ -1,0 +1,216 @@
+{
+    "common": {
+        "appName": "ແພລດເຟີມຕອບໂຕ້ໄພພິບັດ Light Keepers",
+        "loading": "ກຳລັງໂຫລດ...",
+        "error": "ເກີດຂໍ້ຜິດພາດ",
+        "success": "ສຳເລັດ",
+        "save": "ບັນທຶກ",
+        "cancel": "ຍົກເລີກ",
+        "confirm": "ຢືນຢັນ",
+        "delete": "ລຶບ",
+        "edit": "ແກ້ໄຂ",
+        "add": "ເພີ່ມ",
+        "search": "ຊອກຫາ",
+        "filter": "ກັ່ນຕອງ",
+        "refresh": "ໂຫລດໃໝ່",
+        "back": "ກັບຄືນ",
+        "next": "ຕໍ່ໄປ",
+        "previous": "ກ່ອນໜ້າ",
+        "submit": "ສົ່ງ",
+        "close": "ປິດ",
+        "yes": "ແມ່ນ",
+        "no": "ບໍ່",
+        "all": "ທັງໝົດ",
+        "none": "ບໍ່ມີ",
+        "required": "ຕ້ອງການ",
+        "optional": "ບໍ່ບັງຄັບ"
+    },
+    "nav": {
+        "dashboard": "ແຜງຄວບຄຸມ",
+        "map": "ແຜນທີ່ໄພພິບັດ",
+        "reports": "ລາຍງານໄພພິບັດ",
+        "volunteers": "ການຄຸ້ມຄອງອາສາສະໝັກ",
+        "resources": "ການຄຸ້ມຄອງຊັບພະຍາກອນ",
+        "events": "ການຄຸ້ມຄອງເຫດການ",
+        "activities": "ລົງທະບຽນກິດຈະກຳ",
+        "announcements": "ປະກາດ",
+        "settings": "ຕັ້ງຄ່າ",
+        "permissions": "ການຄຸ້ມຄອງສິດທິ",
+        "profile": "ໂປຣໄຟລ໌",
+        "logout": "ອອກຈາກລະບົບ"
+    },
+    "auth": {
+        "login": "ເຂົ້າສູ່ລະບົບ",
+        "logout": "ອອກຈາກລະບົບ",
+        "register": "ລົງທະບຽນ",
+        "email": "ອີເມວ",
+        "password": "ລະຫັດຜ່ານ",
+        "confirmPassword": "ຢືນຢັນລະຫັດຜ່ານ",
+        "forgotPassword": "ລືມລະຫັດຜ່ານບໍ?",
+        "rememberMe": "ຈົດຈຳຂ້ອຍ",
+        "loginWithGoogle": "ເຂົ້າສູ່ລະບົບດ້ວຍ Google",
+        "loginWithLine": "ເຂົ້າສູ່ລະບົບດ້ວຍ LINE",
+        "loginSuccess": "ເຂົ້າສູ່ລະບົບສຳເລັດ",
+        "loginFailed": "ເຂົ້າສູ່ລະບົບບໍ່ສຳເລັດ",
+        "logoutSuccess": "ອອກຈາກລະບົບແລ້ວ"
+    },
+    "dashboard": {
+        "title": "ແຜງຄວບຄຸມ",
+        "welcome": "ຍິນດີຕ້ອນຮັບກັບມາ",
+        "overview": "ພາບລວມ",
+        "todayReports": "ລາຍງານມື້ນີ້",
+        "activeVolunteers": "ອາສາສະໝັກທີ່ໃຊ້ງານ",
+        "totalResources": "ຊັບພະຍາກອນທັງໝົດ",
+        "pendingTasks": "ວຽກທີ່ຍັງຄ້າງ",
+        "recentActivity": "ກິດຈະກຳຫລ້າສຸດ",
+        "quickActions": "ການກະທຳດ່ວນ",
+        "newReport": "ລາຍງານໃໝ່",
+        "viewMap": "ເບິ່ງແຜນທີ່"
+    },
+    "reports": {
+        "title": "ລາຍງານໄພພິບັດ",
+        "new": "ລາຍງານໃໝ່",
+        "list": "ລາຍການລາຍງານ",
+        "status": {
+            "pending": "ລໍຖ້າ",
+            "confirmed": "ຢືນຢັນແລ້ວ",
+            "rejected": "ປະຕິເສດ",
+            "resolved": "ແກ້ໄຂແລ້ວ"
+        },
+        "type": {
+            "flood": "ນ້ຳຖ້ວມ",
+            "debris": "ດິນເຈື່ອນ",
+            "fire": "ໄຟໄໝ້",
+            "accident": "ອຸບັດຕິເຫດ",
+            "other": "ອື່ນໆ"
+        },
+        "severity": {
+            "low": "ຕ່ຳ",
+            "medium": "ກາງ",
+            "high": "ສູງ",
+            "critical": "ສຸກເສີນ"
+        },
+        "fields": {
+            "title": "ຫົວຂໍ້",
+            "description": "ລາຍລະອຽດ",
+            "location": "ທີ່ຕັ້ງ",
+            "photos": "ຮູບພາບ",
+            "contact": "ຕິດຕໍ່"
+        }
+    },
+    "volunteers": {
+        "title": "ການຄຸ້ມຄອງອາສາສະໝັກ",
+        "list": "ລາຍຊື່ອາສາສະໝັກ",
+        "add": "ເພີ່ມອາສາສະໝັກ",
+        "status": {
+            "available": "ວ່າງ",
+            "busy": "ບໍ່ວ່າງ",
+            "offline": "ອອບໄລນ໌"
+        },
+        "fields": {
+            "name": "ຊື່",
+            "phone": "ໂທລະສັບ",
+            "region": "ເຂດບໍລິການ",
+            "skills": "ທັກສະ",
+            "hours": "ຊົ່ວໂມງບໍລິການ",
+            "points": "ຄະແນນ"
+        },
+        "recognition": {
+            "badges": "ເຄື່ອງໝາຍ",
+            "awards": "ລາງວັນ",
+            "milestones": "ເປົ້າໝາຍສຳຄັນ",
+            "leaderboard": "ກະດານຈັດອັນດັບ"
+        }
+    },
+    "resources": {
+        "title": "ການຄຸ້ມຄອງຊັບພະຍາກອນ",
+        "list": "ລາຍການຊັບພະຍາກອນ",
+        "add": "ເພີ່ມຊັບພະຍາກອນ",
+        "status": {
+            "available": "ພຽງພໍ",
+            "low": "ໜ້ອຍ",
+            "depleted": "ໝົດ"
+        },
+        "fields": {
+            "name": "ຊື່",
+            "category": "ປະເພດ",
+            "quantity": "ຈຳນວນ",
+            "unit": "ໜ່ວຍ",
+            "location": "ທີ່ຕັ້ງ",
+            "expiresAt": "ໝົດອາຍຸ"
+        }
+    },
+    "activities": {
+        "title": "ລົງທະບຽນກິດຈະກຳ",
+        "list": "ລາຍການກິດຈະກຳ",
+        "create": "ສ້າງກິດຈະກຳ",
+        "register": "ລົງທະບຽນ",
+        "status": {
+            "draft": "ຮ່າງ",
+            "open": "ເປີດ",
+            "closed": "ປິດ",
+            "cancelled": "ຍົກເລີກ",
+            "completed": "ສຳເລັດ"
+        },
+        "fields": {
+            "title": "ຊື່ກິດຈະກຳ",
+            "description": "ລາຍລະອຽດ",
+            "date": "ວັນທີ",
+            "location": "ທີ່ຕັ້ງ",
+            "participants": "ຈຳນວນຜູ້ເຂົ້າຮ່ວມ"
+        }
+    },
+    "sos": {
+        "title": "SOS ສຸກເສີນ",
+        "send": "ສົ່ງສັນຍານ SOS",
+        "status": {
+            "active": "ໃຊ້ງານ",
+            "acknowledged": "ຮັບຮູ້ແລ້ວ",
+            "resolved": "ແກ້ໄຂແລ້ວ"
+        }
+    },
+    "settings": {
+        "title": "ຕັ້ງຄ່າ",
+        "theme": {
+            "title": "ຮູບແບບ",
+            "light": "ໂໝດສະຫວ່າງ",
+            "dark": "ໂໝດມືດ",
+            "system": "ຕາມລະບົບ"
+        },
+        "language": {
+            "title": "ພາສາ",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ko": "한국어",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia",
+            "km": "ភាសាខ្មែរ",
+            "my": "မြန်မာဘာသာ",
+            "lo": "ພາສາລາວ"
+        },
+        "notifications": {
+            "title": "ຕັ້ງຄ່າການແຈ້ງເຕືອນ",
+            "push": "ການແຈ້ງເຕືອນ Push",
+            "email": "ການແຈ້ງເຕືອນອີເມວ"
+        }
+    },
+    "errors": {
+        "notFound": "ບໍ່ພົບໜ້າ",
+        "unauthorized": "ຕ້ອງຢືນຢັນຕົວຕົນ",
+        "forbidden": "ບໍ່ມີສິດເຂົ້າເຖິງ",
+        "serverError": "ຂໍ້ຜິດພາດຂອງເຊີບເວີ",
+        "networkError": "ຂໍ້ຜິດພາດເຄືອຂ່າຍ",
+        "timeout": "ໝົດເວລາ"
+    },
+    "offline": {
+        "title": "ໂໝດອອບໄລນ໌",
+        "message": "ທ່ານກຳລັງອອບໄລນ໌. ບາງຄຸນສົມບັດອາດຖືກຈຳກັດ.",
+        "pending": "ລາຍການລໍຖ້າ sync",
+        "sync": "Sync"
+    }
+}

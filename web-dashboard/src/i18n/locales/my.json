@@ -1,0 +1,216 @@
+{
+    "common": {
+        "appName": "Light Keepers ဘေးအန္တရာယ်တုံ့ပြန်ရေး Platform",
+        "loading": "ခေတ္တစောင့်ပါ...",
+        "error": "အမှားတစ်ခုဖြစ်ပေါ်ခဲ့သည်",
+        "success": "အောင်မြင်သည်",
+        "save": "သိမ်းဆည်း",
+        "cancel": "ပယ်ဖျက်",
+        "confirm": "အတည်ပြု",
+        "delete": "ဖျက်မည်",
+        "edit": "ပြင်ဆင်",
+        "add": "ထည့်သွင်း",
+        "search": "ရှာဖွေ",
+        "filter": "စစ်ထုတ်",
+        "refresh": "ပြန်လည်ဖွင့်",
+        "back": "နောက်သို့",
+        "next": "ရှေ့ဆက်",
+        "previous": "အရင်",
+        "submit": "တင်သွင်း",
+        "close": "ပိတ်",
+        "yes": "ဟုတ်ကဲ့",
+        "no": "မဟုတ်ပါ",
+        "all": "အားလုံး",
+        "none": "မရှိ",
+        "required": "လိုအပ်သည်",
+        "optional": "ရွေးချယ်နိုင်"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "map": "ဘေးအန္တရာယ်မြေပုံ",
+        "reports": "ဘေးအန္တရာယ်အစီရင်ခံစာ",
+        "volunteers": "စေတနာ့ဝန်ထမ်းစီမံခန့်ခွဲမှု",
+        "resources": "အရင်းအမြစ်စီမံခန့်ခွဲမှု",
+        "events": "ပွဲစီမံခန့်ခွဲမှု",
+        "activities": "လုပ်ဆောင်ချက်မှတ်ပုံတင်",
+        "announcements": "ကြေညာချက်များ",
+        "settings": "ဆက်တင်များ",
+        "permissions": "ခွင့်ပြုချက်စီမံခန့်ခွဲမှု",
+        "profile": "ပရိုဖိုင်",
+        "logout": "ထွက်မည်"
+    },
+    "auth": {
+        "login": "ဝင်မည်",
+        "logout": "ထွက်မည်",
+        "register": "စာရင်းသွင်း",
+        "email": "အီးမေးလ်",
+        "password": "စကားဝှက်",
+        "confirmPassword": "စကားဝှက်အတည်ပြု",
+        "forgotPassword": "စကားဝှက်မေ့သွားပြီလား?",
+        "rememberMe": "မှတ်ထားပေးပါ",
+        "loginWithGoogle": "Google ဖြင့်ဝင်မည်",
+        "loginWithLine": "LINE ဖြင့်ဝင်မည်",
+        "loginSuccess": "ဝင်ရောက်မှုအောင်မြင်",
+        "loginFailed": "ဝင်ရောက်မှုမအောင်မြင်",
+        "logoutSuccess": "ထွက်ပြီးပါပြီ"
+    },
+    "dashboard": {
+        "title": "Dashboard",
+        "welcome": "ပြန်လာတာကြိုဆိုပါတယ်",
+        "overview": "အကျဉ်းချုပ်",
+        "todayReports": "ယနေ့အစီရင်ခံစာများ",
+        "activeVolunteers": "တက်ကြွသောစေတနာ့ဝန်ထမ်းများ",
+        "totalResources": "စုစုပေါင်းအရင်းအမြစ်",
+        "pendingTasks": "စောင့်ဆိုင်းနေသောတာဝန်များ",
+        "recentActivity": "မကြာသေးမီကလုပ်ဆောင်ချက်",
+        "quickActions": "အမြန်လုပ်ဆောင်ချက်",
+        "newReport": "အစီရင်ခံစာအသစ်",
+        "viewMap": "မြေပုံကြည့်မည်"
+    },
+    "reports": {
+        "title": "ဘေးအန္တရာယ်အစီရင်ခံစာ",
+        "new": "အစီရင်ခံစာအသစ်",
+        "list": "အစီရင်ခံစာစာရင်း",
+        "status": {
+            "pending": "စောင့်ဆိုင်းနေဆဲ",
+            "confirmed": "အတည်ပြုပြီး",
+            "rejected": "ပယ်ချပြီး",
+            "resolved": "ဖြေရှင်းပြီး"
+        },
+        "type": {
+            "flood": "ရေကြီးရေလျှံ",
+            "debris": "မြေပြိုမှု",
+            "fire": "မီးလောင်မှု",
+            "accident": "မတော်တဆမှု",
+            "other": "အခြား"
+        },
+        "severity": {
+            "low": "နိမ့်",
+            "medium": "အလယ်အလတ်",
+            "high": "မြင့်",
+            "critical": "အရေးပေါ်"
+        },
+        "fields": {
+            "title": "ခေါင်းစဉ်",
+            "description": "ဖော်ပြချက်",
+            "location": "နေရာ",
+            "photos": "ဓာတ်ပုံများ",
+            "contact": "ဆက်သွယ်ရန်"
+        }
+    },
+    "volunteers": {
+        "title": "စေတနာ့ဝန်ထမ်းစီမံခန့်ခွဲမှု",
+        "list": "စေတနာ့ဝန်ထမ်းစာရင်း",
+        "add": "စေတနာ့ဝန်ထမ်းထည့်မည်",
+        "status": {
+            "available": "ရရှိနိုင်သည်",
+            "busy": "အလုပ်များနေသည်",
+            "offline": "Offline"
+        },
+        "fields": {
+            "name": "အမည်",
+            "phone": "ဖုန်းနံပါတ်",
+            "region": "တာဝန်ကျဒေသ",
+            "skills": "ကျွမ်းကျင်မှု",
+            "hours": "ဝန်ဆောင်မှုနာရီ",
+            "points": "အမှတ်များ"
+        },
+        "recognition": {
+            "badges": "Badge များ",
+            "awards": "ဆုငွေများ",
+            "milestones": "မှတ်တိုင်များ",
+            "leaderboard": "အဆင့်ဇယား"
+        }
+    },
+    "resources": {
+        "title": "အရင်းအမြစ်စီမံခန့်ခွဲမှု",
+        "list": "အရင်းအမြစ်စာရင်း",
+        "add": "အရင်းအမြစ်ထည့်မည်",
+        "status": {
+            "available": "လုံလောက်သည်",
+            "low": "နည်းသည်",
+            "depleted": "ကုန်သွားသည်"
+        },
+        "fields": {
+            "name": "အမည်",
+            "category": "အမျိုးအစား",
+            "quantity": "အရေအတွက်",
+            "unit": "ယူနစ်",
+            "location": "နေရာ",
+            "expiresAt": "သက်တမ်းကုန်ရက်"
+        }
+    },
+    "activities": {
+        "title": "လုပ်ဆောင်ချက်မှတ်ပုံတင်",
+        "list": "လုပ်ဆောင်ချက်စာရင်း",
+        "create": "လုပ်ဆောင်ချက်ဖန်တီး",
+        "register": "မှတ်ပုံတင်",
+        "status": {
+            "draft": "မူကြမ်း",
+            "open": "ဖွင့်ထား",
+            "closed": "ပိတ်ထား",
+            "cancelled": "ပယ်ဖျက်ပြီး",
+            "completed": "ပြီးဆုံးပြီး"
+        },
+        "fields": {
+            "title": "လုပ်ဆောင်ချက်အမည်",
+            "description": "ဖော်ပြချက်",
+            "date": "ရက်စွဲ",
+            "location": "နေရာ",
+            "participants": "ပါဝင်သူအရေအတွက်"
+        }
+    },
+    "sos": {
+        "title": "အရေးပေါ် SOS",
+        "send": "SOS အချက်ပြပို့မည်",
+        "status": {
+            "active": "လုပ်ဆောင်နေဆဲ",
+            "acknowledged": "လက်ခံပြီး",
+            "resolved": "ဖြေရှင်းပြီး"
+        }
+    },
+    "settings": {
+        "title": "ဆက်တင်များ",
+        "theme": {
+            "title": "အပြင်အဆင်",
+            "light": "အလင်းမုဒ်",
+            "dark": "အမှောင်မုဒ်",
+            "system": "System ဆက်တင်"
+        },
+        "language": {
+            "title": "ဘာသာစကား",
+            "zh-TW": "繁體中文",
+            "zh-CN": "简体中文",
+            "en": "English",
+            "ja": "日本語",
+            "ko": "한국어",
+            "ms": "Bahasa Melayu",
+            "fil": "Filipino",
+            "th": "ภาษาไทย",
+            "vi": "Tiếng Việt",
+            "id": "Bahasa Indonesia",
+            "km": "ភាសាខ្មែរ",
+            "my": "မြန်မာဘာသာ",
+            "lo": "ພາສາລາວ"
+        },
+        "notifications": {
+            "title": "အသိပေးချက်ဆက်တင်",
+            "push": "Push အသိပေးချက်",
+            "email": "Email အသိပေးချက်"
+        }
+    },
+    "errors": {
+        "notFound": "စာမျက်နှာရှာမတွေ့ပါ",
+        "unauthorized": "အတည်ပြုရန်လိုအပ်သည်",
+        "forbidden": "ဝင်ခွင့်မရှိပါ",
+        "serverError": "Server အမှား",
+        "networkError": "ကွန်ရက်အမှား",
+        "timeout": "အချိန်ကုန်သွားပါပြီ"
+    },
+    "offline": {
+        "title": "Offline မုဒ်",
+        "message": "လောလောဆယ် Offline ဖြစ်နေပါသည်။ အချို့လုပ်ဆောင်ချက်များ ကန့်သတ်ထားနိုင်ပါသည်။",
+        "pending": "ခု sync စောင့်နေသည်",
+        "sync": "Sync"
+    }
+}
