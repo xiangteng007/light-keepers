@@ -3,8 +3,11 @@
  * 
  * Centralized widget content components for all pages
  * Each widget ID maps to its React component content
+ * 
+ * i18n Support: Key widgets are now translatable via useTranslation hook
  */
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import {
     MapPin, Users, Package, AlertTriangle, Layers, Navigation,
     Filter, Search, CheckCircle, Clock, Zap, TrendingUp, TrendingDown,
@@ -14,9 +17,105 @@ import {
 }
     from 'lucide-react';
 
+// ===== i18n Helper Components =====
+const TranslatedMetricCard = ({ labelKey, value, trend, color = '#C39B6F' }: { labelKey: string; value: string | number; trend?: 'up' | 'down' | 'stable'; color?: string }) => {
+    const { t } = useTranslation();
+    return (
+        <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            padding: '16px',
+            background: 'rgba(47, 54, 65, 0.3)',
+            borderRadius: '8px',
+            minWidth: '100px',
+        }}>
+            <span style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{t(labelKey)}</span>
+            {trend && (
+                <span style={{ marginTop: '4px', color: trend === 'up' ? '#22c55e' : trend === 'down' ? '#ef4444' : '#94A3B8' }}>
+                    {trend === 'up' && <TrendingUp size={14} />}
+                    {trend === 'down' && <TrendingDown size={14} />}
+                </span>
+            )}
+        </div>
+    );
+};
+
+// Translated Key Metrics Widget (main dashboard stats)
+const TranslatedKeyMetricsWidget = () => {
+    const { t } = useTranslation();
+    return (
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
+            <TranslatedMetricCard labelKey="widgets.taskStats.pending" value={5} color="#ef4444" />
+            <TranslatedMetricCard labelKey="widgets.taskStats.matched" value={12} trend="up" color="#3B82F6" />
+            <TranslatedMetricCard labelKey="widgets.taskStats.completed" value={28} color="#22c55e" />
+            <TranslatedMetricCard labelKey="widgets.taskStats.matchRate" value="91%" trend="up" color="#C39B6F" />
+        </div>
+    );
+};
+
+// Translated Map Layers Widget
+const TranslatedMapLayersWidget = () => {
+    const { t } = useTranslation();
+    const layers = [
+        { key: 'widgets.mapLayers.events', defaultChecked: true },
+        { key: 'widgets.mapLayers.volunteers', defaultChecked: true },
+        { key: 'widgets.mapLayers.resources', defaultChecked: true },
+        { key: 'widgets.mapLayers.routes', defaultChecked: false },
+    ];
+    return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', height: '100%', padding: '8px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--accent-gold)', fontWeight: 600, marginBottom: '8px' }}>
+                <Layers size={14} style={{ verticalAlign: 'middle', marginRight: '6px' }} />
+                {t('widgets.mapLayers.title')}
+            </div>
+            {layers.map((layer, i) => (
+                <label key={i} style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    padding: '10px 12px',
+                    background: layer.defaultChecked ? 'rgba(195, 155, 111, 0.15)' : 'rgba(47, 54, 65, 0.3)',
+                    borderRadius: '6px',
+                    cursor: 'pointer',
+                    fontSize: '13px',
+                }}>
+                    <input type="checkbox" defaultChecked={layer.defaultChecked} />
+                    <span>{t(layer.key)}</span>
+                </label>
+            ))}
+        </div>
+    );
+};
+
+// Translated Map Legend Widget  
+const TranslatedMapLegendWidget = () => {
+    const { t } = useTranslation();
+    const items = [
+        { color: '#ef4444', key: 'widgets.mapLegend.critical' },
+        { color: '#f97316', key: 'widgets.mapLegend.high' },
+        { color: '#eab308', key: 'widgets.mapLegend.medium' },
+        { color: '#22c55e', key: 'widgets.mapLegend.normal' },
+    ];
+    return (
+        <div style={{ padding: '8px', fontSize: '12px' }}>
+            {items.map((item, i) => (
+                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px' }}>
+                    <span style={{ width: '10px', height: '10px', borderRadius: '50%', background: item.color }} />
+                    <span style={{ color: 'var(--text-secondary)' }}>{t(item.key)}</span>
+                </div>
+            ))}
+        </div>
+    );
+};
+
 // ===== Phase 10: Hub Widgets (New) =====
 
-const SocialFeedWidget = () => (
+const SocialFeedWidget = () => {
+    const { t } = useTranslation();
+    return (
+
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
             <div style={{ fontSize: '13px', color: 'var(--accent-gold)', fontWeight: 600 }}>社群情資</div>
@@ -42,7 +141,8 @@ const SocialFeedWidget = () => (
             </div>
         ))}
     </div>
-);
+    );
+};
 
 const WeatherAlertWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
@@ -1145,14 +1245,14 @@ const QuickActionsWidget = () => (
 
 // ===== Export Widget Content Map =====
 export const WIDGET_CONTENT_MAP: Record<string, React.ReactNode> = {
-    // Tactical Map
-    'map-layers': <MapLayersWidget />,
+    // Tactical Map - Using translated components
+    'map-layers': <TranslatedMapLayersWidget />,
     'tactical-map': <TacticalMapWidget />,
-    'map-legend': <MapLegendWidget />,
+    'map-legend': <TranslatedMapLegendWidget />,
     'quick-actions': <QuickActionsWidget />,
 
-    // Resource Matching
-    'key-metrics': <KeyMetricsWidget />,
+    // Resource Matching - Using translated components
+    'key-metrics': <TranslatedKeyMetricsWidget />,
     'ai-matches': <AIMatchesWidget />,
     'requests-list': <RequestsListWidget />,
     'supplies-grid': <SuppliesGridWidget />,

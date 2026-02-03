@@ -276,5 +276,195 @@
     "breadcrumb": {
         "home": "ホーム",
         "commandCenter": "指揮センター"
+    },
+    "widgets": {
+        "taskStats": {
+            "title": "タスク統計",
+            "pending": "待機中",
+            "matched": "配置済",
+            "completed": "完了",
+            "matchRate": "配置率"
+        },
+        "situationMap": {
+            "title": "状況マップ",
+            "mapContent": "マップコンテンツ"
+        },
+        "ncdrAlerts": {
+            "title": "NCDR 警報"
+        },
+        "disasterReports": {
+            "title": "災害報告",
+            "report": "災害報告"
+        },
+        "socialFeed": {
+            "title": "ソーシャルインテル",
+            "live": "ライブ"
+        },
+        "weatherAlert": {
+            "title": "大雨警報",
+            "rainfall": "降水量",
+            "windSpeed": "風速"
+        },
+        "notificationCenter": {
+            "title": "通知センター",
+            "systemAnnouncement": "システム通知",
+            "taskUpdate": "タスク更新"
+        },
+        "aiCommand": {
+            "title": "AI 指揮補助",
+            "suggestedAction": "推奨アクション",
+            "execute": "実行"
+        },
+        "channelStatus": {
+            "title": "チャンネル接続状態",
+            "online": "接続中",
+            "offline": "オフライン"
+        },
+        "geoAlerts": {
+            "title": "地理警報",
+            "alertCount": "警報総数",
+            "source": {
+                "ncdr": "NCDR",
+                "cwb": "気象庁",
+                "social": "ソーシャルインテル"
+            }
+        },
+        "earthquake": {
+            "noEarthquake": "現在地震なし",
+            "lastUpdate": "最終更新"
+        },
+        "analytics": {
+            "todayTasks": "本日のタスク",
+            "inProgress": "進行中",
+            "completed": "完了",
+            "pending": "保留中"
+        },
+        "reportGenerator": {
+            "title": "レポート生成",
+            "daily": "日報",
+            "weekly": "週報",
+            "monthly": "月報",
+            "generate": "レポート生成"
+        },
+        "scheduledReports": {
+            "dailySummary": "毎日タスク要約",
+            "weeklyHours": "週ボランティア活動時間",
+            "nextRun": "次回"
+        },
+        "aiTasks": {
+            "title": "実行中のAIタスク",
+            "eventClassification": "イベント分類",
+            "resourceMatching": "リソースマッチング",
+            "trendPrediction": "トレンド予測",
+            "running": "実行中",
+            "completed": "完了",
+            "queued": "待機中"
+        },
+        "aiPrediction": {
+            "title": "トレンド予測",
+            "next24Hours": "今後24時間の予測",
+            "rainProbability": "降水確率",
+            "taskVolumeIncrease": "予想タスク量"
+        },
+        "aiSuggestions": {
+            "title": "スマート提案"
+        },
+        "syncStatus": {
+            "online": "オンライン",
+            "networkStatus": "ネットワーク状態",
+            "pendingSync": "同期待ち",
+            "lastSync": "最終同期"
+        },
+        "pendingQueue": {
+            "title": "同期待ち操作",
+            "addReport": "報告追加",
+            "updateStatus": "ステータス更新",
+            "uploadPhoto": "写真アップロード"
+        },
+        "meshNetwork": {
+            "title": "P2P ネットワーク",
+            "nodesConnected": "個のノード接続中"
+        },
+        "intakeForm": {
+            "title": "災害報告フォーム",
+            "disasterType": "災害タイプ",
+            "flood": "洪水",
+            "debris": "土砂崩れ",
+            "buildingCollapse": "建物崩壊",
+            "other": "その他",
+            "locationDesc": "場所の説明",
+            "locationPlaceholder": "場所を入力",
+            "disasterDesc": "災害の説明",
+            "disasterPlaceholder": "災害状況を説明...",
+            "submit": "報告送信"
+        },
+        "intakeTips": {
+            "title": "報告のヒント",
+            "tip1": "できるだけ正確な住所またはGPS座標を提供してください",
+            "tip2": "撮影時は安全に注意してください",
+            "tip3": "人が閉じ込められている場合は119にも電話してください",
+            "tip4": "報告後は電話を取れる状態にしてください"
+        },
+        "recentIntakes": {
+            "title": "最近の報告"
+        },
+        "mapLayers": {
+            "title": "レイヤー制御",
+            "events": "イベントマーカー",
+            "volunteers": "ボランティア位置",
+            "resources": "リソースポイント",
+            "routes": "ルート計画"
+        },
+        "mapLegend": {
+            "critical": "緊急",
+            "high": "高優先",
+            "medium": "中優先",
+            "normal": "一般"
+        },
+        "resourceMatching": {
+            "aiMatching": "AIスマートマッチング提案",
+            "poweredByAi": "powered by AI",
+            "confirm": "確認"
+        },
+        "requestsList": {
+            "title": "ニーズリスト"
+        },
+        "suppliesGrid": {
+            "title": "供給在庫"
+        },
+        "search": {
+            "placeholder": "名前または場所を検索...",
+            "allStatus": "すべてのステータス",
+            "searching": "検索中",
+            "found": "発見",
+            "reunited": "再会完了"
+        },
+        "trends": {
+            "eventCount": "イベント数",
+            "responseTime": "応答時間",
+            "resourceDemand": "リソース需要",
+            "volunteerAttendance": "ボランティア出勤",
+            "continueDown": "継続的に減少予測",
+            "efficiencyImprove": "効率継続改善中",
+            "needMoreSupply": "備品追加が必要",
+            "stayStable": "安定維持"
+        },
+        "aiReports": {
+            "dailyDisasterSummary": "毎日の災害要約レポート",
+            "resourceDispatchSuggestion": "リソース派遣提案",
+            "volunteerEfficiencyAnalysis": "ボランティア動員効率分析",
+            "dailyReport": "日報",
+            "recommendation": "推奨",
+            "analysis": "分析",
+            "confidence": "信頼度"
+        }
+    },
+    "mobileNav": {
+        "timeline": "イベントタイムライン",
+        "volunteers": "ボランティア動向",
+        "quickActions": "クイックアクション",
+        "sidebar": "サイドバー",
+        "header": "ヘッダー",
+        "footer": "フッター"
     }
 }

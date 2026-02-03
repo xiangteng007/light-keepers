@@ -261,5 +261,195 @@
     "breadcrumb": {
         "home": "Home",
         "commandCenter": "Command Center"
+    },
+    "widgets": {
+        "taskStats": {
+            "title": "Task Statistics",
+            "pending": "Pending",
+            "matched": "Matched",
+            "completed": "Completed",
+            "matchRate": "Match Rate"
+        },
+        "situationMap": {
+            "title": "Situation Map",
+            "mapContent": "Map Content Area"
+        },
+        "ncdrAlerts": {
+            "title": "NCDR Alerts"
+        },
+        "disasterReports": {
+            "title": "Disaster Reports",
+            "report": "Disaster Report"
+        },
+        "socialFeed": {
+            "title": "Social Intel",
+            "live": "Live"
+        },
+        "weatherAlert": {
+            "title": "Heavy Rain Warning",
+            "rainfall": "Rainfall",
+            "windSpeed": "Wind Speed"
+        },
+        "notificationCenter": {
+            "title": "Notification Center",
+            "systemAnnouncement": "System Announcement",
+            "taskUpdate": "Task Update"
+        },
+        "aiCommand": {
+            "title": "AI Command Assist",
+            "suggestedAction": "Suggested Action",
+            "execute": "Execute"
+        },
+        "channelStatus": {
+            "title": "Channel Status",
+            "online": "Online",
+            "offline": "Offline"
+        },
+        "geoAlerts": {
+            "title": "Geo Alerts",
+            "alertCount": "Total Alerts",
+            "source": {
+                "ncdr": "NCDR",
+                "cwb": "CWB",
+                "social": "Social Intel"
+            }
+        },
+        "earthquake": {
+            "noEarthquake": "No Earthquake",
+            "lastUpdate": "Last Update"
+        },
+        "analytics": {
+            "todayTasks": "Today's Tasks",
+            "inProgress": "In Progress",
+            "completed": "Completed",
+            "pending": "Pending"
+        },
+        "reportGenerator": {
+            "title": "Report Generator",
+            "daily": "Daily Report",
+            "weekly": "Weekly Report",
+            "monthly": "Monthly Report",
+            "generate": "Generate Report"
+        },
+        "scheduledReports": {
+            "dailySummary": "Daily Task Summary",
+            "weeklyHours": "Weekly Volunteer Hours",
+            "nextRun": "Next"
+        },
+        "aiTasks": {
+            "title": "Running AI Tasks",
+            "eventClassification": "Event Classification",
+            "resourceMatching": "Resource Matching",
+            "trendPrediction": "Trend Prediction",
+            "running": "Running",
+            "completed": "Completed",
+            "queued": "Queued"
+        },
+        "aiPrediction": {
+            "title": "Trend Prediction",
+            "next24Hours": "Next 24 Hours Forecast",
+            "rainProbability": "Rain Probability",
+            "taskVolumeIncrease": "Est. Task Volume"
+        },
+        "aiSuggestions": {
+            "title": "Smart Suggestions"
+        },
+        "syncStatus": {
+            "online": "Online",
+            "networkStatus": "Network Status",
+            "pendingSync": "Pending Sync",
+            "lastSync": "Last Sync"
+        },
+        "pendingQueue": {
+            "title": "Pending Sync Operations",
+            "addReport": "Add Report",
+            "updateStatus": "Update Status",
+            "uploadPhoto": "Upload Photo"
+        },
+        "meshNetwork": {
+            "title": "P2P Network",
+            "nodesConnected": "nodes connected"
+        },
+        "intakeForm": {
+            "title": "Disaster Report Form",
+            "disasterType": "Disaster Type",
+            "flood": "Flood",
+            "debris": "Debris Flow",
+            "buildingCollapse": "Building Collapse",
+            "other": "Other",
+            "locationDesc": "Location Description",
+            "locationPlaceholder": "Enter location",
+            "disasterDesc": "Disaster Description",
+            "disasterPlaceholder": "Describe the disaster...",
+            "submit": "Submit Report"
+        },
+        "intakeTips": {
+            "title": "Report Tips",
+            "tip1": "Provide accurate address or GPS coordinates",
+            "tip2": "Stay safe when taking photos",
+            "tip3": "If someone is trapped, also call 119",
+            "tip4": "Keep your phone available after reporting"
+        },
+        "recentIntakes": {
+            "title": "Recent Reports"
+        },
+        "mapLayers": {
+            "title": "Layer Control",
+            "events": "Event Markers",
+            "volunteers": "Volunteer Locations",
+            "resources": "Resource Points",
+            "routes": "Route Planning"
+        },
+        "mapLegend": {
+            "critical": "Critical",
+            "high": "High Priority",
+            "medium": "Medium Priority",
+            "normal": "Normal"
+        },
+        "resourceMatching": {
+            "aiMatching": "AI Smart Matching",
+            "poweredByAi": "powered by AI",
+            "confirm": "Confirm"
+        },
+        "requestsList": {
+            "title": "Needs List"
+        },
+        "suppliesGrid": {
+            "title": "Supply Inventory"
+        },
+        "search": {
+            "placeholder": "Search name or location...",
+            "allStatus": "All Status",
+            "searching": "Searching",
+            "found": "Found",
+            "reunited": "Reunited"
+        },
+        "trends": {
+            "eventCount": "Event Count",
+            "responseTime": "Response Time",
+            "resourceDemand": "Resource Demand",
+            "volunteerAttendance": "Volunteer Attendance",
+            "continueDown": "Continuing to decrease",
+            "efficiencyImprove": "Efficiency improving",
+            "needMoreSupply": "Need more supplies",
+            "stayStable": "Staying stable"
+        },
+        "aiReports": {
+            "dailyDisasterSummary": "Daily Disaster Summary",
+            "resourceDispatchSuggestion": "Resource Dispatch Suggestion",
+            "volunteerEfficiencyAnalysis": "Volunteer Efficiency Analysis",
+            "dailyReport": "Daily Report",
+            "recommendation": "Recommendation",
+            "analysis": "Analysis",
+            "confidence": "Confidence"
+        }
+    },
+    "mobileNav": {
+        "timeline": "Event Timeline",
+        "volunteers": "Volunteer Activity",
+        "quickActions": "Quick Actions",
+        "sidebar": "Sidebar",
+        "header": "Header",
+        "footer": "Footer"
     }
 }

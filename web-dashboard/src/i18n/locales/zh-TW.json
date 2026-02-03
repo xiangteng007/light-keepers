@@ -261,5 +261,195 @@
     "breadcrumb": {
         "home": "首頁",
         "commandCenter": "指揮中心"
+    },
+    "widgets": {
+        "taskStats": {
+            "title": "任務統計",
+            "pending": "待配對",
+            "matched": "已配對",
+            "completed": "已完成",
+            "matchRate": "配對率"
+        },
+        "situationMap": {
+            "title": "戰情地圖",
+            "mapContent": "地圖內容區"
+        },
+        "ncdrAlerts": {
+            "title": "NCDR 警報"
+        },
+        "disasterReports": {
+            "title": "災情通報",
+            "report": "災情通報"
+        },
+        "socialFeed": {
+            "title": "社群情資",
+            "live": "即時"
+        },
+        "weatherAlert": {
+            "title": "豪雨特報",
+            "rainfall": "雨量",
+            "windSpeed": "風速"
+        },
+        "notificationCenter": {
+            "title": "通知中心",
+            "systemAnnouncement": "系統公告",
+            "taskUpdate": "任務更新"
+        },
+        "aiCommand": {
+            "title": "AI 指揮輔助",
+            "suggestedAction": "建議行動",
+            "execute": "執行建議"
+        },
+        "channelStatus": {
+            "title": "頻道連線狀態",
+            "online": "連線中",
+            "offline": "離線"
+        },
+        "geoAlerts": {
+            "title": "地理警報",
+            "alertCount": "警報總數",
+            "source": {
+                "ncdr": "NCDR",
+                "cwb": "氣象局",
+                "social": "社群情資"
+            }
+        },
+        "earthquake": {
+            "noEarthquake": "目前無地震",
+            "lastUpdate": "最後更新"
+        },
+        "analytics": {
+            "todayTasks": "今日任務",
+            "inProgress": "進行中",
+            "completed": "已完成",
+            "pending": "待處理"
+        },
+        "reportGenerator": {
+            "title": "報表生成",
+            "daily": "日報表",
+            "weekly": "週報表",
+            "monthly": "月報表",
+            "generate": "生成報表"
+        },
+        "scheduledReports": {
+            "dailySummary": "每日任務摘要",
+            "weeklyHours": "週志工服務時數",
+            "nextRun": "下次"
+        },
+        "aiTasks": {
+            "title": "執行中的 AI 任務",
+            "eventClassification": "事件分類",
+            "resourceMatching": "資源配對",
+            "trendPrediction": "趨勢預測",
+            "running": "執行中",
+            "completed": "完成",
+            "queued": "等待中"
+        },
+        "aiPrediction": {
+            "title": "趨勢預測",
+            "next24Hours": "未來 24 小時預測",
+            "rainProbability": "降雨機率",
+            "taskVolumeIncrease": "預估任務量"
+        },
+        "aiSuggestions": {
+            "title": "智慧建議"
+        },
+        "syncStatus": {
+            "online": "上線",
+            "networkStatus": "網路狀態",
+            "pendingSync": "待同步",
+            "lastSync": "最後同步"
+        },
+        "pendingQueue": {
+            "title": "待同步操作",
+            "addReport": "新增通報",
+            "updateStatus": "更新任務狀態",
+            "uploadPhoto": "上傳照片"
+        },
+        "meshNetwork": {
+            "title": "P2P 網路",
+            "nodesConnected": "個節點連線中"
+        },
+        "intakeForm": {
+            "title": "災情通報表單",
+            "disasterType": "災情類型",
+            "flood": "淹水",
+            "debris": "土石流",
+            "buildingCollapse": "建物倒塌",
+            "other": "其他",
+            "locationDesc": "地點描述",
+            "locationPlaceholder": "請輸入地點",
+            "disasterDesc": "災情描述",
+            "disasterPlaceholder": "請描述災情狀況...",
+            "submit": "送出通報"
+        },
+        "intakeTips": {
+            "title": "通報提示",
+            "tip1": "請盡量提供精確的地址或GPS座標",
+            "tip2": "拍照時請注意自身安全",
+            "tip3": "若有人員受困，請同時撥打119",
+            "tip4": "通報後請保持手機暢通"
+        },
+        "recentIntakes": {
+            "title": "近期通報"
+        },
+        "mapLayers": {
+            "title": "圖層控制",
+            "events": "事件標記",
+            "volunteers": "志工位置",
+            "resources": "資源點",
+            "routes": "路線規劃"
+        },
+        "mapLegend": {
+            "critical": "緊急",
+            "high": "高優先",
+            "medium": "中優先",
+            "normal": "一般"
+        },
+        "resourceMatching": {
+            "aiMatching": "AI 智慧配對建議",
+            "poweredByAi": "powered by AI",
+            "confirm": "確認"
+        },
+        "requestsList": {
+            "title": "需求列表"
+        },
+        "suppliesGrid": {
+            "title": "供給庫存"
+        },
+        "search": {
+            "placeholder": "搜尋姓名或地點...",
+            "allStatus": "所有狀態",
+            "searching": "尋找中",
+            "found": "已尋獲",
+            "reunited": "已團聚"
+        },
+        "trends": {
+            "eventCount": "事件數量",
+            "responseTime": "響應時間",
+            "resourceDemand": "資源需求",
+            "volunteerAttendance": "志工出勤",
+            "continueDown": "預計持續下降",
+            "efficiencyImprove": "效率持續改善",
+            "needMoreSupply": "需增加備品",
+            "stayStable": "維持穩定"
+        },
+        "aiReports": {
+            "dailyDisasterSummary": "每日災情彙整報告",
+            "resourceDispatchSuggestion": "資源調度建議",
+            "volunteerEfficiencyAnalysis": "志工動員效率分析",
+            "dailyReport": "每日報告",
+            "recommendation": "建議",
+            "analysis": "分析",
+            "confidence": "信心度"
+        }
+    },
+    "mobileNav": {
+        "timeline": "事件時間線",
+        "volunteers": "志工動態",
+        "quickActions": "快速操作",
+        "sidebar": "側邊欄",
+        "header": "標題列",
+        "footer": "頁尾"
     }
 }
