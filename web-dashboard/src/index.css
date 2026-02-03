@@ -10,7 +10,12 @@
 ============================================ */
 @import url('./styles/globals.css');
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+/* Multi-language Font Support - 13 Languages
+   CJK: TC, SC, JP, KR
+   SEA: Thai, Vietnamese, Khmer, Myanmar, Lao
+   Latin: Inter for UI elements
+*/
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Khmer:wght@400;500;600;700&family=Noto+Sans+Myanmar:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
 /* Dark Mode Override - Tactical Theme */
 html.dark {
@@ -171,7 +176,15 @@ html.dark ::-webkit-scrollbar-thumb:hover {
 }
 
 :root {
-  font-family: 'Inter', 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  /* Multi-language font stack */
+  font-family: 
+    'Inter', 
+    /* CJK */
+    'Noto Sans TC', 'Noto Sans SC', 'Noto Sans JP', 'Noto Sans KR',
+    /* Southeast Asian */
+    'Noto Sans Thai', 'Noto Sans Khmer', 'Noto Sans Myanmar', 'Noto Sans Lao',
+    /* System fallbacks */
+    system-ui, -apple-system, sans-serif;
   line-height: 1.5;
   font-weight: 400;
   font-synthesis: none;
