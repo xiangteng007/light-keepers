@@ -22,7 +22,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // Config version - increment when nav structure changes to force localStorage reset
-const CONFIG_VERSION = 3;
+const CONFIG_VERSION = 4;  // v4: Fix insights group accessibility
 const STORAGE_KEY = 'lk-sidebar-config';
 const VERSION_KEY = 'lk-sidebar-version';
 
@@ -89,7 +89,7 @@ export const NAV_GROUPS: NavGroupConfig[] = [
     { id: 'rescue', label: '救援行動', icon: 'Stethoscope', emoji: '🏥', order: 3, minLevel: PermissionLevel.Volunteer },
     { id: 'logistics', label: '資源後勤', icon: 'Package', emoji: '📦', order: 4, minLevel: PermissionLevel.Volunteer },
     { id: 'workforce', label: '人員動員', icon: 'Users', emoji: '👥', order: 5, minLevel: PermissionLevel.Volunteer },
-    { id: 'insights', label: '分析知識', icon: 'BarChart3', emoji: '📊', order: 6, minLevel: PermissionLevel.Supervisor },
+    { id: 'insights', label: '分析知識', icon: 'BarChart3', emoji: '📊', order: 6 },  // Contains public items like manuals
     { id: 'admin', label: '系統管理', icon: 'Settings', emoji: '⚙️', order: 7, minLevel: PermissionLevel.Manager },
 ];
 
