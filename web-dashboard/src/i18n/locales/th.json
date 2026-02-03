@@ -208,5 +208,73 @@
         "message": "คุณกำลังออฟไลน์อยู่ บางฟีเจอร์อาจถูกจำกัด",
         "pending": "รอการซิงค์",
         "sync": "ซิงค์"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "ฉุกเฉิน",
+            "ops": "ศูนย์บัญชาการ",
+            "geo": "แผนที่ข่าวกรอง",
+            "rescue": "ปฏิบัติการกู้ภัย",
+            "logistics": "โลจิสติกส์",
+            "workforce": "กำลังพล",
+            "insights": "การวิเคราะห์",
+            "admin": "ผู้ดูแลระบบ"
+        },
+        "items": {
+            "sos": "ส่ง SOS",
+            "quickReport": "รายงานด่วน",
+            "evacuation": "แจ้งเตือนอพยพ",
+            "hotline": "สายด่วน",
+            "commandCenter": "แดชบอร์ดสถานการณ์",
+            "incidents": "เหตุการณ์",
+            "tasks": "กระดานงาน",
+            "icsForms": "แบบฟอร์ม ICS",
+            "notifications": "การแจ้งเตือน",
+            "icDashboard": "แดชบอร์ด IC",
+            "offline": "ออฟไลน์",
+            "unifiedMap": "แผนที่รวม",
+            "alerts": "ศูนย์แจ้งเตือน",
+            "weather": "สภาพอากาศ",
+            "shelterMap": "แผนที่ที่พักพิง",
+            "shelters": "จัดการที่พักพิง",
+            "triage": "คัดกรอง",
+            "reunification": "รวมครอบครัว",
+            "searchRescue": "ค้นหากู้ภัย",
+            "medicalTransport": "ขนส่งทางการแพทย์",
+            "fieldComms": "สื่อสารภาคสนาม",
+            "inventory": "คลังสินค้า",
+            "equipment": "อุปกรณ์",
+            "donations": "บริจาค",
+            "unifiedResources": "ศูนย์ทรัพยากร",
+            "approvals": "การอนุมัติ",
+            "people": "บุคลากร",
+            "shifts": "ปฏิทินกะ",
+            "mobilization": "ระดมพล",
+            "performance": "ผลงาน",
+            "communityHub": "ศูนย์ชุมชน",
+            "mentalHealth": "สุขภาพจิต",
+            "analytics": "แดชบอร์ดวิเคราะห์",
+            "reports": "รายงาน",
+            "unifiedReporting": "รายงานรวม",
+            "simulationEngine": "การจำลอง",
+            "aiTasks": "งาน AI",
+            "aiChat": "ผู้ช่วย AI",
+            "training": "การฝึกอบรม",
+            "manuals": "คู่มือ",
+            "iam": "ควบคุมการเข้าถึง",
+            "audit": "บันทึกการตรวจสอบ",
+            "security": "ความปลอดภัย",
+            "interoperability": "การทำงานร่วมกัน",
+            "webhooks": "Webhook",
+            "biometric": "ไบโอเมตริก",
+            "settings": "การตั้งค่า"
+        },
+        "status": {
+            "onDuty": "เข้าเวร"
+        }
+    },
+    "breadcrumb": {
+        "home": "หน้าหลัก",
+        "commandCenter": "ศูนย์บัญชาการ"
     }
 }

@@ -193,5 +193,73 @@
         "message": "您目前處於離線狀態，部分功能可能受限",
         "pending": "筆待同步",
         "sync": "同步"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "緊急快捷",
+            "ops": "作戰中心",
+            "geo": "情資地圖",
+            "rescue": "救援行動",
+            "logistics": "資源後勤",
+            "workforce": "人員動員",
+            "insights": "分析知識",
+            "admin": "系統管理"
+        },
+        "items": {
+            "sos": "SOS 發送",
+            "quickReport": "快速通報",
+            "evacuation": "撤離警報",
+            "hotline": "緊急專線",
+            "commandCenter": "戰情儀表板",
+            "incidents": "事件列表",
+            "tasks": "任務看板",
+            "icsForms": "ICS 表單",
+            "notifications": "通知中心",
+            "icDashboard": "IC 儀表板",
+            "offline": "離線狀態",
+            "unifiedMap": "統一地圖",
+            "alerts": "警報中心",
+            "weather": "氣象預報",
+            "shelterMap": "避難所地圖",
+            "shelters": "避難所管理",
+            "triage": "傷患分類",
+            "reunification": "家庭重聚",
+            "searchRescue": "搜救任務",
+            "medicalTransport": "醫療後送",
+            "fieldComms": "現地通訊",
+            "inventory": "物資庫存",
+            "equipment": "裝備管理",
+            "donations": "捐贈追蹤",
+            "unifiedResources": "資源整合",
+            "approvals": "審批中心",
+            "people": "人員名冊",
+            "shifts": "排班日曆",
+            "mobilization": "志工動員",
+            "performance": "績效中心",
+            "communityHub": "社區活動",
+            "mentalHealth": "心理支持",
+            "analytics": "分析儀表板",
+            "reports": "報表中心",
+            "unifiedReporting": "綜合報表",
+            "simulationEngine": "模擬引擎",
+            "aiTasks": "AI 任務",
+            "aiChat": "AI 助手",
+            "training": "訓練課程",
+            "manuals": "作業手冊",
+            "iam": "權限管理",
+            "audit": "審計日誌",
+            "security": "安全中心",
+            "interoperability": "機構互通",
+            "webhooks": "Webhook 管理",
+            "biometric": "生物辨識",
+            "settings": "系統設定"
+        },
+        "status": {
+            "onDuty": "值班中"
+        }
+    },
+    "breadcrumb": {
+        "home": "首頁",
+        "commandCenter": "指揮中心"
     }
 }

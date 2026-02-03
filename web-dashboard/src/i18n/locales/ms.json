@@ -208,5 +208,73 @@
         "message": "Anda sedang luar talian. Sesetengah ciri mungkin terhad.",
         "pending": "menunggu penyegerakan",
         "sync": "Segerak"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "Kecemasan",
+            "ops": "Pusat Perintah",
+            "geo": "Peta Intel",
+            "rescue": "Ops Penyelamatan",
+            "logistics": "Logistik",
+            "workforce": "Tenaga Kerja",
+            "insights": "Analitik",
+            "admin": "Admin"
+        },
+        "items": {
+            "sos": "Hantar SOS",
+            "quickReport": "Laporan Pantas",
+            "evacuation": "Amaran Pemindahan",
+            "hotline": "Talian Kecemasan",
+            "commandCenter": "Papan Pemuka Situasi",
+            "incidents": "Insiden",
+            "tasks": "Papan Tugas",
+            "icsForms": "Borang ICS",
+            "notifications": "Pemberitahuan",
+            "icDashboard": "Papan Pemuka IC",
+            "offline": "Luar Talian",
+            "unifiedMap": "Peta Bersatu",
+            "alerts": "Pusat Amaran",
+            "weather": "Cuaca",
+            "shelterMap": "Peta Tempat Perlindungan",
+            "shelters": "Pengurusan Perlindungan",
+            "triage": "Triaj",
+            "reunification": "Penyatuan Keluarga",
+            "searchRescue": "Carian & Penyelamatan",
+            "medicalTransport": "Pengangkutan Perubatan",
+            "fieldComms": "Komunikasi Lapangan",
+            "inventory": "Inventori",
+            "equipment": "Peralatan",
+            "donations": "Derma",
+            "unifiedResources": "Hub Sumber",
+            "approvals": "Kelulusan",
+            "people": "Kakitangan",
+            "shifts": "Kalendar Syif",
+            "mobilization": "Mobilisasi",
+            "performance": "Prestasi",
+            "communityHub": "Hub Komuniti",
+            "mentalHealth": "Kesihatan Mental",
+            "analytics": "Papan Pemuka Analitik",
+            "reports": "Laporan",
+            "unifiedReporting": "Laporan Bersepadu",
+            "simulationEngine": "Simulasi",
+            "aiTasks": "Tugas AI",
+            "aiChat": "Pembantu AI",
+            "training": "Latihan",
+            "manuals": "Manual",
+            "iam": "Kawalan Akses",
+            "audit": "Log Audit",
+            "security": "Keselamatan",
+            "interoperability": "Interoperabiliti",
+            "webhooks": "Webhook",
+            "biometric": "Biometrik",
+            "settings": "Tetapan"
+        },
+        "status": {
+            "onDuty": "Bertugas"
+        }
+    },
+    "breadcrumb": {
+        "home": "Utama",
+        "commandCenter": "Pusat Perintah"
     }
 }

@@ -193,5 +193,73 @@
         "message": "You are currently offline. Some features may be limited.",
         "pending": "pending sync",
         "sync": "Sync"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "Emergency",
+            "ops": "Command Center",
+            "geo": "Intel Map",
+            "rescue": "Rescue Ops",
+            "logistics": "Logistics",
+            "workforce": "Workforce",
+            "insights": "Analytics",
+            "admin": "Admin"
+        },
+        "items": {
+            "sos": "Send SOS",
+            "quickReport": "Quick Report",
+            "evacuation": "Evacuation Alert",
+            "hotline": "Emergency Hotline",
+            "commandCenter": "Situation Dashboard",
+            "incidents": "Incidents",
+            "tasks": "Task Board",
+            "icsForms": "ICS Forms",
+            "notifications": "Notifications",
+            "icDashboard": "IC Dashboard",
+            "offline": "Offline Status",
+            "unifiedMap": "Unified Map",
+            "alerts": "Alert Center",
+            "weather": "Weather",
+            "shelterMap": "Shelter Map",
+            "shelters": "Shelter Mgmt",
+            "triage": "Triage",
+            "reunification": "Family Reunification",
+            "searchRescue": "Search & Rescue",
+            "medicalTransport": "Medical Transport",
+            "fieldComms": "Field Comms",
+            "inventory": "Inventory",
+            "equipment": "Equipment",
+            "donations": "Donations",
+            "unifiedResources": "Resource Hub",
+            "approvals": "Approvals",
+            "people": "Personnel",
+            "shifts": "Shift Calendar",
+            "mobilization": "Mobilization",
+            "performance": "Performance",
+            "communityHub": "Community Hub",
+            "mentalHealth": "Mental Health",
+            "analytics": "Analytics Dashboard",
+            "reports": "Reports",
+            "unifiedReporting": "Unified Reports",
+            "simulationEngine": "Simulation",
+            "aiTasks": "AI Tasks",
+            "aiChat": "AI Assistant",
+            "training": "Training",
+            "manuals": "Manuals",
+            "iam": "Access Control",
+            "audit": "Audit Logs",
+            "security": "Security",
+            "interoperability": "Interoperability",
+            "webhooks": "Webhooks",
+            "biometric": "Biometrics",
+            "settings": "Settings"
+        },
+        "status": {
+            "onDuty": "On Duty"
+        }
+    },
+    "breadcrumb": {
+        "home": "Home",
+        "commandCenter": "Command Center"
     }
 }

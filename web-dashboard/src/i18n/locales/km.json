@@ -212,5 +212,73 @@
         "message": "អ្នកបច្ចុប្បន្នមិនមានអ៊ីនធឺណិត។ មុខងារមួយចំនួនអាចមានកំណត់។",
         "pending": "កំពុងរង់ចាំសមកាលកម្ម",
         "sync": "សមកាលកម្ម"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "បន្ទាន់",
+            "ops": "មជ្ឈមណ្ឌលបញ្ជា",
+            "geo": "ផែនទីព័ត៌មាន",
+            "rescue": "ប្រតិបត្តិការសង្គ្រោះ",
+            "logistics": "ភស្តុភារ",
+            "workforce": "កម្លាំងពលកម្ម",
+            "insights": "ការវិភាគ",
+            "admin": "អ្នកគ្រប់គ្រង"
+        },
+        "items": {
+            "sos": "ផ្ញើ SOS",
+            "quickReport": "រាយការណ៍រហ័ស",
+            "evacuation": "ការជូនដំណឹងជម្លៀស",
+            "hotline": "ខ្សែទូរសព្ទបន្ទាន់",
+            "commandCenter": "ផ្ទាំងសភាពការណ៍",
+            "incidents": "ឧប្បត្តិហេតុ",
+            "tasks": "បន្ទះភារកិច្ច",
+            "icsForms": "ទម្រង់ ICS",
+            "notifications": "ការជូនដំណឹង",
+            "icDashboard": "ផ្ទាំង IC",
+            "offline": "ក្រៅបណ្តាញ",
+            "unifiedMap": "ផែនទីរួម",
+            "alerts": "មជ្ឈមណ្ឌលប្រកាស",
+            "weather": "អាកាសធាតុ",
+            "shelterMap": "ផែនទីជម្រក",
+            "shelters": "ការគ្រប់គ្រងជម្រក",
+            "triage": "ការចាត់ថ្នាក់",
+            "reunification": "ការរួបរួមគ្រួសារ",
+            "searchRescue": "ស្វែងរក និងសង្គ្រោះ",
+            "medicalTransport": "ដឹកជញ្ជូនពេទ្យ",
+            "fieldComms": "ការទំនាក់ទំនងវាល",
+            "inventory": "សន្និធិ",
+            "equipment": "ឧបករណ៍",
+            "donations": "ការបរិច្ចាគ",
+            "unifiedResources": "មជ្ឈមណ្ឌលធនធាន",
+            "approvals": "ការអនុម័ត",
+            "people": "បុគ្គលិក",
+            "shifts": "កាលវិភាគប្តូរវេន",
+            "mobilization": "ការបង្កើតកម្លាំង",
+            "performance": "ដំណើរការ",
+            "communityHub": "មជ្ឈមណ្ឌលសហគមន៍",
+            "mentalHealth": "សុខភាពផ្លូវចិត្ត",
+            "analytics": "ផ្ទាំងវិភាគ",
+            "reports": "របាយការណ៍",
+            "unifiedReporting": "របាយការណ៍រួម",
+            "simulationEngine": "ការក្លែងធ្វើ",
+            "aiTasks": "ភារកិច្ច AI",
+            "aiChat": "ជំនួយការ AI",
+            "training": "ការបណ្តុះបណ្តាល",
+            "manuals": "សៀវភៅណែនាំ",
+            "iam": "ការត្រួតពិនិត្យចូល",
+            "audit": "កំណត់ត្រាសវនកម្ម",
+            "security": "សុវត្ថិភាព",
+            "interoperability": "អន្តរប្រតិបត្តិការ",
+            "webhooks": "Webhooks",
+            "biometric": "ជីវមាត្រ",
+            "settings": "ការកំណត់"
+        },
+        "status": {
+            "onDuty": "កំពុងបំពេញភារកិច្ច"
+        }
+    },
+    "breadcrumb": {
+        "home": "ទំព័រដើម",
+        "commandCenter": "មជ្ឈមណ្ឌលបញ្ជា"
     }
 }

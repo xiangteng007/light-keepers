@@ -208,5 +208,73 @@
         "message": "現在オフラインです。一部の機能が制限される場合があります。",
         "pending": "件同期待ち",
         "sync": "同期"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "緊急",
+            "ops": "指揮センター",
+            "geo": "情報地図",
+            "rescue": "救助活動",
+            "logistics": "物流",
+            "workforce": "人員",
+            "insights": "分析",
+            "admin": "管理"
+        },
+        "items": {
+            "sos": "SOS発信",
+            "quickReport": "速報",
+            "evacuation": "避難警報",
+            "hotline": "緊急ダイヤル",
+            "commandCenter": "状況ダッシュボード",
+            "incidents": "事件一覧",
+            "tasks": "タスク一覧",
+            "icsForms": "ICSフォーム",
+            "notifications": "通知",
+            "icDashboard": "IC ダッシュボード",
+            "offline": "オフライン",
+            "unifiedMap": "統合マップ",
+            "alerts": "アラートセンター",
+            "weather": "天気",
+            "shelterMap": "避難所マップ",
+            "shelters": "避難所管理",
+            "triage": "トリアージ",
+            "reunification": "家族再会",
+            "searchRescue": "捜索救助",
+            "medicalTransport": "医療輸送",
+            "fieldComms": "現場通信",
+            "inventory": "在庫",
+            "equipment": "設備",
+            "donations": "寄付",
+            "unifiedResources": "リソースハブ",
+            "approvals": "承認",
+            "people": "人員",
+            "shifts": "シフト",
+            "mobilization": "動員",
+            "performance": "パフォーマンス",
+            "communityHub": "コミュニティ",
+            "mentalHealth": "メンタルヘルス",
+            "analytics": "分析ダッシュボード",
+            "reports": "レポート",
+            "unifiedReporting": "統合レポート",
+            "simulationEngine": "シミュレーション",
+            "aiTasks": "AIタスク",
+            "aiChat": "AIアシスタント",
+            "training": "研修",
+            "manuals": "マニュアル",
+            "iam": "アクセス制御",
+            "audit": "監査ログ",
+            "security": "セキュリティ",
+            "interoperability": "相互運用",
+            "webhooks": "Webhook",
+            "biometric": "生体認証",
+            "settings": "設定"
+        },
+        "status": {
+            "onDuty": "勤務中"
+        }
+    },
+    "breadcrumb": {
+        "home": "ホーム",
+        "commandCenter": "指揮センター"
     }
 }

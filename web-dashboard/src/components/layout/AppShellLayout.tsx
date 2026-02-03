@@ -4,7 +4,8 @@
  * Implementation of appshell-layout.md with iOS Widget system
  * Level 5 users can edit, drag, resize, and hide widgets
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User, Plus, Minus } from 'lucide-react';
 import { WidgetGrid } from './WidgetGrid';
 import { Widget, WidgetEditControls } from './Widget';
@@ -31,6 +32,33 @@ export default function AppShellLayout({
     userLevel = PermissionLevel.SystemOwner,  // Default to Level 5 for demo
     pageId = 'default',
 }: AppShellLayoutProps) {
+    const { t } = useTranslation();
+
+    // Helper to convert item id to camelCase translation key
+    const getItemLabel = useMemo(() => {
+        const idToKey: Record<string, string> = {
+            'sos': 'sos', 'quick-report': 'quickReport', 'evacuation': 'evacuation', 'hotline': 'hotline',
+            'command-center': 'commandCenter', 'incidents': 'incidents', 'tasks': 'tasks',
+            'ics-forms': 'icsForms', 'notifications': 'notifications', 'ic-dashboard': 'icDashboard',
+            'offline': 'offline', 'unified-map': 'unifiedMap', 'alerts': 'alerts', 'weather': 'weather',
+            'shelter-map': 'shelterMap', 'shelters': 'shelters', 'triage': 'triage',
+            'reunification': 'reunification', 'search-rescue': 'searchRescue',
+            'medical-transport': 'medicalTransport', 'field-comms': 'fieldComms',
+            'inventory': 'inventory', 'equipment': 'equipment', 'donations': 'donations',
+            'unified-resources': 'unifiedResources', 'approvals': 'approvals', 'people': 'people',
+            'shifts': 'shifts', 'mobilization': 'mobilization', 'performance': 'performance',
+            'community-hub': 'communityHub', 'mental-health': 'mentalHealth', 'analytics': 'analytics',
+            'reports': 'reports', 'unified-reporting': 'unifiedReporting',
+            'simulation-engine': 'simulationEngine', 'ai-tasks': 'aiTasks', 'ai-chat': 'aiChat',
+            'training': 'training', 'manuals': 'manuals', 'iam': 'iam', 'audit': 'audit',
+            'security': 'security', 'interoperability': 'interoperability', 'webhooks': 'webhooks',
+            'biometric': 'biometric', 'settings': 'settings',
+        };
+        return (id: string, fallback: string) => {
+            const key = idToKey[id];
+            return key ? t(`sidebar.items.${key}`, fallback) : fallback;
+        };
+    }, [t]);
     const [drawerOpen, setDrawerOpen] = useState(false);
     // Persist sidebar expanded state to localStorage
     const [sidebarExpanded, setSidebarExpanded] = useState(() => {
@@ -352,7 +380,7 @@ export default function AppShellLayout({
                                             <>
                                                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                                                     <span>{group.emoji}</span>
-                                                    <span>{group.label}</span>
+                                                    <span>{t(`sidebar.groups.${group.id}`, group.label)}</span>
                                                 </div>
                                                 {isCollapsed ? <Plus size={16} /> : <Minus size={16} />}
                                             </>
@@ -373,7 +401,7 @@ export default function AppShellLayout({
                                                     <NavItem
                                                         key={item.id}
                                                         icon={IconComponent ? <IconComponent size={20} /> : null}
-                                                        label={item.label}
+                                                        label={getItemLabel(item.id, item.label)}
                                                         path={item.path}
                                                         expanded={sidebarExpanded}
                                                     />

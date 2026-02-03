@@ -208,5 +208,73 @@
         "message": "Anda sedang offline. Beberapa fitur mungkin terbatas.",
         "pending": "menunggu sinkronisasi",
         "sync": "Sinkronkan"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "Darurat",
+            "ops": "Pusat Komando",
+            "geo": "Peta Intel",
+            "rescue": "Operasi Penyelamatan",
+            "logistics": "Logistik",
+            "workforce": "Tenaga Kerja",
+            "insights": "Analitik",
+            "admin": "Admin"
+        },
+        "items": {
+            "sos": "Kirim SOS",
+            "quickReport": "Laporan Cepat",
+            "evacuation": "Peringatan Evakuasi",
+            "hotline": "Hotline Darurat",
+            "commandCenter": "Dasbor Situasi",
+            "incidents": "Insiden",
+            "tasks": "Papan Tugas",
+            "icsForms": "Formulir ICS",
+            "notifications": "Notifikasi",
+            "icDashboard": "Dasbor IC",
+            "offline": "Offline",
+            "unifiedMap": "Peta Terpadu",
+            "alerts": "Pusat Peringatan",
+            "weather": "Cuaca",
+            "shelterMap": "Peta Tempat Perlindungan",
+            "shelters": "Manajemen Tempat Perlindungan",
+            "triage": "Triase",
+            "reunification": "Reunifikasi Keluarga",
+            "searchRescue": "Pencarian & Penyelamatan",
+            "medicalTransport": "Transportasi Medis",
+            "fieldComms": "Komunikasi Lapangan",
+            "inventory": "Inventaris",
+            "equipment": "Peralatan",
+            "donations": "Donasi",
+            "unifiedResources": "Hub Sumber Daya",
+            "approvals": "Persetujuan",
+            "people": "Personel",
+            "shifts": "Kalender Shift",
+            "mobilization": "Mobilisasi",
+            "performance": "Kinerja",
+            "communityHub": "Hub Komunitas",
+            "mentalHealth": "Kesehatan Mental",
+            "analytics": "Dasbor Analitik",
+            "reports": "Laporan",
+            "unifiedReporting": "Laporan Terpadu",
+            "simulationEngine": "Simulasi",
+            "aiTasks": "Tugas AI",
+            "aiChat": "Asisten AI",
+            "training": "Pelatihan",
+            "manuals": "Manual",
+            "iam": "Kontrol Akses",
+            "audit": "Log Audit",
+            "security": "Keamanan",
+            "interoperability": "Interoperabilitas",
+            "webhooks": "Webhook",
+            "biometric": "Biometrik",
+            "settings": "Pengaturan"
+        },
+        "status": {
+            "onDuty": "Bertugas"
+        }
+    },
+    "breadcrumb": {
+        "home": "Beranda",
+        "commandCenter": "Pusat Komando"
     }
 }

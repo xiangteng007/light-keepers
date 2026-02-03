@@ -208,5 +208,73 @@
         "message": "Kasalukuyan kang offline. Ang ilang feature ay maaaring limitado.",
         "pending": "naghihintay na i-sync",
         "sync": "I-sync"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "Emergency",
+            "ops": "Command Center",
+            "geo": "Intel Map",
+            "rescue": "Rescue Ops",
+            "logistics": "Logistics",
+            "workforce": "Workforce",
+            "insights": "Analytics",
+            "admin": "Admin"
+        },
+        "items": {
+            "sos": "Magpadala ng SOS",
+            "quickReport": "Mabilis na Ulat",
+            "evacuation": "Babala sa Paglikas",
+            "hotline": "Emergency Hotline",
+            "commandCenter": "Dashboard ng Sitwasyon",
+            "incidents": "Mga Insidente",
+            "tasks": "Task Board",
+            "icsForms": "ICS Forms",
+            "notifications": "Mga Abiso",
+            "icDashboard": "IC Dashboard",
+            "offline": "Offline",
+            "unifiedMap": "Unified Map",
+            "alerts": "Alert Center",
+            "weather": "Panahon",
+            "shelterMap": "Mapa ng Shelter",
+            "shelters": "Shelter Mgmt",
+            "triage": "Triage",
+            "reunification": "Family Reunification",
+            "searchRescue": "Search & Rescue",
+            "medicalTransport": "Medical Transport",
+            "fieldComms": "Field Comms",
+            "inventory": "Inventory",
+            "equipment": "Kagamitan",
+            "donations": "Mga Donasyon",
+            "unifiedResources": "Resource Hub",
+            "approvals": "Mga Approval",
+            "people": "Personnel",
+            "shifts": "Shift Calendar",
+            "mobilization": "Mobilization",
+            "performance": "Performance",
+            "communityHub": "Community Hub",
+            "mentalHealth": "Mental Health",
+            "analytics": "Analytics Dashboard",
+            "reports": "Mga Ulat",
+            "unifiedReporting": "Unified Reports",
+            "simulationEngine": "Simulation",
+            "aiTasks": "AI Tasks",
+            "aiChat": "AI Assistant",
+            "training": "Pagsasanay",
+            "manuals": "Mga Manual",
+            "iam": "Access Control",
+            "audit": "Audit Logs",
+            "security": "Seguridad",
+            "interoperability": "Interoperability",
+            "webhooks": "Webhooks",
+            "biometric": "Biometrics",
+            "settings": "Settings"
+        },
+        "status": {
+            "onDuty": "Naka-duty"
+        }
+    },
+    "breadcrumb": {
+        "home": "Home",
+        "commandCenter": "Command Center"
     }
 }

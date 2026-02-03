@@ -212,5 +212,73 @@
         "message": "현재 오프라인 상태입니다. 일부 기능이 제한될 수 있습니다.",
         "pending": "건 동기화 대기 중",
         "sync": "동기화"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "긴급",
+            "ops": "지휘 센터",
+            "geo": "정보 지도",
+            "rescue": "구조 활동",
+            "logistics": "물류",
+            "workforce": "인력",
+            "insights": "분석",
+            "admin": "관리"
+        },
+        "items": {
+            "sos": "SOS 전송",
+            "quickReport": "빠른 보고",
+            "evacuation": "대피 경보",
+            "hotline": "긴급 전화",
+            "commandCenter": "상황 대시보드",
+            "incidents": "사건 목록",
+            "tasks": "작업 보드",
+            "icsForms": "ICS 양식",
+            "notifications": "알림",
+            "icDashboard": "IC 대시보드",
+            "offline": "오프라인",
+            "unifiedMap": "통합 지도",
+            "alerts": "경보 센터",
+            "weather": "날씨",
+            "shelterMap": "대피소 지도",
+            "shelters": "대피소 관리",
+            "triage": "환자 분류",
+            "reunification": "가족 재결합",
+            "searchRescue": "수색 구조",
+            "medicalTransport": "의료 이송",
+            "fieldComms": "현장 통신",
+            "inventory": "재고",
+            "equipment": "장비",
+            "donations": "기부",
+            "unifiedResources": "자원 허브",
+            "approvals": "승인",
+            "people": "인력 명단",
+            "shifts": "근무 일정",
+            "mobilization": "동원",
+            "performance": "성과",
+            "communityHub": "커뮤니티",
+            "mentalHealth": "정신 건강",
+            "analytics": "분석 대시보드",
+            "reports": "보고서",
+            "unifiedReporting": "통합 보고",
+            "simulationEngine": "시뮬레이션",
+            "aiTasks": "AI 작업",
+            "aiChat": "AI 어시스턴트",
+            "training": "교육",
+            "manuals": "매뉴얼",
+            "iam": "접근 제어",
+            "audit": "감사 로그",
+            "security": "보안",
+            "interoperability": "상호운용",
+            "webhooks": "Webhook",
+            "biometric": "생체 인증",
+            "settings": "설정"
+        },
+        "status": {
+            "onDuty": "근무 중"
+        }
+    },
+    "breadcrumb": {
+        "home": "홈",
+        "commandCenter": "지휘 센터"
     }
 }

@@ -208,5 +208,73 @@
         "message": "Bạn hiện đang ngoại tuyến. Một số tính năng có thể bị giới hạn.",
         "pending": "đang chờ đồng bộ",
         "sync": "Đồng bộ"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "Khẩn cấp",
+            "ops": "Trung tâm Chỉ huy",
+            "geo": "Bản đồ Intel",
+            "rescue": "Cứu hộ",
+            "logistics": "Hậu cần",
+            "workforce": "Nhân lực",
+            "insights": "Phân tích",
+            "admin": "Quản lý"
+        },
+        "items": {
+            "sos": "Gửi SOS",
+            "quickReport": "Báo cáo Nhanh",
+            "evacuation": "Cảnh báo Sơ tán",
+            "hotline": "Đường dây Khẩn cấp",
+            "commandCenter": "Bảng điều khiển",
+            "incidents": "Sự cố",
+            "tasks": "Công việc",
+            "icsForms": "Biểu mẫu ICS",
+            "notifications": "Thông báo",
+            "icDashboard": "Bảng IC",
+            "offline": "Ngoại tuyến",
+            "unifiedMap": "Bản đồ Thống nhất",
+            "alerts": "Trung tâm Cảnh báo",
+            "weather": "Thời tiết",
+            "shelterMap": "Bản đồ Nơi trú",
+            "shelters": "Quản lý Nơi trú",
+            "triage": "Phân loại",
+            "reunification": "Đoàn tụ Gia đình",
+            "searchRescue": "Tìm kiếm Cứu nạn",
+            "medicalTransport": "Vận chuyển Y tế",
+            "fieldComms": "Thông tin Hiện trường",
+            "inventory": "Kho",
+            "equipment": "Thiết bị",
+            "donations": "Quyên góp",
+            "unifiedResources": "Hub Tài nguyên",
+            "approvals": "Phê duyệt",
+            "people": "Nhân sự",
+            "shifts": "Lịch Ca",
+            "mobilization": "Huy động",
+            "performance": "Hiệu suất",
+            "communityHub": "Cộng đồng",
+            "mentalHealth": "Sức khỏe Tâm thần",
+            "analytics": "Bảng Phân tích",
+            "reports": "Báo cáo",
+            "unifiedReporting": "Báo cáo Tổng hợp",
+            "simulationEngine": "Mô phỏng",
+            "aiTasks": "Tác vụ AI",
+            "aiChat": "Trợ lý AI",
+            "training": "Đào tạo",
+            "manuals": "Hướng dẫn",
+            "iam": "Kiểm soát Truy cập",
+            "audit": "Nhật ký Kiểm toán",
+            "security": "Bảo mật",
+            "interoperability": "Tương tác",
+            "webhooks": "Webhook",
+            "biometric": "Sinh trắc học",
+            "settings": "Cài đặt"
+        },
+        "status": {
+            "onDuty": "Đang trực"
+        }
+    },
+    "breadcrumb": {
+        "home": "Trang chủ",
+        "commandCenter": "Trung tâm Chỉ huy"
     }
 }

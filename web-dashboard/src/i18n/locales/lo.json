@@ -212,5 +212,73 @@
         "message": "ທ່ານກຳລັງອອບໄລນ໌. ບາງຄຸນສົມບັດອາດຖືກຈຳກັດ.",
         "pending": "ລາຍການລໍຖ້າ sync",
         "sync": "Sync"
+    },
+    "sidebar": {
+        "groups": {
+            "emergency": "ສຸກເສີນ",
+            "ops": "ສູນບັນຊາການ",
+            "geo": "ແຜນທີ່ຂ່າວກອງ",
+            "rescue": "ປະຕິບັດການກູ້ໄພ",
+            "logistics": "ການຂົນສົ່ງ",
+            "workforce": "ກຳລັງຄົນ",
+            "insights": "ການວິເຄາະ",
+            "admin": "ຜູ້ຄວບຄຸມ"
+        },
+        "items": {
+            "sos": "ສົ່ງ SOS",
+            "quickReport": "ລາຍງານດ່ວນ",
+            "evacuation": "ການແຈ້ງເຕືອນການອົບພະຍົບ",
+            "hotline": "ສາຍດ່ວນສຸກເສີນ",
+            "commandCenter": "ແດດບອດສະຖານະການ",
+            "incidents": "ເຫດການ",
+            "tasks": "ກະດານວຽກ",
+            "icsForms": "ແບບຟອມ ICS",
+            "notifications": "ການແຈ້ງເຕືອນ",
+            "icDashboard": "ແດດບອດ IC",
+            "offline": "ອອບລາຍ",
+            "unifiedMap": "ແຜນທີ່ລວມ",
+            "alerts": "ສູນແຈ້ງເຕືອນ",
+            "weather": "ສະພາບອາກາດ",
+            "shelterMap": "ແຜນທີ່ບ່ອນພັກພິງ",
+            "shelters": "ການຈັດການບ່ອນພັກພິງ",
+            "triage": "ການຈັດລຳດັບ",
+            "reunification": "ການລວມຄອບຄົວ",
+            "searchRescue": "ຄົ້ນຫາ ແລະ ກູ້ໄພ",
+            "medicalTransport": "ການຂົນສົ່ງທາງການແພດ",
+            "fieldComms": "ການສື່ສານພາກສະໜາມ",
+            "inventory": "ສາງ",
+            "equipment": "ອຸປະກອນ",
+            "donations": "ການບໍລິຈາກ",
+            "unifiedResources": "ສູນຊັບພະຍາກອນ",
+            "approvals": "ການອະນຸມັດ",
+            "people": "ບຸກຄະລາກອນ",
+            "shifts": "ປະຕິທິນກະ",
+            "mobilization": "ການລະດົມ",
+            "performance": "ປະສິດທິພາບ",
+            "communityHub": "ສູນຊຸມຊົນ",
+            "mentalHealth": "ສຸຂະພາບຈິດ",
+            "analytics": "ແດດບອດວິເຄາະ",
+            "reports": "ລາຍງານ",
+            "unifiedReporting": "ລາຍງານລວມ",
+            "simulationEngine": "ການຈຳລອງ",
+            "aiTasks": "ວຽກ AI",
+            "aiChat": "ຜູ້ຊ່ວຍ AI",
+            "training": "ການຝຶກອົບຮົມ",
+            "manuals": "ຄູ່ມື",
+            "iam": "ການຄວບຄຸມການເຂົ້າເຖິງ",
+            "audit": "ບັນທຶກການກວດສອບ",
+            "security": "ຄວາມປອດໄພ",
+            "interoperability": "ການເຮັດວຽກຮ່ວມກັນ",
+            "webhooks": "Webhooks",
+            "biometric": "ລາຍມືຊີວະພາບ",
+            "settings": "ການຕັ້ງຄ່າ"
+        },
+        "status": {
+            "onDuty": "ກຳລັງປະຈຳການ"
+        }
+    },
+    "breadcrumb": {
+        "home": "ໜ້າຫຼັກ",
+        "commandCenter": "ສູນບັນຊາການ"
     }
 }
