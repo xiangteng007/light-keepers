@@ -3,6 +3,7 @@ import { useRegisterSW } from 'virtual:pwa-register/react'
 import { AuthProvider } from './context/AuthContext'
 import { RealtimeProvider } from './context/RealtimeContext'
 import { EmergencyProvider } from './context/useEmergencyContext'
+import { ThemeProvider } from './context/ThemeProvider'
 import ProtectedRoute from './components/ProtectedRoute'
 import PageWrapper from './components/layout/PageWrapper'
 import EventsPage from './pages/EventsPage'
@@ -156,6 +157,7 @@ function App() {
   })
 
   return (
+    <ThemeProvider>
     <RealtimeProvider>
       <AuthProvider>
         <EmergencyProvider>
@@ -389,6 +391,7 @@ function App() {
         </EmergencyProvider>
       </AuthProvider>
     </RealtimeProvider>
+    </ThemeProvider>
   )
 }
 

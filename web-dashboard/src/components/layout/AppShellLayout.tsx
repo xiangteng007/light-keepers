@@ -19,6 +19,7 @@ import { SyncStatusIndicator } from '../SyncStatusIndicator';
 import { Breadcrumb } from '../Breadcrumb';
 import { LanguageSelector } from '../LanguageSelector';
 import MobileBottomNav from './MobileBottomNav';
+import { ThemeSwitcher } from '../ui/ThemeSwitcher';
 import './AppShellLayout.css';
 
 interface AppShellLayoutProps {
@@ -197,6 +198,9 @@ export default function AppShellLayout({
 
                     {/* Sync Status Indicator */}
                     <SyncStatusIndicator />
+
+                    {/* Theme Switcher */}
+                    <ThemeSwitcher />
 
                     {/* Language Selector Dropdown */}
                     <LanguageSelector />
