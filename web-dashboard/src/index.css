@@ -9,6 +9,7 @@
    當 html.dark 時啟用戰術主題
 ============================================ */
 @import url('./styles/globals.css');
+@import url('./styles/design-tokens.css');
 
 /* Multi-language Font Support - 13 Languages
    CJK: TC, SC, JP, KR
