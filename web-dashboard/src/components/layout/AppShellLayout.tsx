@@ -168,18 +168,11 @@ export default function AppShellLayout({
                     <button className="burgerBtn" onClick={toggleDrawer}>
                         {drawerOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
-                    <span style={{ fontWeight: 600, letterSpacing: '2px', color: 'var(--accent-gold)' }}>
+                    <span className="header__logo">
                         LIGHTKEEPERS
                     </span>
                     {canEdit && (
-                        <span className="level-badge" style={{
-                            marginLeft: '12px',
-                            padding: '2px 8px',
-                            background: 'rgba(212, 168, 75, 0.2)',
-                            color: 'var(--accent-gold)',
-                            borderRadius: '4px',
-                            fontSize: '10px',
-                        }}>
+                        <span className="header__level-badge">
                             Level {userLevel}
                         </span>
                     )}

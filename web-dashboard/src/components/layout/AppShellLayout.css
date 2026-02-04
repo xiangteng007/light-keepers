@@ -78,6 +78,24 @@
   gap: 12px;
 }
 
+/* Header Logo */
+.header__logo {
+  font-weight: 600;
+  letter-spacing: 2px;
+  color: var(--layout-accent, var(--accent-gold));
+}
+
+/* Level Badge */
+.header__level-badge {
+  margin-left: 12px;
+  padding: 2px 8px;
+  background: rgba(249, 115, 22, 0.15);
+  color: var(--layout-accent, var(--accent-gold));
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 500;
+}
+
 .burgerBtn {
   display: none;
   background: transparent;
