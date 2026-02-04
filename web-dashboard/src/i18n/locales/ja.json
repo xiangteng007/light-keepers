@@ -278,6 +278,10 @@
         "commandCenter": "指揮センター"
     },
     "widgets": {
+        "editTitleHint": "ダブルクリックでタイトル編集",
+        "missionStats": {
+            "title": "ミッション統計"
+        },
         "taskStats": {
             "title": "タスク統計",
             "pending": "待機中",
@@ -290,11 +294,127 @@
             "mapContent": "マップコンテンツ"
         },
         "ncdrAlerts": {
-            "title": "NCDR 警報"
+            "title": "NCDRアラート"
         },
         "disasterReports": {
             "title": "災害報告",
             "report": "災害報告"
+        },
+        "eventTimeline": {
+            "title": "イベントタイムライン"
+        },
+        "volunteerStatus": {
+            "title": "ボランティア状況"
+        },
+        "quickActions": {
+            "title": "クイックアクション"
+        },
+        "tacticalMap": {
+            "title": "戦術マップ"
+        },
+        "weatherRadar": {
+            "title": "気象レーダー"
+        },
+        "earthquakeMap": {
+            "title": "地震モニター"
+        },
+        "mapLayers": {
+            "title": "レイヤー制御",
+            "events": "イベントマーカー",
+            "volunteers": "ボランティア位置",
+            "resources": "リソースポイント",
+            "routes": "ルート計画"
+        },
+        "mapLegend": {
+            "title": "マップ凡例",
+            "critical": "緊急",
+            "high": "高優先",
+            "medium": "中優先",
+            "normal": "一般"
+        },
+        "aiMatches": {
+            "title": "AIマッチング提案"
+        },
+        "requestsList": {
+            "title": "ニーズリスト"
+        },
+        "suppliesGrid": {
+            "title": "供給在庫"
+        },
+        "missingCases": {
+            "title": "行方不明ケース"
+        },
+        "auditTable": {
+            "title": "監査ログ"
+        },
+        "pttPanel": {
+            "title": "PTTパネル"
+        },
+        "resourceSearch": {
+            "title": "リソース検索"
+        },
+        "searchPanel": {
+            "title": "検索パネル"
+        },
+        "reportForm": {
+            "title": "報告フォーム"
+        },
+        "blessingWall": {
+            "title": "祈願の壁"
+        },
+        "moodTracker": {
+            "title": "心情トラッカー"
+        },
+        "pfaChat": {
+            "title": "AIメンタルファーストエイド"
+        },
+        "resourceChart": {
+            "title": "リソースチャート"
+        },
+        "trendsChart": {
+            "title": "トレンド予測"
+        },
+        "keyMetrics": {
+            "title": "主要指標"
+        },
+        "accountsGrid": {
+            "title": "アカウント一覧"
+        },
+        "tenantList": {
+            "title": "テナント一覧"
+        },
+        "tenantDetail": {
+            "title": "テナント詳細"
+        },
+        "settingsNav": {
+            "title": "設定ナビ"
+        },
+        "settingsPanel": {
+            "title": "設定パネル"
+        },
+        "featureFlags": {
+            "title": "機能フラグ"
+        },
+        "notificationFeed": {
+            "title": "通知フィード"
+        },
+        "notificationSummary": {
+            "title": "通知概要"
+        },
+        "geoAlertFeed": {
+            "title": "アラートフィード"
+        },
+        "geoSummary": {
+            "title": "インテル概要"
+        },
+        "weatherCard": {
+            "title": "天気カード"
+        },
+        "earthquakeMonitor": {
+            "title": "地震モニター"
+        },
+        "dashboardStats": {
+            "title": "ダッシュボード統計"
         },
         "socialFeed": {
             "title": "ソーシャルインテル",
