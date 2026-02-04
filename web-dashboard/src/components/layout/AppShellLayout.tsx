@@ -198,20 +198,10 @@ export default function AppShellLayout({
                     <LanguageSelector />
 
                     {/* Notification Icon */}
-                    <div style={{ position: 'relative' }}>
+                    <div className="header__dropdown-container">
                         <button
                             onClick={() => setNotificationOpen(!notificationOpen)}
-                            style={{
-                                background: 'transparent',
-                                border: 'none',
-                                color: 'var(--text-secondary)',
-                                cursor: 'pointer',
-                                padding: '8px',
-                                borderRadius: '8px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
+                            className="header__icon-btn"
                             title="通知"
                         >
                             <Bell size={20} />
