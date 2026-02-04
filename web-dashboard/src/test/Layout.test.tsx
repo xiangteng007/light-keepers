@@ -3,6 +3,7 @@ import { render, screen } from '@testing-library/react';
 import { BrowserRouter } from 'react-router-dom';
 import AppShellLayout from '../components/layout/AppShellLayout';
 import { AuthProvider } from '../context/AuthContext';
+import { ThemeProvider } from '../context/ThemeProvider';
 import { PermissionLevel } from '../components/layout/widget.types';
 
 // Mock Lucide icons
@@ -17,11 +18,13 @@ describe('AppShellLayout Component', () => {
     it('renders the header with LIGHTKEEPERS branding', () => {
         render(
             <BrowserRouter>
-                <AuthProvider>
-                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
-                        <div>Test Content</div>
-                    </AppShellLayout>
-                </AuthProvider>
+                <ThemeProvider>
+                    <AuthProvider>
+                        <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                            <div>Test Content</div>
+                        </AppShellLayout>
+                    </AuthProvider>
+                </ThemeProvider>
             </BrowserRouter>
         );
 
@@ -32,11 +35,13 @@ describe('AppShellLayout Component', () => {
     it('renders the sidebar navigation', () => {
         render(
             <BrowserRouter>
-                <AuthProvider>
-                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
-                        <div>Test Content</div>
-                    </AppShellLayout>
-                </AuthProvider>
+                <ThemeProvider>
+                    <AuthProvider>
+                        <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                            <div>Test Content</div>
+                        </AppShellLayout>
+                    </AuthProvider>
+                </ThemeProvider>
             </BrowserRouter>
         );
 
@@ -49,11 +54,13 @@ describe('AppShellLayout Component', () => {
     it('renders child content correctly', () => {
         render(
             <BrowserRouter>
-                <AuthProvider>
-                    <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
-                        <div data-testid="test-content">Hello World</div>
-                    </AppShellLayout>
-                </AuthProvider>
+                <ThemeProvider>
+                    <AuthProvider>
+                        <AppShellLayout userLevel={PermissionLevel.SystemOwner} pageId="test">
+                            <div data-testid="test-content">Hello World</div>
+                        </AppShellLayout>
+                    </AuthProvider>
+                </ThemeProvider>
             </BrowserRouter>
         );
 
