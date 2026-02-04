@@ -148,18 +148,18 @@
 }
 
 .statusValid {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10B981;
+    background: var(--color-success-alpha, rgba(16, 185, 129, 0.15));
+    color: var(--color-success, #10B981);
 }
 
 .statusExpired {
-    background: rgba(239, 68, 68, 0.15);
-    color: #EF4444;
+    background: var(--color-danger-alpha, rgba(239, 68, 68, 0.15));
+    color: var(--color-danger, #EF4444);
 }
 
 .statusPending {
-    background: rgba(245, 158, 11, 0.15);
-    color: #F59E0B;
+    background: var(--color-warning-alpha, rgba(245, 158, 11, 0.15));
+    color: var(--color-warning, #F59E0B);
 }
 
 .certMeta {
@@ -299,7 +299,7 @@
     gap: 4px;
     margin-top: 10px;
     font-size: 0.75rem;
-    color: #10B981;
+    color: var(--color-success, #10B981);
 }
 
 /* Empty State */

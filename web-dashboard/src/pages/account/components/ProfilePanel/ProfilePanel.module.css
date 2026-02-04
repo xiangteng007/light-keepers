@@ -74,7 +74,7 @@
     background: var(--account-accent-gold, #D4AF37);
     border: none;
     border-radius: 8px;
-    color: #0B1220;
+    color: var(--bg-primary, #0B1220);
     font-size: 0.85rem;
     font-weight: 600;
     cursor: pointer;
@@ -82,7 +82,7 @@
 }
 
 .saveBtn:hover:not(:disabled) {
-    background: #E5C158;
+    background: var(--color-secondary-hover, #E5C158);
 }
 
 .saveBtn:disabled {

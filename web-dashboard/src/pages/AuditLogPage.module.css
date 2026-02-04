@@ -27,12 +27,12 @@
     gap: 12px;
     font-size: 24px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary, #fff);
     margin: 0;
 }
 
 .title svg {
-    color: #D4AF37;
+    color: var(--color-secondary, #D4AF37);
 }
 
 .subtitle {
@@ -124,8 +124,8 @@
 }
 
 .filterSelect option {
-    background: #111B2E;
-    color: #fff;
+    background: var(--surface-default, #111B2E);
+    color: var(--text-primary, #fff);
 }
 
 /* Stats */
@@ -158,11 +158,11 @@
 }
 
 .successText {
-    color: #10B981 !important;
+    color: var(--color-success, #10B981) !important;
 }
 
 .dangerText {
-    color: #EF4444 !important;
+    color: var(--color-danger, #EF4444) !important;
 }
 
 /* Table */
@@ -234,7 +234,7 @@
 }
 
 .userCell svg {
-    color: #D4AF37;
+    color: var(--color-secondary, #D4AF37);
 }
 
 .actionBadge {
@@ -249,26 +249,26 @@
 
 .actionLOGIN,
 .actionLOGOUT {
-    background: rgba(59, 130, 246, 0.2);
-    color: #60A5FA;
+    background: var(--color-info-alpha, rgba(59, 130, 246, 0.2));
+    color: var(--color-info, #60A5FA);
 }
 
 .actionCREATE,
 .actionAPPROVE {
-    background: rgba(16, 185, 129, 0.2);
-    color: #34D399;
+    background: var(--color-success-alpha, rgba(16, 185, 129, 0.2));
+    color: var(--color-success, #34D399);
 }
 
 .actionUPDATE,
 .actionSYNC {
-    background: rgba(245, 158, 11, 0.2);
-    color: #FBBF24;
+    background: var(--color-warning-alpha, rgba(245, 158, 11, 0.2));
+    color: var(--color-warning, #FBBF24);
 }
 
 .actionDELETE,
 .actionREJECT {
-    background: rgba(239, 68, 68, 0.2);
-    color: #F87171;
+    background: var(--color-danger-alpha, rgba(239, 68, 68, 0.2));
+    color: var(--color-danger, #F87171);
 }
 
 .resourceId {
@@ -287,13 +287,13 @@
 }
 
 .statusBadge.success {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10B981;
+    background: var(--color-success-alpha, rgba(16, 185, 129, 0.15));
+    color: var(--color-success, #10B981);
 }
 
 .statusBadge.failed {
-    background: rgba(239, 68, 68, 0.15);
-    color: #EF4444;
+    background: var(--color-danger-alpha, rgba(239, 68, 68, 0.15));
+    color: var(--color-danger, #EF4444);
 }
 
 .ipCell {
