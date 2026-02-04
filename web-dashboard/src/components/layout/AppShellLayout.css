@@ -2,10 +2,10 @@
  * AppShellLayout.css
  * 
  * Implementation of appshell-layout.md specification
- * Provides the foundational CSS variables and layout grid
+ * Uses CSS variables from design-tokens.css for theme switching
  */
 
-/* ===== Design Tokens (Light Theme) ===== */
+/* ===== Layout Tokens ===== */
 :root {
   --header-h: 52px;
   --mobile-bottom-h: 72px;
@@ -17,13 +17,14 @@
   --right-col-min: 280px;
   --right-col-max: 420px;
 
-  /* Base Colors (Light Theme) */
-  --layout-bg: #FFFFFF;
-  --text-primary: #1F2937;
-  --text-secondary: #6B7280;
-  --text-muted: #9CA3AF;
-  --accent-gold: #D97706;
-  --border-subtle: #E2E8F0;
+  /* Layout Colors - 使用 design-tokens.css 變數 */
+  --layout-bg: var(--bg-primary, #F4F4F5);
+  --layout-surface: var(--surface-default, #FFFFFF);
+  --layout-border: var(--border-default, #D4D4D8);
+  --layout-text: var(--text-primary, #18181B);
+  --layout-text-secondary: var(--text-secondary, #52525B);
+  --layout-text-muted: var(--text-tertiary, #71717A);
+  --layout-accent: var(--color-secondary, #F97316);
 }
 
 /* ===== AppShell Container ===== */
@@ -98,8 +99,8 @@
   display: flex;
   flex-direction: column;
   width: var(--sidebar-w-collapsed);
-  background: #F8FAFC;
-  border-right: 1px solid var(--border-subtle);
+  background: var(--surface-default, #FFFFFF);
+  border-right: 1px solid var(--layout-border);
   transition: width 0.3s ease;
   flex-shrink: 0;
   overflow: hidden;
@@ -183,8 +184,8 @@
   width: var(--right-col-w);
   min-width: var(--right-col-min);
   max-width: var(--right-col-max);
-  background: #F8FAFC;
-  border-left: 1px solid var(--border-subtle);
+  background: var(--surface-default, #FFFFFF);
+  border-left: 1px solid var(--layout-border);
   flex-shrink: 0;
 }
 
@@ -218,9 +219,9 @@
   padding: 10px 16px;
   font-size: 12px;
   font-weight: 500;
-  color: var(--text-secondary);
-  background: #F1F5F9;
-  border-bottom: 1px solid var(--border-subtle);
+  color: var(--layout-text-secondary);
+  background: var(--surface-hover, #F4F4F5);
+  border-bottom: 1px solid var(--layout-border);
 }
 
 .region {
