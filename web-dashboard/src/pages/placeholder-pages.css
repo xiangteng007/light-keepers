@@ -297,6 +297,32 @@
   font-size: 14px;
 }
 
+/* Dev Notice Color Variants - Title */
+.placeholder-page__dev-notice--blue .placeholder-page__dev-notice-title {
+  color: #1E40AF;
+}
+
+.placeholder-page__dev-notice--purple .placeholder-page__dev-notice-title {
+  color: #7C3AED;
+}
+
+.placeholder-page__dev-notice--green .placeholder-page__dev-notice-title {
+  color: #059669;
+}
+
+/* Dev Notice Color Variants - Text */
+.placeholder-page__dev-notice--blue .placeholder-page__dev-notice-text {
+  color: #1E3A8A;
+}
+
+.placeholder-page__dev-notice--purple .placeholder-page__dev-notice-text {
+  color: #6B21A8;
+}
+
+.placeholder-page__dev-notice--green .placeholder-page__dev-notice-text {
+  color: #047857;
+}
+
 /* === Expected Features Section === */
 .placeholder-page__expected-features {
   margin-top: 32px;

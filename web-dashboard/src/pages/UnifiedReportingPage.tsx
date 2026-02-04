@@ -18,8 +18,8 @@ export default function UnifiedReportingPage() {
             <div className="placeholder-page__dev-notice placeholder-page__dev-notice--blue">
                 <AlertTriangle size={20} color="#1E40AF" />
                 <div>
-                    <strong style={{ color: '#1E40AF' }}>🚧 報表功能開發中</strong>
-                    <p style={{ margin: '4px 0 0', color: '#1E3A8A', fontSize: '14px' }}>
+                    <strong className="placeholder-page__dev-notice-title">🚧 報表功能開發中</strong>
+                    <p className="placeholder-page__dev-notice-text">
                         綜合報表系統正在開發中，預計包含：SITREP 自動生成、AAR 範本、資料視覺化儀表板等功能。
                     </p>
                 </div>

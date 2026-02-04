@@ -18,8 +18,8 @@ export default function SimulationPage() {
             <div className="placeholder-page__dev-notice placeholder-page__dev-notice--purple">
                 <AlertTriangle size={20} color="#7C3AED" />
                 <div>
-                    <strong style={{ color: '#7C3AED' }}>🚧 模擬功能開發中</strong>
-                    <p style={{ margin: '4px 0 0', color: '#6B21A8', fontSize: '14px' }}>
+                    <strong className="placeholder-page__dev-notice-title">🚧 模擬功能開發中</strong>
+                    <p className="placeholder-page__dev-notice-text">
                         災害模擬引擎正在開發中，預計包含：洪水範圍預估、地震損害評估、桌上推演設計器等功能。
                     </p>
                 </div>

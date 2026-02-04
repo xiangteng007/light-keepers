@@ -18,8 +18,8 @@ export default function AITasksPage() {
             <div className="placeholder-page__dev-notice placeholder-page__dev-notice--blue">
                 <Bot size={20} color="#1E40AF" />
                 <div>
-                    <strong style={{ color: '#1E40AF' }}>🚧 AI 功能開發中</strong>
-                    <p style={{ margin: '4px 0 0', color: '#1E3A8A', fontSize: '14px' }}>
+                    <strong className="placeholder-page__dev-notice-title">🚧 AI 功能開發中</strong>
+                    <p className="placeholder-page__dev-notice-text">
                         AI 自動化系統正在開發中，預計包含：智能排班、資源匹配、情報摘要、預測分析等功能。
                     </p>
                 </div>

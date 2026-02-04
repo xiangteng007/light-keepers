@@ -18,8 +18,8 @@ export default function InteroperabilityPage() {
             <div className="placeholder-page__dev-notice placeholder-page__dev-notice--green">
                 <AlertTriangle size={20} color="#047857" />
                 <div>
-                    <strong style={{ color: '#047857' }}>🚧 互通功能開發中</strong>
-                    <p style={{ margin: '4px 0 0', color: '#065F46', fontSize: '14px' }}>
+                    <strong className="placeholder-page__dev-notice-title">🚧 互通功能開發中</strong>
+                    <p className="placeholder-page__dev-notice-text">
                         機構互通系統正在開發中，預計包含：EDXL 訊息發送、EMAP 標準對接、API 管理介面等功能。
                     </p>
                 </div>
