@@ -40,7 +40,7 @@
 }
 
 .dangerCard .cardHeader {
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     background: rgba(239, 68, 68, 0.05);
 }
 
@@ -89,7 +89,7 @@
     padding: 4px 10px;
     background: rgba(16, 185, 129, 0.15);
     border-radius: 4px;
-    color: #10B981;
+    color: var(--account-success, #10B981);
     font-size: 0.8rem;
     font-weight: 500;
 }
@@ -128,7 +128,7 @@
 }
 
 .actionDanger {
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     border-color: rgba(239, 68, 68, 0.3);
 }
 
@@ -159,7 +159,7 @@
     background: rgba(245, 158, 11, 0.1);
     border: 1px solid rgba(245, 158, 11, 0.2);
     border-radius: 8px;
-    color: #F59E0B;
+    color: var(--account-warning, #F59E0B);
     font-size: 0.85rem;
 }
 
@@ -247,7 +247,7 @@
     background: transparent;
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 6px;
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     font-size: 0.8rem;
     cursor: pointer;
     transition: all 0.2s ease;
@@ -281,7 +281,7 @@
     background: rgba(239, 68, 68, 0.1);
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     font-size: 0.85rem;
     font-weight: 500;
     cursor: pointer;
@@ -334,7 +334,7 @@
     height: 64px;
     background: rgba(239, 68, 68, 0.1);
     border-radius: 50%;
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     margin-bottom: 20px;
 }
 
@@ -376,7 +376,7 @@
 .confirmDialogBtn {
     flex: 1;
     padding: 12px;
-    background: #EF4444;
+    background: var(--account-danger, #EF4444);
     border: none;
     border-radius: 8px;
     color: white;

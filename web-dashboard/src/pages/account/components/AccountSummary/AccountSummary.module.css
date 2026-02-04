@@ -163,17 +163,17 @@
 
 .statusActive {
     background: rgba(16, 185, 129, 0.15);
-    color: #10B981;
+    color: var(--account-success, #10B981);
 }
 
 .statusSuspended {
     background: rgba(239, 68, 68, 0.15);
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
 }
 
 .statusPending {
     background: rgba(245, 158, 11, 0.15);
-    color: #F59E0B;
+    color: var(--account-warning, #F59E0B);
 }
 
 .lastLogin {
@@ -269,13 +269,13 @@
 }
 
 .actionDanger {
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     border-color: rgba(239, 68, 68, 0.2);
 }
 
 .actionDanger:hover {
     background: rgba(239, 68, 68, 0.1);
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     border-color: rgba(239, 68, 68, 0.3);
 }
 

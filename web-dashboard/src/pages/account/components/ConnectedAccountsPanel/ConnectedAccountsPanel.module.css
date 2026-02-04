@@ -85,7 +85,7 @@
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 99px;
-    color: #10B981;
+    color: var(--account-success, #10B981);
     font-size: 0.8rem;
     font-weight: 500;
 }
@@ -145,7 +145,7 @@
     background: transparent;
     border: 1px solid rgba(239, 68, 68, 0.3);
     border-radius: 8px;
-    color: #EF4444;
+    color: var(--account-danger, #EF4444);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
