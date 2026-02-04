@@ -8,30 +8,39 @@
  */
 
 /* ============ CSS Variables ============ */
-/* Account page uses K2 Copper Steel dark theme for consistency */
+/* Account page uses K2 Copper Steel dark theme via data-theme="dark" */
 .accountPage {
-    --account-bg: #0B1220;
-    --account-card-bg: #111B2E;
-    --account-card-bg-hover: #152238;
-    --account-card-border: rgba(255, 255, 255, 0.06);
-    --account-card-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
-    --account-accent-gold: #D4AF37;
-    --account-accent-gold-dim: rgba(212, 175, 55, 0.15);
-    --account-success: #10B981;
-    --account-warning: #F59E0B;
-    --account-danger: #EF4444;
-    --account-info: #3B82F6;
-    --account-text-primary: #F8FAFC;
-    --account-text-secondary: #94A3B8;
-    --account-text-muted: #64748B;
-    --account-radius-sm: 8px;
-    --account-radius-md: 12px;
-    --account-radius-lg: 16px;
-    --account-spacing-xs: 8px;
-    --account-spacing-sm: 12px;
-    --account-spacing-md: 16px;
-    --account-spacing-lg: 24px;
-    --account-spacing-xl: 32px;
+    /* Background colors - using design-tokens K2 theme */
+    --account-bg: var(--bg-primary);
+    --account-card-bg: var(--surface-default);
+    --account-card-bg-hover: var(--surface-raised);
+    --account-card-border: var(--border-default);
+    --account-card-shadow: var(--shadow-md);
+    
+    /* Accent colors */
+    --account-accent-gold: var(--color-secondary);
+    --account-accent-gold-dim: rgba(184, 115, 51, 0.15);
+    
+    /* Semantic colors */
+    --account-success: var(--color-success);
+    --account-warning: var(--color-warning);
+    --account-danger: var(--color-danger);
+    --account-info: var(--color-info);
+    
+    /* Text colors */
+    --account-text-primary: var(--text-primary);
+    --account-text-secondary: var(--text-secondary);
+    --account-text-muted: var(--text-tertiary);
+    
+    /* Spacing & Radius */
+    --account-radius-sm: var(--radius-md);
+    --account-radius-md: var(--radius-lg);
+    --account-radius-lg: var(--radius-xl);
+    --account-spacing-xs: var(--space-2);
+    --account-spacing-sm: var(--space-3);
+    --account-spacing-md: var(--space-4);
+    --account-spacing-lg: var(--space-6);
+    --account-spacing-xl: var(--space-8);
 }
 
 /* ============ Page Container ============ */
