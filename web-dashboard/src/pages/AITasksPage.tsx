@@ -15,16 +15,7 @@ export default function AITasksPage() {
             </p>
 
             {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice" style={{
-                background: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)',
-                border: '1px solid #3B82F6',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--blue">
                 <Bot size={20} color="#1E40AF" />
                 <div>
                     <strong style={{ color: '#1E40AF' }}>🚧 AI 功能開發中</strong>
@@ -55,24 +46,24 @@ export default function AITasksPage() {
             </div>
 
             {/* 預期功能區塊 */}
-            <div style={{ marginTop: '32px' }}>
-                <h3 style={{ color: 'var(--primary, #001F3F)', marginBottom: '16px', fontSize: '18px' }}>
+            <div className="placeholder-page__expected-features">
+                <h3 className="placeholder-page__expected-features-title">
                     📋 預期 AI 功能
                 </h3>
                 <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Zap size={24} color="#F59E0B" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>智能排班</div>
+                        <div className="placeholder-page__feature-card-title">智能排班</div>
                         <div className="placeholder-page__card-label">自動最佳化人員調度</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Brain size={24} color="#8B5CF6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>情報摘要</div>
+                        <div className="placeholder-page__feature-card-title">情報摘要</div>
                         <div className="placeholder-page__card-label">自動生成 SITREP 報告</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Bot size={24} color="#10B981" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>資源匹配</div>
+                        <div className="placeholder-page__feature-card-title">資源匹配</div>
                         <div className="placeholder-page__card-label">需求與供給智能配對</div>
                     </div>
                 </div>

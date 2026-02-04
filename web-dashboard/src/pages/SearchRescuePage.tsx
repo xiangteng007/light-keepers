@@ -4,7 +4,7 @@
  * 搜救任務管理頁面 - 山搜/水域/城市倒塌搜救
  */
 import './placeholder-pages.css';
-import { AlertTriangle, MapPin, Users, CheckCircle, Plus } from 'lucide-react';
+import { AlertTriangle, MapPin, Users, Plus } from 'lucide-react';
 
 export default function SearchRescuePage() {
     return (
@@ -15,20 +15,11 @@ export default function SearchRescuePage() {
             </p>
 
             {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice" style={{
-                background: 'linear-gradient(135deg, #FEF3C7 0%, #FDE68A 100%)',
-                border: '1px solid #F59E0B',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+            <div className="placeholder-page__dev-notice">
                 <AlertTriangle size={20} color="#92400E" />
                 <div>
-                    <strong style={{ color: '#92400E' }}>🚧 功能開發中</strong>
-                    <p style={{ margin: '4px 0 0', color: '#78350F', fontSize: '14px' }}>
+                    <strong className="placeholder-page__dev-notice-title">🚧 功能開發中</strong>
+                    <p className="placeholder-page__dev-notice-text">
                         搜救任務管理系統正在開發中，預計包含：任務建立、GPS 追蹤、人員調度、即時通訊等功能。
                     </p>
                 </div>
@@ -55,24 +46,24 @@ export default function SearchRescuePage() {
             </div>
 
             {/* 預期功能區塊 */}
-            <div style={{ marginTop: '32px' }}>
-                <h3 style={{ color: 'var(--primary, #001F3F)', marginBottom: '16px', fontSize: '18px' }}>
+            <div className="placeholder-page__expected-features">
+                <h3 className="placeholder-page__expected-features-title">
                     📋 預期功能
                 </h3>
                 <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <MapPin size={24} color="#3B82F6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>任務地圖</div>
+                        <div className="placeholder-page__feature-card-title">任務地圖</div>
                         <div className="placeholder-page__card-label">即時搜救範圍與人員位置</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Users size={24} color="#8B5CF6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>人員調度</div>
+                        <div className="placeholder-page__feature-card-title">人員調度</div>
                         <div className="placeholder-page__card-label">搜救小隊分配與追蹤</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Plus size={24} color="#10B981" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>新增任務</div>
+                        <div className="placeholder-page__feature-card-title">新增任務</div>
                         <div className="placeholder-page__card-label">快速建立搜救任務</div>
                     </div>
                 </div>

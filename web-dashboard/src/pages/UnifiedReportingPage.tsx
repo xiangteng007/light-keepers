@@ -15,16 +15,7 @@ export default function UnifiedReportingPage() {
             </p>
 
             {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice" style={{
-                background: 'linear-gradient(135deg, #DBEAFE 0%, #BFDBFE 100%)',
-                border: '1px solid #3B82F6',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--blue">
                 <AlertTriangle size={20} color="#1E40AF" />
                 <div>
                     <strong style={{ color: '#1E40AF' }}>🚧 報表功能開發中</strong>
@@ -55,24 +46,24 @@ export default function UnifiedReportingPage() {
             </div>
 
             {/* 預期功能區塊 */}
-            <div style={{ marginTop: '32px' }}>
-                <h3 style={{ color: 'var(--primary, #001F3F)', marginBottom: '16px', fontSize: '18px' }}>
+            <div className="placeholder-page__expected-features">
+                <h3 className="placeholder-page__expected-features-title">
                     📋 預期功能
                 </h3>
                 <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <FileText size={24} color="#DC2626" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>SITREP 生成</div>
+                        <div className="placeholder-page__feature-card-title">SITREP 生成</div>
                         <div className="placeholder-page__card-label">自動化情況報告</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <TrendingUp size={24} color="#3B82F6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>趨勢分析</div>
+                        <div className="placeholder-page__feature-card-title">趨勢分析</div>
                         <div className="placeholder-page__card-label">歷史資料對比</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Printer size={24} color="#10B981" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>報表輸出</div>
+                        <div className="placeholder-page__feature-card-title">報表輸出</div>
                         <div className="placeholder-page__card-label">PDF / Excel 匯出</div>
                     </div>
                 </div>

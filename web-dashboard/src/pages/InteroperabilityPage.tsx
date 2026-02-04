@@ -15,16 +15,7 @@ export default function InteroperabilityPage() {
             </p>
 
             {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice" style={{
-                background: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
-                border: '1px solid #10B981',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--green">
                 <AlertTriangle size={20} color="#047857" />
                 <div>
                     <strong style={{ color: '#047857' }}>🚧 互通功能開發中</strong>
@@ -55,24 +46,24 @@ export default function InteroperabilityPage() {
             </div>
 
             {/* 預期功能區塊 */}
-            <div style={{ marginTop: '32px' }}>
-                <h3 style={{ color: 'var(--primary, #001F3F)', marginBottom: '16px', fontSize: '18px' }}>
+            <div className="placeholder-page__expected-features">
+                <h3 className="placeholder-page__expected-features-title">
                     📋 預期功能
                 </h3>
                 <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Link size={24} color="#3B82F6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>API 管理</div>
+                        <div className="placeholder-page__feature-card-title">API 管理</div>
                         <div className="placeholder-page__card-label">外部系統連接設定</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Database size={24} color="#8B5CF6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>EDXL 訊息</div>
+                        <div className="placeholder-page__feature-card-title">EDXL 訊息</div>
                         <div className="placeholder-page__card-label">標準化災害訊息交換</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <RefreshCw size={24} color="#10B981" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>資料同步</div>
+                        <div className="placeholder-page__feature-card-title">資料同步</div>
                         <div className="placeholder-page__card-label">即時同步狀態監控</div>
                     </div>
                 </div>

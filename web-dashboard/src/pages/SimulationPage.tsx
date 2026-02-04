@@ -15,16 +15,7 @@ export default function SimulationPage() {
             </p>
 
             {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice" style={{
-                background: 'linear-gradient(135deg, #F3E8FF 0%, #E9D5FF 100%)',
-                border: '1px solid #9333EA',
-                borderRadius: '12px',
-                padding: '16px 20px',
-                marginBottom: '24px',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px'
-            }}>
+            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--purple">
                 <AlertTriangle size={20} color="#7C3AED" />
                 <div>
                     <strong style={{ color: '#7C3AED' }}>🚧 模擬功能開發中</strong>
@@ -61,24 +52,24 @@ export default function SimulationPage() {
             </div>
 
             {/* 預期功能區塊 */}
-            <div style={{ marginTop: '32px' }}>
-                <h3 style={{ color: 'var(--primary, #001F3F)', marginBottom: '16px', fontSize: '18px' }}>
+            <div className="placeholder-page__expected-features">
+                <h3 className="placeholder-page__expected-features-title">
                     📋 預期功能
                 </h3>
                 <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Play size={24} color="#10B981" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>情境執行</div>
+                        <div className="placeholder-page__feature-card-title">情境執行</div>
                         <div className="placeholder-page__card-label">即時模擬執行與暫停</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <Settings size={24} color="#6B7280" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>參數調校</div>
+                        <div className="placeholder-page__feature-card-title">參數調校</div>
                         <div className="placeholder-page__card-label">災害強度與範圍設定</div>
                     </div>
-                    <div className="placeholder-page__card" style={{ opacity: 0.6 }}>
+                    <div className="placeholder-page__card placeholder-page__feature-card">
                         <BarChart3 size={24} color="#3B82F6" />
-                        <div style={{ marginTop: '12px', fontWeight: 600 }}>結果分析</div>
+                        <div className="placeholder-page__feature-card-title">結果分析</div>
                         <div className="placeholder-page__card-label">損失評估報告生成</div>
                     </div>
                 </div>
