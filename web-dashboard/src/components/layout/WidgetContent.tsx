@@ -26,12 +26,14 @@ const TranslatedMetricCard = ({ labelKey, value, trend, color = '#C39B6F' }: { l
             flexDirection: 'column',
             alignItems: 'center',
             padding: '16px',
-            background: 'rgba(47, 54, 65, 0.3)',
+            background: 'var(--surface-raised, rgba(255, 255, 255, 0.9))',
             borderRadius: '8px',
             minWidth: '100px',
+            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+            border: '1px solid var(--border-default, rgba(0, 0, 0, 0.06))',
         }}>
             <span style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
-            <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{t(labelKey)}</span>
+            <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>{t(labelKey)}</span>
             {trend && (
                 <span style={{ marginTop: '4px', color: trend === 'up' ? '#22c55e' : trend === 'down' ? '#ef4444' : '#94A3B8' }}>
                     {trend === 'up' && <TrendingUp size={14} />}
@@ -532,12 +534,14 @@ const MetricCard = ({ label, value, trend, color = '#C39B6F' }: { label: string;
         flexDirection: 'column',
         alignItems: 'center',
         padding: '16px',
-        background: 'rgba(47, 54, 65, 0.3)',
+        background: 'var(--surface-raised, rgba(255, 255, 255, 0.9))',
         borderRadius: '8px',
         minWidth: '100px',
+        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
+        border: '1px solid var(--border-default, rgba(0, 0, 0, 0.06))',
     }}>
         <span style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
-        <span style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{label}</span>
+        <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>{label}</span>
         {trend && (
             <span style={{ marginTop: '4px', color: trend === 'up' ? '#22c55e' : trend === 'down' ? '#ef4444' : '#94A3B8' }}>
                 {trend === 'up' && <TrendingUp size={14} />}
