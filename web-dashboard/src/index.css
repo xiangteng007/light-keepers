@@ -304,28 +304,28 @@ select {
 
 .glass {
   background: var(--glass-bg, rgba(255, 255, 255, 0.7));
-  backdrop-filter: blur(var(--glass-blur, 20px));
   -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+  backdrop-filter: blur(var(--glass-blur, 20px));
   border: 1px solid var(--glass-border, rgba(255, 255, 255, 0.2));
 }
 
 .glass-light {
   background: var(--glass-bg-light, rgba(255, 255, 255, 0.85));
-  backdrop-filter: blur(var(--glass-blur, 20px));
   -webkit-backdrop-filter: blur(var(--glass-blur, 20px));
+  backdrop-filter: blur(var(--glass-blur, 20px));
   border: 1px solid var(--glass-border-light, rgba(255, 255, 255, 0.3));
 }
 
 .glass-subtle {
   background: var(--glass-bg-subtle, rgba(255, 255, 255, 0.5));
-  backdrop-filter: blur(var(--glass-blur-sm, 10px));
   -webkit-backdrop-filter: blur(var(--glass-blur-sm, 10px));
+  backdrop-filter: blur(var(--glass-blur-sm, 10px));
 }
 
 .glass-dark {
   background: var(--glass-bg-dark, rgba(61, 46, 36, 0.85));
-  backdrop-filter: blur(var(--glass-blur-lg, 40px));
   -webkit-backdrop-filter: blur(var(--glass-blur-lg, 40px));
+  backdrop-filter: blur(var(--glass-blur-lg, 40px));
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
@@ -353,10 +353,10 @@ select {
   border-radius: inherit;
   padding: 1px;
   background: var(--gradient-gold, linear-gradient(135deg, #C4A77D 0%, #A68660 100%));
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: xor;
   -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
   -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: xor;
   pointer-events: none;
 }
 
