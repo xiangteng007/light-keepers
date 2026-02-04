@@ -72,7 +72,16 @@ export default function InboundQrModal({
     const handlePrintLabel = async () => {
         if (!generatedQr) return;
 
-        alert('🖨️ 貼紙列印功能開發中...\n將來會產生 PDF 並觸發列印');
+        window.confirm(
+            '🖨️ 貼紙列印功能\n\n' +
+            '標籤列印功能正在開發中，預計包含：\n' +
+            '• 產生 PDF 標籤（含 QR Code）\n' +
+            '• 支援多種標籤尺寸（30x20mm, 50x30mm）\n' +
+            '• 批次列印多張標籤\n' +
+            '• 相容 Brother / Zebra 印表機\n\n' +
+            `QR Code 內容：${generatedQr}\n` +
+            '您可以複製此內容手動製作標籤。'
+        );
         // TODO: 呼叫 /api/labels/generate/lot API
     };
 

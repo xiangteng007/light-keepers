@@ -145,9 +145,15 @@ export default function ResourcesPublicPage() {
         input.onchange = async (e) => {
             const file = (e.target as HTMLInputElement).files?.[0];
             if (file) {
-                // 這裡可以使用 jsQR 或其他 QR 解碼庫
-                // 目前先顯示提示
-                alert('掃碼功能開發中，請使用搜尋功能查詢物資');
+                // 顯示詳細功能說明
+                window.confirm(
+                    '📷 QR Code 掃描功能\n\n' +
+                    '掃碼查詢功能正在開發中，預計包含：\n' +
+                    '• 掃描物資 QR Code 查看詳細資訊\n' +
+                    '• 快速查詢儲位與庫存狀態\n' +
+                    '• 支援離線掃描（PWA）\n\n' +
+                    '目前請使用上方搜尋框查詢物資。'
+                );
             }
         };
         input.click();

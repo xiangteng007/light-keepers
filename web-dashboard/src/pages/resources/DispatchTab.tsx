@@ -167,7 +167,23 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
                     <option value="completed">已完成</option>
                 </select>
                 {canManage && (
-                    <Button size="sm" onClick={() => alert('建立調度單功能開發中')}>+ 建立調度單</Button>
+                    <Button 
+                        size="sm" 
+                        onClick={() => {
+                            const confirmed = window.confirm(
+                                '📦 建立調度單功能\n\n' +
+                                '此功能正在開發中，預計包含：\n' +
+                                '• 選擇物資品項與數量\n' +
+                                '• 指定配送目的地\n' +
+                                '• 設定緊急等級與聯絡人\n' +
+                                '• 追蹤配送狀態\n\n' +
+                                '目前請使用後台管理系統建立調度單。'
+                            );
+                            if (confirmed) {
+                                window.open('/command-center', '_blank');
+                            }
+                        }}
+                    >+ 建立調度單</Button>
                 )}
             </div>
 
