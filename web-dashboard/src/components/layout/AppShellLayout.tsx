@@ -8,7 +8,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User, Plus, Minus } from 'lucide-react';
 import { WidgetGrid } from './WidgetGrid';
-import { Widget, WidgetEditControls } from './Widget';
+import { WidgetEditControls } from './Widget';
 import { WidgetPicker } from './WidgetPicker';
 import { SidebarSettings } from './SidebarSettings';
 import { useWidgetLayout } from './useWidgetLayout';
@@ -86,7 +86,6 @@ export default function AppShellLayout({
 
     // Sidebar navigation config with RBAC
     const {
-        visibleNavItems,
         visibleGroups,
         navItems,
         updateNavItem,
@@ -571,30 +570,6 @@ function NavItem({ icon, label, path, expanded, active }: {
         >
             {icon}
             {expanded && <span style={{ fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>}
-        </div>
-    );
-}
-
-function EventPlaceholder({ title }: { title: string }) {
-    return (
-        <div style={{
-            minWidth: '180px', padding: '12px', background: 'rgba(255,255,255,0.03)',
-            borderRadius: '8px', borderLeft: '3px solid var(--accent-gold)',
-        }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>00:00</div>
-            <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{title}</div>
-        </div>
-    );
-}
-
-function CardPlaceholder({ title }: { title: string }) {
-    return (
-        <div style={{
-            padding: '12px', background: 'rgba(255,255,255,0.03)',
-            borderRadius: '8px', marginBottom: '8px',
-            borderLeft: '3px solid rgba(255,255,255,0.2)',
-        }}>
-            <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{title}</div>
         </div>
     );
 }
