@@ -100,7 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // 載入使用者資訊
     const loadUser = async (retryCount = 0) => {
         // DEV MODE: 如果設置了 devModeUser，使用模擬用戶
-        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        const devModeValue = localStorage.getItem('devModeUser');
+        console.log('[AuthContext] devModeUser check:', devModeValue);
+        
+        const devModeEnabled = devModeValue === 'true';
         if (devModeEnabled) {
             console.log('[AuthContext] DEV MODE: Using mock Level 5 user');
             setUser({
