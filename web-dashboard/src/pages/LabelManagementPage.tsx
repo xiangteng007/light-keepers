@@ -242,8 +242,22 @@ export default function LabelManagementPage() {
                                         此功能通常整合在入庫流程中。若需手動產碼，請前往物資管理頁面的入庫功能。
                                     </div>
                                 </Alert>
-                                <div className="text-center text-muted py-4">
-                                    🔨 功能開發中...
+                                <div className="p-4 bg-light rounded">
+                                    <h5 className="text-muted mb-3">🔨 獨立產碼功能籌備中</h5>
+                                    <p className="text-muted small mb-3">預計包含以下功能：</p>
+                                    <ul className="text-muted small">
+                                        <li>選擇物資與批號產生 QR Code</li>
+                                        <li>批次產生多個標籤</li>
+                                        <li>自訂標籤版面配置</li>
+                                        <li>預覽與列印整合</li>
+                                    </ul>
+                                    <Button
+                                        variant="outline-primary"
+                                        size="sm"
+                                        onClick={() => (window.location.href = '/resources/inventory')}
+                                    >
+                                        📦 前往物資入庫
+                                    </Button>
                                 </div>
                             </Card.Body>
                         </Card>

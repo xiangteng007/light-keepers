@@ -7,7 +7,6 @@
 
 import React, { useState } from 'react';
 import {
-    User,
     Shield,
     Edit3,
     Lock,
@@ -182,9 +181,18 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
 
                     <button
                         className={`${styles.actionBtn} ${styles.actionDisabled}`}
-                        onClick={onExportData}
-                        disabled
-                        title="功能開發中"
+                        onClick={() => {
+                            window.confirm(
+                                '📦 匯出個資功能\n\n' +
+                                '此功能正在開發中，預計包含：\n' +
+                                '• 匯出個人資料（JSON/CSV）\n' +
+                                '• GDPR 合規資料可攜性\n' +
+                                '• 志工服務紀錄下載\n' +
+                                '• 任務完成證明產出\n\n' +
+                                '如有緊急需求，請聯繫管理員。'
+                            );
+                        }}
+                        title="資料匯出功能開發中 - 點擊查看詳情"
                     >
                         <Download size={16} />
                         <span>匯出個資</span>
