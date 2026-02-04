@@ -20,15 +20,15 @@
     --lk-success: #10B981;
     --lk-info: #3B82F6;
     
-    /* Nav Colors */
-    --nav-bg: #0F1218;
-    --nav-bg-secondary: #13171F;
-    --nav-border: #1F2937;
-    --nav-item-hover: rgba(212, 175, 55, 0.08);
-    --nav-item-active: rgba(212, 175, 55, 0.15);
-    --nav-text: #94A3B8;
-    --nav-text-hover: #CBD5E1;
-    --nav-text-active: #D4AF37;
+    /* Nav Colors - Using design tokens for theme support */
+    --nav-bg: var(--surface-default, #0F1218);
+    --nav-bg-secondary: var(--surface-raised, #13171F);
+    --nav-border: var(--border-default, #1F2937);
+    --nav-item-hover: var(--color-secondary-alpha, rgba(212, 175, 55, 0.08));
+    --nav-item-active: var(--color-secondary-alpha-strong, rgba(212, 175, 55, 0.15));
+    --nav-text: var(--text-secondary, #94A3B8);
+    --nav-text-hover: var(--text-primary, #CBD5E1);
+    --nav-text-active: var(--color-secondary, #D4AF37);
     
     /* Sidebar dimensions */
     --sidebar-width: 240px;
@@ -70,7 +70,7 @@
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--lk-gold-500) 0%, var(--lk-gold-600) 100%);
-    color: #0F1218;
+    color: var(--bg-primary, #0F1218);
     font-weight: 700;
     font-size: 14px;
     border-radius: 8px;
@@ -79,7 +79,7 @@
 .v3-logo-text {
     font-size: 16px;
     font-weight: 600;
-    color: #E5E7EB;
+    color: var(--text-primary, #E5E7EB);
     letter-spacing: 0.5px;
 }
 
@@ -295,7 +295,7 @@
 .v3-user-name {
     font-size: 13px;
     font-weight: 600;
-    color: #E5E7EB;
+    color: var(--text-primary, #E5E7EB);
     margin: 0;
 }
 
@@ -327,12 +327,12 @@
 }
 
 .v3-user-menu-item--danger {
-    color: #F87171;
+    color: var(--color-danger, #F87171);
 }
 
 .v3-user-menu-item--danger:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #FCA5A5;
+    background: var(--color-danger-alpha, rgba(239, 68, 68, 0.1));
+    color: var(--color-danger-light, #FCA5A5);
 }
 
 /* ==========================================
