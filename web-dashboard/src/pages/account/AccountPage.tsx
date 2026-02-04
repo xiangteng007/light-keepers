@@ -298,7 +298,7 @@ const AccountPage: React.FC = () => {
     // Loading state
     if (isLoading || !accountData) {
         return (
-            <div className={styles.accountPage} data-theme="dark">
+            <div className={styles.accountPage}>
                 <header className={styles.pageHeader}>
                     <h1 className={styles.pageTitle}>
                         <User size={28} className={styles.pageTitleIcon} />
@@ -320,7 +320,7 @@ const AccountPage: React.FC = () => {
     }
 
     return (
-        <div className={styles.accountPage} data-theme="dark">
+        <div className={styles.accountPage}>
             {/* Page Header */}
             <header className={styles.pageHeader}>
                 <h1 className={styles.pageTitle}>
