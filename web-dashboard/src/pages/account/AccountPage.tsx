@@ -38,7 +38,7 @@ const TABS: { id: TabId; label: string }[] = [
 
 const AccountPage: React.FC = () => {
     const navigate = useNavigate();
-    const { user, logout } = useAuth();
+    const { user, logout, isLoading: authLoading } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
     // State
@@ -59,6 +59,17 @@ const AccountPage: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
+
+    // Redirect to login if not authenticated (after auth loading completes)
+    useEffect(() => {
+        // Check for dev mode - skip redirect if dev mode is enabled
+        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        // Wait for auth to finish loading before redirecting
+        if (!authLoading && !user && !devModeEnabled) {
+            console.log('[AccountPage] User not authenticated, redirecting to login...');
+            navigate('/login', { replace: true });
+        }
+    }, [user, authLoading, navigate]);
 
     // Load account data
     useEffect(() => {
