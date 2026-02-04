@@ -158,7 +158,12 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
 
             {/* 篩選 */}
             <div className="filter-row">
-                <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}>
+                <select 
+                    value={filterStatus} 
+                    onChange={e => setFilterStatus(e.target.value)}
+                    aria-label="篩選調度狀態"
+                    title="篩選調度狀態"
+                >
                     <option value="all">全部狀態</option>
                     <option value="pending">待審核</option>
                     <option value="approved">已審核</option>

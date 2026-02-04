@@ -356,6 +356,8 @@ export default function TrainingPage() {
                                 <select
                                     value={newCourse.category}
                                     onChange={(e) => setNewCourse(prev => ({ ...prev, category: e.target.value }))}
+                                    aria-label="選擇課程分類"
+                                    title="課程分類"
                                 >
                                     {Object.entries(INTERNAL_CATEGORY_CONFIG).map(([key, config]) => (
                                         <option key={key} value={key}>{config.icon} {config.label}</option>
@@ -367,6 +369,8 @@ export default function TrainingPage() {
                                 <select
                                     value={newCourse.level}
                                     onChange={(e) => setNewCourse(prev => ({ ...prev, level: e.target.value }))}
+                                    aria-label="選擇課程難度"
+                                    title="課程難度"
                                 >
                                     {Object.entries(LEVEL_CONFIG).map(([key, config]) => (
                                         <option key={key} value={key}>{config.label}</option>
@@ -384,6 +388,9 @@ export default function TrainingPage() {
                                     onChange={(e) => setNewCourse(prev => ({ ...prev, durationMinutes: parseInt(e.target.value) || 30 }))}
                                     min={5}
                                     max={480}
+                                    aria-label="課程時長（分鐘）"
+                                    title="時長（分鐘）"
+                                    placeholder="30"
                                 />
                             </div>
                             <div className="form-group">
