@@ -54,10 +54,12 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
             return;
         }
 
-        const newSocket = io(`${WS_URL}/realtime`, {
+        // Connect to root namespace (not /realtime - backend may not have it)
+        const newSocket = io(WS_URL, {
             transports: ['websocket', 'polling'],
-            reconnectionAttempts: 5,
-            reconnectionDelay: 1000,
+            reconnectionAttempts: 3,
+            reconnectionDelay: 2000,
+            timeout: 10000,
         });
 
         newSocket.on('connect', () => {
