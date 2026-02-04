@@ -2,47 +2,40 @@
  * ThemeProvider.tsx
  * 
  * 主題切換 Context Provider
- * 支援四個主題：light, dark, high-contrast, nature
+ * 工業鋼鐵雙主題版：K1 亮鋼 / K2 銅鋼
  */
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 // 主題類型
-export type ThemeName = 'light' | 'dark' | 'high-contrast' | 'nature';
+export type ThemeName = 'light' | 'dark';
 
 // 主題資訊
 export interface ThemeInfo {
   name: ThemeName;
   displayName: string;
+  displayNameEn: string;
   description: string;
   icon: string;
+  isOledOptimized?: boolean;
 }
 
 // 可用主題列表
 export const AVAILABLE_THEMES: ThemeInfo[] = [
   {
     name: 'light',
-    displayName: '北歐極簡',
-    description: '明亮專業，適合日常辦公',
-    icon: '☀️',
+    displayName: '亮鋼版',
+    displayNameEn: 'Bright Steel',
+    description: '日間模式，適合辦公環境',
+    icon: '🔩',
   },
   {
     name: 'dark',
-    displayName: '戰術暗色',
-    description: '深色護眼，適合現場作業',
-    icon: '🌙',
-  },
-  {
-    name: 'high-contrast',
-    displayName: '高對比',
-    description: '最大可讀性，無障礙友善',
-    icon: '🔳',
-  },
-  {
-    name: 'nature',
-    displayName: '大地色系',
-    description: '柔和療癒，適合社區服務',
-    icon: '🌿',
+    displayName: '銅鋼版',
+    displayNameEn: 'Copper Steel',
+    description: '暗色模式，OLED 省電優化',
+    icon: '🟤',
+    isOledOptimized: true,
   },
 ];
 
@@ -53,6 +46,7 @@ interface ThemeContextType {
   toggleTheme: () => void;
   themeInfo: ThemeInfo;
   availableThemes: ThemeInfo[];
+  isDark: boolean;
 }
 
 // 創建 Context
@@ -77,16 +71,13 @@ export function ThemeProvider({
   const [theme, setThemeState] = useState<ThemeName>(() => {
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem(storageKey);
-      if (stored && AVAILABLE_THEMES.some(t => t.name === stored)) {
+      if (stored === 'light' || stored === 'dark') {
         return stored as ThemeName;
       }
       
       // 檢查系統偏好
       if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
         return 'dark';
-      }
-      if (window.matchMedia('(prefers-contrast: more)').matches) {
-        return 'high-contrast';
       }
     }
     return defaultTheme;
@@ -98,67 +89,49 @@ export function ThemeProvider({
     localStorage.setItem(storageKey, newTheme);
   };
 
-  // 循環切換主題
+  // 切換主題
   const toggleTheme = () => {
-    const currentIndex = AVAILABLE_THEMES.findIndex(t => t.name === theme);
-    const nextIndex = (currentIndex + 1) % AVAILABLE_THEMES.length;
-    setTheme(AVAILABLE_THEMES[nextIndex].name);
+    setTheme(theme === 'light' ? 'dark' : 'light');
   };
 
   // 應用主題到 DOM
   useEffect(() => {
     const root = document.documentElement;
     
-    // 移除所有主題 class
-    AVAILABLE_THEMES.forEach(t => {
-      root.classList.remove(`theme-${t.name}`);
-    });
-    
     // 設定 data-theme attribute
     root.setAttribute('data-theme', theme);
     
-    // 新增主題 class
-    root.classList.add(`theme-${theme}`);
+    // 設定 class (相容舊版 html.dark 樣式)
+    if (theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
     
-    // 更新 meta theme-color
+    // 更新 meta theme-color (行動裝置狀態列顏色)
     const metaThemeColor = document.querySelector('meta[name="theme-color"]');
     if (metaThemeColor) {
-      const colors: Record<ThemeName, string> = {
-        light: '#FFFFFF',
-        dark: '#0F172A',
-        'high-contrast': '#FFFFFF',
-        nature: '#FFFBEB',
-      };
-      metaThemeColor.setAttribute('content', colors[theme]);
+      metaThemeColor.setAttribute(
+        'content',
+        theme === 'dark' ? '#1C1917' : '#F4F4F5'
+      );
     }
   }, [theme]);
 
   // 監聽系統偏好變化
   useEffect(() => {
     const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const contrastQuery = window.matchMedia('(prefers-contrast: more)');
 
-    const handleChange = () => {
+    const handleChange = (e: MediaQueryListEvent) => {
       // 只有當用戶沒有手動設定過時才自動切換
       const stored = localStorage.getItem(storageKey);
       if (!stored) {
-        if (contrastQuery.matches) {
-          setThemeState('high-contrast');
-        } else if (darkModeQuery.matches) {
-          setThemeState('dark');
-        } else {
-          setThemeState('light');
-        }
+        setThemeState(e.matches ? 'dark' : 'light');
       }
     };
 
     darkModeQuery.addEventListener('change', handleChange);
-    contrastQuery.addEventListener('change', handleChange);
-
-    return () => {
-      darkModeQuery.removeEventListener('change', handleChange);
-      contrastQuery.removeEventListener('change', handleChange);
-    };
+    return () => darkModeQuery.removeEventListener('change', handleChange);
   }, [storageKey]);
 
   // 取得當前主題資訊
@@ -170,6 +143,7 @@ export function ThemeProvider({
     toggleTheme,
     themeInfo,
     availableThemes: AVAILABLE_THEMES,
+    isDark: theme === 'dark',
   };
 
   return (

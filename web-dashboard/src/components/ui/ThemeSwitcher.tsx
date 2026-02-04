@@ -1,13 +1,14 @@
 /**
  * ThemeSwitcher.tsx
  * 
- * 主題切換下拉選單組件
+ * 工業鋼鐵主題切換組件
+ * K1 亮鋼版 ↔ K2 銅鋼版
  */
 
 import React from 'react';
 import { useTheme } from '../../context/ThemeProvider';
-import { Dropdown } from 'react-bootstrap';
-import { Palette } from 'lucide-react';
+import { Sun, Moon } from 'lucide-react';
+import styles from './ThemeSwitcher.module.css';
 
 interface ThemeSwitcherProps {
   showLabel?: boolean;
@@ -15,48 +16,31 @@ interface ThemeSwitcherProps {
 }
 
 export function ThemeSwitcher({ showLabel = false, size = 'md' }: ThemeSwitcherProps) {
-  const { theme, setTheme, themeInfo, availableThemes } = useTheme();
+  const { theme, toggleTheme, themeInfo, isDark } = useTheme();
 
-  const sizeClasses = {
-    sm: 'btn-sm',
-    md: '',
-    lg: 'btn-lg',
-  };
+  const iconSize = size === 'sm' ? 16 : size === 'lg' ? 24 : 20;
 
   return (
-    <Dropdown>
-      <Dropdown.Toggle
-        variant="outline-secondary"
-        className={sizeClasses[size]}
-        style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-      >
-        <Palette size={size === 'sm' ? 14 : size === 'lg' ? 20 : 16} />
-        {showLabel && (
-          <span>
-            {themeInfo.icon} {themeInfo.displayName}
-          </span>
+    <button
+      onClick={toggleTheme}
+      className={`${styles.switcher} ${styles[size]}`}
+      title={`切換到${isDark ? '亮鋼版' : '銅鋼版'}`}
+      aria-label={`當前主題: ${themeInfo.displayName}，點擊切換`}
+    >
+      <span className={styles.iconWrapper}>
+        {isDark ? (
+          <Sun size={iconSize} className={styles.icon} />
+        ) : (
+          <Moon size={iconSize} className={styles.icon} />
         )}
-      </Dropdown.Toggle>
-
-      <Dropdown.Menu>
-        <Dropdown.Header>選擇主題</Dropdown.Header>
-        {availableThemes.map((t) => (
-          <Dropdown.Item
-            key={t.name}
-            active={theme === t.name}
-            onClick={() => setTheme(t.name)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}
-          >
-            <span style={{ fontWeight: 600 }}>
-              {t.icon} {t.displayName}
-            </span>
-            <small style={{ color: 'var(--text-secondary)', fontSize: '12px' }}>
-              {t.description}
-            </small>
-          </Dropdown.Item>
-        ))}
-      </Dropdown.Menu>
-    </Dropdown>
+      </span>
+      
+      {showLabel && (
+        <span className={styles.label}>
+          {themeInfo.icon} {themeInfo.displayName}
+        </span>
+      )}
+    </button>
   );
 }
 

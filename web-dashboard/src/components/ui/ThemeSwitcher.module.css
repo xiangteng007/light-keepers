@@ -1,0 +1,85 @@
+/**
+ * ThemeSwitcher.module.css
+ * 
+ * 工業鋼鐵主題切換器樣式
+ */
+
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  font-family: inherit;
+  font-size: var(--text-sm);
+}
+
+.switcher:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-dark);
+}
+
+.switcher:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--color-secondary);
+}
+
+.switcher:active {
+  background: var(--surface-active);
+}
+
+/* 尺寸變體 */
+.sm {
+  padding: 6px 10px;
+  font-size: var(--text-xs);
+}
+
+.md {
+  padding: 8px 12px;
+  font-size: var(--text-sm);
+}
+
+.lg {
+  padding: 10px 16px;
+  font-size: var(--text-base);
+}
+
+/* 圖示容器 */
+.iconWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon {
+  transition: transform var(--transition-base);
+}
+
+.switcher:hover .icon {
+  transform: rotate(15deg);
+}
+
+/* 標籤 */
+.label {
+  font-weight: var(--font-medium);
+}
+
+/* 暗色模式調整 */
+:global([data-theme="dark"]) .switcher {
+  background: var(--surface-default);
+  border-color: var(--border-default);
+}
+
+:global([data-theme="dark"]) .switcher:hover {
+  background: var(--surface-hover);
+  border-color: var(--copper-accent, #B87333);
+}
+
+:global([data-theme="dark"]) .icon {
+  color: var(--color-secondary-light);
+}
