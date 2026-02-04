@@ -263,6 +263,10 @@
         "commandCenter": "Command Center"
     },
     "widgets": {
+        "editTitleHint": "Double-click to edit title",
+        "missionStats": {
+            "title": "Mission Stats"
+        },
         "taskStats": {
             "title": "Task Statistics",
             "pending": "Pending",
@@ -280,6 +284,122 @@
         "disasterReports": {
             "title": "Disaster Reports",
             "report": "Disaster Report"
+        },
+        "eventTimeline": {
+            "title": "Event Timeline"
+        },
+        "volunteerStatus": {
+            "title": "Volunteer Status"
+        },
+        "quickActions": {
+            "title": "Quick Actions"
+        },
+        "tacticalMap": {
+            "title": "Tactical Map"
+        },
+        "weatherRadar": {
+            "title": "Weather Radar"
+        },
+        "earthquakeMap": {
+            "title": "Earthquake Monitor"
+        },
+        "mapLayers": {
+            "title": "Layer Control",
+            "events": "Event Markers",
+            "volunteers": "Volunteer Locations",
+            "resources": "Resource Points",
+            "routes": "Route Planning"
+        },
+        "mapLegend": {
+            "title": "Map Legend",
+            "critical": "Critical",
+            "high": "High Priority",
+            "medium": "Medium Priority",
+            "normal": "Normal"
+        },
+        "aiMatches": {
+            "title": "AI Matching Suggestions"
+        },
+        "requestsList": {
+            "title": "Needs List"
+        },
+        "suppliesGrid": {
+            "title": "Supply Inventory"
+        },
+        "missingCases": {
+            "title": "Missing Cases"
+        },
+        "auditTable": {
+            "title": "Audit Log"
+        },
+        "pttPanel": {
+            "title": "PTT Panel"
+        },
+        "resourceSearch": {
+            "title": "Resource Search"
+        },
+        "searchPanel": {
+            "title": "Search Panel"
+        },
+        "reportForm": {
+            "title": "Report Form"
+        },
+        "blessingWall": {
+            "title": "Blessing Wall"
+        },
+        "moodTracker": {
+            "title": "Mood Tracker"
+        },
+        "pfaChat": {
+            "title": "AI Mental First Aid"
+        },
+        "resourceChart": {
+            "title": "Resource Chart"
+        },
+        "trendsChart": {
+            "title": "Trend Forecast"
+        },
+        "keyMetrics": {
+            "title": "Key Metrics"
+        },
+        "accountsGrid": {
+            "title": "Accounts List"
+        },
+        "tenantList": {
+            "title": "Tenant List"
+        },
+        "tenantDetail": {
+            "title": "Tenant Details"
+        },
+        "settingsNav": {
+            "title": "Settings Navigation"
+        },
+        "settingsPanel": {
+            "title": "Settings Panel"
+        },
+        "featureFlags": {
+            "title": "Feature Flags"
+        },
+        "notificationFeed": {
+            "title": "Notification Feed"
+        },
+        "notificationSummary": {
+            "title": "Notification Summary"
+        },
+        "geoAlertFeed": {
+            "title": "Alert Feed"
+        },
+        "geoSummary": {
+            "title": "Intel Summary"
+        },
+        "weatherCard": {
+            "title": "Weather Card"
+        },
+        "earthquakeMonitor": {
+            "title": "Earthquake Monitor"
+        },
+        "dashboardStats": {
+            "title": "Dashboard Stats"
         },
         "socialFeed": {
             "title": "Social Intel",

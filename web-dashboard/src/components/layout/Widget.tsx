@@ -5,7 +5,9 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { GripVertical, Eye, EyeOff, Lock, Unlock, Settings, Pencil, Trash2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { WidgetConfig } from './widget.types';
+import { getWidgetTitle } from '../../utils/widget-i18n';
 import './Widget.css';
 
 interface WidgetProps {
@@ -33,14 +35,17 @@ export function Widget({
     onRemove,
     children,
 }: WidgetProps) {
+    const { t } = useTranslation();
     const [isEditingTitle, setIsEditingTitle] = useState(false);
-    const [titleValue, setTitleValue] = useState(config.title);
+    // Get translated title using widget ID
+    const translatedTitle = getWidgetTitle(config.id, config.title, t);
+    const [titleValue, setTitleValue] = useState(translatedTitle);
     const titleInputRef = useRef<HTMLInputElement>(null);
 
-    // Sync title value when config changes
+    // Sync title value when config or language changes
     useEffect(() => {
-        setTitleValue(config.title);
-    }, [config.title]);
+        setTitleValue(translatedTitle);
+    }, [translatedTitle]);
 
     // Focus input when editing starts
     useEffect(() => {
@@ -61,7 +66,7 @@ export function Widget({
         if (titleValue.trim() && onTitleChange) {
             onTitleChange(titleValue.trim());
         } else {
-            setTitleValue(config.title);  // Revert if empty
+            setTitleValue(translatedTitle);  // Revert if empty
         }
         setIsEditingTitle(false);
     };
@@ -70,7 +75,7 @@ export function Widget({
         if (e.key === 'Enter') {
             handleTitleSave();
         } else if (e.key === 'Escape') {
-            setTitleValue(config.title);
+            setTitleValue(translatedTitle);
             setIsEditingTitle(false);
         }
     };
@@ -110,9 +115,9 @@ export function Widget({
                     <h3
                         className="widget__title"
                         onDoubleClick={handleTitleDoubleClick}
-                        title={isEditMode ? '雙擊編輯標題' : undefined}
+                        title={isEditMode ? t('widgets.editTitleHint', '雙擊編輯標題') : undefined}
                     >
-                        {config.title}
+                        {translatedTitle}
                         {isEditMode && canEdit && (
                             <button
                                 className="widget__title-edit-btn"
@@ -162,7 +167,7 @@ export function Widget({
             <div className="widget__content">
                 {children || (
                     <div className="widget__placeholder">
-                        {config.title}
+                        {translatedTitle}
                     </div>
                 )}
             </div>

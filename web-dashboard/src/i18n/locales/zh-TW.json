@@ -263,6 +263,10 @@
         "commandCenter": "指揮中心"
     },
     "widgets": {
+        "editTitleHint": "雙擊編輯標題",
+        "missionStats": {
+            "title": "任務統計"
+        },
         "taskStats": {
             "title": "任務統計",
             "pending": "待配對",
@@ -280,6 +284,122 @@
         "disasterReports": {
             "title": "災情通報",
             "report": "災情通報"
+        },
+        "eventTimeline": {
+            "title": "事件時間線"
+        },
+        "volunteerStatus": {
+            "title": "志工動態"
+        },
+        "quickActions": {
+            "title": "快速操作"
+        },
+        "tacticalMap": {
+            "title": "戰術地圖"
+        },
+        "weatherRadar": {
+            "title": "氣象雷達"
+        },
+        "earthquakeMap": {
+            "title": "地震監測"
+        },
+        "mapLayers": {
+            "title": "圖層控制",
+            "events": "事件標記",
+            "volunteers": "志工位置",
+            "resources": "資源點",
+            "routes": "路線規劃"
+        },
+        "mapLegend": {
+            "title": "地圖圖例",
+            "critical": "緊急",
+            "high": "高優先",
+            "medium": "中優先",
+            "normal": "一般"
+        },
+        "aiMatches": {
+            "title": "AI 配對建議"
+        },
+        "requestsList": {
+            "title": "需求列表"
+        },
+        "suppliesGrid": {
+            "title": "供給庫存"
+        },
+        "missingCases": {
+            "title": "失蹤案例"
+        },
+        "auditTable": {
+            "title": "審計日誌"
+        },
+        "pttPanel": {
+            "title": "PTT 對講"
+        },
+        "resourceSearch": {
+            "title": "物資查詢"
+        },
+        "searchPanel": {
+            "title": "搜尋面板"
+        },
+        "reportForm": {
+            "title": "通報表單"
+        },
+        "blessingWall": {
+            "title": "祈福牆"
+        },
+        "moodTracker": {
+            "title": "心情追蹤"
+        },
+        "pfaChat": {
+            "title": "AI 心理急救"
+        },
+        "resourceChart": {
+            "title": "物資圖表"
+        },
+        "trendsChart": {
+            "title": "趨勢預測"
+        },
+        "keyMetrics": {
+            "title": "關鍵指標"
+        },
+        "accountsGrid": {
+            "title": "帳戶清單"
+        },
+        "tenantList": {
+            "title": "租戶列表"
+        },
+        "tenantDetail": {
+            "title": "租戶詳情"
+        },
+        "settingsNav": {
+            "title": "設定導航"
+        },
+        "settingsPanel": {
+            "title": "設定面板"
+        },
+        "featureFlags": {
+            "title": "功能開關"
+        },
+        "notificationFeed": {
+            "title": "通知動態"
+        },
+        "notificationSummary": {
+            "title": "通知摘要"
+        },
+        "geoAlertFeed": {
+            "title": "警報動態"
+        },
+        "geoSummary": {
+            "title": "情資摘要"
+        },
+        "weatherCard": {
+            "title": "天氣卡片"
+        },
+        "earthquakeMonitor": {
+            "title": "地震監控"
+        },
+        "dashboardStats": {
+            "title": "儀表板統計"
         },
         "socialFeed": {
             "title": "社群情資",
