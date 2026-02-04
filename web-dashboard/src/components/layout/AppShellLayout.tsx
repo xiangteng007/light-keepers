@@ -30,7 +30,7 @@ interface AppShellLayoutProps {
 
 export default function AppShellLayout({
     children,
-    userLevel = PermissionLevel.SystemOwner,  // Default to Level 5 for demo
+    userLevel = PermissionLevel.Anonymous,  // Default to Level 0 (unauthenticated)
     pageId = 'default',
 }: AppShellLayoutProps) {
     const { t } = useTranslation();
