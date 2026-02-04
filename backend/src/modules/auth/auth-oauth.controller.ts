@@ -20,7 +20,7 @@ import {
 } from '@nestjs/common';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
-import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, Public } from '../shared/guards';
 import { OAuthService } from './services/oauth.service';
 import { AuthService } from './auth.service';
 import { ConfigService } from '@nestjs/config';
@@ -41,6 +41,7 @@ export class AuthOAuthController {
 
     // ===== LINE OAuth =====
 
+    @Public()
     @Get('line')
     @ApiOperation({ summary: 'Redirect to LINE Login authorization page' })
     @ApiQuery({ name: 'redirect', required: false, description: 'URL to redirect after login' })
@@ -56,6 +57,7 @@ export class AuthOAuthController {
         return res.redirect(authUrl);
     }
 
+    @Public()
     @Get('line/callback')
     @ApiOperation({ summary: 'LINE OAuth callback handler' })
     async lineCallback(
@@ -147,6 +149,7 @@ export class AuthOAuthController {
 
     // ===== Google OAuth =====
 
+    @Public()
     @Get('google')
     @ApiOperation({ summary: 'Redirect to Google OAuth authorization page' })
     @ApiQuery({ name: 'redirect', required: false, description: 'URL to redirect after login' })
@@ -161,6 +164,7 @@ export class AuthOAuthController {
         return res.redirect(authUrl);
     }
 
+    @Public()
     @Get('google/callback')
     @ApiOperation({ summary: 'Google OAuth callback handler' })
     async googleCallback(
