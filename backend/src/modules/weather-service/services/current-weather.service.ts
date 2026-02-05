@@ -110,11 +110,12 @@ export class CurrentWeatherService {
     /**
      * 生成天氣描述
      */
-    private getWeatherDescription(element: any): string {
+    private getWeatherDescription(element: Record<string, unknown>): string {
         if (!element) return '晴';
+        const now = element.Now as Record<string, unknown> | undefined;
         
-        const rainfall = parseFloat(element.Now?.Precipitation) || 0;
-        const humidity = parseFloat(element.RelativeHumidity) || 70;
+        const rainfall = parseFloat((now?.Precipitation as string) || '0') || 0;
+        const humidity = parseFloat((element.RelativeHumidity as string) || '70') || 70;
         
         if (rainfall > 10) return '大雨';
         if (rainfall > 1) return '雨';

@@ -58,7 +58,7 @@ export class WeatherService {
      */
     async getWeatherByLocation(lat: number, lng: number): Promise<{
         current: CurrentWeatherData | null;
-        forecast: any;
+        forecast: unknown;
         risk: WeatherRiskAssessment;
         alerts: WeatherAlert[];
     }> {
@@ -167,12 +167,12 @@ export class WeatherService {
 
     // === 任務連結 ===
 
-    linkMissionToWeather(missionId: string, alertId: string, actions: string[]) {
+    linkMissionToWeather(missionId: string, alertId: string, actions: ('notify_team' | 'suspend_outdoor' | 'evacuate' | 'standby')[]) {
         return this.alerts.linkMission({
             missionId,
             alertId,
             autoTrigger: true,
-            actions: actions as any,
+            actions: actions,
         });
     }
 

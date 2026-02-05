@@ -251,20 +251,21 @@ export class AlertService {
 
     // === Private Helpers ===
 
-    private parseAlertFromCwa(info: any): WeatherAlert | null {
+    private parseAlertFromCwa(info: Record<string, unknown>): WeatherAlert | null {
         if (!info) return null;
 
         const now = new Date();
+        const validTime = info.validTime as Record<string, unknown> | undefined;
         
         return {
-            id: `cwa-${info.datasetId || Date.now()}`,
-            type: this.mapAlertType(info.datasetDescription),
-            severity: this.mapSeverity(info.datasetSignificance),
-            title: info.datasetDescription || '氣象警報',
-            description: info.datasetDescription || '',
+            id: `cwa-${(info.datasetId as string) || Date.now()}`,
+            type: this.mapAlertType(info.datasetDescription as string),
+            severity: this.mapSeverity(info.datasetSignificance as string),
+            title: (info.datasetDescription as string) || '氣象警報',
+            description: (info.datasetDescription as string) || '',
             affectedAreas: ['全臺'],
-            startTime: new Date(info.validTime?.start || now),
-            endTime: info.validTime?.end ? new Date(info.validTime.end) : undefined,
+            startTime: new Date((validTime?.start as string) || now),
+            endTime: validTime?.end ? new Date(validTime.end as string) : undefined,
             source: 'cwb',
             isActive: true,
             createdAt: now,

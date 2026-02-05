@@ -32,9 +32,9 @@ export interface CwaApiResponse {
     success: string;
     result: {
         resource_id: string;
-        fields: any[];
+        fields: unknown[];
     };
-    records: any;
+    records: unknown;
 }
 
 /**
@@ -52,7 +52,7 @@ export class CwaApiService {
     private readonly apiKey: string;
     
     // 簡易快取
-    private cache: Map<string, { data: any; expiry: number }> = new Map();
+    private cache: Map<string, { data: unknown; expiry: number }> = new Map();
     private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
     constructor(

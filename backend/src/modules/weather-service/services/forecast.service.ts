@@ -69,10 +69,10 @@ export class ForecastService {
         const forecasts: WeatherForecast[] = [];
 
         for (const loc of data.location) {
-            const wx = loc.weatherElement?.find((e: any) => e.elementName === 'Wx');
-            const pop = loc.weatherElement?.find((e: any) => e.elementName === 'PoP');
-            const minT = loc.weatherElement?.find((e: any) => e.elementName === 'MinT');
-            const maxT = loc.weatherElement?.find((e: any) => e.elementName === 'MaxT');
+            const wx = loc.weatherElement?.find((e: Record<string, unknown>) => e.elementName === 'Wx');
+            const pop = loc.weatherElement?.find((e: Record<string, unknown>) => e.elementName === 'PoP');
+            const minT = loc.weatherElement?.find((e: Record<string, unknown>) => e.elementName === 'MinT');
+            const maxT = loc.weatherElement?.find((e: Record<string, unknown>) => e.elementName === 'MaxT');
 
             for (let i = 0; i < (wx?.time?.length || 3); i++) {
                 forecasts.push({
@@ -104,9 +104,9 @@ export class ForecastService {
             return this.generateFallbackWeekly(countyName);
         }
 
-        return data.locations[0].location.map((loc: any) => ({
+        return data.locations[0].location.map((loc: Record<string, unknown>) => ({
             locationName: loc.locationName,
-            days: this.parseWeeklyDays(loc.weatherElement),
+            days: this.parseWeeklyDays(loc.weatherElement as Record<string, unknown>[]),
         }));
     }
 
@@ -141,8 +141,8 @@ export class ForecastService {
             return this.generateFallbackTide(stationName);
         }
 
-        return data.TideForecasts.map((station: any) => ({
-            stationName: station.Location?.StationName || '未知',
+        return data.TideForecasts.map((station: Record<string, unknown>) => ({
+            stationName: (station.Location as Record<string, unknown>)?.StationName || '未知',
             tides: this.parseTides(station.DailyForecast),
         }));
     }
@@ -150,7 +150,7 @@ export class ForecastService {
     /**
      * 取得登山天氣預報
      */
-    async getMountainForecast(locationName?: string): Promise<any[]> {
+    async getMountainForecast(locationName?: string): Promise<unknown[]> {
         const mountains = [
             { name: '玉山', baseCounty: '南投縣' },
             { name: '雪山', baseCounty: '臺中市' },
@@ -187,7 +187,7 @@ export class ForecastService {
     /**
      * 取得預報摘要
      */
-    async getForecastSummary(countyName?: string): Promise<any> {
+    async getForecastSummary(countyName?: string): Promise<unknown> {
         const [general, weekly, marine] = await Promise.all([
             this.getGeneralForecast(countyName),
             this.getWeeklyForecast(countyName),
@@ -204,14 +204,17 @@ export class ForecastService {
 
     // === Private Helper Methods ===
 
-    private parseWeeklyDays(elements: any[]): any[] {
-        const days: any[] = [];
-        const wx = elements?.find((e: any) => e.elementName === 'Wx');
+    private parseWeeklyDays(elements: Record<string, unknown>[]): Record<string, unknown>[] {
+        const days: Record<string, unknown>[] = [];
+        const wx = elements?.find((e: Record<string, unknown>) => e.elementName === 'Wx') as Record<string, unknown> | undefined;
+        const timeArray = (wx?.time as Record<string, unknown>[] | undefined) ?? [];
         
         for (let i = 0; i < 7; i++) {
+            const timeItem = timeArray[i] as Record<string, unknown> | undefined;
+            const elementValue = (timeItem?.elementValue as Record<string, unknown>[] | undefined)?.[0];
             days.push({
                 date: new Date(Date.now() + i * 86400000).toISOString().split('T')[0],
-                description: wx?.time?.[i]?.elementValue?.[0]?.value || '晴',
+                description: (elementValue?.value as string) ?? '晴',
                 temperature: { min: 22, max: 28 },
                 pop: Math.floor(Math.random() * 30),
             });
@@ -220,16 +223,17 @@ export class ForecastService {
         return days;
     }
 
-    private parseTides(dailyForecast: any): any[] {
-        const tides: any[] = [];
-        const today = dailyForecast?.[0];
+    private parseTides(dailyForecast: unknown): Record<string, unknown>[] {
+        const tides: Record<string, unknown>[] = [];
+        const forecast = dailyForecast as Record<string, unknown>[];
+        const today = forecast?.[0];
         
         if (today?.Time) {
-            for (const t of today.Time) {
+            for (const t of (today.Time as Record<string, unknown>[])) {
                 tides.push({
-                    type: t.Tide?.includes('高') ? 'high' : 'low',
-                    time: new Date(t.DateTime),
-                    height: parseFloat(t.TideHeights?.AboveChartDatum) || 1.5,
+                    type: (t.Tide as string)?.includes('高') ? 'high' : 'low',
+                    time: new Date(t.DateTime as string),
+                    height: parseFloat((t.TideHeights as Record<string, unknown>)?.AboveChartDatum as string) || 1.5,
                 });
             }
         }
