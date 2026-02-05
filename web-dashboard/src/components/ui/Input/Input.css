@@ -1,0 +1,219 @@
+/**
+ * Input Component Styles
+ * Uses design tokens from components.css
+ */
+
+/* Container */
+.input-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-1);
+}
+
+.input-container--full-width {
+  width: 100%;
+}
+
+/* Label */
+.input-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+.input-label--required {
+  color: var(--danger-500);
+}
+
+/* Input Wrapper */
+.input-wrapper {
+  display: flex;
+  align-items: center;
+  position: relative;
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  transition: 
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background-color var(--transition-fast);
+}
+
+.input-wrapper:hover:not(.input-wrapper--disabled) {
+  border-color: var(--border-hover);
+}
+
+.input-wrapper:focus-within:not(.input-wrapper--disabled) {
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+/* Variants */
+.input-wrapper--filled {
+  background: var(--surface-raised);
+  border-color: transparent;
+}
+
+.input-wrapper--filled:focus-within {
+  background: var(--surface-default);
+  border-color: var(--primary-500);
+}
+
+.input-wrapper--outline {
+  background: transparent;
+}
+
+.input-wrapper--ghost {
+  background: transparent;
+  border-color: transparent;
+}
+
+.input-wrapper--ghost:hover:not(.input-wrapper--disabled) {
+  background: var(--surface-raised);
+}
+
+/* Sizes */
+.input-wrapper--sm {
+  height: 32px;
+  padding: 0 var(--spacing-2);
+}
+
+.input-wrapper--md {
+  height: 40px;
+  padding: 0 var(--spacing-3);
+}
+
+.input-wrapper--lg {
+  height: 48px;
+  padding: 0 var(--spacing-4);
+}
+
+/* Error State */
+.input-wrapper--error {
+  border-color: var(--danger-500);
+}
+
+.input-wrapper--error:focus-within {
+  border-color: var(--danger-500);
+  box-shadow: 0 0 0 3px var(--danger-100);
+}
+
+/* Disabled State */
+.input-wrapper--disabled {
+  background: var(--surface-muted);
+  border-color: var(--border-default);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Icon Padding */
+.input-wrapper--has-left-icon {
+  padding-left: var(--spacing-2);
+}
+
+.input-wrapper--has-right-icon {
+  padding-right: var(--spacing-2);
+}
+
+/* Input */
+.input {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  outline: none;
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.input:disabled {
+  cursor: not-allowed;
+}
+
+/* Icons */
+.input-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  flex-shrink: 0;
+}
+
+.input-icon--left {
+  margin-right: var(--spacing-2);
+}
+
+.input-icon--right {
+  margin-left: var(--spacing-2);
+}
+
+.input-wrapper:focus-within .input-icon {
+  color: var(--primary-500);
+}
+
+/* Error Message */
+.input-error {
+  font-size: var(--font-size-sm);
+  color: var(--danger-500);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-1);
+}
+
+/* Helper Text */
+.input-helper {
+  font-size: var(--font-size-sm);
+  color: var(--text-muted);
+}
+
+/* Textarea */
+.textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: var(--spacing-3);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+  border: 1px solid var(--border-default);
+  font-size: var(--font-size-base);
+  color: var(--text-primary);
+  resize: vertical;
+  transition: 
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.textarea:hover:not(:disabled) {
+  border-color: var(--border-hover);
+}
+
+.textarea:focus {
+  outline: none;
+  border-color: var(--primary-500);
+  box-shadow: 0 0 0 3px var(--primary-100);
+}
+
+.textarea::placeholder {
+  color: var(--text-muted);
+}
+
+.textarea--error {
+  border-color: var(--danger-500);
+}
+
+.textarea--error:focus {
+  box-shadow: 0 0 0 3px var(--danger-100);
+}
+
+.textarea--disabled {
+  background: var(--surface-muted);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
