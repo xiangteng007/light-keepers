@@ -4,7 +4,10 @@ import { getScrapedCourses, triggerScrape } from '../api/services';
 import type { ScrapedCourse } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import { Plus } from 'lucide-react';
+import { createLogger } from '../utils/logger';
 import './TrainingPage.css';
+
+const logger = createLogger('Training');
 
 // 🏷️ 爬取課程分類
 const SCRAPED_CATEGORY_CONFIG = {
@@ -80,7 +83,7 @@ export default function TrainingPage() {
                 const response = await getScrapedCourses();
                 setScrapedCourses(response.data.data);
             } catch (err) {
-                console.error('Failed to fetch scraped courses:', err);
+                logger.error('Failed to fetch scraped courses:', err);
                 setError('載入外部課程失敗');
             } finally {
                 setIsLoadingCourses(false);
@@ -111,7 +114,7 @@ export default function TrainingPage() {
             const coursesResponse = await getScrapedCourses();
             setScrapedCourses(coursesResponse.data.data);
         } catch (err) {
-            console.error('Scrape trigger failed:', err);
+            logger.error('Scrape trigger failed:', err);
             alert('❌ 更新失敗，請稍後再試');
         } finally {
             setIsLoading(false);
@@ -125,7 +128,7 @@ export default function TrainingPage() {
             return;
         }
         // TODO: 連接後端 API 新增課程
-        console.log('New course:', newCourse);
+        logger.debug('New course:', newCourse);
         
         window.confirm(
             '📚 內部課程系統\n\n' +

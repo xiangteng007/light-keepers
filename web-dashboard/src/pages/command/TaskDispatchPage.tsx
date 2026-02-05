@@ -12,7 +12,10 @@ import {
 import { PageTemplate } from '../../components/PageTemplate';
 import { TaskModal, TaskFormData } from '../../components/TaskModal';
 import { useTasks, useCreateTask, useUpdateTaskStatus, usePersonnel } from '../../hooks/useCoreObjects';
+import { createLogger } from '../../utils/logger';
 import './TaskDispatchPage.css';
+
+const logger = createLogger('TaskDispatch');
 
 // Mock data for demo
 const MOCK_TASKS = [
@@ -80,7 +83,7 @@ export default function TaskDispatchPage() {
     };
 
     const handleCreateTask = (task: TaskFormData) => {
-        console.log('New task created:', task);
+        logger.debug('New task created:', task);
         // In a real app, this would call the API
         // createTask.mutate(task);
     };

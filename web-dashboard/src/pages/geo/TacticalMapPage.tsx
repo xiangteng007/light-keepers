@@ -3,7 +3,10 @@
  * Strategic map with Mapbox integration
  */
 import { Suspense, lazy } from 'react';
+import { createLogger } from '../../utils/logger';
 import './TacticalMapPage.css';
+
+const logger = createLogger('TacticalMap');
 
 // Lazy load to avoid SSR issues with mapbox
 const TacticalMap = lazy(() => import('../../components/TacticalMap/TacticalMap').then(m => ({ default: m.TacticalMap })));
@@ -41,7 +44,7 @@ export default function TacticalMapPage() {
                         center={[121.5654, 25.0330]}
                         zoom={13}
                         markers={mockMarkers}
-                        onMarkerClick={(marker) => console.log('Clicked marker:', marker)}
+                        onMarkerClick={(marker) => logger.debug('Clicked marker:', marker)}
                         showLayers={true}
                     />
                 </Suspense>

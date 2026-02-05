@@ -25,7 +25,10 @@ import {
     Share2,
     ChevronLeft,
 } from 'lucide-react';
+import { createLogger } from '../../utils/logger';
 import './ICS201BriefingPage.css';
+
+const logger = createLogger('ICS201');
 
 interface IncidentBriefing {
     incidentName: string;
@@ -108,7 +111,7 @@ export default function ICS201BriefingPage() {
 
     const handleSave = () => {
         // TODO: Save to backend
-        console.log('Saving ICS 201:', briefing);
+        logger.debug('Saving ICS 201:', briefing);
         alert('ICS 201 已儲存');
     };
 

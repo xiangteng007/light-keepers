@@ -23,7 +23,10 @@ import {
     Trash2,
     Calendar,
 } from 'lucide-react';
+import { createLogger } from '../../utils/logger';
 import './ICS205CommsPage.css';
+
+const logger = createLogger('ICS205');
 
 interface RadioChannel {
     id: string;
@@ -132,7 +135,7 @@ export default function ICS205CommsPage() {
     };
 
     const handleSave = () => {
-        console.log('Saving ICS 205:', plan);
+        logger.debug('Saving ICS 205:', plan);
         alert('ICS 205 已儲存');
     };
 

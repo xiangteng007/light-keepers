@@ -5,7 +5,10 @@ import { useFieldReports } from '../hooks/useFieldReports';
 import { useAiQueue } from '../hooks/useAiQueue';
 import { ReportsPanel, SOSButton } from '../components/field-reports';
 import { MapContainer } from '../components/map';
+import { createLogger } from '../utils/logger';
 import './MissionCommandPage.css';
+
+const logger = createLogger('MissionCommand');
 
 // Token storage key (same as AuthContext)
 const TOKEN_KEY = 'accessToken';
@@ -64,7 +67,7 @@ export function MissionCommandPage() {
     // Handle report triage (unused params prefixed with _)
     const handleTriaged = async (reportId: string, _status?: string, _version?: number) => {
         // Would call updateReport with status: 'triaged'
-        console.log('Triaged:', reportId);
+        logger.debug('Triaged:', reportId);
     };
 
     // Handle SOS ACK
@@ -82,7 +85,7 @@ export function MissionCommandPage() {
         try {
             await summarizeReport(reportId);
         } catch (err) {
-            console.error('AI summarize failed:', err);
+            logger.error('AI summarize failed:', err);
         }
     };
 
@@ -91,7 +94,7 @@ export function MissionCommandPage() {
         try {
             await acceptResult(reportId, true);
         } catch (err) {
-            console.error('AI accept failed:', err);
+            logger.error('AI accept failed:', err);
         }
     };
 
@@ -100,7 +103,7 @@ export function MissionCommandPage() {
         try {
             await rejectResult(reportId, '使用者拒絕');
         } catch (err) {
-            console.error('AI reject failed:', err);
+            logger.error('AI reject failed:', err);
         }
     };
 
@@ -160,7 +163,7 @@ export function MissionCommandPage() {
                                 reports={reports}
                                 activeSos={activeSos}
                                 isLoading={isLoading}
-                                onSelectReport={(report) => console.log('View report:', report.id)}
+                                onSelectReport={(report) => logger.debug('View report:', report.id)}
                                 onTriageReport={(id) => handleTriaged(id)}
                                 onAckSos={handleSosAck}
                                 onResolveSos={handleSosResolve}
@@ -197,9 +200,9 @@ export function MissionCommandPage() {
                         reports={reports}
                         activeSos={activeSos}
                         liveLocations={liveLocations}
-                        onReportClick={(report) => console.log('Report clicked:', report.id)}
-                        onSosClick={(sos) => console.log('SOS clicked:', sos.id)}
-                        onLocationClick={(loc) => console.log('Location clicked:', loc.userId)}
+                        onReportClick={(report) => logger.debug('Report clicked:', report.id)}
+                        onSosClick={(sos) => logger.debug('SOS clicked:', sos.id)}
+                        onLocationClick={(loc) => logger.debug('Location clicked:', loc.userId)}
                     />
                 </main>
             </div>

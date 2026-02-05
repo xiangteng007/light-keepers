@@ -12,7 +12,10 @@ import {
     BlessingWall,
     PFAChatbot,
 } from '../components/mental-health';
+import { createLogger } from '../utils/logger';
 import './MentalHealthPage.css';
+
+const logger = createLogger('MentalHealth');
 
 type TabType = 'mood' | 'phq9' | 'gad7' | 'blessing' | 'chat';
 
@@ -30,7 +33,7 @@ export default function MentalHealthPage() {
 
     // Handlers
     const handleMoodSubmit = async (score: number, note: string, tags: string[]) => {
-        console.log('Mood submitted:', { score, note, tags });
+        logger.debug('Mood submitted:', { score, note, tags });
         // TODO: Call API
         const newEntry = { date: new Date().toISOString(), score };
         setMoodHistory(prev => [...prev, newEntry]);
@@ -38,12 +41,12 @@ export default function MentalHealthPage() {
     };
 
     const handlePHQ9Complete = (score: number, answers: number[]) => {
-        console.log('PHQ-9 completed:', { score, answers });
+        logger.debug('PHQ-9 completed:', { score, answers });
         // TODO: Save to backend
     };
 
     const handleGAD7Complete = (score: number, answers: number[]) => {
-        console.log('GAD-7 completed:', { score, answers });
+        logger.debug('GAD-7 completed:', { score, answers });
         // TODO: Save to backend
     };
 

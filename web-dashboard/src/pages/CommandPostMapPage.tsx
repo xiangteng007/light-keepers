@@ -6,7 +6,10 @@ import { CreateOverlayDialog } from '../components/overlays';
 import type { CreateOverlayData, OverlayTypeForCreation } from '../components/overlays';
 import { overlaysApi } from '../services/overlaysApi';
 import type { OverlayDto, CreateOverlayDto } from '../services/overlaysApi';
+import { createLogger } from '../utils/logger';
 import './CommandPostMapPage.css';
+
+const logger = createLogger('CommandPostMap');
 
 // Drawing modes (alias for DrawingMode)
 
@@ -52,7 +55,7 @@ const CommandPostMapPage: React.FC = () => {
         center: [121.0, 23.5],
         zoom: 8,
         onLoad: () => {
-            console.log('Command Post map loaded');
+            logger.debug('Command Post map loaded');
         },
     });
 
@@ -104,7 +107,7 @@ const CommandPostMapPage: React.FC = () => {
             }
         } catch (err: any) {
             setError(err.message || '無法載入覆蓋層資料');
-            console.error('Failed to load overlays:', err);
+            logger.error('Failed to load overlays:', err);
         } finally {
             setIsLoading(false);
         }

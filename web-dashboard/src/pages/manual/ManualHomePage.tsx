@@ -4,7 +4,10 @@ import { ManualCard } from '../../components/manual/ManualCard';
 import { ManualTag } from '../../components/manual/ManualTag';
 import { RiskBadge } from '../../components/manual/RiskBadge';
 import { ManualSearchInput } from '../../components/manual/ManualSearchInput';
+import { createLogger } from '../../utils/logger';
 import './ManualHomePage.css';
+
+const logger = createLogger('Manual');
 
 // 值勤快捷操作
 const QUICK_ACTIONS = [
@@ -154,7 +157,7 @@ export const ManualHomePage: React.FC = () => {
                                 icon={flow.icon}
                                 tags={flow.tags}
                                 riskLevel={flow.riskLevel}
-                                onClick={() => console.log('Navigate to', flow.id)}
+                                onClick={() => logger.debug('Navigate to', flow.id)}
                             />
                         ))}
                     </div>
@@ -172,7 +175,7 @@ export const ManualHomePage: React.FC = () => {
                                 description={guide.description}
                                 icon={guide.icon}
                                 riskLevel={guide.riskLevel}
-                                onClick={() => console.log('Navigate to', guide.id)}
+                                onClick={() => logger.debug('Navigate to', guide.id)}
                             />
                         ))}
                     </div>
@@ -189,7 +192,7 @@ export const ManualHomePage: React.FC = () => {
                                 title={field.label}
                                 icon={field.icon}
                                 articleCount={field.count}
-                                onClick={() => console.log('Navigate to field', field.id)}
+                                onClick={() => logger.debug('Navigate to field', field.id)}
                             />
                         ))}
                     </div>
