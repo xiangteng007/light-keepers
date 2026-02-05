@@ -8,12 +8,13 @@ import './styles/theme.css'
 import './styles/a11y.css' // 無障礙樣式
 import './styles/EmergencyTheme.css' // 緊急模式主題
 import './index.css'
+import { appLogger, pwaLogger } from './utils/logger'
 
 // Skip React rendering for Firebase Auth handler routes
 // Firebase will handle these internally via their SDK
 if (window.location.pathname.startsWith('/__/')) {
   // Let Firebase handle the auth callback - don't render React app
-  console.log('Firebase auth handler route detected, skipping React render');
+  appLogger.info('Firebase auth handler route detected, skipping React render');
 } else {
   const queryClient = new QueryClient({
     defaultOptions: {
@@ -39,7 +40,7 @@ if (window.location.pathname.startsWith('/__/')) {
     window.addEventListener('load', () => {
       navigator.serviceWorker.register('/sw.js')
         .then((registration) => {
-          console.log('[PWA] Service Worker registered:', registration.scope);
+          pwaLogger.info('Service Worker registered:', registration.scope);
 
           // Check for updates
           registration.addEventListener('updatefound', () => {
@@ -47,7 +48,7 @@ if (window.location.pathname.startsWith('/__/')) {
             if (newWorker) {
               newWorker.addEventListener('statechange', () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('[PWA] New content available, refresh to update');
+                  pwaLogger.info('New content available, refresh to update');
                   // Optionally show update notification to user
                 }
               });
@@ -55,13 +56,13 @@ if (window.location.pathname.startsWith('/__/')) {
           });
         })
         .catch((error) => {
-          console.warn('[PWA] Service Worker registration failed:', error);
+          pwaLogger.warn('Service Worker registration failed:', error);
         });
 
       // Listen for sync results
       navigator.serviceWorker.addEventListener('message', (event) => {
         if (event.data.type === 'SYNC_COMPLETE') {
-          console.log('[PWA] Sync completed:', event.data.results);
+          pwaLogger.info('Sync completed:', event.data.results);
         }
       });
     });

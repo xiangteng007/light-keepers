@@ -7,6 +7,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
+import { socketLogger } from '../utils/logger';
 
 interface SocketContextType {
     socket: Socket | null;
@@ -65,18 +66,18 @@ export const SocketProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         });
 
         namespaceSocket.on('connect', () => {
-            console.log('🔌 Socket connected');
+            socketLogger.info('Connected');
             setConnected(true);
             setLastPing(new Date());
         });
 
         namespaceSocket.on('disconnect', () => {
-            console.log('🔌 Socket disconnected');
+            socketLogger.info('Disconnected');
             setConnected(false);
         });
 
         namespaceSocket.on('connect_error', (err) => {
-            console.error('🔌 Socket connection error:', err);
+            socketLogger.error('Connection error:', err);
         });
 
         namespaceSocket.on('ping', () => setLastPing(new Date()));

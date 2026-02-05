@@ -150,6 +150,66 @@
             "expiryDate": null,
             "dataClassification": "internal",
             "risk": "low"
+        },
+        {
+            "id": "auth-google",
+            "method": "GET",
+            "path": "/auth/google",
+            "reason": "Google OAuth2 authentication initiation endpoint - redirects to Google for login.",
+            "owner": "Security Team",
+            "throttle": {
+                "profile": "strict",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "auth-google-callback",
+            "method": "GET",
+            "path": "/auth/google/callback",
+            "reason": "Google OAuth2 callback endpoint - receives authorization code from Google.",
+            "owner": "Security Team",
+            "throttle": {
+                "profile": "strict",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "medium"
+        },
+        {
+            "id": "auth-line",
+            "method": "GET",
+            "path": "/auth/line",
+            "reason": "LINE OAuth2 authentication initiation endpoint - redirects to LINE for login.",
+            "owner": "Security Team",
+            "throttle": {
+                "profile": "strict",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "auth-line-callback",
+            "method": "GET",
+            "path": "/auth/line/callback",
+            "reason": "LINE OAuth2 callback endpoint - receives authorization code from LINE.",
+            "owner": "Security Team",
+            "throttle": {
+                "profile": "strict",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "internal",
+            "risk": "medium"
         }
     ]
 }

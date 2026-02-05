@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import type { ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
+import { socketLogger } from '../utils/logger';
 
 // 警報類型
 interface Alert {
@@ -50,7 +51,7 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         // 🔧 DevMode 時跳過 WebSocket 連接（本地開發不需要）
         const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
         if (devModeEnabled) {
-            console.log('🔌 WebSocket skipped in dev mode');
+            socketLogger.debug('WebSocket skipped in dev mode');
             return;
         }
 
@@ -63,17 +64,17 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
         });
 
         newSocket.on('connect', () => {
-            console.log('🔌 WebSocket connected');
+            socketLogger.info('WebSocket connected');
             setIsConnected(true);
         });
 
         newSocket.on('disconnect', () => {
-            console.log('🔌 WebSocket disconnected');
+            socketLogger.info('WebSocket disconnected');
             setIsConnected(false);
         });
 
         newSocket.on('connect_error', (error) => {
-            console.error('🔌 WebSocket connection error:', error);
+            socketLogger.error('WebSocket connection error:', error);
         });
 
         // 線上人數
@@ -83,19 +84,19 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
         // 災害警報
         newSocket.on('alert', (alert: Alert) => {
-            console.log('🚨 Received alert:', alert);
+            socketLogger.debug('Received alert:', alert);
             setAlerts(prev => [alert, ...prev].slice(0, 50)); // 保留最新 50 筆
         });
 
         // 通知
         newSocket.on('notification', (notification: Alert) => {
-            console.log('🔔 Received notification:', notification);
+            socketLogger.debug('Received notification:', notification);
             setAlerts(prev => [notification, ...prev].slice(0, 50));
         });
 
         // 任務更新
         newSocket.on('taskUpdate', (update: TaskUpdate) => {
-            console.log('📋 Task update:', update);
+            socketLogger.debug('Task update:', update);
             setTaskUpdates(prev => [update, ...prev].slice(0, 20));
         });
 
