@@ -22,7 +22,7 @@ export interface ReportRequest {
     type: ReportType;
     format: ReportFormat;
     dateRange?: { from: Date; to: Date };
-    filters?: Record<string, any>;
+    filters?: Record<string, unknown>;
     userId?: string;
     schedule?: string;  // cron expression
 }
@@ -112,7 +112,7 @@ export class AnalyticsHubService {
         }
     }
 
-    private async fetchReportData(request: ReportRequest): Promise<any[]> {
+    private async fetchReportData(request: ReportRequest): Promise<unknown[]> {
         // 根據類型獲取資料
         switch (request.type) {
             case 'incident':
@@ -128,21 +128,21 @@ export class AnalyticsHubService {
         }
     }
 
-    private async formatReport(data: any[], format: ReportFormat): Promise<string> {
+    private async formatReport(data: unknown[], format: ReportFormat): Promise<string> {
         switch (format) {
             case 'json':
                 return JSON.stringify(data, null, 2);
             case 'csv':
-                return this.toCsv(data);
+                return this.toCsv(data as Record<string, unknown>[]);
             default:
                 return JSON.stringify(data);
         }
     }
 
-    private toCsv(data: any[]): string {
+    private toCsv(data: Record<string, unknown>[]): string {
         if (!data.length) return '';
         const headers = Object.keys(data[0]);
-        const rows = data.map(row => headers.map(h => row[h]).join(','));
+        const rows = data.map(row => headers.map(h => String(row[h] ?? '')).join(','));
         return [headers.join(','), ...rows].join('\n');
     }
 

@@ -29,7 +29,7 @@ export interface WebhookDelivery {
     id: string;
     webhookId: string;
     event: string;
-    payload: any;
+    payload: unknown;
     status: 'pending' | 'success' | 'failed';
     attempts: number;
     lastAttemptAt?: Date;
@@ -42,7 +42,7 @@ export interface WebhookDelivery {
 export interface WebhookPayload {
     event: string;
     timestamp: string;
-    data: any;
+    data: unknown;
     signature?: string;
 }
 
@@ -126,7 +126,7 @@ export class WebhookService {
     /**
      * Trigger webhooks for an event
      */
-    async trigger(event: string, data: any): Promise<void> {
+    async trigger(event: string, data: unknown): Promise<void> {
         const webhooks = this.webhooksCache.filter(
             w => w.enabled && w.events.includes(event)
         );
@@ -144,7 +144,7 @@ export class WebhookService {
     private async deliverWebhook(
         webhook: WebhookConfig,
         event: string,
-        data: any
+        data: unknown
     ): Promise<void> {
         const delivery: WebhookDelivery = {
             id: `delivery-${Date.now()}`,
@@ -194,9 +194,10 @@ export class WebhookService {
 
                 await this.saveDelivery(delivery);
                 return;
-            } catch (error: any) {
-                delivery.error = error.message;
-                delivery.responseStatus = error.response?.status;
+            } catch (error: unknown) {
+                const errObj = error as { message?: string; response?: { status?: number } };
+                delivery.error = errObj.message || String(error);
+                delivery.responseStatus = errObj.response?.status;
 
                 if (attempt < webhook.retryCount) {
                     this.logger.warn(`Webhook retry ${attempt + 1}/${webhook.retryCount}: ${webhook.name}`);
@@ -252,7 +253,7 @@ export class WebhookService {
 
     // ==================== Helpers ====================
 
-    private generateSignature(payload: any, secret: string): string {
+    private generateSignature(payload: unknown, secret: string): string {
         const crypto = require('crypto');
         const hmac = crypto.createHmac('sha256', secret);
         hmac.update(JSON.stringify(payload));
