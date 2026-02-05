@@ -50,9 +50,9 @@ export interface ExportedData {
         google?: { id: string; email?: string };
     };
     roles: string[];
-    volunteer?: any;
-    activities: any[];
-    tasks: any[];
+    volunteer?: unknown;
+    activities: unknown[];
+    tasks: unknown[];
     exportedAt: string;
 }
 
@@ -186,9 +186,9 @@ export class DataExportService {
             request.expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
             this.logger.log(`Export ${requestId} completed: ${filePath}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             request.status = 'failed';
-            request.error = error.message;
+            request.error = error instanceof Error ? error.message : 'Unknown error';
             throw error;
         }
     }

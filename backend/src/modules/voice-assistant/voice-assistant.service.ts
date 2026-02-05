@@ -250,9 +250,9 @@ export class VoiceAssistantService {
         };
     }
 
-    private extractParams(text: string, command: VoiceCommand): Record<string, any> {
+    private extractParams(text: string, command: VoiceCommand): Record<string, unknown> {
         // Extract entities like locations, numbers, etc.
-        const params: Record<string, any> = {};
+        const params: Record<string, unknown> = {};
 
         // Extract numbers
         const numbers = text.match(/\d+/g);
@@ -313,13 +313,13 @@ interface SessionContext {
 interface VoiceCommand {
     name: string;
     patterns: string[];
-    handler: (params: Record<string, any>, session: VoiceSession) => Promise<CommandResult>;
+    handler: (params: Record<string, unknown>, session: VoiceSession) => Promise<CommandResult>;
 }
 
 interface IntentResult {
     command: string;
     confidence: number;
-    params: Record<string, any>;
+    params: Record<string, unknown>;
 }
 
 interface CommandResult {
@@ -327,7 +327,7 @@ interface CommandResult {
     message: string;
     requiresFollowUp?: boolean;
     priority?: string;
-    data?: any;
+    data?: unknown;
 }
 
 interface VoiceResponse {
