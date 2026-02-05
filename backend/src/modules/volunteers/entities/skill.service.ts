@@ -30,7 +30,7 @@ export class SkillService {
 
     // 取得所有專長
     async findAll(activeOnly: boolean = true): Promise<Skill[]> {
-        const query: any = {};
+        const query: Record<string, unknown> = {};
         if (activeOnly) {
             query.isActive = true;
         }

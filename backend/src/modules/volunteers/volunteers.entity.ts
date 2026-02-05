@@ -25,10 +25,10 @@ export class Volunteer {
 
     // ===== 新增: 帳號關聯 =====
     // 一對一關聯到 Account (雙向)
-    // 使用 lazy loading 避免循環依賴
+    // 使用 lazy loading + unknown 避免循環依賴
     @OneToOne('Account', 'volunteer')
     @JoinColumn({ name: 'account_id' })
-    account?: any;  // 使用 any 避免循環引用問題
+    account?: unknown;  // 使用 unknown 避免循環引用問題
 
     // ===== 基本資料 =====
 

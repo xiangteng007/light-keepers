@@ -25,15 +25,15 @@ export class WaterResourcesService {
             );
             const data = await response.json();
 
-            return (data.RiverLevels || []).map((r: any) => ({
+            return (data.RiverLevels || []).map((r: Record<string, unknown>) => ({
                 stationId: r.StationIdentifier,
                 stationName: r.StationName,
                 riverName: r.RiverName,
-                waterLevel: parseFloat(r.WaterLevel),
-                warningLevel: parseFloat(r.WarningLevel),
-                alertLevel: parseFloat(r.AlertLevel),
-                status: this.determineStatus(parseFloat(r.WaterLevel), parseFloat(r.AlertLevel), parseFloat(r.WarningLevel)),
-                recordedAt: new Date(r.RecordTime),
+                waterLevel: parseFloat(String(r.WaterLevel ?? '0')),
+                warningLevel: parseFloat(String(r.WarningLevel ?? '0')),
+                alertLevel: parseFloat(String(r.AlertLevel ?? '0')),
+                status: this.determineStatus(parseFloat(String(r.WaterLevel ?? '0')), parseFloat(String(r.AlertLevel ?? '0')), parseFloat(String(r.WarningLevel ?? '0'))),
+                recordedAt: new Date(String(r.RecordTime)),
             }));
         } catch (error) {
             this.logger.error('Failed to fetch river levels', error);
@@ -51,15 +51,15 @@ export class WaterResourcesService {
             );
             const data = await response.json();
 
-            return (data.ReservoirConditionData || []).map((r: any) => ({
+            return (data.ReservoirConditionData || []).map((r: Record<string, unknown>) => ({
                 reservoirId: r.ReservoirIdentifier,
                 reservoirName: r.ReservoirName,
-                currentCapacity: parseFloat(r.EffectiveWaterStorageCapacity),
-                percentage: parseFloat(r.PercentageOfStorage),
-                inflow: parseFloat(r.InflowVolume || 0),
-                outflow: parseFloat(r.OutflowTotal || 0),
-                status: this.getReservoirAlertLevel(parseFloat(r.PercentageOfStorage)),
-                recordedAt: new Date(r.RecordTime),
+                currentCapacity: parseFloat(String(r.EffectiveWaterStorageCapacity ?? '0')),
+                percentage: parseFloat(String(r.PercentageOfStorage ?? '0')),
+                inflow: parseFloat(String(r.InflowVolume ?? '0')),
+                outflow: parseFloat(String(r.OutflowTotal ?? '0')),
+                status: this.getReservoirAlertLevel(parseFloat(String(r.PercentageOfStorage ?? '0'))),
+                recordedAt: new Date(String(r.RecordTime)),
             }));
         } catch (error) {
             this.logger.error('Failed to fetch reservoir status', error);

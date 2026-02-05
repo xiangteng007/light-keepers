@@ -33,7 +33,7 @@ export class MobilizationService {
     }
 
     async findAll(status?: MobilizationStatus): Promise<VolunteerMobilization[]> {
-        const where: any = {};
+        const where: Record<string, unknown> = {};
         if (status) where.status = status;
 
         return this.mobilizationRepo.find({
@@ -166,7 +166,7 @@ export class MobilizationService {
         totalCheckedIn: number;
         overallFulfillmentRate: number;
     }> {
-        const where: any = {};
+        const where: Record<string, unknown> = {};
         if (missionSessionId) where.missionSessionId = missionSessionId;
 
         const mobilizations = await this.mobilizationRepo.find({ where });

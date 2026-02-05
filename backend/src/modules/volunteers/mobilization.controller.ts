@@ -19,7 +19,7 @@ import {
     CheckinDto,
     MobilizationResponseDto,
 } from './dto/mobilization.dto';
-import { MobilizationStatus } from './entities/mobilization.entity';
+import { MobilizationStatus, MobilizationPriority } from './entities/mobilization.entity';
 
 @ApiTags('Volunteer Mobilization')
 @ApiBearerAuth()
@@ -33,7 +33,7 @@ export class MobilizationController {
     @ApiOperation({ summary: 'Create volunteer mobilization order' })
     async create(
         @Body() dto: CreateMobilizationDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: { id: string },
     ) {
         const mobilization = await this.service.create(dto, user.id);
         return { data: mobilization };
@@ -104,7 +104,7 @@ export class MobilizationController {
     async respond(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: RespondMobilizationDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: { id: string },
     ) {
         const response = await this.service.respond(id, user.id, dto);
         return { data: response };
@@ -117,7 +117,7 @@ export class MobilizationController {
     async checkin(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: CheckinDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: { id: string },
     ) {
         const response = await this.service.checkin(id, user.id, dto);
         return { data: response };
@@ -134,7 +134,7 @@ export class MobilizationController {
 
     // ==================== Helper ====================
 
-    private toResponse(m: any): MobilizationResponseDto {
+    private toResponse(m: { id: string; title: string; priority: MobilizationPriority; status: MobilizationStatus; requiredCount: number; confirmedCount: number; checkedInCount: number }): MobilizationResponseDto {
         return {
             id: m.id,
             title: m.title,
