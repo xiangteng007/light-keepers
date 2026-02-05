@@ -16,10 +16,27 @@ export interface GeocodingResult {
     context?: { id: string; text: string }[];
 }
 
+/** GeoJSON geometry type */
+export interface GeoJSONGeometry {
+    type: string;
+    coordinates: unknown;
+}
+
+/** Mapbox API feature response */
+interface MapboxFeature {
+    place_name: string;
+    center: [number, number];
+    relevance: number;
+    place_type: string[];
+    context?: { id: string; text: string }[];
+    geometry?: GeoJSONGeometry;
+    properties?: Record<string, unknown>;
+}
+
 export interface DirectionsResult {
     distance: number;  // meters
     duration: number;  // seconds
-    geometry: any;     // GeoJSON LineString
+    geometry: GeoJSONGeometry;     // GeoJSON LineString
     legs: {
         distance: number;
         duration: number;
@@ -33,7 +50,7 @@ export interface DirectionsResult {
 
 export interface IsochroneResult {
     type: 'Feature';
-    geometry: any;  // GeoJSON Polygon
+    geometry: GeoJSONGeometry;  // GeoJSON Polygon
     properties: {
         contour: number;
         color: string;
@@ -100,15 +117,16 @@ export class MapboxService implements OnModuleInit {
 
             const data = await response.json();
 
-            return data.features.map((f: any) => ({
+            return data.features.map((f: MapboxFeature) => ({
                 placeName: f.place_name,
                 coordinates: f.center,
                 relevance: f.relevance,
                 placeType: f.place_type,
                 context: f.context,
             }));
-        } catch (error: any) {
-            this.logger.error(`Geocoding error: ${error.message}`);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Geocoding error: ${message}`);
             return this.getMockGeocodeResults(address);
         }
     }
@@ -141,8 +159,9 @@ export class MapboxService implements OnModuleInit {
                 placeType: feature.place_type,
                 context: feature.context,
             };
-        } catch (error: any) {
-            this.logger.error(`Reverse geocoding error: ${error.message}`);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Reverse geocoding error: ${message}`);
             return this.getMockReverseGeocode(lng, lat);
         }
     }
@@ -191,18 +210,19 @@ export class MapboxService implements OnModuleInit {
                 distance: route.distance,
                 duration: route.duration,
                 geometry: route.geometry,
-                legs: route.legs.map((leg: any) => ({
+                legs: route.legs.map((leg: { distance: number; duration: number; steps: { maneuver?: { instruction?: string }; distance: number; duration: number }[] }) => ({
                     distance: leg.distance,
                     duration: leg.duration,
-                    steps: leg.steps.map((step: any) => ({
+                    steps: leg.steps.map((step) => ({
                         instruction: step.maneuver?.instruction || '',
                         distance: step.distance,
                         duration: step.duration,
                     })),
                 })),
             };
-        } catch (error: any) {
-            this.logger.error(`Directions error: ${error.message}`);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Directions error: ${message}`);
             return this.getMockDirections(coordinates);
         }
     }
@@ -246,16 +266,17 @@ export class MapboxService implements OnModuleInit {
 
             const data = await response.json();
 
-            return data.features.map((f: any) => ({
-                type: 'Feature',
-                geometry: f.geometry,
+            return data.features.map((f: MapboxFeature & { properties: { contour: number; color?: string } }) => ({
+                type: 'Feature' as const,
+                geometry: f.geometry!,
                 properties: {
                     contour: f.properties.contour,
                     color: f.properties.color || '#3B82F6',
                 },
             }));
-        } catch (error: any) {
-            this.logger.error(`Isochrone error: ${error.message}`);
+        } catch (error: unknown) {
+            const message = error instanceof Error ? error.message : String(error);
+            this.logger.error(`Isochrone error: ${message}`);
             return this.getMockIsochrone(center, minutes);
         }
     }

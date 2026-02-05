@@ -35,6 +35,18 @@ export interface SphereComplianceReport {
     recommendations: string[];
 }
 
+/** Facility data structure for Sphere assessments */
+export interface FacilityData {
+    location?: string;
+    population?: number;
+    waterSupplyLiters?: number;
+    toiletCount?: number;
+    coveredAreaM2?: number;
+    dailyKcal?: number;
+    drugAvailabilityPercent?: number;
+    [key: string]: unknown;
+}
+
 @Injectable()
 export class SphereStandardsService {
     private readonly logger = new Logger(SphereStandardsService.name);
@@ -75,7 +87,7 @@ export class SphereStandardsService {
      * Assess Sphere compliance for a shelter/camp
      */
     async assessCompliance(
-        facilityData: any,
+        facilityData: FacilityData,
         category: SphereStandardCategory
     ): Promise<SphereAssessment[]> {
         this.logger.log(`Assessing Sphere compliance for ${category}`);
@@ -105,19 +117,21 @@ export class SphereStandardsService {
         return assessments;
     }
 
-    private assessWash(data: any, standards: any): SphereAssessment[] {
+    private assessWash(data: FacilityData, standards: any): SphereAssessment[] {
         const assessments: SphereAssessment[] = [];
 
         // Water quantity
-        const waterPerPerson = data.waterSupplyLiters / data.population;
-        assessments.push({
-            standard: SphereStandardCategory.WASH,
-            indicator: 'Water Quantity',
-            target: `${standards.waterQuantity.min} ${standards.waterQuantity.unit}`,
-            actual: `${waterPerPerson.toFixed(1)} liters/person/day`,
-            compliant: waterPerPerson >= standards.waterQuantity.min,
-            notes: standards.waterQuantity.description,
-        });
+        if (data.waterSupplyLiters != null && data.population != null) {
+            const waterPerPerson = data.waterSupplyLiters / data.population;
+            assessments.push({
+                standard: SphereStandardCategory.WASH,
+                indicator: 'Water Quantity',
+                target: `${standards.waterQuantity.min} ${standards.waterQuantity.unit}`,
+                actual: `${waterPerPerson.toFixed(1)} liters/person/day`,
+                compliant: waterPerPerson >= standards.waterQuantity.min,
+                notes: standards.waterQuantity.description,
+            });
+        }
 
         // Toilet ratio
         if (data.toiletCount && data.population) {
@@ -135,7 +149,7 @@ export class SphereStandardsService {
         return assessments;
     }
 
-    private assessShelter(data: any, standards: any): SphereAssessment[] {
+    private assessShelter(data: FacilityData, standards: any): SphereAssessment[] {
         const assessments: SphereAssessment[] = [];
 
         // Covered space
@@ -154,7 +168,7 @@ export class SphereStandardsService {
         return assessments;
     }
 
-    private assessFoodSecurity(data: any, standards: any): SphereAssessment[] {
+    private assessFoodSecurity(data: FacilityData, standards: any): SphereAssessment[] {
         const assessments: SphereAssessment[] = [];
 
         // Caloric intake
@@ -172,7 +186,7 @@ export class SphereStandardsService {
         return assessments;
     }
 
-    private assessHealth(data: any, standards: any): SphereAssessment[] {
+    private assessHealth(data: FacilityData, standards: any): SphereAssessment[] {
         const assessments: SphereAssessment[] = [];
 
         // Drug availability
@@ -194,7 +208,7 @@ export class SphereStandardsService {
      * Generate compliance report
      */
     async generateReport(
-        facilityData: any,
+        facilityData: FacilityData,
         assessor: string
     ): Promise<SphereComplianceReport> {
         const allAssessments: SphereAssessment[] = [];
