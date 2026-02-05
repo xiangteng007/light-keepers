@@ -55,15 +55,15 @@ export class AuditLog {
 
     /** Previous state (for updates) */
     @Column({ type: 'jsonb', nullable: true })
-    previousState?: Record<string, any>;
+    previousState?: Record<string, unknown>;
 
     /** New state (for creates/updates) */
     @Column({ type: 'jsonb', nullable: true })
-    newState?: Record<string, any>;
+    newState?: Record<string, unknown>;
 
     /** Additional metadata */
     @Column({ type: 'jsonb', nullable: true })
-    metadata?: Record<string, any>;
+    metadata?: Record<string, unknown>;
 
     /** IP address */
     @Column({ length: 45, nullable: true })

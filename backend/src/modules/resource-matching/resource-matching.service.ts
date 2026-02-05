@@ -281,7 +281,7 @@ export class ResourceMatchingService {
 }
 
 // Types
-interface DonorInfo {
+export interface DonorInfo {
     name: string;
     phone: string;
     email?: string;
@@ -291,7 +291,7 @@ interface DonorInfo {
     anonymous?: boolean;
 }
 
-interface DonationItem {
+export interface DonationItem {
     type: string;
     name: string;
     quantity: number;
@@ -301,7 +301,7 @@ interface DonationItem {
     expiryDate?: Date;
 }
 
-interface Donation {
+export interface Donation {
     id: string;
     donor: DonorInfo;
     items: DonationItem[];
@@ -311,7 +311,7 @@ interface Donation {
     expiresAt: Date;
 }
 
-interface NeedRequest {
+export interface NeedRequest {
     organizationName: string;
     contactName: string;
     contactPhone: string;
@@ -326,7 +326,7 @@ interface NeedRequest {
     description?: string;
 }
 
-interface ResourceNeed extends NeedRequest {
+export interface ResourceNeed extends NeedRequest {
     id: string;
     status: 'open' | 'partially_fulfilled' | 'fulfilled' | 'cancelled';
     matchedDonations: string[];
@@ -334,7 +334,7 @@ interface ResourceNeed extends NeedRequest {
     createdAt: Date;
 }
 
-interface ResourceMatch {
+export interface ResourceMatch {
     id: string;
     donationId: string;
     needId: string;
@@ -350,12 +350,12 @@ interface ResourceMatch {
     completedAt: Date | null;
 }
 
-interface MatchFeedback {
+export interface MatchFeedback {
     rating: number;
     comment?: string;
 }
 
-interface MatchingStats {
+export interface MatchingStats {
     totalDonations: number;
     activeDonations: number;
     totalNeeds: number;
@@ -366,7 +366,7 @@ interface MatchingStats {
     topItemTypes: { type: string; count: number }[];
 }
 
-interface DonorRanking {
+export interface DonorRanking {
     rank: number;
     id: string;
     name: string;

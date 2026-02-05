@@ -9,8 +9,16 @@
  */
 
 import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
-import { ResourceMatchingService } from '../resource-matching/resource-matching.service';
-import { ResourceOptimizationService } from '../resource-optimization/resource-optimization.service';
+import { 
+    ResourceMatchingService, 
+    Donation, 
+    DonationItem,
+    ResourceNeed, 
+    ResourceMatch, 
+    MatchingStats, 
+    DonorRanking 
+} from '../resource-matching/resource-matching.service';
+import { ResourceOptimizationService, OptimizationResult, DepotSuggestion, OptimizedRoute } from '../resource-optimization/resource-optimization.service';
 
 @Injectable()
 export class UnifiedResourcesService {
@@ -59,7 +67,7 @@ export class UnifiedResourcesService {
         condition: 'new' | 'good' | 'fair';
         perishable?: boolean;
         expiryDate?: Date;
-    }[]): any {
+    }[]): Donation {
         return this.matchingService.submitDonation(donor, items);
     }
 
@@ -79,56 +87,56 @@ export class UnifiedResourcesService {
         deliveryAddress: string;
         canPickup: boolean;
         description?: string;
-    }): any {
+    }): ResourceNeed {
         return this.matchingService.submitNeed(request);
     }
 
     /**
      * Get available donations
      */
-    getAvailableDonations(itemType?: string, region?: string): any[] {
+    getAvailableDonations(itemType?: string, region?: string): Donation[] {
         return this.matchingService.getAvailableDonations(itemType, region);
     }
 
     /**
      * Get open needs
      */
-    getOpenNeeds(itemType?: string, urgency?: string): any[] {
+    getOpenNeeds(itemType?: string, urgency?: string): ResourceNeed[] {
         return this.matchingService.getOpenNeeds(itemType, urgency);
     }
 
     /**
      * Create a match between donation and need
      */
-    createMatch(donationId: string, needId: string, quantity: number): any {
+    createMatch(donationId: string, needId: string, quantity: number): ResourceMatch {
         return this.matchingService.createMatch(donationId, needId, quantity);
     }
 
     /**
      * Confirm a match
      */
-    confirmMatch(matchId: string, confirmedBy: 'donor' | 'recipient'): any {
+    confirmMatch(matchId: string, confirmedBy: 'donor' | 'recipient'): ResourceMatch {
         return this.matchingService.confirmMatch(matchId, confirmedBy);
     }
 
     /**
      * Complete a match (delivery done)
      */
-    completeMatch(matchId: string, feedback?: { rating: number; comment?: string }): any {
+    completeMatch(matchId: string, feedback?: { rating: number; comment?: string }): ResourceMatch {
         return this.matchingService.completeMatch(matchId, feedback);
     }
 
     /**
      * Get matching statistics
      */
-    getMatchingStats(period?: { from: Date; to: Date }): any {
+    getMatchingStats(period?: { from: Date; to: Date }): MatchingStats {
         return this.matchingService.getStatistics(period);
     }
 
     /**
      * Get donor leaderboard
      */
-    getDonorLeaderboard(limit: number = 10): any[] {
+    getDonorLeaderboard(limit: number = 10): DonorRanking[] {
         return this.matchingService.getDonorLeaderboard(limit);
     }
 
@@ -155,7 +163,7 @@ export class UnifiedResourcesService {
             maxDistance?: number;
             maxTime?: number;
         };
-    }): any {
+    }): OptimizationResult {
         return this.optimizationService.optimizeAllocation(config);
     }
 
@@ -165,7 +173,7 @@ export class UnifiedResourcesService {
     suggestDepotLocations(
         demandPoints: Array<{ lat: number; lng: number }>,
         numDepots: number,
-    ): any[] {
+    ): DepotSuggestion[] {
         return this.optimizationService.suggestDepotLocations(demandPoints, numDepots);
     }
 
@@ -175,7 +183,7 @@ export class UnifiedResourcesService {
     optimizeRoutes(
         origin: { lat: number; lng: number },
         destinations: Array<{ lat: number; lng: number }>,
-    ): any {
+    ): OptimizedRoute {
         return this.optimizationService.optimizeRoutes(origin, destinations);
     }
 
@@ -189,9 +197,9 @@ export class UnifiedResourcesService {
         itemType?: string;
         urgency?: 'low' | 'medium' | 'high' | 'critical';
     }): Promise<{
-        availableDonations: any[];
-        openNeeds: any[];
-        suggestedAllocations: any;
+        availableDonations: Donation[];
+        openNeeds: ResourceNeed[];
+        suggestedAllocations: OptimizationResult | null;
         timestamp: Date;
     }> {
         this.logger.log(`Smart allocation for region: ${params.region || 'all'}`);
@@ -204,11 +212,11 @@ export class UnifiedResourcesService {
         let suggestedAllocations = null;
         if (availableDonations.length > 0 && openNeeds.length > 0) {
             const resources = availableDonations
-                .filter((d: any) => d.donor?.address)
-                .map((d: any) => ({
+                .filter((d: Donation) => d.donor?.address)
+                .map((d: Donation) => ({
                     id: d.id,
                     type: d.items?.[0]?.type || 'general',
-                    available: d.items?.reduce((sum: number, i: any) => sum + (i.quantity || 0), 0) || 0,
+                    available: d.items?.reduce((sum: number, i: DonationItem) => sum + (i.quantity || 0), 0) || 0,
                     location: { lat: 25.0330, lng: 121.5654 }, // Default if no geo
                 }));
 

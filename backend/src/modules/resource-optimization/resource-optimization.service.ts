@@ -236,16 +236,16 @@ export class ResourceOptimizationService {
 }
 
 // Types
-interface GeoPoint { lat: number; lng: number; }
+export interface GeoPoint { lat: number; lng: number; }
 
-interface ResourceSource {
+export interface ResourceSource {
     id: string;
     type: string;
     available: number;
     location: GeoPoint;
 }
 
-interface ResourceDemand {
+export interface ResourceDemand {
     id: string;
     resourceType: string;
     quantity: number;
@@ -253,13 +253,13 @@ interface ResourceDemand {
     priority: 'low' | 'medium' | 'high' | 'critical';
 }
 
-interface OptimizationConfig {
+export interface OptimizationConfig {
     resources: ResourceSource[];
     demands: ResourceDemand[];
     constraints?: { maxDistance?: number; maxTime?: number };
 }
 
-interface ResourceAllocation {
+export interface ResourceAllocation {
     resourceId: string;
     demandId: string;
     quantity: number;
@@ -267,7 +267,7 @@ interface ResourceAllocation {
     estimatedTime: number;
 }
 
-interface OptimizationResult {
+export interface OptimizationResult {
     allocations: ResourceAllocation[];
     metrics: {
         totalAllocated: number;
@@ -280,14 +280,14 @@ interface OptimizationResult {
     optimizedAt: Date;
 }
 
-interface DepotSuggestion {
+export interface DepotSuggestion {
     id: string;
     location: GeoPoint;
     coverageRadius: number;
     demandPointsServed: number;
 }
 
-interface OptimizedRoute {
+export interface OptimizedRoute {
     route: GeoPoint[];
     totalDistance: number;
     estimatedTime: number;

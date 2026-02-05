@@ -45,35 +45,35 @@ export class UnifiedReportingService {
     /**
      * Create a report definition/template
      */
-    createReportDefinition(data: any): any {
+    createReportDefinition(data: any): unknown {
         return this.engineService.createReportDefinition(data);
     }
 
     /**
      * Get a report definition by ID
      */
-    getReportDefinition(id: string): any {
+    getReportDefinition(id: string): unknown {
         return this.engineService.getReportDefinition(id);
     }
 
     /**
      * List all report definitions
      */
-    listReportDefinitions(): any[] {
+    listReportDefinitions(): unknown[] {
         return this.engineService.listReportDefinitions();
     }
 
     /**
      * Generate a report from definition
      */
-    async generateReport(definitionId: string, filters?: any[]): Promise<any> {
+    async generateReport(definitionId: string, filters?: any[]): Promise<unknown> {
         return this.engineService.generateReport(definitionId, filters);
     }
 
     /**
      * Export a generated report
      */
-    async exportReport(reportId: string, options: { format: 'pdf' | 'excel' | 'csv'; filename?: string }): Promise<any> {
+    async exportReport(reportId: string, options: { format: 'pdf' | 'excel' | 'csv'; filename?: string }): Promise<unknown> {
         return this.engineService.exportReport(reportId, options);
     }
 
@@ -84,21 +84,21 @@ export class UnifiedReportingService {
         definitionId: string,
         exportOptions: { format: 'pdf' | 'excel' | 'csv'; filename?: string },
         filters?: any[],
-    ): Promise<any> {
+    ): Promise<unknown> {
         return this.engineService.generateAndExport(definitionId, exportOptions, filters);
     }
 
     /**
      * Create report schedule
      */
-    createSchedule(data: any): any {
+    createSchedule(data: any): unknown {
         return this.engineService.createSchedule(data);
     }
 
     /**
      * List all schedules
      */
-    listSchedules(): any[] {
+    listSchedules(): unknown[] {
         return this.engineService.listSchedules();
     }
 
@@ -119,7 +119,7 @@ export class UnifiedReportingService {
         contactName?: string;
         contactPhone?: string;
         source?: string;
-    }): Promise<any> {
+    }): Promise<unknown> {
         return this.reportsService.create(dto as any);
     }
 
@@ -132,21 +132,21 @@ export class UnifiedReportingService {
         severity?: string;
         limit?: number;
         offset?: number;
-    }): Promise<any[]> {
+    }): Promise<unknown[]> {
         return this.reportsService.findAll(filter as any);
     }
 
     /**
      * Get a single report by ID
      */
-    async findReport(id: string): Promise<any> {
+    async findReport(id: string): Promise<unknown> {
         return this.reportsService.findOne(id);
     }
 
     /**
      * Get reports for map display
      */
-    async findForMap(): Promise<any[]> {
+    async findForMap(): Promise<unknown[]> {
         return this.reportsService.findForMap();
     }
 
@@ -157,7 +157,7 @@ export class UnifiedReportingService {
         status: 'confirmed' | 'rejected';
         reviewedBy: string;
         reviewNote?: string;
-    }): Promise<any> {
+    }): Promise<unknown> {
         return this.reportsService.review(id, dto);
     }
 
@@ -181,7 +181,7 @@ export class UnifiedReportingService {
         gridSizeKm?: number;
         minCount?: number;
         days?: number;
-    }): Promise<any> {
+    }): Promise<unknown> {
         return this.reportsService.getHotspots(options as any);
     }
 
@@ -215,9 +215,9 @@ export class UnifiedReportingService {
         includeHotspots?: boolean;
         includeTrends?: boolean;
     }): Promise<{
-        stats: any;
-        hotspots?: any;
-        trends?: any;
+        stats: unknown;
+        hotspots?: unknown;
+        trends?: unknown;
         generatedAt: Date;
     }> {
         this.logger.log('Generating comprehensive disaster summary');
