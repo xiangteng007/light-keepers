@@ -25,9 +25,9 @@ export type AITaskType =
 export interface AITask {
     id: string;
     type: AITaskType;
-    input: any;
+    input: unknown;
     status: 'queued' | 'processing' | 'completed' | 'failed';
-    result?: any;
+    result?: unknown;
     error?: string;
     createdAt: Date;
     completedAt?: Date;
@@ -72,7 +72,7 @@ export class AIHubService implements OnModuleInit {
 
     // ===== 任務提交 =====
 
-    async submitTask(type: AITaskType, input: any): Promise<AITask> {
+    async submitTask(type: AITaskType, input: unknown): Promise<AITask> {
         const taskId = `ai-${type}-${Date.now()}`;
 
         const task: AITask = {
@@ -137,7 +137,7 @@ export class AIHubService implements OnModuleInit {
     async classifyEvent(text: string): Promise<{ category: string; confidence: number; keywords: string[] }> {
         const task = await this.submitTask('classification', { text });
         await this.waitForCompletion(task.id);
-        return this.getTaskResult(task.id);
+        return this.getTaskResult(task.id) as { category: string; confidence: number; keywords: string[] };
     }
 
     /**
@@ -146,7 +146,7 @@ export class AIHubService implements OnModuleInit {
     async summarize(text: string, maxLength?: number): Promise<{ summary: string; keyPoints: string[] }> {
         const task = await this.submitTask('summary', { text, maxLength });
         await this.waitForCompletion(task.id);
-        return this.getTaskResult(task.id);
+        return this.getTaskResult(task.id) as { summary: string; keyPoints: string[] };
     }
 
     // ===== 任務處理 =====
@@ -186,7 +186,7 @@ export class AIHubService implements OnModuleInit {
         }
     }
 
-    private async executeTask(task: AITask): Promise<any> {
+    private async executeTask(task: AITask): Promise<unknown> {
         // 模擬 AI 處理
         await this.delay(500 + Math.random() * 1000);
 
@@ -208,9 +208,9 @@ export class AIHubService implements OnModuleInit {
 
     // ===== Mock AI Results =====
 
-    private mockPrediction(input: any): PredictionResult {
+    private mockPrediction(_input: unknown): PredictionResult {
         return {
-            trend: ['increasing', 'decreasing', 'stable'][Math.floor(Math.random() * 3)] as any,
+            trend: ['increasing', 'decreasing', 'stable'][Math.floor(Math.random() * 3)] as PredictionResult['trend'],
             confidence: 0.75 + Math.random() * 0.2,
             forecast: Array.from({ length: 7 }, (_, i) => ({
                 date: new Date(Date.now() + i * 86400000).toISOString().split('T')[0],
@@ -220,7 +220,8 @@ export class AIHubService implements OnModuleInit {
         };
     }
 
-    private mockVision(input: any): VisionResult {
+    private mockVision(input: unknown): VisionResult {
+        const opts = input as { detectDamage?: boolean } | undefined;
         return {
             labels: [
                 { name: 'flood', confidence: 0.92 },
@@ -229,13 +230,14 @@ export class AIHubService implements OnModuleInit {
             objects: [
                 { name: 'car', bbox: [100, 200, 150, 100], confidence: 0.85 },
             ],
-            damageAssessment: input.detectDamage ? { level: 'moderate', confidence: 0.78 } : undefined,
+            damageAssessment: opts?.detectDamage ? { level: 'moderate', confidence: 0.78 } : undefined,
         };
     }
 
-    private mockDispatch(input: any): DispatchSuggestion {
+    private mockDispatch(input: unknown): DispatchSuggestion {
+        const taskInfo = input as { taskId?: string };
         return {
-            taskId: input.taskId,
+            taskId: taskInfo?.taskId || 'unknown',
             recommendedVolunteers: [
                 { id: 'v1', name: '張三', score: 0.95, reason: '技能匹配、距離近' },
                 { id: 'v2', name: '李四', score: 0.88, reason: '經驗豐富' },
@@ -247,7 +249,7 @@ export class AIHubService implements OnModuleInit {
         };
     }
 
-    private mockClassification(input: any): any {
+    private mockClassification(_input: unknown): { category: string; confidence: number; keywords: string[] } {
         const categories = ['地震', '颱風', '水災', '火災', '交通事故'];
         return {
             category: categories[Math.floor(Math.random() * categories.length)],
@@ -256,10 +258,11 @@ export class AIHubService implements OnModuleInit {
         };
     }
 
-    private mockSummary(input: any): any {
-        const text = input.text || '';
+    private mockSummary(input: unknown): { summary: string; keyPoints: string[] } {
+        const opts = input as { text?: string; maxLength?: number } | undefined;
+        const text = opts?.text || '';
         return {
-            summary: text.substring(0, input.maxLength || 100) + '...',
+            summary: text.substring(0, opts?.maxLength || 100) + '...',
             keyPoints: ['重點1', '重點2', '重點3'],
         };
     }
@@ -270,7 +273,7 @@ export class AIHubService implements OnModuleInit {
         return this.taskQueue.get(id) || null;
     }
 
-    getTaskResult(id: string): any {
+    getTaskResult(id: string): unknown {
         return this.taskQueue.get(id)?.result || null;
     }
 
@@ -291,7 +294,7 @@ export class AIHubService implements OnModuleInit {
     // ===== 事件監聽 =====
 
     @OnEvent('incidents.created')
-    async handleIncidentCreated(payload: any) {
+    async handleIncidentCreated(payload: { incidentId?: string; description?: string }) {
         // 自動分類新事件
         if (payload.description) {
             const classification = await this.classifyEvent(payload.description);

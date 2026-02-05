@@ -36,7 +36,7 @@ export interface MaskConfig {
  */
 export const SENSITIVE_FIELDS_KEY = 'sensitiveFields';
 export const SensitiveFields = (config: MaskConfig[]): MethodDecorator => {
-    return (target: any, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
+    return (target: object, propertyKey: string | symbol, descriptor: PropertyDescriptor) => {
         Reflect.defineMetadata(SENSITIVE_FIELDS_KEY, config, descriptor.value);
         return descriptor;
     };
@@ -103,7 +103,7 @@ export class SensitiveDataMaskingInterceptor implements NestInterceptor {
 
     constructor(private reflector: Reflector) { }
 
-    intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+    intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
         const request = context.switchToHttp().getRequest();
         const user = request.user;
         const roleLevel = user?.roleLevel ?? 0;
@@ -121,13 +121,13 @@ export class SensitiveDataMaskingInterceptor implements NestInterceptor {
         );
     }
 
-    private maskData(data: any, roleLevel: number, config: MaskConfig[]): any {
+    private maskData(data: unknown, roleLevel: number, config: MaskConfig[]): unknown {
         if (Array.isArray(data)) {
             return data.map((item) => this.maskData(item, roleLevel, config));
         }
 
         if (data && typeof data === 'object') {
-            const masked = { ...data };
+            const masked = { ...data } as Record<string, unknown>;
 
             for (const { field, type, minLevel = 3 } of config) {
                 if (roleLevel < minLevel && masked[field]) {
@@ -154,10 +154,10 @@ export class SensitiveDataMaskingInterceptor implements NestInterceptor {
  * 全域敏感資料遮罩 (用於手動調用)
  */
 export function maskSensitiveData(
-    data: any,
+    data: unknown,
     roleLevel: number,
     customFields?: MaskConfig[],
-): any {
+): unknown {
     const config = customFields || DEFAULT_SENSITIVE_FIELDS;
 
     if (Array.isArray(data)) {
@@ -165,7 +165,7 @@ export function maskSensitiveData(
     }
 
     if (data && typeof data === 'object') {
-        const masked = { ...data };
+        const masked = { ...data } as Record<string, unknown>;
 
         for (const { field, type, minLevel = 3 } of config) {
             if (roleLevel < minLevel && masked[field]) {
