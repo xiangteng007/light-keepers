@@ -6,133 +6,144 @@ import { EmergencyProvider } from './context/useEmergencyContext'
 import { ThemeProvider } from './context/ThemeProvider'
 import ProtectedRoute from './components/ProtectedRoute'
 import PageWrapper from './components/layout/PageWrapper'
-import EventsPage from './pages/EventsPage'
-import TasksPage from './pages/TasksPage'
-import MapPage from './pages/MapPage'
-import NcdrAlertsPage from './pages/NcdrAlertsPage'
-import ManualsPage from './pages/ManualsPage'
-import ManualDetailPage from './pages/ManualDetailPage'
-import { ManualHomePage } from './pages/manual'
-import { ComponentShowcase } from './pages/ComponentShowcase'
-import ReportPage from './pages/ReportPage'
-import { AccountPage } from './pages/account'
-import VolunteersPage from './pages/VolunteersPage'
-import VolunteerDetailPage from './pages/VolunteerDetailPage'
-import TrainingPage from './pages/TrainingPage'
-import ResourcesPage from './pages/ResourcesPage'
-import NotificationsPage from './pages/NotificationsPage'
-import ReportsAdminPage from './pages/ReportsAdminPage'
-import ReportsExportPage from './pages/ReportsExportPage'
-import AnalyticsPage from './pages/AnalyticsPage'
-import VolunteerSchedulePage from './pages/VolunteerSchedulePage'
-import ForgotPasswordPage from './pages/ForgotPasswordPage'
-import ResetPasswordPage from './pages/ResetPasswordPage'
-import ProfilePage from './pages/ProfilePage'
-import PermissionsPage from './pages/PermissionsPage'
-import BindLinePage from './pages/BindLinePage'
-import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
-import ForecastPage from './pages/ForecastPage'
-import EmergencyResponsePage from './pages/EmergencyResponsePage'
-import LoginPage from './pages/LoginPage'
-import DonationsPage from './pages/DonationsPage'
-import ResourcesPublicPage from './pages/ResourcesPublicPage'
-import ApprovalCenterPage from './pages/ApprovalCenterPage'
-import SensitiveAuditPage from './pages/SensitiveAuditPage'
-import LabelManagementPage from './pages/LabelManagementPage'
-import VehicleManagementPage from './pages/VehicleManagementPage'
-import InsuranceManagementPage from './pages/InsuranceManagementPage'
-import PointsReportPage from './pages/PointsReportPage'
-import CommunityPage from './pages/CommunityPage'
-import ActivitiesPage from './pages/ActivitiesPage'
-import LeaderboardPage from './pages/LeaderboardPage'
-import ReportSchedulePage from './pages/ReportSchedulePage'
-import BackupPage from './pages/BackupPage'
-import CommandCenterPage from './pages/CommandCenterPage'
-import MentalHealthPage from './pages/MentalHealthPage'
-import AuditLogPage from './pages/AuditLogPage'
-import OfflinePrepPage from './pages/OfflinePrepPage'
-import ReunificationPage from './pages/ReunificationPage'
-import EquipmentPage from './pages/EquipmentPage'
-import SearchRescuePage from './pages/SearchRescuePage'
-import MedicalTransportPage from './pages/MedicalTransportPage'
-import FieldCommsPage from './pages/FieldCommsPage'
-import ICSFormsPage from './pages/ICSFormsPage'
-import AITasksPage from './pages/AITasksPage'
-import UnifiedResourcesPage from './pages/UnifiedResourcesPage'
-import UnifiedReportingPage from './pages/UnifiedReportingPage'
-import SimulationPage from './pages/SimulationPage'
-import InteroperabilityPage from './pages/InteroperabilityPage'
-import SettingsPage from './pages/governance/SettingsPage'
 import { CommandPalette } from './components/CommandPalette'
 
-
-// Note: TacticalMapPage, ResourceMatchingPage, ReunificationPage, AISummaryPage, AuditLogPage,
-// AccountsPage, TenantsPage, SettingsPage, FeaturesPage now use PageWrapper + Widget system
-// Their pageId is used to load page-specific widget configurations
-
-// ===== V2 Domain Architecture Imports =====
+// ===== Lazy-loaded Pages (Code Splitting) =====
+// All pages are now dynamically imported for optimal bundle size
 import {
-  AttendancePage as WorkforceAttendancePage,
-  LeaderboardPage as WorkforceLeaderboardPage,
-  OrgChartPage as WorkforceOrgChartPage,
-  PointsReportPage as WorkforcePointsReportPage,
-  ShiftCalendarPage as WorkforceShiftCalendarPage,
-} from './pages/domains/workforce'
-
-import {
+  // Core Pages
+  LoginPage,
+  ForgotPasswordPage,
+  ResetPasswordPage,
+  BindLinePage,
+  ProfilePage,
+  
+  // Dashboard & Command
+  CommandCenterPage,
+  MentalHealthPage,
+  EmergencyResponsePage,
+  
+  // Events & Tasks
+  EventsPage,
+  TasksPage,
+  
+  // Map & Geo
+  MapPage,
+  NcdrAlertsPage,
+  ForecastPage,
+  
+  // Knowledge & Manuals
+  ManualsPage,
+  ManualDetailPage,
+  ManualHomePage,
+  
+  // Volunteers & Workforce
+  VolunteersPage,
+  VolunteerDetailPage,
+  VolunteerSchedulePage,
+  VolunteerProfileSetupPage,
+  TrainingPage,
+  
+  // Resources & Logistics
+  ResourcesPage,
+  ResourcesPublicPage,
+  EquipmentPage,
+  DonationsPage,
+  UnifiedResourcesPage,
+  VehicleManagementPage,
+  InsuranceManagementPage,
+  
+  // Reports & Analytics
+  ReportPage,
+  ReportsAdminPage,
+  ReportsExportPage,
+  AnalyticsPage,
+  ReportSchedulePage,
+  UnifiedReportingPage,
+  PointsReportPage,
+  
+  // Community
+  CommunityPage,
+  ActivitiesPage,
+  LeaderboardPage,
+  
+  // Governance & Admin
+  PermissionsPage,
+  AuditLogPage,
+  BackupPage,
+  LabelManagementPage,
+  ApprovalCenterPage,
+  SensitiveAuditPage,
+  
+  // Rescue Operations
+  SearchRescuePage,
+  MedicalTransportPage,
+  FieldCommsPage,
+  ReunificationPage,
+  
+  // ICS Forms
+  ICSFormsPage,
+  
+  // AI & Hub
+  AITasksPage,
+  AIChatPage,
+  NotificationsPage,
+  OfflinePrepPage,
+  
+  // Simulation & Interoperability
+  SimulationPage,
+  InteroperabilityPage,
+  
+  // v6.0 Governance
+  SecurityPage,
+  WebhooksPage,
+  BiometricPage,
+  SettingsPage,
+  
+  // Domain Pages
   MissionCommandPage,
   TriagePage,
-} from './pages/domains/mission-command'
-
-// ===== Rescue Module (Expert Council Navigation v3.0) =====
-import { SheltersPage } from './pages/rescue'
-
-// ===== ICS Section Dashboard (Expert Council Navigation v3.0) =====
-import { ICSSectionDashboard, ICS201BriefingPage, ICS205CommsPage } from './pages/ics'
-
-import {
-  EquipmentPage as LogisticsEquipmentPage,
-  ResourcesPage as LogisticsResourcesPage,
-} from './pages/domains/logistics'
-
-import {
-  ReportsPage as DataInsightReportsPage,
-} from './pages/domains/data-insight'
-
-import {
-  CommunicationsPage as ConnectivityCommunicationsPage,
-} from './pages/domains/connectivity'
-
-import {
-  CommunityPage as DomainCommunityPage,
-} from './pages/domains/community'
-
-import {
-  SettingsPage as CoreSettingsPage,
-  DashboardPage as CoreDashboardPage,
-} from './pages/domains/core'
-
-import {
-  DroneControlPage,
-} from './pages/domains/air-ops'
-
-import TaskDispatchPage from './pages/command/TaskDispatchPage'
-import ResourceOverviewPage from './pages/resources/ResourceOverviewPage'
-import PersonnelManagementPage from './pages/domains/workforce/PersonnelManagementPage'
-import CommunityCenterPage from './pages/domains/community/CommunityCenterPage'
-import ReportGeneratorPage from './pages/analytics/ReportGeneratorPage'
-
-import IncidentsPage from './pages/c2/IncidentsPage'
-import DrillsPage from './pages/c2/DrillsPage'
-import AARPage from './pages/c2/AARPage'
-
-// ===== v6.0 Feature Pages =====
-import AIChatPage from './pages/hub/AIChatPage'
-import SecurityPage from './pages/governance/SecurityPage'
-import WebhooksPage from './pages/governance/WebhooksPage'
-import BiometricPage from './pages/governance/BiometricPage'
+  SheltersPage,
+  ICSSectionDashboard,
+  ICS201BriefingPage,
+  ICS205CommsPage,
+  
+  // Workforce Domain
+  WorkforceAttendancePage,
+  WorkforceLeaderboardPage,
+  WorkforceOrgChartPage,
+  WorkforcePointsReportPage,
+  WorkforceShiftCalendarPage,
+  
+  // Logistics Domain
+  LogisticsResourcesPage,
+  
+  // Data Insight Domain
+  DataInsightReportsPage,
+  
+  // Connectivity Domain
+  ConnectivityCommunicationsPage,
+  
+  // Community Domain
+  DomainCommunityPage,
+  CommunityCenterPage,
+  
+  // Core Domain
+  CoreSettingsPage,
+  CoreDashboardPage,
+  
+  // C2 Pages
+  IncidentsPage,
+  AARPage,
+  ReportGeneratorPage,
+  
+  // Account & Showcase
+  AccountPage,
+  ComponentShowcase,
+} from './components/lazy/LazyPages'
 
 import './App.css'
+
 
 
 /**
