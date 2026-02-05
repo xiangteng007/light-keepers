@@ -1,0 +1,551 @@
+/**
+ * Light Keepers Design System - Motion Tokens
+ * ═══════════════════════════════════════════════════════════════
+ * 完整動效系統 - 微互動、頁面轉場、骨架屏
+ * Version: 1.0.0
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   MOTION TOKENS (Extended)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Duration Scale ── */
+  --duration-instant: 50ms;
+  --duration-fast: 100ms;
+  --duration-normal: 200ms;
+  --duration-slow: 300ms;
+  --duration-slower: 400ms;
+  --duration-slowest: 500ms;
+  
+  /* ── Easing Functions ── */
+  --ease-linear: linear;
+  --ease-in: cubic-bezier(0.4, 0, 1, 1);
+  --ease-out: cubic-bezier(0, 0, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --ease-elastic: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+  
+  /* ── Stagger Delays ── */
+  --stagger-1: 50ms;
+  --stagger-2: 100ms;
+  --stagger-3: 150ms;
+  --stagger-4: 200ms;
+  --stagger-5: 250ms;
+  --stagger-6: 300ms;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   KEYFRAME ANIMATIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Fade Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ── Scale Animations ── */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes scaleOut {
+  from {
+    opacity: 1;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+@keyframes popIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  70% {
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── Slide Animations ── */
+@keyframes slideInUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInDown {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+/* ── Pulse & Attention ── */
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+  20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-3deg); }
+  75% { transform: rotate(3deg); }
+}
+
+@keyframes ping {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* ── Spin & Rotate ── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes spinReverse {
+  from { transform: rotate(360deg); }
+  to { transform: rotate(0deg); }
+}
+
+/* ── Skeleton Loading ── */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--color-brand-accent);
+    opacity: 1;
+  }
+  50% {
+    box-shadow: 0 0 20px 5px var(--color-brand-accent);
+    opacity: 0.8;
+  }
+}
+
+/* ── Emergency Alert ── */
+@keyframes alertPulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 var(--color-danger-bg);
+  }
+  50% {
+    box-shadow: 0 0 20px 8px var(--color-danger-bg);
+  }
+}
+
+@keyframes criticalBlink {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.6; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATION UTILITY CLASSES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Base Animations ── */
+.animate-fade-in { animation: fadeIn var(--duration-normal) var(--ease-out) forwards; }
+.animate-fade-out { animation: fadeOut var(--duration-normal) var(--ease-in) forwards; }
+.animate-fade-in-up { animation: fadeInUp var(--duration-slow) var(--ease-out) forwards; }
+.animate-fade-in-down { animation: fadeInDown var(--duration-slow) var(--ease-out) forwards; }
+.animate-fade-in-left { animation: fadeInLeft var(--duration-slow) var(--ease-out) forwards; }
+.animate-fade-in-right { animation: fadeInRight var(--duration-slow) var(--ease-out) forwards; }
+
+.animate-scale-in { animation: scaleIn var(--duration-normal) var(--ease-out) forwards; }
+.animate-scale-out { animation: scaleOut var(--duration-fast) var(--ease-in) forwards; }
+.animate-pop-in { animation: popIn var(--duration-slower) var(--ease-spring) forwards; }
+
+.animate-slide-in-up { animation: slideInUp var(--duration-slow) var(--ease-out) forwards; }
+.animate-slide-in-down { animation: slideInDown var(--duration-slow) var(--ease-out) forwards; }
+.animate-slide-in-left { animation: slideInLeft var(--duration-slow) var(--ease-out) forwards; }
+.animate-slide-in-right { animation: slideInRight var(--duration-slow) var(--ease-out) forwards; }
+
+/* ── Attention Animations ── */
+.animate-pulse { animation: pulse 2s var(--ease-in-out) infinite; }
+.animate-bounce { animation: bounce 1s var(--ease-in-out) infinite; }
+.animate-shake { animation: shake 0.5s var(--ease-in-out); }
+.animate-wiggle { animation: wiggle 0.3s var(--ease-in-out); }
+.animate-ping { animation: ping 1s var(--ease-out) infinite; }
+.animate-spin { animation: spin 1s linear infinite; }
+
+/* ── Staggered Reveal (for lists/grids) ── */
+.stagger-children > *:nth-child(1) { animation-delay: var(--stagger-1); }
+.stagger-children > *:nth-child(2) { animation-delay: var(--stagger-2); }
+.stagger-children > *:nth-child(3) { animation-delay: var(--stagger-3); }
+.stagger-children > *:nth-child(4) { animation-delay: var(--stagger-4); }
+.stagger-children > *:nth-child(5) { animation-delay: var(--stagger-5); }
+.stagger-children > *:nth-child(6) { animation-delay: var(--stagger-6); }
+.stagger-children > *:nth-child(n+7) { animation-delay: 350ms; }
+
+/* ── Initial State for Stagger ── */
+.stagger-children > * {
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   SKELETON LOADING
+   ═══════════════════════════════════════════════════════════════ */
+
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--surface-hover) 25%,
+    var(--surface-pressed) 37%,
+    var(--surface-hover) 63%
+  );
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease infinite;
+  border-radius: var(--radius-md);
+}
+
+.skeleton-text {
+  height: 1em;
+  margin-bottom: var(--space-2);
+}
+
+.skeleton-title {
+  height: 1.5em;
+  width: 60%;
+  margin-bottom: var(--space-3);
+}
+
+.skeleton-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+}
+
+.skeleton-button {
+  height: 40px;
+  width: 120px;
+}
+
+.skeleton-card {
+  height: 200px;
+  width: 100%;
+}
+
+.skeleton-image {
+  aspect-ratio: 16/9;
+  width: 100%;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MICRO-INTERACTIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Button Interactions ── */
+.interactive-button {
+  transition: 
+    transform var(--duration-fast) var(--ease-out),
+    box-shadow var(--duration-fast) var(--ease-out),
+    background var(--duration-fast) var(--ease-out);
+}
+
+.interactive-button:hover {
+  transform: var(--hover-lift);
+}
+
+.interactive-button:active {
+  transform: var(--press-scale);
+}
+
+.interactive-button:focus-visible {
+  box-shadow: var(--focus-ring-accent);
+}
+
+/* ── Card Interactions ── */
+.interactive-card {
+  transition: 
+    transform var(--duration-normal) var(--ease-out),
+    box-shadow var(--duration-normal) var(--ease-out),
+    border-color var(--duration-fast);
+}
+
+.interactive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.interactive-card:active {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* ── Link Interactions ── */
+.interactive-link {
+  position: relative;
+  transition: color var(--duration-fast);
+}
+
+.interactive-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-brand-accent);
+  transition: width var(--duration-normal) var(--ease-out);
+}
+
+.interactive-link:hover::after {
+  width: 100%;
+}
+
+/* ── Icon Interactions ── */
+.interactive-icon {
+  transition: 
+    transform var(--duration-fast) var(--ease-spring),
+    color var(--duration-fast);
+}
+
+.interactive-icon:hover {
+  transform: scale(1.15);
+  color: var(--color-brand-accent);
+}
+
+/* ── Toggle/Switch Interactions ── */
+.interactive-toggle {
+  position: relative;
+  transition: background var(--duration-normal) var(--ease-out);
+}
+
+.interactive-toggle::before {
+  content: '';
+  position: absolute;
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   PAGE TRANSITIONS
+   ═══════════════════════════════════════════════════════════════ */
+
+/* ── Page Enter ── */
+.page-enter {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: 
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-out);
+}
+
+/* ── Page Exit ── */
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: 
+    opacity var(--duration-fast) var(--ease-in),
+    transform var(--duration-fast) var(--ease-in);
+}
+
+/* ── Modal Transitions ── */
+.modal-backdrop-enter {
+  opacity: 0;
+}
+
+.modal-backdrop-enter-active {
+  opacity: 1;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.modal-backdrop-exit {
+  opacity: 1;
+}
+
+.modal-backdrop-exit-active {
+  opacity: 0;
+  transition: opacity var(--duration-fast) var(--ease-in);
+}
+
+.modal-content-enter {
+  opacity: 0;
+  transform: scale(0.95) translateY(16px);
+}
+
+.modal-content-enter-active {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+  transition: 
+    opacity var(--duration-slow) var(--ease-out),
+    transform var(--duration-slow) var(--ease-spring);
+}
+
+.modal-content-exit {
+  opacity: 1;
+  transform: scale(1) translateY(0);
+}
+
+.modal-content-exit-active {
+  opacity: 0;
+  transform: scale(0.95) translateY(8px);
+  transition: 
+    opacity var(--duration-fast) var(--ease-in),
+    transform var(--duration-fast) var(--ease-in);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   EMERGENCY/ALERT STATES
+   ═══════════════════════════════════════════════════════════════ */
+
+.alert-critical {
+  animation: criticalBlink 1s ease-in-out infinite;
+  border-color: var(--color-critical);
+}
+
+.alert-danger-pulse {
+  animation: alertPulse 2s ease-in-out infinite;
+}
+
+.emergency-glow {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   REDUCED MOTION
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+  
+  .skeleton {
+    animation: none;
+    background: var(--surface-hover);
+  }
+}
