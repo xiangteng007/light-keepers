@@ -203,10 +203,10 @@ export class MultiEocService {
      * P1: Merge Common Operational Picture (COP) from multiple EOCs
      */
     mergeOperationalPicture(eocIds: string[]): CommonOperationalPicture {
-        const incidents: any[] = [];
+        const incidents: IncidentInfo[] = [];
         const resources: SharedResource[] = [];
-        const personnel: any[] = [];
-        const boundaries: any[] = [];
+        const personnel: PersonnelInfo[] = [];
+        const boundaries: EocBoundary[] = [];
 
         for (const eocId of eocIds) {
             const eoc = this.eocRegistry.get(eocId);
@@ -329,7 +329,7 @@ export class MultiEocService {
     }
 
     // Private
-    private async notifyEoc(eocId: string, event: string, data: any): Promise<void> {
+    private async notifyEoc(eocId: string, event: string, data: unknown): Promise<void> {
         const eoc = this.eocRegistry.get(eocId);
         if (!eoc) return;
         // Would send webhook/API call to EOC endpoint
@@ -368,9 +368,9 @@ interface FederatedMissionConfig {
 interface FederatedMission extends FederatedMissionConfig {
     id: string;
     status: 'active' | 'completed' | 'suspended';
-    resourceRequests: any[];
+    resourceRequests: ResourceRequestRecord[];
     sharedResources: SharedResource[];
-    communications: any[];
+    communications: CommunicationRecord[];
     createdAt: Date;
     commandTransfers?: Array<{
         from: string;
@@ -426,13 +426,62 @@ interface FederationAlert {
 interface CommonOperationalPicture {
     generatedAt: Date;
     eocCount: number;
-    incidents: any[];
+    incidents: IncidentInfo[];
     resources: SharedResource[];
-    personnel: any[];
-    boundaries: any[];
+    personnel: PersonnelInfo[];
+    boundaries: EocBoundary[];
     legend: {
         resourceTypes: string[];
     };
+}
+
+/** Incident information for COP */
+interface IncidentInfo {
+    missionId: string;
+    name: string;
+    type: string;
+    leadEoc: string;
+    status: string;
+    affectedArea: { lat: number; lng: number; radius: number };
+}
+
+/** Personnel information for COP */
+interface PersonnelInfo {
+    id: string;
+    name: string;
+    role: string;
+    eocId: string;
+    status: string;
+}
+
+/** EOC boundary for COP */
+interface EocBoundary {
+    eocId: string;
+    eocName: string;
+    jurisdiction: string[];
+}
+
+/** Resource request record */
+interface ResourceRequestRecord {
+    id: string;
+    requestingEocId: string;
+    resourceType: string;
+    quantity: number;
+    urgency: 'low' | 'medium' | 'high' | 'critical';
+    destination: { lat: number; lng: number };
+    status: 'pending' | 'approved' | 'rejected';
+    allocatedFrom: string | null;
+    allocatedAt: Date | null;
+}
+
+/** Communication record */
+interface CommunicationRecord {
+    id: string;
+    timestamp: Date;
+    fromEocId: string;
+    toEocId?: string;
+    type: 'message' | 'alert' | 'status_update';
+    content: string;
 }
 
 interface MutualAidRequest {

@@ -39,8 +39,8 @@ export interface ConflictRecord {
     type: ConflictType;
     entityType: string;
     entityId: string;
-    localVersion: any;
-    remoteVersion: any;
+    localVersion: unknown;
+    remoteVersion: unknown;
     localTimestamp: Date;
     remoteTimestamp: Date;
     localUserId: string;
@@ -48,7 +48,7 @@ export interface ConflictRecord {
     resolution?: ResolutionStrategy;
     resolvedAt?: Date;
     resolvedBy?: string;
-    resolvedValue?: any;
+    resolvedValue?: unknown;
 }
 
 /**
@@ -57,7 +57,7 @@ export interface ConflictRecord {
 export interface ResolutionResult {
     success: boolean;
     strategy: ResolutionStrategy;
-    resolvedValue: any;
+    resolvedValue: unknown;
     requiresManual: boolean;
     message?: string;
 }
@@ -206,7 +206,7 @@ export class ConflictResolverService {
      */
     resolveManually(
         conflictId: string,
-        resolvedValue: any,
+        resolvedValue: unknown,
         resolvedBy: string,
     ): boolean {
         const index = this.manualQueue.findIndex(c => c.id === conflictId);
@@ -325,8 +325,10 @@ export class ConflictResolverService {
 
     private resolvePriorityBased(conflict: ConflictRecord): ResolutionResult {
         // 依資料優先級解決
-        const localPriority = conflict.localVersion?.priority || 0;
-        const remotePriority = conflict.remoteVersion?.priority || 0;
+        const localObj = conflict.localVersion as Record<string, unknown> | null;
+        const remoteObj = conflict.remoteVersion as Record<string, unknown> | null;
+        const localPriority = (localObj?.priority as number) || 0;
+        const remotePriority = (remoteObj?.priority as number) || 0;
         
         const resolvedValue = localPriority >= remotePriority
             ? conflict.localVersion
@@ -365,7 +367,7 @@ export class ConflictResolverService {
     private recordResolution(
         conflict: ConflictRecord,
         strategy: ResolutionStrategy,
-        resolvedValue: any,
+        resolvedValue: unknown,
     ): void {
         conflict.resolution = strategy;
         conflict.resolvedAt = new Date();
@@ -377,17 +379,19 @@ export class ConflictResolverService {
         return `conflict_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     }
 
-    private deepMerge(target: any, source: any): any {
+    private deepMerge(target: unknown, source: unknown): unknown {
         if (!target || typeof target !== 'object') return source;
         if (!source || typeof source !== 'object') return target;
         
-        const result = { ...target };
+        const targetObj = target as Record<string, unknown>;
+        const sourceObj = source as Record<string, unknown>;
+        const result = { ...targetObj };
         
-        for (const key of Object.keys(source)) {
-            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                result[key] = this.deepMerge(target[key], source[key]);
+        for (const key of Object.keys(sourceObj)) {
+            if (sourceObj[key] && typeof sourceObj[key] === 'object' && !Array.isArray(sourceObj[key])) {
+                result[key] = this.deepMerge(targetObj[key], sourceObj[key]);
             } else {
-                result[key] = source[key];
+                result[key] = sourceObj[key];
             }
         }
         

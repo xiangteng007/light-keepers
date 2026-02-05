@@ -6,7 +6,7 @@ import {
     ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, DataSource } from 'typeorm';
+import { Repository, DataSource, EntityManager } from 'typeorm';
 import { AiJob, AiJobStatus, AiResult } from './entities';
 import { AcceptAiResultDto, RejectAiResultDto, AcceptResultResponse, RejectResultResponse, AcceptAction } from './dto';
 import { AiQueueGateway } from './ai-queue.gateway';
@@ -182,7 +182,7 @@ export class AiResultsService {
         action: AcceptAction,
         parameters: object | undefined,
         user: AuthUser,
-        em: any,
+        em: EntityManager,
     ): Promise<Array<{ type: string; id: string }>> {
         switch (action) {
             case 'apply_summary':
@@ -199,8 +199,8 @@ export class AiResultsService {
     /**
      * Apply summary to report metadata
      */
-    private async applySummary(job: AiJob, em: any): Promise<Array<{ type: string; id: string }>> {
-        const output = job.outputJson as any;
+    private async applySummary(job: AiJob, em: EntityManager): Promise<Array<{ type: string; id: string }>> {
+        const output = job.outputJson as Record<string, unknown>;
 
         // Update report's AI summary field
         await em.query(`
@@ -222,11 +222,11 @@ export class AiResultsService {
      */
     private async mergeReports(
         job: AiJob,
-        parameters: any,
+        parameters: object | undefined,
         user: AuthUser,
-        em: any,
+        em: EntityManager,
     ): Promise<Array<{ type: string; id: string }>> {
-        const output = job.outputJson as any;
+        const output = job.outputJson as { clusters?: Array<{ reportIds: string[] }> };
         const affected: Array<{ type: string; id: string }> = [];
 
         // For each cluster, merge into primary report
@@ -273,11 +273,11 @@ export class AiResultsService {
      */
     private async createTask(
         job: AiJob,
-        parameters: any,
+        parameters: object | undefined,
         user: AuthUser,
-        em: any,
+        em: EntityManager,
     ): Promise<Array<{ type: string; id: string }>> {
-        const output = job.outputJson as any;
+        const output = job.outputJson as { title?: string; objective?: string; priority?: string; checklist?: unknown; requiredItems?: unknown; sopSlugs?: unknown; estimatedDurationMin?: number };
 
         // Insert new task
         const result = await em.query(`
@@ -320,7 +320,7 @@ export class AiResultsService {
     /**
      * Capture state before action
      */
-    private async captureBeforeState(job: AiJob, action: AcceptAction, em: any): Promise<object> {
+    private async captureBeforeState(job: AiJob, action: AcceptAction, em: EntityManager): Promise<object> {
         switch (action) {
             case 'apply_summary':
             case 'merge_reports':
@@ -342,9 +342,9 @@ export class AiResultsService {
         job: AiJob,
         action: AcceptAction,
         affected: Array<{ type: string; id: string }>,
-        em: any,
+        em: EntityManager,
     ): Promise<object> {
-        const snapshots: any = {};
+        const snapshots: Record<string, unknown> = {};
 
         for (const entity of affected) {
             if (entity.type === 'report') {

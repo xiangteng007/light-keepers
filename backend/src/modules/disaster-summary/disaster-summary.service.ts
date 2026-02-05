@@ -114,16 +114,24 @@ export class DisasterSummaryService {
 
     // Private
     private aggregateSourceData(sources: SummarySource[]): AggregatedData {
-        const reports: any[] = [];
-        const resources: any[] = [];
-        const timeline: any[] = [];
+        const reports: ReportData[] = [];
+        const resources: ResourceData[] = [];
+        const timeline: TimelineEntry[] = [];
         let personnel = { total: 0, deployed: 0, available: 0 };
 
         for (const source of sources) {
-            if (source.type === 'reports') reports.push(...(source.data || []));
-            if (source.type === 'resources') resources.push(...(source.data || []));
-            if (source.type === 'personnel') personnel = source.data || personnel;
-            if (source.type === 'timeline') timeline.push(...(source.data || []));
+            if (source.type === 'reports' && Array.isArray(source.data)) {
+                reports.push(...(source.data as ReportData[]));
+            }
+            if (source.type === 'resources' && Array.isArray(source.data)) {
+                resources.push(...(source.data as ResourceData[]));
+            }
+            if (source.type === 'personnel' && source.data && typeof source.data === 'object' && 'total' in source.data) {
+                personnel = source.data as { total: number; deployed: number; available: number };
+            }
+            if (source.type === 'timeline' && Array.isArray(source.data)) {
+                timeline.push(...(source.data as TimelineEntry[]));
+            }
         }
 
         return { reports, resources, personnel, timeline };
@@ -147,14 +155,38 @@ export class DisasterSummaryService {
 // Types
 interface SummarySource {
     type: 'reports' | 'resources' | 'personnel' | 'timeline' | 'sensors';
-    data: any;
+    data: ReportData[] | ResourceData[] | TimelineEntry[] | { total: number; deployed: number; available: number } | unknown;
 }
 
 interface AggregatedData {
-    reports: any[];
-    resources: any[];
+    reports: ReportData[];
+    resources: ResourceData[];
     personnel: { total: number; deployed: number; available: number };
-    timeline: any[];
+    timeline: TimelineEntry[];
+}
+
+/** Report data from field reports */
+interface ReportData {
+    id: string;
+    content: string;
+    location?: { lat: number; lng: number };
+    timestamp: Date;
+    severity?: string;
+}
+
+/** Resource data for summary */
+interface ResourceData {
+    id: string;
+    type: string;
+    quantity: number;
+    status: string;
+}
+
+/** Timeline entry for events */
+interface TimelineEntry {
+    timestamp: Date;
+    event: string;
+    details?: string;
 }
 
 interface DisasterSummary {
@@ -165,7 +197,7 @@ interface DisasterSummary {
     casualties: { injured: number; missing: number; deceased: number; rescued: number };
     needs: string[];
     priorities: string[];
-    keyMetrics: Record<string, any>;
+    keyMetrics: Record<string, unknown>;
     confidence: number;
 }
 
