@@ -33,6 +33,7 @@ import BindLinePage from './pages/BindLinePage'
 import VolunteerProfileSetupPage from './pages/VolunteerProfileSetupPage'
 import ForecastPage from './pages/ForecastPage'
 import EmergencyResponsePage from './pages/EmergencyResponsePage'
+import LoginPage from './pages/LoginPage'
 import DonationsPage from './pages/DonationsPage'
 import ResourcesPublicPage from './pages/ResourcesPublicPage'
 import ApprovalCenterPage from './pages/ApprovalCenterPage'
@@ -187,6 +188,7 @@ function App() {
 
         <Routes>
           {/* ===== 獨立頁面 (無需 Layout 包裝) ===== */}
+          <Route path="/login" element={<LoginPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />
@@ -195,8 +197,8 @@ function App() {
           <Route path="/account" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="account"><AccountPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
-          <Route path="/dashboard" element={<CommandCenterPage />} />
-          <Route path="/command-center" element={<CommandCenterPage />} />
+          <Route path="/dashboard" element={<ProtectedRoute requiredLevel={1}><CommandCenterPage /></ProtectedRoute>} />
+          <Route path="/command-center" element={<ProtectedRoute requiredLevel={1}><CommandCenterPage /></ProtectedRoute>} />
           <Route path="/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
 
           {/* ===== Emergency 緊急快捷 Routes (Expert Council v3.0) ===== */}

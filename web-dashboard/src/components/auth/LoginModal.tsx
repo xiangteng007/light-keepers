@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { login as apiLogin } from '../../api/services';
-import { ShieldCheck, Activity, AlertTriangle, X } from 'lucide-react';
+import { ShieldCheck, Mail, Lock, Loader2, AlertCircle, X, LogIn } from 'lucide-react';
+import './LoginModal.css';
 
 interface LoginModalProps {
     isOpen: boolean;
@@ -10,11 +11,16 @@ interface LoginModalProps {
 }
 
 /**
- * Login Modal Component
+ * Premium Login Modal - Light Theme Design
+ * 
+ * 設計規格：
+ * - 主色：Navy Blue #001F3F
+ * - 輔色：Golden Amber #D97706
+ * - 背景：白色漸層 + 毛玻璃效果
+ * - 圓角：12px
  * 
  * 🔐 PR-04: Deep Link Protection
- * - 登入成功後自動導回 intended route（來自 ProtectedRoute 的 state.from）
- * - 若無 intended route，則停留在當前頁面
+ * - 登入成功後自動導回 intended route
  */
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const { login } = useAuth();
@@ -24,10 +30,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     const [password, setPassword] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [focusedField, setFocusedField] = useState<string | null>(null);
 
     if (!isOpen) return null;
 
-    // 🔐 PR-04: 從 location.state 取得 intended route
     const intendedRoute = (location.state as { from?: { pathname: string } })?.from?.pathname;
 
     const handleLogin = async (e: React.FormEvent) => {
@@ -36,15 +42,12 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         setError(null);
 
         try {
-            // 1. Call API to get token
             const response = await apiLogin(email, password);
 
-            // 2. Pass token to AuthContext
             if (response.data && response.data.accessToken) {
                 await login(response.data.accessToken);
-                onClose(); // Close modal on success
+                onClose();
                 
-                // 🔐 PR-04: 登入成功後導回 intended route
                 if (intendedRoute && intendedRoute !== '/') {
                     navigate(intendedRoute, { replace: true });
                 }
@@ -53,103 +56,129 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             }
         } catch (err: unknown) {
             console.error('Login failed:', err);
-            setError('ACCESS DENIED: Invalid credentials');
+            setError('登入失敗：帳號或密碼錯誤');
         } finally {
             setIsLoading(false);
         }
     };
 
+    const handleGoogleLogin = () => {
+        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+        window.location.href = `${API_BASE_URL}/api/v1/auth/google`;
+    };
+
     return (
-        <div className="fixed inset-0 flex items-center justify-center z-50">
-            {/* Backdrop */}
-            <div
-                className="absolute inset-0 bg-black/60 backdrop-blur-sm"
-                onClick={onClose}
-            ></div>
+        <div className="login-modal-overlay" onClick={onClose}>
+            {/* Modal Container */}
+            <div 
+                className="login-modal" 
+                onClick={(e) => e.stopPropagation()}
+            >
+                {/* Close Button */}
+                <button className="login-modal__close" onClick={onClose} aria-label="關閉">
+                    <X size={20} />
+                </button>
 
-            {/* Modal Container - Secure Terminal Aesthetic */}
-            <div className="relative w-full max-w-md p-1 z-10 animate-in fade-in zoom-in-95 duration-200">
-                <div className="bg-[#1D2635]/90 backdrop-blur-md border border-[#2F3641] rounded-lg shadow-2xl overflow-hidden relative">
-
-                    {/* Corner Brackets */}
-                    <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-[#C39B6F] opacity-50"></div>
-                    <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-[#C39B6F] opacity-50"></div>
-                    <div className="absolute bottom-0 left-0 w-4 h-4 border-b-2 border-l-2 border-[#C39B6F] opacity-50"></div>
-                    <div className="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-[#C39B6F] opacity-50"></div>
-
-                    {/* Close Button */}
-                    <button
-                        onClick={onClose}
-                        className="absolute top-4 right-4 text-gray-500 hover:text-white transition-colors"
-                        aria-label="關閉登入視窗"
-                        title="關閉"
-                    >
-                        <X size={20} />
-                    </button>
-
-                    {/* Header */}
-                    <div className="flex flex-col items-center pt-8 pb-4 px-8 border-b border-[#2F3641]/50 bg-[#13171F]/50">
-                        <div className="flex items-center gap-2 mb-2 px-3 py-1 bg-[#0B1120] border border-[#2F3641] rounded-full">
-                            <ShieldCheck size={14} className="text-[#C39B6F]" />
-                            <span className="text-[10px] font-mono text-[#C39B6F] tracking-widest uppercase">
-                                SECURE TERMINAL
-                            </span>
-                        </div>
-                        <h2 className="text-xl font-bold text-white tracking-[0.2em] font-sans">
-                            OPERATOR LOGIN
-                        </h2>
+                {/* Header with Brand Bar */}
+                <div className="login-modal__header">
+                    <div className="login-modal__brand">
+                        <ShieldCheck className="login-modal__brand-icon" />
+                        <span className="login-modal__brand-text">LIGHTKEEPERS</span>
                     </div>
+                </div>
 
-                    {/* Form */}
-                    <form onSubmit={handleLogin} className="px-8 py-8">
-                        {error && (
-                            <div className="bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono p-3 rounded flex items-center gap-2 mb-6">
-                                <AlertTriangle size={14} />
-                                {error}
-                            </div>
-                        )}
+                {/* Content Area */}
+                <div className="login-modal__content">
+                    {/* Title */}
+                    <h2 className="login-modal__title">登入系統</h2>
+                    <p className="login-modal__subtitle">歡迎回來，守護者</p>
 
-                        <div className="mb-4">
-                            <label className="block text-[10px] text-gray-400 font-mono tracking-wider uppercase pl-1 mb-2">
-                                Operator ID
-                            </label>
+                    {/* Error Message */}
+                    {error && (
+                        <div className="login-modal__error">
+                            <AlertCircle size={16} />
+                            <span>{error}</span>
+                        </div>
+                    )}
+
+                    {/* Login Form */}
+                    <form onSubmit={handleLogin} className="login-modal__form">
+                        {/* Email Field */}
+                        <div className={`login-modal__field ${focusedField === 'email' ? 'login-modal__field--focused' : ''}`}>
+                            <Mail className="login-modal__field-icon" size={18} />
                             <input
                                 type="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                className="w-full bg-[#13171F] border border-[#2F3641] rounded-sm text-white px-4 py-3 text-sm font-mono placeholder-gray-600 outline-none focus:border-[#C39B6F] transition-all"
-                                placeholder="ENTER ID..."
+                                onFocus={() => setFocusedField('email')}
+                                onBlur={() => setFocusedField(null)}
+                                placeholder="請輸入電子郵件"
                                 required
+                                autoComplete="email"
                             />
                         </div>
 
-                        <div className="mb-8">
-                            <label className="block text-[10px] text-gray-400 font-mono tracking-wider uppercase pl-1 mb-2">
-                                Access Code
-                            </label>
+                        {/* Password Field */}
+                        <div className={`login-modal__field ${focusedField === 'password' ? 'login-modal__field--focused' : ''}`}>
+                            <Lock className="login-modal__field-icon" size={18} />
                             <input
                                 type="password"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
-                                className="w-full bg-[#13171F] border border-[#2F3641] rounded-sm text-white px-4 py-3 text-sm font-mono placeholder-gray-600 outline-none focus:border-[#C39B6F] transition-all"
-                                placeholder="••••••••"
+                                onFocus={() => setFocusedField('password')}
+                                onBlur={() => setFocusedField(null)}
+                                placeholder="請輸入密碼"
                                 required
+                                autoComplete="current-password"
                             />
                         </div>
 
-                        {/* NUCLEAR OPTION BUTTON */}
-                        <button
-                            type="submit"
+                        {/* Forgot Password Link */}
+                        <div className="login-modal__forgot">
+                            <a href="/forgot-password">忘記密碼？</a>
+                        </div>
+
+                        {/* Primary Login Button */}
+                        <button 
+                            type="submit" 
+                            className="login-modal__submit"
                             disabled={isLoading}
-                            className="w-full bg-[#C39B6F] hover:bg-[#D4AF37] text-[#0F1218] font-bold py-3 rounded-sm tracking-wide transition-all uppercase flex items-center justify-center gap-2"
                         >
                             {isLoading ? (
-                                <Activity className="animate-spin" size={20} />
+                                <>
+                                    <Loader2 className="login-modal__spinner" size={20} />
+                                    驗證中...
+                                </>
                             ) : (
-                                'Initiate Uplink'
+                                <>
+                                    <LogIn size={18} />
+                                    開始任務
+                                </>
                             )}
                         </button>
                     </form>
+
+                    {/* Divider */}
+                    <div className="login-modal__divider">
+                        <span>或使用以下方式登入</span>
+                    </div>
+
+                    {/* Social Login Buttons */}
+                    <div className="login-modal__social">
+                        <button 
+                            type="button" 
+                            className="login-modal__social-btn login-modal__social-btn--google"
+                            onClick={handleGoogleLogin}
+                        >
+                            <svg viewBox="0 0 24 24" width="20" height="20">
+                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                            </svg>
+                            使用 Google 帳號登入
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

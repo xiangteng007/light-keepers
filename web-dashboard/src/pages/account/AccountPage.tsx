@@ -8,9 +8,10 @@
  */
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import LoginModal from '../../components/auth/LoginModal';
 
 // Components
 import { AccountSummary } from './components/AccountSummary';
@@ -37,7 +38,6 @@ const TABS: { id: TabId; label: string }[] = [
 ];
 
 const AccountPage: React.FC = () => {
-    const navigate = useNavigate();
     const { user, logout, isLoading: authLoading } = useAuth();
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -50,6 +50,7 @@ const AccountPage: React.FC = () => {
     });
     const [isSummaryCollapsed, setIsSummaryCollapsed] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth < 1200);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
     // Responsive detection
     useEffect(() => {
@@ -60,16 +61,16 @@ const AccountPage: React.FC = () => {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    // Redirect to login if not authenticated (after auth loading completes)
+    // Show login modal if not authenticated (after auth loading completes)
     useEffect(() => {
-        // Check for dev mode - skip redirect if dev mode is enabled
+        // Check for dev mode - skip if dev mode is enabled
         const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
-        // Wait for auth to finish loading before redirecting
+        // Wait for auth to finish loading before showing login
         if (!authLoading && !user && !devModeEnabled) {
-            console.log('[AccountPage] User not authenticated, redirecting to login...');
-            navigate('/login', { replace: true });
+            console.log('[AccountPage] User not authenticated, showing login modal...');
+            setIsLoginModalOpen(true);
         }
-    }, [user, authLoading, navigate]);
+    }, [user, authLoading]);
 
     // Load account data
     useEffect(() => {
@@ -121,9 +122,10 @@ const AccountPage: React.FC = () => {
     const handleLogout = useCallback(async () => {
         if (window.confirm('確定要登出嗎？')) {
             await logout();
-            navigate('/login');
+            // After logout, show login modal instead of navigating to non-existent route
+            setIsLoginModalOpen(true);
         }
-    }, [logout, navigate]);
+    }, [logout]);
 
     // Profile panel handlers
     const handleSaveProfile = useCallback(async (formData: ProfileFormData) => {
@@ -324,6 +326,35 @@ const AccountPage: React.FC = () => {
                     <div className={styles.rightColumn}>
                         <div className={`${styles.tabNavigation} ${styles.skeleton}`} style={{ height: 52 }} />
                         <div className={`${styles.card} ${styles.skeleton}`} style={{ height: 400 }} />
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    // Show login modal for unauthenticated users
+    if (!user && !authLoading) {
+        return (
+            <div className={styles.accountPage}>
+                <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
+                <header className={styles.pageHeader}>
+                    <h1 className={styles.pageTitle}>
+                        <User size={28} className={styles.pageTitleIcon} />
+                        我的帳戶
+                    </h1>
+                    <p className={styles.pageSubtitle}>請先登入以查看您的帳戶資訊</p>
+                </header>
+                <div className={styles.mainLayout}>
+                    <div className={styles.leftColumn}>
+                        <div className={styles.card} style={{ padding: '2rem', textAlign: 'center' }}>
+                            <p style={{ marginBottom: '1rem' }}>您尚未登入</p>
+                            <button 
+                                className="lk-btn lk-btn--primary"
+                                onClick={() => setIsLoginModalOpen(true)}
+                            >
+                                登入
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
