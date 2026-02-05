@@ -4,8 +4,19 @@
  * Implements Content Security Policy headers to prevent XSS and data injection.
  */
 
-import { Injectable, NestMiddleware } from '@nestjs/common';
+import { Injectable, NestMiddleware, Logger } from '@nestjs/common';
 import { Request, Response, NextFunction } from 'express';
+
+/** CSP Violation Report Type */
+interface CSPViolationReport {
+    'document-uri'?: string;
+    'violated-directive'?: string;
+    'blocked-uri'?: string;
+    'source-file'?: string;
+    'line-number'?: number;
+    'column-number'?: number;
+    [key: string]: string | number | undefined;
+}
 
 @Injectable()
 export class CSPMiddleware implements NestMiddleware {
@@ -50,8 +61,10 @@ export class CSPMiddleware implements NestMiddleware {
  */
 @Injectable()
 export class CSPReportHandler {
-    handleReport(report: any) {
-        console.warn('[CSP Violation]', JSON.stringify({
+    private readonly logger = new Logger(CSPReportHandler.name);
+
+    handleReport(report: CSPViolationReport) {
+        this.logger.warn('[CSP Violation]', JSON.stringify({
             documentUri: report['document-uri'],
             violatedDirective: report['violated-directive'],
             blockedUri: report['blocked-uri'],

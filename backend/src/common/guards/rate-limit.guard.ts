@@ -12,7 +12,13 @@ import {
     SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
 import { CacheService } from '../../modules/cache/cache.service';
+
+/** Extended Request with user property */
+interface AuthenticatedRequest extends Request {
+    user?: { id?: string; uid?: string };
+}
 
 export const RATE_LIMIT_KEY = 'rateLimit';
 
@@ -97,7 +103,7 @@ export class RateLimitGuard implements CanActivate {
         return true;
     }
 
-    private getKey(request: any): string {
+    private getKey(request: AuthenticatedRequest): string {
         // Use user ID if authenticated, otherwise IP
         const userId = request.user?.id || request.user?.uid;
         if (userId) {
@@ -105,8 +111,8 @@ export class RateLimitGuard implements CanActivate {
         }
 
         const ip = request.ip ||
-            request.headers['x-forwarded-for']?.split(',')[0] ||
-            request.connection?.remoteAddress ||
+            (request.headers['x-forwarded-for'] as string)?.split(',')[0] ||
+            request.socket?.remoteAddress ||
             'unknown';
         return `ip:${ip}`;
     }

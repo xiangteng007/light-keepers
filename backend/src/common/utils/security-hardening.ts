@@ -33,7 +33,7 @@ export class PIIMasker {
         return masked;
     }
 
-    static maskObject(obj: any): any {
+    static maskObject(obj: unknown): unknown {
         if (typeof obj === 'string') {
             return this.mask(obj);
         }
@@ -41,7 +41,7 @@ export class PIIMasker {
             return obj.map(item => this.maskObject(item));
         }
         if (obj && typeof obj === 'object') {
-            const masked: any = {};
+            const masked: Record<string, unknown> = {};
             for (const [key, value] of Object.entries(obj)) {
                 // Mask sensitive field names entirely
                 if (['password', 'token', 'secret', 'apiKey', 'refreshToken'].includes(key)) {

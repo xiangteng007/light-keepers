@@ -1,5 +1,11 @@
 import { Injectable, CanActivate, ExecutionContext, HttpException, HttpStatus, Logger } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { Request } from 'express';
+
+/** Extended Request with user property */
+interface AuthenticatedRequest extends Request {
+    user?: { id?: string };
+}
 
 /**
  * Advanced Rate Limit Guard
@@ -66,9 +72,9 @@ export class AdvancedRateLimitGuard implements CanActivate {
         return true;
     }
 
-    private generateKey(request: any): string {
+    private generateKey(request: AuthenticatedRequest): string {
         const userId = request.user?.id || 'anon';
-        const ip = request.ip || request.connection?.remoteAddress || 'unknown';
+        const ip = request.ip || request.socket?.remoteAddress || 'unknown';
         const path = request.path;
         return `${userId}:${ip}:${path}`;
     }
