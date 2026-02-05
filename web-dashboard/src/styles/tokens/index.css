@@ -1,0 +1,256 @@
+/**
+ * Light Keepers Design System - Core Tokens
+ * ═══════════════════════════════════════════════════════════════
+ * 統一設計代幣系統 - 單一真相來源
+ * Version: 2.0.0
+ */
+
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* ═══════════════════════════════════════════════════════════════
+   LIGHT THEME (Default)
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  /* ── Brand Colors ── */
+  --color-brand-primary: #001F3F;       /* Navy Blue */
+  --color-brand-accent: #D97706;        /* Golden Amber */
+  --color-brand-accent-light: #FBBF24;  /* Light Gold */
+  --color-brand-accent-dark: #B45309;   /* Dark Amber */
+  
+  /* ── Semantic Status Colors (災難應變專用) ── */
+  --color-safe: #059669;                /* 安全/低風險 */
+  --color-safe-bg: rgba(5, 150, 105, 0.1);
+  --color-warning: #D97706;             /* 警告/中風險 */
+  --color-warning-bg: rgba(217, 119, 6, 0.1);
+  --color-danger: #DC2626;              /* 危險/高風險 */
+  --color-danger-bg: rgba(220, 38, 38, 0.1);
+  --color-critical: #7C3AED;            /* 極危/立即行動 */
+  --color-critical-bg: rgba(124, 58, 237, 0.1);
+  --color-info: #3B82F6;                /* 資訊 */
+  --color-info-bg: rgba(59, 130, 246, 0.1);
+  
+  /* ── Surface Layers ── */
+  --surface-ground: #F8FAFC;            /* 最底層背景 */
+  --surface-card: #FFFFFF;              /* 卡片背景 */
+  --surface-raised: #FFFFFF;            /* 浮起元素 */
+  --surface-overlay: rgba(255, 255, 255, 0.95);
+  --surface-hover: #F1F5F9;             /* Hover 狀態 */
+  --surface-pressed: #E2E8F0;           /* Pressed 狀態 */
+  
+  /* ── Text Hierarchy ── */
+  --text-heading: #0F172A;              /* 標題文字 */
+  --text-body: #1F2937;                 /* 主文字 */
+  --text-secondary: #6B7280;            /* 輔助文字 */
+  --text-muted: #9CA3AF;                /* 淡化文字 */
+  --text-disabled: #D1D5DB;             /* 禁用文字 */
+  --text-inverse: #FFFFFF;              /* 反色文字 */
+  --text-link: #001F3F;                 /* 連結文字 */
+  --text-accent: #D97706;               /* 強調文字 */
+  
+  /* ── Border Colors ── */
+  --border-default: #E2E8F0;
+  --border-light: #F1F5F9;
+  --border-focus: #001F3F;
+  --border-accent: #D97706;
+  --border-danger: #DC2626;
+  
+  /* ── Spacing Scale (4px base) ── */
+  --space-0: 0;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  
+  /* ── Border Radius ── */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-2xl: 24px;
+  --radius-full: 9999px;
+  
+  /* ── Typography ── */
+  --font-display: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-body: 'Inter', 'Noto Sans TC', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+  
+  --font-size-xs: 12px;
+  --font-size-sm: 14px;
+  --font-size-base: 16px;
+  --font-size-lg: 18px;
+  --font-size-xl: 20px;
+  --font-size-2xl: 24px;
+  --font-size-3xl: 30px;
+  --font-size-4xl: 36px;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  --letter-spacing-tight: -0.025em;
+  --letter-spacing-normal: 0;
+  --letter-spacing-wide: 0.025em;
+  
+  /* ── Shadows ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+  --shadow-glow-accent: 0 0 20px rgba(217, 119, 6, 0.25);
+  --shadow-glow-primary: 0 0 20px rgba(0, 31, 63, 0.15);
+  
+  /* ── Motion / Animation ── */
+  --transition-fast: 100ms ease;
+  --transition-normal: 200ms ease;
+  --transition-slow: 300ms ease-out;
+  --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  /* ── Effects ── */
+  --hover-lift: translateY(-2px);
+  --press-scale: scale(0.98);
+  --focus-ring: 0 0 0 3px rgba(0, 31, 63, 0.2);
+  --focus-ring-accent: 0 0 0 3px rgba(217, 119, 6, 0.3);
+  
+  /* ── Z-Index Scale ── */
+  --z-base: 0;
+  --z-dropdown: 100;
+  --z-sticky: 200;
+  --z-fixed: 300;
+  --z-modal-backdrop: 400;
+  --z-modal: 500;
+  --z-popover: 600;
+  --z-tooltip: 700;
+  --z-toast: 800;
+  --z-emergency: 999;
+  
+  /* ── Layout Dimensions ── */
+  --sidebar-width: 280px;
+  --sidebar-collapsed-width: 64px;
+  --header-height: 64px;
+  --footer-height: 48px;
+  --mobile-nav-height: 64px;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   DARK THEME
+   ═══════════════════════════════════════════════════════════════ */
+
+[data-theme="dark"],
+.dark {
+  /* ── Surface Layers (Dark) ── */
+  --surface-ground: #0F172A;
+  --surface-card: #1E293B;
+  --surface-raised: #334155;
+  --surface-overlay: rgba(30, 41, 59, 0.95);
+  --surface-hover: #334155;
+  --surface-pressed: #475569;
+  
+  /* ── Text Hierarchy (Dark) ── */
+  --text-heading: #F8FAFC;
+  --text-body: #E2E8F0;
+  --text-secondary: #94A3B8;
+  --text-muted: #64748B;
+  --text-disabled: #475569;
+  --text-inverse: #0F172A;
+  --text-link: #FBBF24;
+  
+  /* ── Border Colors (Dark) ── */
+  --border-default: #334155;
+  --border-light: #1E293B;
+  --border-focus: #FBBF24;
+  
+  /* ── Shadows (Dark) ── */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 10px 10px rgba(0, 0, 0, 0.3);
+  --shadow-glow-accent: 0 0 30px rgba(217, 119, 6, 0.4);
+  --shadow-glow-primary: 0 0 30px rgba(0, 31, 63, 0.4);
+  
+  /* ── Effects (Dark) ── */
+  --focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.3);
+  --focus-ring-accent: 0 0 0 3px rgba(217, 119, 6, 0.4);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BASE STYLES
+   ═══════════════════════════════════════════════════════════════ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-body);
+  background-color: var(--surface-ground);
+  min-height: 100vh;
+}
+
+/* ── Focus Visible ── */
+:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+/* ── Selection ── */
+::selection {
+  background-color: rgba(217, 119, 6, 0.2);
+  color: var(--text-heading);
+}
+
+/* ── Scrollbar (Light Theme) ── */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--surface-ground);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Dark Theme scrollbar */
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--surface-card);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--border-default);
+}

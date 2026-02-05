@@ -3,9 +3,15 @@
  * ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
  * Theme: "Expert Council Light Theme"
  * Style: Navy Blue + Golden Amber, Clean Professional
+ * 
+ * Design System v2.0 - Unified Token Architecture
  */
 
-@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+/* ═══════════════════════════════════════════════════════════════
+   DESIGN SYSTEM IMPORTS - Single Source of Truth
+   ═══════════════════════════════════════════════════════════════ */
+@import './tokens/index.css';
+@import './tokens/components.css';
 
 @tailwind base;
 @tailwind components;
