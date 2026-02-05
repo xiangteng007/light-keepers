@@ -12,6 +12,7 @@
    ═══════════════════════════════════════════════════════════════ */
 @import './tokens/index.css';
 @import './tokens/components.css';
+@import './tokens/bento-grid.css';
 
 @tailwind base;
 @tailwind components;

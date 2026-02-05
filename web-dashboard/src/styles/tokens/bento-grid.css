@@ -1,0 +1,479 @@
+/**
+ * Dashboard Bento Grid Layout
+ * ═══════════════════════════════════════════════════════════════
+ * Modern dashboard layout with asymmetric grid design
+ */
+
+/* ═══════════════════════════════════════════════════════════════
+   BENTO GRID CONTAINER
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-dashboard {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  min-height: calc(100vh - var(--header-height, 64px));
+  
+  /* Desktop: 4 column layout */
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto repeat(3, minmax(180px, auto));
+  grid-template-areas:
+    "header header header header"
+    "stat1 stat2 stat3 stat4"
+    "missions missions quickact quickact"
+    "alerts alerts team activity";
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   GRID AREA ASSIGNMENTS
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-header { grid-area: header; }
+.bento-stat-1 { grid-area: stat1; }
+.bento-stat-2 { grid-area: stat2; }
+.bento-stat-3 { grid-area: stat3; }
+.bento-stat-4 { grid-area: stat4; }
+.bento-missions { grid-area: missions; }
+.bento-quickact { grid-area: quickact; }
+.bento-alerts { grid-area: alerts; }
+.bento-team { grid-area: team; }
+.bento-activity { grid-area: activity; }
+
+/* Span variations */
+.bento-span-2 { grid-column: span 2; }
+.bento-span-3 { grid-column: span 3; }
+.bento-span-full { grid-column: 1 / -1; }
+.bento-row-span-2 { grid-row: span 2; }
+
+/* ═══════════════════════════════════════════════════════════════
+   BENTO CELL (Card) Styles
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-cell {
+  background: var(--surface-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: all var(--transition-normal);
+}
+
+.bento-cell:hover {
+  border-color: var(--color-brand-accent);
+  box-shadow: var(--shadow-md);
+}
+
+.bento-cell--elevated {
+  box-shadow: var(--shadow-sm);
+}
+
+.bento-cell--elevated:hover {
+  box-shadow: var(--shadow-lg);
+  transform: var(--hover-lift);
+}
+
+.bento-cell--glass {
+  background: var(--surface-overlay);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+.bento-cell--emergency {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 1px var(--color-danger-bg);
+}
+
+.bento-cell--emergency:hover {
+  box-shadow: 0 0 20px var(--color-danger-bg);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BENTO HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-2) 0;
+}
+
+.bento-title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-heading);
+  margin: 0;
+}
+
+.bento-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.bento-status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-safe-bg);
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-safe);
+  text-transform: uppercase;
+}
+
+.bento-status__dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BENTO STAT CARD
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-stat {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+}
+
+.bento-stat__icon {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(217, 119, 6, 0.1);
+  border-radius: var(--radius-lg);
+  font-size: 28px;
+}
+
+.bento-stat__content {
+  flex: 1;
+  min-width: 0;
+}
+
+.bento-stat__value {
+  font-family: var(--font-display);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--text-heading);
+  line-height: 1;
+}
+
+.bento-stat__label {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-top: var(--space-1);
+}
+
+.bento-stat__change {
+  font-size: var(--font-size-xs);
+  color: var(--color-safe);
+  margin-top: var(--space-1);
+}
+
+.bento-stat__change--negative {
+  color: var(--color-danger);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   BENTO CELL HEADER
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-cell__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+}
+
+.bento-cell__title {
+  font-family: var(--font-display);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  color: var(--text-heading);
+}
+
+.bento-cell__action {
+  font-size: var(--font-size-sm);
+  color: var(--color-brand-accent);
+  text-decoration: none;
+  transition: color var(--transition-fast);
+}
+
+.bento-cell__action:hover {
+  color: var(--color-brand-accent-light);
+}
+
+.bento-cell__body {
+  flex: 1;
+  padding: var(--space-4);
+  overflow-y: auto;
+}
+
+.bento-cell__body--compact {
+  padding: var(--space-3);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   MISSION CARD (inside bento cell)
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-mission {
+  background: var(--surface-hover);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-3);
+  transition: all var(--transition-fast);
+}
+
+.bento-mission:last-child {
+  margin-bottom: 0;
+}
+
+.bento-mission:hover {
+  border-color: var(--color-brand-accent);
+}
+
+.bento-mission__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-2);
+}
+
+.bento-mission__title {
+  font-weight: var(--font-weight-medium);
+  color: var(--text-heading);
+  font-size: var(--font-size-sm);
+}
+
+.bento-mission__id {
+  font-size: var(--font-size-xs);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.bento-mission__footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: var(--space-3);
+  font-size: var(--font-size-xs);
+}
+
+.bento-mission__teams {
+  color: var(--text-secondary);
+}
+
+.bento-mission__progress-label {
+  color: var(--color-brand-accent);
+  font-weight: var(--font-weight-semibold);
+}
+
+.bento-mission__progress-bar {
+  height: 4px;
+  background: var(--border-default);
+  border-radius: var(--radius-full);
+  margin-top: var(--space-2);
+  overflow: hidden;
+}
+
+.bento-mission__progress-fill {
+  height: 100%;
+  background: var(--color-brand-accent);
+  border-radius: var(--radius-full);
+  transition: width var(--transition-slow);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   QUICK ACTIONS GRID
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-quickactions {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.bento-quickaction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-normal);
+  text-align: center;
+}
+
+.bento-quickaction--emergency {
+  background: var(--color-danger-bg);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+}
+
+.bento-quickaction--emergency:hover {
+  background: rgba(220, 38, 38, 0.15);
+  transform: var(--hover-lift);
+}
+
+.bento-quickaction--volunteers {
+  background: rgba(217, 119, 6, 0.08);
+  border: 1px solid rgba(217, 119, 6, 0.3);
+}
+
+.bento-quickaction--volunteers:hover {
+  background: rgba(217, 119, 6, 0.15);
+  transform: var(--hover-lift);
+}
+
+.bento-quickaction--resources {
+  background: var(--color-info-bg);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.bento-quickaction--resources:hover {
+  background: rgba(59, 130, 246, 0.15);
+  transform: var(--hover-lift);
+}
+
+.bento-quickaction--map {
+  background: var(--color-safe-bg);
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.bento-quickaction--map:hover {
+  background: rgba(5, 150, 105, 0.15);
+  transform: var(--hover-lift);
+}
+
+.bento-quickaction__icon {
+  font-size: 28px;
+  margin-bottom: var(--space-2);
+}
+
+.bento-quickaction__label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+.bento-quickaction--emergency .bento-quickaction__label {
+  color: var(--color-danger);
+}
+
+.bento-quickaction--volunteers .bento-quickaction__label {
+  color: var(--color-brand-accent);
+}
+
+.bento-quickaction--resources .bento-quickaction__label {
+  color: var(--color-info);
+}
+
+.bento-quickaction--map .bento-quickaction__label {
+  color: var(--color-safe);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE - TABLET
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 1279px) {
+  .bento-dashboard {
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-areas:
+      "header header"
+      "stat1 stat2"
+      "stat3 stat4"
+      "missions missions"
+      "quickact quickact"
+      "alerts activity"
+      "team team";
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   RESPONSIVE - MOBILE
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (max-width: 767px) {
+  .bento-dashboard {
+    grid-template-columns: 1fr;
+    padding: var(--space-4);
+    grid-template-areas:
+      "header"
+      "stat1"
+      "stat2"
+      "stat3"
+      "stat4"
+      "missions"
+      "quickact"
+      "alerts"
+      "activity"
+      "team";
+  }
+
+  .bento-stat {
+    padding: var(--space-4);
+  }
+
+  .bento-stat__icon {
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
+  }
+
+  .bento-stat__value {
+    font-size: var(--font-size-2xl);
+  }
+
+  .bento-quickactions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   ANIMATION - STAGGERED REVEAL
+   ═══════════════════════════════════════════════════════════════ */
+
+.bento-dashboard.animate-stagger > * {
+  animation: fadeInUp 0.4s ease backwards;
+}
+
+.bento-dashboard.animate-stagger > *:nth-child(1) { animation-delay: 0ms; }
+.bento-dashboard.animate-stagger > *:nth-child(2) { animation-delay: 50ms; }
+.bento-dashboard.animate-stagger > *:nth-child(3) { animation-delay: 100ms; }
+.bento-dashboard.animate-stagger > *:nth-child(4) { animation-delay: 150ms; }
+.bento-dashboard.animate-stagger > *:nth-child(5) { animation-delay: 200ms; }
+.bento-dashboard.animate-stagger > *:nth-child(6) { animation-delay: 250ms; }
+.bento-dashboard.animate-stagger > *:nth-child(7) { animation-delay: 300ms; }
+.bento-dashboard.animate-stagger > *:nth-child(8) { animation-delay: 350ms; }
+.bento-dashboard.animate-stagger > *:nth-child(9) { animation-delay: 400ms; }
+.bento-dashboard.animate-stagger > *:nth-child(10) { animation-delay: 450ms; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
