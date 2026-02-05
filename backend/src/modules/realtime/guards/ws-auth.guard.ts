@@ -70,7 +70,7 @@ export class WsAuthGuard implements CanActivate {
  * Decorator to get authenticated user from WebSocket context
  */
 export function WsUser() {
-    return (target: any, propertyKey: string, parameterIndex: number) => {
+    return (target: unknown, propertyKey: string, parameterIndex: number) => {
         // Implementation would be added here
     };
 }
@@ -78,6 +78,6 @@ export function WsUser() {
 /**
  * Helper to get user from socket in handlers
  */
-export function getWsUser(client: Socket): any {
+export function getWsUser(client: Socket): unknown {
     return client.data?.user;
 }

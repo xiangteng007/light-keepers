@@ -14,7 +14,7 @@ import { IS_PUBLIC_KEY } from './public.decorator';
 // Import REQUIRED_LEVEL_KEY for @RequiredLevel(0) as public
 const REQUIRED_LEVEL_KEY = 'requiredLevel';
 
-type AuthPayload = Record<string, any>;
+type AuthPayload = Record<string, unknown>;
 
 type AuthContext = {
     tokenType: 'jwt';
@@ -175,9 +175,10 @@ export class GlobalAuthGuard implements CanActivate {
             }
 
             return payload;
-        } catch (err: any) {
+        } catch (err: unknown) {
             // Avoid leaking sensitive details
-            this.logger.warn(`Token verification failed (${channel}): ${err?.message ?? 'unknown error'}`);
+            const errMessage = err instanceof Error ? err.message : 'unknown error';
+            this.logger.warn(`Token verification failed (${channel}): ${errMessage}`);
             if (channel === 'ws') throw new WsException('Unauthorized');
             throw new UnauthorizedException('Unauthorized');
         }

@@ -23,6 +23,11 @@ import {
 } from './dto';
 import { TaskStatus, TaskPriority } from './entities/dispatch-task.entity';
 
+// Authenticated request interface for type safety
+interface AuthenticatedRequest {
+    user: { id: string };
+}
+
 @Controller('tasks')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 export class TaskDispatchController {
@@ -33,7 +38,7 @@ export class TaskDispatchController {
      */
     @Post()
     @RequiredLevel(RoleLevel.OFFICER)
-    async createTask(@Body() dto: CreateTaskDto, @Request() req: any) {
+    async createTask(@Body() dto: CreateTaskDto, @Request() req: AuthenticatedRequest) {
         const task = await this.taskService.createTask(dto, req.user.id);
         return task;
     }
@@ -60,7 +65,7 @@ export class TaskDispatchController {
      */
     @Get('my')
     @RequiredLevel(RoleLevel.VOLUNTEER)
-    async getMyTasks(@Request() req: any) {
+    async getMyTasks(@Request() req: AuthenticatedRequest) {
         return this.taskService.getVolunteerTasks(req.user.id);
     }
 
@@ -90,7 +95,7 @@ export class TaskDispatchController {
     async assignTask(
         @Param('id') id: string,
         @Body() dto: AssignTaskDto,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         // TODO: Fetch volunteer names from volunteer service
         const volunteerNames = new Map<string, string>();
@@ -106,7 +111,7 @@ export class TaskDispatchController {
     async acceptTask(
         @Param('id') id: string,
         @Body() dto: AcceptTaskDto,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.acceptAssignment(id, req.user.id, dto.note);
     }
@@ -119,7 +124,7 @@ export class TaskDispatchController {
     async declineTask(
         @Param('id') id: string,
         @Body() dto: DeclineTaskDto,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.declineAssignment(id, req.user.id, dto.reason);
     }
@@ -129,7 +134,7 @@ export class TaskDispatchController {
      */
     @Post(':id/start')
     @RequiredLevel(RoleLevel.VOLUNTEER)
-    async startTask(@Param('id') id: string, @Request() req: any) {
+    async startTask(@Param('id') id: string, @Request() req: AuthenticatedRequest) {
         return this.taskService.startTask(id, req.user.id);
     }
 
@@ -141,7 +146,7 @@ export class TaskDispatchController {
     async completeTask(
         @Param('id') id: string,
         @Body() dto: CompleteTaskDto,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.completeTask(id, req.user.id, dto.notes);
     }
@@ -172,7 +177,7 @@ export class TaskDispatchController {
     async checkIn(
         @Param('id') id: string,
         @Body() dto: { latitude: number; longitude: number; note?: string },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.checkIn(id, req.user.id, {
             latitude: dto.latitude,
@@ -189,7 +194,7 @@ export class TaskDispatchController {
     async checkOut(
         @Param('id') id: string,
         @Body() dto: { latitude?: number; longitude?: number; notes?: string },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.checkOut(id, req.user.id, {
             latitude: dto.latitude,
