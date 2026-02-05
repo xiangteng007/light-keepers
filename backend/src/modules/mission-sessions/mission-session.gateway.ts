@@ -214,7 +214,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
         @ConnectedSocket() client: Socket,
         @MessageBody() data: {
             sessionId: string;
-            report: any;
+            report: unknown;
             reportedBy: string;
         },
     ) {
@@ -232,7 +232,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
         @ConnectedSocket() client: Socket,
         @MessageBody() data: {
             sessionId: string;
-            sitrep: any;
+            sitrep: unknown;
             updatedBy: string;
         },
     ) {
@@ -268,7 +268,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
     // ==================== Event Emitter 整合 ====================
 
     @OnEvent('mission.task.created')
-    handleMissionTaskCreated(payload: { sessionId: string; task: any }) {
+    handleMissionTaskCreated(payload: { sessionId: string; task: unknown }) {
         this.server.to(payload.sessionId).emit('taskCreated', {
             task: payload.task,
             timestamp: new Date(),
@@ -276,7 +276,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
     }
 
     @OnEvent('mission.task.updated')
-    handleMissionTaskUpdated(payload: { sessionId: string; taskId: string; changes: any }) {
+    handleMissionTaskUpdated(payload: { sessionId: string; taskId: string; changes: unknown }) {
         this.server.to(payload.sessionId).emit('taskUpdated', {
             taskId: payload.taskId,
             changes: payload.changes,
@@ -285,7 +285,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
     }
 
     @OnEvent('mission.sitrep.published')
-    handleSitrepPublished(payload: { sessionId: string; sitrep: any }) {
+    handleSitrepPublished(payload: { sessionId: string; sitrep: unknown }) {
         this.server.to(payload.sessionId).emit('sitrepPublished', {
             sitrep: payload.sitrep,
             timestamp: new Date(),
@@ -293,7 +293,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
     }
 
     @OnEvent('mission.session.ended')
-    handleSessionEnded(payload: { sessionId: string; endedBy: string; summary: any }) {
+    handleSessionEnded(payload: { sessionId: string; endedBy: string; summary: unknown }) {
         this.server.to(payload.sessionId).emit('sessionEnded', {
             endedBy: payload.endedBy,
             summary: payload.summary,
@@ -313,6 +313,7 @@ export class MissionSessionGateway implements OnGatewayConnection, OnGatewayDisc
     }
 
     // 外部 API: 廣播到特定會議室
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     broadcastToSession(sessionId: string, event: string, data: any) {
         this.server.to(sessionId).emit(event, {
             ...data,
