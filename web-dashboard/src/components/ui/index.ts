@@ -15,3 +15,7 @@ export type { CardProps, CardHeaderProps, CardBodyProps } from './Card/Card';
 // Badge
 export { Badge, SafeBadge, WarningBadge, DangerBadge, CriticalBadge } from './Badge/Badge';
 export type { BadgeProps } from './Badge/Badge';
+
+// Skeleton
+export { Skeleton, SkeletonCard, SkeletonList, SkeletonTable } from './Skeleton/Skeleton';
+export type { default as SkeletonDefault } from './Skeleton/Skeleton';
