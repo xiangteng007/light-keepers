@@ -2,6 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { getProfile, logout as apiLogout } from '../api/services';
 import axios from 'axios';
+import { authLogger } from '../utils/logger';
 
 // Token 存儲 key
 const TOKEN_KEY = 'accessToken';
@@ -84,7 +85,7 @@ const refreshAccessToken = async (): Promise<string | null> => {
         }
         return null;
     } catch (error) {
-        console.error('[AuthContext] Token refresh failed:', error);
+        authLogger.error('Token refresh failed:', error);
         return null;
     }
 };
@@ -101,11 +102,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const loadUser = async (retryCount = 0) => {
         // DEV MODE: 如果設置了 devModeUser，使用模擬用戶
         const devModeValue = localStorage.getItem('devModeUser');
-        console.log('[AuthContext] devModeUser check:', devModeValue);
+        authLogger.debug('devModeUser check:', devModeValue);
         
         const devModeEnabled = devModeValue === 'true';
         if (devModeEnabled) {
-            console.log('[AuthContext] DEV MODE: Using mock Level 5 user');
+            authLogger.debug('DEV MODE: Using mock Level 5 user');
             setUser({
                 id: 'dev-user-001',
                 email: 'xiangteng007@gmail.com',
@@ -124,7 +125,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         // 如果沒有 token,嘗試用 refresh token 換取新的
         if (!token) {
-            console.log('[AuthContext] No token found, attempting refresh...');
+            authLogger.debug('No token found, attempting refresh...');
             token = await refreshAccessToken();
             if (!token) {
                 setUser(null);
@@ -151,17 +152,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
                 'response' in error && 
                 (error as { response?: { status?: number } }).response?.status === 401;
 
-            console.error('[AuthContext] Failed to load user profile:', error);
+            authLogger.error('Failed to load user profile:', error);
 
             // Timeout 且有重試次數時，重試一次
             if (isTimeout && retryCount < 1) {
-                console.log('[AuthContext] Profile load timeout, retrying...');
+                authLogger.debug('Profile load timeout, retrying...');
                 return loadUser(retryCount + 1);
             }
 
             // 如果是 401,嘗試刷新 token
             if (isAuthError && retryCount < 1) {
-                console.log('[AuthContext] 401 error, attempting token refresh...');
+                authLogger.debug('401 error, attempting token refresh...');
                 const newToken = await refreshAccessToken();
                 if (newToken) {
                     return loadUser(retryCount + 1);
@@ -195,7 +196,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             // 呼叫後端 API 清除 refresh_token cookie
             await apiLogout();
         } catch (error) {
-            console.error('[AuthContext] Logout API failed:', error);
+            authLogger.error('Logout API failed:', error);
         } finally {
             // 無論 API 成功與否,都清除本地狀態
             clearToken();
@@ -227,14 +228,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     useEffect(() => {
         if (!user || user.isAnonymous) return;
 
-        console.log('[AuthContext] Setting up auto-refresh timer (every 13 minutes)');
+        authLogger.debug('Setting up auto-refresh timer (every 13 minutes)');
         const interval = setInterval(async () => {
-            console.log('[AuthContext] Auto-refreshing token...');
+            authLogger.debug('Auto-refreshing token...');
             await refreshAccessToken();
         }, 13 * 60 * 1000); // 13 分鐘
 
         return () => {
-            console.log('[AuthContext] Clearing auto-refresh timer');
+            authLogger.debug('Clearing auto-refresh timer');
             clearInterval(interval);
         };
     }, [user]);

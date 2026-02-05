@@ -25,8 +25,9 @@ import { PreferencesPanel } from './components/PreferencesPanel';
 import type { AccountData, TabId, ProfileFormData, NotificationPreferences } from './account.types';
 import { MOCK_ACCOUNT_DATA, simulateApiCall } from './account.mock';
 
-// Styles
+// Styles & Utilities
 import styles from './AccountPage.module.css';
+import { authLogger } from '../../utils/logger';
 
 // Tab configuration
 const TABS: { id: TabId; label: string }[] = [
@@ -67,7 +68,7 @@ const AccountPage: React.FC = () => {
         const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
         // Wait for auth to finish loading before showing login
         if (!authLoading && !user && !devModeEnabled) {
-            console.log('[AccountPage] User not authenticated, showing login modal...');
+            authLogger.debug('User not authenticated, showing login modal');
             setIsLoginModalOpen(true);
         }
     }, [user, authLoading]);
@@ -91,7 +92,7 @@ const AccountPage: React.FC = () => {
                 }, 500);
                 setAccountData(data);
             } catch (error) {
-                console.error('Failed to load account data:', error);
+                authLogger.error('Failed to load account data:', error);
             } finally {
                 setIsLoading(false);
             }
@@ -116,7 +117,7 @@ const AccountPage: React.FC = () => {
 
     const handleExportData = useCallback(() => {
         // TODO: Implement data export
-        console.log('Export data - feature coming soon');
+        authLogger.debug('Export data - feature coming soon');
     }, []);
 
     const handleLogout = useCallback(async () => {
@@ -130,7 +131,7 @@ const AccountPage: React.FC = () => {
     // Profile panel handlers
     const handleSaveProfile = useCallback(async (formData: ProfileFormData) => {
         // TODO: Implement API call
-        console.log('Saving profile:', formData);
+        authLogger.debug('Saving profile:', formData);
         await simulateApiCall(null, 1000);
         setAccountData(prev => prev ? {
             ...prev,
@@ -143,21 +144,21 @@ const AccountPage: React.FC = () => {
 
     const handleResendVerification = useCallback(async (type: 'email' | 'phone') => {
         // TODO: Implement verification resend
-        console.log(`Resending ${type} verification`);
+        authLogger.debug(`Resending ${type} verification`);
         await simulateApiCall(null, 1000);
     }, []);
 
     // Security panel handlers
     const handleChangePassword = useCallback(async () => {
         // TODO: Implement password change flow
-        console.log('Change password');
+        authLogger.debug('Change password requested');
         await simulateApiCall(null, 500);
         alert('密碼重設信已發送至您的信箱');
     }, []);
 
     const handleToggle2FA = useCallback(async () => {
         // TODO: Implement 2FA toggle
-        console.log('Toggle 2FA');
+        authLogger.debug('Toggle 2FA requested');
         await simulateApiCall(null, 500);
         setAccountData(prev => prev ? {
             ...prev,
@@ -167,7 +168,7 @@ const AccountPage: React.FC = () => {
 
     const handleRevokeSession = useCallback(async (sessionId: string) => {
         // TODO: Implement session revocation
-        console.log('Revoke session:', sessionId);
+        authLogger.debug('Revoke session:', sessionId);
         await simulateApiCall(null, 500);
         setAccountData(prev => prev ? {
             ...prev,
@@ -177,14 +178,14 @@ const AccountPage: React.FC = () => {
 
     const handleDeactivateAccount = useCallback(async () => {
         // TODO: Implement account deactivation
-        console.log('Deactivate account');
+        authLogger.debug('Deactivate account requested');
         await simulateApiCall(null, 500);
     }, []);
 
     // Connected accounts handlers
     const handleConnectLine = useCallback(async () => {
         // TODO: Implement LINE OAuth
-        console.log('Connect LINE - TODO');
+        authLogger.debug('Connect LINE requested');
         await simulateApiCall(null, 1000);
         setAccountData(prev => prev ? {
             ...prev,
@@ -196,7 +197,7 @@ const AccountPage: React.FC = () => {
 
     const handleDisconnectLine = useCallback(async () => {
         if (!window.confirm('確定要解除 LINE 連結嗎？')) return;
-        console.log('Disconnect LINE');
+        authLogger.debug('Disconnect LINE requested');
         await simulateApiCall(null, 500);
         setAccountData(prev => prev ? {
             ...prev,
@@ -208,7 +209,7 @@ const AccountPage: React.FC = () => {
 
     const handleConnectGoogle = useCallback(async () => {
         // TODO: Implement Google OAuth
-        console.log('Connect Google - TODO');
+        authLogger.debug('Connect Google requested');
         await simulateApiCall(null, 1000);
         setAccountData(prev => prev ? {
             ...prev,
@@ -220,7 +221,7 @@ const AccountPage: React.FC = () => {
 
     const handleDisconnectGoogle = useCallback(async () => {
         if (!window.confirm('確定要解除 Google 連結嗎？')) return;
-        console.log('Disconnect Google');
+        authLogger.debug('Disconnect Google requested');
         await simulateApiCall(null, 500);
         setAccountData(prev => prev ? {
             ...prev,
@@ -233,7 +234,7 @@ const AccountPage: React.FC = () => {
     // Preferences handlers
     const handleSavePreferences = useCallback(async (prefs: NotificationPreferences) => {
         // TODO: Implement API call
-        console.log('Saving preferences:', prefs);
+        authLogger.debug('Saving preferences:', prefs);
         await simulateApiCall(null, 500);
         setAccountData(prev => prev ? {
             ...prev,
@@ -242,7 +243,7 @@ const AccountPage: React.FC = () => {
     }, []);
 
     const handleResetPreferences = useCallback(() => {
-        console.log('Reset preferences to default');
+        authLogger.debug('Reset preferences to default');
     }, []);
 
     // Render tab content
