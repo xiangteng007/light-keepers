@@ -59,7 +59,7 @@ export class UnifiedResourcesService {
         condition: 'new' | 'good' | 'fair';
         perishable?: boolean;
         expiryDate?: Date;
-    }[]): unknown {
+    }[]): any {
         return this.matchingService.submitDonation(donor, items);
     }
 
@@ -79,56 +79,56 @@ export class UnifiedResourcesService {
         deliveryAddress: string;
         canPickup: boolean;
         description?: string;
-    }): unknown {
+    }): any {
         return this.matchingService.submitNeed(request);
     }
 
     /**
      * Get available donations
      */
-    getAvailableDonations(itemType?: string, region?: string): unknown[] {
+    getAvailableDonations(itemType?: string, region?: string): any[] {
         return this.matchingService.getAvailableDonations(itemType, region);
     }
 
     /**
      * Get open needs
      */
-    getOpenNeeds(itemType?: string, urgency?: string): unknown[] {
+    getOpenNeeds(itemType?: string, urgency?: string): any[] {
         return this.matchingService.getOpenNeeds(itemType, urgency);
     }
 
     /**
      * Create a match between donation and need
      */
-    createMatch(donationId: string, needId: string, quantity: number): unknown {
+    createMatch(donationId: string, needId: string, quantity: number): any {
         return this.matchingService.createMatch(donationId, needId, quantity);
     }
 
     /**
      * Confirm a match
      */
-    confirmMatch(matchId: string, confirmedBy: 'donor' | 'recipient'): unknown {
+    confirmMatch(matchId: string, confirmedBy: 'donor' | 'recipient'): any {
         return this.matchingService.confirmMatch(matchId, confirmedBy);
     }
 
     /**
      * Complete a match (delivery done)
      */
-    completeMatch(matchId: string, feedback?: { rating: number; comment?: string }): unknown {
+    completeMatch(matchId: string, feedback?: { rating: number; comment?: string }): any {
         return this.matchingService.completeMatch(matchId, feedback);
     }
 
     /**
      * Get matching statistics
      */
-    getMatchingStats(period?: { from: Date; to: Date }): unknown {
+    getMatchingStats(period?: { from: Date; to: Date }): any {
         return this.matchingService.getStatistics(period);
     }
 
     /**
      * Get donor leaderboard
      */
-    getDonorLeaderboard(limit: number = 10): unknown[] {
+    getDonorLeaderboard(limit: number = 10): any[] {
         return this.matchingService.getDonorLeaderboard(limit);
     }
 
@@ -155,7 +155,7 @@ export class UnifiedResourcesService {
             maxDistance?: number;
             maxTime?: number;
         };
-    }): unknown {
+    }): any {
         return this.optimizationService.optimizeAllocation(config);
     }
 
@@ -165,7 +165,7 @@ export class UnifiedResourcesService {
     suggestDepotLocations(
         demandPoints: Array<{ lat: number; lng: number }>,
         numDepots: number,
-    ): unknown[] {
+    ): any[] {
         return this.optimizationService.suggestDepotLocations(demandPoints, numDepots);
     }
 
@@ -175,7 +175,7 @@ export class UnifiedResourcesService {
     optimizeRoutes(
         origin: { lat: number; lng: number },
         destinations: Array<{ lat: number; lng: number }>,
-    ): unknown {
+    ): any {
         return this.optimizationService.optimizeRoutes(origin, destinations);
     }
 
@@ -189,9 +189,9 @@ export class UnifiedResourcesService {
         itemType?: string;
         urgency?: 'low' | 'medium' | 'high' | 'critical';
     }): Promise<{
-        availableDonations: unknown[];
-        openNeeds: unknown[];
-        suggestedAllocations: unknown;
+        availableDonations: any[];
+        openNeeds: any[];
+        suggestedAllocations: any;
         timestamp: Date;
     }> {
         this.logger.log(`Smart allocation for region: ${params.region || 'all'}`);
@@ -204,20 +204,20 @@ export class UnifiedResourcesService {
         let suggestedAllocations = null;
         if (availableDonations.length > 0 && openNeeds.length > 0) {
             const resources = availableDonations
-                .filter((d: Record<string, unknown>) => (d.donor as Record<string, unknown>)?.address)
-                .map((d: Record<string, unknown>) => ({
+                .filter((d: any) => d.donor?.address)
+                .map((d: any) => ({
                     id: d.id,
-                    type: (d.items as Record<string, unknown>[])?.[0]?.type || 'general',
-                    available: (d.items as Record<string, unknown>[])?.reduce((sum: number, i: Record<string, unknown>) => sum + ((i.quantity as number) || 0), 0) || 0,
+                    type: d.items?.[0]?.type || 'general',
+                    available: d.items?.reduce((sum: number, i: any) => sum + (i.quantity || 0), 0) || 0,
                     location: { lat: 25.0330, lng: 121.5654 }, // Default if no geo
                 }));
 
-            const demands = (openNeeds as Record<string, unknown>[]).map((n: Record<string, unknown>) => ({
+            const demands = openNeeds.map((n: any) => ({
                 id: n.id,
-                resourceType: (n.itemType as string) || 'general',
-                quantity: (n.quantity as number) || 0,
+                resourceType: n.itemType || 'general',
+                quantity: n.quantity || 0,
                 location: { lat: 25.0330, lng: 121.5654 }, // Default if no geo
-                priority: (n.urgency as string) || 'medium',
+                priority: n.urgency || 'medium',
             }));
 
             if (resources.length > 0 && demands.length > 0) {

@@ -80,7 +80,7 @@ export class SheltersController {
     async activate(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: ActivateShelterDto,
-        @CurrentUser() user: { id: string },
+        @CurrentUser() user: any,
     ): Promise<ShelterResponseDto> {
         const shelter = await this.sheltersService.activate(id, dto, user.id);
         return this.toShelterResponse(shelter);
@@ -106,7 +106,7 @@ export class SheltersController {
     async checkIn(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: CheckInEvacueeDto,
-        @CurrentUser() user: { id: string },
+        @CurrentUser() user: any,
     ): Promise<EvacueeResponseDto> {
         const evacuee = await this.sheltersService.checkIn(id, dto, user.id);
         return this.toEvacueeResponse(evacuee);
@@ -120,7 +120,7 @@ export class SheltersController {
     async checkOut(
         @Param('id', ParseUUIDPipe) id: string,
         @Param('evacueeId', ParseUUIDPipe) evacueeId: string,
-        @CurrentUser() user: { id: string },
+        @CurrentUser() user: any,
     ): Promise<EvacueeResponseDto> {
         const evacuee = await this.sheltersService.checkOut(id, evacueeId, user.id);
         return this.toEvacueeResponse(evacuee);
@@ -148,7 +148,7 @@ export class SheltersController {
         @Param('id', ParseUUIDPipe) id: string,
         @Param('evacueeId', ParseUUIDPipe) evacueeId: string,
         @Body() dto: HealthScreeningDto,
-        @CurrentUser() user: { id: string },
+        @CurrentUser() user: any,
     ) {
         return this.sheltersService.createHealthScreening(id, evacueeId, dto, user.id);
     }
@@ -234,7 +234,7 @@ export class SheltersController {
 
     // ==================== Helper Methods ====================
 
-    private toShelterResponse(shelter: Shelter): ShelterResponseDto {
+    private toShelterResponse(shelter: any): ShelterResponseDto {
         return {
             id: shelter.id,
             name: shelter.name,
@@ -249,7 +249,7 @@ export class SheltersController {
         };
     }
 
-    private toEvacueeResponse(evacuee: ShelterEvacuee): EvacueeResponseDto {
+    private toEvacueeResponse(evacuee: any): EvacueeResponseDto {
         return {
             id: evacuee.id,
             name: evacuee.name,
