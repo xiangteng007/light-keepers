@@ -12,9 +12,9 @@
  * - User menu with profile/logout
  * - Responsive design ready
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { ChevronDown, ChevronRight, User, LogOut } from 'lucide-react';
+import { ChevronDown, ChevronRight, ChevronLeft, User, LogOut } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSidebarConfig, NAV_GROUPS, ICON_MAP } from './useSidebarConfig';
 import { PermissionLevel } from './widget.types';
@@ -28,6 +28,19 @@ export default function Sidebar() {
     const { user, logout } = useAuth();
     const [isLoginOpen, setIsLoginOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    
+    // Sidebar collapse state with localStorage persistence
+    const [isCollapsed, setIsCollapsed] = useState(() => {
+        const saved = localStorage.getItem('sidebar_collapsed');
+        return saved === 'true';
+    });
+
+    // Persist collapse state
+    useEffect(() => {
+        localStorage.setItem('sidebar_collapsed', String(isCollapsed));
+    }, [isCollapsed]);
+
+    const toggleSidebar = () => setIsCollapsed(!isCollapsed);
 
     // Get user permission level (default to Volunteer for logged in, Anonymous otherwise)
     const userLevel = user 
@@ -58,15 +71,25 @@ export default function Sidebar() {
 
     return (
         <>
-            <aside className="v3-sidebar">
+            <aside className={`v3-sidebar ${isCollapsed ? 'collapsed' : ''}`}>
+                {/* Collapse Toggle Button */}
+                <button
+                    className="v3-sidebar-toggle"
+                    onClick={toggleSidebar}
+                    title={isCollapsed ? '展開側邊欄' : '收合側邊欄'}
+                    aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+                >
+                    <ChevronLeft size={14} />
+                </button>
+
                 {/* Logo */}
                 <div className="v3-logo" title="Light Keepers Tactical V3">
                     <span className="v3-logo-icon">LK</span>
                     <span className="v3-logo-text">光守護者</span>
                 </div>
 
-                {/* Emergency Quick Actions */}
-                <EmergencyQuickActions />
+                {/* Emergency Quick Actions - hide when collapsed */}
+                {!isCollapsed && <EmergencyQuickActions />}
 
                 {/* Navigation Groups */}
                 <nav className="v3-nav-groups">
@@ -76,7 +99,7 @@ export default function Sidebar() {
                             const items = groupedItems[group.id] || [];
                             if (items.length === 0) return null;
 
-                            const isCollapsed = collapsedGroups.has(group.id);
+                            const isGroupCollapsed = collapsedGroups.has(group.id);
                             const GroupIcon = ICON_MAP[group.icon] || User;
 
                             return (
@@ -84,18 +107,18 @@ export default function Sidebar() {
                                     <button
                                         className="v3-nav-group-header"
                                         onClick={() => toggleGroup(group.id)}
-                                        aria-expanded={!isCollapsed ? "true" : "false"}
+                                        aria-expanded={!isGroupCollapsed}
                                     >
                                         <span className="v3-nav-group-icon">
                                             <GroupIcon size={16} strokeWidth={1.5} />
                                         </span>
                                         <span className="v3-nav-group-label">{group.label}</span>
                                         <span className="v3-nav-group-chevron">
-                                            {isCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
+                                            {isGroupCollapsed ? <ChevronRight size={14} /> : <ChevronDown size={14} />}
                                         </span>
                                     </button>
 
-                                    {!isCollapsed && (
+                                    {!isGroupCollapsed && (
                                         <div className="v3-nav-group-items">
                                             {items.map(item => {
                                                 const ItemIcon = ICON_MAP[item.icon] || User;

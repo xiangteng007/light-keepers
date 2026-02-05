@@ -50,6 +50,77 @@
     flex-direction: column;
     z-index: 100;
     overflow: hidden;
+    transition: width 250ms ease;
+}
+
+/* Collapsed State (Manual Toggle) */
+.v3-sidebar.collapsed {
+    width: var(--sidebar-collapsed-width);
+}
+
+.v3-sidebar.collapsed .v3-logo-text,
+.v3-sidebar.collapsed .v3-nav-group-label,
+.v3-sidebar.collapsed .v3-nav-group-chevron,
+.v3-sidebar.collapsed .v3-nav-item span {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 150ms ease, visibility 150ms ease;
+}
+
+.v3-sidebar.collapsed .v3-nav-item {
+    padding: 12px;
+    justify-content: center;
+}
+
+.v3-sidebar.collapsed .v3-nav-item::before {
+    display: none;
+}
+
+.v3-sidebar.collapsed .v3-nav-group-header {
+    justify-content: center;
+    padding: 10px;
+}
+
+.v3-sidebar.collapsed .v3-nav-group-icon {
+    margin: 0;
+}
+
+.v3-sidebar.collapsed .v3-logo {
+    justify-content: center;
+    padding: 16px 12px;
+}
+
+/* Collapse Toggle Button */
+.v3-sidebar-toggle {
+    position: absolute;
+    top: 16px;
+    right: -12px;
+    width: 24px;
+    height: 24px;
+    background: var(--nav-bg-secondary);
+    border: 1px solid var(--nav-border);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--nav-text);
+    transition: all 150ms ease;
+    z-index: 10;
+}
+
+.v3-sidebar-toggle:hover {
+    background: var(--lk-gold-500);
+    border-color: var(--lk-gold-500);
+    color: var(--nav-bg);
+}
+
+.v3-sidebar-toggle svg {
+    transition: transform 250ms ease;
+}
+
+.v3-sidebar.collapsed .v3-sidebar-toggle svg {
+    transform: rotate(180deg);
 }
 
 /* ==========================================
