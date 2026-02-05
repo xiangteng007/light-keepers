@@ -29,7 +29,7 @@ export interface NotificationPayload {
     priority?: NotificationPriority;
     urgency?: number;  // 1-10
     location?: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     imageUrl?: string;
     actions?: NotificationAction[];
     channels?: NotificationChannel[];  // 指定頻道，空 = 全部
@@ -126,7 +126,7 @@ export class NotificationHubService implements OnModuleInit {
         const baseUrl = botToken ? `https://api.telegram.org/bot${botToken}` : this.telegramBaseUrl;
 
         try {
-            const body: any = {
+            const body: Record<string, unknown> = {
                 chat_id: chatId,
                 text: message,
                 parse_mode: 'HTML',
@@ -207,7 +207,7 @@ export class NotificationHubService implements OnModuleInit {
         const { webhookUrl, channel } = config.config as { webhookUrl: string; channel?: string };
 
         try {
-            const slackPayload: any = {
+            const slackPayload: Record<string, unknown> = {
                 text: payload.title,
                 blocks: [
                     {
@@ -219,7 +219,7 @@ export class NotificationHubService implements OnModuleInit {
 
             if (channel) slackPayload.channel = channel;
             if (payload.location) {
-                slackPayload.blocks.push({
+                (slackPayload.blocks as Record<string, unknown>[]).push({
                     type: 'context',
                     elements: [{ type: 'mrkdwn', text: `📍 ${payload.location}` }],
                 });
@@ -281,10 +281,10 @@ ${payload.body}`;
 
     // ===== 事件監聽 =====
     @OnEvent(GEO_EVENTS.ALERT_RECEIVED)
-    async handleAlertReceived(payload: any) {
+    async handleAlertReceived(payload: { content?: string; description?: string; urgency?: number; location?: string }) {
         await this.broadcast({
             title: '🚨 緊急警報',
-            body: payload.content || payload.description,
+            body: payload.content || payload.description || '',
             urgency: payload.urgency || 8,
             location: payload.location,
             priority: 'urgent',
@@ -292,11 +292,11 @@ ${payload.body}`;
     }
 
     @OnEvent(GEO_EVENTS.SOCIAL_INTEL_DETECTED)
-    async handleSocialIntel(payload: any) {
-        if (payload.urgency >= 7) {
+    async handleSocialIntel(payload: { urgency?: number; keywords?: string[]; location?: string }) {
+        if ((payload.urgency ?? 0) >= 7) {
             await this.broadcast({
                 title: '📱 社群情資警報',
-                body: `偵測到 ${payload.keywords?.join(', ')} 相關貼文`,
+                body: `偵測到 ${payload.keywords?.join(', ') || ''} 相關貼文`,
                 urgency: payload.urgency,
                 location: payload.location,
                 priority: 'high',
@@ -305,7 +305,7 @@ ${payload.body}`;
     }
 
     @OnEvent('incidents.created')
-    async handleIncidentCreated(payload: any) {
+    async handleIncidentCreated(payload: { title?: string; severity?: string; location?: string }) {
         await this.broadcast({
             title: '📋 新事件建立',
             body: `${payload.title || '新事件'} - ${payload.severity || '未分級'}`,
