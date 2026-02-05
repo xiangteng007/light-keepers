@@ -134,8 +134,8 @@ export class RichMenuService implements OnModuleInit {
             const data = await response.json();
             this.logger.log(`Created Rich Menu: ${data.richMenuId}`);
             return data.richMenuId;
-        } catch (error: any) {
-            this.logger.error(`Failed to create Rich Menu: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to create Rich Menu: ${error instanceof Error ? error.message : String(error)}`);
             return null;
         }
     }
@@ -163,8 +163,8 @@ export class RichMenuService implements OnModuleInit {
 
             this.logger.log(`Uploaded image for Rich Menu: ${richMenuId}`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to upload Rich Menu image: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to upload Rich Menu image: ${error instanceof Error ? error.message : String(error)}`);
             return false;
         }
     }
@@ -190,8 +190,8 @@ export class RichMenuService implements OnModuleInit {
 
             this.logger.log(`Set default Rich Menu: ${richMenuId}`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to set default Rich Menu: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to set default Rich Menu: ${error instanceof Error ? error.message : String(error)}`);
             return false;
         }
     }
@@ -217,8 +217,8 @@ export class RichMenuService implements OnModuleInit {
 
             this.logger.log(`Linked Rich Menu ${richMenuId} to user ${userId}`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to link Rich Menu: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to link Rich Menu: ${error instanceof Error ? error.message : String(error)}`);
             return false;
         }
     }
@@ -244,8 +244,8 @@ export class RichMenuService implements OnModuleInit {
 
             this.logger.log(`Unlinked Rich Menu from user ${userId}`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to unlink Rich Menu: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to unlink Rich Menu: ${error instanceof Error ? error.message : String(error)}`);
             return false;
         }
     }
@@ -270,8 +270,8 @@ export class RichMenuService implements OnModuleInit {
 
             const data = await response.json();
             return data.richmenus || [];
-        } catch (error: any) {
-            this.logger.error(`Failed to get Rich Menu list: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to get Rich Menu list: ${error instanceof Error ? error.message : String(error)}`);
             return [];
         }
     }
@@ -297,8 +297,8 @@ export class RichMenuService implements OnModuleInit {
 
             this.logger.log(`Deleted Rich Menu: ${richMenuId}`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to delete Rich Menu: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to delete Rich Menu: ${error instanceof Error ? error.message : String(error)}`);
             return false;
         }
     }

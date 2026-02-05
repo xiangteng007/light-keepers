@@ -15,15 +15,15 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger, Inject, forwardRef } from '@nestjs/common';
-import { NotificationQueueService } from './notification-queue.service';
+import { NotificationQueueService, NotificationPriority } from './notification-queue.service';
 
 interface NotificationEvent {
     type: string;
     title: string;
     body: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     recipients: string[];
-    priority: string;
+    priority?: NotificationPriority;
     timestamp: string;
 }
 
@@ -136,14 +136,14 @@ export class NotificationGateway implements OnGatewayConnection, OnGatewayDiscon
     /**
      * Broadcast to all connected clients
      */
-    broadcastAll(event: string, data: any): void {
+    broadcastAll(event: string, data: unknown): void {
         this.server.emit(event, data);
     }
 
     /**
      * Send to specific user
      */
-    sendToUser(userId: string, event: string, data: any): void {
+    sendToUser(userId: string, event: string, data: unknown): void {
         this.server.to(`user:${userId}`).emit(event, data);
     }
 

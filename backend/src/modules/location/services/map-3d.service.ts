@@ -22,7 +22,7 @@ export interface Map3DLayer {
     name: string;
     type: 'buildings' | 'terrain' | 'imagery' | 'custom';
     visible: boolean;
-    config: Record<string, any>;
+    config: Record<string, unknown>;
 }
 
 @Injectable()
@@ -49,7 +49,12 @@ export class Map3DService {
         return true;
     }
 
-    getCesiumConfig(): any {
+    getCesiumConfig(): {
+        terrainProvider: { type: string; requestWaterMask: boolean; requestVertexNormals: boolean };
+        imageryProviders: { type: string; defaultAlpha: number }[];
+        layers: Map3DLayer[];
+        defaultCamera: { destination: { longitude: number; latitude: number; height: number } };
+    } {
         return {
             terrainProvider: {
                 type: 'cesium-world-terrain',
@@ -66,7 +71,11 @@ export class Map3DService {
         };
     }
 
-    flyToPosition(camera: CameraPosition): any {
+    flyToPosition(camera: CameraPosition): {
+        destination: { longitude: number; latitude: number; height: number };
+        orientation: { heading: number; pitch: number; roll: number };
+        duration: number;
+    } {
         return {
             destination: {
                 longitude: camera.longitude,
@@ -92,7 +101,7 @@ export class Map3DService {
         };
     }
 
-    highlightBuilding(buildingId: string, color: string = '#ff0000'): any {
+    highlightBuilding(buildingId: string, color: string = '#ff0000'): { conditions: [string, string][] } {
         return {
             conditions: [[`\${id} === '${buildingId}'`, `color('${color}')`]],
         };

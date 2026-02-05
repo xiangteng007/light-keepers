@@ -518,7 +518,7 @@ export class FlexMessageService {
     /**
      * Create quick reply options
      */
-    createQuickReplyItems(options: { label: string; text: string }[]): any {
+    createQuickReplyItems(options: { label: string; text: string }[]): { items: { type: string; action: { type: string; label: string; text: string } }[] } {
         return {
             items: options.map(opt => ({
                 type: 'action',

@@ -27,7 +27,7 @@ export interface NotificationPayload {
     type: string;
     title: string;
     body: string;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     priority?: NotificationPriority;
     channels?: NotificationChannel[];
     recipients: string[]; // User IDs
@@ -48,7 +48,7 @@ export interface NotificationResult {
 export class NotificationQueueService {
     private readonly logger = new Logger(NotificationQueueService.name);
     private readonly pendingNotifications: Map<string, NotificationPayload> = new Map();
-    private inAppHandler: ((event: any) => void) | null = null;
+    private inAppHandler: ((event: { type: string; title: string; body: string; data?: Record<string, unknown>; recipients: string[]; priority?: NotificationPriority; timestamp: string }) => void) | null = null;
 
     constructor(
         private configService: ConfigService,
@@ -58,7 +58,7 @@ export class NotificationQueueService {
     /**
      * Set handler for in-app notifications (called by gateway)
      */
-    setInAppHandler(handler: (event: any) => void): void {
+    setInAppHandler(handler: (event: { type: string; title: string; body: string; data?: Record<string, unknown>; recipients: string[]; priority?: NotificationPriority; timestamp: string }) => void): void {
         this.inAppHandler = handler;
     }
 
@@ -96,7 +96,7 @@ export class NotificationQueueService {
      */
     async send(notification: NotificationPayload): Promise<NotificationResult> {
         const id = notification.id || `notif-${Date.now()}`;
-        const channelResults: Record<NotificationChannel, { success: boolean; error?: string }> = {} as any;
+        const channelResults = {} as Record<NotificationChannel, { success: boolean; error?: string }>;
 
         for (const channel of notification.channels || []) {
             try {

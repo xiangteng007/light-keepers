@@ -4,6 +4,7 @@
  */
 
 import { Controller, Get, Post, Body, Param, Query, UseGuards, Req } from '@nestjs/common';
+import { Request } from 'express';
 import { NotificationQueueService, NotificationChannel, NotificationPriority } from './notification-queue.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
@@ -14,7 +15,7 @@ class SendNotificationDto {
     recipients: string[];
     channels?: NotificationChannel[];
     priority?: NotificationPriority;
-    data?: Record<string, any>;
+    data?: Record<string, unknown>;
     actionUrl?: string;
 }
 
@@ -63,7 +64,7 @@ export class NotificationController {
      */
     @Post('register-token')
     @RequiredLevel(ROLE_LEVELS.PUBLIC)
-    async registerToken(@Req() req: any, @Body() dto: RegisterTokenDto) {
+    async registerToken(@Req() req: Request & { user?: { id?: string; uid?: string } }, @Body() dto: RegisterTokenDto) {
         const userId = req.user?.id || req.user?.uid;
         if (!userId) {
             return { success: false, error: 'User not authenticated' };
@@ -78,7 +79,7 @@ export class NotificationController {
      */
     @Post('test')
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
-    async testNotification(@Req() req: any) {
+    async testNotification(@Req() req: Request & { user?: { id?: string; uid?: string } }) {
         const userId = req.user?.id || req.user?.uid;
         if (!userId) {
             return { success: false, error: 'User not authenticated' };
@@ -101,7 +102,7 @@ export class NotificationController {
      */
     @Get('preferences')
     @RequiredLevel(ROLE_LEVELS.PUBLIC)
-    async getPreferences(@Req() req: any) {
+    async getPreferences(@Req() _req: Request) {
         // Placeholder - would fetch from user settings
         return {
             success: true,
