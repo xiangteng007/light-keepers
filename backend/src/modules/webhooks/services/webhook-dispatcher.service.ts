@@ -17,7 +17,7 @@ import { WebhookSubscriptionService } from './webhook-subscription.service';
 
 export interface WebhookEvent {
     type: WebhookEventType;
-    data: any;
+    data: unknown;
     timestamp?: Date;
     sourceId?: string;
     tenantId?: string;
@@ -129,11 +129,12 @@ export class WebhookDispatcherService implements OnModuleInit {
                 // Non-2xx response
                 throw new Error(`HTTP ${response.status}: ${responseBody.substring(0, 200)}`);
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
             const durationMs = Date.now() - startTime;
+            const errObj = error as { message?: string };
 
             delivery.status = DeliveryStatus.FAILED;
-            delivery.error = error.message;
+            delivery.error = errObj.message || String(error);
             delivery.durationMs = durationMs;
             delivery.attempt += 1;
 
@@ -148,16 +149,16 @@ export class WebhookDispatcherService implements OnModuleInit {
             }
 
             await this.deliveryLogRepo.save(delivery);
-            await this.subscriptionService.recordFailure(subscription.id, error.message);
+            await this.subscriptionService.recordFailure(subscription.id, errObj.message || String(error));
 
-            this.logger.warn(`Webhook delivery failed: ${deliveryId} - ${error.message}`);
+            this.logger.warn(`Webhook delivery failed: ${deliveryId} - ${errObj.message || String(error)}`);
         }
     }
 
     /**
      * Generate HMAC-SHA256 signature
      */
-    private generateSignature(payload: any, secret: string, timestamp: string): string {
+    private generateSignature(payload: unknown, secret: string, timestamp: string): string {
         const signatureBase = `${timestamp}.${JSON.stringify(payload)}`;
         const hmac = crypto.createHmac('sha256', secret);
         hmac.update(signatureBase);
@@ -188,8 +189,9 @@ export class WebhookDispatcherService implements OnModuleInit {
                     try {
                         const subscription = await this.subscriptionService.findById(delivery.subscriptionId);
                         await this.deliverWebhook(delivery.id, subscription);
-                    } catch (error: any) {
-                        this.logger.error(`Retry failed for ${delivery.id}: ${error.message}`);
+                    } catch (error: unknown) {
+                        const errObj = error as { message?: string };
+                        this.logger.error(`Retry failed for ${delivery.id}: ${errObj.message || String(error)}`);
                     }
                 }
             }
@@ -267,7 +269,7 @@ export class WebhookDispatcherService implements OnModuleInit {
     // ===== Event Listeners =====
 
     @OnEvent('alert.created')
-    async onAlertCreated(payload: any) {
+    async onAlertCreated(payload: unknown) {
         await this.dispatch({
             type: WebhookEventType.ALERT_CREATED,
             data: payload,
@@ -275,7 +277,7 @@ export class WebhookDispatcherService implements OnModuleInit {
     }
 
     @OnEvent('task.created')
-    async onTaskCreated(payload: any) {
+    async onTaskCreated(payload: unknown) {
         await this.dispatch({
             type: WebhookEventType.TASK_CREATED,
             data: payload,
@@ -283,7 +285,7 @@ export class WebhookDispatcherService implements OnModuleInit {
     }
 
     @OnEvent('task.completed')
-    async onTaskCompleted(payload: any) {
+    async onTaskCompleted(payload: unknown) {
         await this.dispatch({
             type: WebhookEventType.TASK_COMPLETED,
             data: payload,
@@ -291,7 +293,7 @@ export class WebhookDispatcherService implements OnModuleInit {
     }
 
     @OnEvent('mission.started')
-    async onMissionStarted(payload: any) {
+    async onMissionStarted(payload: unknown) {
         await this.dispatch({
             type: WebhookEventType.MISSION_STARTED,
             data: payload,
@@ -299,7 +301,7 @@ export class WebhookDispatcherService implements OnModuleInit {
     }
 
     @OnEvent('resource.low')
-    async onResourceLow(payload: any) {
+    async onResourceLow(payload: unknown) {
         await this.dispatch({
             type: WebhookEventType.RESOURCE_LOW,
             data: payload,

@@ -42,7 +42,7 @@ export class WebhookDeliveryLog {
     eventType: WebhookEventType;
 
     @Column('jsonb')
-    payload: any;
+    payload: unknown;
 
     @Column({ type: 'enum', enum: DeliveryStatus, default: DeliveryStatus.PENDING })
     status: DeliveryStatus;

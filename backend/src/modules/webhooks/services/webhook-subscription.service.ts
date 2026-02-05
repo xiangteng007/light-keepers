@@ -261,11 +261,12 @@ export class WebhookSubscriptionService {
                     error: `HTTP ${response.status}: ${response.statusText}`,
                 };
             }
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const errObj = error as { message?: string };
             return {
                 success: false,
                 responseTime: Date.now() - startTime,
-                error: error.message,
+                error: errObj.message || String(error),
             };
         }
     }
@@ -273,7 +274,7 @@ export class WebhookSubscriptionService {
     /**
      * Generate HMAC signature for payload
      */
-    generateSignature(payload: any, secret: string): string {
+    generateSignature(payload: unknown, secret: string): string {
         const hmac = crypto.createHmac('sha256', secret);
         hmac.update(JSON.stringify(payload));
         return 'sha256=' + hmac.digest('hex');
