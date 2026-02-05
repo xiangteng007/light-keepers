@@ -115,6 +115,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * GeoIntel 警報更新
      */
     @OnEvent(EVENT_TYPES.GEO_INTEL_UPDATED)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     handleGeoIntelUpdate(payload: any) {
         this.server.emit('geo:update', payload);
 
@@ -128,7 +129,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * AI 任務完成
      */
     @OnEvent(EVENT_TYPES.AI_TASK_COMPLETED)
-    handleAiTaskCompleted(payload: any) {
+    handleAiTaskCompleted(payload: Record<string, unknown>) {
         this.server.emit(`ai:task:${payload.taskId}`, payload);
         this.server.emit('ai:update', payload);
     }
@@ -137,7 +138,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * 離線同步狀態
      */
     @OnEvent(EVENT_TYPES.OFFLINE_SYNC_COMPLETED)
-    handleSyncCompleted(payload: any) {
+    handleSyncCompleted(payload: Record<string, unknown>) {
         // 廣播給特定用戶 (如果 payload 有 userId)
         if (payload.userId) {
             this.server.to(`user:${payload.userId}`).emit('sync:completed', payload);
@@ -148,7 +149,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * 離線同步衝突
      */
     @OnEvent(EVENT_TYPES.OFFLINE_SYNC_CONFLICT)
-    handleSyncConflict(payload: any) {
+    handleSyncConflict(payload: Record<string, unknown>) {
         if (payload.userId) {
             this.server.to(`user:${payload.userId}`).emit('sync:conflict', payload);
         }
@@ -158,7 +159,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * 廣播通知
      */
     @OnEvent(EVENT_TYPES.NOTIFICATIONS_BATCH_COMPLETED)
-    handleNotificationBroadcast(payload: any) {
+    handleNotificationBroadcast(payload: Record<string, unknown>) {
         // 只發送摘要，避免洗版
         this.server.emit('notification:broadcast', {
             total: payload.total,
@@ -171,7 +172,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * 任務更新
      */
     @OnEvent(TASK_EVENTS.UPDATED)
-    handleTaskUpdate(payload: any) {
+    handleTaskUpdate(payload: Record<string, unknown>) {
         if (payload.assigneeId) {
             this.server.to(`user:${payload.assigneeId}`).emit('task:update', payload);
         }
@@ -181,7 +182,7 @@ export class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGate
      * 事件(Incident)更新
      */
     @OnEvent(INCIDENT_EVENTS.UPDATED)
-    handleIncidentUpdate(payload: any) {
+    handleIncidentUpdate(payload: unknown) {
         this.server.emit('incident:update', payload);
     }
 }

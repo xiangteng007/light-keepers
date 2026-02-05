@@ -10,6 +10,11 @@ import { SectorType, SectorStatus } from './entities/sector.entity';
 import { RallyPointType, RallyPointStatus } from './entities/rally-point.entity';
 import { RouteType, RouteStatus, Waypoint } from './entities/planned-route.entity';
 
+// Authenticated request interface for type safety
+interface AuthenticatedRequest {
+    user?: { uid: string };
+}
+
 @ApiTags('map-dispatch')
 @Controller('api/missions/:sessionId/map')
 @ApiBearerAuth()
@@ -35,9 +40,9 @@ export class MapDispatchController {
             sectorType: SectorType;
             geometry: { type: 'Polygon'; coordinates: number[][][] };
             severity?: number;
-            props?: Record<string, any>;
+            props?: Record<string, unknown>;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.createSector({
             missionSessionId: sessionId,
@@ -52,7 +57,7 @@ export class MapDispatchController {
     async assignTeamToSector(
         @Param('sectorId') sectorId: string,
         @Body() body: { teamId: string; teamName: string },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.assignTeamToSector(sectorId, {
             ...body,
@@ -66,7 +71,7 @@ export class MapDispatchController {
     async updateSectorStatus(
         @Param('sectorId') sectorId: string,
         @Body() body: { status: SectorStatus },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.updateSectorStatus(
             sectorId,
@@ -98,9 +103,9 @@ export class MapDispatchController {
             contactName?: string;
             contactPhone?: string;
             radioChannel?: string;
-            props?: Record<string, any>;
+            props?: Record<string, unknown>;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const point = await this.service.createRallyPoint({
             missionSessionId: sessionId,
@@ -140,9 +145,9 @@ export class MapDispatchController {
             waypoints?: Waypoint[];
             estimatedTime?: number;
             estimatedDistance?: number;
-            props?: Record<string, any>;
+            props?: Record<string, unknown>;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const route = await this.service.createRoute({
             missionSessionId: sessionId,
@@ -176,7 +181,7 @@ export class MapDispatchController {
             taskDescription?: string;
             priority?: number;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const task = await this.service.dispatchFromBbox({
             missionSessionId: sessionId,
@@ -192,7 +197,7 @@ export class MapDispatchController {
         @Param('sessionId') sessionId: string,
         @Param('sectorId') sectorId: string,
         @Body() body: { taskTitle: string; taskDescription: string },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const task = await this.service.dispatchToSector(
             sessionId,
