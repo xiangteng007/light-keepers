@@ -41,11 +41,11 @@ const keyframes = `
 }
 
 @keyframes scan-line {
-  0% {
-    top: -100%;
+  0%, 100% {
+    top: 0%;
   }
-  100% {
-    top: 100%;
+  50% {
+    top: calc(100% - 2px);
   }
 }
 
@@ -61,7 +61,55 @@ const keyframes = `
 }
 
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* Responsive breakpoints */
+@media (max-width: 480px) {
+  .login-container {
+    padding: 16px !important;
+  }
+  .login-card {
+    padding: 24px 20px !important;
+    margin: 16px !important;
+    max-width: calc(100% - 32px) !important;
+  }
+  .login-title {
+    font-size: 24px !important;
+    letter-spacing: 0.1em !important;
+  }
+  .login-subtitle {
+    font-size: 12px !important;
+  }
+  .form-title {
+    font-size: 16px !important;
+  }
+  .input-field {
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+  }
+  .submit-btn {
+    padding: 16px 24px !important;
+    font-size: 12px !important;
+  }
+  .corner-decorator {
+    width: 12px !important;
+    height: 12px !important;
+  }
+}
+
+@media (min-width: 481px) and (max-width: 1024px) {
+  .login-container {
+    padding: 24px !important;
+  }
+  .login-card {
+    padding: 36px 32px !important;
+    max-width: 480px !important;
+  }
+  .login-title {
+    font-size: 32px !important;
+  }
+}
 `;
+
 
 const LoginPage: React.FC = () => {
     const navigate = useNavigate();
@@ -341,7 +389,7 @@ const LoginPage: React.FC = () => {
     const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
 
     return (
-        <div style={styles.container}>
+        <div className="login-container" style={styles.container}>
             {/* Background effects */}
             <div style={styles.gridOverlay} />
             <div style={styles.beaconSweep} />
@@ -395,7 +443,7 @@ const LoginPage: React.FC = () => {
 
             {/* Form Panel */}
             <div style={styles.formPanel}>
-                <div style={styles.formCard}>
+            <div className="login-card" style={styles.formCard}>
                     {/* Scan line effect */}
                     <div style={styles.scanLine}/>
                     
@@ -408,12 +456,12 @@ const LoginPage: React.FC = () => {
                     {/* Mobile title */}
                     {isMobile && (
                         <>
-                            <h1 style={{...styles.brandTitle, fontSize: '28px', marginBottom: '4px'}}>LIGHT KEEPERS</h1>
-                            <p style={{...styles.brandSubtitle, marginBottom: '32px'}}>曦望燈塔資訊管理平台</p>
+                            <h1 className="login-title" style={{...styles.brandTitle, fontSize: '28px', marginBottom: '4px'}}>LIGHT KEEPERS</h1>
+                            <p className="login-subtitle" style={{...styles.brandSubtitle, marginBottom: '32px'}}>曦望燈塔資訊管理平台</p>
                         </>
                     )}
 
-                    <h2 style={styles.formTitle}>OPERATOR LOGIN</h2>
+                    <h2 className="form-title" style={styles.formTitle}>OPERATOR LOGIN</h2>
                     <p style={styles.formSubtitle}>Enter your credentials to access the system</p>
 
                     <form onSubmit={handleLogin}>
