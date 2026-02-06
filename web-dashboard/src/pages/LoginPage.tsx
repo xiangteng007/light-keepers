@@ -497,7 +497,7 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="login-container" style={styles.container}>
+        <div className="login-container" data-testid="login-page" style={styles.container}>
             {/* Background effects */}
             <div style={styles.gridOverlay} />
             <div style={styles.beaconSweep} />
