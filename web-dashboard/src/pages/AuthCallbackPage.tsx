@@ -6,6 +6,8 @@ import { useAuth } from '../context/AuthContext';
  * OAuth Callback Handler
  * Receives access_token & refresh_token from backend OAuth flow
  * and completes the authentication process.
+ * 
+ * Build trigger: 2026-02-06T23:45
  */
 const AuthCallbackPage: React.FC = () => {
     const navigate = useNavigate();
