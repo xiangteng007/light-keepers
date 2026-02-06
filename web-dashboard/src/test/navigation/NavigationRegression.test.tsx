@@ -12,12 +12,59 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, waitFor, act } from '@testing-library/react';
-import { MemoryRouter, Route, Routes, Navigate } from 'react-router-dom';
-import { AuthProvider } from '../../context/AuthContext';
-import { PermissionsProvider } from '../../context/PermissionsContext';
+import { render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import React, { createContext, useContext } from 'react';
 import ProtectedRoute from '../../components/ProtectedRoute';
 import { ROLE_LEVELS } from '../../config/page-policy';
+
+// ==================== MOCK CONTEXTS ====================
+
+// Mock AuthContext to avoid axios calls in CI
+interface MockAuthContextType {
+    user: { id: string; displayName: string; roleLevel: number } | null;
+    isAuthenticated: boolean;
+    isAnonymous: boolean;
+    isLoading: boolean;
+    authReady: boolean;
+    login: () => Promise<void>;
+    logout: () => void;
+    refreshUser: () => Promise<void>;
+}
+
+const MockAuthContext = createContext<MockAuthContextType | undefined>(undefined);
+
+// Mock useAuth hook for ProtectedRoute
+vi.mock('../../context/AuthContext', () => ({
+    useAuth: () => {
+        const context = useContext(MockAuthContext);
+        if (!context) {
+            // Default unauthenticated state when no provider
+            return {
+                user: null,
+                isAuthenticated: false,
+                isAnonymous: true,
+                isLoading: false,
+                authReady: true,
+                login: vi.fn(),
+                logout: vi.fn(),
+                refreshUser: vi.fn(),
+            };
+        }
+        return context;
+    },
+    AuthProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock PermissionsContext
+vi.mock('../../context/PermissionsContext', () => ({
+    usePermissions: () => ({
+        hasPermission: () => true,
+        canAccessPage: (level: number) => level <= 5,
+        roleLevel: 5,
+    }),
+    PermissionsProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
 
 // ==================== TEST HELPERS ====================
 
@@ -44,21 +91,35 @@ const mockUsers = {
 // Test pages with different permission requirements
 const TestPage = ({ id }: { id: string }) => <div data-testid={`page-${id}`}>Page: {id}</div>;
 const LoginPage = () => <div data-testid="login-page">Login Page</div>;
+const AccountPage = () => <div data-testid="account-page">Account Page (Login UI)</div>;
 const AccessDeniedPage = () => <div data-testid="access-denied">Access Denied</div>;
 
-// Test wrapper component
+// Test wrapper component with mock auth state
 interface TestAppProps {
     initialPath?: string;
     user?: typeof mockUsers.volunteer | null;
     isAuthenticated?: boolean;
 }
 
-const TestApp = ({ initialPath = '/', user = null, isAuthenticated = false }: TestAppProps) => (
-    <MemoryRouter initialEntries={[initialPath]}>
-        <AuthProvider>
-            <PermissionsProvider>
+const TestApp = ({ initialPath = '/', user = null, isAuthenticated = false }: TestAppProps) => {
+    const mockAuthValue: MockAuthContextType = {
+        user,
+        isAuthenticated,
+        isAnonymous: !isAuthenticated,
+        isLoading: false,
+        authReady: true,
+        login: vi.fn(),
+        logout: vi.fn(),
+        refreshUser: vi.fn(),
+    };
+
+    return (
+        <MockAuthContext.Provider value={mockAuthValue}>
+            <MemoryRouter initialEntries={[initialPath]}>
                 <Routes>
                     <Route path="/" element={<LoginPage />} />
+                    <Route path="/login" element={<LoginPage />} />
+                    <Route path="/account" element={<AccountPage />} />
                     <Route path="/access-denied" element={<AccessDeniedPage />} />
                     
                     {/* Public route */}
@@ -106,10 +167,10 @@ const TestApp = ({ initialPath = '/', user = null, isAuthenticated = false }: Te
                         }
                     />
                 </Routes>
-            </PermissionsProvider>
-        </AuthProvider>
-    </MemoryRouter>
-);
+            </MemoryRouter>
+        </MockAuthContext.Provider>
+    );
+};
 
 // ==================== TEST SUITES ====================
 
@@ -131,12 +192,12 @@ describe('Navigation Regression Suite', () => {
             expect(screen.getByTestId('page-public')).toBeInTheDocument();
         });
 
-        it('Case 2: Protected routes redirect to login when unauthenticated', async () => {
+        it('Case 2: Protected routes redirect to account page when unauthenticated', async () => {
             render(<TestApp initialPath="/volunteer-area" isAuthenticated={false} />);
             
-            // Should redirect to login page
+            // ProtectedRoute redirects to /account for unauthenticated users
             await waitFor(() => {
-                expect(screen.getByTestId('login-page')).toBeInTheDocument();
+                expect(screen.getByTestId('account-page')).toBeInTheDocument();
             });
         });
 
