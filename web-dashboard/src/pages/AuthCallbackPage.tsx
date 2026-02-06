@@ -20,7 +20,6 @@ const AuthCallbackPage: React.FC = () => {
         const handleCallback = async () => {
             try {
                 const accessToken = searchParams.get('access_token');
-                const refreshToken = searchParams.get('refresh_token');
                 const isNew = searchParams.get('is_new') === 'true';
                 const redirectPath = searchParams.get('redirect') || '/dashboard';
                 const errorParam = searchParams.get('error');
@@ -39,11 +38,8 @@ const AuthCallbackPage: React.FC = () => {
                     return;
                 }
 
-                // Store tokens
+                // Store access token (refresh token is now httpOnly cookie)
                 localStorage.setItem('accessToken', accessToken);
-                if (refreshToken) {
-                    localStorage.setItem('refreshToken', refreshToken);
-                }
 
                 // Complete login
                 await login(accessToken);

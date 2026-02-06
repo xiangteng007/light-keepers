@@ -207,7 +207,7 @@ function App() {
           <Route path="/bind-line" element={<BindLinePage />} />
           <Route path="/volunteer-setup" element={<ProtectedRoute requiredLevel={1}><VolunteerProfileSetupPage /></ProtectedRoute>} />
           <Route path="/showcase" element={<ComponentShowcase />} />
-          <Route path="/account" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="account"><AccountPage /></PageWrapper></ProtectedRoute>} />
+          <Route path="/account" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="account"><AccountPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
           <Route path="/dashboard" element={<ProtectedRoute requiredLevel={1}><CommandCenterPage /></ProtectedRoute>} />

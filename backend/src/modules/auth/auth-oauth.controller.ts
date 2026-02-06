@@ -65,7 +65,7 @@ export class AuthOAuthController {
     lineAuth(@Query('redirect') redirect: string, @Res() res: Response) {
         // Store redirect URL in state (base64 encoded)
         const state = Buffer.from(JSON.stringify({
-            redirect: redirect || '/account?tab=connected',
+            redirect: redirect || '/dashboard',
             timestamp: Date.now(),
         })).toString('base64');
 
@@ -84,7 +84,7 @@ export class AuthOAuthController {
         @Res() res: Response,
     ) {
         // Parse redirect from state
-        let redirectPath = '/account?tab=connected';
+        let redirectPath = '/dashboard';
         try {
             const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
             redirectPath = stateData.redirect || redirectPath;
@@ -179,7 +179,7 @@ export class AuthOAuthController {
     @ApiQuery({ name: 'redirect', required: false, description: 'URL to redirect after login' })
     googleAuth(@Query('redirect') redirect: string, @Res() res: Response) {
         const state = Buffer.from(JSON.stringify({
-            redirect: redirect || '/account?tab=connected',
+            redirect: redirect || '/dashboard',
             timestamp: Date.now(),
         })).toString('base64');
 
@@ -197,7 +197,7 @@ export class AuthOAuthController {
         @Query('error') error: string,
         @Res() res: Response,
     ) {
-        let redirectPath = '/account?tab=connected';
+        let redirectPath = '/dashboard';
         try {
             const stateData = JSON.parse(Buffer.from(state, 'base64').toString());
             redirectPath = stateData.redirect || redirectPath;
