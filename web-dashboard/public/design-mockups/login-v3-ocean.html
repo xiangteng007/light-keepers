@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIGHT KEEPERS - Login Design V3: Ocean Guardian</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700;900&family=Source+Sans+3:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        /* === DESIGN V3: OCEAN GUARDIAN === */
+        /* Aesthetic: Dramatic, Cinematic, Inspirational */
+        /* Font: Playfair Display (editorial) + Source Sans 3 (readable) */
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-ocean: #0C1929;
+            --bg-overlay: rgba(12, 25, 41, 0.75);
+            --text-white: #FFFFFF;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --accent-sunset: #FF7B4F;
+            --accent-warm: #FFB088;
+            --border-light: rgba(255, 255, 255, 0.15);
+        }
+        
+        @keyframes wave {
+            0%, 100% { transform: translateY(0) scaleY(1); }
+            50% { transform: translateY(-10px) scaleY(0.95); }
+        }
+        
+        @keyframes lighthouse-glow {
+            0%, 100% { opacity: 0.8; filter: brightness(1); }
+            50% { opacity: 1; filter: brightness(1.3); }
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        
+        body {
+            min-height: 100vh;
+            font-family: 'Source Sans 3', -apple-system, sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Full-screen Ocean Background */
+        .ocean-bg {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(180deg, 
+                #1a3a5c 0%, 
+                #0C1929 30%,
+                #0a1420 70%,
+                #06101a 100%
+            );
+        }
+        
+        /* Lighthouse in background */
+        .lighthouse-bg {
+            position: fixed;
+            left: 10%;
+            bottom: 0;
+            width: 300px;
+            height: 500px;
+            opacity: 0.6;
+            animation: lighthouse-glow 4s ease-in-out infinite;
+        }
+        
+        /* Sunset gradient */
+        .sunset-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 50%;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255, 123, 79, 0.2) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        /* Wave animation */
+        .waves {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 200px;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 30, 50, 0.8) 100%);
+        }
+        
+        .waves::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -50%;
+            right: -50%;
+            height: 100px;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent 0px,
+                rgba(255, 255, 255, 0.03) 50px,
+                transparent 100px
+            );
+            animation: wave 6s ease-in-out infinite;
+        }
+        
+        /* Main container */
+        .container {
+            position: relative;
+            z-index: 10;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 24px;
+        }
+        
+        /* Login Card - Frosted Glass */
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-overlay);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--border-light);
+            border-radius: 24px;
+            padding: 56px 48px;
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        /* Header */
+        .card-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .lighthouse-icon {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 28px;
+            filter: drop-shadow(0 4px 20px rgba(255, 123, 79, 0.4));
+        }
+        
+        .brand-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 36px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: var(--text-white);
+            margin-bottom: 12px;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.3);
+        }
+        
+        .brand-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            letter-spacing: 0.15em;
+        }
+        
+        .divider {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-sunset), var(--accent-warm));
+            margin: 32px auto;
+            border-radius: 2px;
+        }
+        
+        .welcome-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            font-weight: 500;
+            color: var(--text-white);
+            margin-bottom: 8px;
+        }
+        
+        .welcome-subtitle {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 15px;
+            color: var(--text-white);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent-sunset);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(255, 123, 79, 0.15);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+        
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            padding: 18px 24px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0.03em;
+            color: #FFF;
+            background: linear-gradient(135deg, var(--accent-sunset) 0%, #E85D3A 100%);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 8px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 123, 79, 0.4);
+        }
+        
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Footer */
+        .card-footer {
+            text-align: center;
+            margin-top: 32px;
+        }
+        
+        .footer-text {
+            font-size: 12px;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.05em;
+        }
+        
+        /* Quote */
+        .quote {
+            text-align: center;
+            margin-top: 48px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-light);
+        }
+        
+        .quote-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        
+        /* Design Label */
+        .design-label {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: linear-gradient(135deg, var(--accent-sunset), #E85D3A);
+            color: #FFF;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div class="ocean-bg"></div>
+    <div class="sunset-glow"></div>
+    <div class="waves"></div>
+    
+    <!-- Background Lighthouse -->
+    <svg class="lighthouse-bg" viewBox="0 0 200 400" fill="none">
+        <path d="M80 380 L90 200 L110 200 L120 380 Z" fill="#1a3a5c" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <path d="M90 200 L95 80 L105 80 L110 200 Z" fill="#0f2a44" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <rect x="92" y="60" width="16" height="20" rx="2" fill="#0f2a44" stroke="rgba(255,255,255,0.2)" stroke-width="2"/>
+        <circle cx="100" cy="50" r="12" fill="#FF7B4F" opacity="0.8"/>
+        <ellipse cx="100" cy="50" rx="30" ry="8" fill="url(#lightBeam)" opacity="0.4"/>
+        <defs>
+            <radialGradient id="lightBeam">
+                <stop offset="0%" stop-color="#FF7B4F"/>
+                <stop offset="100%" stop-color="transparent"/>
+            </radialGradient>
+        </defs>
+    </svg>
+    
+    <div class="design-label">設計 V3: 海洋守護者</div>
+    
+    <div class="container">
+        <div class="login-card">
+            <div class="card-header">
+                <svg class="lighthouse-icon" viewBox="0 0 64 64" fill="none">
+                    <path d="M26 58 L28 32 L36 32 L38 58 Z" fill="#FF7B4F"/>
+                    <path d="M28 32 L30 14 L34 14 L36 32 Z" fill="#FFB088"/>
+                    <circle cx="32" cy="10" r="5" fill="#FF7B4F"/>
+                    <path d="M22 10 L32 10" stroke="#FFB088" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M32 10 L42 10" stroke="#FFB088" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+                
+                <h1 class="brand-title">LIGHT KEEPERS</h1>
+                <p class="brand-subtitle">曦望燈塔資訊管理平台</p>
+            </div>
+            
+            <div class="divider"></div>
+            
+            <h2 class="welcome-text">歡迎回來，守護者</h2>
+            <p class="welcome-subtitle">請登入以繼續您的任務</p>
+            
+            <form>
+                <div class="form-group">
+                    <label class="form-label">電子郵件</label>
+                    <input type="email" class="form-input" placeholder="your@email.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">密碼</label>
+                    <input type="password" class="form-input" placeholder="••••••••">
+                </div>
+                
+                <button type="submit" class="submit-btn">開始守護</button>
+            </form>
+            
+            <div class="card-footer">
+                <p class="footer-text">安全連線 · 版本 2.1.0</p>
+            </div>
+            
+            <div class="quote">
+                <p class="quote-text">「即使在最黑暗的夜晚，燈塔依然指引方向」</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

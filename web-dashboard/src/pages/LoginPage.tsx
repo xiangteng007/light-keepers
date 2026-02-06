@@ -6,7 +6,7 @@ import { login as apiLogin } from '../api/services';
 /**
  * Light Keepers Login Page
  * Design: Industrial Cyberpunk Command Center
- * Key Feature: Animated lighthouse beacon sweep effect
+ * Key Feature: Digital Clock Display + Command Center Aesthetic
  */
 
 // Keyframe animations as style element
@@ -31,13 +31,19 @@ const keyframes = `
   }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
+@keyframes clock-flicker {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.95; }
+}
+
+@keyframes colon-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+@keyframes data-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
 }
 
 @keyframes scan-line {
@@ -119,6 +125,24 @@ const LoginPage: React.FC = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [focusedField, setFocusedField] = useState<string | null>(null);
+    const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
+    const [currentTime, setCurrentTime] = useState(new Date());
+
+    // Update clock every second
+    useEffect(() => {
+        const timer = setInterval(() => setCurrentTime(new Date()), 1000);
+        return () => clearInterval(timer);
+    }, []);
+
+    // Listen for window resize
+    useEffect(() => {
+        const handleResize = () => setWindowWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    // Responsive breakpoint - brand panel only on desktop
+    const isDesktop = windowWidth >= 1024;
 
     useEffect(() => {
         // Add keyframes to document
@@ -182,24 +206,109 @@ const LoginPage: React.FC = () => {
             transformOrigin: 'center center',
             pointerEvents: 'none' as const,
         },
-        // Left brand panel
+        // Left brand panel (only visible on desktop ≥1024px)
         brandPanel: {
-            flex: 1,
+            flex: '0 0 45%',
             display: 'flex',
             flexDirection: 'column' as const,
             justifyContent: 'center',
             alignItems: 'center',
-            padding: '60px',
+            padding: '40px',
             position: 'relative' as const,
             borderRight: '1px solid rgba(255, 191, 36, 0.1)',
         },
-        // Lighthouse icon
-        lighthouse: {
-            width: '180px',
-            height: '180px',
+        // Digital Clock Container
+        digitalClockContainer: {
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
             marginBottom: '40px',
-            animation: 'float 6s ease-in-out infinite',
-            filter: 'drop-shadow(0 0 30px rgba(255, 191, 36, 0.5))',
+            animation: 'clock-flicker 4s ease-in-out infinite',
+        },
+        // Main Time Display
+        timeDisplay: {
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '72px',
+            fontWeight: 800,
+            color: '#FBBF24',
+            letterSpacing: '0.05em',
+            textShadow: '0 0 30px rgba(255, 191, 36, 0.6), 0 0 60px rgba(255, 191, 36, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '8px',
+        },
+        timeColon: {
+            animation: 'colon-blink 1s steps(1) infinite',
+            margin: '0 4px',
+        },
+        // Date Display
+        dateDisplay: {
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '18px',
+            color: 'rgba(255, 191, 36, 0.8)',
+            letterSpacing: '0.3em',
+            marginBottom: '4px',
+        },
+        // Day of Week
+        dayDisplay: {
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.4)',
+            letterSpacing: '0.5em',
+            marginBottom: '24px',
+        },
+        // System Metrics Row
+        metricsRow: {
+            display: 'flex',
+            gap: '24px',
+            marginTop: '16px',
+        },
+        metricBox: {
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
+            padding: '12px 16px',
+            background: 'rgba(0, 0, 0, 0.3)',
+            border: '1px solid rgba(255, 191, 36, 0.2)',
+            borderRadius: '4px',
+        },
+        metricValue: {
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '24px',
+            fontWeight: 700,
+            color: '#00D4FF',
+            textShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+        },
+        metricLabel: {
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '9px',
+            color: 'rgba(255, 255, 255, 0.4)',
+            letterSpacing: '0.15em',
+            marginTop: '4px',
+        },
+        // Mobile Clock Styles (compact version)
+        mobileClockContainer: {
+            display: 'flex',
+            flexDirection: 'column' as const,
+            alignItems: 'center',
+            paddingTop: '40px',
+            paddingBottom: '20px',
+        },
+        mobileTimeDisplay: {
+            fontFamily: "'Orbitron', sans-serif",
+            fontSize: '36px',
+            fontWeight: 700,
+            color: '#FBBF24',
+            textShadow: '0 0 20px rgba(255, 191, 36, 0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            marginBottom: '4px',
+        },
+        mobileDateDisplay: {
+            fontFamily: "'JetBrains Mono', monospace",
+            fontSize: '12px',
+            color: 'rgba(255, 191, 36, 0.6)',
+            letterSpacing: '0.2em',
         },
         brandTitle: {
             fontFamily: "'Orbitron', sans-serif",
@@ -240,14 +349,16 @@ const LoginPage: React.FC = () => {
             color: '#22C55E',
             letterSpacing: '0.2em',
         },
-        // Right form panel
+        // Right form panel (main content, always visible)
         formPanel: {
-            flex: 1,
+            flex: '1 1 55%',
             display: 'flex',
-            justifyContent: 'center',
+            flexDirection: 'column' as const,
+            justifyContent: isDesktop ? 'center' : 'flex-start',
             alignItems: 'center',
-            padding: '40px',
+            padding: isDesktop ? '40px 24px' : '0 24px 40px 24px',
             position: 'relative' as const,
+            minHeight: '100vh',
         },
         // Form card
         formCard: {
@@ -385,51 +496,49 @@ const LoginPage: React.FC = () => {
         },
     };
 
-    // Check if mobile
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 1024;
-
     return (
         <div className="login-container" style={styles.container}>
             {/* Background effects */}
             <div style={styles.gridOverlay} />
             <div style={styles.beaconSweep} />
 
-            {/* Brand Panel - Hidden on mobile */}
-            {!isMobile && (
+            {/* Brand Panel - Only visible on desktop (>=1024px) */}
+            {isDesktop && (
                 <div style={styles.brandPanel}>
-                    {/* Lighthouse SVG */}
-                    <svg style={styles.lighthouse} viewBox="0 0 100 120" fill="none">
-                        {/* Base */}
-                        <path d="M30 115 L35 70 L65 70 L70 115 Z" fill="#1a1a2e" stroke="#FBBF24" strokeWidth="1.5"/>
-                        {/* Tower */}
-                        <path d="M35 70 L40 25 L60 25 L65 70 Z" fill="#0f0f1a" stroke="#FBBF24" strokeWidth="1.5"/>
-                        {/* Stripes */}
-                        <rect x="42" y="35" width="16" height="6" fill="#FBBF24" opacity="0.3"/>
-                        <rect x="43" y="48" width="14" height="6" fill="#FBBF24" opacity="0.3"/>
-                        {/* Lantern room */}
-                        <rect x="42" y="12" width="16" height="13" fill="#1a1a2e" stroke="#FBBF24" strokeWidth="1.5"/>
-                        {/* Dome */}
-                        <path d="M42 12 Q50 2 58 12" fill="none" stroke="#FBBF24" strokeWidth="2"/>
-                        {/* Beacon */}
-                        <circle cx="50" cy="18.5" r="5" fill="#FBBF24" filter="url(#glow)"/>
-                        {/* Light rays */}
-                        <g opacity="0.6" stroke="#FBBF24" strokeWidth="1.5">
-                            <line x1="50" y1="18" x2="20" y2="5"/>
-                            <line x1="50" y1="18" x2="80" y2="5"/>
-                            <line x1="50" y1="18" x2="10" y2="18"/>
-                            <line x1="50" y1="18" x2="90" y2="18"/>
-                        </g>
-                        {/* Glow filter */}
-                        <defs>
-                            <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-                                <feGaussianBlur stdDeviation="3" result="blur"/>
-                                <feMerge>
-                                    <feMergeNode in="blur"/>
-                                    <feMergeNode in="SourceGraphic"/>
-                                </feMerge>
-                            </filter>
-                        </defs>
-                    </svg>
+                    {/* Digital Clock Display */}
+                    <div style={styles.digitalClockContainer}>
+                        {/* Main Time */}
+                        <div style={styles.timeDisplay}>
+                            <span>{currentTime.getHours().toString().padStart(2, '0')}</span>
+                            <span style={styles.timeColon}>:</span>
+                            <span>{currentTime.getMinutes().toString().padStart(2, '0')}</span>
+                            <span style={styles.timeColon}>:</span>
+                            <span>{currentTime.getSeconds().toString().padStart(2, '0')}</span>
+                        </div>
+                        {/* Date */}
+                        <div style={styles.dateDisplay}>
+                            {currentTime.getFullYear()}.{(currentTime.getMonth() + 1).toString().padStart(2, '0')}.{currentTime.getDate().toString().padStart(2, '0')}
+                        </div>
+                        {/* Day of Week */}
+                        <div style={styles.dayDisplay}>
+                            {['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][currentTime.getDay()]}
+                        </div>
+                        {/* System Metrics */}
+                        <div style={styles.metricsRow}>
+                            <div style={styles.metricBox}>
+                                <span style={styles.metricValue}>99.9</span>
+                                <span style={styles.metricLabel}>UPTIME %</span>
+                            </div>
+                            <div style={styles.metricBox}>
+                                <span style={styles.metricValue}>247</span>
+                                <span style={styles.metricLabel}>ACTIVE</span>
+                            </div>
+                            <div style={styles.metricBox}>
+                                <span style={styles.metricValue}>0</span>
+                                <span style={styles.metricLabel}>ALERTS</span>
+                            </div>
+                        </div>
+                    </div>
 
                     <h1 style={styles.brandTitle}>LIGHT KEEPERS</h1>
                     <p style={styles.brandSubtitle}>曦望燈塔資訊管理平台</p>
@@ -443,6 +552,22 @@ const LoginPage: React.FC = () => {
 
             {/* Form Panel */}
             <div style={styles.formPanel}>
+                {/* Mobile Clock - shown when brand panel is hidden */}
+                {!isDesktop && (
+                    <div style={styles.mobileClockContainer}>
+                        <div style={styles.mobileTimeDisplay}>
+                            <span>{currentTime.getHours().toString().padStart(2, '0')}</span>
+                            <span style={styles.timeColon}>:</span>
+                            <span>{currentTime.getMinutes().toString().padStart(2, '0')}</span>
+                            <span style={styles.timeColon}>:</span>
+                            <span>{currentTime.getSeconds().toString().padStart(2, '0')}</span>
+                        </div>
+                        <div style={styles.mobileDateDisplay}>
+                            {currentTime.getFullYear()}.{(currentTime.getMonth() + 1).toString().padStart(2, '0')}.{currentTime.getDate().toString().padStart(2, '0')} {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][currentTime.getDay()]}
+                        </div>
+                    </div>
+                )}
+
             <div className="login-card" style={styles.formCard}>
                     {/* Scan line effect */}
                     <div style={styles.scanLine}/>
@@ -453,8 +578,8 @@ const LoginPage: React.FC = () => {
                     <div style={{...styles.corner, ...styles.cornerBL}}/>
                     <div style={{...styles.corner, ...styles.cornerBR}}/>
 
-                    {/* Mobile title */}
-                    {isMobile && (
+                    {/* Mobile/Tablet title - shown when brand panel is hidden */}
+                    {!isDesktop && (
                         <>
                             <h1 className="login-title" style={{...styles.brandTitle, fontSize: '28px', marginBottom: '4px'}}>LIGHT KEEPERS</h1>
                             <p className="login-subtitle" style={{...styles.brandSubtitle, marginBottom: '32px'}}>曦望燈塔資訊管理平台</p>

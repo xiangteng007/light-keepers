@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIGHT KEEPERS - Login Design V2: Cyberpunk Command</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* === DESIGN V2: CYBERPUNK COMMAND CENTER === */
+        /* Aesthetic: Industrial, High-Tech, Tactical */
+        /* Font: Orbitron (display) + JetBrains Mono (tech) */
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-deep: #06060A;
+            --bg-surface: rgba(15, 15, 22, 0.85);
+            --text-bright: #F5F5F7;
+            --text-dim: rgba(255, 255, 255, 0.5);
+            --accent-gold: #FBBF24;
+            --accent-cyan: #00D4FF;
+            --glow-gold: rgba(251, 191, 36, 0.4);
+            --glow-cyan: rgba(0, 212, 255, 0.3);
+        }
+        
+        @keyframes beacon-sweep {
+            0%, 100% { transform: translateX(-50%) rotate(-30deg); opacity: 0.6; }
+            50% { transform: translateX(-50%) rotate(30deg); opacity: 0.9; }
+        }
+        
+        @keyframes scan-line {
+            0%, 100% { top: 0; }
+            50% { top: calc(100% - 2px); }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px var(--accent-gold)); }
+            50% { opacity: 0.7; filter: drop-shadow(0 0 20px var(--accent-gold)); }
+        }
+        
+        @keyframes edge-breathe {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+        
+        body {
+            min-height: 100vh;
+            background: var(--bg-deep);
+            font-family: 'JetBrains Mono', monospace;
+            display: flex;
+            overflow: hidden;
+        }
+        
+        /* Background Effects */
+        .bg-grid {
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(rgba(251, 191, 36, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(251, 191, 36, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        .bg-beacon {
+            position: fixed;
+            top: -100%;
+            left: 50%;
+            width: 200%;
+            height: 300%;
+            background: conic-gradient(from 0deg, transparent 0deg, var(--glow-gold) 15deg, transparent 30deg);
+            animation: beacon-sweep 10s ease-in-out infinite;
+            transform-origin: center center;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+        
+        .edge-glow {
+            position: fixed;
+            inset: 0;
+            box-shadow: inset 0 0 150px rgba(0, 100, 200, 0.15);
+            animation: edge-breathe 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+        
+        /* Split Layout */
+        .brand-panel {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            position: relative;
+            border-right: 1px solid rgba(251, 191, 36, 0.15);
+        }
+        
+        .form-panel {
+            flex: 1 1 55%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        /* Brand */
+        .lighthouse-svg {
+            width: 160px;
+            height: 180px;
+            margin-bottom: 40px;
+            filter: drop-shadow(0 0 40px var(--glow-gold));
+        }
+        
+        .beacon-light {
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .brand-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 42px;
+            font-weight: 900;
+            letter-spacing: 0.25em;
+            color: var(--accent-gold);
+            text-shadow: 0 0 50px var(--glow-gold);
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        
+        .brand-subtitle {
+            font-size: 13px;
+            color: var(--text-dim);
+            letter-spacing: 0.4em;
+        }
+        
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 48px;
+            padding: 12px 24px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(34, 197, 94, 0.4);
+            border-radius: 4px;
+        }
+        
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            background: #22C55E;
+            border-radius: 50%;
+            box-shadow: 0 0 10px #22C55E;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        .status-text {
+            font-size: 10px;
+            color: #22C55E;
+            letter-spacing: 0.15em;
+        }
+        
+        /* Login Card */
+        .login-card {
+            width: 100%;
+            max-width: 420px;
+            background: var(--bg-surface);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+            border-radius: 8px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Corner Decorators */
+        .corner { position: absolute; width: 20px; height: 20px; }
+        .corner-tl { top: 0; left: 0; border-top: 2px solid var(--accent-gold); border-left: 2px solid var(--accent-gold); }
+        .corner-tr { top: 0; right: 0; border-top: 2px solid var(--accent-gold); border-right: 2px solid var(--accent-gold); }
+        .corner-bl { bottom: 0; left: 0; border-bottom: 2px solid var(--accent-gold); border-left: 2px solid var(--accent-gold); }
+        .corner-br { bottom: 0; right: 0; border-bottom: 2px solid var(--accent-gold); border-right: 2px solid var(--accent-gold); }
+        
+        /* Scan Line */
+        .scan-line {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 0%, var(--accent-gold) 50%, transparent 100%);
+            box-shadow: 0 0 15px var(--glow-gold);
+            animation: scan-line 4s ease-in-out infinite;
+        }
+        
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.15em;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+        }
+        
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 32px;
+        }
+        
+        /* Form */
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 16px 18px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            color: var(--text-bright);
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+        
+        .form-input:focus {
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(251, 191, 36, 0.15), inset 0 0 20px rgba(251, 191, 36, 0.05);
+        }
+        
+        .form-input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Submit */
+        .submit-btn {
+            width: 100%;
+            padding: 18px 24px;
+            font-family: 'Orbitron', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            color: #0A0A0F;
+            background: var(--accent-gold);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px var(--glow-gold);
+        }
+        
+        .submit-btn::after {
+            content: '›';
+            font-size: 18px;
+            margin-left: 12px;
+        }
+        
+        /* Footer */
+        .card-footer {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .version-tag {
+            font-size: 9px;
+            color: var(--text-dim);
+            letter-spacing: 0.08em;
+        }
+        
+        /* Design Label */
+        .design-label {
+            position: fixed;
+            top: 16px;
+            left: 16px;
+            background: var(--accent-gold);
+            color: #0A0A0F;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            z-index: 100;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .brand-panel { display: none; }
+            body { justify-content: center; }
+            .form-panel { flex: 1; max-width: 500px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-beacon"></div>
+    <div class="edge-glow"></div>
+    
+    <div class="design-label">設計 V2: Cyberpunk 指揮中心</div>
+    
+    <!-- Brand Panel -->
+    <div class="brand-panel">
+        <svg class="lighthouse-svg" viewBox="0 0 100 120" fill="none">
+            <defs>
+                <filter id="glow">
+                    <feGaussianBlur stdDeviation="3" result="blur"/>
+                    <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+                </filter>
+            </defs>
+            <!-- Base -->
+            <path d="M30 115 L35 70 L65 70 L70 115 Z" fill="#1a1a2e" stroke="#FBBF24" stroke-width="1.5"/>
+            <!-- Tower -->
+            <path d="M35 70 L40 25 L60 25 L65 70 Z" fill="#0f0f1a" stroke="#FBBF24" stroke-width="1.5"/>
+            <!-- Stripes -->
+            <path d="M37 60 L63 60" stroke="#FBBF24" stroke-width="1" opacity="0.5"/>
+            <path d="M38 45 L62 45" stroke="#FBBF24" stroke-width="1" opacity="0.5"/>
+            <!-- Lantern Room -->
+            <rect x="38" y="18" width="24" height="8" rx="1" fill="#0f0f1a" stroke="#FBBF24" stroke-width="1.5"/>
+            <!-- Beacon -->
+            <circle class="beacon-light" cx="50" cy="12" r="6" fill="#FBBF24" filter="url(#glow)"/>
+            <!-- Light Rays -->
+            <path d="M35 12 L50 12" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+            <path d="M50 12 L65 12" stroke="#FBBF24" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+            <path d="M30 8 L50 12 L30 16" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+            <path d="M70 8 L50 12 L70 16" stroke="#FBBF24" stroke-width="1.5" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+        
+        <h1 class="brand-title">LIGHT<br/>KEEPERS</h1>
+        <p class="brand-subtitle">曦望燈塔資訊管理平台</p>
+        
+        <div class="status-badge">
+            <div class="status-dot"></div>
+            <span class="status-text">SYSTEM STATUS: OPERATIONAL</span>
+        </div>
+    </div>
+    
+    <!-- Form Panel -->
+    <div class="form-panel">
+        <div class="login-card">
+            <div class="scan-line"></div>
+            <div class="corner corner-tl"></div>
+            <div class="corner corner-tr"></div>
+            <div class="corner corner-bl"></div>
+            <div class="corner corner-br"></div>
+            
+            <h2 class="card-title">OPERATOR LOGIN</h2>
+            <p class="card-subtitle">Enter your credentials to access the system</p>
+            
+            <form>
+                <div class="form-group">
+                    <label class="form-label">OPERATOR ID</label>
+                    <input type="email" class="form-input" placeholder="enter.id@domain.com">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">ACCESS CODE</label>
+                    <input type="password" class="form-input" placeholder="••••••••••••">
+                </div>
+                
+                <button type="submit" class="submit-btn">INITIATE UPLINK</button>
+            </form>
+            
+            <div class="card-footer">
+                <span class="version-tag">VERSION 2.1.0 // CLASSIFIED // LEVEL-5 CLEARANCE</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
