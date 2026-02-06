@@ -48,6 +48,7 @@ export function lazyWithSuspense(
 
 // ===== Core Pages =====
 export const LoginPage = lazyWithSuspense(() => import('../../pages/LoginPage'));
+export const AuthCallbackPage = lazyWithSuspense(() => import('../../pages/AuthCallbackPage'));
 export const ForgotPasswordPage = lazyWithSuspense(() => import('../../pages/ForgotPasswordPage'));
 export const ResetPasswordPage = lazyWithSuspense(() => import('../../pages/ResetPasswordPage'));
 export const BindLinePage = lazyWithSuspense(() => import('../../pages/BindLinePage'));

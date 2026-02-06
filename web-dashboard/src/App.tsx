@@ -13,6 +13,7 @@ import { CommandPalette } from './components/CommandPalette'
 import {
   // Core Pages
   LoginPage,
+  AuthCallbackPage,
   ForgotPasswordPage,
   ResetPasswordPage,
   BindLinePage,
@@ -200,6 +201,7 @@ function App() {
         <Routes>
           {/* ===== 獨立頁面 (無需 Layout 包裝) ===== */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/bind-line" element={<BindLinePage />} />

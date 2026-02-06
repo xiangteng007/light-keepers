@@ -1,15 +1,13 @@
 /**
- * Account Reset Script
- * Deletes all accounts and creates a single owner account
+ * Account Reset Script (Simplified)
+ * Deletes all accounts - new owner will be created via Firebase Auth
  * 
  * Usage: npx ts-node scripts/reset-accounts.ts
  */
 
 import { DataSource } from 'typeorm';
-import * as bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid';
 
-// Database configuration (matches AppModule TypeORM config)
+// Database configuration
 const AppDataSource = new DataSource({
     type: 'postgres',
     host: process.env.DB_HOST || 'localhost',
@@ -33,48 +31,34 @@ async function resetAccounts() {
         await queryRunner.startTransaction();
 
         try {
-            // 1. Delete all account-role relationships
+            // 1. Check current accounts
+            const currentCount = await queryRunner.query('SELECT COUNT(*) as count FROM account');
+            console.log(`📊 Current accounts: ${currentCount[0].count}`);
+
+            // 2. Delete all account-role relationships
             console.log('🗑️ Deleting account-role relationships...');
-            await queryRunner.query('DELETE FROM account_roles_role');
+            const deletedRoles = await queryRunner.query('DELETE FROM account_roles_role');
+            console.log(`   Deleted ${deletedRoles?.rowCount || 'all'} role assignments`);
             
-            // 2. Delete all accounts
+            // 3. Delete all accounts
             console.log('🗑️ Deleting all accounts...');
-            await queryRunner.query('DELETE FROM account');
-            
-            // 3. Create new owner account
-            console.log('👤 Creating owner account...');
-            const accountId = uuidv4();
-            const email = 'xiangteng007@gmail.com';
-            const passwordHash = await bcrypt.hash('19861007', 10);
-            
-            await queryRunner.query(`
-                INSERT INTO account (id, email, "passwordHash", "displayName", phone, "isActive", "createdAt", "updatedAt")
-                VALUES ($1, $2, $3, $4, $5, $6, NOW(), NOW())
-            `, [accountId, email, passwordHash, 'System Owner', '', true]);
-            
-            // 4. Get owner role ID
-            const ownerRole = await queryRunner.query(
-                `SELECT id FROM role WHERE name = 'owner' LIMIT 1`
-            );
-            
-            if (ownerRole && ownerRole.length > 0) {
-                // 5. Assign owner role
-                await queryRunner.query(`
-                    INSERT INTO account_roles_role ("accountId", "roleId")
-                    VALUES ($1, $2)
-                `, [accountId, ownerRole[0].id]);
-                console.log('✅ Owner role assigned');
-            } else {
-                console.log('⚠️ Owner role not found, skipping role assignment');
-            }
+            const deletedAccounts = await queryRunner.query('DELETE FROM account');
+            console.log(`   Deleted ${deletedAccounts?.rowCount || 'all'} accounts`);
 
             await queryRunner.commitTransaction();
+            console.log('');
+            console.log('═══════════════════════════════════════════════════════');
             console.log('✅ Account reset complete!');
-            console.log(`📧 Email: ${email}`);
-            console.log(`🔑 Password: 19861007`);
-            console.log(`🆔 Account ID: ${accountId}`);
+            console.log('');
+            console.log('📝 Next steps:');
+            console.log('   1. Go to Firebase Console > Authentication');
+            console.log('   2. Delete all users (or keep existing)');
+            console.log('   3. Create new user: xiangteng007@gmail.com / 19861007');
+            console.log('   4. Login via web app - account will be auto-created with owner role');
+            console.log('═══════════════════════════════════════════════════════');
             
         } catch (error) {
+            console.error('❌ Transaction error, rolling back...');
             await queryRunner.rollbackTransaction();
             throw error;
         } finally {
