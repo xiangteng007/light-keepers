@@ -192,12 +192,12 @@ describe('Navigation Regression Suite', () => {
             expect(screen.getByTestId('page-public')).toBeInTheDocument();
         });
 
-        it('Case 2: Protected routes redirect to account page when unauthenticated', async () => {
+        it('Case 2: Protected routes redirect to login page when unauthenticated', async () => {
             render(<TestApp initialPath="/volunteer-area" isAuthenticated={false} />);
             
-            // ProtectedRoute redirects to /account for unauthenticated users
+            // ProtectedRoute redirects to /login for unauthenticated users
             await waitFor(() => {
-                expect(screen.getByTestId('account-page')).toBeInTheDocument();
+                expect(screen.getByTestId('login-page')).toBeInTheDocument();
             });
         });
 

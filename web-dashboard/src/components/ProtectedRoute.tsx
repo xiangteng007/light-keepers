@@ -59,11 +59,10 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
     // 🔐 Auth Ready 後才判斷：Level 1+ 頁面需要登入
     // 此時 authReady = true，isAuthenticated 是最終確定的值
     if (!isAuthenticated) {
-        // 401 行為：未登入 → 導向帳戶頁（可顯示登入 UI），保留 intended route
-        // 註：不導向 "/" 因為 "/" 會重導向到 /command-center，造成無限迴圈
+        // 401 行為：未登入 → 導向登入頁，保留 intended route
         return (
             <Navigate 
-                to="/account" 
+                to="/login" 
                 state={{ from: location, reason: 'unauthenticated' }} 
                 replace 
             />
