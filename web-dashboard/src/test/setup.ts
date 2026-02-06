@@ -4,6 +4,37 @@ import 'fake-indexeddb/auto';
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
 
+// Mock axios globally to prevent ERR_NETWORK in CI
+// This prevents AuthContext token refresh from making actual API calls
+vi.mock('axios', () => ({
+    default: {
+        create: vi.fn(() => ({
+            get: vi.fn(() => Promise.resolve({ data: {} })),
+            post: vi.fn(() => Promise.resolve({ data: {} })),
+            put: vi.fn(() => Promise.resolve({ data: {} })),
+            delete: vi.fn(() => Promise.resolve({ data: {} })),
+            interceptors: {
+                request: { use: vi.fn(), eject: vi.fn() },
+                response: { use: vi.fn(), eject: vi.fn() },
+            },
+        })),
+        get: vi.fn(() => Promise.resolve({ data: {} })),
+        post: vi.fn(() => Promise.resolve({ data: {} })),
+        put: vi.fn(() => Promise.resolve({ data: {} })),
+        delete: vi.fn(() => Promise.resolve({ data: {} })),
+        interceptors: {
+            request: { use: vi.fn(), eject: vi.fn() },
+            response: { use: vi.fn(), eject: vi.fn() },
+        },
+    },
+    AxiosError: class AxiosError extends Error {
+        constructor(message: string) {
+            super(message);
+            this.name = 'AxiosError';
+        }
+    },
+}));
+
 // Mock fetch globally to prevent ERR_NETWORK in CI
 // This prevents tests from making actual API calls
 const mockFetch = vi.fn(() =>
