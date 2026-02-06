@@ -24,6 +24,7 @@ import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger'
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, Public } from '../shared/guards';
 import { OAuthService } from './services/oauth.service';
 import { AuthService } from './auth.service';
+import { RefreshTokenService } from './services/refresh-token.service';
 import { ConfigService } from '@nestjs/config';
 
 @ApiTags('OAuth')
@@ -35,9 +36,24 @@ export class AuthOAuthController {
     constructor(
         private readonly oauthService: OAuthService,
         private readonly authService: AuthService,
+        private readonly refreshTokenService: RefreshTokenService,
         private readonly configService: ConfigService,
     ) {
         this.frontendUrl = this.configService.get<string>('FRONTEND_URL', 'http://localhost:5175');
+    }
+
+    /**
+     * Helper method to get consistent cookie options
+     */
+    private getCookieOptions() {
+        const isProduction = process.env.NODE_ENV === 'production';
+        return {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' as const : 'lax' as const,
+            path: '/',
+            maxAge: 30 * 24 * 60 * 60 * 1000, // 30 days
+        };
     }
 
     // ===== LINE OAuth =====
@@ -91,10 +107,17 @@ export class AuthOAuthController {
             // Generate JWT token
             const tokens = await this.authService.generateTokenForAccountId(account.id);
 
-            // Redirect with tokens (for frontend to store)
+            // Create and set refresh token as httpOnly cookie
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                account.id,
+                'OAuth Browser',
+                undefined,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+
+            // Redirect with access token only (refresh token is in cookie)
             const params = new URLSearchParams({
                 access_token: tokens.accessToken,
-                refresh_token: tokens.refreshToken || '',
                 is_new: isNew.toString(),
             });
 
@@ -196,9 +219,17 @@ export class AuthOAuthController {
 
             const tokens = await this.authService.generateTokenForAccountId(account.id);
 
+            // Create and set refresh token as httpOnly cookie
+            const refreshToken = await this.refreshTokenService.createRefreshToken(
+                account.id,
+                'OAuth Browser',
+                undefined,
+            );
+            res.cookie('refresh_token', refreshToken, this.getCookieOptions());
+
+            // Redirect with access token only (refresh token is in cookie)
             const params = new URLSearchParams({
                 access_token: tokens.accessToken,
-                refresh_token: tokens.refreshToken || '',
                 is_new: isNew.toString(),
             });
 
