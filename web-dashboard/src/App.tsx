@@ -220,8 +220,8 @@ function App() {
           {/* ===== Command IC Dashboard (IC 儀表板) ===== */}
           <Route path="/command/ic" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="command-ic"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
 
-          {/* ===== 根路由重導向 ===== */}
-          <Route index element={<Navigate to="/command-center" replace />} />
+          {/* ===== 根路由重導向 (需認證檢查) ===== */}
+          <Route index element={<ProtectedRoute requiredLevel={1}><Navigate to="/command-center" replace /></ProtectedRoute>} />
 
 
           {/* ===== v2.2: 舊 redirect routes 已移除 (2026-01-12) ===== */}
