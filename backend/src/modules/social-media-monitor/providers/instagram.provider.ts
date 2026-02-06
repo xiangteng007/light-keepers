@@ -8,6 +8,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface InstagramMedia {
     id: string;
@@ -77,8 +78,8 @@ export class InstagramProvider {
 
             this.logger.log(`Fetched ${response.data.data.length} media items`);
             return response.data.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch Instagram media: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch Instagram media: ${getErrorMessage(error)}`);
             return [];
         }
     }
@@ -113,8 +114,8 @@ export class InstagramProvider {
             });
 
             return response.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch media ${mediaId}: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch media ${mediaId}: ${getErrorMessage(error)}`);
             return null;
         }
     }

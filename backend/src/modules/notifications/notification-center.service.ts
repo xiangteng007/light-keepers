@@ -5,6 +5,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { getErrorMessage } from '../../common/utils/error-utils';
 
 export interface NotificationItem {
     id: string;
@@ -85,9 +86,9 @@ export class NotificationCenterService {
                 notification.deliveredAt = new Date();
             }, 1000);
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             notification.status = 'failed';
-            notification.errorMessage = error.message;
+            notification.errorMessage = getErrorMessage(error);
         }
 
         return notification;

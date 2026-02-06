@@ -18,6 +18,7 @@ import {
     Logger,
     BadRequestException,
 } from '@nestjs/common';
+import { getErrorMessage } from '../../common/utils/error-utils';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, Public } from '../shared/guards';
@@ -98,9 +99,9 @@ export class AuthOAuthController {
             });
 
             return res.redirect(`${this.frontendUrl}/auth/callback?${params.toString()}&redirect=${encodeURIComponent(redirectPath)}`);
-        } catch (e: any) {
-            this.logger.error(`LINE callback error: ${e.message}`);
-            return res.redirect(`${this.frontendUrl}${redirectPath}&error=${encodeURIComponent(e.message)}`);
+        } catch (e: unknown) {
+            this.logger.error(`LINE callback error: ${getErrorMessage(e)}`);
+            return res.redirect(`${this.frontendUrl}${redirectPath}&error=${encodeURIComponent(getErrorMessage(e))}`);
         }
     }
 
@@ -202,9 +203,9 @@ export class AuthOAuthController {
             });
 
             return res.redirect(`${this.frontendUrl}/auth/callback?${params.toString()}&redirect=${encodeURIComponent(redirectPath)}`);
-        } catch (e: any) {
-            this.logger.error(`Google callback error: ${e.message}`);
-            return res.redirect(`${this.frontendUrl}${redirectPath}&error=${encodeURIComponent(e.message)}`);
+        } catch (e: unknown) {
+            this.logger.error(`Google callback error: ${getErrorMessage(e)}`);
+            return res.redirect(`${this.frontendUrl}${redirectPath}&error=${encodeURIComponent(getErrorMessage(e))}`);
         }
     }
 

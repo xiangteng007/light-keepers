@@ -9,6 +9,7 @@ import { Storage } from '@google-cloud/storage';
 import { MapPackage } from './entities/map-package.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { hasErrorCode } from '../../common/utils/error-utils';
 
 @Injectable()
 export class CloudStorageService {
@@ -133,8 +134,8 @@ export class CloudStorageService {
         try {
             await file.delete();
             this.logger.log(`Deleted package file: ${fileName}`);
-        } catch (err: any) {
-            if (err.code !== 404) {
+        } catch (err: unknown) {
+            if (!hasErrorCode(err, '404')) {
                 throw err;
             }
         }

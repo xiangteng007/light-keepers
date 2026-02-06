@@ -8,6 +8,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface FacebookPost {
     id: string;
@@ -79,8 +80,8 @@ export class FacebookProvider {
 
             this.logger.log(`Fetched ${response.data.data.length} posts from page ${pageId}`);
             return response.data.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch Facebook posts: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch Facebook posts: ${getErrorMessage(error)}`);
             return [];
         }
     }
@@ -116,8 +117,8 @@ export class FacebookProvider {
             });
 
             return response.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch post ${postId}: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch post ${postId}: ${getErrorMessage(error)}`);
             return null;
         }
     }

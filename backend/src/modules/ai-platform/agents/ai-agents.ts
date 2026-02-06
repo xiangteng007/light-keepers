@@ -9,6 +9,7 @@
  */
 
 import { Injectable } from '@nestjs/common';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 /**
  * Base AI Agent Interface
@@ -95,10 +96,10 @@ export class ScoutAgent implements AIAgent {
                 confidence: result.confidence || 0.85,
                 processingTime: Date.now() - startTime,
             };
-        } catch (error: any) {
+        } catch (error: unknown) {
             return {
                 success: false,
-                errors: [error.message],
+                errors: [getErrorMessage(error)],
                 processingTime: Date.now() - startTime,
             };
         }

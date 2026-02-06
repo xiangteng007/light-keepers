@@ -7,6 +7,7 @@
 
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface ChatMessage {
     role: 'user' | 'model';
@@ -106,8 +107,8 @@ export class GeminiProvider implements OnModuleInit {
                 finishReason: candidate?.finishReason || 'UNKNOWN',
                 tokenCount: data.usageMetadata?.totalTokenCount,
             };
-        } catch (error: any) {
-            this.logger.error(`Gemini generate error: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Gemini generate error: ${getErrorMessage(error)}`);
             return this.getMockResponse(prompt);
         }
     }
@@ -160,8 +161,8 @@ export class GeminiProvider implements OnModuleInit {
                 finishReason: candidate?.finishReason || 'UNKNOWN',
                 tokenCount: data.usageMetadata?.totalTokenCount,
             };
-        } catch (error: any) {
-            this.logger.error(`Gemini chat error: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Gemini chat error: ${getErrorMessage(error)}`);
             const lastMessage = messages[messages.length - 1];
             return this.getMockResponse(lastMessage?.content || '');
         }

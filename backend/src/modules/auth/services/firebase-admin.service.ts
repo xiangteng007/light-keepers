@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
+import { getErrorMessage, hasErrorCode } from '../../../common/utils/error-utils';
 
 /**
  * Firebase Admin 服務
@@ -438,17 +439,17 @@ export class FirebaseAdminService implements OnModuleInit {
                 success: true,
                 message: 'Firebase 用戶已刪除',
             };
-        } catch (error: any) {
-            if (error.code === 'auth/user-not-found') {
+        } catch (error: unknown) {
+            if (hasErrorCode(error, 'auth/user-not-found')) {
                 return {
                     success: true,
                     message: 'Firebase 用戶不存在',
                 };
             }
-            this.logger.error(`Failed to delete Firebase user by UID: ${error.message}`);
+            this.logger.error(`Failed to delete Firebase user by UID: ${getErrorMessage(error)}`);
             return {
                 success: false,
-                message: `刪除失敗: ${error.message}`,
+                message: `刪除失敗: ${getErrorMessage(error)}`,
             };
         }
     }
@@ -509,16 +510,16 @@ export class FirebaseAdminService implements OnModuleInit {
             const messageId = await admin.messaging().send(message);
             this.logger.log(`FCM push sent: ${messageId}`);
             return { success: true, messageId };
-        } catch (error: any) {
-            this.logger.error(`FCM push failed: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`FCM push failed: ${getErrorMessage(error)}`);
 
             // 處理無效 Token 錯誤
-            if (error.code === 'messaging/invalid-registration-token' ||
-                error.code === 'messaging/registration-token-not-registered') {
+            if (hasErrorCode(error, 'messaging/invalid-registration-token') ||
+                hasErrorCode(error, 'messaging/registration-token-not-registered')) {
                 return { success: false, error: 'invalid_token' };
             }
 
-            return { success: false, error: error.message };
+            return { success: false, error: getErrorMessage(error) };
         }
     }
 
@@ -576,8 +577,8 @@ export class FirebaseAdminService implements OnModuleInit {
                 failureCount: response.failureCount,
                 invalidTokens,
             };
-        } catch (error: any) {
-            this.logger.error(`FCM multicast failed: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`FCM multicast failed: ${getErrorMessage(error)}`);
             return { successCount: 0, failureCount: fcmTokens.length, invalidTokens: [] };
         }
     }
@@ -608,8 +609,8 @@ export class FirebaseAdminService implements OnModuleInit {
             const messageId = await admin.messaging().send(message);
             this.logger.log(`FCM topic push sent to '${topic}': ${messageId}`);
             return { success: true, messageId };
-        } catch (error: any) {
-            this.logger.error(`FCM topic push failed: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`FCM topic push failed: ${getErrorMessage(error)}`);
             return { success: false };
         }
     }
@@ -626,8 +627,8 @@ export class FirebaseAdminService implements OnModuleInit {
             await admin.messaging().subscribeToTopic(fcmTokens, topic);
             this.logger.log(`Subscribed ${fcmTokens.length} tokens to topic '${topic}'`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to subscribe to topic: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to subscribe to topic: ${getErrorMessage(error)}`);
             return false;
         }
     }
@@ -644,8 +645,8 @@ export class FirebaseAdminService implements OnModuleInit {
             await admin.messaging().unsubscribeFromTopic(fcmTokens, topic);
             this.logger.log(`Unsubscribed ${fcmTokens.length} tokens from topic '${topic}'`);
             return true;
-        } catch (error: any) {
-            this.logger.error(`Failed to unsubscribe from topic: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to unsubscribe from topic: ${getErrorMessage(error)}`);
             return false;
         }
     }

@@ -10,6 +10,7 @@ import { Cron, CronExpression, SchedulerRegistry } from '@nestjs/schedule';
 import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CronJob } from 'cron';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface ScheduledReport {
     id: string;
@@ -259,10 +260,10 @@ export class ReportSchedulerService {
             });
 
             this.logger.log(`Report generated: ${report.name}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             result.status = 'failed';
-            result.error = error.message;
-            this.logger.error(`Report generation failed: ${error.message}`);
+            result.error = getErrorMessage(error);
+            this.logger.error(`Report generation failed: ${getErrorMessage(error)}`);
         }
 
         this.reportHistory.push(result);
@@ -286,8 +287,8 @@ export class ReportSchedulerService {
 
             this.schedulerRegistry.addCronJob(report.id, job);
             job.start();
-        } catch (error: any) {
-            this.logger.error(`Failed to add cron job for ${report.id}: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to add cron job for ${report.id}: ${getErrorMessage(error)}`);
         }
     }
 

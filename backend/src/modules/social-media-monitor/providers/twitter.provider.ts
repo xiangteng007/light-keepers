@@ -8,6 +8,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface Tweet {
     id: string;
@@ -102,8 +103,8 @@ export class TwitterProvider {
 
             this.logger.log(`Found ${response.data.meta?.result_count || 0} tweets for query: ${query}`);
             return response.data.data || [];
-        } catch (error: any) {
-            this.logger.error(`Failed to search tweets: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to search tweets: ${getErrorMessage(error)}`);
             return [];
         }
     }
@@ -125,8 +126,8 @@ export class TwitterProvider {
             });
 
             return response.data.data || [];
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch user tweets: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch user tweets: ${getErrorMessage(error)}`);
             return [];
         }
     }
@@ -148,8 +149,8 @@ export class TwitterProvider {
             });
 
             return response.data.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to fetch tweet ${tweetId}: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to fetch tweet ${tweetId}: ${getErrorMessage(error)}`);
             return null;
         }
     }

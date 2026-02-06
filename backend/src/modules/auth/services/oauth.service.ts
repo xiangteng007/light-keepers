@@ -11,6 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Account } from '../../accounts/entities/account.entity';
 import axios from 'axios';
+import { getErrorMessage } from '../../../common/utils/error-utils';
 
 export interface LineTokenResponse {
     access_token: string;
@@ -104,8 +105,8 @@ export class OAuthService {
                 }
             );
             return response.data;
-        } catch (error: any) {
-            this.logger.error(`LINE token exchange failed: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`LINE token exchange failed: ${getErrorMessage(error)}`);
             throw new BadRequestException('LINE authorization failed');
         }
     }
@@ -123,8 +124,8 @@ export class OAuthService {
                 headers: { Authorization: `Bearer ${accessToken}` },
             });
             return response.data;
-        } catch (error: any) {
-            this.logger.error(`Failed to get LINE profile: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Failed to get LINE profile: ${getErrorMessage(error)}`);
             throw new BadRequestException('Failed to get LINE profile');
         }
     }
@@ -261,8 +262,8 @@ export class OAuthService {
             );
 
             return userInfo.data;
-        } catch (error: any) {
-            this.logger.error(`Google token exchange failed: ${error.message}`);
+        } catch (error: unknown) {
+            this.logger.error(`Google token exchange failed: ${getErrorMessage(error)}`);
             throw new BadRequestException('Google authorization failed');
         }
     }

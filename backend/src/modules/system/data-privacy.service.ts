@@ -5,6 +5,7 @@
 
 import { Injectable, Logger } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { getErrorMessage } from '../../common/utils/error-utils';
 
 export interface DataDeletionRequest {
     id: string;
@@ -118,9 +119,9 @@ export class DataPrivacyService {
             request.processedBy = adminId;
 
             this.logger.log(`Processed ${request.requestType} request ${requestId}`);
-        } catch (error: any) {
+        } catch (error: unknown) {
             request.status = 'rejected';
-            request.notes = error.message;
+            request.notes = getErrorMessage(error);
         }
 
         return request;

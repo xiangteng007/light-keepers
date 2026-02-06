@@ -8,6 +8,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { Response } from 'express';
 import { FileStorageService } from './file-storage.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, CurrentUser } from '../shared/guards';
+import { getErrorMessage } from '../../common/utils/error-utils';
 
 @Controller('files')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -39,8 +40,8 @@ export class FilesController {
             );
 
             return { success: true, data: storedFile };
-        } catch (error: any) {
-            return { success: false, error: error.message };
+        } catch (error: unknown) {
+            return { success: false, error: getErrorMessage(error) };
         }
     }
 
