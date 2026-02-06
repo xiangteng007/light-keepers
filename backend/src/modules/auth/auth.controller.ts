@@ -7,6 +7,13 @@ import { RefreshTokenService } from './services/refresh-token.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { Public } from './decorators/public.decorator';
 
+// Request types for type safety
+interface RequestWithCookies {
+    headers: { 'user-agent'?: string };
+    ip?: string;
+    cookies?: { refresh_token?: string };
+}
+
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -26,7 +33,7 @@ export class AuthController {
     @Post('login')
     async login(
         @Body() dto: LoginDto,
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.login(dto);
@@ -105,7 +112,7 @@ export class AuthController {
     @Post('line/callback')
     async lineCallback(
         @Body() body: { code: string; redirectUri: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.exchangeLineCode(body.code, body.redirectUri);
@@ -130,7 +137,7 @@ export class AuthController {
     @Post('line/login')
     async loginWithLine(
         @Body() body: { accessToken: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.loginWithLine(body.accessToken);
@@ -195,7 +202,7 @@ export class AuthController {
     @Post('liff/login')
     async loginWithLiffToken(
         @Body() body: { idToken: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.loginWithLiffToken(body.idToken);
@@ -224,7 +231,7 @@ export class AuthController {
     @Post('google/callback')
     async googleCallback(
         @Body() body: { code: string; redirectUri: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.exchangeGoogleCode(body.code, body.redirectUri);
@@ -249,7 +256,7 @@ export class AuthController {
     @Post('google/login')
     async loginWithGoogle(
         @Body() body: { accessToken: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.loginWithGoogle(body.accessToken);
@@ -319,7 +326,7 @@ export class AuthController {
     @Post('firebase/login')
     async loginWithFirebaseToken(
         @Body() body: { idToken: string },
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const result = await this.authService.loginWithFirebaseToken(body.idToken);
@@ -560,7 +567,7 @@ export class AuthController {
     @Throttle({ default: { limit: 30, ttl: 60000 } })
     @Post('refresh')
     async refreshToken(
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         // Get refresh token from cookie
@@ -595,7 +602,7 @@ export class AuthController {
      */
     @Post('logout')
     async logout(
-        @Request() req: any,
+        @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
         const refreshToken = req.cookies?.refresh_token;

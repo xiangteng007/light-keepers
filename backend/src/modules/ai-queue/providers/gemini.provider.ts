@@ -158,6 +158,7 @@ export class GeminiProvider {
     /**
      * Basic schema validation
      */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private validateSchema(data: object, schema: any): boolean {
         if (!schema.properties) return true;
 
@@ -190,7 +191,7 @@ export class GeminiProvider {
         mimeType: string;
         outputSchema?: object;
         maxOutputTokens?: number;
-    }): Promise<{ success: boolean; data?: any; error?: string }> {
+    }): Promise<{ success: boolean; data?: unknown; error?: string }> {
         const startTime = Date.now();
         const modelName = 'gemini-2.0-flash-exp';
 
@@ -201,7 +202,7 @@ export class GeminiProvider {
         const url = `${this.baseUrl}/models/${modelName}:generateContent?key=${this.apiKey}`;
 
         // Build image part
-        let imagePart: any;
+        let imagePart: { inlineData: { mimeType: string; data: string } } | undefined;
         if (options.imageBase64) {
             imagePart = {
                 inlineData: {
@@ -226,6 +227,7 @@ export class GeminiProvider {
             }
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const body: any = {
             systemInstruction: {
                 parts: [{ text: options.systemPrompt }],
@@ -298,7 +300,7 @@ export class GeminiProvider {
         mimeType: string;
         outputSchema?: object;
         maxOutputTokens?: number;
-    }): Promise<{ success: boolean; data?: any; error?: string }> {
+    }): Promise<{ success: boolean; data?: unknown; error?: string }> {
         const startTime = Date.now();
         const modelName = 'gemini-2.0-flash-exp';
 
@@ -315,6 +317,7 @@ export class GeminiProvider {
             },
         };
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const body: any = {
             systemInstruction: {
                 parts: [{ text: options.systemPrompt }],

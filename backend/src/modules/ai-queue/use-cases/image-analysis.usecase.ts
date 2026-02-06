@@ -137,7 +137,7 @@ export class ImageAnalysisUseCase {
 
             return {
                 success: true,
-                analysis: response.data,
+                analysis: response.data as ImageAnalysisResult['analysis'],
             };
         } catch (error) {
             this.logger.error('Image analysis failed', error);

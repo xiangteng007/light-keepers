@@ -99,7 +99,7 @@ export class VoiceTranscriptionUseCase {
 
             return {
                 success: true,
-                transcription: response.data,
+                transcription: response.data as VoiceTranscriptionResult['transcription'],
             };
         } catch (error) {
             this.logger.error('Voice transcription failed', error);

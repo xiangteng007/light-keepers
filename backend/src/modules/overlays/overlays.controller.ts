@@ -23,6 +23,12 @@ import {
     OverlayDto,
 } from './dto';
 
+// User payload interface for type safety
+interface UserPayload {
+    uid?: string;
+    id?: string;
+}
+
 @ApiTags('Overlays')
 @ApiBearerAuth()
 @Controller('mission-sessions/:sessionId/overlays')
@@ -58,9 +64,9 @@ export class OverlaysController {
     async create(
         @Param('sessionId', ParseUUIDPipe) sessionId: string,
         @Body() dto: CreateOverlayDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<OverlayDto> {
-        return this.overlaysService.create(sessionId, dto, user.uid || user.id);
+        return this.overlaysService.create(sessionId, dto, (user.uid || user.id)!);
     }
 
     @Patch(':id')
@@ -73,10 +79,10 @@ export class OverlaysController {
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: UpdateOverlayDto,
         @Headers('if-match') versionHeader: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<OverlayDto> {
         const version = parseInt(versionHeader, 10) || dto.version;
-        return this.overlaysService.update(id, dto, version, user.uid || user.id);
+        return this.overlaysService.update(id, dto, version, (user.uid || user.id)!);
     }
 
     @Post(':id/publish')
@@ -85,9 +91,9 @@ export class OverlaysController {
     @ApiResponse({ status: 200, type: OverlayDto })
     async publish(
         @Param('id', ParseUUIDPipe) id: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<OverlayDto> {
-        return this.overlaysService.publish(id, user.uid || user.id);
+        return this.overlaysService.publish(id, (user.uid || user.id)!);
     }
 
     @Delete(':id')
@@ -96,9 +102,9 @@ export class OverlaysController {
     @ApiResponse({ status: 204, description: 'Overlay removed' })
     async remove(
         @Param('id', ParseUUIDPipe) id: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<void> {
-        return this.overlaysService.remove(id, user.uid || user.id);
+        return this.overlaysService.remove(id, (user.uid || user.id)!);
     }
 
     // Lock endpoints
@@ -109,9 +115,9 @@ export class OverlaysController {
     @ApiResponse({ status: 409, description: 'Lock held by another user' })
     async acquireLock(
         @Param('id', ParseUUIDPipe) id: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<{ success: boolean; expiresAt: Date }> {
-        return this.overlaysService.acquireLock(id, user.uid || user.id);
+        return this.overlaysService.acquireLock(id, (user.uid || user.id)!);
     }
 
     @Delete(':id/lock')
@@ -120,8 +126,8 @@ export class OverlaysController {
     @ApiResponse({ status: 200, description: 'Lock released' })
     async releaseLock(
         @Param('id', ParseUUIDPipe) id: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: UserPayload,
     ): Promise<{ success: boolean }> {
-        return this.overlaysService.releaseLock(id, user.uid || user.id);
+        return this.overlaysService.releaseLock(id, (user.uid || user.id)!);
     }
 }
