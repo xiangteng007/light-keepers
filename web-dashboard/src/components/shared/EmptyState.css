@@ -1,0 +1,97 @@
+/* EmptyState.css - Unified empty state component */
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    text-align: center;
+    min-height: 200px;
+}
+
+.empty-state__icon-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-tertiary, #666);
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+}
+
+.empty-state:hover .empty-state__icon-wrapper {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(255, 255, 255, 0.12);
+    transform: scale(1.05);
+}
+
+.empty-state__title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary, #e0e0e0);
+    margin: 0 0 8px 0;
+    letter-spacing: -0.01em;
+}
+
+.empty-state__description {
+    font-size: 0.9rem;
+    color: var(--text-secondary, #999);
+    margin: 0 0 20px 0;
+    max-width: 320px;
+    line-height: 1.5;
+}
+
+.empty-state__action {
+    padding: 8px 20px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.06);
+    color: var(--text-primary, #e0e0e0);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.empty-state__action:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.25);
+    transform: translateY(-1px);
+}
+
+/* Variant: search */
+.empty-state--search .empty-state__icon-wrapper {
+    border-color: rgba(59, 130, 246, 0.2);
+    color: rgba(59, 130, 246, 0.6);
+}
+
+/* Variant: error */
+.empty-state--error .empty-state__icon-wrapper {
+    border-color: rgba(239, 68, 68, 0.2);
+    color: rgba(239, 68, 68, 0.6);
+}
+
+/* Variant: minimal */
+.empty-state--minimal {
+    padding: 24px 16px;
+    min-height: 120px;
+}
+
+.empty-state--minimal .empty-state__icon-wrapper {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 12px;
+}
+
+.empty-state--minimal .empty-state__icon-wrapper svg {
+    width: 24px;
+    height: 24px;
+}
+
+.empty-state--minimal .empty-state__title {
+    font-size: 0.95rem;
+}
