@@ -13,7 +13,8 @@ export interface JwtPayload {
     email: string;        // Email
     name?: string;        // Display name
     displayName?: string; // Display name (alias for AuthUser compat)
-    roleLevel?: number;   // 權限等級 (0-5)
+ 
+        role?: string;roleLevel?: number;   // 權限等級 (0-5)
     roles?: string[];     // 角色名稱陣列
     iat?: number;         // Issued at
     exp?: number;         // Expiration
@@ -56,7 +57,8 @@ export class CoreJwtGuard implements CanActivate {
                 uid: payload.sub,           // AuthUser compat
                 email: payload.email,
                 name: payload.name,
-                displayName: payload.name,  // AuthUser compat
+                displayName: payload.name,  // AuthUse
+                              role: payload.roles?.[0] || '',
                 roleLevel: payload.roleLevel ?? 0,
                 roles: payload.roles ?? [],
             };
