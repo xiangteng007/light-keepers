@@ -5,173 +5,19 @@ import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed,
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
-// Google Maps API Key - from environment variable
-const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || '';
-const GOOGLE_MAPS_LIBRARIES: ("places" | "visualization")[] = ['places', 'visualization'];
-
-// 台灣中心座標
-const TAIWAN_CENTER = { lat: 23.5, lng: 121 };
-const DEFAULT_ZOOM = 7;
-const AED_MIN_ZOOM = 17; // AED 最低顯示縮放等級 (約 50m 比例尺)
-const EVENT_ZOOM_LEVEL = 16;
-
-// NCDR 核心示警類型定義（使用官方 AlertType ID）
-// 來源: https://alerts.ncdr.nat.gov.tw/RSS.aspx
-const NCDR_CORE_TYPES = [
-    { id: 6, name: '地震', icon: '🌍', color: '#5BA3C0' },       // 地震(中央氣象署)
-    { id: 7, name: '海嘯', icon: '🌊', color: '#4DA6E8' },       // 海嘯(中央氣象署)
-    { id: 5, name: '颱風', icon: '🌀', color: '#7B6FA6' },       // 颱風(中央氣象署)
-    { id: 1051, name: '雷雨', icon: '⛈️', color: '#A67B5B' },    // 雷雨(中央氣象署)
-    { id: 10, name: '降雨', icon: '🌧️', color: '#6B8EC9' },      // 降雨(中央氣象署)
-    { id: 9, name: '土石流', icon: '⛰️', color: '#8B6B5A' },     // 土石流(農業部)
-    { id: 1087, name: '火災', icon: '🔥', color: '#E85A5A' },    // 火災(內政部消防署)
-];
-
-// NCDR 擴展示警類型
-const NCDR_EXTENDED_TYPES = [
-    { id: 1060, name: '低溫', icon: '❄️', color: '#88CCEE' },    // 低溫(中央氣象署)
-    { id: 1062, name: '濃霧', icon: '🌫️', color: '#9AA5B1' },    // 濃霧(中央氣象署)
-    { id: 1061, name: '強風', icon: '💨', color: '#7EC8E3' },    // 強風(中央氣象署)
-    { id: 2107, name: '高溫', icon: '🌡️', color: '#E8A65A' },    // 高溫(中央氣象署)
-    { id: 8, name: '淹水', icon: '🌊', color: '#5AB3E8' },       // 淹水(水利署)
-    { id: 12, name: '水庫放流', icon: '💧', color: '#5AAAE8' },  // 水庫放流(水利署)
-    { id: 11, name: '河川高水位', icon: '🏞️', color: '#6BB3C9' }, // 河川高水位(水利署)
-    { id: 13, name: '道路封閉', icon: '🚧', color: '#F5A623' },  // 道路封閉(交通部公路局)
-    { id: 34, name: '鐵路事故', icon: '🚃', color: '#607D8B' },  // 鐵路事故(臺鐵公司)
-    { id: 32, name: '鐵路事故(高鐵)', icon: '🚄', color: '#FF5722' }, // 鐵路事故(台灣高鐵)
-    { id: 1053, name: '傳染病', icon: '🦠', color: '#8BC34A' },  // 傳染病(疾病管制署)
-    { id: 1078, name: '空氣品質', icon: '😷', color: '#9E9E9E' }, // 空氣品質(環境部)
-    { id: 1093, name: '林火', icon: '🌲', color: '#4CAF50' },    // 林火危險度預警(農業部)
-    { id: 1080, name: '電力', icon: '⚡', color: '#FFC107' },    // 電力中斷(台灣電力公司)
-    { id: 1089, name: '停水', icon: '🚰', color: '#2196F3' },    // 停水(台灣自來水公司)
-    { id: 2135, name: '捷運營運', icon: '🚇', color: '#9C27B0' }, // 捷運營運(臺北大眾捷運)
-];
-
-// 圖層類型配置
-const MAP_TYPES = {
-    roadmap: { name: '預設', id: 'roadmap' as google.maps.MapTypeId },
-    satellite: { name: '衛星', id: 'satellite' as google.maps.MapTypeId },
-    terrain: { name: '地形', id: 'terrain' as google.maps.MapTypeId },
-    hybrid: { name: '衛星+標籤', id: 'hybrid' as google.maps.MapTypeId },
-} as const;
-
-type MapTypeKey = keyof typeof MAP_TYPES;
-
-// 嚴重程度對應的顏色和標記圖標
-const getSeverityColor = (severity: number) => {
-    if (severity >= 5) return '#B85C5C'; // 危機 - 紅色
-    if (severity >= 4) return '#C9A256'; // 緊急 - 橙色
-    if (severity >= 3) return '#B8976F'; // 警戒 - 金棕
-    if (severity >= 2) return '#5C7B8E'; // 注意 - 藍灰
-    return '#6B8E5C'; // 一般 - 綠色
-};
-
-const getSeverityLabel = (severity: number) => {
-    if (severity >= 5) return '危機';
-    if (severity >= 4) return '緊急';
-    if (severity >= 3) return '警戒';
-    if (severity >= 2) return '注意';
-    return '一般';
-};
-
-// 自訂標記圖標 - 災害回報 (PIN 形狀)
-const createMarkerIcon = (severity: number) => {
-    const color = getSeverityColor(severity);
-    return {
-        path: 'M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z',
-        fillColor: color,
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 2,
-        scale: 1.8,
-        anchor: new google.maps.Point(12, 22),
-    };
-};
-
-// NCDR 警報圖標 - 圓形圖標（根據類型顯示不同顏色）
-const getNcdrTypeColor = (alertTypeId: number): string => {
-    const allTypes = [...NCDR_CORE_TYPES, ...NCDR_EXTENDED_TYPES];
-    const typeInfo = allTypes.find(t => t.id === alertTypeId);
-    return typeInfo?.color || '#C9A256';
-};
-
-const createNcdrMarkerIcon = (alertTypeId: number) => {
-    const color = getNcdrTypeColor(alertTypeId);
-    // 使用圓形帶圖標的設計
-    return {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: color,
-        fillOpacity: 1,
-        strokeColor: '#fff',
-        strokeWeight: 3,
-        scale: 12,
-    };
-};
-
-// 避難所標記圖標 - 房子形狀（綠色系）
-const createShelterMarkerIcon = () => ({
-    path: 'M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z',
-    fillColor: '#4CAF50',
-    fillOpacity: 1,
-    strokeColor: '#fff',
-    strokeWeight: 2,
-    scale: 1.5,
-    anchor: new google.maps.Point(12, 20),
-});
-
-// AED 標記圖標 - 心臟形狀（紅色）
-const createAedMarkerIcon = () => ({
-    path: 'M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z',
-    fillColor: '#E53935',
-    fillOpacity: 1,
-    strokeColor: '#fff',
-    strokeWeight: 2,
-    scale: 1.2,
-    anchor: new google.maps.Point(12, 21),
-});
-
-// 倉庫標記圖標 - 方形倉庫（藍色）
-const createWarehouseMarkerIcon = () => ({
-    path: 'M2 20h20v-4H2v4zm2-3h2v2H4v-2zM2 4v4h20V4H2zm4 3H4V5h2v2zm-4 7h20v-4H2v4zm2-3h2v2H4v-2z',
-    fillColor: '#2196F3',
-    fillOpacity: 1,
-    strokeColor: '#fff',
-    strokeWeight: 2,
-    scale: 1.4,
-    anchor: new google.maps.Point(12, 12),
-});
-
-// Map container style
-const containerStyle = {
-    width: '100%',
-    height: '100%',
-};
-
-// Map options for POI click
-const mapOptions: google.maps.MapOptions = {
-    disableDefaultUI: false,
-    zoomControl: true,
-    mapTypeControl: false, // We'll create our own
-    scaleControl: true,
-    streetViewControl: true,
-    rotateControl: false, // 關閉旋轉控制
-    fullscreenControl: true,
-    clickableIcons: true, // Enable POI clicking
-    keyboardShortcuts: false, // 關閉鍵盤快捷鍵控制介面
-    tilt: 0, // 禁用傾斜
-    heading: 0, // 固定朝向北方
-    styles: [
-        // 可選：自訂地圖樣式
-    ],
-};
-
-// 初始化所有類型為全選
-const initNcdrFilters = (): Record<number, boolean> => {
-    const filters: Record<number, boolean> = {};
-    NCDR_CORE_TYPES.forEach(t => { filters[t.id] = true; });
-    NCDR_EXTENDED_TYPES.forEach(t => { filters[t.id] = true; }); // 全部預設開啟
-    return filters;
-};
+// Map constants and utilities (extracted)
+import {
+    GOOGLE_MAPS_API_KEY, GOOGLE_MAPS_LIBRARIES,
+    TAIWAN_CENTER, DEFAULT_ZOOM, AED_MIN_ZOOM, EVENT_ZOOM_LEVEL,
+    NCDR_CORE_TYPES, NCDR_EXTENDED_TYPES,
+    MAP_TYPES, type MapTypeKey,
+} from './map-constants';
+import {
+    getSeverityColor, getSeverityLabel,
+    createMarkerIcon, createNcdrMarkerIcon,
+    createShelterMarkerIcon, createAedMarkerIcon, createWarehouseMarkerIcon,
+    containerStyle, mapOptions, initNcdrFilters,
+} from './map-utils';
 
 export default function MapPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
