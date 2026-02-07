@@ -32,7 +32,7 @@ export class MenuConfigController {
         @CurrentUserDecorator() user: JwtPayload,
     ) {
         // Only owner (level 5) can update menu config
-        if (!user || user.roleLevel < 5) {
+          if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('只有系統擁有者可以編輯選單設定');
         }
 
