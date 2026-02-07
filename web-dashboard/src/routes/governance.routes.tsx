@@ -10,6 +10,7 @@ import {
   BiometricPage,
   SettingsPage,
   InteroperabilityPage,
+  MonitorPage,
 } from '../components/lazy/LazyPages';
 import ProtectedRoute from '../components/ProtectedRoute';
 import PageWrapper from '../components/layout/PageWrapper';
@@ -26,5 +27,7 @@ export const governanceRoutes = (
 
     {/* Admin Audit Route (alias) */}
     <Route path="/admin/audit-logs" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="admin-audit-logs"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
+    {/* System Monitor */}
+    <Route path="/governance/monitor" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-monitor"><MonitorPage /></PageWrapper></ProtectedRoute>} />
   </>
 );

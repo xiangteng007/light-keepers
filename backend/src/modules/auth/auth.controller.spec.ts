@@ -1,0 +1,153 @@
+import { Test, TestingModule } from '@nestjs/testing';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
+import { RefreshTokenService } from './services/refresh-token.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
+
+describe('AuthController', () => {
+    let controller: AuthController;
+    let authService: any;
+
+    const mockRoleOwner = {
+        id: 'role-1',
+        name: 'owner',
+        displayName: '系統管理員',
+        level: 5,
+    };
+
+    const mockRoleVolunteer = {
+        id: 'role-2',
+        name: 'volunteer',
+        displayName: '登記志工',
+        level: 1,
+    };
+
+    const mockAccount = {
+        id: 'user-123',
+        email: 'owner@example.com',
+        phone: '0912345678',
+        displayName: '管理員',
+        avatarUrl: null,
+        lineUserId: 'line-uid',
+        googleId: 'google-uid',
+        volunteerProfileCompleted: true,
+        roles: [mockRoleOwner],
+    };
+
+    beforeEach(async () => {
+        const module: TestingModule = await Test.createTestingModule({
+            controllers: [AuthController],
+            providers: [
+                {
+                    provide: AuthService,
+                    useValue: {
+                        getAccountById: jest.fn(),
+                    },
+                },
+                {
+                    provide: RefreshTokenService,
+                    useValue: {},
+                },
+            ],
+        })
+            .overrideGuard(CoreJwtGuard)
+            .useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard)
+            .useValue({ canActivate: () => true })
+            .compile();
+
+        controller = module.get<AuthController>(AuthController);
+        authService = module.get(AuthService);
+    });
+
+    it('should be defined', () => {
+        expect(controller).toBeDefined();
+    });
+
+    describe('getProfile', () => {
+        it('should calculate roleLevel from DB roles (not JWT string[])', async () => {
+            authService.getAccountById.mockResolvedValue(mockAccount);
+
+            const req = { user: { id: 'user-123', email: 'owner@example.com' } };
+            const result = await controller.getProfile(req);
+
+            expect(result.roleLevel).toBe(5);
+            expect(result.roles).toEqual(['owner']);
+            expect(result.roleDisplayName).toBe('系統管理員');
+        });
+
+        it('should return roleLevel 0 and "一般民眾" when no DB roles', async () => {
+            authService.getAccountById.mockResolvedValue({
+                ...mockAccount,
+                roles: [],
+            });
+
+            const req = { user: { id: 'user-123' } };
+            const result = await controller.getProfile(req);
+
+            expect(result.roleLevel).toBe(0);
+            expect(result.roleDisplayName).toBe('一般民眾');
+        });
+
+        it('should fallback to JWT roleLevel when account has no roles', async () => {
+            authService.getAccountById.mockResolvedValue({
+                ...mockAccount,
+                roles: [],
+            });
+
+            const req = { user: { id: 'user-123', roleLevel: 3 } };
+            const result = await controller.getProfile(req);
+
+            expect(result.roleLevel).toBe(3);
+            expect(result.roleDisplayName).toBe('登記志工');
+        });
+
+        it('should use highest role level when multiple roles exist', async () => {
+            authService.getAccountById.mockResolvedValue({
+                ...mockAccount,
+                roles: [mockRoleVolunteer, mockRoleOwner],
+            });
+
+            const req = { user: { id: 'user-123' } };
+            const result = await controller.getProfile(req);
+
+            expect(result.roleLevel).toBe(5);
+            expect(result.roleDisplayName).toBe('系統管理員');
+        });
+
+        it('should return correct linked status', async () => {
+            authService.getAccountById.mockResolvedValue(mockAccount);
+
+            const req = { user: { id: 'user-123' } };
+            const result = await controller.getProfile(req);
+
+            expect(result.lineLinked).toBe(true);
+            expect(result.googleLinked).toBe(true);
+        });
+
+        it('should return false for linked status when IDs are null', async () => {
+            authService.getAccountById.mockResolvedValue({
+                ...mockAccount,
+                lineUserId: null,
+                googleId: null,
+            });
+
+            const req = { user: { id: 'user-123' } };
+            const result = await controller.getProfile(req);
+
+            expect(result.lineLinked).toBe(false);
+            expect(result.googleLinked).toBe(false);
+        });
+
+        it('should handle null account gracefully', async () => {
+            authService.getAccountById.mockResolvedValue(null);
+
+            const req = { user: { id: 'user-123', email: 'test@example.com', roleLevel: 0 } };
+            const result = await controller.getProfile(req);
+
+            expect(result.roleLevel).toBe(0);
+            expect(result.email).toBe('test@example.com');
+            expect(result.roleDisplayName).toBe('一般民眾');
+        });
+    });
+});

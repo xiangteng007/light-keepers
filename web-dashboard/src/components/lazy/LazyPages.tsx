@@ -232,3 +232,6 @@ export const AccountPage = lazyWithSuspense(() =>
 export const ComponentShowcase = lazyWithSuspense(() => 
   import('../../pages/ComponentShowcase').then(m => ({ default: m.ComponentShowcase }))
 );
+
+// ===== System Monitoring =====
+export const MonitorPage = lazyWithSuspense(() => import('../../pages/MonitorPage'));
