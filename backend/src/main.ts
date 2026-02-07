@@ -76,7 +76,7 @@ async function bootstrap() {
                     imgSrc: ["'self'", "data:", "https:"],
                     connectSrc: [
                         "'self'",
-                        "https://light-keepers-api-bsf4y44tja-de.a.run.app",
+                        ...(process.env.API_URL ? [process.env.API_URL] : ["https://light-keepers-api-bsf4y44tja-de.a.run.app"]),
                     ],
                     fontSrc: ["'self'", "https://fonts.gstatic.com"],
                     objectSrc: ["'none'"],

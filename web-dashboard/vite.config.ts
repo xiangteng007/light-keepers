@@ -130,6 +130,12 @@ export default defineConfig({
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
           // PDF generation (~80KB)
           'vendor-pdf': ['jspdf', 'jspdf-autotable'],
+          // Map libraries (~500KB)
+          'vendor-maps': ['maplibre-gl', 'leaflet', 'react-leaflet'],
+          // Firebase (~200KB)
+          'vendor-firebase': ['firebase'],
+          // Excel export (~300KB)
+          'vendor-excel': ['exceljs'],
         },
       },
     },
