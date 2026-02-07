@@ -21,11 +21,11 @@ export class ApprovalController {
         @Query('controlLevel') controlLevel?: 'controlled' | 'medical',
         @Query('limit') limit?: string,
         @Query('offset') offset?: string,
-        @Request() req?: any,
+        @Request() req?: AuthenticatedRequest,
     ) {
         // 僅倉管與幹部可查看待覆核
         const user = req?.user;
-        if (user && user.roleLevel < 3) {
+        if (user && (user.roleLevel ?? 0) < 3) {
             throw new ForbiddenException('權限不足');
         }
 
@@ -48,14 +48,14 @@ export class ApprovalController {
         const user = req.user;
 
         // 僅倉管與幹部可覆核
-        if (!user || user.roleLevel < 3) {
+        if (!user || (user.roleLevel ?? 0) < 3) {
             throw new ForbiddenException('僅倉管與幹部可覆核');
         }
 
         return this.approvalService.approve({
             transactionId: id,
-            approverUid: user.uid,
-            approverName: user.name || user.email,
+            approverUid: user.uid || user.id,
+            approverName: user.name || user.email || 'unknown',
         });
     }
 
@@ -72,14 +72,14 @@ export class ApprovalController {
         const user = req.user;
 
         // 僅倉管與幹部可拒絕
-        if (!user || user.roleLevel < 3) {
+        if (!user || (user.roleLevel ?? 0) < 3) {
             throw new ForbiddenException('僅倉管與幹部可拒絕覆核');
         }
 
         return this.approvalService.reject({
             transactionId: id,
-            approverUid: user.uid,
-            approverName: user.name || user.email,
+            approverUid: user.uid || user.id,
+            approverName: user.name || user.email || 'unknown',
             rejectReason,
         });
     }
@@ -91,7 +91,7 @@ export class ApprovalController {
     @Get(':id')
     async getDetail(
         @Param('id') id: string,
-        @Request() req?: any,
+        @Request() _req?: AuthenticatedRequest,
     ) {
         return this.approvalService.getTransactionDetail(id);
     }

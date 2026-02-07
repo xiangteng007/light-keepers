@@ -48,21 +48,17 @@ export interface AuthenticatedRequest extends Request {
  * Request with optional cookies (for refresh token handling)
  */
 export interface RequestWithCookies extends Request {
-    cookies?: {
+    cookies: {
         refresh_token?: string;
         [key: string]: string | undefined;
     };
-    headers: Request['headers'] & {
-        'user-agent'?: string;
-    };
-    ip?: string;
 }
 
 /**
  * Request with both user and cookies
  */
 export interface AuthenticatedRequestWithCookies extends AuthenticatedRequest {
-    cookies?: {
+    cookies: {
         refresh_token?: string;
         [key: string]: string | undefined;
     };

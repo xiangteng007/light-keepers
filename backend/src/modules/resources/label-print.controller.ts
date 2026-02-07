@@ -23,15 +23,15 @@ export class LabelPrintController {
     ) {
         const user = req.user;
 
-        if (!user || (user.roleLevel < 3 && user.role !== '倉管')) {
+        if (!user || ((user.roleLevel ?? 0) < 3 && user.role !== '倉管')) {
             throw new ForbiddenException('權限不足');
         }
 
         return this.labelPrintService.generateLabelData({
             lotId: body.lotId,
             templateId: body.templateId,
-            actorUid: user.uid,
-            actorRole: user.role,
+            actorUid: user.uid || user.id,
+            actorRole: user.role || 'unknown',
         });
     }
 
@@ -49,15 +49,15 @@ export class LabelPrintController {
     ) {
         const user = req.user;
 
-        if (!user || (user.roleLevel < 3 && user.role !== '倉管')) {
+        if (!user || ((user.roleLevel ?? 0) < 3 && user.role !== '倉管')) {
             throw new ForbiddenException('權限不足');
         }
 
         return this.labelPrintService.batchGenerateLabelData({
             assetIds: body.assetIds,
             templateId: body.templateId,
-            actorUid: user.uid,
-            actorRole: user.role,
+            actorUid: user.uid || user.id,
+            actorRole: user.role || 'unknown',
         });
     }
 
@@ -76,7 +76,7 @@ export class LabelPrintController {
     ) {
         const user = req.user;
 
-        if (!user || (user.roleLevel < 3 && user.role !== '倉管')) {
+        if (!user || ((user.roleLevel ?? 0) < 3 && user.role !== '倉管')) {
             throw new ForbiddenException('權限不足');
         }
 
@@ -84,8 +84,8 @@ export class LabelPrintController {
             targetType: body.targetType,
             targetId: body.targetId,
             templateId: body.templateId,
-            actorUid: user.uid,
-            actorRole: user.role,
+            actorUid: user.uid || user.id,
+            actorRole: user.role || 'unknown',
         });
     }
 
@@ -105,7 +105,7 @@ export class LabelPrintController {
         const user = req.user;
 
         // 僅倉管與幹部可作廢
-        if (!user || (user.roleLevel < 3 && user.role !== '倉管')) {
+        if (!user || ((user.roleLevel ?? 0) < 3 && user.role !== '倉管')) {
             throw new ForbiddenException('僅倉管與幹部可作廢貼紙');
         }
 
@@ -113,8 +113,8 @@ export class LabelPrintController {
             targetType: body.targetType,
             targetId: body.targetId,
             revokeReason: body.revokeReason,
-            actorUid: user.uid,
-            actorRole: user.role,
+            actorUid: user.uid || user.id,
+            actorRole: user.role || 'unknown',
         });
 
         return { message: '貼紙已作廢' };

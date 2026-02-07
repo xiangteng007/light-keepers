@@ -55,13 +55,13 @@ export class LabelTemplatesController {
         const user = req.user;
 
         // 僅幹部可創建
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('僅幹部可創建模板');
         }
 
         return this.templatesService.create({
             ...body,
-            createdBy: user.uid,
+            createdBy: user.uid || user.id,
         });
     }
 
@@ -86,7 +86,7 @@ export class LabelTemplatesController {
     ) {
         const user = req.user;
 
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('僅幹部可編輯模板');
         }
 
@@ -105,7 +105,7 @@ export class LabelTemplatesController {
     ) {
         const user = req.user;
 
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('僅幹部可啟用/停用模板');
         }
 
@@ -123,7 +123,7 @@ export class LabelTemplatesController {
     ) {
         const user = req.user;
 
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('僅幹部可刪除模板');
         }
 

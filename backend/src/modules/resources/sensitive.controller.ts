@@ -35,8 +35,8 @@ export class SensitiveController {
 
         // 呼叫服務層處理
         return this.sensitiveService.readSensitiveData({
-            actorUid: user.uid,
-            actorRole: user.role,
+            actorUid: user.uid || user.id,
+            actorRole: user.role || 'unknown',
             targetType: body.targetType,
             targetId: body.targetId,
             fieldsAccessed: body.fieldsAccessed,
@@ -70,7 +70,7 @@ export class SensitiveController {
         const user = req.user;
 
         // 僅幹部可查詢
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('權限不足');
         }
 
@@ -100,7 +100,7 @@ export class SensitiveController {
         const user = req.user;
 
         // 僅幹部可查詢
-        if (!user || user.roleLevel < 5) {
+        if (!user || (user.roleLevel ?? 0) < 5) {
             throw new ForbiddenException('權限不足');
         }
 
