@@ -44,7 +44,7 @@ jobs:
             --platform managed \
             --revision-suffix=${REVISION_SUFFIX} \
             --add-cloudsql-instances=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db \
-            --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }},GOOGLE_REDIRECT_URI=https://light-keepers-api-381507943724.asia-east1.run.app/api/v1/auth/google/callback,FRONTEND_URL=https://lightkeepers.ngo" \
+            --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }},GOOGLE_REDIRECT_URI=https://light-keepers-api-955234851806.asia-east1.run.app/api/v1/auth/google/callback,FRONTEND_URL=https://lightkeepers.ngo" \
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
             --timeout=300 \
             --cpu-boost \
@@ -92,7 +92,7 @@ jobs:
       - name: Build
         working-directory: web-dashboard
         env:
-          VITE_API_URL: https://light-keepers-api-381507943724.asia-east1.run.app
+          VITE_API_URL: https://light-keepers-api-955234851806.asia-east1.run.app
           VITE_LINE_CLIENT_ID: "2008769727"
           VITE_LIFF_ID: ${{ secrets.LIFF_ID }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
