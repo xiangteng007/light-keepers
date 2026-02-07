@@ -22,7 +22,7 @@
 import { useState, useEffect, useCallback } from 'react';
 
 // Config version - increment when nav structure changes to force localStorage reset
-const CONFIG_VERSION = 4;  // v4: Fix insights group accessibility
+const CONFIG_VERSION = 5;  // v5: Hide shell pages without backend API (P0 audit)
 const STORAGE_KEY = 'lk-sidebar-config';
 const VERSION_KEY = 'lk-sidebar-version';
 
@@ -97,68 +97,68 @@ export const NAV_GROUPS: NavGroupConfig[] = [
 // Default navigation items - v3.0 (40+ items across 8 groups)
 // ==========================================
 const DEFAULT_NAV_ITEMS: NavItemConfig[] = [
-    // ========== ⚡ 緊急快捷 (emergency) - 4 items - ALWAYS VISIBLE ==========
-    { id: 'sos', icon: 'AlertCircle', label: 'SOS 發送', path: '/emergency/sos', group: 'emergency', order: 0, visible: true, minLevel: PermissionLevel.Anonymous, isQuickAction: true },
+    // ========== ⚡ 緊急快捷 (emergency) - 2 active / 2 hidden (shell) ==========
+    { id: 'sos', icon: 'AlertCircle', label: 'SOS 發送', path: '/emergency/sos', group: 'emergency', order: 0, visible: false, minLevel: PermissionLevel.Anonymous, isQuickAction: true },
     { id: 'quick-report', icon: 'FileWarning', label: '快速通報', path: '/intake', group: 'emergency', order: 1, visible: true, minLevel: PermissionLevel.Anonymous, isQuickAction: true },
-    { id: 'evacuation', icon: 'Siren', label: '撤離警報', path: '/emergency/evacuation', group: 'emergency', order: 2, visible: true, minLevel: PermissionLevel.Volunteer, isQuickAction: true },
-    { id: 'hotline', icon: 'Phone', label: '緊急專線', path: '/emergency/hotline', group: 'emergency', order: 3, visible: true, minLevel: PermissionLevel.Anonymous, isQuickAction: true },
+    { id: 'evacuation', icon: 'Siren', label: '撤離警報', path: '/emergency/evacuation', group: 'emergency', order: 2, visible: false, minLevel: PermissionLevel.Volunteer, isQuickAction: true },
+    { id: 'hotline', icon: 'Phone', label: '緊急專線', path: '/emergency/hotline', group: 'emergency', order: 3, visible: false, minLevel: PermissionLevel.Anonymous, isQuickAction: true },
 
     // ========== 🎯 作戰中心 (ops) - 7 items ==========
     { id: 'command-center', icon: 'LayoutDashboard', label: '戰情儀表板', path: '/command-center', group: 'ops', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'incidents', icon: 'AlertTriangle', label: '事件列表', path: '/incidents', group: 'ops', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'tasks', icon: 'ClipboardList', label: '任務看板', path: '/tasks', group: 'ops', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'ics-forms', icon: 'FileStack', label: 'ICS 表單', path: '/ops/ics-forms', group: 'ops', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'ics-forms', icon: 'FileStack', label: 'ICS 表單', path: '/ops/ics-forms', group: 'ops', order: 3, visible: false, minLevel: PermissionLevel.Supervisor },
     { id: 'notifications', icon: 'BellRing', label: '通知中心', path: '/hub/notifications', group: 'ops', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'ic-dashboard', icon: 'Target', label: 'IC 儀表板', path: '/command/ic', group: 'ops', order: 5, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'offline', icon: 'HardDrive', label: '離線狀態', path: '/hub/offline', group: 'ops', order: 6, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'ic-dashboard', icon: 'Target', label: 'IC 儀表板', path: '/command/ic', group: 'ops', order: 5, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'offline', icon: 'HardDrive', label: '離線狀態', path: '/hub/offline', group: 'ops', order: 6, visible: false, minLevel: PermissionLevel.Anonymous },
 
     // ========== 🗺️ 情資地圖 (geo) - 4 items ==========
     { id: 'unified-map', icon: 'Map', label: '統一地圖', path: '/geo/map', group: 'geo', order: 0, visible: true, minLevel: PermissionLevel.Anonymous },
     { id: 'alerts', icon: 'Bell', label: '警報中心', path: '/hub/geo-alerts', group: 'geo', order: 1, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: true, minLevel: PermissionLevel.Anonymous },
-    { id: 'shelter-map', icon: 'MapPin', label: '避難所地圖', path: '/geo/shelters', group: 'geo', order: 3, visible: true, minLevel: PermissionLevel.Anonymous },
+    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: false, minLevel: PermissionLevel.Anonymous },
+    { id: 'shelter-map', icon: 'MapPin', label: '避難所地圖', path: '/geo/shelters', group: 'geo', order: 3, visible: false, minLevel: PermissionLevel.Anonymous },
 
     // ========== 🏥 救援行動 (rescue) - 6 items (NEW GROUP) ==========
-    { id: 'shelters', icon: 'Building', label: '避難所管理', path: '/rescue/shelters', group: 'rescue', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'shelters', icon: 'Building', label: '避難所管理', path: '/rescue/shelters', group: 'rescue', order: 0, visible: false, minLevel: PermissionLevel.Volunteer },
     { id: 'triage', icon: 'Stethoscope', label: '傷患分類', path: '/rescue/triage', group: 'rescue', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'reunification', icon: 'Users2', label: '家庭重聚', path: '/rescue/reunification', group: 'rescue', order: 2, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'search-rescue', icon: 'Search', label: '搜救任務', path: '/rescue/search-rescue', group: 'rescue', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'medical-transport', icon: 'Truck', label: '醫療後送', path: '/rescue/medical-transport', group: 'rescue', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'field-comms', icon: 'Radio', label: '現地通訊', path: '/rescue/field-comms', group: 'rescue', order: 5, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'reunification', icon: 'Users2', label: '家庭重聚', path: '/rescue/reunification', group: 'rescue', order: 2, visible: false, minLevel: PermissionLevel.Volunteer },
+    { id: 'search-rescue', icon: 'Search', label: '搜救任務', path: '/rescue/search-rescue', group: 'rescue', order: 3, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'medical-transport', icon: 'Truck', label: '醫療後送', path: '/rescue/medical-transport', group: 'rescue', order: 4, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'field-comms', icon: 'Radio', label: '現地通訊', path: '/rescue/field-comms', group: 'rescue', order: 5, visible: false, minLevel: PermissionLevel.Supervisor },
 
     // ========== 📦 資源後勤 (logistics) - 5 items ==========
     { id: 'inventory', icon: 'Package', label: '物資庫存', path: '/logistics/inventory', group: 'logistics', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'equipment', icon: 'QrCode', label: '裝備管理', path: '/logistics/equipment', group: 'logistics', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'donations', icon: 'Heart', label: '捐贈追蹤', path: '/logistics/donations', group: 'logistics', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'unified-resources', icon: 'Combine', label: '資源整合', path: '/logistics/unified-resources', group: 'logistics', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'unified-resources', icon: 'Combine', label: '資源整合', path: '/logistics/unified-resources', group: 'logistics', order: 3, visible: false, minLevel: PermissionLevel.Supervisor },
     { id: 'approvals', icon: 'CheckSquare', label: '審批中心', path: '/approvals', group: 'logistics', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
 
     // ========== 👥 人員動員 (workforce) - 6 items ==========
     { id: 'people', icon: 'Users', label: '人員名冊', path: '/workforce/people', group: 'workforce', order: 0, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'shifts', icon: 'Calendar', label: '排班日曆', path: '/workforce/shifts', group: 'workforce', order: 1, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'mobilization', icon: 'Zap', label: '志工動員', path: '/workforce/mobilization', group: 'workforce', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
+    { id: 'mobilization', icon: 'Zap', label: '志工動員', path: '/workforce/mobilization', group: 'workforce', order: 2, visible: false, minLevel: PermissionLevel.Supervisor },
     { id: 'performance', icon: 'Trophy', label: '績效中心', path: '/workforce/performance', group: 'workforce', order: 3, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'community-hub', icon: 'Building2', label: '社區活動', path: '/community/hub', group: 'workforce', order: 4, visible: true, minLevel: PermissionLevel.Volunteer },
-    { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 5, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 5, visible: false, minLevel: PermissionLevel.Volunteer },
 
     // ========== 📊 分析知識 (insights) - 8 items ==========
     { id: 'analytics', icon: 'BarChart3', label: '分析儀表板', path: '/hub/analytics', group: 'insights', order: 0, visible: true, minLevel: PermissionLevel.Supervisor },
     { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'unified-reporting', icon: 'Files', label: '綜合報表', path: '/analytics/unified-reporting', group: 'insights', order: 2, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'simulation-engine', icon: 'FlaskConical', label: '模擬引擎', path: '/analytics/simulation', group: 'insights', order: 3, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'ai-tasks', icon: 'Brain', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 4, visible: true, minLevel: PermissionLevel.Supervisor },
-    { id: 'ai-chat', icon: 'Bot', label: 'AI 助手', path: '/hub/ai-chat', group: 'insights', order: 5, visible: true, minLevel: PermissionLevel.Volunteer },
+    { id: 'unified-reporting', icon: 'Files', label: '綜合報表', path: '/analytics/unified-reporting', group: 'insights', order: 2, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'simulation-engine', icon: 'FlaskConical', label: '模擬引擎', path: '/analytics/simulation', group: 'insights', order: 3, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'ai-tasks', icon: 'Brain', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 4, visible: false, minLevel: PermissionLevel.Supervisor },
+    { id: 'ai-chat', icon: 'Bot', label: 'AI 助手', path: '/hub/ai-chat', group: 'insights', order: 5, visible: false, minLevel: PermissionLevel.Volunteer },
     { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 6, visible: true, minLevel: PermissionLevel.Volunteer },
     { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 7, visible: true, minLevel: PermissionLevel.Anonymous },
 
     // ========== ⚙️ 系統管理 (admin) - 7 items ==========
     { id: 'iam', icon: 'Lock', label: '權限管理', path: '/governance/iam', group: 'admin', order: 0, visible: true, minLevel: PermissionLevel.Manager },
     { id: 'audit', icon: 'ScrollText', label: '審計日誌', path: '/governance/audit', group: 'admin', order: 1, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'security', icon: 'Shield', label: '安全中心', path: '/governance/security', group: 'admin', order: 2, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'interoperability', icon: 'Share2', label: '機構互通', path: '/governance/interoperability', group: 'admin', order: 3, visible: true, minLevel: PermissionLevel.Manager },
-    { id: 'webhooks', icon: 'Webhook', label: 'Webhook 管理', path: '/governance/webhooks', group: 'admin', order: 4, visible: true, minLevel: PermissionLevel.Admin },
-    { id: 'biometric', icon: 'Fingerprint', label: '生物辨識', path: '/governance/biometric', group: 'admin', order: 5, visible: true, minLevel: PermissionLevel.Admin },
-    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 6, visible: true, minLevel: PermissionLevel.Admin },
+    { id: 'security', icon: 'Shield', label: '安全中心', path: '/governance/security', group: 'admin', order: 2, visible: false, minLevel: PermissionLevel.Manager },
+    { id: 'interoperability', icon: 'Share2', label: '機構互通', path: '/governance/interoperability', group: 'admin', order: 3, visible: false, minLevel: PermissionLevel.Manager },
+    { id: 'webhooks', icon: 'Webhook', label: 'Webhook 管理', path: '/governance/webhooks', group: 'admin', order: 4, visible: false, minLevel: PermissionLevel.Admin },
+    { id: 'biometric', icon: 'Fingerprint', label: '生物辨識', path: '/governance/biometric', group: 'admin', order: 5, visible: false, minLevel: PermissionLevel.Admin },
+    { id: 'settings', icon: 'Settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 6, visible: false, minLevel: PermissionLevel.Admin },
 ];
 
 // ==========================================
