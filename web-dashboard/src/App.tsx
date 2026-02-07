@@ -5,6 +5,7 @@ import { RealtimeProvider } from './context/RealtimeContext'
 import { EmergencyProvider } from './context/useEmergencyContext'
 import { ThemeProvider } from './context/ThemeProvider'
 import ProtectedRoute from './components/ProtectedRoute'
+import HomeRedirect from './components/HomeRedirect'
 import PageWrapper from './components/layout/PageWrapper'
 import { CommandPalette } from './components/CommandPalette'
 
@@ -210,8 +211,8 @@ function App() {
           <Route path="/account" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="account"><AccountPage /></PageWrapper></ProtectedRoute>} />
 
           {/* ===== Dashboard 和 Command Center (使用 AppShellLayout) ===== */}
-          <Route path="/dashboard" element={<ProtectedRoute requiredLevel={1}><CommandCenterPage /></ProtectedRoute>} />
-          <Route path="/command-center" element={<ProtectedRoute requiredLevel={1}><CommandCenterPage /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute requiredLevel={0}><CommandCenterPage /></ProtectedRoute>} />
+          <Route path="/command-center" element={<ProtectedRoute requiredLevel={0}><CommandCenterPage /></ProtectedRoute>} />
           <Route path="/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
 
           {/* ===== Emergency 緊急快捷 Routes (Expert Council v3.0) ===== */}
@@ -222,8 +223,8 @@ function App() {
           {/* ===== Command IC Dashboard (IC 儀表板) ===== */}
           <Route path="/command/ic" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="command-ic"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
 
-          {/* ===== 根路由重導向 (需認證檢查) ===== */}
-          <Route index element={<ProtectedRoute requiredLevel={1}><Navigate to="/command-center" replace /></ProtectedRoute>} />
+          {/* ===== 根路由：智能導向（不做 roleLevel 檢查）===== */}
+          <Route index element={<HomeRedirect />} />
 
 
           {/* ===== v2.2: 舊 redirect routes 已移除 (2026-01-12) ===== */}
