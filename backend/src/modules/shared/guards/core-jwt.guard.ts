@@ -7,7 +7,8 @@ import { Request } from 'express';
  * 這是 JWT token 解碼後的資料結構
  */
 export interface JwtPayload {
-    sub: string;        // Account ID
+    sub: string;        // Account ID (JWT standard)
+    id: string;         // Account ID (alias, set by CoreJwtGuard)
     email: string;      // Email
     name?: string;      // Display name
     roleLevel?: number; // 權限等級 (0-5)
