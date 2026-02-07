@@ -1,13 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 /**
  * OAuth Callback Handler
- * Receives access_token & refresh_token from backend OAuth flow
+ * Receives access_token from backend OAuth flow
  * and completes the authentication process.
  * 
- * Build trigger: 2026-02-06T23:45
+ * Build trigger: 2026-02-07T09:30
  */
 const AuthCallbackPage: React.FC = () => {
     const navigate = useNavigate();
@@ -15,8 +15,13 @@ const AuthCallbackPage: React.FC = () => {
     const { login } = useAuth();
     const [status, setStatus] = useState<'processing' | 'success' | 'error'>('processing');
     const [error, setError] = useState<string | null>(null);
+    const processedRef = useRef(false);
 
     useEffect(() => {
+        // Prevent double execution (React StrictMode or re-renders)
+        if (processedRef.current) return;
+        processedRef.current = true;
+
         const handleCallback = async () => {
             try {
                 const accessToken = searchParams.get('access_token');
@@ -41,7 +46,7 @@ const AuthCallbackPage: React.FC = () => {
                 // Store access token (refresh token is now httpOnly cookie)
                 localStorage.setItem('accessToken', accessToken);
 
-                // Complete login
+                // Complete login — calls loadUser() which fetches /auth/me
                 await login(accessToken);
 
                 setStatus('success');
@@ -64,7 +69,8 @@ const AuthCallbackPage: React.FC = () => {
         };
 
         handleCallback();
-    }, [searchParams, login, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     // Minimal Cyberpunk Loading UI
     const styles = {

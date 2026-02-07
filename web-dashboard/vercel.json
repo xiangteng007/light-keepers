@@ -3,6 +3,19 @@
     "installCommand": "npm install",
     "buildCommand": "npm run build",
     "outputDirectory": "dist",
+    "redirects": [
+        {
+            "source": "/:path(.*)",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "lightkeepers.ngo"
+                }
+            ],
+            "destination": "https://www.lightkeepers.ngo/:path",
+            "permanent": true
+        }
+    ],
     "rewrites": [
         {
             "source": "/(.*)",
