@@ -15,6 +15,19 @@ export const getProfile = () => api.get('/auth/me');
 // Logout - clears refresh_token cookie on server
 export const logout = () => api.post('/auth/logout');
 
+// ===== OAuth Account Linking =====
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+
+export const getLineAuthUrl = () => `${API_BASE_URL}/api/v1/auth/line`;
+export const getGoogleAuthUrl = () => `${API_BASE_URL}/api/v1/auth/google`;
+export const unlinkLine = () => api.delete('/auth/link/line');
+export const unlinkGoogle = () => api.delete('/auth/link/google');
+
+// ===== Profile Update =====
+export const updateProfile = (data: { displayName?: string; phone?: string }) =>
+    api.patch('/auth/me', data);
+
+
 // ===== OTP 驗證 =====
 
 export const sendPhoneOtp = (phone: string) =>

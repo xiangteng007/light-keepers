@@ -1,35 +1,76 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import {
     User,
     Shield,
     Smartphone,
     Bell,
-    Lock,
     Mail,
-    Award,
-    CreditCard,
     LogOut,
     CheckCircle2,
-    XCircle
+    XCircle,
+    LinkIcon,
+    Unlink,
+    Loader2,
 } from 'lucide-react';
+import { unlinkLine, unlinkGoogle, getLineAuthUrl, getGoogleAuthUrl } from '../api/services';
 import './AccountPage.css';
 
 const AccountPage: React.FC = () => {
-    const { user, logout } = useAuth();
+    const { user, logout, refreshUser } = useAuth();
+    const [unlinking, setUnlinking] = useState<'line' | 'google' | null>(null);
+    const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
     if (!user) {
         return <div className="p-8 text-center text-white">載入中...</div>;
     }
 
+    const showMessage = (type: 'success' | 'error', text: string) => {
+        setMessage({ type, text });
+        setTimeout(() => setMessage(null), 4000);
+    };
+
+    const handleUnlink = async (provider: 'line' | 'google') => {
+        if (!confirm(`確定要解除 ${provider === 'line' ? 'LINE' : 'Google'} 帳號連結嗎？`)) return;
+        
+        setUnlinking(provider);
+        try {
+            if (provider === 'line') {
+                await unlinkLine();
+            } else {
+                await unlinkGoogle();
+            }
+            showMessage('success', `已成功解除 ${provider === 'line' ? 'LINE' : 'Google'} 連結`);
+            await refreshUser();
+        } catch {
+            showMessage('error', '解除連結失敗，請稍後再試');
+        } finally {
+            setUnlinking(null);
+        }
+    };
+
+    const handleLink = (provider: 'line' | 'google') => {
+        // Redirect to OAuth flow with redirect back to account page
+        const authUrl = provider === 'line' ? getLineAuthUrl() : getGoogleAuthUrl();
+        window.location.href = `${authUrl}?redirect=${encodeURIComponent('/account')}`;
+    };
+
     return (
         <div className="account-page">
+            {/* Status Message */}
+            {message && (
+                <div className={`account-toast ${message.type}`}>
+                    {message.type === 'success' ? <CheckCircle2 size={16} /> : <XCircle size={16} />}
+                    {message.text}
+                </div>
+            )}
+
             <header className="account-header">
                 <h1>
                     <User size={32} className="text-[var(--accent-gold)]" />
                     我的帳戶
                 </h1>
-                <div className="subtitle">管理您的個人資料、安全設定與連結帳戶</div>
+                <div className="subtitle">管理您的個人資料與連結帳戶</div>
             </header>
 
             <div className="account-grid">
@@ -55,17 +96,6 @@ const AccountPage: React.FC = () => {
                                 <span>{user.roleDisplayName} (Level {user.roleLevel})</span>
                             </div>
 
-                            <div className="profile-stats">
-                                <div className="stat-item">
-                                    <span className="stat-value">2,450</span>
-                                    <span className="stat-label">貢獻積分</span>
-                                </div>
-                                <div className="stat-item">
-                                    <span className="stat-value">128</span>
-                                    <span className="stat-label">服務時數</span>
-                                </div>
-                            </div>
-
                             <button
                                 onClick={logout}
                                 className="mt-8 w-full py-2 px-4 bg-red-500/10 border border-red-500/30 text-red-500 rounded-lg flex items-center justify-center gap-2 hover:bg-red-500/20 transition-colors"
@@ -73,27 +103,6 @@ const AccountPage: React.FC = () => {
                                 <LogOut size={16} />
                                 登出帳戶
                             </button>
-                        </div>
-                    </div>
-
-                    {/* Volunteer Status Card (Mobile/Compact view) */}
-                    <div className="account-card mt-6">
-                        <div className="card-header">
-                            <h2>志工徽章</h2>
-                            <Award size={20} className="text-[var(--accent-gold)]" />
-                        </div>
-                        <div className="card-content">
-                            <div className="flex flex-wrap gap-2">
-                                <span className="px-3 py-1 bg-blue-500/20 text-blue-300 text-xs rounded-full border border-blue-500/30">
-                                    急救轉運
-                                </span>
-                                <span className="px-3 py-1 bg-green-500/20 text-green-300 text-xs rounded-full border border-green-500/30">
-                                    物資管理
-                                </span>
-                                <span className="px-3 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-full border border-purple-500/30">
-                                    通訊協調
-                                </span>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -104,16 +113,13 @@ const AccountPage: React.FC = () => {
                     <div className="account-card">
                         <div className="card-header">
                             <h2>基本資料</h2>
-                            <button className="text-sm text-[var(--accent-gold)] hover:underline">
-                                編輯資料
-                            </button>
                         </div>
                         <div className="card-content">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="info-group">
                                     <label className="info-label">顯示名稱</label>
                                     <div className="info-value">
-                                        {user.displayName || '-'}
+                                        {user.displayName || '未設定'}
                                         <User size={16} className="text-gray-500" />
                                     </div>
                                 </div>
@@ -127,33 +133,18 @@ const AccountPage: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="info-group">
-                                    <label className="info-label">手機號碼</label>
-                                    <div className="info-value">
-                                        0912-345-678
-                                        <div className="verified-badge">
-                                            <CheckCircle2 size={14} />
-                                            已驗證
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="info-group">
-                                    <label className="info-label">所屬單位</label>
-                                    <div className="info-value">
-                                        台北市救難協會 - 第一大隊
-                                    </div>
-                                </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Linked Accounts */}
+                    {/* Linked Accounts — Real Data */}
                     <div className="account-card">
                         <div className="card-header">
                             <h2>連結帳戶</h2>
                         </div>
                         <div className="card-content">
                             <div className="space-y-3">
+                                {/* LINE */}
                                 <div className="linked-account-item">
                                     <div className="platform-info">
                                         <div className="platform-icon bg-[#06C755]/10 text-[#06C755]">
@@ -166,11 +157,32 @@ const AccountPage: React.FC = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className={`status-indicator ${user.lineLinked ? 'connected' : 'disconnected'}`}>
-                                        {user.lineLinked ? '已連結' : '未設定'}
+                                    <div className="flex items-center gap-2">
+                                        <div className={`status-indicator ${user.lineLinked ? 'connected' : 'disconnected'}`}>
+                                            {user.lineLinked ? '已連結' : '未設定'}
+                                        </div>
+                                        {user.lineLinked ? (
+                                            <button
+                                                onClick={() => handleUnlink('line')}
+                                                disabled={unlinking === 'line'}
+                                                className="link-action-btn unlink"
+                                                title="解除 LINE 連結"
+                                            >
+                                                {unlinking === 'line' ? <Loader2 size={14} className="animate-spin" /> : <Unlink size={14} />}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleLink('line')}
+                                                className="link-action-btn link"
+                                                title="連結 LINE 帳號"
+                                            >
+                                                <LinkIcon size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
 
+                                {/* Google */}
                                 <div className="linked-account-item">
                                     <div className="platform-info">
                                         <div className="platform-icon bg-red-500/10 text-red-500">
@@ -183,50 +195,52 @@ const AccountPage: React.FC = () => {
                                             </span>
                                         </div>
                                     </div>
-                                    <div className={`status-indicator ${user.googleLinked ? 'connected' : 'disconnected'}`}>
-                                        {user.googleLinked ? '已連結' : '未設定'}
+                                    <div className="flex items-center gap-2">
+                                        <div className={`status-indicator ${user.googleLinked ? 'connected' : 'disconnected'}`}>
+                                            {user.googleLinked ? '已連結' : '未設定'}
+                                        </div>
+                                        {user.googleLinked ? (
+                                            <button
+                                                onClick={() => handleUnlink('google')}
+                                                disabled={unlinking === 'google'}
+                                                className="link-action-btn unlink"
+                                                title="解除 Google 連結"
+                                            >
+                                                {unlinking === 'google' ? <Loader2 size={14} className="animate-spin" /> : <Unlink size={14} />}
+                                            </button>
+                                        ) : (
+                                            <button
+                                                onClick={() => handleLink('google')}
+                                                className="link-action-btn link"
+                                                title="連結 Google 帳號"
+                                            >
+                                                <LinkIcon size={14} />
+                                            </button>
+                                        )}
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Security & Preferences */}
+                    {/* Notification Preferences */}
                     <div className="account-card">
                         <div className="card-header">
-                            <h2>安全與偏好設定</h2>
+                            <h2>通知設定</h2>
                         </div>
                         <div className="card-content">
                             <div className="setting-item">
                                 <div className="setting-info">
-                                    <h4>兩步驟驗證 (2FA)</h4>
-                                    <p>為您的帳戶增加一層額外的安全保護</p>
+                                    <h4>
+                                        <Bell size={16} className="inline mr-2 text-[var(--accent-gold)]" />
+                                        緊急警報通知
+                                    </h4>
+                                    <p>透過 LINE 接收即時災情警報{!user.lineLinked && '（需先連結 LINE）'}</p>
                                 </div>
                                 <label className="toggle-switch">
-                                    <input type="checkbox" />
+                                    <input type="checkbox" defaultChecked={user.lineLinked} disabled={!user.lineLinked} />
                                     <span className="slider"></span>
                                 </label>
-                            </div>
-
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <h4>緊急警報通知</h4>
-                                    <p>透過 LINE 接收即時災情警報</p>
-                                </div>
-                                <label className="toggle-switch">
-                                    <input type="checkbox" defaultChecked />
-                                    <span className="slider"></span>
-                                </label>
-                            </div>
-
-                            <div className="setting-item">
-                                <div className="setting-info">
-                                    <h4>變更密碼</h4>
-                                    <p>建議定期更換您的登入密碼</p>
-                                </div>
-                                <button className="px-4 py-2 text-sm bg-white/5 border border-white/10 rounded hover:bg-white/10 transition-colors">
-                                    修改
-                                </button>
                             </div>
                         </div>
                     </div>
