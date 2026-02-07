@@ -37,14 +37,14 @@ jobs:
           # IAM 設定由有權限的管理員另行處理
           # Generate unique revision suffix to prevent revision ID collision
           REVISION_SUFFIX=$(echo "${{ github.sha }}" | cut -c1-8)-$(date +%H%M%S)
-          
+
           gcloud run deploy ${{ env.API_SERVICE }} \
             --source ./backend \
             --region ${{ env.REGION }} \
             --platform managed \
             --revision-suffix=${REVISION_SUFFIX} \
             --add-cloudsql-instances=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db \
-            --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }}" \
+            --set-env-vars="NODE_ENV=production,DB_HOST=/cloudsql/${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,DB_USERNAME=postgres,DB_DATABASE=lightkeepers,CLOUD_SQL_CONNECTION_NAME=${{ env.PROJECT_ID }}:asia-east1:light-keepers-db,LINE_CLIENT_ID=2008769727,RESEND_FROM=noreply@lightkeepers.ngo,GIT_COMMIT=${{ github.sha }},GOOGLE_REDIRECT_URI=https://light-keepers-api-381507943724.asia-east1.run.app/api/v1/auth/google/callback,FRONTEND_URL=https://lightkeepers.ngo" \
             --set-secrets="DB_PASSWORD=db-password:latest,LINE_CLIENT_SECRET=line-client-secret:latest,LINE_CHANNEL_ACCESS_TOKEN=line-channel-access-token:latest,LINE_CHANNEL_SECRET=line-channel-secret:latest,GOOGLE_CLIENT_ID=google-client-id:latest,GOOGLE_CLIENT_SECRET=google-client-secret:latest,GEMINI_API_KEY=GEMINI_API_KEY:latest,RESEND_API_KEY=resend-api-key:latest" \
             --timeout=300 \
             --cpu-boost \
@@ -57,7 +57,7 @@ jobs:
             --cpu-throttling \
             --startup-probe=httpGet.path=/api/v1/health/live,timeoutSeconds=30,periodSeconds=60,failureThreshold=10 \
             --quiet
-      
+
       # IAM Policy 備註：
       # 若需要公開存取，請由有權限的管理員手動執行：
       # gcloud run services add-iam-policy-binding light-keepers-api \
@@ -81,8 +81,8 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: web-dashboard/package-lock.json
 
       - name: Install dependencies
@@ -92,7 +92,7 @@ jobs:
       - name: Build
         working-directory: web-dashboard
         env:
-          VITE_API_URL: https://light-keepers-api-955234851806.asia-east1.run.app
+          VITE_API_URL: https://light-keepers-api-381507943724.asia-east1.run.app
           VITE_LINE_CLIENT_ID: "2008769727"
           VITE_LIFF_ID: ${{ secrets.LIFF_ID }}
           VITE_GOOGLE_MAPS_API_KEY: ${{ secrets.GOOGLE_MAPS_API_KEY }}
@@ -112,4 +112,3 @@ jobs:
           channelId: live
           projectId: light-keepers-mvp
           entryPoint: web-dashboard
-
