@@ -1,12 +1,20 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+/**
+ * AuthContext — Authentication State Management
+ * 
+ * Responsibilities:
+ * - User state management (login/logout/refresh)
+ * - Auth Ready gating (prevents premature redirects)
+ * - Auto-refresh timer for long sessions
+ * 
+ * Token operations delegated to api/client.ts (Single Source of Truth)
+ * 
+ * @version 2.0.0 — Expert-level optimization
+ */
+import { createContext, useContext, useState, useEffect, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { getProfile, logout as apiLogout } from '../api/services';
-import axios from 'axios';
+import { getStoredToken, storeToken, clearToken, refreshAccessToken } from '../api/client';
 import { authLogger } from '../utils/logger';
-
-// Token 存儲 key
-const TOKEN_KEY = 'accessToken';
-const REMEMBER_KEY = 'rememberMe';
 
 // 使用者資訊介面
 export interface User {
@@ -20,7 +28,7 @@ export interface User {
     lineLinked?: boolean;
     googleLinked?: boolean;
     isAnonymous?: boolean;
-    volunteerProfileCompleted?: boolean;  // 是否已完成志工資料
+    volunteerProfileCompleted?: boolean;
 }
 
 // Auth Context 介面
@@ -29,7 +37,7 @@ interface AuthContextType {
     isAuthenticated: boolean;
     isAnonymous: boolean;
     isLoading: boolean;
-    authReady: boolean;  // 🔐 Auth Ready Gating：權限狀態已確定
+    authReady: boolean;
     login: (token: string, remember?: boolean) => Promise<void>;
     logout: () => void;
     refreshUser: () => Promise<void>;
@@ -37,179 +45,109 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper: 獲取存儲的 token
-const getStoredToken = (): string | null => {
-    return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY);
-};
+// DevMode 檢查
+const isDevMode = (): boolean =>
+    typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
 
-// Helper: 存儲 token
-const storeToken = (token: string, remember: boolean): void => {
-    if (remember) {
-        localStorage.setItem(TOKEN_KEY, token);
-        localStorage.setItem(REMEMBER_KEY, 'true');
-        sessionStorage.removeItem(TOKEN_KEY);
-    } else {
-        sessionStorage.setItem(TOKEN_KEY, token);
-        localStorage.removeItem(TOKEN_KEY);
-        localStorage.removeItem(REMEMBER_KEY);
-    }
-};
-
-// Helper: 清除 token
-const clearToken = (): void => {
-    localStorage.removeItem(TOKEN_KEY);
-    localStorage.removeItem(REMEMBER_KEY);
-    sessionStorage.removeItem(TOKEN_KEY);
-};
-
-// Helper: 刷新 Access Token
-const refreshAccessToken = async (): Promise<string | null> => {
-    // 🔧 DevMode 時跳過 token refresh（使用模擬用戶）
-    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
-    if (devModeEnabled) {
-        return null;
-    }
-
-    try {
-        const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-        const response = await axios.post(
-            `${API_BASE_URL}/api/v1/auth/refresh`,
-            {},
-            { withCredentials: true }
-        );
-
-        if (response.data?.accessToken) {
-            const remember = localStorage.getItem(REMEMBER_KEY) === 'true';
-            storeToken(response.data.accessToken, remember);
-            return response.data.accessToken;
-        }
-        return null;
-    } catch (error) {
-        authLogger.error('Token refresh failed:', error);
-        return null;
-    }
+// DevMode 模擬用戶
+const DEV_USER: User = {
+    id: 'dev-user-001',
+    email: 'xiangteng007@gmail.com',
+    displayName: '開發測試用戶',
+    roles: ['系統擁有者'],
+    roleLevel: 5,
+    roleDisplayName: '系統擁有者',
+    isAnonymous: false,
+    volunteerProfileCompleted: true,
 };
 
 // AuthProvider 元件
 export function AuthProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(!isDevMode());
+    const loadingRef = useRef(false); // Prevent concurrent loadUser calls
 
-    // 🔧 DevMode 時不需要等待 API，直接設 isLoading = false
-    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
-    const [isLoading, setIsLoading] = useState(!devModeEnabled);
+    // 載入使用者資訊（simplified — 401 refresh delegated to API client interceptor）
+    const loadUser = useCallback(async () => {
+        // Prevent concurrent calls
+        if (loadingRef.current) return;
+        loadingRef.current = true;
 
-    // 載入使用者資訊
-    const loadUser = async (retryCount = 0) => {
-        // DEV MODE: 如果設置了 devModeUser，使用模擬用戶
-        const devModeValue = localStorage.getItem('devModeUser');
-        authLogger.debug('devModeUser check:', devModeValue);
-        
-        const devModeEnabled = devModeValue === 'true';
-        if (devModeEnabled) {
-            authLogger.debug('DEV MODE: Using mock Level 5 user');
-            setUser({
-                id: 'dev-user-001',
-                email: 'xiangteng007@gmail.com',
-                displayName: '開發測試用戶',
-                roles: ['系統擁有者'],
-                roleLevel: 5,
-                roleDisplayName: '系統擁有者',
-                isAnonymous: false,
-                volunteerProfileCompleted: true,
-            });
-            setIsLoading(false);
-            return;
-        }
-
-        let token = getStoredToken();
-
-        // 如果沒有 token,嘗試用 refresh token 換取新的
-        if (!token) {
-            authLogger.debug('No token found, attempting refresh...');
-            token = await refreshAccessToken();
-            if (!token) {
-                setUser(null);
+        try {
+            // DevMode bypass
+            if (isDevMode()) {
+                authLogger.debug('DEV MODE: Using mock Level 5 user');
+                setUser(DEV_USER);
                 setIsLoading(false);
                 return;
             }
-        }
 
-        try {
-            // 增加到 15 秒超時機制，應對 Cloud Run cold start
-            const timeoutPromise = new Promise((_, reject) => {
-                setTimeout(() => reject(new Error('API timeout')), 15000);
-            });
+            let token = getStoredToken();
 
-            const response = await Promise.race([
-                getProfile(),
-                timeoutPromise
-            ]) as Awaited<ReturnType<typeof getProfile>>;
-
-            setUser(response.data);
-        } catch (error) {
-            const isTimeout = error instanceof Error && error.message === 'API timeout';
-            const isAuthError = error instanceof Error && 
-                'response' in error && 
-                (error as { response?: { status?: number } }).response?.status === 401;
-
-            authLogger.error('Failed to load user profile:', error);
-
-            // Timeout 且有重試次數時，重試一次
-            if (isTimeout && retryCount < 1) {
-                authLogger.debug('Profile load timeout, retrying...');
-                return loadUser(retryCount + 1);
-            }
-
-            // 如果是 401,嘗試刷新 token
-            if (isAuthError && retryCount < 1) {
-                authLogger.debug('401 error, attempting token refresh...');
-                const newToken = await refreshAccessToken();
-                if (newToken) {
-                    return loadUser(retryCount + 1);
+            // No token? Try silent refresh via httpOnly cookie
+            if (!token) {
+                authLogger.debug('No token found, attempting silent refresh...');
+                token = await refreshAccessToken();
+                if (!token) {
+                    setUser(null);
+                    setIsLoading(false);
+                    return;
                 }
             }
 
-            // 只有認證錯誤才清除 token
+            // Fetch profile — 401 handling delegated to API client interceptor
+            // The interceptor will auto-refresh and retry once if needed
+            const response = await getProfile();
+            setUser(response.data);
+
+        } catch (error) {
+            authLogger.error('Failed to load user profile:', error);
+
+            // Check if auth error (401 that failed even after interceptor retry)
+            const isAuthError = error instanceof Error &&
+                'response' in error &&
+                (error as { response?: { status?: number } }).response?.status === 401;
+
             if (isAuthError) {
                 clearToken();
             }
             setUser(null);
         } finally {
             setIsLoading(false);
+            loadingRef.current = false;
         }
-    };
+    }, []);
 
     // 初始載入
     useEffect(() => {
         loadUser();
-    }, []);
+    }, [loadUser]);
 
-    // 登入
-    const login = async (token: string, remember: boolean = true): Promise<void> => {
+    // 登入（stable reference via useCallback）
+    const login = useCallback(async (token: string, remember: boolean = true): Promise<void> => {
         storeToken(token, remember);
         await loadUser();
-    };
+    }, [loadUser]);
 
-    // 登出
-    const logout = async () => {
+    // 登出（stable reference via useCallback）
+    const logout = useCallback(async () => {
         try {
-            // 呼叫後端 API 清除 refresh_token cookie
             await apiLogout();
         } catch (error) {
             authLogger.error('Logout API failed:', error);
         } finally {
-            // 無論 API 成功與否,都清除本地狀態
             clearToken();
             setUser(null);
         }
-    };
+    }, []);
 
-    // 刷新使用者資訊
-    const refreshUser = async () => {
+    // 刷新使用者資訊（stable reference via useCallback）
+    const refreshUser = useCallback(async () => {
+        loadingRef.current = false; // Allow re-fetch
         await loadUser();
-    };
+    }, [loadUser]);
 
-    // 判斷是否為已驗證用戶（有 user 且非匿名）
+    // 判斷認證狀態
     const isAuthenticated = !!user && !user.isAnonymous;
     const isAnonymous = !user || !!user.isAnonymous;
 
@@ -218,21 +156,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isAuthenticated,
         isAnonymous,
         isLoading,
-        authReady: !isLoading,  // 🔐 Auth Ready = 載入完成
+        authReady: !isLoading,
         login,
         logout,
         refreshUser,
     };
 
-    // 自動刷新定時器 - 每 13 分鐘刷新一次 (token 15 分鐘過期)
+    // 自動刷新定時器 - 每 13 分鐘（token 15 分鐘過期）
     useEffect(() => {
         if (!user || user.isAnonymous) return;
 
         authLogger.debug('Setting up auto-refresh timer (every 13 minutes)');
         const interval = setInterval(async () => {
             authLogger.debug('Auto-refreshing token...');
-            await refreshAccessToken();
-        }, 13 * 60 * 1000); // 13 分鐘
+            const newToken = await refreshAccessToken();
+            if (!newToken) {
+                authLogger.warn('Auto-refresh failed, user may need to re-login');
+            }
+        }, 13 * 60 * 1000);
 
         return () => {
             authLogger.debug('Clearing auto-refresh timer');
@@ -255,4 +196,3 @@ export function useAuth() {
     }
     return context;
 }
-

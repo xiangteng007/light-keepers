@@ -29,9 +29,15 @@ const AuthCallbackPage: React.FC = () => {
                 const redirectPath = searchParams.get('redirect') || '/dashboard';
                 const errorParam = searchParams.get('error');
 
+                // 🔒 Immediately clean sensitive params from URL
+                // Prevents token leakage via screenshots, browser history, or sharing
+                window.history.replaceState({}, '', '/auth/callback');
+
                 if (errorParam) {
+                    const errorMsg = decodeURIComponent(errorParam);
+                    console.error('OAuth error from provider:', errorMsg);
                     setStatus('error');
-                    setError(decodeURIComponent(errorParam));
+                    setError(errorMsg);
                     setTimeout(() => navigate('/login'), 3000);
                     return;
                 }
@@ -43,10 +49,7 @@ const AuthCallbackPage: React.FC = () => {
                     return;
                 }
 
-                // Store access token (refresh token is now httpOnly cookie)
-                localStorage.setItem('accessToken', accessToken);
-
-                // Complete login — calls loadUser() which fetches /auth/me
+                // Complete login — stores token + fetches /auth/me
                 await login(accessToken);
 
                 setStatus('success');
@@ -63,7 +66,7 @@ const AuthCallbackPage: React.FC = () => {
             } catch (err) {
                 console.error('OAuth callback error:', err);
                 setStatus('error');
-                setError('Authentication failed');
+                setError(err instanceof Error ? err.message : 'Authentication failed');
                 setTimeout(() => navigate('/login'), 3000);
             }
         };

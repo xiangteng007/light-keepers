@@ -574,7 +574,10 @@ export class AuthController {
         const refreshToken = req.cookies?.refresh_token;
 
         if (!refreshToken) {
-            throw new UnauthorizedException('No refresh token provided');
+            throw new UnauthorizedException({
+                message: 'No refresh token provided',
+                code: 'NO_REFRESH_TOKEN',
+            });
         }
 
         // Validate and get account ID
@@ -583,7 +586,10 @@ export class AuthController {
         if (!accountId) {
             // Clear invalid cookie
             res.clearCookie('refresh_token', this.getCookieOptions());
-            throw new UnauthorizedException('Invalid or expired refresh token');
+            throw new UnauthorizedException({
+                message: 'Invalid or expired refresh token',
+                code: 'INVALID_REFRESH_TOKEN',
+            });
         }
 
         // Generate new access token
