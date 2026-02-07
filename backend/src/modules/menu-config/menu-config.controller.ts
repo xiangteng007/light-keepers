@@ -9,6 +9,7 @@ import {
 import { MenuConfigService, MenuConfigItem } from './menu-config.service';
 // Use unified guards from SharedAuthModule
 import { CoreJwtGuard, CurrentUser as CurrentUserDecorator } from '../shared/guards';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 interface UpdateMenuConfigDto {
     items: MenuConfigItem[];
@@ -28,7 +29,7 @@ export class MenuConfigController {
     @UseGuards(CoreJwtGuard)
     async updateAll(
         @Body() dto: UpdateMenuConfigDto,
-        @CurrentUserDecorator() user: any,
+        @CurrentUserDecorator() user: JwtPayload,
     ) {
         // Only owner (level 5) can update menu config
         if (!user || user.roleLevel < 5) {

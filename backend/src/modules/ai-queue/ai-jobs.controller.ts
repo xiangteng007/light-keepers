@@ -15,6 +15,7 @@ import { RoleLevel } from '../accounts/entities/role.entity';
 import { AiJobsService } from './ai-jobs.service';
 import { CreateAiJobDto, AiJobCreatedResponse, AiJobDetailResponse } from './dto';
 import { AiJobStatus } from './entities';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('AI Queue')
 @ApiBearerAuth()
@@ -28,7 +29,7 @@ export class AiJobsController {
     @ApiOperation({ summary: 'Create a new AI job' })
     async createJob(
         @Body() dto: CreateAiJobDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<AiJobCreatedResponse> {
         // Calculate max role level from roles array
         const roleLevel = user.roles?.reduce((max: number, role: any) =>
@@ -55,7 +56,7 @@ export class AiJobsController {
     @ApiOperation({ summary: 'Cancel a queued AI job' })
     async cancelJob(
         @Param('jobId', ParseUUIDPipe) jobId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<{ success: boolean }> {
         const roleLevel = user.roles?.reduce((max: number, role: any) =>
             Math.max(max, role.level || 0), 0) || 0;

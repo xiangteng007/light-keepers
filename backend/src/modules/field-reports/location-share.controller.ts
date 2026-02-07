@@ -5,6 +5,7 @@ import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { LocationShareService } from './location-share.service';
 import { StartLocationShareDto, UpdateLocationDto } from './dto';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('Location Share')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class LocationShareController {
     async start(
         @Param('missionSessionId') missionSessionId: string,
         @Body() dto: StartLocationShareDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.start(missionSessionId, dto, user);
     }
@@ -29,7 +30,7 @@ export class LocationShareController {
     @ApiOperation({ summary: 'Stop location sharing' })
     async stop(
         @Param('missionSessionId') missionSessionId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.stop(missionSessionId, user);
     }
@@ -40,7 +41,7 @@ export class LocationShareController {
     async updateLocation(
         @Param('missionSessionId') missionSessionId: string,
         @Body() dto: UpdateLocationDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         const updated = await this.service.updateLocation(missionSessionId, dto, user);
         return { success: updated };

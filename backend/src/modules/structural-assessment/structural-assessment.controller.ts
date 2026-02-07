@@ -15,6 +15,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { StructuralAssessmentService } from './structural-assessment.service';
 import { CreateStructuralAssessmentDto, UpdateAssessmentDto } from './dto/structural-assessment.dto';
 import { SafetyLevel } from './entities/structural-assessment.entity';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('Structural Assessment')
 @ApiBearerAuth()
@@ -28,7 +29,7 @@ export class StructuralAssessmentController {
     @ApiOperation({ summary: 'Create structural assessment' })
     async create(
         @Body() dto: CreateStructuralAssessmentDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.create(dto, user.id);
     }
@@ -72,7 +73,7 @@ export class StructuralAssessmentController {
     async update(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: UpdateAssessmentDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.update(id, dto, user.id);
     }

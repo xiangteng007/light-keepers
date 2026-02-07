@@ -27,6 +27,7 @@ import {
     EvacueeQueryResultDto,
 } from './dto/shelter.dto';
 import { ShelterStatus } from './entities/shelter.entity';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('Shelters')
 @ApiBearerAuth()
@@ -80,7 +81,7 @@ export class SheltersController {
     async activate(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: ActivateShelterDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<ShelterResponseDto> {
         const shelter = await this.sheltersService.activate(id, dto, user.id);
         return this.toShelterResponse(shelter);
@@ -106,7 +107,7 @@ export class SheltersController {
     async checkIn(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: CheckInEvacueeDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<EvacueeResponseDto> {
         const evacuee = await this.sheltersService.checkIn(id, dto, user.id);
         return this.toEvacueeResponse(evacuee);
@@ -120,7 +121,7 @@ export class SheltersController {
     async checkOut(
         @Param('id', ParseUUIDPipe) id: string,
         @Param('evacueeId', ParseUUIDPipe) evacueeId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<EvacueeResponseDto> {
         const evacuee = await this.sheltersService.checkOut(id, evacueeId, user.id);
         return this.toEvacueeResponse(evacuee);
@@ -148,7 +149,7 @@ export class SheltersController {
         @Param('id', ParseUUIDPipe) id: string,
         @Param('evacueeId', ParseUUIDPipe) evacueeId: string,
         @Body() dto: HealthScreeningDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.sheltersService.createHealthScreening(id, evacueeId, dto, user.id);
     }
@@ -190,7 +191,7 @@ export class SheltersController {
     async createDailyReport(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: CreateDailyReportDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.sheltersService.createDailyReport(id, dto, user.id);
     }

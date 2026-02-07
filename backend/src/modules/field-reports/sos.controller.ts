@@ -5,6 +5,7 @@ import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SosService } from './sos.service';
 import { CreateSosDto, AckSosDto, ResolveSosDto } from './dto';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('SOS')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class SosController {
     async trigger(
         @Param('missionSessionId') missionSessionId: string,
         @Body() dto: CreateSosDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.trigger(missionSessionId, dto, user);
     }
@@ -30,7 +31,7 @@ export class SosController {
     async ack(
         @Param('sosId') sosId: string,
         @Body() dto: AckSosDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.ack(sosId, dto, user);
     }
@@ -41,7 +42,7 @@ export class SosController {
     async resolve(
         @Param('sosId') sosId: string,
         @Body() dto: ResolveSosDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.resolve(sosId, dto, user);
     }

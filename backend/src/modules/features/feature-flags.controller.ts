@@ -6,6 +6,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { FeatureFlagsService, FeatureFlag, UserContext } from './feature-flags.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, CurrentUser } from '../shared/guards';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 class CreateFlagDto {
     key: string;
@@ -106,7 +107,7 @@ export class FeatureFlagsController {
      */
     @Get('evaluate/all')
     @UseGuards(CoreJwtGuard)
-    async evaluateAll(@CurrentUser() user: any) {
+    async evaluateAll(@CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,
             role: user?.role,
@@ -120,7 +121,7 @@ export class FeatureFlagsController {
      */
     @Get('evaluate/:key')
     @UseGuards(CoreJwtGuard)
-    async evaluateFlag(@Param('key') key: string, @CurrentUser() user: any) {
+    async evaluateFlag(@Param('key') key: string, @CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,
             role: user?.role,
@@ -134,7 +135,7 @@ export class FeatureFlagsController {
      */
     @Get('client/enabled')
     @UseGuards(CoreJwtGuard)
-    async getEnabledFeatures(@CurrentUser() user: any) {
+    async getEnabledFeatures(@CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,
             role: user?.role,

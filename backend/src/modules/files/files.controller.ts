@@ -9,6 +9,7 @@ import { Response } from 'express';
 import { FileStorageService } from './file-storage.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, CurrentUser } from '../shared/guards';
 import { getErrorMessage } from '../../common/utils/error-utils';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @Controller('files')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -23,7 +24,7 @@ export class FilesController {
     @UseInterceptors(FileInterceptor('file'))
     async uploadFile(
         @UploadedFile() file: any,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
         @Query('folder') folder?: string
     ) {
         if (!file) {

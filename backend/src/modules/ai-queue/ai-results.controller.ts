@@ -12,6 +12,7 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { AiResultsService } from './ai-results.service';
 import { AcceptAiResultDto, RejectAiResultDto, AcceptResultResponse, RejectResultResponse } from './dto';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('AI Results')
 @ApiBearerAuth()
@@ -26,7 +27,7 @@ export class AiResultsController {
     async acceptResult(
         @Param('jobId', ParseUUIDPipe) jobId: string,
         @Body() dto: AcceptAiResultDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<AcceptResultResponse> {
         return this.aiResultsService.accept(jobId, dto, {
             uid: user.uid,
@@ -41,7 +42,7 @@ export class AiResultsController {
     async rejectResult(
         @Param('jobId', ParseUUIDPipe) jobId: string,
         @Body() dto: RejectAiResultDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ): Promise<RejectResultResponse> {
         return this.aiResultsService.reject(jobId, dto, {
             uid: user.uid,

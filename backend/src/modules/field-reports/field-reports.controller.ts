@@ -5,6 +5,7 @@ import { RoleLevel } from '../accounts/entities/role.entity';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { FieldReportsService } from './field-reports.service';
 import { CreateFieldReportDto, UpdateFieldReportDto, FieldReportQueryDto } from './dto';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('Field Reports')
 @ApiBearerAuth()
@@ -19,7 +20,7 @@ export class FieldReportsController {
     async create(
         @Param('missionSessionId') missionSessionId: string,
         @Body() dto: CreateFieldReportDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         return this.service.create(missionSessionId, dto, user);
     }
@@ -42,7 +43,7 @@ export class FieldReportsController {
         @Param('reportId') reportId: string,
         @Body() dto: UpdateFieldReportDto,
         @Headers('If-Match') ifMatch: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         const version = parseInt(ifMatch?.replace(/"/g, '') || '0', 10);
         return this.service.update(reportId, dto, version, user);
@@ -54,7 +55,7 @@ export class FieldReportsController {
     @ApiOperation({ summary: 'Soft delete a field report' })
     async delete(
         @Param('reportId') reportId: string,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         await this.service.softDelete(reportId, user);
     }

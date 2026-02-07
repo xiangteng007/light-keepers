@@ -4,6 +4,7 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RoleLevel } from '../accounts/entities/role.entity';
 import { TaskClaimsService } from './task-claims.service';
+import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 class ClaimTaskDto {
     missionSessionId: string;
@@ -35,7 +36,7 @@ export class TaskClaimsController {
     async claimTask(
         @Param('taskId') taskId: string,
         @Body() dto: ClaimTaskDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         const claim = await this.taskClaimsService.claim(taskId, dto.missionSessionId, user);
         return {
@@ -51,7 +52,7 @@ export class TaskClaimsController {
     async releaseTask(
         @Param('taskId') taskId: string,
         @Body() dto: ReleaseTaskDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         await this.taskClaimsService.release(taskId, dto.missionSessionId, dto.reason || '', user);
         return { taskId, released: true };
@@ -63,7 +64,7 @@ export class TaskClaimsController {
     async addProgress(
         @Param('taskId') taskId: string,
         @Body() dto: AddProgressDto,
-        @CurrentUser() user: any,
+        @CurrentUser() user: JwtPayload,
     ) {
         const progress = await this.taskClaimsService.addProgress(
             taskId,

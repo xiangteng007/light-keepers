@@ -7,14 +7,16 @@ import { Request } from 'express';
  * 這是 JWT token 解碼後的資料結構
  */
 export interface JwtPayload {
-    sub: string;        // Account ID (JWT standard)
-    id: string;         // Account ID (alias, set by CoreJwtGuard)
-    email: string;      // Email
-    name?: string;      // Display name
-    roleLevel?: number; // 權限等級 (0-5)
-    roles?: string[];   // 角色名稱陣列
-    iat?: number;       // Issued at
-    exp?: number;       // Expiration
+    sub: string;          // Account ID (JWT standard)
+    id: string;           // Account ID (alias, set by CoreJwtGuard)
+    uid: string;          // Account ID (alias for AuthUser compat)
+    email: string;        // Email
+    name?: string;        // Display name
+    displayName?: string; // Display name (alias for AuthUser compat)
+    roleLevel?: number;   // 權限等級 (0-5)
+    roles?: string[];     // 角色名稱陣列
+    iat?: number;         // Issued at
+    exp?: number;         // Expiration
 }
 
 /**
@@ -51,8 +53,10 @@ export class CoreJwtGuard implements CanActivate {
             (request as any).user = {
                 id: payload.sub,
                 sub: payload.sub,
+                uid: payload.sub,           // AuthUser compat
                 email: payload.email,
                 name: payload.name,
+                displayName: payload.name,  // AuthUser compat
                 roleLevel: payload.roleLevel ?? 0,
                 roles: payload.roles ?? [],
             };
