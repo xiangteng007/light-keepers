@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AttendanceController } from './attendance.controller';
 import { AttendanceService } from './attendance.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('AttendanceController', () => {
     let controller: AttendanceController;
@@ -22,7 +23,12 @@ describe('AttendanceController', () => {
             providers: [
                 { provide: AttendanceService, useValue: mockAttendanceService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard)
+            .useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard)
+            .useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<AttendanceController>(AttendanceController);
         service = module.get<AttendanceService>(AttendanceService);
@@ -49,7 +55,7 @@ describe('AttendanceController', () => {
 
             const result = await controller.checkInWithGps(dto);
 
-            expect(service.checkInWithGps).toHaveBeenCalled();
+            expect(service.checkInWithGps).toHaveBeenCalledWith('v1', { lat: 25.0330, lng: 121.5654, accuracy: 10 });
             expect(result).toEqual(expected);
         });
     });
@@ -62,7 +68,7 @@ describe('AttendanceController', () => {
 
             const result = await controller.checkInWithQr(dto);
 
-            expect(service.checkInWithQr).toHaveBeenCalled();
+            expect(service.checkInWithQr).toHaveBeenCalledWith('v1', 'abc123');
             expect(result).toEqual(expected);
         });
     });
@@ -72,7 +78,7 @@ describe('AttendanceController', () => {
             const expected = { id: 'rec-1', checkOutTime: new Date() };
             mockAttendanceService.checkOut.mockResolvedValue(expected);
 
-            const result = await controller.checkOut('rec-1', {});
+            const result = await controller.checkOut('rec-1', {} as any);
 
             expect(service.checkOut).toHaveBeenCalledWith('rec-1', undefined);
             expect(result).toEqual(expected);
@@ -86,7 +92,7 @@ describe('AttendanceController', () => {
 
             const result = await controller.getVolunteerRecords('v1', '2026-01-01', '2026-01-31');
 
-            expect(service.getVolunteerRecords).toHaveBeenCalled();
+            expect(service.getVolunteerRecords).toHaveBeenCalledWith('v1', new Date('2026-01-01'), new Date('2026-01-31'));
             expect(result).toEqual(records);
         });
     });
@@ -98,7 +104,7 @@ describe('AttendanceController', () => {
 
             const result = await controller.getDailySummary('2026-01-07');
 
-            expect(service.getDailySummary).toHaveBeenCalledWith('2026-01-07');
+            expect(service.getDailySummary).toHaveBeenCalledWith(new Date('2026-01-07'));
             expect(result).toEqual(summary);
         });
     });

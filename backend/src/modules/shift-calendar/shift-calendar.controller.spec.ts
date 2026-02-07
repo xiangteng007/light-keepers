@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ShiftCalendarController } from './shift-calendar.controller';
 import { ShiftCalendarService } from './shift-calendar.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('ShiftCalendarController', () => {
     let controller: ShiftCalendarController;
@@ -24,7 +25,12 @@ describe('ShiftCalendarController', () => {
             providers: [
                 { provide: ShiftCalendarService, useValue: mockService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard)
+            .useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard)
+            .useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<ShiftCalendarController>(ShiftCalendarController);
         service = module.get<ShiftCalendarService>(ShiftCalendarService);
@@ -45,7 +51,7 @@ describe('ShiftCalendarController', () => {
 
             const result = await controller.getCalendarView('2026-01-01', '2026-01-31');
 
-            expect(service.getCalendarView).toHaveBeenCalledWith('2026-01-01', '2026-01-31');
+            expect(service.getCalendarView).toHaveBeenCalledWith(new Date('2026-01-01'), new Date('2026-01-31'));
             expect(result).toEqual(calendarData);
         });
     });
@@ -90,18 +96,18 @@ describe('ShiftCalendarController', () => {
 
     describe('deleteShift', () => {
         it('should delete shift by ID', async () => {
-            mockService.deleteShift.mockResolvedValue(true);
+            mockService.deleteShift.mockReturnValue(true);
 
             const result = await controller.deleteShift('s1');
 
             expect(service.deleteShift).toHaveBeenCalledWith('s1');
-            expect(result).toEqual({ deleted: true });
+            expect(result).toEqual({ success: true });
         });
     });
 
     describe('swapShifts', () => {
         it('should swap two shifts', async () => {
-            mockService.swapShifts.mockResolvedValue(true);
+            mockService.swapShifts.mockReturnValue(true);
 
             const result = await controller.swapShifts({ shiftId1: 's1', shiftId2: 's2' });
 
@@ -112,15 +118,15 @@ describe('ShiftCalendarController', () => {
 
     describe('copyWeekSchedule', () => {
         it('should copy week schedule', async () => {
-            mockService.copyWeekSchedule.mockResolvedValue(5);
+            mockService.copyWeekSchedule.mockReturnValue(5);
 
             const result = await controller.copyWeekSchedule({
                 sourceWeekStart: '2026-01-06',
                 targetWeekStart: '2026-01-13',
             });
 
-            expect(service.copyWeekSchedule).toHaveBeenCalledWith('2026-01-06', '2026-01-13');
-            expect(result).toEqual({ copiedCount: 5 });
+            expect(service.copyWeekSchedule).toHaveBeenCalledWith(new Date('2026-01-06'), new Date('2026-01-13'));
+            expect(result).toEqual({ success: true, copiedCount: 5 });
         });
     });
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PayrollController } from './payroll.controller';
 import { PayrollService } from './payroll.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('PayrollController', () => {
     let controller: PayrollController;
@@ -22,7 +23,12 @@ describe('PayrollController', () => {
             providers: [
                 { provide: PayrollService, useValue: mockService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard)
+            .useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard)
+            .useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<PayrollController>(PayrollController);
         service = module.get<PayrollService>(PayrollService);
