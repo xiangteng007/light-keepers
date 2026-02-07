@@ -31,12 +31,12 @@ export class AuthService {
     ) { }
 
     /**
-     * 獲取帳號資料（含綁定狀態）
+     * 獲取帳號資料（含綁定狀態與角色）
      */
     async getAccountById(id: string): Promise<Account | null> {
         return this.accountRepository.findOne({
             where: { id },
-            select: ['id', 'email', 'phone', 'displayName', 'avatarUrl', 'lineUserId', 'googleId'],
+            relations: ['roles'],
         });
     }
 

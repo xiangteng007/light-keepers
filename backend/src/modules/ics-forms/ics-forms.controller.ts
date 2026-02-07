@@ -12,6 +12,7 @@ import {
     Request,
     Logger,
 } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import {
     ApiTags,
     ApiOperation,
@@ -85,7 +86,7 @@ export class IcsFormsController {
     @ApiOperation({ summary: 'Create a new ICS form' })
     @ApiResponse({ status: 201, description: 'Form created successfully' })
     @RequiredLevel(ROLE_LEVELS.OFFICER)
-    async create(@Body() dto: CreateIcsFormDto, @Request() req: any): Promise<IcsForm> {
+    async create(@Body() dto: CreateIcsFormDto, @Request() req: AuthenticatedRequest): Promise<IcsForm> {
         const userId = req.user?.sub || req.user?.id;
         const userName = req.user?.name || req.user?.email || 'Unknown';
         return this.icsFormsService.create(dto, userId, userName);
@@ -115,7 +116,7 @@ export class IcsFormsController {
     async approve(
         @Param('id', ParseUUIDPipe) id: string,
         @Body() dto: ApproveIcsFormDto,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ): Promise<IcsForm> {
         const userId = req.user?.sub || req.user?.id;
         const userName = req.user?.name || req.user?.email || 'Unknown';
@@ -131,7 +132,7 @@ export class IcsFormsController {
     @RequiredLevel(ROLE_LEVELS.OFFICER)
     async createNewVersion(
         @Param('id', ParseUUIDPipe) id: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ): Promise<IcsForm> {
         const userId = req.user?.sub || req.user?.id;
         const userName = req.user?.name || req.user?.email || 'Unknown';

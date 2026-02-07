@@ -13,6 +13,7 @@ import {
     UseGuards,
     Request,
 } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { CommandChainService, AssignRoleDto, ReliefDto } from './command-chain.service';
 
@@ -56,7 +57,7 @@ export class CommandChainController {
     async assignRole(
         @Param('sessionId') sessionId: string,
         @Body() dto: Omit<AssignRoleDto, 'missionSessionId' | 'assignedBy'>,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.commandChainService.assignRole({
             ...dto,
@@ -82,7 +83,7 @@ export class CommandChainController {
     async reliefRole(
         @Param('assignmentId') assignmentId: string,
         @Body() dto: Omit<ReliefDto, 'relievedBy'>,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.commandChainService.reliefRole(assignmentId, {
             ...dto,
@@ -97,7 +98,7 @@ export class CommandChainController {
     @RequiredLevel(2)
     async getMyRoles(
         @Param('sessionId') sessionId: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const userId = req.user?.id;
         if (!userId) {
@@ -113,7 +114,7 @@ export class CommandChainController {
     @RequiredLevel(2)
     async amICommander(
         @Param('sessionId') sessionId: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const userId = req.user?.id;
         if (!userId) {

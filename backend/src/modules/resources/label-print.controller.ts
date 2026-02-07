@@ -1,4 +1,5 @@
 import { Controller, Post, Get, Body, Param, Request, ForbiddenException, Query } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { LabelPrintService } from './label-print.service';
 
 /**
@@ -18,7 +19,7 @@ export class LabelPrintController {
             lotId: string;
             templateId: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -44,7 +45,7 @@ export class LabelPrintController {
             assetIds: string[];
             templateId: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -71,7 +72,7 @@ export class LabelPrintController {
             targetId: string;
             templateId: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -99,7 +100,7 @@ export class LabelPrintController {
             targetId: string;
             revokeReason: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -127,7 +128,7 @@ export class LabelPrintController {
     async getPrintHistory(
         @Param('targetType') targetType: 'lot' | 'asset',
         @Param('targetId') targetId: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 

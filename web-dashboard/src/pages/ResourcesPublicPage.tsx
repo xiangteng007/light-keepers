@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Badge } from '../design-system';
 import './ResourcesPublicPage.css';
-
-// API 基礎 URL - VITE_API_URL 不含 /api/v1，需要手動加上
-const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
+import { API_BASE } from '../api/config';
 
 // 物資分類配置
 const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: string }> = {

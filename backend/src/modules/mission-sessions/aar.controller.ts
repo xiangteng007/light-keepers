@@ -4,6 +4,7 @@
  */
 
 import { Controller, Get, Post, Put, Body, Param, Req } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { AARService } from './aar.service';
 import { DecisionReview, LessonLearned } from './entities/aar.entity';
@@ -25,7 +26,7 @@ export class AARController {
     @ApiOperation({ summary: '建立 AAR' })
     async createAAR(
         @Param('sessionId') sessionId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const aar = await this.aarService.createAAR(sessionId, req.user?.uid || 'system');
         return { success: true, data: aar, message: 'AAR 已建立' };
@@ -35,7 +36,7 @@ export class AARController {
     @ApiOperation({ summary: 'AI 自動生成 AAR 草稿' })
     async generateAAR(
         @Param('sessionId') sessionId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const aar = await this.aarService.generateAARDraft(sessionId, req.user?.uid || 'system');
         return { success: true, data: aar, message: 'AAR 草稿已生成' };
@@ -76,7 +77,7 @@ export class AARController {
     @ApiOperation({ summary: '定稿 AAR' })
     async finalizeAAR(
         @Param('aarId') aarId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const aar = await this.aarService.finalizeAAR(aarId, req.user?.uid || 'system');
         return { success: true, data: aar, message: 'AAR 已定稿' };

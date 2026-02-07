@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, useCallback } from 'rea
 import type { ReactNode } from 'react';
 import { io, Socket } from 'socket.io-client';
 import { socketLogger } from '../utils/logger';
+import { API_BASE_URL } from '../api/config';
 
 // 警報類型
 interface Alert {
@@ -35,9 +36,7 @@ interface RealtimeContextType {
 const RealtimeContext = createContext<RealtimeContextType | undefined>(undefined);
 
 // API URL for WebSocket
-const WS_URL = import.meta.env.VITE_WS_URL ||
-    import.meta.env.VITE_API_URL ||
-    'https://light-keepers-api-bsf4y44tja-de.a.run.app';
+const WS_URL = import.meta.env.VITE_WS_URL || API_BASE_URL;
 
 export function RealtimeProvider({ children }: { children: ReactNode }) {
     const [socket, setSocket] = useState<Socket | null>(null);

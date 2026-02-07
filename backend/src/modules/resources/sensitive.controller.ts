@@ -1,4 +1,5 @@
 import { Controller, Post, Body, UseGuards, Request, ForbiddenException } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { SensitiveService } from './sensitive.service';
 import { AuditTargetType } from './sensitive-read-log.entity';
 
@@ -24,7 +25,7 @@ export class SensitiveController {
             reasonCode?: string;
             reasonText?: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user; // 從 JWT 或 session 取得使用者資訊
 
@@ -64,7 +65,7 @@ export class SensitiveController {
             limit?: number;
             offset?: number;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -94,7 +95,7 @@ export class SensitiveController {
             targetType: AuditTargetType;
             targetId: string;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 

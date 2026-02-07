@@ -1,11 +1,11 @@
-/* ============================================
-   Light Keepers 曦望燈塔 Design System
-   風格: Senteng Design System 完整移植
+﻿/* ============================================
+   Light Keepers 鏇︽湜鐕堝 Design System
+   棰ㄦ牸: Senteng Design System 瀹屾暣绉绘
 ============================================ */
 
 :root {
-  /* ===== Senteng 核心色 ===== */
-  /* Slate 深色系 */
+  /* ===== Senteng 鏍稿績鑹?===== */
+  /* Slate 娣辫壊绯?*/
   --slate-900: #0f172a;
   --slate-800: #1e293b;
   --slate-700: #334155;
@@ -17,18 +17,18 @@
   --slate-100: #f1f5f9;
   --slate-50: #f8fafc;
 
-  /* 主色 - Emerald */
+  /* 涓昏壊 - Emerald */
   --primary-500: #10b981;
   --primary-600: #059669;
   --primary-700: #047857;
 
-  /* ===== 功能色 ===== */
+  /* ===== 鍔熻兘鑹?===== */
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
   --info: #3b82f6;
 
-  /* ===== Senteng 主題 ===== */
+  /* ===== Senteng 涓婚 ===== */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
@@ -42,7 +42,7 @@
   --border-color: #e2e8f0;
   --border-light: #f1f5f9;
 
-  /* 導覽選中狀態 - Senteng 深藍灰 */
+  /* 灏庤閬镐腑鐙€鎱?- Senteng 娣辫棈鐏?*/
   --nav-active-bg: #334155;
   --nav-active-text: #ffffff;
   --nav-hover-bg: #f1f5f9;
@@ -52,12 +52,12 @@
   --accent-active-bg: #334155;
   --accent-active-text: #ffffff;
 
-  /* ===== 陰影 ===== */
+  /* ===== 闄板奖 ===== */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-  /* 相容舊變數 */
+  /* 鐩稿鑸婅畩鏁?*/
   --brown-900: #1e293b;
   --brown-800: #334155;
   --gold-400: #10b981;
@@ -75,11 +75,11 @@
   --color-info: #3b82f6;
 }
 
-/* 主題已統一使用 Senteng Design System */
-/* 詳見 senteng-theme.css */
+/* 涓婚宸茬当涓€浣跨敤 Senteng Design System */
+/* 瑭宠 senteng-theme.css */
 
 /* ============================================
-   基礎樣式
+   鍩虹妯ｅ紡
 ============================================ */
 
 * {
@@ -97,7 +97,7 @@ body {
 }
 
 /* ============================================
-   Layout 佈局 - Senteng Clean Design
+   Layout 浣堝眬 - Senteng Clean Design
 ============================================ */
 
 .layout {
@@ -206,7 +206,7 @@ body {
   font-size: 14px;
 }
 
-/* ===== Navigation Groups - 分組導航 ===== */
+/* ===== Navigation Groups - 鍒嗙祫灏庤埅 ===== */
 .nav-group {
   margin-bottom: 4px;
 }
@@ -384,7 +384,7 @@ body {
 }
 
 /* ============================================
-   Stats Cards 統計卡片
+   Stats Cards 绲辫▓鍗＄墖
 ============================================ */
 
 .stats-grid {
@@ -544,7 +544,7 @@ body {
 }
 
 /* ============================================
-   Buttons 按鈕
+   Buttons 鎸夐垥
 ============================================ */
 
 .btn-primary {
@@ -604,7 +604,7 @@ body {
 }
 
 /* ============================================
-   Filter Bar 篩選欄
+   Filter Bar 绡╅伕娆?
 ============================================ */
 
 .filter-bar {
@@ -634,7 +634,7 @@ body {
 }
 
 /* ============================================
-   Table 表格
+   Table 琛ㄦ牸
 ============================================ */
 
 .events-table {
@@ -700,7 +700,7 @@ body {
 }
 
 /* ============================================
-   Task Board 任務看板
+   Task Board 浠诲嫏鐪嬫澘
 ============================================ */
 
 .task-board {
@@ -805,7 +805,7 @@ body {
 }
 
 /* ============================================
-   Modal 彈窗
+   Modal 褰堢獥
 ============================================ */
 
 .modal-overlay {
@@ -883,7 +883,7 @@ body {
 }
 
 /* ============================================
-   Empty State 空狀態
+   Empty State 绌虹媭鎱?
 ============================================ */
 
 .empty-state {
@@ -915,7 +915,7 @@ body {
 }
 
 /* ============================================
-   Responsive 響應式
+   Responsive 闊挎噳寮?
 ============================================ */
 
 @media (max-width: 1024px) {
@@ -929,11 +929,11 @@ body {
 }
 
 @media (max-width: 768px) {
-  /* 手機版側邊欄 - Senteng 風格設計 */
-  /* 側邊欄由 hamburger menu 控制，展開時顯示完整文字 */
+  /* 鎵嬫鐗堝伌閭婃瑒 - Senteng 棰ㄦ牸瑷▓ */
+  /* 鍋撮倞娆勭敱 hamburger menu 鎺у埗锛屽睍闁嬫檪椤ず瀹屾暣鏂囧瓧 */
 
-  /* 側邊欄隱藏時的狀態由 hamburger menu CSS 控制 */
-  /* 此區塊不再隱藏 nav-label，讓側邊欄展開時顯示完整導覽 */
+  /* 鍋撮倞娆勯毐钘忔檪鐨勭媭鎱嬬敱 hamburger menu CSS 鎺у埗 */
+  /* 姝ゅ崁濉婁笉鍐嶉毐钘?nav-label锛岃畵鍋撮倞娆勫睍闁嬫檪椤ず瀹屾暣灏庤 */
 
   .main-content {
     padding: 16px;
@@ -1150,1047 +1150,12 @@ body {
   color: var(--color-success);
 }
 
-/* ============================================
-   Map Page Styles
-============================================ */
 
-.map-page {
-  height: calc(100vh - 64px);
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-}
-
-.map-layout {
-  display: grid;
-  grid-template-columns: 1fr 350px;
-  gap: 24px;
-  flex: 1;
-  min-height: 0;
-  width: 100%;
-}
-
-.map-container {
-  position: relative;
-  border-radius: var(--radius-xl);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  min-height: 500px;
-  width: 100%;
-}
-
-/* Leaflet 樣式覆寫 */
-.leaflet-container {
-  font-family: var(--font-family-primary);
-}
-
-.leaflet-popup-content-wrapper {
-  background: var(--bg-card);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.leaflet-popup-tip {
-  background: var(--bg-card);
-}
-
-.map-popup h4 {
-  margin: 0 0 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.map-popup__category {
-  color: var(--text-muted);
-  font-size: 12px;
-  margin: 4px 0;
-}
-
-.map-popup__severity {
-  font-weight: 600;
-  font-size: 12px;
-  margin: 4px 0;
-}
-
-/* 地圖圖例 - 左下角圖層篩選 */
-.map-legend {
-  position: absolute;
-  bottom: 24px;
-  left: 24px;
-  background: var(--bg-card);
-  padding: 12px 16px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  z-index: 1000;
-  max-height: calc(100vh - 200px);
-  overflow-y: auto;
-}
-
-/* 嚴重程度圖例 - 右下角 (與縮放按鈕等高) */
-.map-severity-legend {
-  position: absolute;
-  bottom: 95px;
-  right: 75px;
-  background: var(--bg-card);
-  padding: 10px 14px;
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  z-index: 1000;
-}
-
-.map-legend__title {
-  font-weight: 600;
-  font-size: 12px;
-  margin-bottom: 8px;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.map-legend__item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 12px;
-  color: var(--text-secondary);
-  margin: 4px 0;
-}
-
-.map-legend__color {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-}
-
-/* 側邊欄 */
-.map-sidebar {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  overflow-y: auto;
-}
-
-.map-event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  max-height: 400px;
-  overflow-y: auto;
-  padding-right: 4px;
-}
-
-.map-event-item {
-  padding: 12px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
-  cursor: pointer;
-  transition: all 0.2s ease;
-  border: 2px solid transparent;
-}
-
-.map-event-item:hover {
-  background: var(--bg-hover);
-}
-
-.map-event-item--selected {
-  border-color: var(--accent-primary);
-  background: var(--bg-hover);
-}
-
-.map-event-item__header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.map-event-item__location {
-  font-size: 14px;
-}
-
-.map-event-item__title {
-  font-weight: 500;
-  font-size: 14px;
-  margin-bottom: 4px;
-  color: var(--text-primary);
-}
-
-.map-event-item__meta {
-  display: flex;
-  justify-content: space-between;
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-/* 事件詳情 */
-.map-event-detail__content h4 {
-  margin: 0 0 8px;
-  font-size: 16px;
-  color: var(--text-primary);
-}
-
-.map-event-detail__desc {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.map-event-detail__info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.map-event-detail__info strong {
-  color: var(--text-secondary);
-  margin-right: 8px;
-}
-
-.map-event-detail__actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-/* GPS 座標顯示 */
-.map-event-detail__gps {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--border-color);
-}
-
-.gps-coords {
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
-  font-size: 12px;
-  background: var(--bg-secondary);
-  padding: 4px 8px;
-  border-radius: 4px;
-  color: var(--accent-primary);
-}
-
-.copy-btn {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px;
-  opacity: 0.7;
-  transition: opacity 0.2s;
-}
-
-.copy-btn:hover {
-  opacity: 1;
-}
-
-/* 響應式 */
-@media (max-width: 1024px) {
-  .map-layout {
-    grid-template-columns: 1fr;
-  }
-
-  .map-container {
-    min-height: 400px;
-  }
-
-  .map-sidebar {
-    max-height: 300px;
-  }
-}
-
-/* 地圖篩選器 */
-.map-filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.map-filter {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.map-filter label {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.map-filter select {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 8px 12px;
-  border-radius: var(--radius-sm);
-  font-size: 13px;
-  cursor: pointer;
-  transition: border-color 0.2s ease;
-}
-
-.map-filter select:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-}
-
-.map-filter select:hover {
-  border-color: var(--accent-primary);
-}
-
-/* 圖層選擇器 - 左上角 */
-.map-layer-selector {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 1000;
-}
-
-.map-layer-btn {
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  padding: 10px 16px;
-  border-radius: var(--radius-md);
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  box-shadow: var(--shadow-md);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.map-layer-btn:hover {
-  background: var(--bg-hover);
-  border-color: var(--accent-primary);
-}
-
-.map-layer-menu {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  margin-top: 8px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-  overflow: hidden;
-  min-width: 120px;
-}
-
-.map-layer-option {
-  display: block;
-  width: 100%;
-  padding: 10px 16px;
-  border: none;
-  background: transparent;
-  color: var(--text-primary);
-  font-size: 13px;
-  text-align: left;
-  cursor: pointer;
-  transition: background 0.15s ease;
-}
-
-.map-layer-option:hover {
-  background: var(--bg-hover);
-}
-
-.map-layer-option.active {
-  background: var(--accent-primary);
-  color: var(--brown-900);
-  font-weight: 600;
-}
-
-/* 定位目前位置按鈕 - Google Maps 風格 */
-.map-locate-btn {
-  position: absolute;
-  bottom: 195px;
-  right: 10px;
-  z-index: 1000;
-  width: 40px;
-  height: 40px;
-  background: #fff;
-  border: none;
-  border-radius: 2px;
-  cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
-  transition: background 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #666;
-}
-
-.map-locate-btn:hover:not(:disabled) {
-  background: #f5f5f5;
-  color: #333;
-}
-
-.map-locate-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.map-locate-btn--loading {
-  color: #4285F4;
-}
-
-.map-locate-btn--loading svg {
-  animation: spin-locate 1s linear infinite;
-}
-
-@keyframes spin-locate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-/* ===== Google Maps Loading & Error States ===== */
-.map-loading {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  background: var(--bg-secondary);
-  color: var(--text-secondary);
-  gap: 16px;
-}
-
-.map-loading__spinner {
-  width: 48px;
-  height: 48px;
-  border: 3px solid var(--border-color);
-  border-top-color: var(--accent-primary);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.map-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  color: var(--text-secondary);
-  text-align: center;
-  padding: 40px;
-}
-
-.map-error h3 {
-  margin-bottom: 8px;
-  color: var(--color-danger);
-}
-
-/* ===== Google Maps InfoWindow Custom Styles ===== */
-.gmap-infowindow {
-  min-width: 220px;
-  max-width: 300px;
-  padding: 4px;
-  font-family: var(--font-family-base);
-}
-
-.gmap-infowindow__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.gmap-infowindow__severity {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: white;
-  text-transform: uppercase;
-}
-
-.gmap-infowindow__category {
-  font-size: 12px;
-  color: var(--text-muted);
-  background: var(--bg-secondary);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.gmap-infowindow__title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px;
-  line-height: 1.3;
-}
-
-.gmap-infowindow__desc {
-  font-size: 13px;
-  color: #666;
-  margin: 0 0 8px;
-  line-height: 1.5;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.gmap-infowindow__address {
-  font-size: 12px;
-  color: #888;
-  margin: 0 0 12px;
-}
-
-.gmap-infowindow__actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
-}
-
-.gmap-infowindow__actions button {
-  flex: 1;
-  padding: 8px 12px;
-  background: var(--accent-primary);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.gmap-infowindow__actions button:hover {
-  background: var(--accent-secondary);
-  transform: translateY(-1px);
-}
-
-/* Override Google Maps default InfoWindow styles */
-.gm-style-iw-c {
-  padding: 12px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-}
-
-.gm-style-iw-d {
-  overflow: hidden !important;
-}
-
-.gm-style-iw-t::after {
-  background: white !important;
-  box-shadow: none !important;
-}
-
-/* Close button styling */
-.gm-ui-hover-effect {
-  top: 2px !important;
-  right: 2px !important;
-}
-
-/* 隱藏傾斜/旋轉控制項和方向鍵導航控制 */
-.gm-style gmp-internal-camera-control,
-.gm-style gmp-internal-camera-control.gmnoprint,
-button[aria-label="Keyboard shortcuts"],
-button[aria-label="鍵盤快速鍵"],
-button[aria-label="Map camera controls"],
-button[aria-label="地圖相機控制"],
-.gm-tilt {
-  display: none !important;
-}
-
-/* ===== NCDR 災害示警頁面 ===== */
-.ncdr-page {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-/* 篩選器 */
-.ncdr-filter {
-  padding: 20px !important;
-}
-
-.ncdr-filter__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.ncdr-filter__header h4 {
-  margin: 0;
-  font-size: 16px;
-  color: var(--text-primary);
-}
-
-.ncdr-filter__actions {
-  display: flex;
-  gap: 8px;
-}
-
-.ncdr-filter__actions button {
-  padding: 6px 12px;
-  border: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.ncdr-filter__actions button:hover {
-  background: var(--accent-primary);
-  color: var(--brown-900);
-  border-color: var(--accent-primary);
-}
-
-.ncdr-filter__groups {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-@media (max-width: 900px) {
-  .ncdr-filter__groups {
-    grid-template-columns: 1fr;
-  }
-}
-
-.ncdr-filter__group h5 {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0 0 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.ncdr-filter__items {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.ncdr-filter__item {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  background: var(--bg-secondary);
-  border-radius: 6px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.ncdr-filter__item:hover {
-  background: rgba(196, 167, 125, 0.15);
-}
-
-.ncdr-filter__item input {
-  accent-color: var(--accent-primary);
-}
-
-.ncdr-filter__item span.core {
-  font-weight: 600;
-  color: var(--color-warning);
-}
-
-.ncdr-filter__footer {
-  margin-top: 16px;
-  padding-top: 12px;
-  border-top: 1px solid var(--border-color);
-  font-size: 12px;
-  color: var(--text-muted);
-}
-
-.ncdr-filter__footer p {
-  margin: 4px 0;
-}
-
-/* 警報網格 */
-.ncdr-alerts-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 16px;
-}
-
-.ncdr-empty {
-  grid-column: 1 / -1;
-}
-
-.ncdr-alert-card {
-  padding: 16px !important;
-}
-
-.ncdr-alert__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
-.ncdr-alert__severity {
-  font-size: 12px;
-  font-weight: 600;
-}
-
-.ncdr-alert__title {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin: 0 0 8px;
-  line-height: 1.4;
-}
-
-.ncdr-alert__desc {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0 0 12px;
-  line-height: 1.5;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ncdr-alert__meta {
-  display: flex;
-  gap: 16px;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 12px;
-}
-
-.ncdr-alert__link {
-  display: inline-block;
-  font-size: 13px;
-  color: var(--accent-primary);
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.ncdr-alert__link:hover {
-  text-decoration: underline;
-}
-
-/* Map Legend Toggle */
-.map-legend__toggle {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 0;
-  cursor: pointer;
-  font-size: 13px;
-  transition: opacity 0.15s ease;
-}
-
-.map-legend__toggle:hover {
-  opacity: 0.8;
-}
-
-.map-legend__toggle input {
-  accent-color: var(--accent-primary);
-}
-
-/* NCDR 類型細分篩選器 */
-.ncdr-type-filters {
-  margin-left: 24px;
-  padding-left: 12px;
-  border-left: 2px solid var(--border-color);
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  margin-top: 4px;
-  max-height: 400px;
-  overflow-y: auto;
-}
-
-.ncdr-type-filter {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 8px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 12px;
-  transition: all 0.15s ease;
-}
-
-.ncdr-type-filter:hover {
-  background: rgba(196, 167, 125, 0.1);
-}
-
-.ncdr-type-filter input {
-  accent-color: var(--accent-primary);
-  width: 14px;
-  height: 14px;
-  flex-shrink: 0;
-}
-
-.ncdr-type-icon {
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.ncdr-type-name {
-  color: var(--text-primary);
-  flex: 1;
-}
-
-.ncdr-type-count {
-  color: var(--text-muted);
-  font-size: 11px;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.ncdr-type-filter--extended {
-  opacity: 0.85;
-}
-
-.ncdr-type-filter--extended:hover {
-  opacity: 1;
-}
-
-.ncdr-type-expand {
-  background: none;
-  border: none;
-  color: var(--accent-primary);
-  font-size: 11px;
-  padding: 6px 8px;
-  cursor: pointer;
-  text-align: left;
-  transition: color 0.15s ease;
-  margin-top: 4px;
-}
-
-.ncdr-type-expand:hover {
-  color: var(--accent-secondary);
-}
-
-.ncdr-extended-types {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding-top: 4px;
-  border-top: 1px dashed var(--border-color);
-  animation: fadeIn 0.2s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(-4px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ===== 側邊欄 Tab 切換器 ===== */
-.sidebar-tabs {
-  display: flex;
-  gap: 0;
-  margin-bottom: 12px;
-  border-radius: var(--radius-md);
-  overflow: hidden;
-  background: var(--bg-secondary);
-  padding: 4px;
-}
-
-.sidebar-tab {
-  flex: 1;
-  padding: 10px 12px;
-  background: transparent;
-  border: none;
-  font-size: 13px;
-  font-weight: 500;
-  cursor: pointer;
-  color: var(--text-secondary);
-  border-radius: var(--radius-sm);
-  transition: all 0.2s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-}
-
-.sidebar-tab:hover {
-  color: var(--text-primary);
-  background: rgba(196, 167, 125, 0.1);
-}
-
-.sidebar-tab--active {
-  background: #2d3748;
-  /* 深色背景 */
-  color: #ffffff;
-  /* 白色文字 */
-  font-weight: 600;
-}
-
-.sidebar-tab--active:hover {
-  background: #1a202c;
-  /* 更深的 hover 背景 */
-  color: #ffffff;
-}
-
-.sidebar-tab__count {
-  font-size: 11px;
-  font-weight: 600;
-  background: rgba(0, 0, 0, 0.15);
-  padding: 2px 6px;
-  border-radius: 10px;
-  min-width: 20px;
-  text-align: center;
-}
-
-.sidebar-tab--active .sidebar-tab__count {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* NCDR 項目樣式 */
-.map-event-item--ncdr {
-  border-left: 3px solid var(--color-warning);
-}
-
-.ncdr-source {
-  color: var(--text-muted);
-  font-size: 11px;
-}
-
-/* ===== 頁首圖層切換 ===== */
-.header-layer-toggles {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: 20px;
-}
-
-.header-layer-toggle {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  cursor: pointer;
-  font-size: 14px;
-  color: var(--text-secondary);
-  transition: color 0.2s ease;
-}
-
-.header-layer-toggle:hover {
-  color: var(--text-primary);
-}
-
-.header-layer-toggle input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  accent-color: var(--accent-primary);
-  cursor: pointer;
-}
-
-.header-layer-toggle span {
-  white-space: nowrap;
-}
-
-/* ===== 頁首嚴重程度圖例 ===== */
-.header-severity-legend {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 13px;
-}
-
-.header-severity-legend__label {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.header-severity-legend__item {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.header-severity-legend__dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.header-severity-legend__text {
-  color: var(--text-primary);
-  font-size: 12px;
-}
-
-/* RWD - 小螢幕隱藏或簡化圖例 */
-@media (max-width: 768px) {
-  .header-severity-legend {
-    display: none;
-  }
-
-  .page-header__right {
-    display: none;
-  }
-
-  .sidebar-tabs {
-    flex-direction: column;
-  }
-
-  .sidebar-tab {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-
-  .map-filters {
-    flex-direction: column;
-  }
-
-  .map-filter {
-    width: 100%;
-  }
-}
-
-@media (max-width: 1024px) {
-  .header-severity-legend__text {
-    display: none;
-  }
-
-  .header-severity-legend__item {
-    gap: 2px;
-  }
-
-  .header-severity-legend {
-    gap: 8px;
-  }
-}
+/* Map/Geo styles  see styles/map-page.css */
+/* NCDR styles  see styles/ncdr-page.css */
 
 /* ============================================
-   PWA Update Prompt 更新提示
+   PWA Update Prompt 鏇存柊鎻愮ず
 ============================================ */
 
 .pwa-update-prompt {
@@ -2274,7 +1239,7 @@ button[aria-label="地圖相機控制"],
   background: var(--bg-hover);
 }
 
-/* RWD - 小螢幕 PWA 提示 */
+/* RWD - 灏忚灑骞?PWA 鎻愮ず */
 @media (max-width: 480px) {
   .pwa-update-prompt {
     left: 16px;
@@ -2294,618 +1259,11 @@ button[aria-label="地圖相機控制"],
   }
 }
 
-/* ============================================
-   Manuals Page 實務手冊頁面
-============================================ */
 
-.manuals-page {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
-.page-subtitle {
-  color: var(--text-muted);
-  font-size: 14px;
-  margin-top: 4px;
-}
-
-/* Search */
-.manuals-search {
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.manuals-search__input {
-  width: 100%;
-  padding: 14px 48px 14px 20px;
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--bg-card);
-  font-size: 15px;
-  color: var(--text-primary);
-  transition: all 0.2s ease;
-}
-
-.manuals-search__input:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(184, 151, 111, 0.15);
-}
-
-.manuals-search__clear {
-  position: absolute;
-  right: 16px;
-  top: 50%;
-  transform: translateY(-50%);
-  background: var(--bg-secondary);
-  border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  cursor: pointer;
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-/* Category Grid */
-.category-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-}
-
-.category-card {
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.category-card:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
-}
-
-.category-card__icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 16px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-
-.category-card__content {
-  flex: 1;
-}
-
-.category-card__title {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.category-card__desc {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-  line-height: 1.5;
-}
-
-/* Manual List */
-.manuals-list-section {
-  margin-top: 16px;
-}
-
-.manuals-list-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 20px;
-}
-
-.manuals-back-btn,
-.manual-back-btn {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  padding: 8px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  font-size: 14px;
-  transition: all 0.2s ease;
-}
-
-.manuals-back-btn:hover,
-.manual-back-btn:hover {
-  background: var(--bg-hover);
-}
-
-.manuals-list-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.manuals-list-title h3 {
-  font-size: 20px;
-  color: var(--text-primary);
-}
-
-.manuals-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.manual-item {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--bg-card);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 16px 20px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.manual-item:hover {
-  border-color: var(--accent-primary);
-  box-shadow: var(--shadow-md);
-}
-
-.manual-item__category {
-  font-size: 24px;
-}
-
-.manual-item__content {
-  flex: 1;
-}
-
-.manual-item__title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 4px;
-}
-
-.manual-item__summary {
-  font-size: 13px;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.manual-item__tags {
-  display: flex;
-  gap: 6px;
-  flex-wrap: wrap;
-}
-
-.manual-item__arrow {
-  font-size: 20px;
-  color: var(--text-muted);
-}
-
-.manuals-empty {
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-}
-
-.manuals-empty span {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 12px;
-}
-
-.manuals-search-results {
-  margin-top: 24px;
-}
-
-.manuals-search-results h3 {
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin-bottom: 16px;
-}
-
-/* Manual Detail Page */
-.manual-detail-page {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.manual-detail-header {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.manual-breadcrumb {
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.manual-detail-card {
-  margin-bottom: 24px;
-}
-
-.manual-detail-title-section {
-  margin-bottom: 24px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.manual-detail-title {
-  font-size: 28px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 8px;
-  line-height: 1.3;
-}
-
-.manual-detail-summary {
-  font-size: 16px;
-  color: var(--text-secondary);
-  margin-bottom: 12px;
-}
-
-.manual-detail-tags {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.manual-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(232, 90, 90, 0.1);
-  border: 1px solid rgba(232, 90, 90, 0.3);
-  border-radius: 12px;
-  padding: 16px;
-  margin-bottom: 24px;
-}
-
-.manual-warning__icon {
-  font-size: 24px;
-}
-
-.manual-warning p {
-  color: var(--danger);
-  font-weight: 500;
-  line-height: 1.5;
-}
-
-.manual-detail-content {
-  font-size: 16px;
-  line-height: 1.8;
-  color: var(--text-primary);
-  margin-bottom: 32px;
-}
-
-/* Steps */
-.manual-steps {
-  margin-bottom: 32px;
-}
-
-.manual-steps h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 20px;
-}
-
-.manual-steps-list {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.manual-step {
-  display: flex;
-  gap: 16px;
-  padding: 16px;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-}
-
-.manual-step__number {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-weight: 700;
-  font-size: 14px;
-  flex-shrink: 0;
-}
-
-.manual-step__content h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.manual-step__content p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* Tips */
-.manual-tips {
-  background: rgba(196, 167, 125, 0.1);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.manual-tips h2 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
-
-.manual-tips ul {
-  margin: 0;
-  padding-left: 20px;
-}
-
-.manual-tips li {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.8;
-}
-
-/* Offline Badge */
-.manual-offline-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(107, 142, 92, 0.15);
-  color: var(--success);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
-}
-
-/* Sections (擴展區塊) */
-.manual-sections {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.manual-section {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 20px;
-  border-left: 4px solid var(--accent-primary);
-}
-
-.manual-section h2 {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-}
-
-.manual-section p {
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-}
-
-/* Pocket Card (口袋卡) */
-.manual-pocket-card {
-  margin-top: 32px;
-}
-
-.manual-pocket-card h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.pocket-card-box {
-  background: linear-gradient(135deg, #1a1f2e, #232a3d);
-  border: 2px solid var(--accent-primary);
-  border-radius: 16px;
-  padding: 20px 24px;
-  font-family: 'Courier New', 'Monaco', monospace;
-}
-
-.pocket-card-line {
-  color: #e0e0e0;
-  font-size: 13px;
-  line-height: 1.8;
-  padding: 6px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
-}
-
-.pocket-card-line:last-child {
-  border-bottom: none;
-}
-
-/* Checklists (檢核清單) */
-.manual-checklists {
-  margin-top: 32px;
-}
-
-.manual-checklists h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 20px;
-}
-
-.checklists-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 16px;
-}
-
-.checklist-card {
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  padding: 16px 20px;
-  border: 1px solid var(--border-color);
-}
-
-.checklist-card h3 {
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 12px;
-  padding-bottom: 8px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.checklist-card ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.checklist-card li {
-  padding: 6px 0;
-}
-
-.checklist-card label {
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.checklist-card input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  margin-top: 2px;
-  accent-color: var(--accent-primary);
-  cursor: pointer;
-  flex-shrink: 0;
-}
-
-.checklist-card input[type="checkbox"]:checked+span {
-  color: var(--success);
-  text-decoration: line-through;
-  opacity: 0.7;
-}
-
-/* FAQ (常見問題) */
-.manual-faq {
-  margin-top: 32px;
-}
-
-.manual-faq h2 {
-  font-size: 18px;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 16px;
-}
-
-.faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.faq-item {
-  background: var(--bg-secondary);
-  border-radius: 10px;
-  border: 1px solid var(--border-color);
-  overflow: hidden;
-}
-
-.faq-item summary {
-  padding: 14px 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  cursor: pointer;
-  list-style: none;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.faq-item summary::-webkit-details-marker {
-  display: none;
-}
-
-.faq-item summary::after {
-  content: '▼';
-  font-size: 10px;
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-}
-
-.faq-item[open] summary::after {
-  transform: rotate(180deg);
-}
-
-.faq-item[open] summary {
-  background: rgba(184, 151, 111, 0.1);
-  border-bottom: 1px solid var(--border-color);
-}
-
-.faq-item p {
-  padding: 16px 20px;
-  font-size: 14px;
-  color: var(--text-secondary);
-  line-height: 1.7;
-  margin: 0;
-  background: rgba(0, 0, 0, 0.02);
-}
-
-/* Not Found */
-.manual-not-found {
-  text-align: center;
-  padding: 80px 20px;
-}
-
-.manual-not-found h2 {
-  font-size: 24px;
-  margin: 16px 0 8px;
-}
-
-.manual-not-found p {
-  color: var(--text-muted);
-  margin-bottom: 24px;
-}
-
-/* RWD */
-@media (max-width: 768px) {
-  .category-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .manual-detail-title {
-    font-size: 22px;
-  }
-
-  .manual-step {
-    flex-direction: column;
-  }
-}
+/* Manuals styles  see styles/manuals-page.css */
 
 /* ============================================
-   Report Page 災情回報頁面
+   Report Page 鐏芥儏鍥炲牨闋侀潰
 ============================================ */
 
 .report-page {
@@ -3122,7 +1480,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Volunteers Page 志工管理頁面
+   Volunteers Page 蹇楀伐绠＄悊闋侀潰
 ============================================ */
 
 .volunteers-page {
@@ -3354,7 +1712,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Enhanced Dashboard 決策儀表板強化
+   Enhanced Dashboard 姹虹瓥鍎€琛ㄦ澘寮峰寲
 ============================================ */
 
 /* 6-column stats grid */
@@ -3488,7 +1846,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Alert Cards V2 - 重新設計的警報卡片
+   Alert Cards V2 - 閲嶆柊瑷▓鐨勮鍫卞崱鐗?
 ============================================ */
 
 .alert-list-v2 {
@@ -3569,7 +1927,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Map Preview V2 - 重新設計的地圖概覽
+   Map Preview V2 - 閲嶆柊瑷▓鐨勫湴鍦栨瑕?
 ============================================ */
 
 .map-preview-v2 {
@@ -3771,7 +2129,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Training Page 培訓中心
+   Training Page 鍩硅〒涓績
 ============================================ */
 
 .training-page {
@@ -3910,7 +2268,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Resources Page 物資管理
+   Resources Page 鐗╄硣绠＄悊
 ============================================ */
 
 .resources-page {
@@ -3986,10 +2344,10 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Phase E: 行動裝置優化
+   Phase E: 琛屽嫊瑁濈疆鍎寲
 ============================================ */
 
-/* 觸控友善 - 更大的點擊區域 */
+/* 瑙告帶鍙嬪杽 - 鏇村ぇ鐨勯粸鎿婂崁鍩?*/
 @media (hover: none) and (pointer: coarse) {
 
   .btn,
@@ -4012,12 +2370,12 @@ button[aria-label="地圖相機控制"],
   .form-select,
   .form-textarea {
     font-size: 16px;
-    /* 防止 iOS 縮放 */
+    /* 闃叉 iOS 绺斁 */
     padding: 14px;
   }
 }
 
-/* PWA 全螢幕模式 */
+/* PWA 鍏ㄨ灑骞曟ā寮?*/
 @media (display-mode: standalone) {
   body {
     padding-top: env(safe-area-inset-top);
@@ -4030,7 +2388,7 @@ button[aria-label="地圖相機控制"],
   }
 }
 
-/* 橫向模式調整 */
+/* 姗悜妯″紡瑾挎暣 */
 @media (orientation: landscape) and (max-height: 500px) {
   .sidebar {
     padding: 8px;
@@ -4041,7 +2399,7 @@ button[aria-label="地圖相機控制"],
   }
 }
 
-/* 離線指示器 */
+/* 闆㈢窔鎸囩ず鍣?*/
 .offline-indicator {
   position: fixed;
   bottom: 20px;
@@ -4060,10 +2418,10 @@ button[aria-label="地圖相機控制"],
 }
 
 .offline-indicator::before {
-  content: '📡';
+  content: '馃摗';
 }
 
-/* 下拉更新提示 */
+/* 涓嬫媺鏇存柊鎻愮ず */
 .pull-to-refresh {
   position: absolute;
   top: -60px;
@@ -4076,7 +2434,7 @@ button[aria-label="地圖相機控制"],
   color: var(--text-muted);
 }
 
-/* 觸控回饋 */
+/* 瑙告帶鍥為 */
 .touch-feedback {
   position: relative;
   overflow: hidden;
@@ -4096,18 +2454,18 @@ button[aria-label="地圖相機控制"],
   opacity: 1;
 }
 
-/* 手勢滑動卡片 */
+/* 鎵嬪嫝婊戝嫊鍗＄墖 */
 .swipeable-card {
   touch-action: pan-y;
   transition: transform 0.3s ease;
 }
 
-/* 底部安全區域 */
+/* 搴曢儴瀹夊叏鍗€鍩?*/
 .bottom-nav {
   padding-bottom: calc(16px + env(safe-area-inset-bottom));
 }
 
-/* 快速操作 FAB */
+/* 蹇€熸搷浣?FAB */
 .fab {
   position: fixed;
   bottom: calc(24px + env(safe-area-inset-bottom));
@@ -4134,7 +2492,7 @@ button[aria-label="地圖相機控制"],
 }
 
 /* ============================================
-   Notifications Page 通知中心
+   Notifications Page 閫氱煡涓績
 ============================================ */
 
 .notifications-page {
@@ -4244,7 +2602,7 @@ button[aria-label="地圖相機控制"],
 
 /* ============================================
    Mobile Header - Senteng Style Design
-   漢堡選單・通知・頭像
+   婕㈠牎閬稿柈銉婚€氱煡銉婚牠鍍?
 ============================================ */
 
 .mobile-header {
@@ -4329,17 +2687,17 @@ button[aria-label="地圖相機控制"],
 
 /* ============================================
    Responsive Styles - Senteng Design Pattern
-   參考圖2,3響應式頁面設計
+   鍙冭€冨湒2,3闊挎噳寮忛爜闈㈣ō瑷?
 ============================================ */
 
 @media (max-width: 768px) {
 
-  /* 顯示手機版頂部導覽列 */
+  /* 椤ず鎵嬫鐗堥爞閮ㄥ皫瑕藉垪 */
   .mobile-header {
     display: flex;
   }
 
-  /* Sidebar 隱藏，透過漢堡選單開啟 */
+  /* Sidebar 闅辫棌锛岄€忛亷婕㈠牎閬稿柈闁嬪暉 */
   .sidebar {
     position: fixed;
     left: -280px;
@@ -4349,26 +2707,26 @@ button[aria-label="地圖相機控制"],
     z-index: 950;
     transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     padding-top: 60px;
-    /* 為手機頂部導覽列留空間 */
+    /* 鐐烘墜姗熼爞閮ㄥ皫瑕藉垪鐣欑┖闁?*/
   }
 
   .sidebar--open {
     left: 0;
   }
 
-  /* 遮罩顯示 */
+  /* 閬僵椤ず */
   .sidebar--open~.sidebar-overlay,
   .sidebar-overlay {
     display: block;
   }
 
-  /* 主內容區調整 */
+  /* 涓诲収瀹瑰崁瑾挎暣 */
   .main-content {
     margin-left: 0 !important;
     padding: 80px 16px 16px !important;
   }
 
-  /* 頁面標題響應式 */
+  /* 闋侀潰妯欓闊挎噳寮?*/
   .page-header {
     flex-direction: column;
     gap: 16px;
@@ -4387,7 +2745,7 @@ button[aria-label="地圖相機控制"],
     width: 100%;
   }
 
-  /* 地圖頁面篩選選項 - 行動裝置換行 */
+  /* 鍦板湒闋侀潰绡╅伕閬搁爡 - 琛屽嫊瑁濈疆鎻涜 */
   .header-layer-toggles {
     display: flex !important;
     flex-wrap: wrap !important;
@@ -4398,7 +2756,7 @@ button[aria-label="地圖相機控制"],
     white-space: nowrap;
   }
 
-  /* Modal 響應式 */
+  /* Modal 闊挎噳寮?*/
   .modal-content,
   .modal-content--lg {
     width: 95vw !important;
@@ -4408,7 +2766,7 @@ button[aria-label="地圖相機控制"],
     margin: 8vh auto;
   }
 
-  /* 表單兩欄變一欄 */
+  /* 琛ㄥ柈鍏╂瑒璁婁竴娆?*/
   .form-row {
     flex-direction: column;
     gap: 0;
@@ -4418,7 +2776,7 @@ button[aria-label="地圖相機控制"],
     width: 100%;
   }
 
-  /* 技能選擇網格 - 2欄 */
+  /* 鎶€鑳介伕鎿囩恫鏍?- 2娆?*/
   .skills-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
@@ -4430,7 +2788,7 @@ button[aria-label="地圖相機控制"],
     min-height: 44px;
   }
 
-  /* 統計卡片 - 2欄 */
+  /* 绲辫▓鍗＄墖 - 2娆?*/
   .volunteers-stats,
   .resources-stats,
   .dashboard-stats,
@@ -4455,13 +2813,13 @@ button[aria-label="地圖相機控制"],
     font-size: 24px;
   }
 
-  /* 按鈕觸控區 - 最小 44px */
+  /* 鎸夐垥瑙告帶鍗€ - 鏈€灏?44px */
   .lk-btn,
   button {
     min-height: 44px;
   }
 
-  /* 表格響應式 */
+  /* 琛ㄦ牸闊挎噳寮?*/
   .resources-table,
   .events-table {
     font-size: 13px;
@@ -4474,17 +2832,17 @@ button[aria-label="地圖相機控制"],
     padding: 10px 6px;
   }
 
-  /* 任務看板 - 單欄堆疊 */
+  /* 浠诲嫏鐪嬫澘 - 鍠瑒鍫嗙枈 */
   .task-board {
     grid-template-columns: 1fr !important;
   }
 
-  /* Dashboard 區域 - 單欄 */
+  /* Dashboard 鍗€鍩?- 鍠瑒 */
   .dashboard-sections {
     grid-template-columns: 1fr;
   }
 
-  /* 志工卡片響應式 */
+  /* 蹇楀伐鍗＄墖闊挎噳寮?*/
   .volunteer-card__actions {
     flex-direction: column;
     gap: 8px;
@@ -4494,7 +2852,7 @@ button[aria-label="地圖相機控制"],
     width: 100%;
   }
 
-  /* 篩選區響應式 */
+  /* 绡╅伕鍗€闊挎噳寮?*/
   .filter-bar {
     flex-direction: column;
     gap: 8px;
@@ -4505,7 +2863,7 @@ button[aria-label="地圖相機控制"],
     width: 100%;
   }
 
-  /* 分類篩選滾動 */
+  /* 鍒嗛绡╅伕婊惧嫊 */
   .resources-categories,
   .status-filters {
     overflow-x: auto;
@@ -4523,7 +2881,7 @@ button[aria-label="地圖相機控制"],
   }
 
   /* ===== Mobile Sidebar Complete Fix ===== */
-  /* 側邊欄基礎修復 - 強制覆蓋所有衝突樣式 */
+  /* 鍋撮倞娆勫熀绀庝慨寰?- 寮峰埗瑕嗚搵鎵€鏈夎绐佹ǎ寮?*/
   .sidebar {
     width: 280px !important;
     min-width: 280px !important;
@@ -4538,7 +2896,7 @@ button[aria-label="地圖相機控制"],
     left: 0 !important;
   }
 
-  /* Logo 完整顯示 */
+  /* Logo 瀹屾暣椤ず */
   .sidebar .logo {
     display: flex !important;
     flex-direction: row !important;
@@ -4570,7 +2928,7 @@ button[aria-label="地圖相機控制"],
     writing-mode: horizontal-tb !important;
   }
 
-  /* 編輯選單按鈕 - 強制水平排列 */
+  /* 绶ㄨ集閬稿柈鎸夐垥 - 寮峰埗姘村钩鎺掑垪 */
   .sidebar .nav-edit-controls {
     display: flex !important;
     flex-direction: row !important;
@@ -4596,7 +2954,7 @@ button[aria-label="地圖相機控制"],
     min-width: 0 !important;
   }
 
-  /* 導航區域 */
+  /* 灏庤埅鍗€鍩?*/
   .sidebar .nav {
     display: flex !important;
     flex-direction: column !important;
@@ -4606,7 +2964,7 @@ button[aria-label="地圖相機控制"],
     box-sizing: border-box !important;
   }
 
-  /* 導航項目包裝 - 確保水平布局 */
+  /* 灏庤埅闋呯洰鍖呰 - 纰轰繚姘村钩甯冨眬 */
   .sidebar .nav-item-wrapper {
     display: flex !important;
     flex-direction: row !important;
@@ -4614,12 +2972,12 @@ button[aria-label="地圖相機控制"],
     width: 100% !important;
   }
 
-  /* 拖曳手柄在移動端隱藏 */
+  /* 鎷栨洺鎵嬫焺鍦ㄧЩ鍕曠闅辫棌 */
   .sidebar .nav-item-drag-handle {
     display: none !important;
   }
 
-  /* 導航項目 - 確保水平完整顯示 */
+  /* 灏庤埅闋呯洰 - 纰轰繚姘村钩瀹屾暣椤ず */
   .sidebar .nav-item {
     display: flex !important;
     flex-direction: row !important;
@@ -4651,7 +3009,7 @@ button[aria-label="地圖相機控制"],
     flex: 1 !important;
   }
 
-  /* 編輯模式下的導航項目 */
+  /* 绶ㄨ集妯″紡涓嬬殑灏庤埅闋呯洰 */
   .sidebar .nav-item--editing {
     display: flex !important;
     flex-direction: row !important;
@@ -4668,7 +3026,7 @@ button[aria-label="地圖相機控制"],
     width: 100% !important;
   }
 
-  /* 用戶區域 */
+  /* 鐢ㄦ埗鍗€鍩?*/
   .sidebar .sidebar-user {
     display: flex !important;
     flex-direction: row !important;
@@ -4716,7 +3074,7 @@ button[aria-label="地圖相機控制"],
     flex-shrink: 0 !important;
   }
 
-  /* 側邊欄底部版本資訊 */
+  /* 鍋撮倞娆勫簳閮ㄧ増鏈硣瑷?*/
   .sidebar .sidebar-footer {
     display: block !important;
     text-align: center !important;
@@ -4736,7 +3094,7 @@ button[aria-label="地圖相機控制"],
   }
 }
 
-/* 超小螢幕 (320-480px) */
+/* 瓒呭皬铻㈠箷 (320-480px) */
 @media (max-width: 480px) {
   .mobile-header {
     padding: 0 12px;
@@ -4757,14 +3115,14 @@ button[aria-label="地圖相機控制"],
     padding: 72px 12px 12px !important;
   }
 
-  /* 統計卡片全寬 */
+  /* 绲辫▓鍗＄墖鍏ㄥ */
   .volunteers-stats,
   .resources-stats,
   .stats-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* 技能選擇全寬 */
+  /* 鎶€鑳介伕鎿囧叏瀵?*/
   .skills-grid {
     grid-template-columns: 1fr !important;
   }
@@ -4773,22 +3131,22 @@ button[aria-label="地圖相機控制"],
     padding: 12px !important;
   }
 
-  /* 頁面標題調整 */
+  /* 闋侀潰妯欓瑾挎暣 */
   .page h2 {
     font-size: 22px;
   }
 }
 
 /* ============================================
-   Event Detail Modal - 災情事件詳情彈窗
-   極簡中性風格設計
+   Event Detail Modal - 鐏芥儏浜嬩欢瑭虫儏褰堢獥
+   妤电啊涓€чⅷ鏍艰ō瑷?
 ============================================ */
 
 .event-detail {
   padding: 8px 0;
 }
 
-/* 類型與嚴重度標籤區 */
+/* 椤炲瀷鑸囧毚閲嶅害妯欑堡鍗€ */
 .event-detail__header {
   display: flex;
   align-items: center;
@@ -4817,7 +3175,7 @@ button[aria-label="地圖相機控制"],
   border-radius: 6px;
 }
 
-/* 標題與描述 */
+/* 妯欓鑸囨弿杩?*/
 .event-detail h3 {
   font-size: 20px;
   font-weight: 600;
@@ -4835,7 +3193,7 @@ button[aria-label="地圖相機控制"],
   border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
-/* 資訊列表 - 更寬鬆的間距 */
+/* 璩囪▕鍒楄〃 - 鏇村楝嗙殑闁撹窛 */
 .event-detail__info {
   display: flex;
   flex-direction: column;
@@ -4863,7 +3221,7 @@ button[aria-label="地圖相機控制"],
   line-height: 1.5;
 }
 
-/* 操作按鈕區 - 極簡中性色 */
+/* 鎿嶄綔鎸夐垥鍗€ - 妤电啊涓€ц壊 */
 .event-detail__actions {
   display: flex;
   gap: 12px;
@@ -4886,7 +3244,7 @@ button[aria-label="地圖相機控制"],
   gap: 8px;
 }
 
-/* 中性淺色按鈕樣式 */
+/* 涓€ф泛鑹叉寜閳曟ǎ寮?*/
 .event-detail__actions .btn-neutral,
 .event-detail__actions .lk-btn--secondary,
 .event-detail__actions button:not(.btn-primary):not(.lk-btn--primary) {
@@ -4902,7 +3260,7 @@ button[aria-label="地圖相機控制"],
   border-color: var(--slate-300, #cbd5e1);
 }
 
-/* 主要操作按鈕 - 淺灰強調 */
+/* 涓昏鎿嶄綔鎸夐垥 - 娣虹伆寮疯 */
 .event-detail__actions .btn-primary,
 .event-detail__actions .lk-btn--primary {
   background: var(--slate-700, #334155);
@@ -4916,7 +3274,7 @@ button[aria-label="地圖相機控制"],
   border-color: var(--slate-800, #1e293b);
 }
 
-/* 響應式調整 */
+/* 闊挎噳寮忚鏁?*/
 @media (max-width: 480px) {
   .event-detail__actions {
     flex-direction: column;

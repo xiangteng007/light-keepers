@@ -1,0 +1,573 @@
+﻿/* ============================================
+   Map Page Styles
+============================================ */
+
+.map-page {
+  height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.map-layout {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 24px;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+}
+
+.map-container {
+  position: relative;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  background: var(--bg-card);
+  min-height: 500px;
+  width: 100%;
+}
+
+/* Leaflet 妯ｅ紡瑕嗗 */
+.leaflet-container {
+  font-family: var(--font-family-primary);
+}
+
+.leaflet-popup-content-wrapper {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+}
+
+.leaflet-popup-tip {
+  background: var(--bg-card);
+}
+
+.map-popup h4 {
+  margin: 0 0 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.map-popup__category {
+  color: var(--text-muted);
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+.map-popup__severity {
+  font-weight: 600;
+  font-size: 12px;
+  margin: 4px 0;
+}
+
+/* 鍦板湒鍦栦緥 - 宸︿笅瑙掑湒灞ょ閬?*/
+.map-legend {
+  position: absolute;
+  bottom: 24px;
+  left: 24px;
+  background: var(--bg-card);
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+}
+
+/* 鍤撮噸绋嬪害鍦栦緥 - 鍙充笅瑙?(鑸囩府鏀炬寜閳曠瓑楂? */
+.map-severity-legend {
+  position: absolute;
+  bottom: 95px;
+  right: 75px;
+  background: var(--bg-card);
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+}
+
+.map-legend__title {
+  font-weight: 600;
+  font-size: 12px;
+  margin-bottom: 8px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.map-legend__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: 4px 0;
+}
+
+.map-legend__color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+/* 鍋撮倞娆?*/
+.map-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.map-event-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.map-event-item {
+  padding: 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 2px solid transparent;
+}
+
+.map-event-item:hover {
+  background: var(--bg-hover);
+}
+
+.map-event-item--selected {
+  border-color: var(--accent-primary);
+  background: var(--bg-hover);
+}
+
+.map-event-item__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.map-event-item__location {
+  font-size: 14px;
+}
+
+.map-event-item__title {
+  font-weight: 500;
+  font-size: 14px;
+  margin-bottom: 4px;
+  color: var(--text-primary);
+}
+
+.map-event-item__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* 浜嬩欢瑭虫儏 */
+.map-event-detail__content h4 {
+  margin: 0 0 8px;
+  font-size: 16px;
+  color: var(--text-primary);
+}
+
+.map-event-detail__desc {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.map-event-detail__info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  margin-bottom: 16px;
+}
+
+.map-event-detail__info strong {
+  color: var(--text-secondary);
+  margin-right: 8px;
+}
+
+.map-event-detail__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* GPS 搴ф椤ず */
+.map-event-detail__gps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+}
+
+.gps-coords {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12px;
+  background: var(--bg-secondary);
+  padding: 4px 8px;
+  border-radius: 4px;
+  color: var(--accent-primary);
+}
+
+.copy-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.copy-btn:hover {
+  opacity: 1;
+}
+
+/* 闊挎噳寮?*/
+@media (max-width: 1024px) {
+  .map-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .map-container {
+    min-height: 400px;
+  }
+
+  .map-sidebar {
+    max-height: 300px;
+  }
+}
+
+/* 鍦板湒绡╅伕鍣?*/
+.map-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.map-filter {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.map-filter label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.map-filter select {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.map-filter select:focus {
+  outline: none;
+  border-color: var(--accent-primary);
+}
+
+.map-filter select:hover {
+  border-color: var(--accent-primary);
+}
+
+/* 鍦栧堡閬告搰鍣?- 宸︿笂瑙?*/
+.map-layer-selector {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 1000;
+}
+
+.map-layer-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.map-layer-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-primary);
+}
+
+.map-layer-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  min-width: 120px;
+}
+
+.map-layer-option {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.map-layer-option:hover {
+  background: var(--bg-hover);
+}
+
+.map-layer-option.active {
+  background: var(--accent-primary);
+  color: var(--brown-900);
+  font-weight: 600;
+}
+
+/* 瀹氫綅鐩墠浣嶇疆鎸夐垥 - Google Maps 棰ㄦ牸 */
+.map-locate-btn {
+  position: absolute;
+  bottom: 195px;
+  right: 10px;
+  z-index: 1000;
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+}
+
+.map-locate-btn:hover:not(:disabled) {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.map-locate-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.map-locate-btn--loading {
+  color: #4285F4;
+}
+
+.map-locate-btn--loading svg {
+  animation: spin-locate 1s linear infinite;
+}
+
+@keyframes spin-locate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ===== Google Maps Loading & Error States ===== */
+.map-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  gap: 16px;
+}
+
+.map-loading__spinner {
+  width: 48px;
+  height: 48px;
+  border: 3px solid var(--border-color);
+  border-top-color: var(--accent-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.map-error {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-lg);
+  color: var(--text-secondary);
+  text-align: center;
+  padding: 40px;
+}
+
+.map-error h3 {
+  margin-bottom: 8px;
+  color: var(--color-danger);
+}
+
+/* ===== Google Maps InfoWindow Custom Styles ===== */
+.gmap-infowindow {
+  min-width: 220px;
+  max-width: 300px;
+  padding: 4px;
+  font-family: var(--font-family-base);
+}
+
+.gmap-infowindow__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.gmap-infowindow__severity {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
+  text-transform: uppercase;
+}
+
+.gmap-infowindow__category {
+  font-size: 12px;
+  color: var(--text-muted);
+  background: var(--bg-secondary);
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.gmap-infowindow__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.gmap-infowindow__desc {
+  font-size: 13px;
+  color: #666;
+  margin: 0 0 8px;
+  line-height: 1.5;
+  max-height: 60px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gmap-infowindow__address {
+  font-size: 12px;
+  color: #888;
+  margin: 0 0 12px;
+}
+
+.gmap-infowindow__actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #eee;
+}
+
+.gmap-infowindow__actions button {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--accent-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gmap-infowindow__actions button:hover {
+  background: var(--accent-secondary);
+  transform: translateY(-1px);
+}
+
+/* Override Google Maps default InfoWindow styles */
+.gm-style-iw-c {
+  padding: 12px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+}
+
+.gm-style-iw-d {
+  overflow: hidden !important;
+}
+
+.gm-style-iw-t::after {
+  background: white !important;
+  box-shadow: none !important;
+}
+
+/* Close button styling */
+.gm-ui-hover-effect {
+  top: 2px !important;
+  right: 2px !important;
+}
+
+/* 闅辫棌鍌炬枩/鏃嬭綁鎺у埗闋呭拰鏂瑰悜閸靛皫鑸帶鍒?*/
+.gm-style gmp-internal-camera-control,
+.gm-style gmp-internal-camera-control.gmnoprint,
+button[aria-label="Keyboard shortcuts"],
+button[aria-label="閸电洡蹇€熼嵉"],
+button[aria-label="Map camera controls"],
+button[aria-label="鍦板湒鐩告鎺у埗"],
+.gm-tilt {
+  display: none !important;
+}
+

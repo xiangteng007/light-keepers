@@ -5,6 +5,7 @@
  * Level 5 users can edit, drag, resize, and hide widgets
  */
 import React, { useState, useEffect, useMemo } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useTranslation } from 'react-i18next';
 import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User, Plus, Minus } from 'lucide-react';
 import { WidgetGrid } from './WidgetGrid';
@@ -34,6 +35,7 @@ export default function AppShellLayout({
     pageId = 'default',
 }: AppShellLayoutProps) {
     const { t } = useTranslation();
+    const { user: authUser } = useAuth();
 
     // Helper to convert item id to camelCase translation key
     const getItemLabel = useMemo(() => {
@@ -275,8 +277,8 @@ export default function AppShellLayout({
                                         <User size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>使用者</div>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Level 5</div>
+                                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{authUser?.displayName || '使用者'}</div>
+                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Level {userLevel}</div>
                                     </div>
                                 </div>
                                 <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
@@ -464,8 +466,8 @@ export default function AppShellLayout({
                     <div className="drawer-user">
                         <User size={40} className="drawer-user-avatar" />
                         <div className="drawer-user-info">
-                            <div className="drawer-user-name">光守護者</div>
-                            <div className="drawer-user-level">Level {userLevel} 管理員</div>
+                            <div className="drawer-user-name">{authUser?.displayName || '光守護者'}</div>
+                            <div className="drawer-user-level">Level {userLevel}{userLevel >= PermissionLevel.Supervisor ? ' 管理員' : ''}</div>
                         </div>
                     </div>
                     <button className="drawer-close" onClick={closeDrawer} title="關閉選單">

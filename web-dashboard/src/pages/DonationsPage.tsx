@@ -16,6 +16,7 @@ import type {
 } from '../api';
 import { useAuth } from '../context/AuthContext';
 import './DonationsPage.css';
+import { API_BASE_URL } from '../api/config';
 
 // 快速金額選項
 const QUICK_AMOUNTS = [100, 300, 500, 1000, 3000, 5000];
@@ -277,7 +278,7 @@ export default function DonationsPage() {
                                         <td>
                                             {donation.receipt ? (
                                                 <a
-                                                    href={`${import.meta.env.VITE_API_URL || 'https://light-keepers-api-890013751803.asia-east1.run.app'}/donations/receipts/${donation.receipt.id}/pdf`}
+                                                    href={`${API_BASE_URL}/donations/receipts/${donation.receipt.id}/pdf`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="receipt-download-link"

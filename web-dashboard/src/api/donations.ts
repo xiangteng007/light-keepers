@@ -1,4 +1,5 @@
 import api from './client';
+import { API_BASE_URL } from './config';
 
 // ===== 捐款系統 Donations =====
 
@@ -143,7 +144,7 @@ export const deleteDonor = (id: string) =>
 
 // 取得 CSV 匯出 URL
 export const getExportCsvUrl = (year?: number) => {
-    const baseUrl = import.meta.env.VITE_API_URL || 'https://light-keepers-api-890013751803.asia-east1.run.app';
+    const baseUrl = API_BASE_URL;
     const targetYear = year || new Date().getFullYear();
     return `${baseUrl}/donations/export/csv?year=${targetYear}`;
 };

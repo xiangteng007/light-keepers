@@ -5,6 +5,7 @@ import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardLi
 import { createVolunteer } from '../api/services';
 import { Badge } from '../design-system';
 import './ProfilePage.css';
+import { API_BASE } from '../api/config';
 
 // LINE Login Config
 const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID || '';
@@ -72,9 +73,6 @@ export default function ProfilePage() {
     });
     const [isVolunteerSubmitting, setIsVolunteerSubmitting] = useState(false);
     const [volunteerSubmitted, setVolunteerSubmitted] = useState(false);
-
-    // VITE_API_URL 不含 /api/v1，需要手動加上
-    const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
     const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
     // Fetch preferences and password status on mount

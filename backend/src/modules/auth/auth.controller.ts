@@ -52,24 +52,28 @@ export class AuthController {
 
     @Get('me')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-    async getProfile(@Request() req: { user: { id: string; email?: string; phone?: string; displayName?: string; lineUserId?: string; googleId?: string; roles?: { name: string; level: number; displayName: string }[] } }) {
-        // 從資料庫獲取最新帳號資料（包含綁定狀態）
+    async getProfile(@Request() req: { user: { id: string; email?: string; roleLevel?: number } }) {
+        // 從資料庫獲取最新帳號資料（包含角色與綁定狀態）
         const account = await this.authService.getAccountById(req.user.id);
-        const roles = req.user.roles || [];
-        const roleLevel = roles.length > 0 ? Math.max(...roles.map(r => r.level || 0)) : 0;
+        // 使用資料庫角色（含 level），而非 JWT 的 string[] roles
+        const dbRoles = account?.roles || [];
+        const roleLevel = dbRoles.length > 0
+            ? Math.max(...dbRoles.map(r => r.level || 0))
+            : (req.user.roleLevel ?? 0);
 
         return {
             id: req.user.id,
-            email: req.user.email,
-            phone: req.user.phone,
-            displayName: account?.displayName || req.user.displayName,
+            email: account?.email || req.user.email,
+            phone: account?.phone,
+            displayName: account?.displayName,
             avatarUrl: account?.avatarUrl || null,
             lineLinked: !!(account?.lineUserId),
             googleLinked: !!(account?.googleId),
             volunteerProfileCompleted: account?.volunteerProfileCompleted || false,
-            roles: roles.map(r => r.name),
+            roles: dbRoles.map(r => r.name),
             roleLevel,
-            roleDisplayName: roles.find(r => r.level === roleLevel)?.displayName || '一般民眾',
+            roleDisplayName: dbRoles.find(r => r.level === roleLevel)?.displayName
+                || (roleLevel > 0 ? '登記志工' : '一般民眾'),
         };
     }
 

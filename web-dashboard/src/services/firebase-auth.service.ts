@@ -13,6 +13,7 @@ import {
     EmailAuthProvider,
 } from 'firebase/auth';
 import firebaseConfig from '../config/firebase.config';
+import { API_BASE } from '../api/config';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -154,9 +155,8 @@ export const firebaseAuthService = {
         }
 
         try {
-            // 使用後端 API 發送自訂驗證信 - VITE_API_URL 不含 /api/v1
-            const API_URL = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
-            const response = await fetch(`${API_URL}/auth/resend-verification`, {
+            // 使用後端 API 發送自訂驗證信
+            const response = await fetch(`${API_BASE}/auth/resend-verification`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: user.email, displayName: user.displayName }),

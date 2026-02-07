@@ -19,20 +19,20 @@ description: 部署 Light Keepers 應用程式到 Google Cloud Run
 
 ```bash
 cd backend
-docker build -t gcr.io/PROJECT_ID/lightkeepers-backend:latest .
+docker build -t gcr.io/light-keepers-mvp/lightkeepers-backend:latest .
 ```
 
 ### 2. 推送到 GCR
 
 ```bash
-docker push gcr.io/PROJECT_ID/lightkeepers-backend:latest
+docker push gcr.io/light-keepers-mvp/lightkeepers-backend:latest
 ```
 
 ### 3. 部署到 Cloud Run
 
 ```bash
 gcloud run deploy lightkeepers-backend \
-  --image gcr.io/PROJECT_ID/lightkeepers-backend:latest \
+  --image gcr.io/light-keepers-mvp/lightkeepers-backend:latest \
   --platform managed \
   --region asia-east1 \
   --allow-unauthenticated \

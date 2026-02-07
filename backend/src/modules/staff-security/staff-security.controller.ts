@@ -4,6 +4,7 @@
  * REST API for staff safety management
  */
 import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 import { SecurityIncidentService, CreateIncidentDto } from './services/security-incident.service';
@@ -62,7 +63,7 @@ export class StaffSecurityController {
 
     @Post('check-in')
     @ApiOperation({ summary: 'Record staff check-in' })
-    async checkIn(@Body() dto: CheckInDto, @Request() req: any) {
+    async checkIn(@Body() dto: CheckInDto, @Request() req: AuthenticatedRequest) {
         return this.checkInService.checkIn({
             ...dto,
             staffId: dto.staffId || req.user?.id,
@@ -73,7 +74,7 @@ export class StaffSecurityController {
     @ApiOperation({ summary: 'Trigger panic button' })
     async panicButton(
         @Body() body: { location?: { latitude: number; longitude: number }; message?: string },
-        @Request() req: any
+        @Request() req: AuthenticatedRequest
     ) {
         return this.checkInService.checkIn({
             staffId: req.user?.id,
@@ -123,7 +124,7 @@ export class StaffSecurityController {
     async initiateEvacuation(
         @Param('planId') planId: string,
         @Body() body: { reason: string },
-        @Request() req: any
+        @Request() req: AuthenticatedRequest
     ) {
         return this.evacuationService.initiateEvacuation(
             planId,

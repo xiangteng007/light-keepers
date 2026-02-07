@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApprovalService } from './approval.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
@@ -42,7 +43,7 @@ export class ApprovalController {
     @Post(':id/approve')
     async approve(
         @Param('id') id: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -66,7 +67,7 @@ export class ApprovalController {
     async reject(
         @Param('id') id: string,
         @Body('rejectReason') rejectReason: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 

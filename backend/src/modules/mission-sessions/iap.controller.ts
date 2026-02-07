@@ -4,6 +4,7 @@
  */
 
 import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { IAPService } from './iap.service';
 import { IAPDocumentType } from './entities/iap-document.entity';
@@ -43,7 +44,7 @@ export class IAPController {
             priorities?: string[];
             commanderGuidance?: string;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const period = await this.iapService.createPeriod({
             missionSessionId: sessionId,
@@ -83,7 +84,7 @@ export class IAPController {
     @ApiOperation({ summary: '核准作戰週期' })
     async approvePeriod(
         @Param('periodId') periodId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const period = await this.iapService.approvePeriod(periodId, req.user?.uid || 'system');
         return { success: true, data: period, message: '作戰週期已核准' };
@@ -128,7 +129,7 @@ export class IAPController {
         @Param('periodId') periodId: string,
         @Param('docType') docType: IAPDocumentType,
         @Body() body: { content: Record<string, any> },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const document = await this.iapService.upsertDocument(
             periodId,
@@ -143,7 +144,7 @@ export class IAPController {
     @ApiOperation({ summary: '核准 IAP 文件' })
     async approveDocument(
         @Param('docId') docId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const document = await this.iapService.approveDocument(docId, req.user?.uid || 'system');
         return { success: true, data: document, message: '文件已核准' };

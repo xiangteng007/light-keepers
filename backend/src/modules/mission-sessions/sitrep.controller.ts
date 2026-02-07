@@ -4,6 +4,7 @@
  */
 
 import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SITREPService } from './sitrep.service';
 import { DecisionType } from './entities/decision-log.entity';
@@ -34,7 +35,7 @@ export class SITREPController {
             periodEnd: string;
             summary?: string;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sitrep = await this.sitrepService.createSITREP({
             missionSessionId: sessionId,
@@ -55,7 +56,7 @@ export class SITREPController {
             periodStart: string;
             periodEnd: string;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sitrep = await this.sitrepService.generateSITREPDraft(
             sessionId,
@@ -87,7 +88,7 @@ export class SITREPController {
     @ApiOperation({ summary: '核准 SITREP' })
     async approveSITREP(
         @Param('sitrepId') sitrepId: string,
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const sitrep = await this.sitrepService.approveSITREP(sitrepId, req.user?.uid || 'system');
         return { success: true, data: sitrep, message: 'SITREP 已核准' };
@@ -125,7 +126,7 @@ export class SITREPController {
             beforeState?: Record<string, any>;
             afterState?: Record<string, any>;
         },
-        @Req() req: any,
+        @Req() req: AuthenticatedRequest,
     ) {
         const decision = await this.sitrepService.logDecision({
             missionSessionId: sessionId,

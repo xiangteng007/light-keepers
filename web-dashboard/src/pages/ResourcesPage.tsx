@@ -8,6 +8,7 @@ import AssetsTab from './resources/AssetsTab';
 import DispatchTab from './resources/DispatchTab';
 import AuditTab from './resources/AuditTab';
 import './ResourcesPage.css';
+import { API_BASE } from '../api/config';
 
 // 物資分類
 const CATEGORY_CONFIG = {
@@ -43,8 +44,6 @@ interface ResourceLog {
     };
 }
 
-// VITE_API_URL 不含 /api/v1，需要手動加上
-const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
 
 export default function ResourcesPage() {
     const { user } = useAuth();

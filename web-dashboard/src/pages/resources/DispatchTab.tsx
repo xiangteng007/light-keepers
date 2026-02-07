@@ -1,9 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
 import './DispatchTab.css';
-
-// VITE_API_URL 不含 /api/v1，需要手動加上
-const API_BASE = `${import.meta.env.VITE_API_URL || 'https://light-keepers-api-bsf4y44tja-de.a.run.app'}/api/v1`;
+import { API_BASE } from '../../api/config';
 
 type DispatchStatus = 'pending' | 'approved' | 'rejected' | 'picking' | 'delivering' | 'completed' | 'cancelled';
 

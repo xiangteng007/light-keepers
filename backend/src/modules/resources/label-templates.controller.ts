@@ -1,4 +1,5 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { LabelTemplatesService } from './label-templates.service';
 
 /**
@@ -49,7 +50,7 @@ export class LabelTemplatesController {
             height: number;
             layoutConfig: Record<string, any>;
         },
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -81,7 +82,7 @@ export class LabelTemplatesController {
             layoutConfig: Record<string, any>;
             isActive: boolean;
         }>,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -100,7 +101,7 @@ export class LabelTemplatesController {
     async setActive(
         @Param('id') id: string,
         @Body('isActive') isActive: boolean,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
@@ -118,7 +119,7 @@ export class LabelTemplatesController {
     @Delete(':id')
     async delete(
         @Param('id') id: string,
-        @Request() req: any,
+        @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
 
