@@ -118,4 +118,20 @@ export default defineConfig({
       }
     })
   ],
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // React core (~140KB)
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          // Lucide icons (~120KB)
+          'vendor-icons': ['lucide-react'],
+          // Charts (~180KB)
+          'vendor-charts': ['chart.js', 'react-chartjs-2'],
+          // PDF generation (~80KB)
+          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
+        },
+      },
+    },
+  },
 })
