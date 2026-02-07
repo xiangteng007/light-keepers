@@ -34,6 +34,23 @@ build/
 # Secrets
 **/serviceAccountKey.json
 **/firebase-adminsdk*.json
+temp_env.json
+
+# Generated logs & debug files
+backend-startup.log
+cloud-run-logs*.json
+cloud_run_logs.json
+revision_details.json
+tsc-errors.txt
+
+# Debug scripts & temp data (root-level)
+fix-deleted-modules.js
+recreate-events.ps1
+update-events-chinese.ps1
+update-events.js
+ncdr_earthquake.xml
+ncdr_rss.html
+split-map.mjs
 
 # ===========================================
 # CI-Generated Dynamic Reports (DO NOT COMMIT)
