@@ -128,14 +128,20 @@ export default defineConfig({
           'vendor-icons': ['lucide-react'],
           // Charts (~180KB)
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
-          // PDF generation (~80KB)
-          'vendor-pdf': ['jspdf', 'jspdf-autotable'],
           // Map libraries (~500KB)
           'vendor-maps': ['maplibre-gl', 'leaflet', 'react-leaflet'],
           // Firebase (~200KB)
           'vendor-firebase': ['firebase'],
           // Excel export (~300KB)
           'vendor-excel': ['exceljs'],
+          // Realtime (~100KB)
+          'vendor-realtime': ['socket.io-client', 'rxjs'],
+          // Offline sync (~200KB)
+          'vendor-offline': ['rxdb', 'idb'],
+          // i18n (~40KB)
+          'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
+          // Data fetching (~30KB)
+          'vendor-query': ['@tanstack/react-query'],
         },
       },
     },

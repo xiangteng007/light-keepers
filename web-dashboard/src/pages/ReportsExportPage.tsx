@@ -1,6 +1,4 @@
 import { useState } from 'react';
-import { jsPDF } from 'jspdf';
-import autoTable from 'jspdf-autotable';
 import { Card, Button, Badge } from '../design-system';
 import {
     getVolunteerHoursReport,
@@ -11,8 +9,10 @@ import {
 import type { VolunteerHoursReport, DisasterReport } from '../api/services';
 import './ReportsExportPage.css';
 
-// PDF 匯出功能
-const exportVolunteerPDF = (data: VolunteerHoursReport[], dateRange: { start: string; end: string }) => {
+// PDF 匯出功能（動態載入 jsPDF — 減少初次載入 ~600KB）
+const exportVolunteerPDF = async (data: VolunteerHoursReport[], dateRange: { start: string; end: string }) => {
+    const { jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
     const doc = new jsPDF();
 
     // 標題
@@ -39,7 +39,9 @@ const exportVolunteerPDF = (data: VolunteerHoursReport[], dateRange: { start: st
     doc.save('volunteer-hours-report.pdf');
 };
 
-const exportDisasterPDF = (data: DisasterReport, dateRange: { start: string; end: string }) => {
+const exportDisasterPDF = async (data: DisasterReport, dateRange: { start: string; end: string }) => {
+    const { jsPDF } = await import('jspdf');
+    const { default: autoTable } = await import('jspdf-autotable');
     const doc = new jsPDF();
 
     // 標題
