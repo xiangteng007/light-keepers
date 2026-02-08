@@ -142,6 +142,8 @@ export default defineConfig({
           'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
           // Data fetching (~30KB)
           'vendor-query': ['@tanstack/react-query'],
+          // Bootstrap UI (~50KB) — used by 4 legacy pages
+          'vendor-bootstrap': ['react-bootstrap'],
         },
       },
     },

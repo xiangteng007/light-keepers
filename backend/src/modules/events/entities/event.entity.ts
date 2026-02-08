@@ -1,6 +1,9 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, OneToMany, Index } from 'typeorm';
 
 @Entity('events')
+@Index(['status'])
+@Index(['category'])
+@Index(['createdAt'])
 export class Event {
     @PrimaryGeneratedColumn('uuid')
     id: string;

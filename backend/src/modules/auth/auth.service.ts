@@ -359,36 +359,6 @@ export class AuthService {
         });
     }
 
-    /**
-     * 診斷帳號狀態（臨時方法）
-     * 用於排查角色問題
-     */
-    async diagnoseAccount(email: string): Promise<any> {
-        // 搜尋所有可能的帳號
-        const accounts = await this.accountRepository.find({
-            where: [
-                { email },
-                { googleEmail: email },
-            ],
-            relations: ['roles'],
-        });
-
-        return {
-            searchEmail: email,
-            accountCount: accounts.length,
-            accounts: accounts.map(acc => ({
-                id: acc.id,
-                email: acc.email,
-                googleEmail: acc.googleEmail,
-                firebaseUid: acc.firebaseUid,
-                displayName: acc.displayName,
-                roles: acc.roles?.map(r => ({ name: r.name, level: r.level })) || [],
-                roleLevel: acc.roles?.length ? Math.max(...acc.roles.map(r => r.level)) : 0,
-                lastLoginAt: acc.lastLoginAt,
-            })),
-        };
-    }
-
     // =========================================
     // Google OAuth 相關方法
     // =========================================

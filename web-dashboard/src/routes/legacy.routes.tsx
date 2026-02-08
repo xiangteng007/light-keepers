@@ -54,12 +54,12 @@ export const legacyRoutes = (
     {/* ===== Dashboard 和 Command Center ===== */}
     <Route path="/dashboard" element={<ProtectedRoute requiredLevel={0}><CommandCenterPage /></ProtectedRoute>} />
     <Route path="/command-center" element={<ProtectedRoute requiredLevel={0}><CommandCenterPage /></ProtectedRoute>} />
-    <Route path="/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
+    <Route path="/mental-health" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper></ProtectedRoute>} />
 
     {/* ===== Emergency 緊急快捷 Routes ===== */}
-    <Route path="/emergency/sos" element={<PageWrapper pageId="emergency-sos"><EmergencyResponsePage /></PageWrapper>} />
-    <Route path="/emergency/evacuation" element={<PageWrapper pageId="emergency-evacuation"><EmergencyResponsePage /></PageWrapper>} />
-    <Route path="/emergency/hotline" element={<PageWrapper pageId="emergency-hotline"><EmergencyResponsePage /></PageWrapper>} />
+    <Route path="/emergency/sos" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="emergency-sos"><EmergencyResponsePage /></PageWrapper></ProtectedRoute>} />
+    <Route path="/emergency/evacuation" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="emergency-evacuation"><EmergencyResponsePage /></PageWrapper></ProtectedRoute>} />
+    <Route path="/emergency/hotline" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="emergency-hotline"><EmergencyResponsePage /></PageWrapper></ProtectedRoute>} />
 
     {/* Command IC Dashboard */}
     <Route path="/command/ic" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="command-ic"><ICSSectionDashboard /></PageWrapper></ProtectedRoute>} />
@@ -68,13 +68,13 @@ export const legacyRoutes = (
     <Route index element={<HomeRedirect />} />
 
     {/* Intake Route (統一通報入口) */}
-    <Route path="/intake" element={<PageWrapper pageId="intake"><ReportPage /></PageWrapper>} />
+    <Route path="/intake" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="intake"><ReportPage /></PageWrapper></ProtectedRoute>} />
 
     {/* Knowledge Routes */}
-    <Route path="/knowledge/manuals" element={<PageWrapper pageId="knowledge-manuals"><ManualsPage /></PageWrapper>} />
-    <Route path="/knowledge/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
-    <Route path="/manuals/:id" element={<PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper>} />
-    <Route path="/manuals-v3" element={<PageWrapper pageId="manuals-v3"><ManualHomePage /></PageWrapper>} />
+    <Route path="/knowledge/manuals" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="knowledge-manuals"><ManualsPage /></PageWrapper></ProtectedRoute>} />
+    <Route path="/knowledge/manuals/:id" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper></ProtectedRoute>} />
+    <Route path="/manuals/:id" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="manual-detail"><ManualDetailPage /></PageWrapper></ProtectedRoute>} />
+    <Route path="/manuals-v3" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="manuals-v3"><ManualHomePage /></PageWrapper></ProtectedRoute>} />
 
     {/* Workforce Routes */}
     <Route path="/workforce/people" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="workforce-people"><VolunteersPage /></PageWrapper></ProtectedRoute>} />
@@ -84,7 +84,7 @@ export const legacyRoutes = (
 
     {/* Community Routes */}
     <Route path="/community/hub" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="community-hub"><CommunityCenterPage /></PageWrapper></ProtectedRoute>} />
-    <Route path="/community/mental-health" element={<PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper>} />
+    <Route path="/community/mental-health" element={<ProtectedRoute requiredLevel={0}><PageWrapper pageId="mental-health"><MentalHealthPage /></PageWrapper></ProtectedRoute>} />
 
     {/* Analytics Routes */}
     <Route path="/analytics/reports" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="analytics-reports"><ReportsAdminPage /></PageWrapper></ProtectedRoute>} />
