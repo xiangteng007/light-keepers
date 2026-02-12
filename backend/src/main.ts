@@ -109,7 +109,7 @@ async function bootstrap() {
 
         app.enableCors({
             origin: process.env.CORS_ORIGIN?.split(',') || allowedOrigins,
-            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+            methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS', 'HEAD'],
             credentials: true,
             allowedHeaders: [
                 'Content-Type',
