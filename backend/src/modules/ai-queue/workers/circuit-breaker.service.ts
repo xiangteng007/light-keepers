@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { AiCircuitBreaker } from '../entities';
@@ -11,6 +11,8 @@ import { AiUseCaseId } from '../dto';
  */
 @Injectable()
 export class CircuitBreakerService {
+    private readonly logger = new Logger(CircuitBreakerService.name);
+
     constructor(
         @InjectRepository(AiCircuitBreaker)
         private breakerRepo: Repository<AiCircuitBreaker>,
@@ -61,7 +63,7 @@ export class CircuitBreakerService {
         // Check if we should open the circuit
         if (breaker.consecutiveFailures >= config.circuitBreakerThreshold) {
             breaker.cooldownUntil = new Date(Date.now() + config.circuitBreakerCooldownMs);
-            console.log(`[CircuitBreaker] Opening circuit for ${useCaseId} until ${breaker.cooldownUntil.toISOString()}`);
+            this.logger.warn(`Opening circuit for ${useCaseId} until ${breaker.cooldownUntil.toISOString()}`);
         }
 
         await this.breakerRepo.save(breaker);

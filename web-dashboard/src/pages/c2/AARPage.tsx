@@ -2,32 +2,55 @@
  * AARPage.tsx
  * 
  * C2 Domain - AAR (After Action Review) 檢討頁面
- * 任務後檢討與經驗學習
+ * 任務後檢討與經驗學習 — connected to real API
  */
-import React, { useState } from 'react';
-import { FileCheck, Calendar, Users, ThumbsUp, ThumbsDown, Lightbulb, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { FileCheck, Calendar, Users, Lightbulb, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import api from '../../utils/api';
 import './AARPage.css';
 
 interface AARReport {
     id: string;
     title: string;
-    incidentNumber: string;
-    date: string;
-    facilitator: string;
+    name?: string;
+    incidentNumber?: string;
+    sessionId?: string;
+    date?: string;
+    createdAt?: string;
+    facilitator?: string;
     participants: number;
     lessonsLearned: number;
     actionItems: number;
 }
 
-const MOCK_AARS: AARReport[] = [
-    { id: '1', title: '2026/01 大安區地震應變', incidentNumber: 'INC-2026-00123', date: '2026/01/11', facilitator: '陳指揮官', participants: 12, lessonsLearned: 5, actionItems: 8 },
-    { id: '2', title: '2025/12 颱風疏散演練', incidentNumber: 'DRL-2025-00045', date: '2025/12/20', facilitator: '林隊長', participants: 25, lessonsLearned: 7, actionItems: 12 },
-    { id: '3', title: '2025/12 火災救援任務', incidentNumber: 'INC-2025-00089', date: '2025/12/15', facilitator: '王組長', participants: 8, lessonsLearned: 4, actionItems: 6 },
-];
-
 export default function AARPage() {
+    const [aars, setAars] = useState<AARReport[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [selectedAAR, setSelectedAAR] = useState<string | null>(null);
+
+    const fetchAARs = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            // Try the AAR listing endpoint
+            const response = await api.get('/api/aar');
+            const data = response.data?.data || response.data || [];
+            const items = Array.isArray(data) ? data : (data.items || data.reports || []);
+            setAars(items);
+        } catch (err: any) {
+            console.error('Failed to fetch AARs:', err);
+            setError(err?.response?.data?.message || '無法載入 AAR 列表');
+            setAars([]);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchAARs();
+    }, [fetchAARs]);
 
     return (
         <PageTemplate
@@ -41,30 +64,57 @@ export default function AARPage() {
                 <div className="aar-list">
                     <div className="list-header">
                         <h3>檢討報告列表</h3>
-                        <button className="btn-new">+ 新增 AAR</button>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button className="btn-new" onClick={fetchAARs} disabled={loading} title="重新整理" style={{ padding: '0.25rem 0.5rem' }}>
+                                <RefreshCw size={14} className={loading ? 'spin' : ''} />
+                            </button>
+                            <button className="btn-new">+ 新增 AAR</button>
+                        </div>
                     </div>
-                    {MOCK_AARS.map(aar => (
+
+                    {/* Error */}
+                    {error && (
+                        <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                            ⚠️ {error}
+                        </div>
+                    )}
+
+                    {/* Loading */}
+                    {loading && (
+                        <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', gap: '0.5rem', color: '#94a3b8' }}>
+                            <Loader2 size={20} className="spin" />
+                            <span>載入中...</span>
+                        </div>
+                    )}
+
+                    {/* List */}
+                    {!loading && aars.length === 0 && (
+                        <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                            暫無 AAR 報告
+                        </div>
+                    )}
+                    {!loading && aars.map(aar => (
                         <div
                             key={aar.id}
                             className={`aar-item ${selectedAAR === aar.id ? 'selected' : ''}`}
                             onClick={() => setSelectedAAR(aar.id)}
                         >
                             <div className="aar-main">
-                                <h4>{aar.title}</h4>
-                                <span className="incident-ref">{aar.incidentNumber}</span>
+                                <h4>{aar.title || aar.name || `AAR-${aar.id.slice(0, 8)}`}</h4>
+                                <span className="incident-ref">{aar.incidentNumber || aar.sessionId || '-'}</span>
                             </div>
                             <div className="aar-meta">
-                                <span><Calendar size={12} /> {aar.date}</span>
-                                <span><Users size={12} /> {aar.participants} 人</span>
+                                <span><Calendar size={12} /> {aar.date || (aar.createdAt ? new Date(aar.createdAt).toLocaleDateString('zh-TW') : '-')}</span>
+                                <span><Users size={12} /> {aar.participants || 0} 人</span>
                             </div>
                             <div className="aar-stats">
                                 <span className="stat lessons">
                                     <Lightbulb size={14} />
-                                    {aar.lessonsLearned} 經驗
+                                    {aar.lessonsLearned || 0} 經驗
                                 </span>
                                 <span className="stat actions">
                                     <FileCheck size={14} />
-                                    {aar.actionItems} 行動項目
+                                    {aar.actionItems || 0} 行動項目
                                 </span>
                             </div>
                             <ChevronRight size={16} className="chevron" />

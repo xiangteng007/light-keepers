@@ -1,313 +1,400 @@
+/**
+ * DonationsPage.css — 捐款管理頁面
+ * Industrial Precision Design System
+ * Uses design-tokens.css (K1 Bright Steel / K2 Copper Steel)
+ * ZERO hardcoded colors — all via var() tokens
+ */
+
+/* ============================================
+   Page Container
+   ============================================ */
 .donations-page {
-    padding: 1.5rem;
+  padding: var(--space-4);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
 }
 
-/* 存取拒絕 */
+/* ============================================
+   Access Denied
+   ============================================ */
 .access-denied {
-    text-align: center;
-    padding: 3rem 2rem;
+  text-align: center;
+  padding: 3rem 2rem;
 }
 
 .access-denied .icon {
-    font-size: 4rem;
-    display: block;
-    margin-bottom: 1rem;
+  font-size: 4rem;
+  display: block;
+  margin-bottom: var(--space-3);
 }
 
 .access-denied h3 {
-    color: #dc2626;
-    margin-bottom: 0.5rem;
+  color: var(--color-danger);
+  margin-bottom: var(--space-2);
 }
 
 .access-denied p {
-    color: #64748b;
+  color: var(--text-tertiary);
 }
 
-/* 頁面標題動作區 */
+/* ============================================
+   Page Header Actions
+   ============================================ */
 .page-header__actions {
-    display: flex;
-    gap: 0.75rem;
-    align-items: center;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 .export-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-    color: #16a34a;
-    border: 1px solid #bbf7d0;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-success) 8%, var(--surface-default));
+  color: var(--color-success-dark);
+  border: 1px solid color-mix(in srgb, var(--color-success) 20%, transparent);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
 .export-btn:hover {
-    background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%);
-    border-color: #86efac;
-    color: #15803d;
+  background: color-mix(in srgb, var(--color-success) 16%, var(--surface-default));
+  border-color: color-mix(in srgb, var(--color-success) 35%, transparent);
+  color: var(--color-success-dark);
 }
 
-/* 標籤欄 */
-.tab-bar {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    background: #f1f5f9;
-    padding: 0.25rem;
-    border-radius: 8px;
+/* ============================================
+   Tab Bar — Pill Style
+   ============================================ */
+.donations-page .tab-bar {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+  background: var(--surface-raised);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
 }
 
-.tab-bar button {
-    flex: 1;
-    padding: 0.75rem 1rem;
-    border: none;
-    background: transparent;
-    border-radius: 6px;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    transition: all 0.2s;
+.donations-page .tab-bar button {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.tab-bar button:hover {
-    color: #334155;
+.donations-page .tab-bar button:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
 }
 
-.tab-bar button.active {
-    background: #fff;
-    color: #1e293b;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+.donations-page .tab-bar button.active {
+  background: var(--color-secondary);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
 }
 
-/* 統計網格 */
+/* ============================================
+   Stats Grid
+   ============================================ */
 .stats-grid {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
 }
 
-.stat-card {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
+.donations-page .stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  background: var(--surface-default);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3);
+  transition: all 0.25s ease;
+}
+
+.donations-page .stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
 .stat-card__icon {
-    font-size: 2rem;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-    border-radius: 12px;
+  font-size: 2rem;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
 }
 
 .stat-card__value {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #1e293b;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--text-primary);
 }
 
 .stat-card__label {
-    font-size: 0.8rem;
-    color: #64748b;
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
-/* 表格 */
+/* ============================================
+   Table
+   ============================================ */
 .donations-table-container {
-    overflow-x: auto;
+  overflow-x: auto;
 }
 
 .donations-table {
-    width: 100%;
-    border-collapse: collapse;
+  width: 100%;
+  border-collapse: collapse;
 }
 
 .donations-table th,
 .donations-table td {
-    padding: 0.875rem 1rem;
-    text-align: left;
-    border-bottom: 1px solid #e2e8f0;
+  padding: 0.875rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
 }
 
 .donations-table th {
-    background: #f8fafc;
-    font-weight: 600;
-    color: #475569;
-    font-size: 0.8rem;
-    text-transform: uppercase;
+  background: var(--surface-raised);
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .donations-table td {
-    font-size: 0.9rem;
-    color: #334155;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.donations-table tbody tr:hover {
+  background: var(--surface-hover);
 }
 
 .donations-table td.amount {
-    font-weight: 600;
-    color: #059669;
+  font-weight: 600;
+  color: var(--color-success-dark);
 }
 
 .donations-table .empty-row {
-    text-align: center;
-    color: #94a3b8;
-    padding: 2rem;
+  text-align: center;
+  color: var(--text-tertiary);
+  padding: 2rem;
 }
 
+/* Receipt Link */
 .receipt-download-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 0.25rem 0.5rem;
-    background: #dcfce7;
-    color: #16a34a;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-decoration: none;
-    transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  background: color-mix(in srgb, var(--color-success) 10%, transparent);
+  color: var(--color-success-dark);
+  border-radius: var(--radius-xs);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s;
 }
 
 .receipt-download-link:hover {
-    background: #bbf7d0;
-    color: #15803d;
+  background: color-mix(in srgb, var(--color-success) 20%, transparent);
+  color: var(--color-success-dark);
 }
 
-/* 表單 */
+/* ============================================
+   Donation Form (Modal)
+   ============================================ */
 .donation-form {
-    display: flex;
-    flex-direction: column;
-    gap: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
 }
 
 .form-section h4 {
-    margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #e2e8f0;
-    color: #475569;
-    font-size: 0.9rem;
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .form-row {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .form-row label {
-    font-weight: 500;
-    color: #475569;
-    font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
 }
 
 .form-row input,
 .form-row select,
 .form-row textarea {
-    padding: 0.75rem 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 0.95rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-base);
+  font-family: var(--font-sans);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  transition: all 0.2s;
 }
 
 .form-row input:focus,
 .form-row select:focus,
 .form-row textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 12%, transparent);
 }
 
+.form-row input::placeholder,
+.form-row textarea::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Radio Group */
 .radio-group {
-    display: flex;
-    gap: 1.5rem;
+  display: flex;
+  gap: var(--space-4);
 }
 
 .radio-group label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 400;
 }
 
+/* Checkbox Row */
 .checkbox-row {
-    flex-direction: row;
-    gap: 1.5rem;
+  flex-direction: row;
+  gap: var(--space-4);
 }
 
 .checkbox-row label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  cursor: pointer;
+  color: var(--text-primary);
+  font-weight: 400;
 }
 
-/* 快速金額 */
+/* ============================================
+   Quick Amount Buttons
+   ============================================ */
 .quick-amounts {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
 }
 
 .quick-amounts button {
-    padding: 0.5rem 1rem;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    border-radius: 8px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border-default);
+  background: var(--surface-default);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
 .quick-amounts button:hover {
-    border-color: #3b82f6;
-    color: #3b82f6;
+  border-color: var(--color-secondary);
+  color: var(--color-secondary);
+  background: color-mix(in srgb, var(--color-secondary) 5%, var(--surface-default));
 }
 
 .quick-amounts button.active {
-    background: #3b82f6;
-    border-color: #3b82f6;
-    color: #fff;
+  background: var(--color-secondary);
+  border-color: var(--color-secondary);
+  color: var(--text-inverse);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-secondary) 25%, transparent);
 }
 
+/* ============================================
+   Form Actions
+   ============================================ */
 .form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e2e8f0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
 }
 
-/* 響應式 */
+/* ============================================
+   Responsive
+   ============================================ */
 @media (max-width: 1400px) {
-    .stats-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 @media (max-width: 1024px) {
-    .stats-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 768px) {
-    .stats-grid {
-        grid-template-columns: 1fr;
-    }
+  .donations-page {
+    padding: var(--space-3);
+  }
 
-    .tab-bar {
-        flex-wrap: wrap;
-    }
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .quick-amounts {
-        justify-content: center;
-    }
+  .donations-page .tab-bar {
+    flex-wrap: wrap;
+  }
+
+  .donations-page .tab-bar button {
+    flex: 1 1 auto;
+    min-width: calc(50% - var(--space-1));
+  }
+
+  .quick-amounts {
+    justify-content: center;
+  }
+
+  .page-header__actions {
+    flex-wrap: wrap;
+  }
 }

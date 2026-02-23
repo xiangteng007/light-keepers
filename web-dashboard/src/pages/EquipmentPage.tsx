@@ -165,16 +165,16 @@ export const EquipmentPage: React.FC = () => {
     };
 
     const getStatusBadge = (status: string) => {
-        const styles: Record<string, { bg: string; color: string; label: string }> = {
-            AVAILABLE: { bg: '#22c55e', color: '#fff', label: '可用' },
-            IN_USE: { bg: '#3b82f6', color: '#fff', label: '使用中' },
-            MAINTENANCE: { bg: '#f59e0b', color: '#000', label: '維護中' },
-            CHARGING: { bg: '#8b5cf6', color: '#fff', label: '充電中' },
-            DAMAGED: { bg: '#ef4444', color: '#fff', label: '損壞' },
-            RETIRED: { bg: '#6b7280', color: '#fff', label: '報廢' },
+        const config: Record<string, { className: string; label: string }> = {
+            AVAILABLE: { className: 'status-badge--available', label: '可用' },
+            IN_USE: { className: 'status-badge--in-use', label: '使用中' },
+            MAINTENANCE: { className: 'status-badge--maintenance', label: '維護中' },
+            CHARGING: { className: 'status-badge--charging', label: '充電中' },
+            DAMAGED: { className: 'status-badge--damaged', label: '損壞' },
+            RETIRED: { className: 'status-badge--retired', label: '報廢' },
         };
-        const style = styles[status] || { bg: '#888', color: '#fff', label: status };
-        return <span className="status-badge" style={{ background: style.bg, color: style.color }}>{style.label}</span>;
+        const cfg = config[status] || { className: '', label: status };
+        return <span className={`status-badge ${cfg.className}`}>{cfg.label}</span>;
     };
 
     // ============ Render ============
@@ -239,11 +239,8 @@ export const EquipmentPage: React.FC = () => {
                         {item.batteryLevel !== undefined && (
                             <div className="battery-bar">
                                 <div
-                                    className="battery-fill"
-                                    style={{
-                                        width: `${item.batteryLevel}%`,
-                                        background: item.batteryLevel < 20 ? '#ef4444' : item.batteryLevel < 50 ? '#f59e0b' : '#22c55e'
-                                    }}
+                                    className={`battery-fill ${item.batteryLevel < 20 ? 'battery-fill--low' : item.batteryLevel < 50 ? 'battery-fill--medium' : 'battery-fill--high'}`}
+                                    style={{ width: `${item.batteryLevel}%` }}
                                 />
                                 <span className="battery-text">{item.batteryLevel}%</span>
                             </div>

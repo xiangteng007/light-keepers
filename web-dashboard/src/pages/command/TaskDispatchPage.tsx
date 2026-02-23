@@ -2,60 +2,88 @@
  * TaskDispatchPage.tsx
  * 
  * C2 Domain - 任務指派頁面
- * 基於核心物件 Task 與 Incident 的完整功能實作
+ * 基於核心物件 Task 與 Incident 的完整功能實作 — connected to real API
  */
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
-    Send, Filter, RefreshCw, Plus, CheckCircle, Clock, AlertTriangle,
-    MapPin, User, ChevronDown, Search, Zap
+    Send, RefreshCw, Plus, CheckCircle, Clock, AlertTriangle,
+    MapPin, User, Search, Zap, Loader2
 } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
 import { TaskModal, TaskFormData } from '../../components/TaskModal';
-import { useTasks, useCreateTask, useUpdateTaskStatus, usePersonnel } from '../../hooks/useCoreObjects';
+import api from '../../utils/api';
 import { createLogger } from '../../utils/logger';
 import './TaskDispatchPage.css';
 
 const logger = createLogger('TaskDispatch');
 
-// Mock data for demo
-const MOCK_TASKS = [
-    { id: '1', title: '前進指揮所架設', status: 'pending', priority: 1, assignee: '王隊長', location: '中正區公所', createdAt: '10:30' },
-    { id: '2', title: '災區人員搜救', status: 'in_progress', priority: 1, assignee: '李組長', location: '信義路段', createdAt: '10:15' },
-    { id: '3', title: '物資運送調度', status: 'in_progress', priority: 2, assignee: '張志工', location: '大安森林公園', createdAt: '09:45' },
-    { id: '4', title: '受災戶安置', status: 'pending', priority: 2, assignee: null, location: '松山區活動中心', createdAt: '09:30' },
-    { id: '5', title: '道路清障作業', status: 'completed', priority: 3, assignee: '陳技師', location: '忠孝東路', createdAt: '08:00' },
-];
-
-const MOCK_PERSONNEL = [
-    { id: 'p1', name: '王隊長', role: '現場指揮', status: 'active' },
-    { id: 'p2', name: '李組長', role: '搜救組', status: 'active' },
-    { id: 'p3', name: '張志工', role: '後勤支援', status: 'active' },
-    { id: 'p4', name: '陳技師', role: '工程組', status: 'available' },
-    { id: 'p5', name: '林護理', role: '醫療組', status: 'available' },
-];
+interface Task {
+    id: string;
+    title: string;
+    name?: string;
+    status: string;
+    priority: number;
+    assignee?: string | null;
+    assigneeName?: string;
+    location?: string;
+    createdAt?: string;
+}
 
 type TaskStatus = 'pending' | 'in_progress' | 'completed';
 type FilterType = 'all' | TaskStatus;
 
 export default function TaskDispatchPage() {
+    const [tasks, setTasks] = useState<Task[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [filter, setFilter] = useState<FilterType>('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [showNewTaskModal, setShowNewTaskModal] = useState(false);
 
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+
+            // Fetch tasks — use general listing endpoint
+            const [tasksRes] = await Promise.allSettled([
+                api.get('/tasks', { params: { limit: '100' } }),
+            ]);
+
+            if (tasksRes.status === 'fulfilled') {
+                const data = tasksRes.value.data?.data || tasksRes.value.data || [];
+                const items = Array.isArray(data) ? data : (data.tasks || data.items || []);
+                setTasks(items);
+            } else {
+                console.error('Task fetch failed:', tasksRes.reason);
+                setError('無法載入任務列表');
+            }
+        } catch (err: any) {
+            console.error('Failed to fetch tasks:', err);
+            setError(err?.response?.data?.message || '無法載入資料');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
     const filteredTasks = useMemo(() => {
-        return MOCK_TASKS.filter(task => {
+        return tasks.filter(task => {
             if (filter !== 'all' && task.status !== filter) return false;
-            if (searchQuery && !task.title.toLowerCase().includes(searchQuery.toLowerCase())) return false;
+            if (searchQuery && !(task.title || task.name || '').toLowerCase().includes(searchQuery.toLowerCase())) return false;
             return true;
         });
-    }, [filter, searchQuery]);
+    }, [tasks, filter, searchQuery]);
 
     const taskCounts = useMemo(() => ({
-        all: MOCK_TASKS.length,
-        pending: MOCK_TASKS.filter(t => t.status === 'pending').length,
-        in_progress: MOCK_TASKS.filter(t => t.status === 'in_progress').length,
-        completed: MOCK_TASKS.filter(t => t.status === 'completed').length,
-    }), []);
+        all: tasks.length,
+        pending: tasks.filter(t => t.status === 'pending').length,
+        in_progress: tasks.filter(t => t.status === 'in_progress').length,
+        completed: tasks.filter(t => t.status === 'completed').length,
+    }), [tasks]);
 
     const getStatusIcon = (status: TaskStatus) => {
         switch (status) {
@@ -82,10 +110,23 @@ export default function TaskDispatchPage() {
         }
     };
 
-    const handleCreateTask = (task: TaskFormData) => {
-        logger.debug('New task created:', task);
-        // In a real app, this would call the API
-        // createTask.mutate(task);
+    const handleCreateTask = async (task: TaskFormData) => {
+        try {
+            await api.post('/tasks', task);
+            logger.debug('Task created successfully');
+            fetchData();
+        } catch (err: any) {
+            logger.debug('Failed to create task:', err);
+        }
+    };
+
+    const handleUpdateStatus = async (taskId: string, newStatus: string) => {
+        try {
+            await api.put(`/tasks/${taskId}/status`, { status: newStatus });
+            fetchData();
+        } catch (err: any) {
+            console.error('Failed to update task status:', err);
+        }
     };
 
     return (
@@ -128,8 +169,8 @@ export default function TaskDispatchPage() {
                         />
                     </div>
                     <div className="toolbar-actions">
-                        <button className="btn-icon" title="重新整理">
-                            <RefreshCw size={18} />
+                        <button className="btn-icon" title="重新整理" onClick={fetchData} disabled={loading}>
+                            <RefreshCw size={18} className={loading ? 'spin' : ''} />
                         </button>
                         <button className="btn-primary" onClick={() => setShowNewTaskModal(true)}>
                             <Plus size={18} />
@@ -138,62 +179,71 @@ export default function TaskDispatchPage() {
                     </div>
                 </div>
 
-                {/* Task List */}
-                <div className="task-list">
-                    {filteredTasks.map(task => (
-                        <div key={task.id} className={`task-card ${getPriorityClass(task.priority)}`}>
-                            <div className="task-header">
-                                {getStatusIcon(task.status as TaskStatus)}
-                                <span className="task-title">{task.title}</span>
-                                <span className={`task-status ${task.status}`}>
-                                    {getStatusLabel(task.status as TaskStatus)}
-                                </span>
-                            </div>
-                            <div className="task-meta">
-                                <span className="meta-item">
-                                    <MapPin size={14} />
-                                    {task.location}
-                                </span>
-                                <span className="meta-item">
-                                    <User size={14} />
-                                    {task.assignee || '未指派'}
-                                </span>
-                                <span className="meta-item">
-                                    <Clock size={14} />
-                                    {task.createdAt}
-                                </span>
-                            </div>
-                            <div className="task-actions">
-                                {task.status === 'pending' && (
-                                    <button className="btn-dispatch">
-                                        <Zap size={14} />
-                                        立即派遣
-                                    </button>
-                                )}
-                                {task.status === 'in_progress' && (
-                                    <button className="btn-complete">
-                                        <CheckCircle size={14} />
-                                        標記完成
-                                    </button>
-                                )}
-                            </div>
-                        </div>
-                    ))}
-                </div>
+                {/* Error */}
+                {error && (
+                    <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <AlertTriangle size={16} /> {error}
+                    </div>
+                )}
 
-                {/* Available Personnel */}
-                <div className="personnel-panel">
-                    <h3>可用人員</h3>
-                    <div className="personnel-list">
-                        {MOCK_PERSONNEL.filter(p => p.status === 'available').map(person => (
-                            <div key={person.id} className="personnel-chip">
-                                <User size={14} />
-                                <span>{person.name}</span>
-                                <span className="role">{person.role}</span>
+                {/* Loading */}
+                {loading && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: '#94a3b8' }}>
+                        <Loader2 size={24} className="spin" />
+                        <span>載入任務中...</span>
+                    </div>
+                )}
+
+                {/* Task List */}
+                {!loading && (
+                    <div className="task-list">
+                        {filteredTasks.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                {error ? '載入失敗' : '暫無任務'}
+                            </div>
+                        ) : filteredTasks.map(task => (
+                            <div key={task.id} className={`task-card ${getPriorityClass(task.priority)}`}>
+                                <div className="task-header">
+                                    {getStatusIcon(task.status as TaskStatus)}
+                                    <span className="task-title">{task.title || task.name}</span>
+                                    <span className={`task-status ${task.status}`}>
+                                        {getStatusLabel(task.status as TaskStatus)}
+                                    </span>
+                                </div>
+                                <div className="task-meta">
+                                    <span className="meta-item">
+                                        <MapPin size={14} />
+                                        {task.location || '-'}
+                                    </span>
+                                    <span className="meta-item">
+                                        <User size={14} />
+                                        {task.assigneeName || task.assignee || '未指派'}
+                                    </span>
+                                    <span className="meta-item">
+                                        <Clock size={14} />
+                                        {task.createdAt ? new Date(task.createdAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }) : '-'}
+                                    </span>
+                                </div>
+                                <div className="task-actions">
+                                    {task.status === 'pending' && (
+                                        <button className="btn-dispatch" onClick={() => handleUpdateStatus(task.id, 'in_progress')}>
+                                            <Zap size={14} />
+                                            立即派遣
+                                        </button>
+                                    )}
+                                    {task.status === 'in_progress' && (
+                                        <button className="btn-complete" onClick={() => handleUpdateStatus(task.id, 'completed')}>
+                                            <CheckCircle size={14} />
+                                            標記完成
+                                        </button>
+                                    )}
+                                </div>
                             </div>
                         ))}
                     </div>
-                </div>
+                )}
+
+                {/* Personnel panel removed mock data — will show only when API data available */}
             </div>
 
             {/* Task Modal */}

@@ -112,6 +112,18 @@ export class Equipment {
     @Column({ type: 'timestamp', nullable: true })
     expectedReturnAt?: Date;
 
+    // ============ 任務/事件串接 ============
+
+    /** 指派的任務 ID (與 tasks 模組串接) */
+    @Column({ type: 'uuid', nullable: true })
+    @Index()
+    assignedTaskId?: string;
+
+    /** 關聯的災害事件 ID */
+    @Column({ type: 'uuid', nullable: true })
+    @Index()
+    assignedEventId?: string;
+
     // ============ 時間戳 ============
 
     @CreateDateColumn()

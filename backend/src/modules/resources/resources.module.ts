@@ -10,8 +10,7 @@ import { Asset } from './asset.entity';
 import { AssetTransaction } from './asset-transaction.entity';
 import { DispatchOrder } from './dispatch-order.entity';
 import { InventoryAudit } from './inventory-audit.entity';
-// 📋 Phase 1: 新增實體
-import { Lot } from './lot.entity';
+// 📋 Phase 1: Lot merged into ResourceBatch
 import { SensitiveReadLog } from './sensitive-read-log.entity';
 import { LabelPrintLog } from './label-print-log.entity';
 import { LabelTemplate } from './label-template.entity';
@@ -56,8 +55,7 @@ import { ResourcesAnalyticsService } from './resources-analytics.service';
             AssetTransaction,     // 📋 資產借出歸還紀錄
             DispatchOrder,        // 🚚 調度單
             InventoryAudit,       // 📊 盤點作業
-            // 📋 Phase 1: 新增實體
-            Lot,                  // 🏷️ 批次（controlled/medical）
+            // 📋 Note: Lot entity merged into ResourceBatch (2026-02)
             SensitiveReadLog,     // 🔐 敏感資料讀取稽核
             LabelPrintLog,        // 🖨️ 貼紙列印稽核
             LabelTemplate,        // 📄 貼紙模板

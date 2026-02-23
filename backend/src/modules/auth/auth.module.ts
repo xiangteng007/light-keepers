@@ -9,7 +9,7 @@ import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
 import { RefreshToken } from './entities/refresh-token.entity';
-import { SmsService, OtpService, PasswordResetService, EmailService, FirebaseAdminService } from './services';
+import { SmsService, OtpService, PasswordResetService, EmailService, FirebaseAdminService, AccountManagementService } from './services';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { OAuthService } from './services/oauth.service';
 import { TwoFactorService } from './services/two-factor.service';
@@ -48,8 +48,9 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         RefreshTokenService,
         OAuthService,
         TwoFactorService,
+        AccountManagementService,
     ],
-    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, OAuthService, TwoFactorService],
+    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, OAuthService, TwoFactorService, AccountManagementService],
 })
 export class AuthModule { }
 

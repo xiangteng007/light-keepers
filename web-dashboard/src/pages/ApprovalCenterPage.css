@@ -1,0 +1,522 @@
+/**
+ * ApprovalCenterPage.css — 覆核中心
+ * Industrial Precision Design System
+ * Uses design-tokens.css (K1 Bright Steel / K2 Copper Steel)
+ * ZERO hardcoded colors — all via var() tokens
+ */
+
+/* ============================================
+   Page Container
+   ============================================ */
+.approval-page {
+  padding: var(--space-4);
+  font-family: var(--font-sans);
+  color: var(--text-primary);
+}
+
+/* ============================================
+   Page Header
+   ============================================ */
+.approval-page .page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-4);
+}
+
+.approval-page .page-header h2 {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ============================================
+   Filter Pills
+   ============================================ */
+.filter-pills {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--surface-raised);
+  padding: var(--space-1);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-light);
+}
+
+.filter-pill {
+  padding: var(--space-2) var(--space-3);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filter-pill:hover {
+  color: var(--text-primary);
+  background: var(--surface-hover);
+}
+
+.filter-pill.active {
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-sm);
+}
+
+.filter-pill.active[data-filter="all"] {
+  background: var(--color-secondary);
+}
+
+.filter-pill.active[data-filter="controlled"] {
+  background: var(--color-warning);
+}
+
+.filter-pill.active[data-filter="medical"] {
+  background: var(--color-danger);
+}
+
+/* ============================================
+   Alert / Error / Empty
+   ============================================ */
+.approval-alert {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  margin-bottom: var(--space-4);
+}
+
+.approval-alert--danger {
+  background: color-mix(in srgb, var(--color-danger) 8%, var(--surface-default));
+  color: var(--color-danger-dark);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 20%, transparent);
+}
+
+.approval-alert--info {
+  background: color-mix(in srgb, var(--color-info) 8%, var(--surface-default));
+  color: var(--color-info-dark);
+  border: 1px solid color-mix(in srgb, var(--color-info) 20%, transparent);
+}
+
+.approval-alert .alert-dismiss {
+  margin-left: auto;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.6;
+  font-size: var(--text-lg);
+}
+
+.approval-alert .alert-dismiss:hover {
+  opacity: 1;
+}
+
+/* ============================================
+   Loading Spinner
+   ============================================ */
+.approval-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-8) 0;
+}
+
+.approval-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-light);
+  border-top-color: var(--color-secondary);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   Approval Cards Grid
+   ============================================ */
+.approval-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.approval-card {
+  background: var(--surface-default);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.approval-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Card header bar — color-coded by control level */
+.approval-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--border-light);
+  background: var(--surface-raised);
+}
+
+.approval-card__name {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+/* Control level badges */
+.control-badge {
+  display: inline-flex;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.control-badge--controlled {
+  background: color-mix(in srgb, var(--color-warning) 15%, transparent);
+  color: var(--color-warning-dark);
+}
+
+.control-badge--medical {
+  background: color-mix(in srgb, var(--color-danger) 15%, transparent);
+  color: var(--color-danger-dark);
+}
+
+/* Card body */
+.approval-card__body {
+  padding: var(--space-4);
+}
+
+.approval-card__field {
+  margin-bottom: var(--space-3);
+}
+
+.approval-card__field:last-child {
+  margin-bottom: 0;
+}
+
+.approval-card__label {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.2rem;
+}
+
+.approval-card__value {
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+}
+
+.approval-card__value--quantity {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-info);
+}
+
+.approval-card__value--truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Card footer */
+.approval-card__footer {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.approval-card__detail-btn {
+  width: 100%;
+  padding: var(--space-2) var(--space-3);
+  background: color-mix(in srgb, var(--color-info) 8%, var(--surface-default));
+  color: var(--color-info);
+  border: 1px solid color-mix(in srgb, var(--color-info) 20%, transparent);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.approval-card__detail-btn:hover {
+  background: color-mix(in srgb, var(--color-info) 14%, var(--surface-default));
+  border-color: var(--color-info);
+}
+
+/* ============================================
+   Detail Modal
+   ============================================ */
+.detail-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: var(--space-4);
+}
+
+.detail-table th,
+.detail-table td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--text-sm);
+}
+
+.detail-table th {
+  width: 30%;
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.detail-table td {
+  color: var(--text-primary);
+}
+
+.detail-table .quantity-value {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-info);
+}
+
+/* Sensitive data section */
+.sensitive-section {
+  background: var(--surface-raised);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 25%, var(--border-light));
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.sensitive-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-3);
+}
+
+.sensitive-header h4 {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sensitive-btn {
+  padding: var(--space-1) var(--space-3);
+  background: color-mix(in srgb, var(--color-warning) 12%, var(--surface-default));
+  color: var(--color-warning-dark);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 30%, transparent);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sensitive-btn:hover {
+  background: color-mix(in srgb, var(--color-warning) 20%, var(--surface-default));
+}
+
+.sensitive-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--surface-default);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.sensitive-table th,
+.sensitive-table td {
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border-light);
+  font-size: var(--text-sm);
+}
+
+.sensitive-table th {
+  width: 35%;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.sensitive-table td {
+  color: var(--text-primary);
+}
+
+.sensitive-notice {
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-default);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+  margin-top: var(--space-2);
+}
+
+/* Modal footer actions */
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+
+.btn-close-modal {
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-close-modal:hover {
+  background: var(--surface-hover);
+}
+
+.btn-reject {
+  padding: var(--space-2) var(--space-4);
+  background: color-mix(in srgb, var(--color-danger) 10%, var(--surface-default));
+  color: var(--color-danger);
+  border: 1px solid color-mix(in srgb, var(--color-danger) 25%, transparent);
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-reject:hover {
+  background: var(--color-danger);
+  color: var(--text-inverse);
+}
+
+.btn-reject:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-approve {
+  padding: var(--space-2) var(--space-4);
+  background: var(--color-success);
+  color: var(--text-inverse);
+  border: none;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn-approve:hover {
+  background: var(--color-success-dark);
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--color-success) 30%, transparent);
+}
+
+.btn-approve:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   Reject Modal
+   ============================================ */
+.reject-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.reject-form label {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.reject-form textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-family: var(--font-sans);
+  background: var(--surface-default);
+  color: var(--text-primary);
+  resize: vertical;
+  transition: border-color 0.2s;
+}
+
+.reject-form textarea:focus {
+  outline: none;
+  border-color: var(--border-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-secondary) 12%, transparent);
+}
+
+.reject-form .char-count {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+}
+
+.reject-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--border-light);
+}
+
+/* ============================================
+   Responsive
+   ============================================ */
+@media (max-width: 1024px) {
+  .approval-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .approval-page {
+    padding: var(--space-3);
+  }
+
+  .approval-page .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+
+  .approval-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .filter-pills {
+    width: 100%;
+  }
+
+  .filter-pill {
+    flex: 1;
+    text-align: center;
+  }
+}

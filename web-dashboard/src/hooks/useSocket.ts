@@ -1,30 +1,24 @@
 /**
  * useSocket.ts
- * 
- * v4.0: Socket Hook
- * 簡化 Socket 事件訂閱
+ *
+ * v5.0: Unified Socket Hook
+ * 使用合併後的 RealtimeContext
  */
 import { useEffect } from 'react';
-import { useSocketContext } from '../context/SocketContext';
+import { useRealtime } from '../context/RealtimeContext';
 
 export const useSocket = (event?: string, handler?: (data: any) => void) => {
-    const { socket, connected } = useSocketContext();
+    const { socket, isConnected, emit } = useRealtime();
 
     useEffect(() => {
-        if (!socket || !connected || !event || !handler) return;
+        if (!socket || !isConnected || !event || !handler) return;
 
         socket.on(event, handler);
 
         return () => {
             socket.off(event, handler);
         };
-    }, [socket, connected, event, handler]);
-
-    const emit = (eventName: string, data: any) => {
-        if (socket && connected) {
-            socket.emit(eventName, data);
-        }
-    };
+    }, [socket, isConnected, event, handler]);
 
     const subscribe = (topic: string) => {
         emit('subscribe:topic', topic);
@@ -34,5 +28,5 @@ export const useSocket = (event?: string, handler?: (data: any) => void) => {
         emit('unsubscribe:topic', topic);
     };
 
-    return { socket, connected, emit, subscribe, unsubscribe };
+    return { socket, connected: isConnected, emit, subscribe, unsubscribe };
 };

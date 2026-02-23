@@ -52,6 +52,22 @@ export class EquipmentController {
         return this.equipmentService.getMaintenanceDue();
     }
 
+    // ==================== 任務/事件串接 ====================
+
+    @Get('by-task/:taskId')
+    @ApiOperation({ summary: '依任務查詢設備' })
+    @ApiParam({ name: 'taskId' })
+    async findByTask(@Param('taskId') taskId: string) {
+        return this.equipmentService.findByTask(taskId);
+    }
+
+    @Get('by-event/:eventId')
+    @ApiOperation({ summary: '依事件查詢設備' })
+    @ApiParam({ name: 'eventId' })
+    async findByEvent(@Param('eventId') eventId: string) {
+        return this.equipmentService.findByEvent(eventId);
+    }
+
     @Get(':id')
     @ApiOperation({ summary: '取得設備詳情' })
     @ApiParam({ name: 'id' })
@@ -125,5 +141,22 @@ export class EquipmentController {
     @ApiParam({ name: 'id' })
     async getLogs(@Param('id') id: string) {
         return this.equipmentService.getLogs(id);
+    }
+
+    @Post(':id/assign-task')
+    @ApiOperation({ summary: '指派設備至任務' })
+    @ApiParam({ name: 'id' })
+    async assignToTask(
+        @Param('id') id: string,
+        @Body() data: { taskId: string; eventId?: string; actorId?: string; actorName?: string }
+    ) {
+        return this.equipmentService.assignToTask(id, data.taskId, data.eventId, data.actorId, data.actorName);
+    }
+
+    @Post(':id/unassign-task')
+    @ApiOperation({ summary: '從任務解除指派' })
+    @ApiParam({ name: 'id' })
+    async unassignFromTask(@Param('id') id: string) {
+        return this.equipmentService.unassignFromTask(id);
     }
 }

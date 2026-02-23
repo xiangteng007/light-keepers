@@ -2,10 +2,10 @@
  * Audit Log Page
  * 
  * View and filter system audit logs
- * Level 5+ only
+ * Level 5+ only — connected to real API
  */
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import {
     Search,
     Download,
@@ -18,7 +18,9 @@ import {
     ChevronDown,
     ChevronRight,
     Eye,
+    Loader2,
 } from 'lucide-react';
+import api from '../utils/api';
 import styles from './AuditLogPage.module.css';
 
 interface AuditLog {
@@ -35,70 +37,6 @@ interface AuditLog {
     details?: Record<string, any>;
     error?: string;
 }
-
-// Mock audit log data
-const MOCK_AUDIT_LOGS: AuditLog[] = [
-    {
-        id: '1',
-        timestamp: '2026-01-13T06:30:00Z',
-        userId: 'user-001',
-        userName: '系統管理員',
-        action: 'LOGIN',
-        resource: 'auth',
-        status: 'success',
-        ipAddress: '203.145.78.23',
-        userAgent: 'Chrome 120.0 / Windows',
-        details: { method: 'password' },
-    },
-    {
-        id: '2',
-        timestamp: '2026-01-13T06:25:00Z',
-        userId: 'user-002',
-        userName: '張三',
-        action: 'UPDATE',
-        resource: 'task',
-        resourceId: 'task-456',
-        status: 'success',
-        ipAddress: '140.112.45.67',
-        userAgent: 'Safari 17.0 / macOS',
-        details: { field: 'status', from: 'pending', to: 'in_progress' },
-    },
-    {
-        id: '3',
-        timestamp: '2026-01-13T06:20:00Z',
-        userId: 'user-003',
-        userName: '李四',
-        action: 'DELETE',
-        resource: 'volunteer',
-        resourceId: 'vol-789',
-        status: 'failed',
-        ipAddress: '61.216.89.12',
-        userAgent: 'Firefox 121.0 / Linux',
-        error: '權限不足',
-    },
-    {
-        id: '4',
-        timestamp: '2026-01-13T06:15:00Z',
-        userId: 'system',
-        userName: '系統',
-        action: 'SYNC',
-        resource: 'ncdr_alerts',
-        status: 'success',
-        details: { count: 15 },
-    },
-    {
-        id: '5',
-        timestamp: '2026-01-13T06:10:00Z',
-        userId: 'user-001',
-        userName: '系統管理員',
-        action: 'EXPORT',
-        resource: 'report',
-        resourceId: 'report-001',
-        status: 'success',
-        ipAddress: '203.145.78.23',
-        details: { format: 'pdf', size: '2.4MB' },
-    },
-];
 
 const ACTION_LABELS: Record<string, string> = {
     LOGIN: '登入',
@@ -125,26 +63,53 @@ const RESOURCE_LABELS: Record<string, string> = {
 };
 
 const AuditLogPage: React.FC = () => {
-    const [logs] = useState<AuditLog[]>(MOCK_AUDIT_LOGS);
+    const [logs, setLogs] = useState<AuditLog[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [actionFilter, setActionFilter] = useState<string>('all');
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
-    // Filter logs
+    const fetchLogs = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const params: Record<string, string> = { limit: '100' };
+            if (statusFilter !== 'all') {
+                params.success = statusFilter === 'success' ? 'true' : 'false';
+            }
+            if (actionFilter !== 'all') {
+                params.action = actionFilter;
+            }
+            const response = await api.get('/audit/logs', { params });
+            const data = response.data?.data || response.data || [];
+            // Normalize: backend returns logs or items array
+            const items = Array.isArray(data) ? data : (data.items || data.logs || []);
+            setLogs(items);
+        } catch (err: any) {
+            console.error('Failed to fetch audit logs:', err);
+            setError(err?.response?.data?.message || '無法載入稽核日誌');
+            setLogs([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [statusFilter, actionFilter]);
+
+    useEffect(() => {
+        fetchLogs();
+    }, [fetchLogs]);
+
+    // Client-side search filter
     const filteredLogs = useMemo(() => {
         return logs.filter(log => {
             const matchSearch = !searchQuery ||
-                log.userName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                log.action.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                log.resource.toLowerCase().includes(searchQuery.toLowerCase());
-
-            const matchStatus = statusFilter === 'all' || log.status === statusFilter;
-            const matchAction = actionFilter === 'all' || log.action === actionFilter;
-
-            return matchSearch && matchStatus && matchAction;
+                (log.userName || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (log.action || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (log.resource || '').toLowerCase().includes(searchQuery.toLowerCase());
+            return matchSearch;
         });
-    }, [logs, searchQuery, statusFilter, actionFilter]);
+    }, [logs, searchQuery]);
 
     // Format timestamp
     const formatTime = (iso: string) => {
@@ -172,8 +137,8 @@ const AuditLogPage: React.FC = () => {
                     </p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className={styles.actionButton}>
-                        <RefreshCw size={18} />
+                    <button className={styles.actionButton} onClick={fetchLogs} disabled={loading}>
+                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
                         重新整理
                     </button>
                     <button className={styles.actionButton}>
@@ -224,6 +189,13 @@ const AuditLogPage: React.FC = () => {
                 </div>
             </div>
 
+            {/* Error */}
+            {error && (
+                <div className={styles.errorBanner}>
+                    <AlertTriangle size={16} /> {error}
+                </div>
+            )}
+
             {/* Stats */}
             <div className={styles.stats}>
                 <div className={styles.statCard}>
@@ -244,98 +216,114 @@ const AuditLogPage: React.FC = () => {
                 </div>
             </div>
 
+            {/* Loading */}
+            {loading && (
+                <div className={styles.loadingOverlay}>
+                    <Loader2 size={32} className="spin" />
+                    <span>載入稽核日誌中...</span>
+                </div>
+            )}
+
             {/* Log Table */}
-            <div className={styles.tableWrapper}>
-                <table className={styles.table}>
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>時間</th>
-                            <th>用戶</th>
-                            <th>動作</th>
-                            <th>資源</th>
-                            <th>狀態</th>
-                            <th>IP 位址</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {filteredLogs.map((log) => (
-                            <React.Fragment key={log.id}>
-                                <tr
-                                    className={`${styles.row} ${expandedLogId === log.id ? styles.rowExpanded : ''}`}
-                                    onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
-                                >
-                                    <td className={styles.expandCell}>
-                                        {expandedLogId === log.id ? (
-                                            <ChevronDown size={16} />
-                                        ) : (
-                                            <ChevronRight size={16} />
-                                        )}
-                                    </td>
-                                    <td className={styles.timeCell}>
-                                        <Clock size={14} />
-                                        {formatTime(log.timestamp)}
-                                    </td>
-                                    <td>
-                                        <div className={styles.userCell}>
-                                            <User size={14} />
-                                            {log.userName}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span className={styles.actionBadge}>
-                                            {ACTION_LABELS[log.action] || log.action}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        {RESOURCE_LABELS[log.resource] || log.resource}
-                                        {log.resourceId && <span className={styles.resourceId}> ({log.resourceId})</span>}
-                                    </td>
-                                    <td>
-                                        <span className={`${styles.statusBadge} ${styles[log.status]}`}>
-                                            {log.status === 'success' ? <Check size={12} /> : <X size={12} />}
-                                            {log.status === 'success' ? '成功' : '失敗'}
-                                        </span>
-                                    </td>
-                                    <td className={styles.ipCell}>
-                                        {log.ipAddress || '-'}
+            {!loading && (
+                <div className={styles.tableWrapper}>
+                    <table className={styles.table}>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>時間</th>
+                                <th>用戶</th>
+                                <th>動作</th>
+                                <th>資源</th>
+                                <th>狀態</th>
+                                <th>IP 位址</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {filteredLogs.length === 0 ? (
+                                <tr>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                                        {error ? '載入失敗' : '暫無稽核日誌'}
                                     </td>
                                 </tr>
-                                {expandedLogId === log.id && (
-                                    <tr className={styles.detailRow}>
-                                        <td colSpan={7}>
-                                            <div className={styles.detailContent}>
-                                                {log.userAgent && (
-                                                    <div className={styles.detailItem}>
-                                                        <span className={styles.detailLabel}>瀏覽器:</span>
-                                                        <span>{log.userAgent}</span>
-                                                    </div>
-                                                )}
-                                                {log.details && (
-                                                    <div className={styles.detailItem}>
-                                                        <span className={styles.detailLabel}>詳細資料:</span>
-                                                        <code className={styles.detailCode}>
-                                                            {JSON.stringify(log.details, null, 2)}
-                                                        </code>
-                                                    </div>
-                                                )}
-                                                {log.error && (
-                                                    <div className={styles.detailItem}>
-                                                        <span className={`${styles.detailLabel} ${styles.dangerText}`}>
-                                                            <AlertTriangle size={14} /> 錯誤:
-                                                        </span>
-                                                        <span className={styles.dangerText}>{log.error}</span>
-                                                    </div>
-                                                )}
+                            ) : filteredLogs.map((log) => (
+                                <React.Fragment key={log.id}>
+                                    <tr
+                                        className={`${styles.row} ${expandedLogId === log.id ? styles.rowExpanded : ''}`}
+                                        onClick={() => setExpandedLogId(expandedLogId === log.id ? null : log.id)}
+                                    >
+                                        <td className={styles.expandCell}>
+                                            {expandedLogId === log.id ? (
+                                                <ChevronDown size={16} />
+                                            ) : (
+                                                <ChevronRight size={16} />
+                                            )}
+                                        </td>
+                                        <td className={styles.timeCell}>
+                                            <Clock size={14} />
+                                            {formatTime(log.timestamp)}
+                                        </td>
+                                        <td>
+                                            <div className={styles.userCell}>
+                                                <User size={14} />
+                                                {log.userName}
                                             </div>
                                         </td>
+                                        <td>
+                                            <span className={styles.actionBadge}>
+                                                {ACTION_LABELS[log.action] || log.action}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {RESOURCE_LABELS[log.resource] || log.resource}
+                                            {log.resourceId && <span className={styles.resourceId}> ({log.resourceId})</span>}
+                                        </td>
+                                        <td>
+                                            <span className={`${styles.statusBadge} ${styles[log.status]}`}>
+                                                {log.status === 'success' ? <Check size={12} /> : <X size={12} />}
+                                                {log.status === 'success' ? '成功' : '失敗'}
+                                            </span>
+                                        </td>
+                                        <td className={styles.ipCell}>
+                                            {log.ipAddress || '-'}
+                                        </td>
                                     </tr>
-                                )}
-                            </React.Fragment>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+                                    {expandedLogId === log.id && (
+                                        <tr className={styles.detailRow}>
+                                            <td colSpan={7}>
+                                                <div className={styles.detailContent}>
+                                                    {log.userAgent && (
+                                                        <div className={styles.detailItem}>
+                                                            <span className={styles.detailLabel}>瀏覽器:</span>
+                                                            <span>{log.userAgent}</span>
+                                                        </div>
+                                                    )}
+                                                    {log.details && (
+                                                        <div className={styles.detailItem}>
+                                                            <span className={styles.detailLabel}>詳細資料:</span>
+                                                            <code className={styles.detailCode}>
+                                                                {JSON.stringify(log.details, null, 2)}
+                                                            </code>
+                                                        </div>
+                                                    )}
+                                                    {log.error && (
+                                                        <div className={styles.detailItem}>
+                                                            <span className={`${styles.detailLabel} ${styles.dangerText}`}>
+                                                                <AlertTriangle size={14} /> 錯誤:
+                                                            </span>
+                                                            <span className={styles.dangerText}>{log.error}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    )}
+                                </React.Fragment>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+            )}
         </div>
     );
 };

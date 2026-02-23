@@ -236,13 +236,41 @@
 }
 
 /* Responsive */
-@media (max-width: 480px) {
+@media (max-width: 768px) {
     .stats-row {
         grid-template-columns: repeat(2, 1fr);
+    }
+
+    .asset-header {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .asset-actions {
+        flex-wrap: wrap;
+    }
+
+    .asset-actions button {
+        min-height: 44px;
+    }
+
+    .filter-row {
+        flex-wrap: wrap;
+    }
+}
+
+@media (max-width: 480px) {
+    .stats-row {
+        grid-template-columns: 1fr;
     }
 
     .form-row {
         flex-direction: column;
         gap: 0;
+    }
+
+    .filter-row {
+        flex-direction: column;
+        align-items: stretch;
     }
 }

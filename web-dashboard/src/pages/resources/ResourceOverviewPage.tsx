@@ -1,59 +1,113 @@
 /**
  * ResourceOverviewPage.tsx
- * 
- * Log Domain - 資源總覽頁面
- * 展示物資庫存、裝備狀態、分配追蹤
+ *
+ * B4: 後勤資源總覽儀表板
+ * 展示物資庫存、裝備狀態 — 真實 API 整合
  */
-import React, { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
-    Package, AlertCircle, TrendingUp, TrendingDown, Warehouse,
-    Truck, Shield, Search, Filter, Download
+    Package, AlertCircle, Truck, Shield, Search, Download,
 } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import api from '../../utils/api';
 import './ResourceOverviewPage.css';
 
-const MOCK_RESOURCES = [
-    { id: '1', name: '緊急醫療包', category: '醫療', stock: 450, allocated: 120, minStock: 100, unit: '箱', status: 'normal' },
-    { id: '2', name: '飲用水 (20L)', category: '民生', stock: 2400, allocated: 800, minStock: 500, unit: '桶', status: 'normal' },
-    { id: '3', name: '救難帳篷', category: '避難', stock: 35, allocated: 28, minStock: 50, unit: '頂', status: 'low' },
-    { id: '4', name: '發電機 (5kW)', category: '裝備', stock: 12, allocated: 10, minStock: 15, unit: '台', status: 'critical' },
-    { id: '5', name: '無線電設備', category: '通訊', stock: 85, allocated: 45, minStock: 30, unit: '台', status: 'normal' },
-    { id: '6', name: '急救毛毯', category: '民生', stock: 1200, allocated: 600, minStock: 300, unit: '條', status: 'normal' },
-];
+interface Resource {
+    id: string;
+    name: string;
+    category: string;
+    quantity: number;
+    unit: string;
+    minQuantity: number;
+    location: string;
+    status: 'available' | 'low' | 'depleted';
+}
 
-const WAREHOUSES = [
-    { id: 'w1', name: '中央物資中心', location: '台北市中正區', capacity: 85, items: 12500 },
-    { id: 'w2', name: '北區救災站', location: '台北市士林區', capacity: 62, items: 4800 },
-    { id: 'w3', name: '南區備援點', location: '台北市大安區', capacity: 45, items: 3200 },
-];
+interface ResourceStats {
+    total: number;
+    byCategory: Record<string, number>;
+    lowStock: number;
+    expiringSoon: number;
+}
 
-type CategoryFilter = 'all' | '醫療' | '民生' | '避難' | '裝備' | '通訊';
+interface EquipmentStats {
+    total: number;
+    available: number;
+    inUse: number;
+    maintenance: number;
+    lowBattery: number;
+    maintenanceDue: number;
+}
 
 export default function ResourceOverviewPage() {
-    const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>('all');
+    const [resources, setResources] = useState<Resource[]>([]);
+    const [resourceStats, setResourceStats] = useState<ResourceStats | null>(null);
+    const [eqStats, setEqStats] = useState<EquipmentStats | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [categoryFilter, setCategoryFilter] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
 
-    const filteredResources = MOCK_RESOURCES.filter(res => {
+    const fetchData = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const [resRes, statsRes, eqStatsRes] = await Promise.all([
+                api.get('/resources'),
+                api.get('/resources/stats'),
+                api.get('/equipment/stats'),
+            ]);
+            setResources(resRes.data?.data || []);
+            setResourceStats(statsRes.data?.data || null);
+            setEqStats(eqStatsRes.data || null);
+        } catch (err: any) {
+            console.error('Failed to fetch overview:', err);
+            setError(err.response?.data?.message || err.message || '無法載入資料');
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
+    useEffect(() => { fetchData(); }, [fetchData]);
+
+    const filteredResources = resources.filter(res => {
         if (categoryFilter !== 'all' && res.category !== categoryFilter) return false;
         if (searchQuery && !res.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
         return true;
     });
 
-    const stats = {
-        totalItems: MOCK_RESOURCES.reduce((sum, r) => sum + r.stock, 0),
-        allocated: MOCK_RESOURCES.reduce((sum, r) => sum + r.allocated, 0),
-        lowStock: MOCK_RESOURCES.filter(r => r.status === 'low' || r.status === 'critical').length,
-        categories: new Set(MOCK_RESOURCES.map(r => r.category)).size,
-    };
+    const categories = ['all', ...new Set(resources.map(r => r.category))];
 
     const getStatusBadge = (status: string) => {
         switch (status) {
-            case 'normal': return <span className="status-badge normal">充足</span>;
+            case 'available': return <span className="status-badge normal">充足</span>;
             case 'low': return <span className="status-badge low">偏低</span>;
-            case 'critical': return <span className="status-badge critical">緊急</span>;
+            case 'depleted': return <span className="status-badge critical">耗盡</span>;
             default: return null;
         }
     };
+
+    if (loading) {
+        return (
+            <PageTemplate title="資源總覽" subtitle="載入中..." icon={Package} domain="Log 後勤資源">
+                <div className="flex items-center justify-center py-20">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
+                </div>
+            </PageTemplate>
+        );
+    }
+
+    if (error) {
+        return (
+            <PageTemplate title="資源總覽" subtitle="載入失敗" icon={Package} domain="Log 後勤資源">
+                <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-400">
+                    <p className="font-medium">載入失敗</p>
+                    <p className="text-sm mt-1">{error}</p>
+                    <button onClick={fetchData} className="mt-3 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 text-sm">重試</button>
+                </div>
+            </PageTemplate>
+        );
+    }
 
     return (
         <PageTemplate
@@ -68,62 +122,64 @@ export default function ResourceOverviewPage() {
                     <div className="stat-card">
                         <Package className="stat-icon" />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.totalItems.toLocaleString()}</span>
-                            <span className="stat-label">總庫存量</span>
+                            <span className="stat-value">{resourceStats?.total ?? resources.length}</span>
+                            <span className="stat-label">物資品項</span>
                         </div>
                     </div>
                     <div className="stat-card">
                         <Truck className="stat-icon" />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.allocated.toLocaleString()}</span>
-                            <span className="stat-label">已調度</span>
+                            <span className="stat-value">{eqStats?.total ?? 0}</span>
+                            <span className="stat-label">裝備總數</span>
                         </div>
                     </div>
                     <div className="stat-card warning">
                         <AlertCircle className="stat-icon" />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.lowStock}</span>
+                            <span className="stat-value">{resourceStats?.lowStock ?? 0}</span>
                             <span className="stat-label">低庫存項目</span>
                         </div>
                     </div>
                     <div className="stat-card">
                         <Shield className="stat-icon" />
                         <div className="stat-content">
-                            <span className="stat-value">{stats.categories}</span>
+                            <span className="stat-value">{Object.keys(resourceStats?.byCategory ?? {}).length}</span>
                             <span className="stat-label">物資類別</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Warehouses */}
-                <div className="warehouses-section">
-                    <h3><Warehouse size={18} /> 倉儲據點</h3>
-                    <div className="warehouse-cards">
-                        {WAREHOUSES.map(wh => (
-                            <div key={wh.id} className="warehouse-card">
+                {/* Equipment Quick Stats */}
+                {eqStats && (
+                    <div className="warehouses-section">
+                        <h3>⚙️ 裝備概況</h3>
+                        <div className="warehouse-cards">
+                            <div className="warehouse-card">
                                 <div className="wh-header">
-                                    <span className="wh-name">{wh.name}</span>
-                                    <span className="wh-location">{wh.location}</span>
+                                    <span className="wh-name">可用設備</span>
                                 </div>
-                                <div className="wh-capacity">
-                                    <div className="capacity-bar">
-                                        <div
-                                            className={`capacity-fill ${wh.capacity > 80 ? 'high' : wh.capacity > 50 ? 'medium' : 'low'}`}
-                                            style={{ width: `${wh.capacity}%` }}
-                                        />
-                                    </div>
-                                    <span className="capacity-text">{wh.capacity}% 使用率</span>
-                                </div>
-                                <div className="wh-items">{wh.items.toLocaleString()} 件物資</div>
+                                <div className="wh-items" style={{ color: '#4ade80' }}>{eqStats.available} 件</div>
                             </div>
-                        ))}
+                            <div className="warehouse-card">
+                                <div className="wh-header">
+                                    <span className="wh-name">使用中</span>
+                                </div>
+                                <div className="wh-items" style={{ color: '#60a5fa' }}>{eqStats.inUse} 件</div>
+                            </div>
+                            <div className="warehouse-card">
+                                <div className="wh-header">
+                                    <span className="wh-name">維護/低電量</span>
+                                </div>
+                                <div className="wh-items" style={{ color: '#fbbf24' }}>{eqStats.maintenance + eqStats.lowBattery} 件</div>
+                            </div>
+                        </div>
                     </div>
-                </div>
+                )}
 
-                {/* Category Filter */}
+                {/* Category Filter & Search */}
                 <div className="resource-toolbar">
                     <div className="category-tabs">
-                        {(['all', '醫療', '民生', '避難', '裝備', '通訊'] as const).map(cat => (
+                        {categories.map(cat => (
                             <button
                                 key={cat}
                                 className={`tab ${categoryFilter === cat ? 'active' : ''}`}
@@ -142,9 +198,9 @@ export default function ResourceOverviewPage() {
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                         </div>
-                        <button className="btn-export">
+                        <button className="btn-export" onClick={fetchData}>
                             <Download size={16} />
-                            匯出
+                            重新整理
                         </button>
                     </div>
                 </div>
@@ -157,28 +213,30 @@ export default function ResourceOverviewPage() {
                                 <th>物資名稱</th>
                                 <th>類別</th>
                                 <th>現有庫存</th>
-                                <th>已調度</th>
-                                <th>可用量</th>
+                                <th>安全庫存</th>
+                                <th>存放位置</th>
                                 <th>狀態</th>
-                                <th>操作</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredResources.map(res => (
-                                <tr key={res.id}>
-                                    <td className="name-cell">{res.name}</td>
-                                    <td><span className="category-tag">{res.category}</span></td>
-                                    <td>{res.stock.toLocaleString()} {res.unit}</td>
-                                    <td>{res.allocated.toLocaleString()} {res.unit}</td>
-                                    <td className={res.stock - res.allocated < res.minStock ? 'warning' : ''}>
-                                        {(res.stock - res.allocated).toLocaleString()} {res.unit}
-                                    </td>
-                                    <td>{getStatusBadge(res.status)}</td>
-                                    <td>
-                                        <button className="btn-action">調度</button>
+                            {filteredResources.length === 0 ? (
+                                <tr>
+                                    <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#9ca3af' }}>
+                                        {searchQuery ? '查無結果' : '尚無物資資料'}
                                     </td>
                                 </tr>
-                            ))}
+                            ) : (
+                                filteredResources.map(res => (
+                                    <tr key={res.id}>
+                                        <td className="name-cell">{res.name}</td>
+                                        <td><span className="category-tag">{res.category}</span></td>
+                                        <td>{res.quantity.toLocaleString()} {res.unit || '個'}</td>
+                                        <td>{res.minQuantity.toLocaleString()} {res.unit || '個'}</td>
+                                        <td>{res.location || '—'}</td>
+                                        <td>{getStatusBadge(res.status)}</td>
+                                    </tr>
+                                ))
+                            )}
                         </tbody>
                     </table>
                 </div>

@@ -2,11 +2,12 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { RefreshTokenService } from './services/refresh-token.service';
+import { AccountManagementService } from './services/account-management.service';
 import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('AuthController', () => {
     let controller: AuthController;
-    let authService: any;
+    let accountManagementService: any;
 
     const mockRoleOwner = {
         id: 'role-1',
@@ -40,13 +41,17 @@ describe('AuthController', () => {
             providers: [
                 {
                     provide: AuthService,
-                    useValue: {
-                        getAccountById: jest.fn(),
-                    },
+                    useValue: {},
                 },
                 {
                     provide: RefreshTokenService,
                     useValue: {},
+                },
+                {
+                    provide: AccountManagementService,
+                    useValue: {
+                        getAccountById: jest.fn(),
+                    },
                 },
             ],
         })
@@ -57,7 +62,7 @@ describe('AuthController', () => {
             .compile();
 
         controller = module.get<AuthController>(AuthController);
-        authService = module.get(AuthService);
+        accountManagementService = module.get(AccountManagementService);
     });
 
     it('should be defined', () => {
@@ -66,7 +71,7 @@ describe('AuthController', () => {
 
     describe('getProfile', () => {
         it('should calculate roleLevel from DB roles (not JWT string[])', async () => {
-            authService.getAccountById.mockResolvedValue(mockAccount);
+            accountManagementService.getAccountById.mockResolvedValue(mockAccount);
 
             const req = { user: { id: 'user-123', email: 'owner@example.com' } };
             const result = await controller.getProfile(req);
@@ -77,7 +82,7 @@ describe('AuthController', () => {
         });
 
         it('should return roleLevel 0 and "一般民眾" when no DB roles', async () => {
-            authService.getAccountById.mockResolvedValue({
+            accountManagementService.getAccountById.mockResolvedValue({
                 ...mockAccount,
                 roles: [],
             });
@@ -90,7 +95,7 @@ describe('AuthController', () => {
         });
 
         it('should fallback to JWT roleLevel when account has no roles', async () => {
-            authService.getAccountById.mockResolvedValue({
+            accountManagementService.getAccountById.mockResolvedValue({
                 ...mockAccount,
                 roles: [],
             });
@@ -103,7 +108,7 @@ describe('AuthController', () => {
         });
 
         it('should use highest role level when multiple roles exist', async () => {
-            authService.getAccountById.mockResolvedValue({
+            accountManagementService.getAccountById.mockResolvedValue({
                 ...mockAccount,
                 roles: [mockRoleVolunteer, mockRoleOwner],
             });
@@ -116,7 +121,7 @@ describe('AuthController', () => {
         });
 
         it('should return correct linked status', async () => {
-            authService.getAccountById.mockResolvedValue(mockAccount);
+            accountManagementService.getAccountById.mockResolvedValue(mockAccount);
 
             const req = { user: { id: 'user-123' } };
             const result = await controller.getProfile(req);
@@ -126,7 +131,7 @@ describe('AuthController', () => {
         });
 
         it('should return false for linked status when IDs are null', async () => {
-            authService.getAccountById.mockResolvedValue({
+            accountManagementService.getAccountById.mockResolvedValue({
                 ...mockAccount,
                 lineUserId: null,
                 googleId: null,
@@ -140,7 +145,7 @@ describe('AuthController', () => {
         });
 
         it('should handle null account gracefully', async () => {
-            authService.getAccountById.mockResolvedValue(null);
+            accountManagementService.getAccountById.mockResolvedValue(null);
 
             const req = { user: { id: 'user-123', email: 'test@example.com', roleLevel: 0 } };
             const result = await controller.getProfile(req);

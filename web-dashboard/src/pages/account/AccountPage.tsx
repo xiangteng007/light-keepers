@@ -73,13 +73,35 @@ const AccountPage: React.FC = () => {
         }
     }, [user, authLoading]);
 
-    // Load account data
+    // Load account data — try real API first, fallback to mock defaults
     useEffect(() => {
         const loadData = async () => {
             setIsLoading(true);
             try {
-                // Merge mock data with actual user data
-                const data = await simulateApiCall({
+                // Try fetching full profile from API
+                const { default: api } = await import('../../utils/api');
+                const response = await api.get('/api/account/profile');
+                const apiData = response.data?.data || response.data || {};
+                
+                // Merge API data over user auth context
+                const mergedData: AccountData = {
+                    ...MOCK_ACCOUNT_DATA, // defaults for missing fields
+                    ...apiData,
+                    // Auth context always wins for core identity
+                    id: user?.id || apiData.id || MOCK_ACCOUNT_DATA.id,
+                    email: user?.email || apiData.email || MOCK_ACCOUNT_DATA.email,
+                    displayName: user?.displayName || apiData.displayName || MOCK_ACCOUNT_DATA.displayName,
+                    avatarUrl: user?.avatarUrl || apiData.avatarUrl,
+                    roleLevel: user?.roleLevel ?? apiData.roleLevel ?? MOCK_ACCOUNT_DATA.roleLevel,
+                    roleDisplayName: user?.roleDisplayName || apiData.roleDisplayName || MOCK_ACCOUNT_DATA.roleDisplayName,
+                    lineLinked: user?.lineLinked ?? apiData.lineLinked ?? MOCK_ACCOUNT_DATA.lineLinked,
+                    googleLinked: user?.googleLinked ?? apiData.googleLinked ?? MOCK_ACCOUNT_DATA.googleLinked,
+                };
+                setAccountData(mergedData);
+            } catch (error) {
+                authLogger.error('Failed to load account from API, using fallback:', error);
+                // Fallback: use mock data merged with auth user
+                const fallbackData: AccountData = {
                     ...MOCK_ACCOUNT_DATA,
                     id: user?.id || MOCK_ACCOUNT_DATA.id,
                     email: user?.email || MOCK_ACCOUNT_DATA.email,
@@ -89,10 +111,8 @@ const AccountPage: React.FC = () => {
                     roleDisplayName: user?.roleDisplayName || MOCK_ACCOUNT_DATA.roleDisplayName,
                     lineLinked: user?.lineLinked ?? MOCK_ACCOUNT_DATA.lineLinked,
                     googleLinked: user?.googleLinked ?? MOCK_ACCOUNT_DATA.googleLinked,
-                }, 500);
-                setAccountData(data);
-            } catch (error) {
-                authLogger.error('Failed to load account data:', error);
+                };
+                setAccountData(fallbackData);
             } finally {
                 setIsLoading(false);
             }

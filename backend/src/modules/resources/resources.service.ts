@@ -35,6 +35,9 @@ export interface TransactionDto {
     recipientIdNo?: string;
     recipientOrg?: string;
     purpose?: string;
+    // A4: 任務/事件串接
+    taskId?: string;
+    eventId?: string;
 }
 
 export interface CreateDonationSourceDto {
@@ -167,6 +170,9 @@ export class ResourcesService {
             purpose: dto.purpose,
             // Phase 4: 覆核狀態
             approvalStatus: needsApproval ? 'pending' : undefined,
+            // A4: 任務/事件串接
+            taskId: dto.taskId,
+            eventId: dto.eventId,
         });
 
         const logAction = needsApproval ? '🕒 待覆核' : dto.type;
@@ -400,5 +406,60 @@ export class ResourcesService {
         }
 
         return { updated };
+    }
+
+    // ==================== 📋 A4: 任務/事件串接 ====================
+
+    /**
+     * 依任務 ID 查詢物資異動（出庫/入庫等）
+     */
+    async findByTask(taskId: string): Promise<ResourceTransaction[]> {
+        return this.transactionRepository.find({
+            where: { taskId },
+            relations: ['resource'],
+            order: { createdAt: 'DESC' },
+        });
+    }
+
+    /**
+     * 依事件 ID 彙總資源消耗
+     */
+    async getUsageByEvent(eventId: string): Promise<{
+        totalIn: number;
+        totalOut: number;
+        netChange: number;
+        byCategory: Record<string, { in: number; out: number }>;
+        transactions: ResourceTransaction[];
+    }> {
+        const transactions = await this.transactionRepository.find({
+            where: { eventId },
+            relations: ['resource'],
+            order: { createdAt: 'ASC' },
+        });
+
+        let totalIn = 0;
+        let totalOut = 0;
+        const byCategory: Record<string, { in: number; out: number }> = {};
+
+        for (const tx of transactions) {
+            const cat = tx.resource?.category || 'unknown';
+            if (!byCategory[cat]) byCategory[cat] = { in: 0, out: 0 };
+
+            if (tx.type === 'in' || tx.type === 'donate') {
+                totalIn += tx.quantity;
+                byCategory[cat].in += tx.quantity;
+            } else if (tx.type === 'out' || tx.type === 'expired') {
+                totalOut += tx.quantity;
+                byCategory[cat].out += tx.quantity;
+            }
+        }
+
+        return {
+            totalIn,
+            totalOut,
+            netChange: totalIn - totalOut,
+            byCategory,
+            transactions,
+        };
     }
 }

@@ -51,6 +51,20 @@ export class ResourcesController {
         return { success: true, data: resources, count: resources.length };
     }
 
+    // ==================== 📋 A4: 任務/事件串接 ====================
+
+    @Get('by-task/:taskId')
+    async findByTask(@Param('taskId') taskId: string) {
+        const transactions = await this.resourcesService.findByTask(taskId);
+        return { success: true, data: transactions, count: transactions.length };
+    }
+
+    @Get('usage-by-event/:eventId')
+    async getUsageByEvent(@Param('eventId') eventId: string) {
+        const usage = await this.resourcesService.getUsageByEvent(eventId);
+        return { success: true, data: usage };
+    }
+
     // ==================== 📱 條碼查詢 (功能4) ====================
 
     @Get('barcode/:barcode')

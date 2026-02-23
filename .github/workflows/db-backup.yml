@@ -1,0 +1,97 @@
+name: Database Backup & Maintenance
+
+on:
+  schedule:
+    # 每天 UTC 18:00 (台灣時間 02:00) 執行
+    - cron: '0 18 * * *'
+  workflow_dispatch:
+    inputs:
+      backup_type:
+        description: 'Backup type'
+        required: true
+        default: 'daily'
+        type: choice
+        options:
+          - daily
+          - pre-deploy
+
+env:
+  PROJECT_ID: light-keepers-mvp
+  INSTANCE_NAME: light-keepers-db
+  REGION: asia-east1
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Create Cloud SQL Backup
+        run: |
+          BACKUP_TYPE="${{ github.event.inputs.backup_type || 'daily' }}"
+          DATE=$(date +%Y%m%d-%H%M%S)
+          DESCRIPTION="auto-${BACKUP_TYPE}-${DATE}"
+          
+          echo "📦 Creating backup: ${DESCRIPTION}"
+          
+          gcloud sql backups create \
+            --instance=${{ env.INSTANCE_NAME }} \
+            --description="${DESCRIPTION}" \
+            --async \
+            --quiet
+          
+          echo "✅ Backup creation initiated: ${DESCRIPTION}"
+
+      - name: List Recent Backups
+        run: |
+          echo "📋 Recent backups:"
+          gcloud sql backups list \
+            --instance=${{ env.INSTANCE_NAME }} \
+            --limit=5 \
+            --format="table(id, type, status, startTime, endTime, description)"
+
+      - name: Cleanup Old Backups (keep last 14 days)
+        run: |
+          echo "🧹 Checking for backups older than 14 days..."
+          
+          CUTOFF_DATE=$(date -d '14 days ago' +%Y-%m-%dT%H:%M:%S 2>/dev/null || date -v-14d +%Y-%m-%dT%H:%M:%S)
+          
+          # List automated backups older than cutoff
+          OLD_BACKUPS=$(gcloud sql backups list \
+            --instance=${{ env.INSTANCE_NAME }} \
+            --filter="startTime < '${CUTOFF_DATE}' AND description~'auto-daily'" \
+            --format="value(id)" 2>/dev/null || true)
+          
+          if [ -z "$OLD_BACKUPS" ]; then
+            echo "✅ No old backups to clean up"
+          else
+            COUNT=$(echo "$OLD_BACKUPS" | wc -l)
+            echo "🗑️ Found ${COUNT} old backup(s) to clean up"
+            
+            for BACKUP_ID in $OLD_BACKUPS; do
+              echo "  Deleting backup: ${BACKUP_ID}"
+              gcloud sql backups delete "${BACKUP_ID}" \
+                --instance=${{ env.INSTANCE_NAME }} \
+                --quiet || true
+            done
+            echo "✅ Cleanup complete"
+          fi
+
+      - name: Verify Instance Health
+        run: |
+          echo "🏥 Checking instance health..."
+          gcloud sql instances describe ${{ env.INSTANCE_NAME }} \
+            --format="table(state, databaseVersion, settings.tier, settings.dataDiskSizeGb)" || true

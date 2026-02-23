@@ -1,10 +1,14 @@
-import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Resource } from './resources.entity';
 import { DonationSource } from './donation-source.entity';
 
+export type BatchStatus = 'active' | 'depleted' | 'expired';
+
 /**
- * 物資批次
- * 同一物資不同批次分別追蹤 (不同過期日、不同來源)
+ * 物資批次（統一版）
+ * 整合原 ResourceBatch + Lot 功能
+ * - 一般物資：追蹤批次來源、效期
+ * - 管制/醫療物資：額外追蹤 QR Code、批號、倉庫/儲位、列印記錄
  */
 @Entity('resource_batches')
 export class ResourceBatch {
@@ -19,8 +23,8 @@ export class ResourceBatch {
     @Column({ type: 'uuid' })
     resourceId: string;
 
-    // 批次編號
-    @Column({ type: 'varchar', length: 50 })
+    // 批次編號 (= 原 Lot.lotNumber)
+    @Column({ type: 'varchar', length: 100 })
     batchNo: string;
 
     // 批次數量
@@ -47,9 +51,37 @@ export class ResourceBatch {
     @Column({ type: 'decimal', precision: 10, scale: 2, nullable: true })
     unitPrice?: number;
 
-    // 存放位置
+    // 存放位置 (文字描述)
     @Column({ type: 'varchar', length: 200, nullable: true })
     location?: string;
+
+    // === 從 Lot 合併的欄位 ===
+
+    // 🔐 QR Code 內容（ORG|LOT|{batchId}|{checksum}）
+    @Column({ type: 'varchar', length: 200, nullable: true })
+    qrValue?: string;
+
+    // 倉庫 ID
+    @Column({ type: 'uuid', nullable: true })
+    warehouseId?: string;
+
+    // 儲位 ID
+    @Column({ type: 'uuid', nullable: true })
+    storageLocationId?: string;
+
+    // 批次狀態
+    @Column({ type: 'varchar', length: 20, default: 'active' })
+    status: BatchStatus;
+
+    // 🏷️ 已列印貼紙數
+    @Column({ type: 'int', default: 0 })
+    labelsPrinted: number;
+
+    // 🏷️ 最後列印批次 ID
+    @Column({ type: 'uuid', nullable: true })
+    lastPrintBatchId?: string;
+
+    // === 原有欄位 ===
 
     // QR Code / 條碼
     @Column({ type: 'varchar', length: 100, nullable: true })
@@ -66,4 +98,7 @@ export class ResourceBatch {
     // 入庫時間
     @CreateDateColumn()
     createdAt: Date;
+
+    @UpdateDateColumn()
+    updatedAt: Date;
 }

@@ -245,4 +245,58 @@ export class EquipmentService {
             maintenanceDue: all.filter(e => e.nextMaintenanceDate && e.nextMaintenanceDate < today).length,
         };
     }
+
+    // ==================== 任務/事件串接 ====================
+
+    async findByTask(taskId: string): Promise<Equipment[]> {
+        return this.equipmentRepository.find({
+            where: { assignedTaskId: taskId },
+            order: { name: 'ASC' },
+        });
+    }
+
+    async findByEvent(eventId: string): Promise<Equipment[]> {
+        return this.equipmentRepository.find({
+            where: { assignedEventId: eventId },
+            order: { name: 'ASC' },
+        });
+    }
+
+    async assignToTask(
+        equipmentId: string,
+        taskId: string,
+        eventId?: string,
+        actorId?: string,
+        actorName?: string,
+    ): Promise<Equipment> {
+        const equipment = await this.findById(equipmentId);
+
+        equipment.assignedTaskId = taskId;
+        if (eventId) equipment.assignedEventId = eventId;
+
+        await this.addLog(equipmentId, {
+            type: EquipmentLogType.CHECKOUT,
+            description: `指派至任務 ${taskId}`,
+            performerId: actorId,
+            performerName: actorName,
+            metadata: { taskId, eventId },
+        });
+
+        return this.equipmentRepository.save(equipment);
+    }
+
+    async unassignFromTask(equipmentId: string): Promise<Equipment> {
+        const equipment = await this.findById(equipmentId);
+
+        const previousTaskId = equipment.assignedTaskId;
+        equipment.assignedTaskId = undefined;
+        equipment.assignedEventId = undefined;
+
+        await this.addLog(equipmentId, {
+            type: EquipmentLogType.RETURN,
+            description: `從任務 ${previousTaskId} 解除指派`,
+        });
+
+        return this.equipmentRepository.save(equipment);
+    }
 }

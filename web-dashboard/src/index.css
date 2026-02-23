@@ -1202,3 +1202,163 @@ select {
 .btn-danger-outline:hover {
   background: rgba(239, 68, 68, 0.1);
 }
+
+/* ============================================
+   📱 M1-M5: Global Mobile Optimization
+   Expert Council Audit — Phase M
+============================================ */
+
+/* --- M1: Global Table Overflow Protection --- */
+@media (max-width: 768px) {
+  /* Ensure all table wrappers allow horizontal scroll */
+  .resources-list,
+  .donations-table-container,
+  .approval-grid,
+  [class*="table-wrap"],
+  [class*="table-container"] {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Tables inside scroll containers get min-width */
+  .resources-table,
+  .logs-table,
+  .donations-table,
+  .detail-table,
+  .sensitive-table {
+    min-width: 580px;
+  }
+}
+
+/* --- M1: Touch Target Enforcement (WCAG 2.1 AA = 44px) --- */
+@media (max-width: 768px) {
+  /* Action buttons in tables */
+  .resource-actions button,
+  .btn-delete,
+  .btn-edit {
+    min-height: 44px;
+    min-width: 44px;
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    font-size: var(--text-xs, 0.75rem);
+  }
+
+  /* Filter and category pills */
+  .filter-pill,
+  .category-btn,
+  .status-filter-btn {
+    min-height: 44px;
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+  }
+
+  /* Close buttons in drawers/overlays */
+  .mobile-more-close,
+  .drawer-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  /* Modal action buttons */
+  .modal-actions button,
+  .reject-actions button,
+  .form-actions button,
+  .btn-approve,
+  .btn-reject,
+  .btn-close-modal {
+    min-height: 44px;
+  }
+
+  /* Tab buttons */
+  .resources-tabs .tab-btn,
+  .donations-page .tab-bar button {
+    min-height: 44px;
+  }
+}
+
+/* --- M1: Text Overflow Protection --- */
+body {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+@media (max-width: 768px) {
+  /* Prevent table cells from causing horizontal overflow */
+  td, th {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+/* --- M3: Modal → Bottom Sheet on Mobile --- */
+@media (max-width: 640px) {
+  .modal-overlay,
+  .resources-page .modal-overlay {
+    align-items: flex-end !important;
+    padding: 0 !important;
+  }
+
+  .modal-content,
+  .modal-content--lg,
+  .resources-page .modal-content,
+  .resources-page .modal-content--lg {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: var(--radius-xl, 16px) var(--radius-xl, 16px) 0 0 !important;
+    max-height: 90vh;
+    animation: slideFromBottom 0.3s ease !important;
+  }
+
+  @keyframes slideFromBottom {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  /* Bottom Sheet drag handle hint */
+  .modal-content::before,
+  .resources-page .modal-content::before {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 4px;
+    background: var(--border-default, #D4D4D8);
+    border-radius: 2px;
+    margin: 0 auto var(--space-3, 12px);
+  }
+}
+
+/* --- M4: Tab Scroll Fade Hint --- */
+@media (max-width: 768px) {
+  .resources-tabs,
+  .donations-page .tab-bar {
+    scrollbar-width: none;
+    position: relative;
+  }
+
+  .resources-tabs::-webkit-scrollbar,
+  .donations-page .tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* --- M5: Accessibility — prefers-reduced-motion --- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* --- M5: Safe Area support for notched devices --- */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .header,
+  .appShellLayout .header {
+    padding-top: env(safe-area-inset-top);
+  }
+
+  .modal-overlay,
+  .resources-page .modal-overlay {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}

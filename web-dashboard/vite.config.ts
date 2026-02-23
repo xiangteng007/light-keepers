@@ -122,28 +122,23 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: {
-          // React core (~140KB)
+          // React core (~47KB)
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
-          // Lucide icons (~120KB)
+          // Lucide icons (~38KB)
           'vendor-icons': ['lucide-react'],
-          // Charts (~180KB)
+          // Charts (~185KB)
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
-          // Map libraries (~500KB)
-          'vendor-maps': ['maplibre-gl', 'leaflet', 'react-leaflet'],
-          // Firebase (~200KB)
-          'vendor-firebase': ['firebase'],
-          // Excel export (~300KB)
-          'vendor-excel': ['exceljs'],
-          // Realtime (~100KB)
+          // Realtime (~42KB)
           'vendor-realtime': ['socket.io-client', 'rxjs'],
-          // Offline sync (~200KB)
-          'vendor-offline': ['rxdb', 'idb'],
-          // i18n (~40KB)
+          // i18n (~55KB)
           'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
-          // Data fetching (~30KB)
+          // Data fetching (~35KB)
           'vendor-query': ['@tanstack/react-query'],
-          // Bootstrap UI (~50KB) — used by 4 legacy pages
+          // Bootstrap UI (~37KB) — used by 4 legacy pages
           'vendor-bootstrap': ['react-bootstrap'],
+          // Note: firebase, exceljs, maplibre/leaflet, rxdb/idb are
+          // already code-split via LazyPages dynamic imports — no need
+          // for manual chunks (they were generating empty 0KB chunks)
         },
       },
     },

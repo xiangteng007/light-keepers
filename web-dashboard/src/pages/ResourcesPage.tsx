@@ -9,22 +9,27 @@ import DispatchTab from './resources/DispatchTab';
 import AuditTab from './resources/AuditTab';
 import './ResourcesPage.css';
 import { API_BASE } from '../api/config';
+import {
+    Package, UtensilsCrossed, Droplets, Stethoscope, Home, Shirt, Wrench,
+    ClipboardList, Factory, Settings, Truck, BarChart3, ScrollText,
+    Loader2, PackageOpen, Plus, type LucideIcon,
+} from 'lucide-react';
 
 // 物資分類
-const CATEGORY_CONFIG = {
-    food: { label: '食品', icon: '🍚', color: '#FF9800' },
-    water: { label: '飲水', icon: '💧', color: '#2196F3' },
-    medical: { label: '醫療', icon: '🏥', color: '#F44336' },
-    shelter: { label: '收容', icon: '🏠', color: '#4CAF50' },
-    clothing: { label: '衣物', icon: '👕', color: '#9C27B0' },
-    equipment: { label: '設備', icon: '🔧', color: '#607D8B' },
-    other: { label: '其他', icon: '📦', color: '#795548' },
+const CATEGORY_CONFIG: Record<string, { label: string; icon: LucideIcon }> = {
+    food: { label: '食品', icon: UtensilsCrossed },
+    water: { label: '飲水', icon: Droplets },
+    medical: { label: '醫療', icon: Stethoscope },
+    shelter: { label: '收容', icon: Home },
+    clothing: { label: '衣物', icon: Shirt },
+    equipment: { label: '設備', icon: Wrench },
+    other: { label: '其他', icon: Package },
 };
 
 const STATUS_CONFIG = {
-    available: { label: '充足', color: '#4CAF50' },
-    low: { label: '不足', color: '#FF9800' },
-    depleted: { label: '缺貨', color: '#F44336' },
+    available: { label: '充足' },
+    low: { label: '不足' },
+    depleted: { label: '缺貨' },
 };
 
 type ResourceStatus = keyof typeof STATUS_CONFIG;
@@ -250,13 +255,13 @@ export default function ResourcesPage() {
         <div className="page resources-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📦 物資管理</h2>
+                    <h2><Package size={24} /> 物資管理</h2>
                     <p className="page-subtitle">庫存管理與調度</p>
                 </div>
                 <div className="page-header__right">
                     {canManage && (
                         <Button onClick={() => setShowAddModal(true)}>
-                            ➕ 新增物資
+                            <Plus size={16} /> 新增物資
                         </Button>
                     )}
                 </div>
@@ -268,37 +273,37 @@ export default function ResourcesPage() {
                     className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
                     onClick={() => setActiveTab('manage')}
                 >
-                    📋 耗材管理
+                    <ClipboardList size={16} /> 耗材管理
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'warehouses' ? 'active' : ''}`}
                     onClick={() => setActiveTab('warehouses')}
                 >
-                    🏭 倉庫/儲位
+                    <Factory size={16} /> 倉庫/儲位
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'assets' ? 'active' : ''}`}
                     onClick={() => setActiveTab('assets')}
                 >
-                    🔧 器材資產
+                    <Settings size={16} /> 器材資產
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'dispatch' ? 'active' : ''}`}
                     onClick={() => setActiveTab('dispatch')}
                 >
-                    🚚 調度
+                    <Truck size={16} /> 調度
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'audit' ? 'active' : ''}`}
                     onClick={() => setActiveTab('audit')}
                 >
-                    📊 盤點
+                    <BarChart3 size={16} /> 盤點
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
                     onClick={() => setActiveTab('logs')}
                 >
-                    📜 異動紀錄
+                    <ScrollText size={16} /> 異動紀錄
                 </button>
             </div>
 
@@ -332,15 +337,18 @@ export default function ResourcesPage() {
                         >
                             全部
                         </button>
-                        {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                            <button
-                                key={key}
-                                className={`category-btn ${selectedCategory === key ? 'active' : ''}`}
-                                onClick={() => setSelectedCategory(key)}
-                            >
-                                {config.icon} {config.label}
-                            </button>
-                        ))}
+                        {Object.entries(CATEGORY_CONFIG).map(([key, config]) => {
+                            const CategoryIcon = config.icon;
+                            return (
+                                <button
+                                    key={key}
+                                    className={`category-btn ${selectedCategory === key ? 'active' : ''}`}
+                                    onClick={() => setSelectedCategory(key)}
+                                >
+                                    <CategoryIcon size={14} /> {config.label}
+                                </button>
+                            );
+                        })}
                     </div>
 
                     {/* 物資列表 */}
@@ -360,19 +368,19 @@ export default function ResourcesPage() {
                                 {isLoading ? (
                                     <tr>
                                         <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                            ⏳ 載入物資資料中...
+                                            <Loader2 size={16} className="spin-icon" /> 載入物資資料中...
                                         </td>
                                     </tr>
                                 ) : error ? (
                                     <tr>
-                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: '#F44336' }}>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-danger)' }}>
                                             ⚠️ {error}
                                         </td>
                                     </tr>
                                 ) : filteredResources.length === 0 ? (
                                     <tr>
                                         <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                            📦 尚無物資資料
+                                            <PackageOpen size={16} /> 尚無物資資料
                                         </td>
                                     </tr>
                                 ) : (
@@ -383,7 +391,7 @@ export default function ResourcesPage() {
                                             <tr key={resource.id}>
                                                 <td>
                                                     <span className="resource-name">
-                                                        {category.icon} {resource.name}
+                                                        {(() => { const CatIcon = category.icon; return <CatIcon size={14} />; })()} {resource.name}
                                                     </span>
                                                 </td>
                                                 <td>{category.label}</td>
@@ -486,7 +494,7 @@ export default function ResourcesPage() {
                                             </td>
                                             <td>
                                                 {log.beforeQuantity} → {log.afterQuantity}
-                                                <span style={{ color: log.quantity > 0 ? '#22c55e' : '#ef4444', marginLeft: '0.5rem' }}>
+                                                <span className={log.quantity > 0 ? 'qty-increase' : 'qty-decrease'} style={{ marginLeft: '0.5rem' }}>
                                                     ({log.quantity > 0 ? '+' : ''}{log.quantity})
                                                 </span>
                                             </td>
@@ -536,7 +544,7 @@ export default function ResourcesPage() {
                                     onChange={e => setResourceForm({ ...resourceForm, category: e.target.value as ResourceCategory })}
                                 >
                                     {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                                        <option key={key} value={key}>{config.icon} {config.label}</option>
+                                        <option key={key} value={key}>{config.label}</option>
                                     ))}
                                 </select>
                             </div>
@@ -635,7 +643,7 @@ export default function ResourcesPage() {
                                     onChange={e => setResourceForm({ ...resourceForm, category: e.target.value as ResourceCategory })}
                                 >
                                     {Object.entries(CATEGORY_CONFIG).map(([key, config]) => (
-                                        <option key={key} value={key}>{config.icon} {config.label}</option>
+                                        <option key={key} value={key}>{config.label}</option>
                                     ))}
                                 </select>
                             </div>

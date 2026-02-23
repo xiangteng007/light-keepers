@@ -4,6 +4,7 @@ import { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
 import { AuthService } from './auth.service';
 import { RefreshTokenService } from './services/refresh-token.service';
+import { AccountManagementService } from './services/account-management.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
 import { Public } from './decorators/public.decorator';
 
@@ -19,6 +20,7 @@ export class AuthController {
     constructor(
         private readonly authService: AuthService,
         private readonly refreshTokenService: RefreshTokenService,
+        private readonly accountManagementService: AccountManagementService,
     ) { }
 
     @Public()
@@ -54,7 +56,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async getProfile(@Request() req: { user: { id: string; email?: string; roleLevel?: number } }) {
         // 從資料庫獲取最新帳號資料（包含角色與綁定狀態）
-        const account = await this.authService.getAccountById(req.user.id);
+        const account = await this.accountManagementService.getAccountById(req.user.id);
         // 使用資料庫角色（含 level），而非 JWT 的 string[] roles
         const dbRoles = account?.roles || [];
         const roleLevel = dbRoles.length > 0
@@ -83,7 +85,7 @@ export class AuthController {
      */
     @Get('permissions')
     async getPermissions() {
-        return this.authService.getPagePermissions();
+        return this.accountManagementService.getPagePermissions();
     }
 
     /**
@@ -92,7 +94,7 @@ export class AuthController {
      */
     @Get('roles')
     async getRoles() {
-        return this.authService.getAllRoles();
+        return this.accountManagementService.getAllRoles();
     }
 
     // =========================================
@@ -360,7 +362,7 @@ export class AuthController {
         @Request() req: { user: { id: string } },
         @Body() dto: UpdateProfileDto
     ) {
-        return this.authService.updateProfile(req.user.id, dto);
+        return this.accountManagementService.updateProfile(req.user.id, dto);
     }
 
     /**
@@ -372,7 +374,7 @@ export class AuthController {
         @Request() req: { user: { id: string } },
         @Body() dto: ChangePasswordDto
     ) {
-        return this.authService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
+        return this.accountManagementService.changePassword(req.user.id, dto.currentPassword, dto.newPassword);
     }
 
     /**
@@ -385,7 +387,7 @@ export class AuthController {
         @Request() req: { user: { id: string } },
         @Body() body: { newPassword: string }
     ) {
-        return this.authService.setPassword(req.user.id, body.newPassword);
+        return this.accountManagementService.setPassword(req.user.id, body.newPassword);
     }
 
     /**
@@ -394,7 +396,7 @@ export class AuthController {
     @Get('has-password')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async hasPassword(@Request() req: { user: { id: string } }) {
-        return this.authService.hasPassword(req.user.id);
+        return this.accountManagementService.hasPassword(req.user.id);
     }
 
     /**
@@ -403,7 +405,7 @@ export class AuthController {
     @Get('preferences')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async getPreferences(@Request() req: { user: { id: string } }) {
-        return this.authService.getPreferences(req.user.id);
+        return this.accountManagementService.getPreferences(req.user.id);
     }
 
     /**
@@ -415,7 +417,7 @@ export class AuthController {
         @Request() req: { user: { id: string } },
         @Body() dto: UpdatePreferencesDto
     ) {
-        return this.authService.updatePreferences(req.user.id, dto);
+        return this.accountManagementService.updatePreferences(req.user.id, dto);
     }
 
     // =========================================
@@ -543,7 +545,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @Get('me/status')
     async getAccountStatus(@Request() req: { user: { id: string } }) {
-        return this.authService.getAccountStatus(req.user.id);
+        return this.accountManagementService.getAccountStatus(req.user.id);
     }
 
     /**
@@ -552,7 +554,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     @Post('me/volunteer-profile-completed')
     async markVolunteerProfileCompleted(@Request() req: { user: { id: string } }) {
-        return this.authService.markVolunteerProfileCompleted(req.user.id);
+        return this.accountManagementService.markVolunteerProfileCompleted(req.user.id);
     }
 
     // =========================================

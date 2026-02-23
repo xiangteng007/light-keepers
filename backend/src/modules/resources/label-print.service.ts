@@ -1,7 +1,7 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Lot } from './lot.entity';
+import { ResourceBatch } from './resource-batch.entity';
 import { Asset } from './asset.entity';
 import { Resource } from './resources.entity';
 import { LabelTemplate } from './label-template.entity';
@@ -14,8 +14,8 @@ import { AuditLogService } from './audit-log.service';
 @Injectable()
 export class LabelPrintService {
     constructor(
-        @InjectRepository(Lot)
-        private readonly lotRepo: Repository<Lot>,
+        @InjectRepository(ResourceBatch)
+        private readonly batchRepo: Repository<ResourceBatch>,
 
         @InjectRepository(Asset)
         private readonly assetRepo: Repository<Asset>,
@@ -41,17 +41,17 @@ export class LabelPrintService {
         labelData: any;
         printBatchId: string;
     }> {
-        const lot = await this.lotRepo.findOne({
+        const batch = await this.batchRepo.findOne({
             where: { id: params.lotId },
-            relations: ['item'],
+            relations: ['resource'],
         });
 
-        if (!lot) {
+        if (!batch) {
             throw new BadRequestException('批次不存在');
         }
 
         // 檢查是否為 civil（防呆）
-        if (lot.item.controlLevel === 'civil') {
+        if (batch.resource.controlLevel === 'civil') {
             throw new BadRequestException('民生物品不可產生系統 QR/貼紙');
         }
 
@@ -68,8 +68,8 @@ export class LabelPrintService {
             throw new BadRequestException('此模板不適用於批次');
         }
 
-        if (!template.controlLevels.includes(lot.item.controlLevel)) {
-            throw new BadRequestException(`此模板不適用於 ${lot.item.controlLevel} 品項`);
+        if (!template.controlLevels.includes(batch.resource.controlLevel)) {
+            throw new BadRequestException(`此模板不適用於 ${batch.resource.controlLevel} 品項`);
         }
 
         // 記錄列印稽核
@@ -79,15 +79,15 @@ export class LabelPrintService {
             action: 'print',
             targetType: 'lot',
             targetIds: [params.lotId],
-            controlLevel: lot.item.controlLevel,
+            controlLevel: batch.resource.controlLevel,
             templateId: params.templateId,
             labelCount: 1,
         });
 
-        // 更新 lot 的列印記錄
-        lot.labelsPrinted += 1;
-        lot.lastPrintBatchId = printBatchId;
-        await this.lotRepo.save(lot);
+        // 更新 batch 的列印記錄
+        batch.labelsPrinted += 1;
+        batch.lastPrintBatchId = printBatchId;
+        await this.batchRepo.save(batch);
 
         // 組裝貼紙資料
         const labelData = {
@@ -97,11 +97,11 @@ export class LabelPrintService {
                 layoutConfig: template.layoutConfig,
             },
             data: {
-                qrValue: lot.qrValue,
-                itemName: lot.item.name,
-                lotNumber: lot.lotNumber,
-                expiryDate: lot.expiryDate,
-                warehouse: lot.warehouseId, // TODO: 關聯查詢倉庫名稱
+                qrValue: batch.qrValue,
+                itemName: batch.resource.name,
+                lotNumber: batch.batchNo,
+                expiryDate: batch.expiresAt,
+                warehouse: batch.warehouseId, // TODO: 關聯查詢倉庫名稱
             },
         };
 

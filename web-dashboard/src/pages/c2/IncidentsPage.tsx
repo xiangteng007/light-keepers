@@ -2,35 +2,33 @@
  * IncidentsPage.tsx
  * 
  * C2 Domain - 事件中心頁面
- * 管理所有事件的列表與狀態追蹤
+ * 管理所有事件的列表與狀態追蹤 — connected to real API
  */
-import React, { useState } from 'react';
-import { AlertTriangle, Clock, CheckCircle, XCircle, Filter, Plus, MapPin, Users } from 'lucide-react';
+import React, { useState, useEffect, useCallback } from 'react';
+import { AlertTriangle, Clock, CheckCircle, XCircle, Plus, MapPin, Users, Loader2, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import api from '../../utils/api';
 import './IncidentsPage.css';
 
 interface Incident {
     id: string;
-    number: string;
+    number?: string;
     title: string;
-    status: 'reported' | 'confirmed' | 'in_progress' | 'resolved' | 'closed';
-    priority: 1 | 2 | 3 | 4 | 5;
-    category: string;
-    location: string;
-    reportedAt: string;
-    assignedTeams: number;
+    name?: string;
+    status: string;
+    priority: number;
+    category?: string;
+    type?: string;
+    location?: string;
+    reportedAt?: string;
+    createdAt?: string;
+    assignedTeams?: number;
 }
-
-const MOCK_INCIDENTS: Incident[] = [
-    { id: '1', number: 'INC-2026-00123', title: '大安區住宅倒塌', status: 'in_progress', priority: 1, category: '地震', location: '大安區復興南路', reportedAt: '2026/01/11 14:32', assignedTeams: 3 },
-    { id: '2', number: 'INC-2026-00122', title: '信義區水管破裂', status: 'confirmed', priority: 2, category: '水災', location: '信義區松仁路', reportedAt: '2026/01/11 12:15', assignedTeams: 1 },
-    { id: '3', number: 'INC-2026-00121', title: '中正區道路坍方', status: 'resolved', priority: 3, category: '山崩', location: '中正區汀州路', reportedAt: '2026/01/10 09:45', assignedTeams: 2 },
-    { id: '4', number: 'INC-2026-00120', title: '松山區火災通報', status: 'closed', priority: 2, category: '火災', location: '松山區敦化北路', reportedAt: '2026/01/09 18:20', assignedTeams: 4 },
-];
 
 const STATUS_INFO: Record<string, { label: string; color: string; icon: React.ElementType }> = {
     reported: { label: '已通報', color: '#6b7280', icon: Clock },
     confirmed: { label: '已確認', color: '#3b82f6', icon: AlertTriangle },
+    active: { label: '進行中', color: '#f59e0b', icon: AlertTriangle },
     in_progress: { label: '處理中', color: '#f59e0b', icon: AlertTriangle },
     resolved: { label: '已解決', color: '#22c55e', icon: CheckCircle },
     closed: { label: '已結案', color: '#10b981', icon: CheckCircle },
@@ -39,11 +37,35 @@ const STATUS_INFO: Record<string, { label: string; color: string; icon: React.El
 const PRIORITY_COLORS = ['', '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e'];
 
 export default function IncidentsPage() {
+    const [incidents, setIncidents] = useState<Incident[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
     const [statusFilter, setStatusFilter] = useState<string>('all');
 
-    const filtered = statusFilter === 'all'
-        ? MOCK_INCIDENTS
-        : MOCK_INCIDENTS.filter(i => i.status === statusFilter);
+    const fetchIncidents = useCallback(async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const params: Record<string, string> = {};
+            if (statusFilter !== 'all') params.status = statusFilter;
+            const response = await api.get('/events', { params });
+            const data = response.data?.data || response.data || [];
+            const items = Array.isArray(data) ? data : (data.items || []);
+            setIncidents(items);
+        } catch (err: any) {
+            console.error('Failed to fetch incidents:', err);
+            setError(err?.response?.data?.message || '無法載入事件列表');
+            setIncidents([]);
+        } finally {
+            setLoading(false);
+        }
+    }, [statusFilter]);
+
+    useEffect(() => {
+        fetchIncidents();
+    }, [fetchIncidents]);
+
+    const filtered = incidents;
 
     return (
         <PageTemplate
@@ -56,7 +78,8 @@ export default function IncidentsPage() {
                 {/* Stats Bar */}
                 <div className="stats-bar">
                     {Object.entries(STATUS_INFO).map(([key, info]) => {
-                        const count = MOCK_INCIDENTS.filter(i => i.status === key).length;
+                        const count = incidents.filter(i => i.status === key).length;
+                        if (count === 0 && key !== statusFilter) return null;
                         return (
                             <div
                                 key={key}
@@ -73,38 +96,62 @@ export default function IncidentsPage() {
 
                 {/* Actions */}
                 <div className="page-actions">
+                    <button className="btn-icon" onClick={fetchIncidents} disabled={loading} title="重新整理">
+                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
+                    </button>
                     <button className="btn-primary">
                         <Plus size={16} /> 新增事件
                     </button>
                 </div>
 
+                {/* Error */}
+                {error && (
+                    <div className="error-banner" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                        <AlertTriangle size={16} /> {error}
+                    </div>
+                )}
+
+                {/* Loading */}
+                {loading && (
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: '#94a3b8' }}>
+                        <Loader2 size={24} className="spin" />
+                        <span>載入事件中...</span>
+                    </div>
+                )}
+
                 {/* Incident List */}
-                <div className="incident-list">
-                    {filtered.map(incident => {
-                        const statusInfo = STATUS_INFO[incident.status];
-                        const StatusIcon = statusInfo.icon;
-                        return (
-                            <div key={incident.id} className="incident-card">
-                                <div className="priority-bar" style={{ background: PRIORITY_COLORS[incident.priority] }} />
-                                <div className="incident-content">
-                                    <div className="incident-header">
-                                        <span className="incident-number">{incident.number}</span>
-                                        <span className="status-badge" style={{ background: statusInfo.color }}>
-                                            <StatusIcon size={12} />
-                                            {statusInfo.label}
-                                        </span>
-                                    </div>
-                                    <h4 className="incident-title">{incident.title}</h4>
-                                    <div className="incident-meta">
-                                        <span><MapPin size={12} /> {incident.location}</span>
-                                        <span><Clock size={12} /> {incident.reportedAt}</span>
-                                        <span><Users size={12} /> {incident.assignedTeams} 小隊</span>
+                {!loading && (
+                    <div className="incident-list">
+                        {filtered.length === 0 ? (
+                            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                                {error ? '載入失敗' : '暫無事件'}
+                            </div>
+                        ) : filtered.map(incident => {
+                            const statusInfo = STATUS_INFO[incident.status] || STATUS_INFO.reported;
+                            const StatusIcon = statusInfo.icon;
+                            return (
+                                <div key={incident.id} className="incident-card">
+                                    <div className="priority-bar" style={{ background: PRIORITY_COLORS[incident.priority] || PRIORITY_COLORS[3] }} />
+                                    <div className="incident-content">
+                                        <div className="incident-header">
+                                            <span className="incident-number">{incident.number || `EVT-${incident.id.slice(0, 8)}`}</span>
+                                            <span className="status-badge" style={{ background: statusInfo.color }}>
+                                                <StatusIcon size={12} />
+                                                {statusInfo.label}
+                                            </span>
+                                        </div>
+                                        <h4 className="incident-title">{incident.title || incident.name}</h4>
+                                        <div className="incident-meta">
+                                            {incident.location && <span><MapPin size={12} /> {incident.location}</span>}
+                                            <span><Clock size={12} /> {incident.reportedAt || (incident.createdAt ? new Date(incident.createdAt).toLocaleString('zh-TW') : '-')}</span>
+                                            {incident.assignedTeams != null && <span><Users size={12} /> {incident.assignedTeams} 小隊</span>}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        );
-                    })}
-                </div>
+                            );
+                        })}
+                    </div>
+                )}
             </div>
         </PageTemplate>
     );

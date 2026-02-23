@@ -68,6 +68,13 @@ export class ResourceTransaction {
     @Column({ type: 'varchar', length: 50, nullable: true })
     referenceNo?: string;
 
+    // 📋 A4: 任務/事件串接
+    @Column({ type: 'uuid', nullable: true })
+    taskId?: string;
+
+    @Column({ type: 'uuid', nullable: true })
+    eventId?: string;
+
     // 🔐 Phase 4: 覆核機制（controlled/medical 出庫）
     // 覆核狀態
     @Column({ type: 'varchar', length: 20, nullable: true })

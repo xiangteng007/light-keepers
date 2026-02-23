@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException, ForbiddenException, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Account, Role, PagePermission } from './entities';
@@ -6,6 +6,7 @@ import { FirebaseAdminService } from '../auth/services/firebase-admin.service';
 
 @Injectable()
 export class AccountsService {
+    private readonly logger = new Logger(AccountsService.name);
     constructor(
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
@@ -414,13 +415,13 @@ export class AccountsService {
         });
 
         if (!account) {
-            console.warn(`[AccountsService] Cannot assign role: account ${accountId} not found`);
+            this.logger.warn(`Cannot assign role: account ${accountId} not found`);
             return;
         }
 
         const role = await this.roleRepository.findOne({ where: { name: roleName } });
         if (!role) {
-            console.warn(`[AccountsService] Cannot assign role: role ${roleName} not found`);
+            this.logger.warn(`Cannot assign role: role ${roleName} not found`);
             return;
         }
 
@@ -433,9 +434,9 @@ export class AccountsService {
         if (!hasRole) {
             account.roles.push(role);
             await this.accountRepository.save(account);
-            console.log(`[AccountsService] Assigned role ${roleName} to account ${accountId}`);
+            this.logger.log(`Assigned role ${roleName} to account ${accountId}`);
         } else {
-            console.log(`[AccountsService] Account ${accountId} already has role ${roleName}`);
+            this.logger.log(`Account ${accountId} already has role ${roleName}`);
         }
     }
 
@@ -450,7 +451,7 @@ export class AccountsService {
         });
 
         if (!account) {
-            console.warn(`[AccountsService] Cannot remove role: account ${accountId} not found`);
+            this.logger.warn(`Cannot remove role: account ${accountId} not found`);
             return;
         }
 
@@ -463,9 +464,9 @@ export class AccountsService {
 
         if (account.roles.length < originalCount) {
             await this.accountRepository.save(account);
-            console.log(`[AccountsService] Removed role ${roleName} from account ${accountId}`);
+            this.logger.log(`Removed role ${roleName} from account ${accountId}`);
         } else {
-            console.log(`[AccountsService] Account ${accountId} did not have role ${roleName}`);
+            this.logger.log(`Account ${accountId} did not have role ${roleName}`);
         }
     }
 }
