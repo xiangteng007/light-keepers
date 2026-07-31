@@ -34,22 +34,31 @@ import './styles/manuals-page.css'
  * 5 = 系統擁有者
  */
 function App() {
-  const {
-    needRefresh: [needRefresh, setNeedRefresh],
-    updateServiceWorker,
-  } = useRegisterSW({
-    onRegistered(r) {
-      console.log('SW Registered:', r)
-    },
-    onRegisterError(error) {
-      console.log('SW registration error', error)
-    },
-  })
+  // Guard PWA registration — failures should not crash the entire app
+  let needRefresh = false;
+  let setNeedRefresh = (_v: boolean) => { /* noop */ };
+  let updateServiceWorker = async (_reloadPage?: boolean) => { /* noop */ };
+
+  try {
+    const swResult = useRegisterSW({
+      onRegistered(r) {
+        console.log('SW Registered:', r)
+      },
+      onRegisterError(error) {
+        console.log('SW registration error', error)
+      },
+    });
+    needRefresh = swResult.needRefresh[0];
+    setNeedRefresh = swResult.needRefresh[1];
+    updateServiceWorker = swResult.updateServiceWorker;
+  } catch (err) {
+    console.warn('[App] PWA registration hook failed, continuing without SW:', err);
+  }
 
   return (
     <ThemeProvider>
-    <RealtimeProvider>
-      <AuthProvider>
+    <AuthProvider>
+      <RealtimeProvider>
         <EmergencyProvider>
         {/* PWA Update Prompt */}
         {needRefresh && (
@@ -86,8 +95,8 @@ function App() {
           {domainRoutes}
         </Routes>
         </EmergencyProvider>
-      </AuthProvider>
-    </RealtimeProvider>
+      </RealtimeProvider>
+    </AuthProvider>
     </ThemeProvider>
   )
 }
