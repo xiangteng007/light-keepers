@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MeshController } from './mesh.controller';
 import { MeshSyncService } from './mesh-sync.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('MeshController', () => {
     let controller: MeshController;
@@ -17,7 +18,10 @@ describe('MeshController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [MeshController],
             providers: [{ provide: MeshSyncService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<MeshController>(MeshController);
     });

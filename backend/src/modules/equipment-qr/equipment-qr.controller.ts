@@ -1,10 +1,14 @@
-import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { EquipmentQrService } from './equipment-qr.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Equipment QR API')
 @ApiBearerAuth()
 @Controller('equipment-qr')
+// 定級理由：裝備清單與 QR 查詢屬現場志工日常唯讀需求（L1）；登錄、領用、歸還、維護等異動屬庫管寫入作業，逐一提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class EquipmentQrController {
     constructor(private readonly service: EquipmentQrService) { }
 
@@ -27,12 +31,14 @@ export class EquipmentQrController {
     }
 
     @Post('register')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：建立裝備主檔
     @ApiOperation({ summary: '登錄新裝備' })
     register(@Body() data: any) {
         return this.service.registerEquipment(data);
     }
 
     @Post('checkout')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：裝備領用需由幹部核發（沿用盤點初判）
     @ApiOperation({ summary: '領用裝備' })
     checkout(@Body() data: { qrCode: string; userId: string; userName: string; expectedReturnAt?: string }) {
         return this.service.checkout(
@@ -44,6 +50,7 @@ export class EquipmentQrController {
     }
 
     @Post('return/:recordId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：歸還驗收含損壞狀態判定
     @ApiOperation({ summary: '歸還裝備' })
     returnEquipment(
         @Param('recordId') recordId: string,
@@ -77,12 +84,14 @@ export class EquipmentQrController {
     }
 
     @Post('maintenance/schedule')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：維護排程
     @ApiOperation({ summary: '排程維護' })
     scheduleMaintenance(@Body() data: any) {
         return this.service.scheduleMaintenance(data);
     }
 
     @Patch('maintenance/:scheduleId/complete')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：結案維護紀錄
     @ApiOperation({ summary: '完成維護' })
     completeMaintenance(@Param('scheduleId') scheduleId: string) {
         return { success: this.service.completeMaintenance(scheduleId) };

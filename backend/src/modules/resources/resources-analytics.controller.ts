@@ -1,9 +1,11 @@
 import { Controller, Get, Query, UseGuards } from '@nestjs/common';
 import { ResourcesAnalyticsService } from './resources-analytics.service';
-import { CoreJwtGuard } from '../shared/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @Controller('resources/analytics')
-@UseGuards(CoreJwtGuard)
+// 定級理由：物資分析報表揭露全域庫存水位、過期與缺料弱點，屬幹部層級的營運研判資料（L2）；原本僅有 CoreJwtGuard（任何登入者可讀），補上角色判斷。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class ResourcesAnalyticsController {
     constructor(private readonly analyticsService: ResourcesAnalyticsService) { }
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LabelPrintController } from './label-print.controller';
 import { LabelPrintService } from './label-print.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('LabelPrintController', () => {
     let controller: LabelPrintController;
@@ -17,7 +18,10 @@ describe('LabelPrintController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [LabelPrintController],
             providers: [{ provide: LabelPrintService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<LabelPrintController>(LabelPrintController);
     });

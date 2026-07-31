@@ -18,8 +18,10 @@ import {
     Res,
     HttpCode,
     HttpStatus,
+    UseGuards,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { SocialMediaMonitorService } from './social-media-monitor.service';
 import { NotificationService } from './services/notification.service';
@@ -37,6 +39,9 @@ import {
 
 @ApiTags('Social Media Monitor v3.0 (社群監視)')
 @Controller('social-monitor')
+// 定級理由：社群輿情監控屬營運情報（含未公開的災情研判與來源帳號），最低幹部（L2）；破壞性清理與全站通知設定另提升至 L3。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class SocialMediaMonitorController {
     constructor(
         private readonly monitorService: SocialMediaMonitorService,
@@ -160,6 +165,7 @@ export class SocialMediaMonitorController {
 
     // ===== 資料清理 =====
     @Delete('purge')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 破壞性：批次刪除監控歷史資料
     @ApiOperation({ summary: '清除舊資料' })
     purgeOld(@Query('maxAgeHours') maxAgeHours?: number): { purged: number } {
         const purged = this.monitorService.purgeOld(maxAgeHours || 24);
@@ -174,18 +180,21 @@ export class SocialMediaMonitorController {
     }
 
     @Post('notifications')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 管理設定：全站告警派送規則
     @ApiOperation({ summary: '建立通知配置' })
     async createNotificationConfig(@Body() dto: CreateNotificationConfigDto) {
         return this.notificationService.createConfig(dto as any);
     }
 
     @Put('notifications/:id')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 管理設定：全站告警派送規則
     @ApiOperation({ summary: '更新通知配置' })
     async updateNotificationConfig(@Param('id') id: string, @Body() dto: Partial<CreateNotificationConfigDto>) {
         return this.notificationService.updateConfig(id, dto as any);
     }
 
     @Delete('notifications/:id')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 管理設定：全站告警派送規則
     @ApiOperation({ summary: '刪除通知配置' })
     async deleteNotificationConfig(@Param('id') id: string) {
         await this.notificationService.deleteConfig(id);

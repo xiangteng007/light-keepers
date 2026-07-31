@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { MapPackagesController } from './map-packages.controller';
 import { MapPackagesService } from './map-packages.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('MapPackagesController', () => {
     let controller: MapPackagesController;
@@ -15,7 +16,10 @@ describe('MapPackagesController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [MapPackagesController],
             providers: [{ provide: MapPackagesService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<MapPackagesController>(MapPackagesController);
     });

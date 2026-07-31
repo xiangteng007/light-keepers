@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { LabelTemplatesController } from './label-templates.controller';
 import { LabelTemplatesService } from './label-templates.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('LabelTemplatesController', () => {
     let controller: LabelTemplatesController;
@@ -19,7 +20,10 @@ describe('LabelTemplatesController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [LabelTemplatesController],
             providers: [{ provide: LabelTemplatesService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<LabelTemplatesController>(LabelTemplatesController);
     });

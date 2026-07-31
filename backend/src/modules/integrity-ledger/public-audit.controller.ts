@@ -10,8 +10,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PublicAuditLog } from './entities/supply-chain-block.entity';
 import { Request } from 'express';
+import { Public } from '../shared/guards';
 
 @ApiTags('transparency')
+// 定級理由：設計上即為「無需登入的物資流向查詢」責信端點（憑收據編號查詢、僅回傳已公開之物流履歷），default-deny 下補標 @Public() 使其真正可用。
+@Public()
 @Controller('api/public/transparency')
 export class PublicAuditController {
     constructor(

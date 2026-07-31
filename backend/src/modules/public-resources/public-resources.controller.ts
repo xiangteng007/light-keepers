@@ -4,7 +4,10 @@ import {
     Query,
 } from '@nestjs/common';
 import { PublicResourcesService, Shelter, AedLocation } from './public-resources.service';
+import { Public } from '../shared/guards';
 
+// 定級理由：避難收容所與 AED 位置屬救命用公開資訊（全為唯讀、無個資），與 PublicController(Level 0) 同性質，default-deny 下補標 @Public()。
+@Public()
 @Controller('public-resources')
 export class PublicResourcesController {
     constructor(private readonly publicResourcesService: PublicResourcesService) { }

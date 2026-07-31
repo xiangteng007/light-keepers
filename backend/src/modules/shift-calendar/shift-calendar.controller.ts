@@ -1,13 +1,18 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ShiftCalendarService } from './shift-calendar.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('排班管理')
 @Controller('shift-calendar')
+// 定級理由：班表／空缺／模板查詢為志工自身排班所需（L1）；建立、修改、刪除、換班、複製週班表屬排班管理寫入，提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class ShiftCalendarController {
     constructor(private readonly service: ShiftCalendarService) { }
 
     @Post()
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：指派他人班次
     @ApiOperation({ summary: '建立班次' })
     @ApiResponse({ status: 201, description: '班次已建立' })
     @ApiBearerAuth()
@@ -36,6 +41,7 @@ export class ShiftCalendarController {
     }
 
     @Put(':shiftId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：修改班次
     @ApiOperation({ summary: '更新班次' })
     @ApiResponse({ status: 200, description: '班次已更新' })
     @ApiBearerAuth()
@@ -44,6 +50,7 @@ export class ShiftCalendarController {
     }
 
     @Delete(':shiftId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：刪除班次
     @ApiOperation({ summary: '刪除班次' })
     @ApiResponse({ status: 200, description: '班次已刪除' })
     @ApiBearerAuth()
@@ -52,6 +59,7 @@ export class ShiftCalendarController {
     }
 
     @Post('swap')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：換班需幹部核可
     @ApiOperation({ summary: '交換班次' })
     @ApiResponse({ status: 200, description: '交換成功' })
     @ApiBearerAuth()
@@ -60,6 +68,7 @@ export class ShiftCalendarController {
     }
 
     @Post('copy-week')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：批次產生班表
     @ApiOperation({ summary: '複製週排班' })
     @ApiResponse({ status: 200, description: '複製成功' })
     @ApiBearerAuth()

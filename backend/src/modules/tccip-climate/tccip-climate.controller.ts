@@ -1,9 +1,13 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { TccipClimateService } from './tccip-climate.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('TCCIP Climate 氣候資料')
 @Controller('api/climate')
+// 定級理由：全為唯讀的氣候趨勢／脆弱度／歷史災害統計（TCCIP 開放資料轉譯），無寫入端點，最低登記志工（L1）。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class TccipClimateController {
     constructor(private readonly climateService: TccipClimateService) { }
 

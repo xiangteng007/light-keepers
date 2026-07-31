@@ -1,11 +1,15 @@
-import { Controller, Post, Get, Body, Param, Request, ForbiddenException, Query } from '@nestjs/common';
+import { Controller, Post, Get, Body, Param, Request, ForbiddenException, Query, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { LabelPrintService } from './label-print.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 /**
  * 貼紙列印 API
  */
 @Controller('labels')
+// 定級理由：列印歷史查詢為倉儲作業唯讀（L1）；產生／重印／作廢貼紙會影響管制品追溯，宣告 L2（各 handler 內既有的「roleLevel >= 3 或 role === 倉管」檢查更嚴，維持不動，兩者取交集）。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class LabelPrintController {
     constructor(private readonly labelPrintService: LabelPrintService) { }
 
@@ -14,6 +18,7 @@ export class LabelPrintController {
      * POST /api/labels/generate/lot
      */
     @Post('generate/lot')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：產生批次貼紙
     async generateLotLabel(
         @Body() body: {
             lotId: string;
@@ -40,6 +45,7 @@ export class LabelPrintController {
      * POST /api/labels/generate/assets
      */
     @Post('generate/assets')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：批次產生資產貼紙
     async generateAssetLabels(
         @Body() body: {
             assetIds: string[];
@@ -66,6 +72,7 @@ export class LabelPrintController {
      * POST /api/labels/reprint
      */
     @Post('reprint')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：重印貼紙（追溯風險）
     async reprintLabel(
         @Body() body: {
             targetType: 'lot' | 'asset';
@@ -94,6 +101,7 @@ export class LabelPrintController {
      * POST /api/labels/revoke
      */
     @Post('revoke')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：作廢貼紙
     async revokeLabel(
         @Body() body: {
             targetType: 'lot' | 'asset';

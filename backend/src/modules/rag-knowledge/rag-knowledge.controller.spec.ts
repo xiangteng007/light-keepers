@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { RagKnowledgeController } from './rag-knowledge.controller';
 import { RagKnowledgeService } from './rag-knowledge.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('RagKnowledgeController', () => {
     let controller: RagKnowledgeController;
@@ -16,7 +17,10 @@ describe('RagKnowledgeController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [RagKnowledgeController],
             providers: [{ provide: RagKnowledgeService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<RagKnowledgeController>(RagKnowledgeController);
     });

@@ -1,9 +1,13 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { PerformanceReportService } from './performance-report.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Performance 績效報表')
 @Controller('api/performance')
+// 定級理由：績效報表可查詢任意志工／團隊／區域的個人績效並可匯出，屬幹部以上的人事管理用途，整份 controller 一律 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class PerformanceReportController {
     constructor(private readonly reportService: PerformanceReportService) { }
 

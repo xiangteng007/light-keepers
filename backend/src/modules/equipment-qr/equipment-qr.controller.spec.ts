@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EquipmentQrController } from './equipment-qr.controller';
 import { EquipmentQrService } from './equipment-qr.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('EquipmentQrController', () => {
     let controller: EquipmentQrController;
@@ -26,7 +27,10 @@ describe('EquipmentQrController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [EquipmentQrController],
             providers: [{ provide: EquipmentQrService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<EquipmentQrController>(EquipmentQrController);
     });

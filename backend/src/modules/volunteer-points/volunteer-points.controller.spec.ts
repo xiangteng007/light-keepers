@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VolunteerPointsController } from './volunteer-points.controller';
 import { VolunteerPointsService } from './volunteer-points.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('VolunteerPointsController', () => {
     let controller: VolunteerPointsController;
@@ -20,7 +21,10 @@ describe('VolunteerPointsController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [VolunteerPointsController],
             providers: [{ provide: VolunteerPointsService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<VolunteerPointsController>(VolunteerPointsController);
     });
 
