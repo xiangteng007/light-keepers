@@ -72,7 +72,7 @@ export class RateLimitGuard implements CanActivate {
 
         // Get current count
         const countKey = `ratelimit:count:${key}`;
-        let count = await this.cache.get<number>(countKey) || 0;
+        const count = await this.cache.get<number>(countKey) || 0;
 
         if (count >= config.points) {
             // Block the user

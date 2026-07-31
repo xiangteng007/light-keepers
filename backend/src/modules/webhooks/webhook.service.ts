@@ -222,7 +222,7 @@ export class WebhookService {
     async getDeliveries(webhookId?: string, limit = 50): Promise<WebhookDelivery[]> {
         const deliveries = await this.cache.get<WebhookDelivery[]>(this.DELIVERIES_KEY) || [];
 
-        let filtered = webhookId
+        const filtered = webhookId
             ? deliveries.filter(d => d.webhookId === webhookId)
             : deliveries;
 
