@@ -69,7 +69,6 @@ import { PrometheusModule } from './modules/prometheus/prometheus.module';
 // Batch 3: Low Side-Effect Modules (CRUD-only)
 // ==============================================
 // Dashboard & Visualization (Note: DashboardModule has no module file)
-import { TimelineVisualizationModule } from './modules/timeline-visualization/timeline-visualization.module';
 // Reports
 import { PerformanceReportModule } from './modules/performance-report/performance-report.module';
 // Operations
@@ -80,7 +79,6 @@ import { ReunificationModule } from './modules/reunification/reunification.modul
 import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module';
 // Volunteer
 import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module';
-import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module';
 // Equipment & Misc
 import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module';
 // REMOVED: MockDataModule - deleted
@@ -95,7 +93,6 @@ import { Fire119Module } from './modules/fire-119/fire-119.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
-import { TranslationModule } from './modules/translation/translation.module';
 // Scheduling & Dispatch
 // Weather & Climate
 import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module';
@@ -137,8 +134,6 @@ import { WaterResourcesModule } from './modules/water-resources/water-resources.
 // Communication
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
 // RealtimeChatModule - CONSOLIDATED into RealtimeModule
-import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
-import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
 // Infrastructure
 import { SentryModule } from './modules/sentry/sentry.module';
 // REMOVED: NfcModule - hardware dependent, use QR instead
@@ -286,7 +281,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Batch 3: Low Side-Effect Modules (CRUD-only)
         // ==============================================
         // Dashboard & Visualization
-        TimelineVisualizationModule, // 📅 時間軸視覺化
         // Reports
         PerformanceReportModule, // 📊 效能報告
         // Operations
@@ -297,7 +291,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         PsychologicalSupportModule, // 🧠 心理支援
         // Volunteer
         VolunteerPointsModule, // ⭐ 志工積分
-        VolunteerCertificationModule, // 🎓 志工認證
         // Equipment & Misc
         EquipmentQrModule, // 📱 裝備 QR 碼
         // REMOVED: MockDataModule, SwaggerAutoDocsModule - deleted
@@ -311,7 +304,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
         FatigueDetectionModule, // 😴 疲勞偵測
-        TranslationModule, // 🌐 翻譯服務
         // Scheduling & Dispatch
         // Weather & Climate
         TccipClimateModule, // 🌦️ TCCIP 氣候資料
@@ -338,8 +330,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Communication
         // REMOVED: BluetoothAudioModule - hardware dependent
         // RealtimeChatModule - CONSOLIDATED into RealtimeModule
-        SpeechToTextModule, // 🎤 語音轉文字
-        VoiceAssistantModule, // 🗣️ 語音助理
         // Infrastructure
         SentryModule, // 🐛 Sentry 監控
         // REMOVED: NfcModule - hardware dependent, use QR instead
