@@ -218,6 +218,19 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 - **影響範圍**: `infra/`、docker-compose、env 組態、storage/LLM provider、資料搬遷腳本；**業務程式碼近乎不動**。
 - **風險**: 中——資料搬遷（DB＋檔案）需一次性停機窗口與備援演練；NAS 單點故障需備份策略（每日 pg_dump＋檔案快照，異地一份）；本地 LLM 品質需以現有 line-bot 災情分類案例做對測驗收。
 - **驗收**: NAS 上全棧啟動且 e2e 綠燈；LINE webhook/FCM 實測可達；本地 LLM 對測通過既有分類案例 ≥ 現行準確率的 90%；演練「從備份完整還原」一次；文件化回雲程序。
+- **D12 落地後的目標拓撲（2026-08-01 更新）**:
+  ```
+  Internet ─ Cloudflare Tunnel（D14 建議）─┐
+                                           ▼
+  NAS AS5404T（ADM Docker，NVMe RAID 10）: nginx → backend(NestJS) → PostGIS
+      │  HDD RAID 6：每日 pg_dump＋uploads 快照（異地一份→Mac mini 或雲端冷儲存）
+      │
+      └─ 內網 2.5GbE ─→ RTX 5090 工作站：Ollama serve（Qwen2.5-32B/14B）
+                          backend 的 LLM provider 以 OpenAI-compatible API 呼叫
+                          工作站離線時 fallback：佇列暫存或雲端 API（依 D13 混合策略）
+  Mac mini：備援/中轉（既有 ST/iCloud 用途不變，可兼任備份第二副本）
+  ```
+  N5105＋16GB 承載評估：NestJS＋PostGIS＋nginx 對協會規模（百人級並發）足夠；AI 推論、PDF 大量產出等重活不落在 NAS。
 
 ### 跨切面
 
@@ -348,6 +361,7 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | D7 | 正式 DB 操作窗口 | **依建議**：提前兩週排程、附備份確認 | P1 baseline、P5 索引、Phase M 搬遷停機皆循此程序 |
 | D9 | 多租戶 | **降級為單租戶** | DA-2 走 (a) 路線：廢 TenantGuard、ADR-001 標 superseded、tenants 模組降為組織資料管理；省去核心表加 tenantId 的大工程；工作項 4.1 風險由 🔴 降為 🟡 |
 | D10 | 41 個純 stub 模組 | **刪除** | BE-4 走刪除路線（工作項 4.2）：先出 app.module import 依賴圖確認無隱性依賴，分批刪除＋CI 綠燈；同時大幅縮小 Gemini 依賴面，利於 Phase M 的本地 LLM 切換 |
+| D12 | NAS 硬體規格 | **已提供（2026-08-01）**：ASUSTOR AS5404T（Nimbustor 4 Gen2）、Celeron N5105 4C4T、16GB DDR4、ADM 5.1.1、4-bay HDD（RAID 6）＋4× M.2 NVMe（規劃 RAID 10 供 Docker/DB）、2× 2.5GbE。**同內網另有 RTX 5090 AI 工作站、Mac mini、中華電信固定 IP、TP-Link 網路** | Phase M 架構修正（見 INF-1 補充）：NAS 只跑 Docker 應用棧（backend＋PostGIS＋nginx，N5105/16GB 對協會規模足夠；DB volume 放 NVMe RAID 10）；**LLM 推論不在 NAS 上跑，走 RTX 5090 工作站**（Ollama/LM Studio server mode，backend 以 OpenAI-compatible endpoint 經內網呼叫）；HDD RAID 6 池承接備份（每日 pg_dump＋檔案快照） |
 
 ### 待 Owner 拍板的方向題（尚未決）
 
@@ -361,8 +375,8 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | D8 | Resources domain 是否動刀 | 待 6.1 分析報告 | 報告後再決 |
 | D11 | 多語系是真需求嗎？（現況 0/137 頁使用，13 語系檔 10 個未註冊） | 若是，工作量≈從零開始 | 需 owner 確認服務對象語言構成 |
 | D12 | **NAS 硬體與規格**：現有 NAS 型號/CPU/RAM/是否有 GPU？ | 決定本地 LLM 選型上限（無 GPU → 小模型或外接推論機）與 Docker 可行性 | 提供型號後由 OPUS 評估 |
-| D13 | **本地 LLM 模型選型**：中文災情分類場景 | 建議候選：Qwen2.5 7B/14B（中文強）、gemma-2 9B；以既有 line-bot 分類案例對測定案 | 對測後定案；亦可混合：本地為主、保留雲端 API 為 fallback |
-| D14 | **對外通道方式**：Cloudflare Tunnel（免開 port、建議）或自管反代＋固定 IP？ | LINE webhook/FCM/外部使用者存取都依賴此 | 建議 Cloudflare Tunnel |
+| D13 | **本地 LLM 模型選型**：中文災情分類場景 | D12 確認推論主機為 **RTX 5090（32GB VRAM）** → 選型上限大幅提高：建議 **Qwen2.5-32B-Instruct**（品質優先）或 14B（延遲優先），Ollama 起 server mode；以既有 line-bot 分類案例對測定案 | 對測後定案；混合模式：本地為主、保留雲端 API 為 fallback。**新增考量：工作站是桌機，需確認 24/7 開機意願**——若否，分類任務走「工作站在線→本地、離線→fallback」策略 |
+| D14 | **對外通道方式** | D12 確認有**中華電信固定 IP** → 兩案皆可行：(a) Cloudflare Tunnel（仍建議：隱藏 IP、免開 port、擋 DDoS）(b) 固定 IP 直連＋nginx＋Let's Encrypt（延遲較低，需自管防火牆） | 建議仍取 (a)；LINE webhook 對來源 IP 無要求，Tunnel 完全相容 |
 | D15 | **搬遷停機窗口與租約到期日** | 決定 Phase M 是否插隊到 P1 之後 | 告知到期日後排定 |
 
 ---
