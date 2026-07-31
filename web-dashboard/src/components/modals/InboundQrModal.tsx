@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Modal, Form, Button, Alert, Badge } from 'react-bootstrap';
-import api from '../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 
 interface InboundQrModalProps {
     show: boolean;
@@ -63,7 +64,7 @@ export default function InboundQrModal({
                 onSuccess();
             }
         } catch (err: any) {
-            alert(`❌ 產生失敗：${err.response?.data?.message || '未知錯誤'}`);
+            alert(`❌ 產生失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         } finally {
             setLoading(false);
         }

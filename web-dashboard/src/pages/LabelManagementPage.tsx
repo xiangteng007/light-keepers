@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Form, Alert, Badge, Modal } from 'react-bootstrap';
-import api from '../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 interface LabelTemplate {
     id: string;
@@ -46,7 +47,7 @@ export default function LabelManagementPage() {
             const response = await api.get('/label-templates');
             setTemplates(response.data || []);
         } catch (err: any) {
-            setError(err.response?.data?.message || '載入失敗');
+            setError(getApiErrorMessage(err, '載入失敗'));
         } finally {
             setLoading(false);
         }
@@ -80,7 +81,7 @@ export default function LabelManagementPage() {
             fetchTemplates();
             resetTemplateForm();
         } catch (err: any) {
-            alert(`❌ 創建失敗：${err.response?.data?.message || '未知錯誤'}`);
+            alert(`❌ 創建失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         } finally {
             setLoading(false);
         }
@@ -103,7 +104,7 @@ export default function LabelManagementPage() {
             alert(`✅ 模板已${!isActive ? '啟用' : '停用'}`);
             fetchTemplates();
         } catch (err: any) {
-            alert(`❌ 更新失敗：${err.response?.data?.message || '未知錯誤'}`);
+            alert(`❌ 更新失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         }
     };
 

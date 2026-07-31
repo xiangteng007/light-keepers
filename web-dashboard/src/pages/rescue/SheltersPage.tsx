@@ -24,7 +24,8 @@ import {
     Loader2,
     RefreshCw,
 } from 'lucide-react';
-import api from '../../utils/api';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import { Alert } from '../../design-system';
 import './SheltersPage.css';
 
@@ -63,7 +64,7 @@ export default function SheltersPage() {
             setShelters(Array.isArray(data) ? data : (data?.data || []));
         } catch (err: any) {
             console.error('Failed to fetch shelters:', err);
-            setError(err?.response?.data?.message || '無法載入避難所資料');
+            setError(getApiErrorMessage(err, '無法載入避難所資料'));
             setShelters([]);
         } finally {
             setLoading(false);

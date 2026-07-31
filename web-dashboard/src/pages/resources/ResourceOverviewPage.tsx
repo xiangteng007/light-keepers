@@ -9,7 +9,8 @@ import {
     Package, AlertCircle, Truck, Shield, Search, Download,
 } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
-import api from '../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './ResourceOverviewPage.css';
 
 interface Resource {
@@ -62,7 +63,7 @@ export default function ResourceOverviewPage() {
             setEqStats(eqStatsRes.data || null);
         } catch (err: any) {
             console.error('Failed to fetch overview:', err);
-            setError(err.response?.data?.message || err.message || '無法載入資料');
+            setError(getApiErrorMessage(err, '無法載入資料'));
         } finally {
             setLoading(false);
         }

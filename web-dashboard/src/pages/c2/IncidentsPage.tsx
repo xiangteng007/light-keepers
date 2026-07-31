@@ -7,7 +7,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { AlertTriangle, Clock, CheckCircle, XCircle, Plus, MapPin, Users, Loader2, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
-import api from '../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './IncidentsPage.css';
 
 interface Incident {
@@ -61,7 +62,7 @@ export default function IncidentsPage() {
             setIncidents(items);
         } catch (err: any) {
             console.error('Failed to fetch incidents:', err);
-            setError(err?.response?.data?.message || '無法載入事件列表');
+            setError(getApiErrorMessage(err, '無法載入事件列表'));
             setIncidents([]);
         } finally {
             setLoading(false);

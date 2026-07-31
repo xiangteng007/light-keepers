@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert, Badge, Table } from 'react-bootstrap';
-import api from '../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 interface SensitiveReadLog {
     id: string;
@@ -70,7 +71,7 @@ export default function SensitiveAuditPage() {
             });
             setReadLogs(response.data.logs || []);
         } catch (err: any) {
-            setError(err.response?.data?.message || '載入失敗');
+            setError(getApiErrorMessage(err, '載入失敗'));
         } finally {
             setLoading(false);
         }
@@ -90,7 +91,7 @@ export default function SensitiveAuditPage() {
             });
             setPrintLogs(response.data.logs || []);
         } catch (err: any) {
-            setError(err.response?.data?.message || '載入失敗');
+            setError(getApiErrorMessage(err, '載入失敗'));
         } finally {
             setLoading(false);
         }
