@@ -3,10 +3,11 @@
  * 模組 C: REST API
  */
 
-import { Controller, Get, Post, Body, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, Req, UseGuards, UseInterceptors, ForbiddenException } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
+import { AuthenticatedRequest } from '../../common/types/request.types';
 import { MoodTrackerService } from './mood-tracker.service';
 import { PFAChatbotService } from './pfa-chatbot.service';
 
@@ -15,8 +16,8 @@ import { PFAChatbotService } from './pfa-chatbot.service';
 //   （對應前台 care/MyMoodPage，若拉高等級等同讓最需要支持的基層志工用不到）。
 // 跨人員的心理健康彙整（團隊趨勢、需關注名單、統計）屬「讀他人特種個資」，且「需關注名單」
 //   直接點名高風險個人，外洩會造成二次傷害 → 收緊 L3（常務理事，對齊 sensitive-audit 的 L3 閘門）。
-// 殘留風險：mood/chat 相關端點以 path param 帶 userId 且無擁有者比對，L1 仍可查他人心情與對話紀錄
-//   （IDOR），這是本模組最高風險項，須另案以 ResourceOwnerGuard／改由 JWT 取 userId 修補。
+// IDOR 修補：寫入端點（mood/chat/blessings）的 userId 一律以 JWT sub 覆寫；讀取端點
+//   （history/summary/chat history）僅允許本人，或 L3+ 讀他人（對齊 attention 名單的 L3 閘門）。
 // 🔐 F-M2 敏感資料遮罩：心理健康屬特種個資，此處掛載可讓夾帶的聯絡欄位（如需關注名單附帶的
 // 電話／Email）對 L1-L2 遮罩。注意這不會遮罩 mood 分數本身，上方註記的 IDOR 殘留風險仍須另案修補。
 @ApiTags('care')
@@ -30,12 +31,22 @@ export class MoodTrackerController {
         private readonly chatbotService: PFAChatbotService,
     ) { }
 
+    /** 本人放行；讀他人需 L3+（心理健康屬特種個資） */
+    private assertCanAccessUser(req: AuthenticatedRequest, targetUserId: string): void {
+        const requesterId = req.user?.sub ?? req.user?.id;
+        const roleLevel = req.user?.roleLevel ?? 0;
+        if (targetUserId !== requesterId && roleLevel < ROLE_LEVELS.DIRECTOR) {
+            throw new ForbiddenException('僅能查詢本人的心理健康記錄');
+        }
+    }
+
     // ==================== 心情記錄 ====================
 
     @Post('mood')
     @ApiOperation({ summary: '記錄心情分數' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async logMood(
+        @Req() req: AuthenticatedRequest,
         @Body() body: {
             userId: string;
             score: number;
@@ -44,7 +55,8 @@ export class MoodTrackerController {
             taskId?: string;
         }
     ) {
-        const log = await this.moodService.logMood(body);
+        // IDOR 防護：不信任 body.userId，一律以 JWT 身分寫入
+        const log = await this.moodService.logMood({ ...body, userId: req.user?.sub ?? body.userId });
         return {
             success: true,
             data: log,
@@ -56,9 +68,11 @@ export class MoodTrackerController {
     @ApiOperation({ summary: '取得心情歷史' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getMoodHistory(
+        @Req() req: AuthenticatedRequest,
         @Param('userId') userId: string,
         @Query('days') days?: string
     ) {
+        this.assertCanAccessUser(req, userId);
         const history = await this.moodService.getUserMoodHistory(
             userId,
             parseInt(days || '30')
@@ -72,7 +86,8 @@ export class MoodTrackerController {
     @Get('mood/summary/:userId')
     @ApiOperation({ summary: '取得心情摘要' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
-    async getMoodSummary(@Param('userId') userId: string) {
+    async getMoodSummary(@Req() req: AuthenticatedRequest, @Param('userId') userId: string) {
+        this.assertCanAccessUser(req, userId);
         const summary = await this.moodService.getUserMoodSummary(userId);
         return {
             success: true,
@@ -123,6 +138,7 @@ export class MoodTrackerController {
     @ApiOperation({ summary: '發送祝福訊息' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async postBlessing(
+        @Req() req: AuthenticatedRequest,
         @Body() body: {
             userId?: string;
             displayName: string;
@@ -130,7 +146,8 @@ export class MoodTrackerController {
             iconType?: string;
         }
     ) {
-        const blessing = await this.moodService.postBlessing(body);
+        // IDOR 防護：祝福以 JWT 身分發送（displayName 仍可自訂暱稱）
+        const blessing = await this.moodService.postBlessing({ ...body, userId: req.user?.sub ?? body.userId });
         return {
             success: true,
             data: blessing,
@@ -155,14 +172,16 @@ export class MoodTrackerController {
     @ApiOperation({ summary: '與 HopeBot 對話' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async chat(
+        @Req() req: AuthenticatedRequest,
         @Body() body: {
             userId: string;
             sessionId: string;
             message: string;
         }
     ) {
+        // IDOR 防護：對話身分以 JWT 為準
         const result = await this.chatbotService.chat(
-            body.userId,
+            req.user?.sub ?? body.userId,
             body.sessionId,
             body.message
         );
@@ -176,9 +195,11 @@ export class MoodTrackerController {
     @ApiOperation({ summary: '取得對話歷史' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getChatHistory(
+        @Req() req: AuthenticatedRequest,
         @Param('userId') userId: string,
         @Query('sessionId') sessionId?: string
     ) {
+        this.assertCanAccessUser(req, userId);
         const history = await this.chatbotService.getChatHistory(userId, sessionId);
         return {
             success: true,
