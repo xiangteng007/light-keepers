@@ -4,6 +4,22 @@
     gap: 20px;
 }
 
+.spin {
+    animation: webhooks-spin 1s linear infinite;
+}
+
+@keyframes webhooks-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.empty-state {
+    text-align: center;
+    padding: 2rem;
+    color: rgba(255, 255, 255, 0.5);
+}
+
 .webhooks-page__header {
     display: flex;
     justify-content: space-between;

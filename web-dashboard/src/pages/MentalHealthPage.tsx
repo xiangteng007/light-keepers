@@ -1,8 +1,17 @@
 /**
  * MentalHealthPage.tsx
- * 
+ *
  * Mental health support and self-assessment page
  * Features: Mood tracking, PHQ-9/GAD-7 questionnaires, Blessing wall, AI chatbot
+ *
+ * FE-4/3.3: 本頁的心情記錄/祈福牆/聊天功能仍是前端寫死假資料與本地假 AI 回應。
+ * 後端確實存在對應模組（backend/src/modules/psychological-support，含
+ * mood-tracker.controller.ts、pfa-chatbot.service.ts），但該 controller 宣告
+ * `@Controller('api/care')`，疊加全域前綴 `api/v1` 後實際路徑變成
+ * `/api/v1/api/care/...`（雙重 /api/v1/api 前綴 bug，同樣影響 pages/care/MyMoodPage.tsx
+ * 等另外 18+ 個以 `@Controller('api/...')` 宣告的 controller），並非 FE 可直接呼叫的正常路徑。
+ * 在 Phase 4/5 修正該後端路徑前綴 bug 之前，本頁維持示範資料並以明顯 banner 標示，
+ * 不接上會 404 的端點。PHQ-9/GAD-7 問卷則完全沒有對應後端儲存端點。
  */
 import React, { useState, useEffect } from 'react';
 import {
@@ -12,6 +21,7 @@ import {
     BlessingWall,
     PFAChatbot,
 } from '../components/mental-health';
+import { Alert } from '../design-system';
 import { createLogger } from '../utils/logger';
 import './MentalHealthPage.css';
 
@@ -94,6 +104,11 @@ export default function MentalHealthPage() {
                 <a href="tel:1925">1925 安心專線</a>
                 <span>24小時免費專人服務</span>
             </div>
+
+            <Alert variant="warning" title="示範資料">
+                此頁目前顯示示範資料，功能建置中。心情記錄、祈福牆、AI 聊聊回覆皆為前端本地模擬，
+                尚未儲存到後端。1925 安心專線為真實服務，可放心撥打。
+            </Alert>
 
             {/* Tabs */}
             <div className="mh-tabs">

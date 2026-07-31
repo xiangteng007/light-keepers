@@ -1,8 +1,13 @@
 /**
  * BiometricPage
  * WebAuthn biometric authentication settings
+ *
+ * FE-4/3.3: 後端目前無 WebAuthn/生物辨識模組（已掃描全庫，`backend/src/modules` 下無對應
+ * controller）。本頁仍顯示寫死的示範資料，並以明顯 banner 標示，避免使用者誤認為真實資料。
+ * 待 Phase 4/5 排入後端 WebAuthn API 後再接上。
  */
 import { useState } from 'react';
+import { Alert } from '../../design-system';
 import './BiometricPage.css';
 
 interface Credential {
@@ -51,6 +56,10 @@ export default function BiometricPage() {
                     <p>管理 FIDO2/WebAuthn 安全金鑰與生物辨識登入</p>
                 </div>
             </header>
+
+            <Alert variant="warning" title="示範資料">
+                此頁目前顯示示範資料，功能建置中。後端尚未提供 WebAuthn/生物辨識 API。
+            </Alert>
 
             <div className="biometric-page__info">
                 <div className="info-card">

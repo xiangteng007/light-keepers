@@ -1,8 +1,14 @@
 /**
  * SecurityPage
  * Security center with anomaly detection
+ *
+ * FE-4/3.3: 後端無對應「登入異常偵測」API。`backend/src/modules/staff-security` 名稱相近但功能
+ * 是人員實體安全（事件通報/簽到/疏散計畫），與本頁的登入異常警報（暴力破解/不可能移動等）是
+ * 不同領域，不可誤接。本頁仍顯示寫死示範資料，並以 banner 標示。待 Phase 4/5 評估是否新增
+ * 對應後端模組。
  */
 import { useState } from 'react';
+import { Alert } from '../../design-system';
 import './SecurityPage.css';
 
 interface AnomalyAlert {
@@ -59,6 +65,10 @@ export default function SecurityPage() {
                     </div>
                 </div>
             </header>
+
+            <Alert variant="warning" title="示範資料">
+                此頁目前顯示示範資料，功能建置中。後端尚未提供登入異常偵測 API。
+            </Alert>
 
             <div className="security-page__controls">
                 <button

@@ -23,7 +23,10 @@ import PageWrapper from '../components/layout/PageWrapper';
 export const domainRoutes = (
   <>
     {/* Mission Command Domain */}
-    <Route path="/domains/mission-command" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="mission-command"><MissionCommandPage /></PageWrapper></ProtectedRoute>} />
+    {/* FE-4/3.3: 真版頁面以 useParams<{missionSessionId}> 讀取場次 ID；:missionSessionId? 為選填，
+        未提供時頁面本身有「任務 ID 錯誤」的 graceful 錯誤態，不會 crash（見 pages/MissionCommandPage.tsx）。
+        目前站內無任何連結會帶入 ID，屬既有限制，供後續補上任務選擇器 UI。 */}
+    <Route path="/domains/mission-command/:missionSessionId?" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="mission-command"><MissionCommandPage /></PageWrapper></ProtectedRoute>} />
     <Route path="/domains/mission-command/triage" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="triage" /></ProtectedRoute>} />
     <Route path="/domains/mission-command/task-dispatch" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="task-dispatch" /></ProtectedRoute>} />
 
