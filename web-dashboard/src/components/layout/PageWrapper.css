@@ -1,0 +1,14 @@
+/* PageWrapper.css — legacy (children) content container */
+
+.page-content {
+    height: 100%;
+    overflow: auto;
+    padding: 16px;
+}
+
+/* Placeholder shown when a pageId has neither children nor a widget config */
+.page-content--placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
