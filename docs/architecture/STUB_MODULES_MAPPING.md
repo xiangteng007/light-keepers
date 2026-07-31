@@ -1,5 +1,10 @@
 # Light Keepers 空殼/Stub 模組功能對照表
 
+> ⚠️ **本文件已被推翻（SUPERSEDED）— 2026-07-31**
+> 本文件（v1.0，「檔案數 ≤ 2」口徑）的「75 個 stub」結論已被 `docs/architecture/STUB_MODULES_ANALYSIS_V2.md`（「Service 行數」口徑）推翻，v1 有 **97% 誤判**（絕大多數所謂 stub 其實有實質實作，只是檔案切分方式不同）。
+> V2 之後，`docs/FULL_SYSTEM_REDESIGN_PLAN.md`（2026-07-31）用第三種、更嚴謹的口徑（「無 controller 且無 entity」＝純記憶體 Map、無 HTTP 出口、無持久化）重新盤點，找到 **41 個真 stub**，與 V2 的「行數多」結論並不矛盾（行數多不代表有輸出/持久化）。Owner 已就這 41 個模組拍板決策 **D10：刪除**（見該計畫 §5 決策記錄、工作項 4.2）。
+> **本文件下方內容保留供歷史脈絡參考，請勿依此表執行任何刪除/合併動作**；最新模組計數請見 `docs/BASELINE_METRICS.md`，stub 處置請見 `docs/FULL_SYSTEM_REDESIGN_PLAN.md` §5 D10 與工作項 4.2。
+
 > **版本**: v1.0  
 > **日期**: 2026-02-01  
 > **識別標準**: 模組內檔案數 ≤ 2
