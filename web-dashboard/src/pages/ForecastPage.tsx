@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import './ForecastPage.css';
 
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // 類型定義
 interface WeatherElement {
@@ -138,13 +138,13 @@ export default function ForecastPage() {
         setError(null);
         try {
             // 使用一週預報 API 取得 7 天資料
-            const res = await fetch(`${API_BASE}/weather/weekly?county=${encodeURIComponent(selectedCounty)}`);
-            const data = await res.json();
+            const res = await api.get('/weather/weekly', { params: { county: selectedCounty } });
+            const data = res.data;
             if (data.success) {
                 setGeneralForecast(data.data || []);
             }
-        } catch {
-            setError('無法載入天氣預報');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入天氣預報'));
         } finally {
             setLoading(false);
         }
@@ -153,11 +153,11 @@ export default function ForecastPage() {
     const fetchMarineForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/weather/marine`);
-            const data = await res.json();
+            const res = await api.get('/weather/marine');
+            const data = res.data;
             if (data.success) setMarineForecast(data.data || []);
-        } catch {
-            setError('無法載入海面天氣');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入海面天氣'));
         } finally {
             setLoading(false);
         }
@@ -166,11 +166,11 @@ export default function ForecastPage() {
     const fetchTideForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/weather/tide`);
-            const data = await res.json();
+            const res = await api.get('/weather/tide');
+            const data = res.data;
             if (data.success) setTideForecast(data.data || []);
-        } catch {
-            setError('無法載入潮汐預報');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入潮汐預報'));
         } finally {
             setLoading(false);
         }
@@ -179,11 +179,11 @@ export default function ForecastPage() {
     const fetchMountainForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/weather/mountain`);
-            const data = await res.json();
+            const res = await api.get('/weather/mountain');
+            const data = res.data;
             if (data.success) setMountainForecast(data.data || []);
-        } catch {
-            setError('無法載入登山天氣');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入登山天氣'));
         } finally {
             setLoading(false);
         }
@@ -192,11 +192,11 @@ export default function ForecastPage() {
     const fetchScenicForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/weather/scenic`);
-            const data = await res.json();
+            const res = await api.get('/weather/scenic');
+            const data = res.data;
             if (data.success) setScenicForecast(data.data || []);
-        } catch {
-            setError('無法載入風景區預報');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入風景區預報'));
         } finally {
             setLoading(false);
         }
@@ -205,11 +205,11 @@ export default function ForecastPage() {
     const fetchFarmForecast = async () => {
         setLoading(true);
         try {
-            const res = await fetch(`${API_BASE}/weather/farm`);
-            const data = await res.json();
+            const res = await api.get('/weather/farm');
+            const data = res.data;
             if (data.success) setFarmForecast(data.data || []);
-        } catch {
-            setError('無法載入農場旅遊');
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入農場旅遊'));
         } finally {
             setLoading(false);
         }

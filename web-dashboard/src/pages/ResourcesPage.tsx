@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
 import { getResources, getResourceStats } from '../api/services';
@@ -9,7 +8,8 @@ import AssetsTab from './resources/AssetsTab';
 import DispatchTab from './resources/DispatchTab';
 import AuditTab from './resources/AuditTab';
 import './ResourcesPage.css';
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import {
     Package, UtensilsCrossed, Droplets, Stethoscope, Home, Shirt, Wrench,
     ClipboardList, Factory, Settings, Truck, BarChart3, ScrollText,
@@ -102,13 +102,12 @@ export default function ResourcesPage() {
                     setStats(statsRes.data.data);
                 } else {
                     // 載入物資紀錄
-                    const res = await fetch(`${API_BASE}/resources/transactions/all`);
-                    const data = await res.json();
-                    setLogs(data.data || []);
+                    const res = await api.get('/resources/transactions/all');
+                    setLogs(res.data.data || []);
                 }
             } catch (err) {
                 console.error('Failed to fetch resources:', err);
-                setError('載入資料失敗');
+                setError(getApiErrorMessage(err, '載入資料失敗'));
             } finally {
                 setIsLoading(false);
             }
@@ -126,20 +125,16 @@ export default function ResourcesPage() {
         }
         setIsSubmitting(true);
         try {
-            await fetch(`${API_BASE}/resources`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...resourceForm,
-                    operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
-                }),
+            await api.post('/resources', {
+                ...resourceForm,
+                operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
             });
             setShowAddModal(false);
             setResourceForm({ name: '', category: 'food', quantity: 0, unit: '件', minQuantity: 10, location: '', description: '' });
             window.location.reload();
         } catch (err) {
             console.error('Failed to add resource:', err);
-            alert('新增失敗');
+            alert(getApiErrorMessage(err, '新增失敗'));
         } finally {
             setIsSubmitting(false);
         }
@@ -150,23 +145,19 @@ export default function ResourcesPage() {
         if (!editModal) return;
         setIsSubmitting(true);
         try {
-            await fetch(`${API_BASE}/resources/${editModal.id}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: resourceForm.name,
-                    category: resourceForm.category,
-                    unit: resourceForm.unit,
-                    minQuantity: resourceForm.minQuantity,
-                    location: resourceForm.location,
-                    description: resourceForm.description,
-                }),
+            await api.patch(`/resources/${editModal.id}`, {
+                name: resourceForm.name,
+                category: resourceForm.category,
+                unit: resourceForm.unit,
+                minQuantity: resourceForm.minQuantity,
+                location: resourceForm.location,
+                description: resourceForm.description,
             });
             setEditModal(null);
             window.location.reload();
         } catch (err) {
             console.error('Failed to edit resource:', err);
-            alert('編輯失敗');
+            alert(getApiErrorMessage(err, '編輯失敗'));
         } finally {
             setIsSubmitting(false);
         }
@@ -176,13 +167,11 @@ export default function ResourcesPage() {
     const handleDeleteResource = async (resource: Resource) => {
         if (!confirm(`確定要刪除「${resource.name}」嗎？此操作無法還原。`)) return;
         try {
-            await fetch(`${API_BASE}/resources/${resource.id}`, {
-                method: 'DELETE',
-            });
+            await api.delete(`/resources/${resource.id}`);
             window.location.reload();
         } catch (err) {
             console.error('Failed to delete resource:', err);
-            alert('刪除失敗');
+            alert(getApiErrorMessage(err, '刪除失敗'));
         }
     };
 
@@ -209,20 +198,16 @@ export default function ResourcesPage() {
         setIsSubmitting(true);
         try {
             const endpoint = stockModal.type === 'add' ? 'add' : 'deduct';
-            await fetch(`${API_BASE}/resources/${stockModal.resource.id}/${endpoint}`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    amount: stockModal.quantity,
-                    operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
-                    notes: stockModal.notes,
-                }),
+            await api.patch(`/resources/${stockModal.resource.id}/${endpoint}`, {
+                amount: stockModal.quantity,
+                operatorName: user?.displayName || user?.roleDisplayName || user?.email || 'Admin',
+                notes: stockModal.notes,
             });
             setStockModal(null);
             window.location.reload();
         } catch (err) {
             console.error('Failed to update stock:', err);
-            alert('操作失敗');
+            alert(getApiErrorMessage(err, '操作失敗'));
         } finally {
             setIsSubmitting(false);
         }
@@ -242,13 +227,11 @@ export default function ResourcesPage() {
     const handleDeleteLog = async (logId: string) => {
         if (!confirm('確定要刪除此紀錄嗎？此操作無法還原。')) return;
         try {
-            await fetch(`${API_BASE}/resources/transactions/${logId}`, {
-                method: 'DELETE',
-            });
+            await api.delete(`/resources/transactions/${logId}`);
             setLogs(logs.filter(log => log.id !== logId));
         } catch (err) {
             console.error('Failed to delete log:', err);
-            alert('刪除失敗');
+            alert(getApiErrorMessage(err, '刪除失敗'));
         }
     };
 

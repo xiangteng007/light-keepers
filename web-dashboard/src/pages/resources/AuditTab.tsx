@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
 import './AuditTab.css';
-import { API_BASE } from '../../api/config';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 
 type AuditStatus = 'in_progress' | 'completed' | 'cancelled';
 
@@ -56,11 +56,10 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
 
     const fetchAudits = async () => {
         try {
-            const res = await fetch(`${API_BASE}/audits${filterStatus !== 'all' ? `?status=${filterStatus}` : ''}`);
-            const data = await res.json();
+            const { data } = await api.get('/audits', { params: filterStatus !== 'all' ? { status: filterStatus } : undefined });
             setAudits(data.data || []);
         } catch (err) {
-            console.error('Failed to fetch audits:', err);
+            console.error('Failed to fetch audits:', getApiErrorMessage(err, '載入盤點紀錄失敗'));
         }
     };
 
@@ -87,54 +86,40 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
 
     const handleStartConsumableAudit = async () => {
         try {
-            await fetch(`${API_BASE}/audits/consumable`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ auditorName: userName }),
-            });
+            await api.post('/audits/consumable', { auditorName: userName });
             await fetchAudits();
         } catch (err) {
-            console.error('Failed to start audit:', err);
+            console.error('Failed to start audit:', getApiErrorMessage(err, '開始盤點失敗'));
         }
     };
 
     const handleStartAssetAudit = async () => {
         try {
-            await fetch(`${API_BASE}/audits/asset`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ auditorName: userName }),
-            });
+            await api.post('/audits/asset', { auditorName: userName });
             await fetchAudits();
         } catch (err) {
-            console.error('Failed to start audit:', err);
+            console.error('Failed to start audit:', getApiErrorMessage(err, '開始盤點失敗'));
         }
     };
 
     const handleCompleteAudit = async (audit: InventoryAudit) => {
         const apply = window.confirm('是否套用差異調整庫存？');
         try {
-            await fetch(`${API_BASE}/audits/${audit.id}/complete`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reviewerName: userName, applyDifference: apply }),
-            });
+            await api.patch(`/audits/${audit.id}/complete`, { reviewerName: userName, applyDifference: apply });
             await fetchAudits();
             setSelectedAudit(null);
         } catch (err) {
-            console.error('Failed to complete audit:', err);
+            console.error('Failed to complete audit:', getApiErrorMessage(err, '完成盤點失敗'));
         }
     };
 
     const handleCancelAudit = async (audit: InventoryAudit) => {
         if (!window.confirm('確定取消此盤點？')) return;
         try {
-            await fetch(`${API_BASE}/audits/${audit.id}/cancel`, {
-                method: 'PATCH',
-            });
+            await api.patch(`/audits/${audit.id}/cancel`);
             await fetchAudits();
         } catch (err) {
-            console.error('Failed to cancel audit:', err);
+            console.error('Failed to cancel audit:', getApiErrorMessage(err, '取消盤點失敗'));
         }
     };
 

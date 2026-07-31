@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
 import './DispatchTab.css';
-import { API_BASE } from '../../api/config';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 
 type DispatchStatus = 'pending' | 'approved' | 'rejected' | 'picking' | 'delivering' | 'completed' | 'cancelled';
 
@@ -57,13 +57,13 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
     const fetchOrders = async () => {
         try {
             const [ordersRes, statsRes] = await Promise.all([
-                fetch(`${API_BASE}/dispatch${filterStatus !== 'all' ? `?status=${filterStatus}` : ''}`).then(r => r.json()),
-                fetch(`${API_BASE}/dispatch/stats`).then(r => r.json()),
+                api.get('/dispatch', { params: filterStatus !== 'all' ? { status: filterStatus } : undefined }).then(r => r.data),
+                api.get('/dispatch/stats').then(r => r.data),
             ]);
             setOrders(ordersRes.data || []);
             setStats(statsRes.data || { pending: 0, inProgress: 0, completed: 0 });
         } catch (err) {
-            console.error('Failed to fetch dispatch orders:', err);
+            console.error('Failed to fetch dispatch orders:', getApiErrorMessage(err, '載入調度單失敗'));
         }
     };
 
@@ -82,14 +82,10 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
 
     const handleApprove = async (order: DispatchOrder) => {
         try {
-            await fetch(`${API_BASE}/dispatch/${order.id}/approve`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ approverName: userName }),
-            });
+            await api.patch(`/dispatch/${order.id}/approve`, { approverName: userName });
             await fetchOrders();
         } catch (err) {
-            console.error('Failed to approve:', err);
+            console.error('Failed to approve:', getApiErrorMessage(err, '審核失敗'));
         }
     };
 
@@ -97,39 +93,28 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
         const reason = window.prompt('請輸入駁回原因');
         if (!reason) return;
         try {
-            await fetch(`${API_BASE}/dispatch/${order.id}/reject`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reason, approverName: userName }),
-            });
+            await api.patch(`/dispatch/${order.id}/reject`, { reason, approverName: userName });
             await fetchOrders();
         } catch (err) {
-            console.error('Failed to reject:', err);
+            console.error('Failed to reject:', getApiErrorMessage(err, '駁回失敗'));
         }
     };
 
     const handleStartPicking = async (order: DispatchOrder) => {
         try {
-            await fetch(`${API_BASE}/dispatch/${order.id}/start-picking`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pickerName: userName }),
-            });
+            await api.patch(`/dispatch/${order.id}/start-picking`, { pickerName: userName });
             await fetchOrders();
         } catch (err) {
-            console.error('Failed to start picking:', err);
+            console.error('Failed to start picking:', getApiErrorMessage(err, '開始配貨失敗'));
         }
     };
 
     const handleComplete = async (order: DispatchOrder) => {
         try {
-            await fetch(`${API_BASE}/dispatch/${order.id}/complete`, {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-            });
+            await api.patch(`/dispatch/${order.id}/complete`);
             await fetchOrders();
         } catch (err) {
-            console.error('Failed to complete:', err);
+            console.error('Failed to complete:', getApiErrorMessage(err, '確認送達失敗'));
         }
     };
 

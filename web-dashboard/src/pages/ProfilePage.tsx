@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
@@ -6,7 +5,8 @@ import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardLi
 import { createVolunteer } from '../api/services';
 import { Badge, Button } from '../design-system';
 import './ProfilePage.css';
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // LINE Login Config
 const LINE_CLIENT_ID = import.meta.env.VITE_LINE_CLIENT_ID || '';
@@ -74,7 +74,6 @@ export default function ProfilePage() {
     });
     const [isVolunteerSubmitting, setIsVolunteerSubmitting] = useState(false);
     const [volunteerSubmitted, setVolunteerSubmitted] = useState(false);
-    const getToken = () => localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
 
     // Fetch preferences and password status on mount
     useEffect(() => {
@@ -85,14 +84,8 @@ export default function ProfilePage() {
     // Check if account has password
     const checkHasPassword = async () => {
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/auth/has-password`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setHasPassword(data.hasPassword);
-            }
+            const { data } = await api.get('/auth/has-password');
+            setHasPassword(data.hasPassword);
         } catch (err) {
             console.error('Failed to check password status:', err);
         }
@@ -114,14 +107,8 @@ export default function ProfilePage() {
     // Fetch notification preferences
     const fetchPreferences = async () => {
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/auth/preferences`, {
-                headers: { 'Authorization': `Bearer ${token}` },
-            });
-            if (response.ok) {
-                const data = await response.json();
-                setPreferences(data);
-            }
+            const { data } = await api.get('/auth/preferences');
+            setPreferences(data);
         } catch (err) {
             console.error('Failed to fetch preferences:', err);
         }
@@ -133,25 +120,11 @@ export default function ProfilePage() {
         setPreferences(newPreferences);
 
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/auth/preferences`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ [key]: value }),
-            });
-
-            if (response.ok) {
-                setMessage({ type: 'success', text: '通知偏好已更新' });
-                setTimeout(() => setMessage(null), 2000);
-            } else {
-                setMessage({ type: 'error', text: '更新失敗' });
-                setPreferences(preferences); // Revert
-            }
+            await api.patch('/auth/preferences', { [key]: value });
+            setMessage({ type: 'success', text: '通知偏好已更新' });
+            setTimeout(() => setMessage(null), 2000);
         } catch (err) {
-            setMessage({ type: 'error', text: '更新失敗' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '更新失敗') });
             setPreferences(preferences); // Revert
         }
     };
@@ -170,29 +143,15 @@ export default function ProfilePage() {
 
         setIsChangingPassword(true);
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/auth/change-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    currentPassword: passwordData.currentPassword,
-                    newPassword: passwordData.newPassword,
-                }),
+            await api.post('/auth/change-password', {
+                currentPassword: passwordData.currentPassword,
+                newPassword: passwordData.newPassword,
             });
-
-            if (response.ok) {
-                setMessage({ type: 'success', text: '密碼已成功變更！' });
-                setShowPasswordModal(false);
-                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-            } else {
-                const error = await response.json();
-                setMessage({ type: 'error', text: error.message || '密碼變更失敗' });
-            }
+            setMessage({ type: 'success', text: '密碼已成功變更！' });
+            setShowPasswordModal(false);
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
         } catch (err) {
-            setMessage({ type: 'error', text: '密碼變更失敗，請稍後再試' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '密碼變更失敗，請稍後再試') });
         } finally {
             setIsChangingPassword(false);
         }
@@ -212,29 +171,15 @@ export default function ProfilePage() {
 
         setIsChangingPassword(true);
         try {
-            const token = getToken();
-            const response = await fetch(`${API_BASE}/auth/set-password`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    newPassword: passwordData.newPassword,
-                }),
+            await api.post('/auth/set-password', {
+                newPassword: passwordData.newPassword,
             });
-
-            if (response.ok) {
-                setMessage({ type: 'success', text: '密碼設定成功！現在您可以使用 Email/密碼登入' });
-                setShowPasswordModal(false);
-                setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
-                setHasPassword(true);  // Update state
-            } else {
-                const error = await response.json();
-                setMessage({ type: 'error', text: error.message || '密碼設定失敗' });
-            }
+            setMessage({ type: 'success', text: '密碼設定成功！現在您可以使用 Email/密碼登入' });
+            setShowPasswordModal(false);
+            setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+            setHasPassword(true);  // Update state
         } catch (err) {
-            setMessage({ type: 'error', text: '密碼設定失敗，請稍後再試' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '密碼設定失敗，請稍後再試') });
         } finally {
             setIsChangingPassword(false);
         }
@@ -242,28 +187,13 @@ export default function ProfilePage() {
 
     const handleLineBindCallback = async (code: string) => {
         try {
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
             // 使用專門的綁定端點（需要認證）
-            const response = await fetch(`${API_BASE}/auth/line/bind-callback`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ code, redirectUri: LINE_REDIRECT_URI }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setMessage({ type: 'success', text: `LINE 帳號綁定成功！(${data.lineDisplayName || ''})` });
-                await refreshUser();
-            } else {
-                const error = await response.json();
-                setMessage({ type: 'error', text: error.message || 'LINE 帳號綁定失敗' });
-            }
+            const { data } = await api.post('/auth/line/bind-callback', { code, redirectUri: LINE_REDIRECT_URI });
+            setMessage({ type: 'success', text: `LINE 帳號綁定成功！(${data.lineDisplayName || ''})` });
+            await refreshUser();
         } catch (err) {
             console.error('LINE binding error:', err);
-            setMessage({ type: 'error', text: 'LINE 帳號綁定失敗，請稍後再試' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, 'LINE 帳號綁定失敗，請稍後再試') });
         } finally {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
@@ -272,28 +202,13 @@ export default function ProfilePage() {
 
     const handleGoogleBindCallback = async (code: string) => {
         try {
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
             // 使用專門的綁定端點（需要認證）
-            const response = await fetch(`${API_BASE}/auth/google/bind-callback`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({ code, redirectUri: GOOGLE_REDIRECT_URI }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setMessage({ type: 'success', text: `Google 帳號綁定成功！(${data.googleEmail || ''})` });
-                await refreshUser();
-            } else {
-                const error = await response.json();
-                setMessage({ type: 'error', text: error.message || 'Google 帳號綁定失敗' });
-            }
+            const { data } = await api.post('/auth/google/bind-callback', { code, redirectUri: GOOGLE_REDIRECT_URI });
+            setMessage({ type: 'success', text: `Google 帳號綁定成功！(${data.googleEmail || ''})` });
+            await refreshUser();
         } catch (err) {
             console.error('Google binding error:', err);
-            setMessage({ type: 'error', text: 'Google 帳號綁定失敗，請稍後再試' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, 'Google 帳號綁定失敗，請稍後再試') });
         } finally {
             window.history.replaceState({}, document.title, window.location.pathname);
         }
@@ -320,27 +235,14 @@ export default function ProfilePage() {
     const handleSave = async () => {
         setIsSaving(true);
         try {
-            const token = localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
-            const response = await fetch(`${API_BASE}/auth/profile`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    displayName: formData.displayName,
-                }),
+            await api.patch('/auth/profile', {
+                displayName: formData.displayName,
             });
-
-            if (response.ok) {
-                setMessage({ type: 'success', text: '個人資料更新成功！' });
-                setIsEditing(false);
-                await refreshUser();
-            } else {
-                setMessage({ type: 'error', text: '更新失敗，請稍後再試' });
-            }
+            setMessage({ type: 'success', text: '個人資料更新成功！' });
+            setIsEditing(false);
+            await refreshUser();
         } catch (err) {
-            setMessage({ type: 'error', text: '更新失敗，請稍後再試' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '更新失敗，請稍後再試') });
         } finally {
             setIsSaving(false);
         }

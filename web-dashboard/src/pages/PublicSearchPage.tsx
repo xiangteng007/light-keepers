@@ -1,10 +1,10 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Public Search Page - 民眾協尋查詢 (無需登入)
  */
 
 import React, { useState } from 'react';
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage, getApiErrorStatus } from '../api/errors';
 import './PublicSearchPage.css';
 
 interface SearchResult {
@@ -34,23 +34,17 @@ export const PublicSearchPage: React.FC = () => {
         setResult(null);
 
         try {
-            // API_BASE 已含 `/api/v1`，不可再加 `/api` 前綴。
             // 後端：@Controller('reunification') + @Get('search') + @Query('code')
-            const response = await fetch(
-                `${API_BASE}/reunification/search?code=${encodeURIComponent(queryCode.trim())}`
-            );
-            if (!response.ok) {
-                if (response.status === 404) {
-                    setError('查無此查詢碼，請確認後再試');
-                } else {
-                    setError('查詢失敗，請稍後再試');
-                }
-                return;
-            }
-            const data = await response.json();
-            setResult(data);
+            const response = await api.get('/reunification/search', {
+                params: { code: queryCode.trim() },
+            });
+            setResult(response.data);
         } catch (err) {
-            setError('網路連線失敗');
+            if (getApiErrorStatus(err) === 404) {
+                setError('查無此查詢碼，請確認後再試');
+            } else {
+                setError(getApiErrorMessage(err, '查詢失敗，請稍後再試'));
+            }
         } finally {
             setLoading(false);
         }
