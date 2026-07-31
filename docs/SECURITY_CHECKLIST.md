@@ -4,7 +4,7 @@
 
 | # | 風險 | 狀態 | 實作 |
 |---|------|------|------|
-| A01 | Broken Access Control | ✅ | ResourceOwnerGuard, TenantGuard, UnifiedRolesGuard |
+| A01 | Broken Access Control | ✅ | GlobalAuthGuard (default-deny), UnifiedRolesGuard (RBAC L0-L5), ResourceOwnerGuard |
 | A02 | Cryptographic Failures | ✅ | bcrypt 密碼雜湊, JWT RS256, HTTPS only |
 | A03 | Injection | ✅ | TypeORM 參數化查詢, class-validator |
 | A04 | Insecure Design | ✅ | RBAC, 最小權限原則 |
@@ -19,14 +19,18 @@
 
 - [x] JWT Access Token (15 分鐘有效期)
 - [x] Refresh Token Rotation (30 天)
-- [x] 六級 RBAC 權限模型
+- [x] RBAC 權限模型（L0–L5）
 - [x] 資源擁有權驗證 (IDOR 防護)
-- [x] 多租戶隔離
+- [x] 預設拒絕：所有端點需認證，例外須明示 `@Public()` (GlobalAuthGuard)
+- [x] ~~多租戶隔離~~ —— **N/A**：平台為單租戶（單一協會自用），
+      不存在跨租戶面。見 `docs/adr/ADR-001-multi-tenant-isolation.md`（Superseded, D9）
 - [ ] 2FA 強制啟用 (OFFICER+)
 
 ## API 安全
 
-- [x] Rate Limiting (100 req/min)
+- [x] Rate Limiting —— 全域基準 100 req/min + 10 req/s 突發保護；
+      敏感端點收緊：登入/註冊/OTP/密碼重設 5/min、OAuth 10/min、匿名通報 10/min、
+      上傳與 AI 推論 20/min、公開查詢 30/min（per IP，見 ADR-004）
 - [x] CORS 配置白名單
 - [ ] CSP Header
 - [ ] CSRF Token (for web forms)

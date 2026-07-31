@@ -1,3 +1,14 @@
+/**
+ * Tenant Entities —— 組織資料（Organization Profile）
+ *
+ * 【定位（2026-08-01, D9 / DA-2 單租戶降級後）】
+ * 平台為單租戶。`tenants` 表在正式環境僅有**一筆**紀錄（協會自身），
+ * `tenant_members` 為該組織的成員名冊。
+ * 這些資料表**不**構成資料隔離邊界，詳見 docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）。
+ *
+ * 表名／欄位名為歷史命名，刻意保留以避免 schema migration 與 API breaking change。
+ */
+
 import {
     Entity,
     Column,
@@ -80,12 +91,18 @@ export class Tenant {
     updatedAt: Date;
 }
 
-// ===== 租戶成員實體 =====
+// ===== 組織成員實體（歷史命名：租戶成員）=====
 @Entity('tenant_members')
 export class TenantMember {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    /**
+     * 所屬組織 ID。
+     * 【單租戶模式（D9, 2026-08-01）】恆為唯一組織（協會自身）的 ID，
+     * 即實務上為單一固定值。欄位保留不移除，供未來若回遷多租戶時使用。
+     * @see docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）
+     */
     @Column({ type: 'uuid' })
     @Index()
     tenantId: string;

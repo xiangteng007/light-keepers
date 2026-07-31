@@ -11,6 +11,7 @@
 
 import { Controller, Get, Query, Logger } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { AnnouncementsService } from '../announcements/announcements.service';
 import { PublicResourcesService } from '../public-resources/public-resources.service';
 import { NcdrAlertsService } from '../ncdr-alerts/ncdr-alerts.service';
@@ -63,6 +64,11 @@ interface PublicWeather {
 
 @ApiTags('Public (Level 0)')
 @Public()
+// 限流：30/min per IP（controller 級，套用全部 public 查詢端點）
+// 理由：完全匿名可存取，且多為 DB 查詢／外部氣象 API 轉發，屬抓取（scraping）
+// 與資源耗用主要面。30/min 足以支撐一般前端頁面載入與地圖瀏覽。
+// 個別端點如需不同值，可於方法上以 @Throttle 覆寫。
+@Throttle({ default: { limit: 30, ttl: 60000 } })
 @Controller('public')
 export class PublicController {
     private readonly logger = new Logger(PublicController.name);
@@ -284,6 +290,9 @@ export class PublicController {
      * 公開健康檢查
      * Level 0 - 用於前端確認 API 可用性
      */
+    // 限流：60/min per IP（覆寫 controller 級 30/min）
+    // 理由：純記憶體回應、零 DB 存取，且供前端輪詢 API 可用性，需較寬鬆額度。
+    @Throttle({ default: { limit: 60, ttl: 60000 } })
     @Get('ping')
     @ApiOperation({ summary: '公開 ping (Level 0)' })
     ping(): { status: string; timestamp: string } {

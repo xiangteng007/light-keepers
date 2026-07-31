@@ -20,6 +20,7 @@ export interface CreateSubscriptionDto {
     maxRetries?: number;
     timeoutMs?: number;
     verifySSL?: boolean;
+    /** 單租戶模式下恆為預設值／undefined，僅作查詢便利標籤，**非**安全邊界。見 ADR-001（Superseded）。 */
     tenantId?: string;
 }
 

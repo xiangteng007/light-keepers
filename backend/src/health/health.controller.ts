@@ -24,6 +24,12 @@ interface HealthStatus {
     };
 }
 
+/**
+ * 限流覆核（2026-08-01, BE-5）：本 controller 各端點 120/min per IP —— 合理，維持。
+ * 理由：LB／Cloud Run liveness＋readiness probe 與外部 uptime 監控會高頻探測，
+ * 收緊至 public 查詢類的 30/min 會造成健康檢查誤判為不健康。
+ * 回應內容不含機敏資料，且仍受全域 short（10/s）突發保護。
+ */
 @Controller('health')
 export class HealthController {
     private readonly startTime = Date.now();

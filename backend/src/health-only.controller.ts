@@ -10,6 +10,10 @@ import { Public } from './modules/auth/decorators/public.decorator';
  * 
  * Security: All endpoints are @Public() with rate limiting (Policy-B)
  */
+/**
+ * 限流覆核（2026-08-01, BE-5）：各端點 120/min per IP —— 合理，維持。
+ * 同 health.controller.ts：需容納 LB／uptime 監控高頻探測。
+ */
 @Controller('health')
 export class HealthOnlyController {
     private readonly startTime: Date = new Date();

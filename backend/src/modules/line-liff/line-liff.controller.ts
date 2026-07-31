@@ -12,6 +12,7 @@ import {
     UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { LineLiffService } from './line-liff.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { Public } from '../shared/guards/public.decorator';
@@ -27,6 +28,8 @@ export class LineLiffController {
      */
     @Get('config')
     @Public()
+    // 限流：30/min per IP —— 匿名公開查詢類端點
+    @Throttle({ default: { limit: 30, ttl: 60000 } })
     @ApiOperation({ summary: '取得 LIFF 設定', description: '公開端點，供前端初始化 LIFF SDK' })
     getLiffConfig() {
         return this.lineLiffService.getLiffConfig();

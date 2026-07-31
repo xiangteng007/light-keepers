@@ -56,6 +56,13 @@ export class WebhookSubscription {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    /**
+     * 組織 ID（歷史欄位）。
+     * 【單租戶模式（D9, 2026-08-01）】恆為預設值／null——平台已降級為單租戶。
+     * `WebhookSubscriptionService.findAll(tenantId?)` 的過濾僅為選用的查詢便利參數，
+     * **非**安全邊界。保留不移除以避免 schema 變更，供未來若回遷多租戶時使用。
+     * @see docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）
+     */
     @Column({ nullable: true })
     @Index()
     tenantId?: string;

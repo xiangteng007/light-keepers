@@ -1,3 +1,14 @@
+/**
+ * Tenant Service —— 組織資料管理（Organization Profile Management）
+ *
+ * 【定位（2026-08-01, D9 / DA-2 單租戶降級後）】
+ * 平台為單租戶（單一協會自用）。本服務維護協會自身的組織檔案、成員名冊、
+ * 方案與配額設定，**不**執行任何跨租戶資料隔離。
+ * 詳見 docs/adr/ADR-001-multi-tenant-isolation.md（已標記 Superseded）。
+ *
+ * 註：`checkQuota()` 等方法為單一組織內的用量上限控管，與租戶隔離無關。
+ */
+
 import { Injectable, Logger, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';

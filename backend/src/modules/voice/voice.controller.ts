@@ -14,6 +14,7 @@ import {
     UploadedFile,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { VoiceTranscriptionService } from './voice-transcription.service';
@@ -25,6 +26,9 @@ import { VoiceTranscriptionService } from './voice-transcription.service';
 export class VoiceController {
     constructor(private readonly voiceService: VoiceTranscriptionService) { }
 
+    // 限流：20/min —— 上傳類：每次上傳觸發外部語音轉文字服務，
+    // 同時消耗儲存空間與 STT 計費額度。
+    @Throttle({ default: { limit: 20, ttl: 60000 } })
     @Post(':missionSessionId/upload')
     @UseInterceptors(FileInterceptor('audio'))
     @ApiOperation({ summary: '上傳語音並轉錄' })

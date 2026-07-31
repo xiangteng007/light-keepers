@@ -14,12 +14,16 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../../shared/guards';
+import { Throttle } from '@nestjs/throttler';
 import { AiClassificationService } from './ai-classification.service';
 
 // 定級理由：現場影像可能拍到受災者、傷患與門牌住址，送入 AI 分析＝把個資交給外部模型；
 // 同時每次呼叫都會消耗付費 AI 額度，無門檻等於開放成本濫用管道。
 // 回報災情是第一線志工的核心動作 → 單張影像/單筆文字分析 L1；
 // `classify/batch`（一次最多 10 筆）屬批次作業，成本與資料量級不同 → L2。
+// 限流：20/min（controller 級，等同上傳類——base64 圖片轉發計費的外部 LLM Vision API，
+// 為成本濫用主要面）。個別端點可於方法上以 @Throttle 覆寫。
+@Throttle({ default: { limit: 20, ttl: 60000 } })
 @Controller('ai')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
 @RequiredLevel(ROLE_LEVELS.VOLUNTEER)

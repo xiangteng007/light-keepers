@@ -39,6 +39,9 @@ export class IntakeController {
      * 公開 API - 允許匿名通報
      */
     @Public()
+    // 限流：10/min per IP —— 覆核：合理，維持。
+    // 匿名可寫入端點（災情通報），為垃圾資料灌入主要面；
+    // ThrottlerGuard 預設 tracker 即為來源 IP。災時真人通報頻率遠低於此上限。
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post()
     @ApiOperation({ summary: '建立通報（統一入口）' })

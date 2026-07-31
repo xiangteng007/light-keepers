@@ -139,11 +139,19 @@ Light Keepers 是一個為台灣災難應變設計的全端平台，整合指揮
 - **Auth**: JWT token in handshake query
 - **Rooms**: event-{eventId}, task-{taskId}, mission-{missionId}
 
-### 5.4 Multi-Tenant Boundary
+### 5.4 Organization Boundary (Single-Tenant)
 
-- **Isolation**: tenant_id column on all tenant-scoped entities
-- **Guard**: TenantGuard injects tenant context from JWT
-- **Query Scope**: TypeORM global scope filter
+> Superseded 2026-08-01 (decision D9 / DA-2). The platform is **single-tenant**:
+> one deployment serves one association. There is **no** cross-tenant isolation
+> layer — `TenantGuard` and the planned TypeORM tenant scope filter were never
+> wired up and have been removed. See `docs/adr/ADR-001-multi-tenant-isolation.md`.
+
+- **Scope**: one organization per deployment; the `tenants` module manages that
+  organization's own profile, member roster, plan and quotas.
+- **Authorization**: `UnifiedRolesGuard` (RBAC, ADR-005) + `ResourceOwnerGuard` (ADR-003).
+- **Residual `tenantId` columns**: 4 tables only (`domain_events_outbox.metadata`,
+  `audit_logs`, `tenant_members`, `webhook_subscriptions`). Constant/default under
+  single-tenant mode; retained to avoid schema churn, not a security boundary.
 
 ---
 
