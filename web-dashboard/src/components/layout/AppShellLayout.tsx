@@ -15,7 +15,7 @@ import { SidebarSettings } from './SidebarSettings';
 import { useWidgetLayout } from './useWidgetLayout';
 import { useSidebarConfig, ICON_MAP } from './useSidebarConfig';
 import { PermissionLevel } from './widget.types';
-import { WIDGET_CONTENT_MAP } from './WidgetContent';
+import { WIDGET_CONTENT_MAP } from '../widgets/widgetContentMap';
 import { SyncStatusIndicator } from '../SyncStatusIndicator';
 import { Breadcrumb } from '../Breadcrumb';
 import { LanguageSelector } from '../LanguageSelector';
