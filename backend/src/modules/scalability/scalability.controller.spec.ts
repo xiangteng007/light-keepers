@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScalabilityController } from './scalability.controller';
 import { ScalabilityService } from './scalability.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('ScalabilityController', () => {
     let controller: ScalabilityController;
@@ -32,7 +33,10 @@ describe('ScalabilityController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ScalabilityController],
             providers: [{ provide: ScalabilityService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<ScalabilityController>(ScalabilityController);
     });
 

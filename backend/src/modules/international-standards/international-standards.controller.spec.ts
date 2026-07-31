@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { InternationalStandardsController } from './international-standards.controller';
 import { InternationalStandardsService } from './international-standards.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('InternationalStandardsController', () => {
     let controller: InternationalStandardsController;
@@ -32,7 +33,10 @@ describe('InternationalStandardsController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [InternationalStandardsController],
             providers: [{ provide: InternationalStandardsService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<InternationalStandardsController>(InternationalStandardsController);
     });

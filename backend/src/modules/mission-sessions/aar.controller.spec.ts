@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { AARController } from './aar.controller';
 import { AARService } from './aar.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('AARController', () => {
     let controller: AARController;
@@ -20,7 +21,10 @@ describe('AARController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AARController],
             providers: [{ provide: AARService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<AARController>(AARController);
     });

@@ -9,15 +9,26 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
 import { ReunificationService } from './reunification.service';
 import { MissingPerson, MissingPersonStatus } from './entities';
 
+// 定級理由：失蹤者資料是災難情境中最敏感的個資（姓名、特徵、最後目擊位置、家屬聯絡方式）。
+// `search`（憑查詢碼查詢）：查詢碼本身即為持有型憑證，設計上供家屬使用；定為 L1，理由與
+//   ncdr-alerts／reports 一致——不由本次任務單方面把它擴大為匿名端點（需先更新
+//   docs/policy/public-surface.policy.json）。已知落差：前端 PublicSearchPage 以無認證 fetch 呼叫，
+//   且其路徑寫法（/search/{code}）與後端（/search?code=）本就不符，屬既有斷線，一併列為後續項。
+// 「管理端 API」原本雖掛了 `UnifiedRolesGuard` 卻**沒有任何 `@RequiredLevel`**——依 UnifiedRolesGuard
+//   的實作，未設定等級即直接放行，等於只驗登入。本次補上實際等級：
+//   `reports`（新增報案）L2、依任務列出失蹤者／統計 L2（跨人員個資清單）、
+//   標記尋獲／團聚 L2（改寫個案狀態，會連動對外通知與家屬期待，屬督導職權）。
 @ApiTags('reunification')
 @Controller('reunification')
 export class ReunificationController {
     constructor(private readonly reunificationService: ReunificationService) { }
 
-    // ============ 公開查詢 (無需登入) ============
+    // ============ 憑查詢碼查詢 ============
 
     @Get('search')
-    @ApiOperation({ summary: '透過查詢碼查詢 (公開)' })
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
+    @ApiOperation({ summary: '透過查詢碼查詢' })
     async searchByQueryCode(@Query('code') code: string) {
         return this.reunificationService.findByQueryCode(code);
     }
@@ -26,6 +37,7 @@ export class ReunificationController {
 
     @Post('reports')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @ApiBearerAuth()
     @ApiOperation({ summary: '新增失蹤者報案' })
     async createReport(@Body() data: Partial<MissingPerson>) {
@@ -34,6 +46,7 @@ export class ReunificationController {
 
     @Get('missions/:missionSessionId')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @ApiBearerAuth()
     @ApiOperation({ summary: '取得任務的失蹤者列表' })
     @ApiParam({ name: 'missionSessionId' })
@@ -43,6 +56,7 @@ export class ReunificationController {
 
     @Get('missions/:missionSessionId/stats')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @ApiBearerAuth()
     @ApiOperation({ summary: '取得統計' })
     @ApiParam({ name: 'missionSessionId' })
@@ -52,6 +66,7 @@ export class ReunificationController {
 
     @Put(':id/found')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @ApiBearerAuth()
     @ApiOperation({ summary: '標記已尋獲' })
     @ApiParam({ name: 'id' })
@@ -69,6 +84,7 @@ export class ReunificationController {
 
     @Put(':id/reunited')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     @ApiBearerAuth()
     @ApiOperation({ summary: '標記已團聚' })
     @ApiParam({ name: 'id' })

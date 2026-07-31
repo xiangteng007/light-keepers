@@ -29,6 +29,12 @@ class UpdatePagePermissionDto {
     sortOrder?: number;
 }
 
+// 定級理由（本次僅補 `getRoles`／`getPagePermissions` 兩個缺口，其餘 handler 既有定級不動）：
+// `roles` 回傳完整角色清單與 level 對照，是權限枚舉／提權偵察的起點，且僅被 L3-L4 的權限管理頁使用
+//   → L3（常務理事）。
+// `page-permissions` 是前端導覽列可見性的設定來源，PermissionsProvider 會為「每一位」登入者載入，
+//   拉高等級會讓一般志工的選單退回前端寫死的預設值 → L1（志工）；真正的防線在寫入端
+//   （`PATCH page-permissions/:pageKey` 已是 OWNER）。
 @Controller('accounts')
 export class AccountsController {
     constructor(private readonly accountsService: AccountsService) { }
@@ -41,11 +47,15 @@ export class AccountsController {
     }
 
     @Get('roles')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.DIRECTOR)
     getRoles() {
         return this.accountsService.getAllRoles();
     }
 
     @Get('page-permissions')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(RoleLevel.VOLUNTEER)
     getPagePermissions() {
         return this.accountsService.getAllPagePermissions();
     }

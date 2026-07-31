@@ -3,13 +3,19 @@
  * Phase 7: 報表匯出 API
  */
 
-import { Controller, Get, Param, Res } from '@nestjs/common';
+import { Controller, Get, Param, Res, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Response } from 'express';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { MissionReportService } from './mission-report.service';
 
+// 定級理由：任務報表把整場任務的人員、時序、決策與受助對象資料打包成可離線攜出的檔案
+// （PDF/CSV/完整 JSON 資料包），屬「作戰資料批次匯出」，一旦下載即脫離系統控管 → 全端點 L2（幹部）。
+// 六個端點皆為同一資料的不同輸出格式，風險相同，故直接以 class 級統一定級，不另做 handler 覆寫。
 @ApiTags('任務報表')
 @Controller('mission-reports')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class MissionReportController {
     constructor(private readonly reportService: MissionReportService) { }
 

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SensitiveController } from './sensitive.controller';
 import { SensitiveService } from './sensitive.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('SensitiveController', () => {
     let controller: SensitiveController;
@@ -15,7 +16,10 @@ describe('SensitiveController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [SensitiveController],
             providers: [{ provide: SensitiveService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<SensitiveController>(SensitiveController);
     });
