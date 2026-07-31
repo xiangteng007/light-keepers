@@ -11,7 +11,6 @@
  * - Sphere Standards compliance checking
  */
 import { Module, Global } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { HxlExportService } from './services/hxl-export.service';
 import { IatiReportingService } from './services/iati-reporting.service';
 import { ThreeWMatrixService } from './services/three-w-matrix.service';

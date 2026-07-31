@@ -13,14 +13,19 @@
 import { Module, Logger } from '@nestjs/common';
 
 // Core Domain Modules（排除 InfrastructureCoreModule 以避免重複）
-import { IamCoreModule } from './iam/iam-core.module';
-import { OperationsCoreModule } from './operations/operations-core.module';
-import { WorkforceCoreModule } from './workforce/workforce-core.module';
-import { ResourcesCoreModule } from './resources/resources-core.module';
-import { GeoIntelCoreModule } from './geointel/geointel-core.module';
-import { EnvironmentCoreModule } from './environment/environment-core.module';
-import { CommsCoreModule } from './comms/comms-core.module';
-import { AnalyticsCoreModule } from './analytics/analytics-core.module';
+//
+// 以下 8 個 Core Modules 是「刻意不載入」的（原因見下方 imports 陣列註解），
+// 因此連 import 陳述式也一併移除——留著未使用的 import 會讓
+// `@typescript-eslint/no-unused-vars` 這道「模組被 import 卻沒註冊」的
+// 防護規則失效（見 eslint.config.mjs）。要啟用時再把 import 加回來即可：
+//   IamCoreModule        ./iam/iam-core.module
+//   OperationsCoreModule ./operations/operations-core.module
+//   WorkforceCoreModule  ./workforce/workforce-core.module
+//   ResourcesCoreModule  ./resources/resources-core.module
+//   GeoIntelCoreModule   ./geointel/geointel-core.module
+//   EnvironmentCoreModule ./environment/environment-core.module
+//   CommsCoreModule      ./comms/comms-core.module
+//   AnalyticsCoreModule  ./analytics/analytics-core.module
 import { AiCoreModule } from './ai/ai-core.module';
 import { IntegrationCoreModule } from './integration/integration-core.module';
 import { AdminCoreModule } from './admin/admin-core.module';
