@@ -5,7 +5,7 @@
  * Tokens are stored as SHA-256 hashes in the database.
  */
 
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, LessThan } from 'typeorm';
 import { RefreshToken } from '../entities/refresh-token.entity';
@@ -17,6 +17,8 @@ const REFRESH_TOKEN_BYTES = 32; // 256 bits
 
 @Injectable()
 export class RefreshTokenService {
+    private readonly logger = new Logger(RefreshTokenService.name);
+
     constructor(
         @InjectRepository(RefreshToken)
         private readonly refreshTokenRepository: Repository<RefreshToken>,
@@ -72,13 +74,13 @@ export class RefreshTokenService {
 
         // Check if revoked
         if (refreshToken.isRevoked) {
-            console.warn(`[RefreshToken] Attempted use of revoked token for account ${refreshToken.accountId}`);
+            this.logger.warn(`Attempted use of revoked token for account ${refreshToken.accountId}`);
             return null;
         }
 
         // Check if expired
         if (new Date() > refreshToken.expiresAt) {
-            console.warn(`[RefreshToken] Expired token used for account ${refreshToken.accountId}`);
+            this.logger.warn(`Expired token used for account ${refreshToken.accountId}`);
             return null;
         }
 

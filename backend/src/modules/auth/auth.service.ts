@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException, ConflictException, NotFoundException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -14,6 +14,8 @@ import { LineBotService } from '../line-bot/line-bot.service';
 
 @Injectable()
 export class AuthService {
+    private readonly logger = new Logger(AuthService.name);
+
     constructor(
         @InjectRepository(Account)
         private readonly accountRepository: Repository<Account>,
@@ -141,7 +143,7 @@ export class AuthService {
 
         if (!tokenResponse.ok) {
             const error = await tokenResponse.text();
-            console.error('LINE token exchange failed:', error);
+            this.logger.error(`LINE token exchange failed: ${error}`);
             throw new UnauthorizedException('LINE 登入失敗');
         }
 
@@ -265,7 +267,7 @@ export class AuthService {
 
         if (!response.ok) {
             const error = await response.text();
-            console.error('LIFF ID Token verification failed:', error);
+            this.logger.error(`LIFF ID Token verification failed: ${error}`);
             throw new UnauthorizedException('LIFF Token 驗證失敗');
         }
 
@@ -369,7 +371,7 @@ export class AuthService {
 
         if (!tokenResponse.ok) {
             const error = await tokenResponse.text();
-            console.error('Google token exchange failed:', error);
+            this.logger.error(`Google token exchange failed: ${error}`);
             throw new UnauthorizedException('Google 登入失敗');
         }
 

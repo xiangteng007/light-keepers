@@ -144,7 +144,7 @@ export class FatigueDetectionService {
         );
 
         let consecutive = 0;
-        let checkDate = new Date(today);
+        const checkDate = new Date(today);
 
         while (dutyDates.has(checkDate.getTime())) {
             consecutive++;

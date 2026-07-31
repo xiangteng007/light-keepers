@@ -1,4 +1,7 @@
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('AddStaffSecurityTables1706803200000');
 
 /**
  * Migration: Add Staff Security Tables
@@ -213,7 +216,7 @@ export class AddStaffSecurityTables1706803200000 implements MigrationInterface {
             }),
         );
 
-        console.log('✅ Created staff security tables: security_incidents, staff_checkins');
+        logger.log('Created staff security tables: security_incidents, staff_checkins');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -230,6 +233,6 @@ export class AddStaffSecurityTables1706803200000 implements MigrationInterface {
         await queryRunner.dropTable('staff_checkins');
         await queryRunner.dropTable('security_incidents');
 
-        console.log('⬇️ Dropped staff security tables');
+        logger.log('Dropped staff security tables');
     }
 }

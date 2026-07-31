@@ -1,4 +1,7 @@
+import { Logger } from '@nestjs/common';
 import { Skill, SkillCategory } from '../modules/volunteers/entities/skill.entity';
+
+const logger = new Logger('SkillsSeed');
 
 // 預設專長種類資料
 export const DEFAULT_SKILLS: Partial<Skill>[] = [
@@ -52,8 +55,8 @@ export async function seedSkills(skillRepository: any) {
                 isActive: true,
             });
             await skillRepository.save(skill);
-            console.log(`Created skill: ${skillData.name}`);
+            logger.log(`Created skill: ${skillData.name}`);
         }
     }
-    console.log('Skills seeding completed');
+    logger.log('Skills seeding completed');
 }

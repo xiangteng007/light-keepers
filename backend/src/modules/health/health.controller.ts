@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Logger } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Public } from '../shared/shared-auth.module';
@@ -16,6 +16,7 @@ import { Public } from '../shared/shared-auth.module';
 @Public()
 @Controller('health')
 export class HealthController {
+    private readonly logger = new Logger(HealthController.name);
     private startTime: Date;
 
     constructor(
@@ -64,7 +65,7 @@ export class HealthController {
                 checks.database = 'ok';
             }
         } catch (error) {
-            console.warn('[HealthCheck] Database check failed:', error.message);
+            this.logger.warn(`Database check failed: ${error.message}`);
             checks.database = 'error';
         }
 

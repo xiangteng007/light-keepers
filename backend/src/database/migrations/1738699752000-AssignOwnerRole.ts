@@ -1,8 +1,11 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('AssignOwnerRole1738699752000');
 
 /**
  * Migration: 將 xiangteng007@gmail.com 設為系統擁有者 (Level 5)
- * 
+ *
  * 此 migration 將 owner 角色分配給指定帳號
  */
 export class AssignOwnerRole1738699752000 implements MigrationInterface {
@@ -15,12 +18,12 @@ export class AssignOwnerRole1738699752000 implements MigrationInterface {
         `);
         
         if (!ownerRoleResult || ownerRoleResult.length === 0) {
-            console.log('⚠️ Owner role not found. Skipping migration.');
+            logger.warn('Owner role not found. Skipping migration.');
             return;
         }
-        
+
         const ownerRoleId = ownerRoleResult[0].id;
-        console.log(`✅ Found owner role: ${ownerRoleId}`);
+        logger.log(`Found owner role: ${ownerRoleId}`);
         
         // 2. 找到目標帳號 (by email or googleEmail)
         const accountResult = await queryRunner.query(`
@@ -30,12 +33,12 @@ export class AssignOwnerRole1738699752000 implements MigrationInterface {
         `, [targetEmail]);
         
         if (!accountResult || accountResult.length === 0) {
-            console.log(`⚠️ Account ${targetEmail} not found. Skipping migration.`);
+            logger.warn(`Account ${targetEmail} not found. Skipping migration.`);
             return;
         }
-        
+
         const accountId = accountResult[0].id;
-        console.log(`✅ Found account: ${accountId}`);
+        logger.log(`Found account: ${accountId}`);
         
         // 3. 檢查是否已有 owner 角色
         const existingRoleResult = await queryRunner.query(`
@@ -45,7 +48,7 @@ export class AssignOwnerRole1738699752000 implements MigrationInterface {
         `, [accountId, ownerRoleId]);
         
         if (existingRoleResult && existingRoleResult.length > 0) {
-            console.log('✅ Account already has owner role. No action needed.');
+            logger.log('Account already has owner role. No action needed.');
             return;
         }
         
@@ -56,7 +59,7 @@ export class AssignOwnerRole1738699752000 implements MigrationInterface {
             ON CONFLICT (account_id, role_id) DO NOTHING
         `, [accountId, ownerRoleId]);
         
-        console.log(`✅ Assigned owner role to ${targetEmail}`);
+        logger.log(`Assigned owner role to ${targetEmail}`);
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -90,6 +93,6 @@ export class AssignOwnerRole1738699752000 implements MigrationInterface {
             WHERE account_id = $1 AND role_id = $2
         `, [accountId, ownerRoleId]);
         
-        console.log(`⚠️ Removed owner role from ${targetEmail}`);
+        logger.warn(`Removed owner role from ${targetEmail}`);
     }
 }

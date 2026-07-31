@@ -75,6 +75,19 @@ export default tseslint.config(
     },
 
     // =========================================================
+    // no-console 守門（工作項 4.5）：一律走 NestJS Logger
+    // =========================================================
+    // src/ 內 45 處 console.* 已於 4.5 轉為 Logger；此規則防復發。
+    // 豁免：main.ts（bootstrap 早於 DI/Logger 可用）、scripts/**（獨立維運腳本）。
+    {
+        files: ['src/**/*.ts'],
+        ignores: ['src/main.ts', 'src/scripts/**'],
+        rules: {
+            'no-console': ['error', { allow: ['warn', 'error'] }],
+        },
+    },
+
+    // =========================================================
     // 核心守門區：*.module.ts
     // =========================================================
     // 這裡是 E.3 事故的發生地。在 NestJS 的 module 檔中，

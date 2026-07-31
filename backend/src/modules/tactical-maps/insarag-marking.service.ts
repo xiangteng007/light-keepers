@@ -477,7 +477,7 @@ export class InsaragMarkingService {
      */
     generateInsaragReport(): {
         generatedAt: Date;
-        stats: ReturnType<typeof this.getSearchAndRescueStats>;
+        stats: ReturnType<InsaragMarkingService['getSearchAndRescueStats']>;
         activeSearchLocations: Array<{ address: string; teams: string[] }>;
         criticalHazards: HazardMarking[];
         priorityRescues: Array<{ address: string; estimatedAlive: number }>;
