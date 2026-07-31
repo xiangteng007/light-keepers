@@ -48,6 +48,10 @@ export default function DrillsPage() {
         try {
             setLoading(true);
             setError(null);
+            // ⚠️ 這裡的 `/api` 前綴看似重複，實際上是正確的：後端該模組寫成
+            // `@Controller('api/drill')`，疊加 global prefix `api/v1` 後真實路由是
+            // /api/v1/api/drill/scenarios。請勿「順手」移除 `/api`，會直接 404。
+            // 後端路由命名不一致的問題留待 Phase 3 統一整理。
             const response = await api.get('/api/drill/scenarios');
             const data = response.data?.data || response.data || [];
             const items = Array.isArray(data) ? data : (data.scenarios || data.items || []);

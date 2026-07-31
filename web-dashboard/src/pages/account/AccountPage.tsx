@@ -28,6 +28,7 @@ import { MOCK_ACCOUNT_DATA, simulateApiCall } from './account.mock';
 // Styles & Utilities
 import styles from './AccountPage.module.css';
 import { authLogger } from '../../utils/logger';
+import { isDevModeUser } from '../../utils/devMode';
 
 // Tab configuration
 const TABS: { id: TabId; label: string }[] = [
@@ -64,8 +65,8 @@ const AccountPage: React.FC = () => {
 
     // Show login modal if not authenticated (after auth loading completes)
     useEffect(() => {
-        // Check for dev mode - skip if dev mode is enabled
-        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        // Check for dev mode - skip if dev mode is enabled (DEV build only)
+        const devModeEnabled = isDevModeUser();
         // Wait for auth to finish loading before showing login
         if (!authLoading && !user && !devModeEnabled) {
             authLogger.debug('User not authenticated, showing login modal');
@@ -80,7 +81,10 @@ const AccountPage: React.FC = () => {
             try {
                 // Try fetching full profile from API
                 const { default: api } = await import('../../utils/api');
-                const response = await api.get('/api/account/profile');
+                // utils/api 的 axios baseURL 已是 `${VITE_API_URL}/api/v1`，不可再加 `/api`。
+                // 原本的 '/api/account/profile' 會打到 /api/v1/api/account/profile —— 後端無此路由。
+                // 實際的個人資料端點：@Controller('auth') + @Get('me') → /api/v1/auth/me
+                const response = await api.get('/auth/me');
                 const apiData = response.data?.data || response.data || {};
                 
                 // Merge API data over user auth context

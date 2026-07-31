@@ -9,6 +9,7 @@
  * @version 2.0.0 — Expert-level optimization
  */
 import axios from 'axios';
+import { isDevModeUser } from '../utils/devMode';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
@@ -56,8 +57,8 @@ let refreshPromise: Promise<string | null> | null = null;
  * receive the same Promise — preventing duplicate refresh requests.
  */
 export const refreshAccessToken = async (): Promise<string | null> => {
-    // DevMode bypass
-    if (typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true') {
+    // DevMode bypass（僅 DEV build 有效；production 恆為 false）
+    if (isDevModeUser()) {
         return null;
     }
 

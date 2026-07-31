@@ -17,6 +17,7 @@ import { io, Socket } from 'socket.io-client';
 import { useAuth } from './AuthContext';
 import { socketLogger } from '../utils/logger';
 import { API_BASE_URL } from '../api/config';
+import { isDevModeUser } from '../utils/devMode';
 
 // 警報類型
 interface Alert {
@@ -76,8 +77,8 @@ export function RealtimeProvider({ children }: { children: ReactNode }) {
 
     // 初始化 Socket 連線
     useEffect(() => {
-        // 🔧 DevMode 時跳過 WebSocket 連接
-        const devModeEnabled = localStorage.getItem('devModeUser') === 'true';
+        // 🔧 DevMode 時跳過 WebSocket 連接（僅 DEV build 有效）
+        const devModeEnabled = isDevModeUser();
         if (devModeEnabled) {
             socketLogger.debug('WebSocket skipped in dev mode');
             return;

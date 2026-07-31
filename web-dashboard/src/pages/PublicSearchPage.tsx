@@ -3,9 +3,8 @@
  */
 
 import React, { useState } from 'react';
+import { API_BASE } from '../api/config';
 import './PublicSearchPage.css';
-
-const API_BASE = import.meta.env.VITE_API_URL || '';
 
 interface SearchResult {
     id: string;
@@ -34,7 +33,11 @@ export const PublicSearchPage: React.FC = () => {
         setResult(null);
 
         try {
-            const response = await fetch(`${API_BASE}/api/reunification/search/${queryCode.trim()}`);
+            // API_BASE 已含 `/api/v1`，不可再加 `/api` 前綴。
+            // 後端：@Controller('reunification') + @Get('search') + @Query('code')
+            const response = await fetch(
+                `${API_BASE}/reunification/search?code=${encodeURIComponent(queryCode.trim())}`
+            );
             if (!response.ok) {
                 if (response.status === 404) {
                     setError('查無此查詢碼，請確認後再試');

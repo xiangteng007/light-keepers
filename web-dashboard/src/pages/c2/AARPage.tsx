@@ -34,7 +34,12 @@ export default function AARPage() {
         try {
             setLoading(true);
             setError(null);
-            // Try the AAR listing endpoint
+            // ⚠️ 後端目前沒有「跨任務的 AAR 列表」端點。
+            // 現有 AAR 路由只有 `@Controller('api/missions/:sessionId/aar')`
+            // （疊加 global prefix 後為 /api/v1/api/missions/:sessionId/aar），需要 sessionId。
+            // 因此本呼叫必定失敗並落入下方 catch 顯示錯誤訊息。
+            // 這不是路徑重複 bug（該模組後端本來就帶 `api/` 前綴），而是缺少後端端點，
+            // 需在 Phase 3 補 GET /aar 列表端點後再一併調整。
             const response = await api.get('/api/aar');
             const data = response.data?.data || response.data || [];
             const items = Array.isArray(data) ? data : (data.items || data.reports || []);
