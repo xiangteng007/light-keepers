@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import { CoreJwtGuard } from './guards/core-jwt.guard';
 import { UnifiedRolesGuard } from './guards/unified-roles.guard';
 import { GlobalAuthGuard } from './guards/global-auth.guard';
+import { getRequiredJwtSecret } from '../../common/config/jwt.config';
 
 // Re-export all guards, decorators, and types
 export * from './guards';
@@ -49,7 +50,7 @@ export * from './guards';
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET', 'light-keepers-jwt-secret-2024'),
+                secret: getRequiredJwtSecret(configService),
                 signOptions: { expiresIn: '7d' },
             }),
         }),

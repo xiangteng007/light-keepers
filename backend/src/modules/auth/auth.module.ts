@@ -15,6 +15,7 @@ import { OAuthService } from './services/oauth.service';
 import { TwoFactorService } from './services/two-factor.service';
 import { TwoFactorController } from './two-factor.controller';
 import { LineBotModule } from '../line-bot/line-bot.module';
+import { getRequiredJwtSecret } from '../../common/config/jwt.config';
 
 @Module({
     imports: [
@@ -29,7 +30,7 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET', 'light-keepers-jwt-secret-2024'),
+                secret: getRequiredJwtSecret(configService),
                 signOptions: { expiresIn: '15m' }, // Shortened to 15 minutes with refresh token
             }),
         }),

@@ -3,6 +3,8 @@ module.exports = {
     moduleFileExtensions: ['js', 'json', 'ts'],
     rootDir: 'src',
     testRegex: '.*\\.spec\\.ts$',
+    // 提供測試專用的 JWT_SECRET（程式碼已移除硬編碼 fallback，改為 fail-fast）
+    setupFiles: ['<rootDir>/test/jest-setup.ts'],
     transform: {
         '^.+\\.(t|j)s$': 'ts-jest',
     },

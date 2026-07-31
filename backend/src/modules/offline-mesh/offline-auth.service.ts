@@ -9,6 +9,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as crypto from 'crypto';
+import { getRequiredOfflineSecret } from '../../common/config/jwt.config';
 
 export interface OfflineToken {
     token: string;
@@ -250,9 +251,9 @@ export class OfflineAuthService {
     // ==================== Private Helpers ====================
 
     private getOfflineSecret(): string {
-        return this.configService.get<string>('JWT_OFFLINE_SECRET') 
-            || this.configService.get<string>('JWT_SECRET') 
-            || 'offline-fallback-secret';
+        // 不提供硬編碼 fallback：缺少密鑰時直接 throw，
+        // 避免離線 token 用可預測的密鑰簽章而被偽造。
+        return getRequiredOfflineSecret(this.configService);
     }
 
     private generateSignature(token: string): string {

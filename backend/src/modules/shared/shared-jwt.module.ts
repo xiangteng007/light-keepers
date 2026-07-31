@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SimpleJwtGuard } from './simple-jwt.guard';
+import { getRequiredJwtSecret } from '../../common/config/jwt.config';
 
 /**
  * Shared JWT Module
@@ -20,7 +21,7 @@ import { SimpleJwtGuard } from './simple-jwt.guard';
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET', 'light-keepers-jwt-secret-2024'),
+                secret: getRequiredJwtSecret(configService),
                 signOptions: { expiresIn: '7d' },
             }),
         }),
