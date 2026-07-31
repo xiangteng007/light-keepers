@@ -89,7 +89,6 @@ import { SystemModule } from './modules/system/system.module';
 // ==============================================
 // Webhooks & Integrations
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
-import { Fire119Module } from './modules/fire-119/fire-119.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
@@ -300,7 +299,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // ==============================================
         // Webhooks & Integrations
         WebhooksModule, // 🔗 Webhook 接收
-        Fire119Module, // 🚒 119 消防整合
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
         FatigueDetectionModule, // 😴 疲勞偵測
