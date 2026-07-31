@@ -53,7 +53,7 @@ async function resetAccounts() {
             console.log('📝 Next steps:');
             console.log('   1. Go to Firebase Console > Authentication');
             console.log('   2. Delete all users (or keep existing)');
-            console.log('   3. Create new user: xiangteng007@gmail.com / 19861007');
+            console.log('   3. Create new owner user (email/password 由操作者自行決定，勿寫入原始碼)');
             console.log('   4. Login via web app - account will be auto-created with owner role');
             console.log('═══════════════════════════════════════════════════════');
             
