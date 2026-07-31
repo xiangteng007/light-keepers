@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Dashboard Editor Page
  * Drag-and-drop dashboard customization
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './DashboardEditorPage.css';
 
 interface WidgetDefinition {
@@ -49,33 +50,26 @@ const DashboardEditorPage: React.FC = () => {
 
     const loadLayout = async () => {
         try {
-            const response = await fetch('/api/dashboard/layout');
-            if (response.ok) {
-                const data = await response.json();
-                if (data.data?.widgets) {
-                    setPlacedWidgets(data.data.widgets);
-                    setLayoutName(data.data.name || '我的儀表板');
-                }
+            const { data } = await api.get('/dashboard/layout');
+            if (data.data?.widgets) {
+                setPlacedWidgets(data.data.widgets);
+                setLayoutName(data.data.name || '我的儀表板');
             }
         } catch (error) {
-            console.error('Failed to load layout:', error);
+            console.error('Failed to load layout:', getApiErrorMessage(error, '載入儀表板配置失敗'));
         }
     };
 
     const saveLayout = async () => {
         setSaving(true);
         try {
-            await fetch('/api/dashboard/layout', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    name: layoutName,
-                    widgets: placedWidgets,
-                }),
+            await api.put('/dashboard/layout', {
+                name: layoutName,
+                widgets: placedWidgets,
             });
             alert('儀表板已儲存');
         } catch (error) {
-            console.error('Failed to save layout:', error);
+            console.error('Failed to save layout:', getApiErrorMessage(error, '儲存儀表板配置失敗'));
         } finally {
             setSaving(false);
         }

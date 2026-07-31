@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { deleteAccount, blacklistAccount } from '../api/services';
 import './PermissionsPage.css';
-import api from '../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // Types
 interface AdminAccount {
@@ -117,8 +118,7 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '角色已更新' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } }, message?: string };
-            setMessage({ type: 'error', text: error.response?.data?.message || error.message || '更新失敗' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '更新失敗') });
             setTimeout(() => setMessage(null), 5000);
         } finally {
             setSavingUser(null);
@@ -142,8 +142,7 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '頁面權限已更新' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } }, message?: string };
-            setMessage({ type: 'error', text: error.response?.data?.message || error.message || '更新失敗' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '更新失敗') });
             setTimeout(() => setMessage(null), 5000);
         }
     };
@@ -221,8 +220,7 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '帳號已刪除' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setMessage({ type: 'error', text: error.response?.data?.message || '刪除失敗' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '刪除失敗') });
             setTimeout(() => setMessage(null), 5000);
         } finally {
             setProcessingId(null);
@@ -243,8 +241,7 @@ export default function PermissionsPage() {
             setMessage({ type: 'success', text: '帳號已加入黑名單' });
             setTimeout(() => setMessage(null), 3000);
         } catch (err: unknown) {
-            const error = err as { response?: { data?: { message?: string } } };
-            setMessage({ type: 'error', text: error.response?.data?.message || '操作失敗' });
+            setMessage({ type: 'error', text: getApiErrorMessage(err, '操作失敗') });
             setTimeout(() => setMessage(null), 5000);
         } finally {
             setProcessingId(null);

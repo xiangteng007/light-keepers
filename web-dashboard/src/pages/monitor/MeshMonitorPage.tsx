@@ -1,10 +1,12 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 網狀網路監控頁面 (Mesh Monitor Page)
  * 模組 B 前端：LoRa 節點拓樸與訊息監控
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { LEGACY } from '../../api/paths';
 import './MeshMonitorPage.css';
 
 interface MeshNode {
@@ -64,51 +66,43 @@ const MeshMonitorPage: React.FC = () => {
 
     const loadNodes = async () => {
         try {
-            const response = await fetch('/api/mesh/nodes');
-            if (response.ok) {
-                const data = await response.json();
-                setNodes(data.data || []);
-            }
+            const { data } = await api.get(`${LEGACY.mesh}/nodes`);
+            setNodes(data.data || []);
         } catch (error) {
-            console.error('Failed to load nodes:', error);
+            console.error('Failed to load nodes:', getApiErrorMessage(error, '節點資料載入失敗'));
         }
     };
 
     const loadStats = async () => {
         try {
-            const response = await fetch('/api/mesh/stats');
-            if (response.ok) {
-                const data = await response.json();
-                setStats(data.data);
-            }
+            const { data } = await api.get(`${LEGACY.mesh}/stats`);
+            setStats(data.data);
         } catch (error) {
-            console.error('Failed to load stats:', error);
+            console.error('Failed to load stats:', getApiErrorMessage(error, '統計資料載入失敗'));
         }
     };
 
     const loadNodeMessages = async (nodeId: string) => {
         try {
-            const response = await fetch(`/api/mesh/nodes/${encodeURIComponent(nodeId)}/messages?limit=20`);
-            if (response.ok) {
-                const data = await response.json();
-                setMessages(data.data || []);
-            }
+            const { data } = await api.get(`${LEGACY.mesh}/nodes/${encodeURIComponent(nodeId)}/messages`, {
+                params: { limit: 20 },
+            });
+            setMessages(data.data || []);
         } catch (error) {
-            console.error('Failed to load messages:', error);
+            console.error('Failed to load messages:', getApiErrorMessage(error, '訊息載入失敗'));
         }
     };
 
     const triggerSync = async () => {
         setSyncing(true);
         try {
-            const response = await fetch('/api/mesh/sync', { method: 'POST' });
-            const data = await response.json();
+            const { data } = await api.post(`${LEGACY.mesh}/sync`);
             if (data.success) {
                 alert(`已同步 ${data.data.synced} 筆訊息`);
                 loadStats();
             }
         } catch (error) {
-            console.error('Sync failed:', error);
+            console.error('Sync failed:', getApiErrorMessage(error, '同步失敗'));
         } finally {
             setSyncing(false);
         }

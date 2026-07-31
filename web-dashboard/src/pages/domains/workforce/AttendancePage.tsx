@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../../api/client';
+import { getApiErrorMessage } from '../../../api/errors';
 import { Alert } from '../../../design-system';
 import './AttendancePage.css';
 
@@ -46,7 +47,7 @@ export default function AttendancePage() {
             })));
         } catch (err: any) {
             console.error('Failed to fetch attendance records:', err);
-            setError(err?.response?.data?.message || '無法載入出勤記錄');
+            setError(getApiErrorMessage(err, '無法載入出勤記錄'));
             setRecords([]);
         } finally {
             setLoading(false);

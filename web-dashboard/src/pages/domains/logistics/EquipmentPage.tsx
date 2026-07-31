@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import api from '../../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../../api/client';
+import { getApiErrorMessage } from '../../../api/errors';
 
 interface Equipment {
     id: string;
@@ -44,7 +45,7 @@ export default function EquipmentPage() {
             setStats(statsRes.data || null);
         } catch (err: any) {
             console.error('Failed to fetch equipment:', err);
-            setError(err.response?.data?.message || err.message || '無法載入設備資料');
+            setError(getApiErrorMessage(err, '無法載入設備資料'));
         } finally {
             setLoading(false);
         }

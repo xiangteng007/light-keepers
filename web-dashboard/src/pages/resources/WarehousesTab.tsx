@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Button } from '../../design-system';
 import './WarehousesTab.css';
-import { API_BASE } from '../../api/config';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 
 interface Warehouse {
     id: string;
@@ -49,24 +49,22 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
 
     const fetchWarehouses = async () => {
         try {
-            const res = await fetch(`${API_BASE}/warehouses`);
-            const data = await res.json();
+            const { data } = await api.get('/warehouses');
             setWarehouses(data.data || []);
             if (data.data?.length > 0 && !selectedWarehouse) {
                 setSelectedWarehouse(data.data[0].id);
             }
         } catch (err) {
-            console.error('Failed to fetch warehouses:', err);
+            console.error('Failed to fetch warehouses:', getApiErrorMessage(err, '載入倉庫清單失敗'));
         }
     };
 
     const fetchLocations = async (warehouseId: string) => {
         try {
-            const res = await fetch(`${API_BASE}/warehouses/${warehouseId}/locations`);
-            const data = await res.json();
+            const { data } = await api.get(`/warehouses/${warehouseId}/locations`);
             setLocations(data.data || []);
         } catch (err) {
-            console.error('Failed to fetch locations:', err);
+            console.error('Failed to fetch locations:', getApiErrorMessage(err, '載入儲位清單失敗'));
         }
     };
 
@@ -83,36 +81,26 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
 
     const handleAddWarehouse = async () => {
         try {
-            const res = await fetch(`${API_BASE}/warehouses`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(warehouseForm),
-            });
-            if (res.ok) {
-                await fetchWarehouses();
-                setShowAddWarehouse(false);
-                setWarehouseForm({ name: '', code: '', address: '', contactPerson: '', contactPhone: '', notes: '', isPrimary: false });
-            }
+            await api.post('/warehouses', warehouseForm);
+            await fetchWarehouses();
+            setShowAddWarehouse(false);
+            setWarehouseForm({ name: '', code: '', address: '', contactPerson: '', contactPhone: '', notes: '', isPrimary: false });
         } catch (err) {
             console.error('Failed to create warehouse:', err);
+            alert(getApiErrorMessage(err, '新增倉庫失敗'));
         }
     };
 
     const handleAddLocation = async () => {
         if (!selectedWarehouse) return;
         try {
-            const res = await fetch(`${API_BASE}/warehouses/${selectedWarehouse}/locations`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(locationForm),
-            });
-            if (res.ok) {
-                await fetchLocations(selectedWarehouse);
-                setShowAddLocation(false);
-                setLocationForm({ zone: '', rack: '', level: '', position: '', capacity: 0 });
-            }
+            await api.post(`/warehouses/${selectedWarehouse}/locations`, locationForm);
+            await fetchLocations(selectedWarehouse);
+            setShowAddLocation(false);
+            setLocationForm({ zone: '', rack: '', level: '', position: '', capacity: 0 });
         } catch (err) {
             console.error('Failed to create location:', err);
+            alert(getApiErrorMessage(err, '新增儲位失敗'));
         }
     };
 

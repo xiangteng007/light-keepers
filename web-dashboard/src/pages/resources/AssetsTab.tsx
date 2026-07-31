@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
 import './AssetsTab.css';
-import { API_BASE } from '../../api/config';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 
 type AssetStatus = 'in_stock' | 'borrowed' | 'maintenance' | 'disposed' | 'lost';
 
@@ -54,13 +54,13 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
     const fetchAssets = async () => {
         try {
             const [assetsRes, statsRes] = await Promise.all([
-                fetch(`${API_BASE}/assets${filterStatus !== 'all' ? `?status=${filterStatus}` : ''}`).then(r => r.json()),
-                fetch(`${API_BASE}/assets/stats`).then(r => r.json()),
+                api.get('/assets', { params: filterStatus !== 'all' ? { status: filterStatus } : undefined }).then(r => r.data),
+                api.get('/assets/stats').then(r => r.data),
             ]);
             setAssets(assetsRes.data || []);
             setStats(statsRes.data || { total: 0, byStatus: {}, overdue: 0 });
         } catch (err) {
-            console.error('Failed to fetch assets:', err);
+            console.error('Failed to fetch assets:', getApiErrorMessage(err, '載入資產清單失敗'));
         }
     };
 
@@ -72,44 +72,28 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
     const handleBorrow = async () => {
         if (!selectedAsset) return;
         try {
-            const res = await fetch(`${API_BASE}/assets/${selectedAsset.id}/borrow`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...borrowForm, operatorName: userName }),
-            });
-            if (res.ok) {
-                await fetchAssets();
-                setShowBorrowModal(false);
-                setSelectedAsset(null);
-                setBorrowForm({ borrowerName: '', borrowerOrg: '', borrowerContact: '', purpose: '', expectedReturnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] });
-            } else {
-                const err = await res.json();
-                alert(err.message || '借出失敗');
-            }
+            await api.post(`/assets/${selectedAsset.id}/borrow`, { ...borrowForm, operatorName: userName });
+            await fetchAssets();
+            setShowBorrowModal(false);
+            setSelectedAsset(null);
+            setBorrowForm({ borrowerName: '', borrowerOrg: '', borrowerContact: '', purpose: '', expectedReturnDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] });
         } catch (err) {
             console.error('Failed to borrow:', err);
+            alert(getApiErrorMessage(err, '借出失敗'));
         }
     };
 
     const handleReturn = async () => {
         if (!selectedAsset || !returnForm.toLocationId) return;
         try {
-            const res = await fetch(`${API_BASE}/assets/${selectedAsset.id}/return`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...returnForm, operatorName: userName }),
-            });
-            if (res.ok) {
-                await fetchAssets();
-                setShowReturnModal(false);
-                setSelectedAsset(null);
-                setReturnForm({ returnCondition: 'normal', conditionNote: '', toLocationId: '' });
-            } else {
-                const err = await res.json();
-                alert(err.message || '歸還失敗');
-            }
+            await api.post(`/assets/${selectedAsset.id}/return`, { ...returnForm, operatorName: userName });
+            await fetchAssets();
+            setShowReturnModal(false);
+            setSelectedAsset(null);
+            setReturnForm({ returnCondition: 'normal', conditionNote: '', toLocationId: '' });
         } catch (err) {
             console.error('Failed to return:', err);
+            alert(getApiErrorMessage(err, '歸還失敗'));
         }
     };
 

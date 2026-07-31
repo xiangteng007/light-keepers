@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 import { PageTemplate } from '../../../components/PageTemplate';
 import { Alert } from '../../../design-system';
-import api from '../../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../../api/client';
+import { getApiErrorMessage } from '../../../api/errors';
 import './CommunityCenterPage.css';
 
 interface Community {
@@ -86,7 +87,7 @@ export default function CommunityCenterPage() {
             }
         } catch (err: any) {
             console.error('Failed to fetch community data:', err);
-            setError(err?.response?.data?.message || '無法載入資料');
+            setError(getApiErrorMessage(err, '無法載入資料'));
         } finally {
             setLoading(false);
         }

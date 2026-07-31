@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Analytics Dashboard Page
  * AI-powered analytics and insights visualization
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './AnalyticsDashboardPage.css';
 
 interface RiskPrediction {
@@ -45,27 +46,24 @@ const AnalyticsDashboardPage: React.FC = () => {
     const loadAnalyticsData = async () => {
         try {
             const [predRes, trendRes, anomalyRes] = await Promise.all([
-                fetch('/api/analytics/predictions'),
-                fetch('/api/analytics/trends'),
-                fetch('/api/analytics/anomalies'),
+                api.get('/analytics/predictions').catch(() => null),
+                api.get('/analytics/trends').catch(() => null),
+                api.get('/analytics/anomalies').catch(() => null),
             ]);
 
-            if (predRes.ok) {
-                const data = await predRes.json();
-                setPredictions(data.data || []);
+            if (predRes) {
+                setPredictions(predRes.data.data || []);
             }
 
-            if (trendRes.ok) {
-                const data = await trendRes.json();
-                setTrends(data.data || []);
+            if (trendRes) {
+                setTrends(trendRes.data.data || []);
             }
 
-            if (anomalyRes.ok) {
-                const data = await anomalyRes.json();
-                setAnomalies(data.data || []);
+            if (anomalyRes) {
+                setAnomalies(anomalyRes.data.data || []);
             }
         } catch (error) {
-            console.error('Failed to load analytics:', error);
+            console.error('Failed to load analytics:', getApiErrorMessage(error, '無法載入分析資料'));
         } finally {
             setLoading(false);
         }

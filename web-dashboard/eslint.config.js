@@ -46,9 +46,13 @@ const BARE_FETCH_MESSAGE = [
  *  - `push-notification.service`：SW / FCM 情境，已正確使用 `API_BASE`（含 `/api/v1`）
  *  - `uploadQueue`：presigned URL 直傳 GCS，夾在 initiate/complete 之間，
  *    無法走 axios baseURL；已改為即時讀取 token + 401 refresh 重試
+ *  - `src/pages/MonitorPage.tsx`：類別 E（見 API_CLIENT_CONSOLIDATION.md §3.3/§4）。
+ *    對 `service.url`（外部健檢端點，非本站後端 API）做 timeout 健康檢查，
+ *    刻意不經過 `src/api/client.ts`（baseURL/攔截器只適用本站 `/api/v1` 端點，
+ *    且此處需要 `AbortSignal.timeout()`）。
  *
  * 工作項 3.4 已完成離線層收斂：`offlineOutbox` / `offlineSOP` / `syncManager` /
- * `rxdbSyncService` 全數刪除（孤兒或端點不存在），豁免清單由 7 檔縮減為 3 檔。
+ * `rxdbSyncService` 全數刪除（孤兒或端點不存在）。
  * 盤點見 `docs/architecture/OFFLINE_LAYER_CONSOLIDATION.md`。
  *
  * 離線寫入請一律使用 `src/services/offline/offline.service.ts` 的 outbox，
@@ -59,6 +63,7 @@ const FETCH_EXEMPT_FILES = [
   'src/services/uploadQueue.ts',
   'src/services/capacitorFilesystem.ts',
   'src/services/push-notification.service.ts',
+  'src/pages/MonitorPage.tsx',
 ]
 
 export default defineConfig([
@@ -106,14 +111,6 @@ export default defineConfig([
     files: FETCH_EXEMPT_FILES,
     rules: {
       'no-restricted-syntax': 'off',
-    },
-  },
-
-  // legacy client 自身：檔案內不受 import 禁令影響（等待 3.2 完成後整檔刪除）
-  {
-    files: ['src/utils/api.ts', 'src/services/api.ts'],
-    rules: {
-      'no-restricted-imports': 'off',
     },
   },
 ])

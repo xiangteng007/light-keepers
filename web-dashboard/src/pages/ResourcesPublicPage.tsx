@@ -1,8 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { useState, useEffect } from 'react';
 import { Card, Badge } from '../design-system';
 import './ResourcesPublicPage.css';
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // 物資分類配置
 const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
@@ -58,15 +58,15 @@ export default function ResourcesPublicPage() {
         setError(null);
         try {
             const [resourcesRes, assetsRes] = await Promise.all([
-                fetch(`${API_BASE}/resources`).then(r => r.json()),
-                fetch(`${API_BASE}/assets/public/list`).then(r => r.json()),
+                api.get('/resources').then(r => r.data),
+                api.get('/assets/public/list').then(r => r.data),
             ]);
             setResources(resourcesRes.data || []);
             setAssets(assetsRes.data || []);
             setLastUpdated(new Date());
         } catch (err) {
             console.error('Failed to fetch data:', err);
-            setError('載入資料失敗，請稍後再試');
+            setError(getApiErrorMessage(err, '載入資料失敗，請稍後再試'));
         } finally {
             setIsLoading(false);
         }

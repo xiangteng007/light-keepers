@@ -10,7 +10,8 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
-import api from '../../utils/api';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import { Alert } from '../../design-system';
 import './WebhooksPage.css';
 
@@ -78,7 +79,7 @@ export default function WebhooksPage() {
             }
         } catch (err: any) {
             console.error('Failed to fetch webhook subscriptions:', err);
-            setError(err?.response?.data?.message || '無法載入 Webhook 訂閱清單');
+            setError(getApiErrorMessage(err, '無法載入 Webhook 訂閱清單'));
             setSubscriptions([]);
         } finally {
             setLoading(false);
@@ -95,7 +96,7 @@ export default function WebhooksPage() {
             const res = await api.post(`/webhooks/subscriptions/${id}/test`);
             alert(res.data?.message || (res.data?.success ? '測試成功' : '測試失敗'));
         } catch (err: any) {
-            alert(err?.response?.data?.message || '測試失敗');
+            alert(getApiErrorMessage(err, '測試失敗'));
         } finally {
             setTestingId(null);
         }
@@ -106,7 +107,7 @@ export default function WebhooksPage() {
             await api.post(`/webhooks/subscriptions/${sub.id}/${sub.active ? 'disable' : 'enable'}`);
             await fetchData();
         } catch (err: any) {
-            alert(err?.response?.data?.message || '操作失敗');
+            alert(getApiErrorMessage(err, '操作失敗'));
         }
     };
 
@@ -126,7 +127,7 @@ export default function WebhooksPage() {
             setFormEvents([]);
             await fetchData();
         } catch (err: any) {
-            alert(err?.response?.data?.message || '建立失敗');
+            alert(getApiErrorMessage(err, '建立失敗'));
         } finally {
             setCreating(false);
         }

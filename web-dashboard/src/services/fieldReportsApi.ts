@@ -1,10 +1,9 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Field Reports API Service
  * Handles REST API calls for field reports, SOS, and live locations
  */
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // Types
 export interface FieldReport {
@@ -96,11 +95,15 @@ export const fieldReportsApi = {
         if (query.status) params.set('status', query.status);
         if (query.limit) params.set('limit', query.limit.toString());
 
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/reports?${params}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to fetch reports: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get(`/mission-sessions/${missionSessionId}/reports`, {
+                params,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to fetch reports'));
+        }
     },
 
     async createReport(missionSessionId: string, report: {
@@ -115,16 +118,14 @@ export const fieldReportsApi = {
         occurredAt?: string;
         metadata?: Record<string, any>;
     }, token: string): Promise<FieldReport> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/reports`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(report),
-        });
-        if (!res.ok) throw new Error(`Failed to create report: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/mission-sessions/${missionSessionId}/reports`, report, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to create report'));
+        }
     },
 
     async updateReport(reportId: string, update: {
@@ -133,21 +134,20 @@ export const fieldReportsApi = {
         message?: string;
         metadata?: Record<string, any>;
     }, version: number, token: string): Promise<FieldReport> {
-        const res = await fetch(`${API_URL}/reports/${reportId}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-                'If-Match': `"${version}"`,
-            },
-            body: JSON.stringify(update),
-        });
-        if (res.status === 409) {
-            const error = await res.json();
-            throw new Error(`VERSION_CONFLICT:${error.currentVersion}`);
+        try {
+            const { data } = await api.patch(`/reports/${reportId}`, update, {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'If-Match': `"${version}"`,
+                },
+            });
+            return data;
+        } catch (err: any) {
+            if (err?.response?.status === 409) {
+                throw new Error(`VERSION_CONFLICT:${err.response.data.currentVersion}`);
+            }
+            throw new Error(getApiErrorMessage(err, 'Failed to update report'));
         }
-        if (!res.ok) throw new Error(`Failed to update report: ${res.status}`);
-        return res.json();
     },
 
     // SOS
@@ -157,93 +157,94 @@ export const fieldReportsApi = {
         accuracyM?: number;
         message?: string;
     }, token: string): Promise<{ sosId: string; reportId: string; status: string }> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/sos`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(sos),
-        });
-        if (!res.ok) throw new Error(`Failed to trigger SOS: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/mission-sessions/${missionSessionId}/sos`, sos, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to trigger SOS'));
+        }
     },
 
     async ackSos(sosId: string, note?: string, token?: string): Promise<SosSignal> {
-        const res = await fetch(`${API_URL}/sos/${sosId}/ack`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ note }),
-        });
-        if (!res.ok) throw new Error(`Failed to ACK SOS: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/sos/${sosId}/ack`, { note }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to ACK SOS'));
+        }
     },
 
     async resolveSos(sosId: string, resolutionNote?: string, token?: string): Promise<SosSignal> {
-        const res = await fetch(`${API_URL}/sos/${sosId}/resolve`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ resolutionNote }),
-        });
-        if (!res.ok) throw new Error(`Failed to resolve SOS: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/sos/${sosId}/resolve`, { resolutionNote }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to resolve SOS'));
+        }
     },
 
     async getActiveSos(missionSessionId: string, token: string): Promise<SosSignal[]> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/sos/active`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get active SOS: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get(`/mission-sessions/${missionSessionId}/sos/active`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get active SOS'));
+        }
     },
 
     // Live Locations
     async getLiveLocations(missionSessionId: string, token: string): Promise<GeoJSON.FeatureCollection> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/live-locations`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get live locations: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get(`/mission-sessions/${missionSessionId}/live-locations`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get live locations'));
+        }
     },
 
     async startLocationShare(missionSessionId: string, mode: 'mission' | 'sos', token: string): Promise<any> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/location-share/start`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ mode }),
-        });
-        if (!res.ok) throw new Error(`Failed to start location share: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/mission-sessions/${missionSessionId}/location-share/start`, { mode }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to start location share'));
+        }
     },
 
     async stopLocationShare(missionSessionId: string, token: string): Promise<any> {
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/location-share/stop`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to stop location share: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/mission-sessions/${missionSessionId}/location-share/stop`, undefined, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to stop location share'));
+        }
     },
 
     // Photo Evidence
     async getPhotoEvidence(missionSessionId: string, bbox?: string, token?: string): Promise<GeoJSON.FeatureCollection> {
-        const params = new URLSearchParams();
-        if (bbox) params.set('bbox', bbox);
-
-        const res = await fetch(`${API_URL}/mission-sessions/${missionSessionId}/photo-evidence?${params}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get photo evidence: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get(`/mission-sessions/${missionSessionId}/photo-evidence`, {
+                params: bbox ? { bbox } : undefined,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get photo evidence'));
+        }
     },
 
     // Attachments
@@ -266,29 +267,25 @@ export const fieldReportsApi = {
         uploadMethod: string;
         expiresAt: string;
     }> {
-        const res = await fetch(`${API_URL}/reports/${reportId}/attachments/initiate`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(upload),
-        });
-        if (!res.ok) throw new Error(`Failed to initiate upload: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/reports/${reportId}/attachments/initiate`, upload, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to initiate upload'));
+        }
     },
 
     async completeUpload(reportId: string, attachmentId: string, success: boolean, token: string): Promise<ReportAttachment> {
-        const res = await fetch(`${API_URL}/reports/${reportId}/attachments/${attachmentId}/complete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ success }),
-        });
-        if (!res.ok) throw new Error(`Failed to complete upload: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(`/reports/${reportId}/attachments/${attachmentId}/complete`, { success }, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to complete upload'));
+        }
     },
 };
 

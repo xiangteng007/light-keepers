@@ -1,12 +1,13 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Timeline 視覺化元件
- * 
+ *
  * 整合 generateTimeline API，顯示任務派遣、災情回報、SITREP、AAR 事件
  */
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './TimelineView.css';
 
 // Timeline 事件類型
@@ -31,15 +32,15 @@ interface TimelineViewProps {
 
 // 獲取 Timeline 資料
 async function fetchTimeline(sessionId?: string, hours: number = 24): Promise<TimelineEvent[]> {
-    const params = new URLSearchParams();
-    if (sessionId) params.set('sessionId', sessionId);
-    params.set('hours', String(hours));
+    try {
+        const params: Record<string, string | number> = { hours };
+        if (sessionId) params.sessionId = sessionId;
 
-    const response = await fetch(`/api/v1/timeline?${params}`);
-    if (!response.ok) throw new Error('Failed to fetch timeline');
-
-    const data = await response.json();
-    return data.events || [];
+        const { data } = await api.get('/timeline', { params });
+        return data.events || [];
+    } catch (err) {
+        throw new Error(getApiErrorMessage(err, '無法載入時間軸資料'));
+    }
 }
 
 // 事件類型顏色

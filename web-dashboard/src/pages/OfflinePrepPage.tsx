@@ -1,5 +1,6 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect, useCallback } from 'react';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import './OfflinePrepPage.css';
 
 interface MapPackage {
@@ -45,30 +46,23 @@ export const OfflinePrepPage: React.FC<OfflinePrepPageProps> = ({
         const fetchPackages = async () => {
             setIsLoading(true);
             try {
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                const token = localStorage.getItem('accessToken');
-
                 // Fetch all packages
-                const allRes = await fetch(`${API_URL}/map-packages`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const allData = await allRes.json();
+                const { data: allData } = await api.get('/map-packages');
                 setPackages(allData);
 
                 // Fetch recommended for session
                 if (sessionId) {
-                    const recRes = await fetch(`${API_URL}/map-packages/recommend?sessionId=${sessionId}`, {
-                        headers: { Authorization: `Bearer ${token}` },
+                    const { data: recData } = await api.get('/map-packages/recommend', {
+                        params: { sessionId },
                     });
-                    const recData = await recRes.json();
                     setRecommended(recData);
                 }
 
                 // Calculate total size
                 const total = allData.reduce((sum: number, pkg: MapPackage) => sum + pkg.size, 0);
                 setTotalSpace(total);
-            } catch (err: any) {
-                setError(err.message || '無法載入地圖套件');
+            } catch (err) {
+                setError(getApiErrorMessage(err, '無法載入地圖套件'));
             } finally {
                 setIsLoading(false);
             }

@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Notification Center Page
  * Unified notification history and management
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './NotificationCenterPage.css';
 
 interface NotificationItem {
@@ -37,14 +38,12 @@ const NotificationCenterPage: React.FC = () => {
 
     const loadNotifications = async () => {
         try {
-            const params = filter === 'unread' ? '?unreadOnly=true' : '';
-            const response = await fetch(`/api/notifications${params}`);
-            if (response.ok) {
-                const data = await response.json();
-                setNotifications(data.data || []);
-            }
+            const response = await api.get('/notifications', {
+                params: filter === 'unread' ? { unreadOnly: true } : {},
+            });
+            setNotifications(response.data.data || []);
         } catch (error) {
-            console.error('Failed to load notifications:', error);
+            console.error('Failed to load notifications:', getApiErrorMessage(error, '無法載入通知'));
         } finally {
             setLoading(false);
         }
@@ -52,35 +51,32 @@ const NotificationCenterPage: React.FC = () => {
 
     const loadStats = async () => {
         try {
-            const response = await fetch('/api/notifications/stats');
-            if (response.ok) {
-                const data = await response.json();
-                setStats(data.data);
-            }
+            const response = await api.get('/notifications/stats');
+            setStats(response.data.data);
         } catch (error) {
-            console.error('Failed to load stats:', error);
+            console.error('Failed to load stats:', getApiErrorMessage(error, '無法載入統計資料'));
         }
     };
 
     const markAsRead = async (id: string) => {
         try {
-            await fetch(`/api/notifications/${id}/read`, { method: 'POST' });
+            await api.post(`/notifications/${id}/read`);
             setNotifications(prev =>
                 prev.map(n => n.id === id ? { ...n, status: 'read' } : n)
             );
         } catch (error) {
-            console.error('Failed to mark as read:', error);
+            console.error('Failed to mark as read:', getApiErrorMessage(error, '標記已讀失敗'));
         }
     };
 
     const markAllAsRead = async () => {
         try {
-            await fetch('/api/notifications/read-all', { method: 'POST' });
+            await api.post('/notifications/read-all');
             setNotifications(prev =>
                 prev.map(n => ({ ...n, status: 'read' }))
             );
         } catch (error) {
-            console.error('Failed to mark all as read:', error);
+            console.error('Failed to mark all as read:', getApiErrorMessage(error, '全部標記已讀失敗'));
         }
     };
 

@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import { initializeApp } from 'firebase/app';
 import {
     getAuth,
@@ -14,7 +13,8 @@ import {
     EmailAuthProvider,
 } from 'firebase/auth';
 import firebaseConfig from '../config/firebase.config';
-import { API_BASE } from '../api/config';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -157,20 +157,15 @@ export const firebaseAuthService = {
 
         try {
             // 使用後端 API 發送自訂驗證信
-            const response = await fetch(`${API_BASE}/auth/resend-verification`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: user.email, displayName: user.displayName }),
+            await api.post('/auth/resend-verification', {
+                email: user.email,
+                displayName: user.displayName,
             });
 
-            if (response.ok) {
-                return { success: true, message: '驗證信已重新發送' };
-            }
-
-            // 如果後端失敗，回傳錯誤而非使用 Firebase fallback
-            return { success: false, message: '發送失敗，請稍後再試' };
+            return { success: true, message: '驗證信已重新發送' };
         } catch (error: any) {
-            return { success: false, message: '發送失敗，請檢查網路連線' };
+            // 如果後端失敗，回傳錯誤而非使用 Firebase fallback
+            return { success: false, message: getApiErrorMessage(error, '發送失敗，請稍後再試') };
         }
     },
 

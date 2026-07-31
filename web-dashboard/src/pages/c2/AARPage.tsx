@@ -7,7 +7,8 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { FileCheck, Calendar, Users, Lightbulb, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
-import api from '../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './AARPage.css';
 
 interface AARReport {
@@ -46,7 +47,7 @@ export default function AARPage() {
             setAars(items);
         } catch (err: any) {
             console.error('Failed to fetch AARs:', err);
-            setError(err?.response?.data?.message || '無法載入 AAR 列表');
+            setError(getApiErrorMessage(err, '無法載入 AAR 列表'));
             setAars([]);
         } finally {
             setLoading(false);
