@@ -210,6 +210,214 @@
             "expiryDate": null,
             "dataClassification": "internal",
             "risk": "medium"
+        },
+        {
+            "id": "transparency-search",
+            "method": "GET",
+            "path": "/api/public/transparency/search",
+            "reason": "Public transparency ledger: receipt-number lookup of published resource logistics history; no PII (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "transparency-resource",
+            "method": "GET",
+            "path": "/api/public/transparency/resource/:resourceId",
+            "reason": "Public transparency ledger: receipt-number lookup of published resource logistics history; no PII (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "transparency-validate",
+            "method": "GET",
+            "path": "/api/public/transparency/validate/:resourceId",
+            "reason": "Public transparency ledger: receipt-number lookup of published resource logistics history; no PII (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "transparency-stats",
+            "method": "GET",
+            "path": "/api/public/transparency/stats",
+            "reason": "Public transparency ledger: receipt-number lookup of published resource logistics history; no PII (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "transparency-recent",
+            "method": "GET",
+            "path": "/api/public/transparency/recent",
+            "reason": "Public transparency ledger: receipt-number lookup of published resource logistics history; no PII (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-summary",
+            "method": "GET",
+            "path": "/api/public/finance/summary/:year",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-expenditures",
+            "method": "GET",
+            "path": "/api/public/finance/expenditures/:year",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-project",
+            "method": "GET",
+            "path": "/api/public/finance/project/:id",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-donor-ack",
+            "method": "GET",
+            "path": "/api/public/finance/donor-acknowledgement",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-annual-report",
+            "method": "GET",
+            "path": "/api/public/finance/annual-report/:year",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "finance-dashboard",
+            "method": "GET",
+            "path": "/api/public/finance/dashboard",
+            "reason": "NPO public financial disclosure: aggregated figures only, no donor PII (verified in public-finance.service; work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-shelters",
+            "method": "GET",
+            "path": "/public-resources/shelters",
+            "reason": "Life-safety public info: shelter and AED locations, read-only, no PII; same nature as PublicController L0 endpoints (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-shelters-nearby",
+            "method": "GET",
+            "path": "/public-resources/shelters/nearby",
+            "reason": "Life-safety public info: shelter and AED locations, read-only, no PII; same nature as PublicController L0 endpoints (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-aed",
+            "method": "GET",
+            "path": "/public-resources/aed",
+            "reason": "Life-safety public info: shelter and AED locations, read-only, no PII; same nature as PublicController L0 endpoints (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-aed-nearby",
+            "method": "GET",
+            "path": "/public-resources/aed/nearby",
+            "reason": "Life-safety public info: shelter and AED locations, read-only, no PII; same nature as PublicController L0 endpoints (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-map",
+            "method": "GET",
+            "path": "/public-resources/map",
+            "reason": "Life-safety public info: shelter and AED locations, read-only, no PII; same nature as PublicController L0 endpoints (work item 1.5b).",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard"
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         }
     ]
 }
