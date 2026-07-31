@@ -8,6 +8,9 @@
    TACTICAL DARK THEME - Command Center Override
    當 html.dark 時啟用戰術主題
 ============================================ */
+/* ⬇ Design token 單一真相來源 — 必須最先載入。
+   詳見 docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md */
+@import url('./styles/tokens.css');
 @import url('./styles/globals.css');
 @import url('./styles/design-tokens.css');
 

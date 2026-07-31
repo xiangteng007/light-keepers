@@ -4,11 +4,19 @@
  * Theme: "Expert Council Light Theme"
  * Style: Navy Blue + Golden Amber, Clean Professional
  * 
- * Design System v2.0 - Unified Token Architecture
+ * Design System v3.0 - Consolidated Token Architecture
+ *
+ * @deprecated(tokens) 自 FE-2 (redesign plan 2.3) 起，本檔的 :root 自訂屬性
+ *   （--primary / --accent / --bg-* / --text-* / --v2-* …）已搬遷至單一真相來源
+ *   → src/styles/tokens.css （Layer 2c）。本檔僅保留 tailwind 指令與樣式規則。
+ *
+ * ⚠ 請勿在此新增 :root 變數；新增請至 src/styles/tokens.css。
+ * @see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md
  */
 
 /* ═══════════════════════════════════════════════════════════════
-   DESIGN SYSTEM IMPORTS - Single Source of Truth
+   STYLE-LAYER IMPORTS
+   （token 單一來源由 src/index.css 直接載入 styles/tokens.css）
    ═══════════════════════════════════════════════════════════════ */
 @import './tokens/index.css';
 @import './tokens/components.css';
@@ -20,70 +28,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ═══════════════════════════════════════════════════════════════
-   CSS CUSTOM PROPERTIES - LIGHT THEME (Expert Council Design)
-   ═══════════════════════════════════════════════════════════════ */
-
-:root {
-  /* ── Core Colors ── */
-  --primary: #001F3F;          /* Navy Blue - 主色 */
-  --accent: #D97706;           /* Golden Amber - 輔色 */
-  --success: #276749;          /* Forest Green - 低風險 */
-  --warning: #C05621;          /* Orange - 中風險 */
-  --danger: #9B2C2C;           /* Deep Red - 高風險 */
-  --critical: #702459;         /* Purple Red - 極危 */
-  
-  /* ── Background ── */
-  --bg-primary: #FFFFFF;
-  --bg-secondary: #F8FAFC;
-  --bg-card: #FFFFFF;
-  --bg-hover: #F1F5F9;
-  
-  /* ── Text ── */
-  --text-primary: #1F2937;     /* Dark Gray - 主要文字 */
-  --text-secondary: #6B7280;   /* Medium Gray - 輔助資訊 */
-  --text-muted: #9CA3AF;
-  
-  /* ── Borders ── */
-  --border-color: #E2E8F0;
-  --border-light: #F1F5F9;
-  
-  /* ── Legacy V2 Variables (for compatibility) ── */
-  --v2-bg-void: #FFFFFF;
-  --v2-bg-glass: rgba(255, 255, 255, 0.95);
-  --v2-bg-glass-heavy: rgba(248, 250, 252, 0.98);
-  --v2-bg-dim: rgba(0, 0, 0, 0.05);
-  --v2-border-subtle: #E2E8F0;
-  --v2-border-neon: rgba(0, 31, 63, 0.2);
-  --v2-border-amber: rgba(217, 119, 6, 0.3);
-  --v2-text-primary: #1F2937;
-  --v2-text-secondary: #6B7280;
-  --v2-text-dim: #9CA3AF;
-  --v2-text-accent: #001F3F;
-  --v2-primary: #D97706;       /* Golden Amber */
-  --v2-secondary: #001F3F;     /* Navy Blue */
-  --v2-critical: #9B2C2C;
-  --v2-success: #276749;
-  
-  /* ── Effects ── */
-  --v2-glow-amber: 0 2px 8px rgba(217, 119, 6, 0.15);
-  --v2-glow-cyan: 0 2px 8px rgba(0, 31, 63, 0.1);
-  --v2-backdrop-blur: 8px;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-  
-  /* ── Layout Dimensions ── */
-  --v2-nav-width: 24px;
-  --v2-header-height: 64px;
-  --v2-ticker-height: 32px;
-  
-  /* ── Typography ── */
-  --font-family: 'Noto Sans TC', 'Inter', sans-serif;
-  --radius: 8px;
-  --radius-small: 4px;
-}
-
+/* Token 宣告已搬遷 → src/styles/tokens.css (Layer 2c) */
 /* ═══════════════════════════════════════════════════════════════
    UTILITY - BACKGROUND PATTERNS (Light Theme)
    ═══════════════════════════════════════════════════════════════ */
