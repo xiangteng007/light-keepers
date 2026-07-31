@@ -16,6 +16,7 @@
 | **Phase E** | ✅ **全部完成** | E.1 JWT+deploy 閘門、E.2 憑證出 git（實際 11 檔，含 GCP 私鑰/DB 密碼/Gemini Key）、E.3 復原 17 個死模組＋後端 ESLint、E.4 LINE webhook、E.5 CI 阻擋式閘門、E.6 critical 漏洞歸零 |
 | **Phase 0** | ✅ 全部完成 | 0.1 devModeUser 後門（7 處）/token key/路徑 bug、0.3 前端測試 88 tests、0.4 ErrorBoundary、0.5 BASELINE_METRICS；0.2 併入 E.5＋後續 gate 工作 |
 | **Phase 1** | 🔄 進行中 | ✅ 1.1 SYNC_TABLES production 硬禁用（cloudbuild 源頭同步清除——**證實生產原本開著 synchronize**）、✅ 1.3 重複 entity 收斂、✅ 1.4 授權盤點（實際 43 裸 controller/361 端點）、✅ 1.5a+1.5b 共 55 controller/383 端點定級補 guard、🔄 1.6 guard 收斂執行中、⏸ 1.2 baseline migration **等 D7/D15 窗口**（範圍已擴充：損壞 migration＋稽核靜默失敗） |
+| **Phase 2** | 🔄 進行中 | ✅ 2.1 四方對帳表（127 路由/43 孤兒/38 組重複/5 權限矛盾；**mission-command 與 triage 線上是 mock、真版是孤兒**）、✅ 2.3 token 5→1（修「全站變深棕」洩漏＋字級不一致；發現 JSX Tailwind class 全 no-op）、✅ 2.4 死依賴清理（leaflet×3、@line/liff、9 檔）、✅ 2.6+2.7 WidgetContent 2479 行→16 個 domain chunk（首屏 −62 kB）＋PageWrapper 明確化、🔄 2.5 首批換皮執行中、⏸ 2.2 路由收斂**等 owner 對 D2 圈選表態** |
 | Phase M 前置 | ✅ M.0 完成 | docker-compose env 修復，compose config 實測通過 |
 | 驗證基準 | — | 後端 357 suites / 3,499 tests 全綠；前端 vitest 88/88；tsc 雙側乾淨；coverage 門檻生效（52%/32%，實測 58.5%/37.4%） |
 
