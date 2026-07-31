@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import { Storage } from '@google-cloud/storage';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common';
+import { FIELD_REPORT_STORAGE } from '../../common/storage/storage.tokens';
+import type { StorageProvider } from '../../common/storage/storage.interface';
 
 export interface SignedUrlOptions {
     bucket: string;
@@ -19,50 +19,42 @@ export interface SignedUrlResult {
 }
 
 /**
- * Google Cloud Storage Service for field reports attachments
+ * Storage service for field-report attachments.
+ *
+ * INF-1 / M.3b: routes through the `STORAGE_PROVIDER` abstraction instead of
+ * the GCS SDK, so `STORAGE_PROVIDER=local` keeps attachments working after the
+ * cloud project is shut down. In GCS mode the emitted URLs are unchanged:
+ * still v4 signatures over the same `reports/<session>/<report>/<attachment>`
+ * paths in the `GCS_BUCKET` bucket.
  */
 @Injectable()
 export class GcsStorageService {
-    private storage: Storage;
-    private readonly defaultBucket: string;
-
-    constructor(private configService: ConfigService) {
-        // Initialize GCS client
-        // In production, credentials come from GOOGLE_APPLICATION_CREDENTIALS
-        // or from the service account attached to Cloud Run
-        this.storage = new Storage();
-        this.defaultBucket = this.configService.get<string>('GCS_BUCKET', 'lightkeepers-uploads');
-    }
+    constructor(
+        @Inject(FIELD_REPORT_STORAGE) private readonly storage: StorageProvider,
+    ) { }
 
     /**
      * Generate a signed URL for uploading or downloading
      */
     async getSignedUrl(options: SignedUrlOptions): Promise<SignedUrlResult> {
-        const {
-            bucket = this.defaultBucket,
-            path,
-            contentType,
-            action,
-            expiresInMinutes = 15,
-        } = options;
+        const { path, contentType, action, expiresInMinutes = 15 } = options;
 
         const expiresAt = new Date(Date.now() + expiresInMinutes * 60 * 1000);
 
-        const [url] = await this.storage
-            .bucket(bucket)
-            .file(path)
-            .getSignedUrl({
-                version: 'v4',
-                action: action === 'write' ? 'write' : 'read',
-                expires: expiresAt,
-                contentType: action === 'write' ? contentType : undefined,
-            });
+        const url = await this.storage.getSignedUrl(path, {
+            version: 'v4',
+            action,
+            expiresAt,
+            // Only write URLs bind a content type — a read URL that pins one
+            // would reject clients that omit the header.
+            contentType: action === 'write' ? contentType : undefined,
+        });
 
         return {
             url,
             method: action === 'write' ? 'PUT' : 'GET',
             expiresAt,
-            bucket,
+            bucket: this.storage.getContainerName(),
             path,
         };
     }
@@ -78,7 +70,7 @@ export class GcsStorageService {
     ): Promise<SignedUrlResult> {
         const path = `reports/${missionSessionId}/${reportId}/${attachmentId}`;
         return this.getSignedUrl({
-            bucket: this.defaultBucket,
+            bucket: this.storage.getContainerName(),
             path,
             contentType,
             action: 'write',
@@ -91,7 +83,7 @@ export class GcsStorageService {
      */
     async generateDownloadUrl(gcsPath: string): Promise<SignedUrlResult> {
         return this.getSignedUrl({
-            bucket: this.defaultBucket,
+            bucket: this.storage.getContainerName(),
             path: gcsPath,
             contentType: 'application/octet-stream',
             action: 'read',
@@ -105,7 +97,7 @@ export class GcsStorageService {
     async generateThumbnailUploadUrl(gcsPath: string): Promise<SignedUrlResult> {
         const thumbnailPath = gcsPath.replace(/(\.[^.]+)$/, '_thumb.webp');
         return this.getSignedUrl({
-            bucket: this.defaultBucket,
+            bucket: this.storage.getContainerName(),
             path: thumbnailPath,
             contentType: 'image/webp',
             action: 'write',
@@ -118,25 +110,19 @@ export class GcsStorageService {
      */
     async fileExists(gcsPath: string): Promise<boolean> {
         try {
-            const [exists] = await this.storage
-                .bucket(this.defaultBucket)
-                .file(gcsPath)
-                .exists();
-            return exists;
+            return await this.storage.exists(gcsPath);
         } catch {
             return false;
         }
     }
 
     /**
-     * Delete a file
+     * Delete a file. Returns false when there was nothing to delete, matching
+     * the pre-abstraction behaviour (GCS `file.delete()` threw a 404).
      */
     async deleteFile(gcsPath: string): Promise<boolean> {
         try {
-            await this.storage
-                .bucket(this.defaultBucket)
-                .file(gcsPath)
-                .delete();
+            await this.storage.delete(gcsPath, { ignoreNotFound: false });
             return true;
         } catch {
             return false;
@@ -153,16 +139,13 @@ export class GcsStorageService {
         created?: Date;
     } | null> {
         try {
-            const [metadata] = await this.storage
-                .bucket(this.defaultBucket)
-                .file(gcsPath)
-                .getMetadata();
+            const info = await this.storage.getMetadata(gcsPath);
 
             return {
-                size: parseInt(metadata.size as string, 10),
-                contentType: metadata.contentType || '',
-                md5Hash: metadata.md5Hash,
-                created: metadata.timeCreated ? new Date(metadata.timeCreated) : undefined,
+                size: info.size,
+                contentType: info.contentType || '',
+                md5Hash: info.md5Hash,
+                created: info.createdAt,
             };
         } catch {
             return null;

@@ -8,7 +8,7 @@ import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { createReadStream, createWriteStream } from 'fs';
+import { createWriteStream } from 'fs';
 import { pipeline } from 'stream/promises';
 import { Readable } from 'stream';
 import * as crypto from 'crypto';
@@ -20,6 +20,7 @@ import {
     StorageListResult,
     StorageFileInfo,
     SignedUrlOptions,
+    StorageDeleteOptions,
 } from './storage.interface';
 
 @Injectable()
@@ -27,10 +28,12 @@ export class LocalStorageProvider implements StorageProvider {
     private readonly logger = new Logger(LocalStorageProvider.name);
     private readonly basePath: string;
     private readonly publicUrl: string;
+    private readonly signingSecret?: string;
 
     constructor(private readonly configService: ConfigService) {
         this.basePath = this.configService.get<string>('LOCAL_STORAGE_PATH') || './uploads';
         this.publicUrl = this.configService.get<string>('LOCAL_STORAGE_URL') || 'http://localhost:3000/uploads';
+        this.signingSecret = this.configService.get<string>('LOCAL_STORAGE_SIGNING_SECRET') || undefined;
 
         this.logger.log(`Local Storage initialized - Path: ${this.basePath}`);
 
@@ -147,7 +150,7 @@ export class LocalStorageProvider implements StorageProvider {
         };
     }
 
-    async delete(filePath: string): Promise<void> {
+    async delete(filePath: string, options?: StorageDeleteOptions): Promise<void> {
         const fullPath = this.getFullPath(filePath);
         try {
             await fs.unlink(fullPath);
@@ -159,7 +162,8 @@ export class LocalStorageProvider implements StorageProvider {
                 // Ignore if metadata file doesn't exist
             }
         } catch (error) {
-            if ((error as NodeJS.ErrnoException).code !== 'ENOENT') {
+            const missing = (error as NodeJS.ErrnoException).code === 'ENOENT';
+            if (!missing || options?.ignoreNotFound === false) {
                 throw error;
             }
         }
@@ -178,14 +182,29 @@ export class LocalStorageProvider implements StorageProvider {
     async getMetadata(filePath: string): Promise<StorageFileInfo> {
         const fullPath = this.getFullPath(filePath);
         const stats = await fs.stat(fullPath);
+        const digest = crypto.createHash('md5').update(await fs.readFile(fullPath));
 
         return {
             path: filePath,
             size: stats.size,
             contentType: this.getMimeType(filePath),
             lastModified: stats.mtime,
-            etag: crypto.createHash('md5').update(await fs.readFile(fullPath)).digest('hex'),
+            etag: digest.copy().digest('hex'),
+            // GCS reports md5 base64-encoded; match that so callers can compare
+            // the two backends without knowing which one answered.
+            md5Hash: digest.copy().digest('base64'),
+            createdAt: stats.birthtime,
+            metadata: await this.readSidecarMetadata(fullPath),
         };
+    }
+
+    private async readSidecarMetadata(fullPath: string): Promise<Record<string, string> | undefined> {
+        try {
+            const raw = await fs.readFile(`${fullPath}.meta.json`, 'utf8');
+            return JSON.parse(raw) as Record<string, string>;
+        } catch {
+            return undefined;
+        }
     }
 
     async list(options?: StorageListOptions): Promise<StorageListResult> {
@@ -233,10 +252,96 @@ export class LocalStorageProvider implements StorageProvider {
         };
     }
 
+    /**
+     * Local "signed" URL — the nginx `/uploads/` direct-serve path.
+     *
+     * The NAS deployment serves this tree with a plain `alias` +
+     * `try_files $uri =404` (infra/nas/nginx/default.conf), i.e. no
+     * `auth_request` and no `secure_link`. So the only URL shape that actually
+     * resolves today is `LOCAL_STORAGE_URL/<path>` — that is what this returns,
+     * and it matches the GCS public-object behaviour the platform had before
+     * the migration (infra/nas/README.md §7.2-2).
+     *
+     * When `LOCAL_STORAGE_SIGNING_SECRET` is set the URL additionally carries
+     * `?expires=<unix>&signature=<hmac>`. nginx matches on `$uri`, which
+     * excludes the query string, so the file still serves unchanged — but the
+     * URL is then ready for the `auth_request` step tracked in README §8:
+     * turning enforcement on becomes an nginx-side change with no new URL
+     * format for clients. `verifySignedUrl()` is that endpoint's counterpart.
+     */
     async getSignedUrl(filePath: string, options?: SignedUrlOptions): Promise<string> {
-        // Local storage doesn't support signed URLs, return direct URL
-        // In production, implement JWT-based access tokens
+        // Reachable from request data now that services inject this provider:
+        // reject traversal before it can be handed out as a URL.
+        this.getFullPath(filePath);
+
+        const base = `${this.publicUrl}/${filePath}`;
+        if (!this.signingSecret) {
+            return base;
+        }
+
+        const expiresAt =
+            options?.expiresAt ?? new Date(Date.now() + (options?.expiresIn || 3600) * 1000);
+        const expires = Math.floor(expiresAt.getTime() / 1000);
+        const action = options?.action === 'write' ? 'write' : 'read';
+        const signature = this.sign(filePath, action, expires);
+
+        return `${base}?action=${action}&expires=${expires}&signature=${signature}`;
+    }
+
+    /**
+     * Validate a URL previously produced by `getSignedUrl()`.
+     * Returns false for an unknown path, a bad signature, or an expired token.
+     */
+    verifySignedUrl(url: string, now: Date = new Date()): boolean {
+        if (!this.signingSecret) {
+            // Nothing was signed, so nothing can be verified.
+            return false;
+        }
+
+        let parsed: URL;
+        try {
+            parsed = new URL(url);
+        } catch {
+            return false;
+        }
+
+        const prefix = new URL(`${this.publicUrl}/`);
+        if (parsed.origin !== prefix.origin || !parsed.pathname.startsWith(prefix.pathname)) {
+            return false;
+        }
+
+        const filePath = decodeURIComponent(parsed.pathname.slice(prefix.pathname.length));
+        const expires = Number(parsed.searchParams.get('expires'));
+        const signature = parsed.searchParams.get('signature') ?? '';
+        const action = parsed.searchParams.get('action') === 'write' ? 'write' : 'read';
+
+        if (!Number.isFinite(expires) || expires * 1000 <= now.getTime()) {
+            return false;
+        }
+
+        const expected = this.sign(filePath, action, expires);
+        const given = Buffer.from(signature);
+        const want = Buffer.from(expected);
+
+        return given.length === want.length && crypto.timingSafeEqual(given, want);
+    }
+
+    private sign(filePath: string, action: string, expires: number): string {
+        return crypto
+            .createHmac('sha256', this.signingSecret as string)
+            .update(`${action}:${filePath}:${expires}`)
+            .digest('hex');
+    }
+
+    getPublicUrl(filePath: string): string {
+        if (filePath) {
+            this.getFullPath(filePath);
+        }
         return `${this.publicUrl}/${filePath}`;
+    }
+
+    getContainerName(): string {
+        return this.basePath;
     }
 
     async copy(sourcePath: string, destinationPath: string): Promise<StorageUploadResult> {

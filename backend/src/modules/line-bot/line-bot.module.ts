@@ -20,6 +20,9 @@ import { LineNotifyService } from '../line-notify/line-notify.service';
 import { LineLiffService } from '../line-liff/line-liff.service';
 // M.2: shared LLM access layer (gemini / local / hybrid routing)
 import { LlmModule } from '../ai-queue/providers/llm.module';
+// M.3b: shared storage abstraction (gcs / local), bound to the disaster-report bucket
+import { StorageModule } from '../../common/storage/storage.module';
+import { DISASTER_REPORT_IMAGE_STORAGE_FEATURE } from '../../common/storage/storage.tokens';
 
 /**
  * LINE Bot Module - Consolidated LINE Integration
@@ -35,6 +38,7 @@ import { LlmModule } from '../ai-queue/providers/llm.module';
         TypeOrmModule.forFeature([Account, Report, Task]),
         forwardRef(() => ReportsModule),
         LlmModule,
+        StorageModule.forFeature(DISASTER_REPORT_IMAGE_STORAGE_FEATURE),
     ],
     controllers: [LineBotController, AiVisionController],
     providers: [

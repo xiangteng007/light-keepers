@@ -4,7 +4,7 @@
  * P4: Storage Abstraction - Google Cloud Storage Implementation
  */
 import { Injectable, Logger } from '@nestjs/common';
-import { Storage, Bucket, File } from '@google-cloud/storage';
+import { Storage, Bucket } from '@google-cloud/storage';
 import { ConfigService } from '@nestjs/config';
 import {
     StorageProvider,
@@ -14,6 +14,7 @@ import {
     StorageListResult,
     StorageFileInfo,
     SignedUrlOptions,
+    StorageDeleteOptions,
 } from './storage.interface';
 import { Readable } from 'stream';
 
@@ -24,9 +25,18 @@ export class GcsStorageProvider implements StorageProvider {
     private readonly bucket: Bucket;
     private readonly publicUrl: string;
 
-    constructor(private readonly configService: ConfigService) {
+    /**
+     * @param options.bucket Bind this instance to a specific bucket instead of
+     *   `GCS_BUCKET_NAME`. Used by `StorageModule.forFeature()` so each feature
+     *   keeps writing to the bucket it used before the abstraction was wired in.
+     */
+    constructor(
+        private readonly configService: ConfigService,
+        options?: { bucket?: string },
+    ) {
         const projectId = this.configService.get<string>('GCP_PROJECT_ID');
-        const bucketName = this.configService.get<string>('GCS_BUCKET_NAME') || 'default-bucket';
+        const bucketName =
+            options?.bucket || this.configService.get<string>('GCS_BUCKET_NAME') || 'default-bucket';
         const keyFilename = this.configService.get<string>('GCS_KEY_FILE');
 
         this.storage = new Storage({
@@ -98,9 +108,9 @@ export class GcsStorageProvider implements StorageProvider {
         };
     }
 
-    async delete(path: string): Promise<void> {
+    async delete(path: string, options?: StorageDeleteOptions): Promise<void> {
         const file = this.bucket.file(path);
-        await file.delete({ ignoreNotFound: true });
+        await file.delete({ ignoreNotFound: options?.ignoreNotFound ?? true });
     }
 
     async exists(path: string): Promise<boolean> {
@@ -119,6 +129,9 @@ export class GcsStorageProvider implements StorageProvider {
             contentType: metadata.contentType || 'application/octet-stream',
             lastModified: metadata.updated ? new Date(metadata.updated) : new Date(),
             etag: metadata.etag,
+            md5Hash: metadata.md5Hash,
+            createdAt: metadata.timeCreated ? new Date(metadata.timeCreated) : undefined,
+            metadata: metadata.metadata as Record<string, string> | undefined,
         };
     }
 
@@ -148,13 +161,32 @@ export class GcsStorageProvider implements StorageProvider {
         const file = this.bucket.file(path);
         const action = options?.action === 'write' ? 'write' : 'read';
 
-        const [url] = await file.getSignedUrl({
+        // Only set keys the caller actually asked for: `version` and
+        // `contentType` change the emitted URL shape, and passing them as
+        // explicit `undefined` is not the same as leaving the SDK default
+        // for every SDK version.
+        const config: Parameters<typeof file.getSignedUrl>[0] = {
             action,
-            expires: Date.now() + (options?.expiresIn || 3600) * 1000,
-            contentType: options?.contentType,
-        });
+            expires: options?.expiresAt ?? Date.now() + (options?.expiresIn || 3600) * 1000,
+        };
+        if (options?.version) {
+            config.version = options.version;
+        }
+        if (options?.contentType) {
+            config.contentType = options.contentType;
+        }
+
+        const [url] = await file.getSignedUrl(config);
 
         return url;
+    }
+
+    getPublicUrl(path: string): string {
+        return `${this.publicUrl}/${path}`;
+    }
+
+    getContainerName(): string {
+        return this.bucket.name;
     }
 
     async copy(sourcePath: string, destinationPath: string): Promise<StorageUploadResult> {

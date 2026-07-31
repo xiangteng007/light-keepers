@@ -86,6 +86,26 @@ describe('LocalStorageProvider', () => {
             await expect(provider.delete('never/existed.txt')).resolves.toBeUndefined();
         });
 
+        it('delete 帶 ignoreNotFound:false 時對不存在的檔案拋錯', async () => {
+            // 呼叫端（field-reports / line-bot）用這個分辨「真的刪掉了」與「本來就沒有」
+            await expect(provider.delete('never/existed.txt', { ignoreNotFound: false }))
+                .rejects.toThrow();
+        });
+
+        it('getMetadata 回傳 base64 md5、建立時間與 sidecar metadata', async () => {
+            await provider.upload('m/1.txt', Buffer.from('payload'), { metadata: { k: 'v' } });
+
+            const info = await provider.getMetadata('m/1.txt');
+
+            // 與 GCS 的 md5Hash 語意一致（base64），etag 維持既有的 hex
+            expect(info.md5Hash).toBe(
+                require('crypto').createHash('md5').update('payload').digest('base64'),
+            );
+            expect(info.etag).toMatch(/^[0-9a-f]{32}$/);
+            expect(info.createdAt?.getTime()).toBeGreaterThan(0);
+            expect(info.metadata).toEqual({ k: 'v' });
+        });
+
         it('list 回傳相對於基底目錄的路徑，且排除 .meta.json sidecar', async () => {
             await provider.upload('x/1.txt', Buffer.from('1'), { metadata: { k: 'v' } });
             await provider.upload('x/2.txt', Buffer.from('2'));
@@ -151,6 +171,17 @@ describe('LocalStorageProvider', () => {
         it('基底目錄內的正常巢狀路徑不受影響', async () => {
             await expect(provider.upload('a/b/c/deep.txt', Buffer.from('ok')))
                 .resolves.toMatchObject({ path: 'a/b/c/deep.txt' });
+        });
+
+        it('getSignedUrl 不為逃逸路徑簽出 URL', async () => {
+            // 這條路徑現在由三個 service 餵進來，可能來自 DB 欄位或請求內容
+            await expect(provider.getSignedUrl('../outside.txt'))
+                .rejects.toBeInstanceOf(BadRequestException);
+        });
+
+        it('getPublicUrl 不為逃逸路徑組出 URL', () => {
+            expect(() => provider.getPublicUrl('../outside.txt'))
+                .toThrow(BadRequestException);
         });
 
         it('目錄名以基底目錄名為前綴的兄弟目錄仍被擋下', async () => {
