@@ -132,7 +132,7 @@ export class TasksService {
 
             return { pending, inProgress, completed };
         } catch (error) {
-            console.error('getKanbanBoard error:', error);
+            this.logger.error(`getKanbanBoard error: ${error.message}`, error.stack);
             return { pending: [], inProgress: [], completed: [] };
         }
     }

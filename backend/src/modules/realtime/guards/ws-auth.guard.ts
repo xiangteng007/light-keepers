@@ -15,6 +15,7 @@ import {
     CanActivate,
     ExecutionContext,
     UnauthorizedException,
+    Logger,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { WsException } from '@nestjs/websockets';
@@ -22,6 +23,8 @@ import { Socket } from 'socket.io';
 
 @Injectable()
 export class WsAuthGuard implements CanActivate {
+    private readonly logger = new Logger(WsAuthGuard.name);
+
     constructor(private readonly jwtService: JwtService) {}
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -40,7 +43,7 @@ export class WsAuthGuard implements CanActivate {
 
             return true;
         } catch (error) {
-            console.error('[WsAuthGuard] Authentication failed:', error.message);
+            this.logger.error(`Authentication failed: ${error.message}`);
             throw new WsException('WebSocket 認證失敗');
         }
     }

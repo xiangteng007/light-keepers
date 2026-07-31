@@ -4,7 +4,9 @@
  */
 
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { INestApplication } from '@nestjs/common';
+import { INestApplication, Logger } from '@nestjs/common';
+
+const logger = new Logger('SwaggerConfig');
 
 export function setupSwagger(app: INestApplication): void {
     const config = new DocumentBuilder()
@@ -131,7 +133,7 @@ Authorization: Bearer <your_jwt_token>
         },
     });
 
-    console.log('📚 Swagger API docs available at /api/docs');
+    logger.log('Swagger API docs available at /api/docs');
 }
 
 // API Response DTOs for Swagger documentation

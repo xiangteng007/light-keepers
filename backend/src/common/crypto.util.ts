@@ -1,4 +1,5 @@
 import * as crypto from 'crypto';
+import { Logger } from '@nestjs/common';
 
 const ALGORITHM = 'aes-256-gcm';
 const IV_LENGTH = 16;
@@ -9,11 +10,13 @@ const AUTH_TAG_LENGTH = 16;
  * 使用 AES-256-GCM 加密
  */
 export class CryptoUtil {
+    private static readonly logger = new Logger(CryptoUtil.name);
+
     private static getKey(): Buffer {
         const key = process.env.ENCRYPTION_KEY;
         if (!key) {
             // 開發環境使用預設金鑰 (生產環境必須設定)
-            console.warn('⚠️ ENCRYPTION_KEY not set, using development key');
+            CryptoUtil.logger.warn('ENCRYPTION_KEY not set, using development key');
             return crypto.scryptSync('dev-key-not-for-production', 'salt', 32);
         }
         // 確保金鑰為 32 bytes
@@ -67,7 +70,7 @@ export class CryptoUtil {
 
             return decrypted;
         } catch (error) {
-            console.error('Decryption failed:', error.message);
+            CryptoUtil.logger.error(`Decryption failed: ${error.message}`);
             return encryptedText; // 解密失敗返回原值
         }
     }

@@ -16,6 +16,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     SetMetadata,
+    Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 
@@ -55,6 +56,8 @@ export const BypassTenantCheck = () =>
  */
 @Injectable()
 export class TenantGuard implements CanActivate {
+    private readonly logger = new Logger(TenantGuard.name);
+
     constructor(
         private readonly reflector: Reflector,
     ) { }
@@ -113,8 +116,8 @@ export class TenantGuard implements CanActivate {
 
         // Validate tenant access
         if (requestedTenantId !== userTenantId) {
-            console.warn(
-                `[TenantGuard] Cross-tenant access attempt: ` +
+            this.logger.warn(
+                `Cross-tenant access attempt: ` +
                 `User ${user.sub} (tenant: ${userTenantId}) tried to access tenant ${requestedTenantId}`
             );
             throw new ForbiddenException('無權存取此組織資源');

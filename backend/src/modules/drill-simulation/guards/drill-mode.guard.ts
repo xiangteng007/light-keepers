@@ -3,10 +3,12 @@
  * 攔截寫入操作，將資料重導向或標記為演練資料
  */
 
-import { Injectable, CanActivate, ExecutionContext, CallHandler, NestInterceptor } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, CallHandler, NestInterceptor, Logger } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DrillSimulationService } from '../drill.service';
+
+const drillLogger = new Logger('DrillIsolated');
 
 /**
  * Guard: 檢查是否在演練模式
@@ -75,7 +77,7 @@ export function DrillIsolated() {
                 // 1. 寫入臨時表
                 // 2. 添加 isDrill 標記
                 // 3. 寫入 Redis
-                console.log(`[DRILL] ${propertyKey} called in drill mode`);
+                drillLogger.debug(`${propertyKey} called in drill mode`);
 
                 // 修改參數以添加演練標記
                 if (args[0] && typeof args[0] === 'object') {

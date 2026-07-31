@@ -17,6 +17,7 @@ import {
     ExecutionContext,
     ForbiddenException,
     SetMetadata,
+    Logger,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { DataSource } from 'typeorm';
@@ -67,6 +68,8 @@ export const ResourceOwner = (config: ResourceOwnerConfig) =>
  */
 @Injectable()
 export class ResourceOwnerGuard implements CanActivate {
+    private readonly logger = new Logger(ResourceOwnerGuard.name);
+
     constructor(
         private readonly reflector: Reflector,
         private readonly dataSource: DataSource,
@@ -142,7 +145,7 @@ export class ResourceOwnerGuard implements CanActivate {
             const repository = this.dataSource.getRepository(entityName);
             return repository.findOne({ where: { id } });
         } catch (error) {
-            console.error(`[ResourceOwnerGuard] Failed to find ${entityName}:`, error.message);
+            this.logger.error(`Failed to find ${entityName}: ${error.message}`);
             return null;
         }
     }

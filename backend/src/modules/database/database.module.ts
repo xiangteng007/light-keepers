@@ -1,24 +1,26 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { DynamicModule, Module, Logger } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 /**
  * Conditional Database Module
- * 
+ *
  * This module provides conditional TypeORM initialization based on the DB_REQUIRED environment variable.
  * When DB_REQUIRED=false, it returns an empty module to allow the application to start without database access.
  * This is useful for CI health checks and environments where the database is unavailable.
  */
 @Module({})
 export class DatabaseModule {
+    private static readonly logger = new Logger(DatabaseModule.name);
+
     static forRoot(): DynamicModule {
         // Check DB_REQUIRED at module registration time (synchronous check)
         const dbRequired = process.env.DB_REQUIRED !== 'false';
 
-        console.log(`[DatabaseModule] DB_REQUIRED check: ${dbRequired}`);
+        DatabaseModule.logger.log(`DB_REQUIRED check: ${dbRequired}`);
 
         if (!dbRequired) {
-            console.log('[DatabaseModule] Skipping TypeORM initialization (DB_REQUIRED=false)');
+            DatabaseModule.logger.log('Skipping TypeORM initialization (DB_REQUIRED=false)');
             // Return empty module - no TypeORM, no database dependencies
             return {
                 module: DatabaseModule,
@@ -28,7 +30,7 @@ export class DatabaseModule {
         }
 
         // Normal TypeORM initialization when database is required
-        console.log('[DatabaseModule] Initializing TypeORM (DB_REQUIRED=true)');
+        DatabaseModule.logger.log('Initializing TypeORM (DB_REQUIRED=true)');
         return {
             module: DatabaseModule,
             imports: [
@@ -41,18 +43,18 @@ export class DatabaseModule {
                         const isProduction = process.env.NODE_ENV === 'production';
                         const dbHost = process.env.DB_HOST;
 
-                        console.log('[TypeORM EARLY BOOT]', JSON.stringify({
+                        DatabaseModule.logger.log(`TypeORM EARLY BOOT: ${JSON.stringify({
                             NODE_ENV: process.env.NODE_ENV,
                             DB_HOST: dbHost,
                             DB_DATABASE: process.env.DB_DATABASE,
                             timestamp: new Date().toISOString()
-                        }));
+                        })}`);
 
                         // Check if DB_HOST is a Unix socket path (Cloud SQL)
                         const isUnixSocket = dbHost && dbHost.startsWith('/cloudsql/');
 
                         if (isProduction && !dbHost) {
-                            console.error('[TypeORM] CRITICAL: DB_HOST not configured in production!');
+                            DatabaseModule.logger.error('CRITICAL: DB_HOST not configured in production!');
                         }
 
                         const config: any = {
@@ -73,7 +75,7 @@ export class DatabaseModule {
                             // 1. host = socket path
                             // 2. port = undefined (CRITICAL: pg driver fails with numeric port on socket)
                             // 3. ssl = false (Unix sockets don't need SSL)
-                            console.log(`[TypeORM] Using Unix socket: ${dbHost}`);
+                            DatabaseModule.logger.log(`Using Unix socket: ${dbHost}`);
                             config.host = dbHost;
                             config.port = undefined;
                             config.ssl = false;
