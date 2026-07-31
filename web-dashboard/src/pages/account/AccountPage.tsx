@@ -80,9 +80,8 @@ const AccountPage: React.FC = () => {
             setIsLoading(true);
             try {
                 // Try fetching full profile from API
-                const { default: api } = await import('../../utils/api');
-                // utils/api 的 axios baseURL 已是 `${VITE_API_URL}/api/v1`，不可再加 `/api`。
-                // 原本的 '/api/account/profile' 會打到 /api/v1/api/account/profile —— 後端無此路由。
+                const { default: api } = await import('../../api/client');
+                // api/client 的 axios baseURL 已是 `${VITE_API_URL}/api/v1`，不可再加 `/api`。
                 // 實際的個人資料端點：@Controller('auth') + @Get('me') → /api/v1/auth/me
                 const response = await api.get('/auth/me');
                 const apiData = response.data?.data || response.data || {};

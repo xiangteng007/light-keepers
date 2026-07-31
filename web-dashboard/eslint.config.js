@@ -109,12 +109,4 @@ export default defineConfig([
       'no-restricted-syntax': 'off',
     },
   },
-
-  // legacy client 自身：檔案內不受 import 禁令影響（等待 3.2 完成後整檔刪除）
-  {
-    files: ['src/utils/api.ts', 'src/services/api.ts'],
-    rules: {
-      'no-restricted-imports': 'off',
-    },
-  },
 ])

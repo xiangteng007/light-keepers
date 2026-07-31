@@ -2,7 +2,7 @@
  * notification-hub.service.ts
  * Frontend Client for NotificationHub
  */
-import api from '../api';
+import api from '../../api/client';
 
 export interface NotificationPayload {
     title: string;

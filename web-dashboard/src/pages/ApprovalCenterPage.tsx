@@ -5,7 +5,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Modal } from '../design-system';
-import api from '../services/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import './ApprovalCenterPage.css';
 
 // ============ Types ============
@@ -53,7 +54,7 @@ export default function ApprovalCenterPage() {
             const response = await api.get('/approvals/pending', { params });
             setApprovals(response.data.transactions || []);
         } catch (err: unknown) {
-            const errorMsg = err instanceof Error ? err.message : '載入失敗';
+            const errorMsg = getApiErrorMessage(err, '載入失敗');
             setError(errorMsg);
             console.error('Failed to fetch approvals:', err);
         } finally {
@@ -75,7 +76,7 @@ export default function ApprovalCenterPage() {
             fetchPendingApprovals();
             setShowDetailModal(false);
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : '未知錯誤';
+            const msg = getApiErrorMessage(err, '未知錯誤');
             alert(`❌ 覆核失敗：${msg}`);
         } finally {
             setActionLoading(false);
@@ -100,7 +101,7 @@ export default function ApprovalCenterPage() {
             setShowDetailModal(false);
             setRejectReason('');
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : '未知錯誤';
+            const msg = getApiErrorMessage(err, '未知錯誤');
             alert(`❌ 拒絕失敗：${msg}`);
         } finally {
             setActionLoading(false);
@@ -119,7 +120,7 @@ export default function ApprovalCenterPage() {
             setSensitiveData(response.data.data);
             alert(`✅ 已記錄查閱（稽核 ID: ${response.data.auditLogId}）`);
         } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : '權限不足';
+            const msg = getApiErrorMessage(err, '權限不足');
             alert(`❌ 無權查看：${msg}`);
         }
     };

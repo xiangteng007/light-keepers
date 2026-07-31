@@ -2,7 +2,7 @@
  * analytics-hub.service.ts
  * Frontend Client for AnalyticsHub
  */
-import api from '../api';
+import api from '../../api/client';
 
 export interface ReportRequest {
     type: 'incident' | 'volunteer' | 'resource' | 'aar';
