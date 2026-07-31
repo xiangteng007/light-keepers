@@ -21,6 +21,7 @@ import { CapAdapterService, CapAlert } from './cap-adapter.service';
 import { EdxlDeAdapterService, EdxlDistribution } from './edxl-de-adapter.service';
 import { NiemMappingService } from './niem-mapping.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CreateEdxlDistributionDto } from './dto/edxl-distribution.dto';
 
 @ApiTags('Interoperability')
 @Controller('api/v1/interop')
@@ -80,15 +81,7 @@ export class InteroperabilityController {
     @ApiOperation({ summary: 'Create EDXL-DE 2.0 distribution envelope' })
     @RequiredLevel(ROLE_LEVELS.OFFICER)
     createEdxlDistribution(
-        @Body() body: {
-            sender: string;
-            type: 'Report' | 'Update' | 'Cancel' | 'Request' | 'Response' | 'Dispatch';
-            payload: any;
-            recipients?: string[];
-            targetAreas?: string[];
-            keywords?: string[];
-            incidentId?: string;
-        },
+        @Body() body: CreateEdxlDistributionDto,
     ): EdxlDistribution {
         return this.edxlAdapter.createDistribution(body);
     }

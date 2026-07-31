@@ -2,6 +2,7 @@ import { Controller, Get, Post, Param, Body, Query, UseGuards } from '@nestjs/co
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { ExpenseReimbursementService } from './expense-reimbursement.service';
+import { MarkPaidDto, ReviewClaimDto, SubmitClaimDto } from './dto/expense.dto';
 
 // 定級理由：經費核銷屬財務流程，必須維持「申請 / 審核 / 撥款」職權分立，不可由同一等級一手包辦。
 // 提交申請與查閱本人報銷紀錄為第一線志工墊付後的權利 → L1；
@@ -17,22 +18,26 @@ export class ExpenseReimbursementController {
     @Post()
     @ApiOperation({ summary: '提交報銷', description: '提交經費報銷申請' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
-    submitClaim(@Body() body: any): any {
+    submitClaim(@Body() body: SubmitClaimDto): any {
         return this.expenseService.submitClaim(body);
     }
 
     @Post(':id/review')
     @ApiOperation({ summary: '審核報銷', description: '審核經費報銷' })
     @RequiredLevel(ROLE_LEVELS.DIRECTOR)
-    reviewClaim(@Param('id') id: string, @Body() body: any): any {
+    reviewClaim(@Param('id') id: string, @Body() body: ReviewClaimDto): any {
         return this.expenseService.reviewClaim(id, body);
     }
 
     @Post(':id/pay')
     @ApiOperation({ summary: '標記已付款', description: '標記報銷已付款' })
     @RequiredLevel(ROLE_LEVELS.CHAIRMAN)
-    markAsPaid(@Param('id') id: string, @Body() body: any): any {
-        return this.expenseService.markAsPaid(id, body);
+    markAsPaid(@Param('id') id: string, @Body() body: MarkPaidDto): any {
+        // paidAt 為選填，未提供時以伺服器時間補上（service 端 PaymentInfo 要求必填）
+        return this.expenseService.markAsPaid(id, {
+            ...body,
+            paidAt: body.paidAt ?? new Date(),
+        });
     }
 
     @Get('pending')

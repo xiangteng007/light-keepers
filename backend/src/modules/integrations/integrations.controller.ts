@@ -8,6 +8,7 @@ import {
 } from '@nestjs/common';
 import { ExternalApiService, NotificationPayload } from './external-api.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { TestWebhookDto } from './dto/test-webhook.dto';
 
 @Controller('integrations')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -100,7 +101,7 @@ export class IntegrationsController {
 
     @Post('webhook/test')
     async testWebhook(
-        @Body() dto: { url: string; payload: any },
+        @Body() dto: TestWebhookDto,
     ) {
         const success = await this.externalApiService.sendWebhook(dto.url, dto.payload);
         return {

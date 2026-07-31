@@ -2,6 +2,11 @@ import { Controller, Get, Post, Put, Param, Query, Body, Headers, UseGuards } fr
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody, ApiHeader } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { ScalabilityService } from './scalability.service';
+import {
+    QueueOfflineOperationDto,
+    ResolveConflictDto,
+    UpdateRateLimitConfigDto,
+} from './dto/scalability.dto';
 
 // 定級理由：本 controller 全部是系統層級設定與韌性機制（限流、熔斷、SLA、離線同步佇列），
 // 遭竄改會影響「全系統可用性」而非單一業務資料，屬「破壞性或全域設定」→ class 基準 L4（理事長）。
@@ -49,7 +54,7 @@ export class ScalabilityController {
     @Post('offline/queue')
     @ApiOperation({ summary: '排隊離線操作' })
     @RequiredLevel(ROLE_LEVELS.OFFICER)
-    queueOperation(@Body() data: any) {
+    queueOperation(@Body() data: QueueOfflineOperationDto) {
         return this.scalability.queueOfflineOperation(data);
     }
 
@@ -58,7 +63,7 @@ export class ScalabilityController {
     @RequiredLevel(ROLE_LEVELS.OFFICER)
     resolveConflict(
         @Param('operationId') operationId: string,
-        @Body() body: { resolution: 'use_client' | 'use_server' | 'merge'; mergedData?: any }
+        @Body() body: ResolveConflictDto
     ) {
         return { resolved: this.scalability.resolveConflict(operationId, body.resolution, body.mergedData) };
     }
@@ -172,7 +177,7 @@ export class ScalabilityController {
     @Put('rate-limits/:name')
     @ApiOperation({ summary: '更新限流配置' })
     @RequiredLevel(ROLE_LEVELS.CHAIRMAN)
-    updateRateLimitConfig(@Param('name') name: string, @Body() updates: any) {
+    updateRateLimitConfig(@Param('name') name: string, @Body() updates: UpdateRateLimitConfigDto) {
         return { updated: this.scalability.updateRateLimitConfig(name, updates) };
     }
 

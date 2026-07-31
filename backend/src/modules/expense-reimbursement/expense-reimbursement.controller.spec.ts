@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { ExpenseReimbursementController } from './expense-reimbursement.controller';
 import { ExpenseReimbursementService } from './expense-reimbursement.service';
 import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
+import { ClaimReviewAction } from './dto/expense.dto';
 
 describe('ExpenseReimbursementController', () => {
     let controller: ExpenseReimbursementController;
@@ -31,17 +32,31 @@ describe('ExpenseReimbursementController', () => {
     it('should be defined', () => expect(controller).toBeDefined());
 
     it('submitClaim submits expense claim', () => {
-        const result = controller.submitClaim({ amount: 1000 });
+        const result = controller.submitClaim({
+            submitterId: 'u1',
+            submitterName: '志工A',
+            category: 'transport',
+            description: '前往災區交通費',
+            amount: 1000,
+        });
         expect(result).toBeDefined();
     });
 
     it('reviewClaim reviews a claim', () => {
-        const result = controller.reviewClaim('c1', { approved: true });
+        const result = controller.reviewClaim('c1', {
+            reviewerId: 'r1',
+            reviewerName: '審核者',
+            action: ClaimReviewAction.APPROVE,
+        });
         expect(result).toBeDefined();
     });
 
     it('markAsPaid marks claim as paid', () => {
-        const result = controller.markAsPaid('c1', { paidAt: '2026-01-01' });
+        const result = controller.markAsPaid('c1', {
+            method: 'bank_transfer',
+            amount: 1000,
+            paidAt: new Date('2026-01-01'),
+        });
         expect(result).toBeDefined();
     });
 

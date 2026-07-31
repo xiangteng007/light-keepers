@@ -44,8 +44,23 @@ describe('InternationalStandardsController', () => {
     it('should be defined', () => expect(controller).toBeDefined());
 
     it('getIcsTemplate returns template', () => expect(controller.getIcsTemplate('ICS-201' as any)).toBeDefined());
-    it('generateIcs201 generates form', () => expect(controller.generateIcs201({})).toBeDefined());
-    it('generateIcs214 generates form', () => expect(controller.generateIcs214({})).toBeDefined());
+    it('generateIcs201 generates form', () => expect(controller.generateIcs201({
+        incidentName: '花蓮地震',
+        incidentNumber: 'INC-001',
+        dateTimePrepared: new Date('2026-01-01T00:00:00Z'),
+        situation: '初期勘災',
+        objectives: ['搜救'],
+        currentOrganization: { incidentCommander: '指揮官' },
+        resourcesSummary: [],
+    })).toBeDefined());
+    it('generateIcs214 generates form', () => expect(controller.generateIcs214({
+        incidentName: '花蓮地震',
+        operationalPeriod: { from: new Date('2026-01-01T00:00:00Z'), to: new Date('2026-01-01T12:00:00Z') },
+        name: '記錄員',
+        position: '計畫組',
+        homeAgency: 'Light Keepers',
+        activityLog: [],
+    })).toBeDefined());
     it('validateIcsForm validates form', () => expect(controller.validateIcsForm('ICS-201' as any, {})).toBeDefined());
     it('listIcsForms lists forms', () => expect(controller.listIcsForms()).toBeDefined());
     it('exportMissionsHxl exports missions', () => expect(controller.exportMissionsHxl([])).toBeDefined());

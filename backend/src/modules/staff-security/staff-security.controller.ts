@@ -10,6 +10,7 @@ import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 import { SecurityIncidentService, CreateIncidentDto } from './services/security-incident.service';
 import { StaffCheckInService, CheckInDto, CheckInType } from './services/staff-checkin.service';
 import { EvacuationPlanService } from './services/evacuation-plan.service';
+import { CreateEvacuationPlanDto } from './dto/evacuation-plan.dto';
 
 @ApiTags('Staff Security')
 @Controller('api/v1/staff-security')
@@ -109,7 +110,7 @@ export class StaffSecurityController {
 
     @Post('evacuation/plans')
     @ApiOperation({ summary: 'Create evacuation plan' })
-    async createEvacuationPlan(@Body() body: { locationId: string; plan: any }) {
+    async createEvacuationPlan(@Body() body: CreateEvacuationPlanDto) {
         return this.evacuationService.createPlan(body.locationId, body.plan);
     }
 

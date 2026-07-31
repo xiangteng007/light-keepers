@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards } from '@ne
 import { DispatchService, CreateDispatchDto } from './dispatch.service';
 import { DispatchOrder, DispatchStatus } from './dispatch-order.entity';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CompletePickingDto } from './dto/complete-picking.dto';
 
 @Controller('dispatch')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -63,7 +64,7 @@ export class DispatchController {
     @Patch(':id/complete-picking')
     async completePicking(
         @Param('id') id: string,
-        @Body() body: { pickedItems: any[]; operatorName: string },
+        @Body() body: CompletePickingDto,
     ): Promise<{ data: DispatchOrder }> {
         const order = await this.dispatchService.completePicking(id, body.pickedItems, body.operatorName);
         return { data: order };

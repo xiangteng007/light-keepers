@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Body, Param, Query, UseGuards } from '@nest
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { PayrollService } from './payroll.service';
+import { CalculateMonthlyPayrollDto, UpdatePayrollRatesDto } from './dto/payroll.dto';
 
 @ApiTags('薪資補助')
 @Controller('payroll')
@@ -30,7 +31,7 @@ export class PayrollController {
     @RequiredLevel(ROLE_LEVELS.OFFICER)
     calculateMonthlyPayroll(
         @Param('volunteerId') volunteerId: string,
-        @Body() body: { shifts: any[] }
+        @Body() body: CalculateMonthlyPayrollDto
     ) {
         return this.service.calculateMonthlyPayroll(volunteerId, body.shifts);
     }
@@ -66,7 +67,7 @@ export class PayrollController {
     @ApiOperation({ summary: '更新費率' })
     @ApiResponse({ status: 200, description: '費率已更新' })
     @RequiredLevel(ROLE_LEVELS.DIRECTOR)
-    updateRates(@Body() body: any) {
+    updateRates(@Body() body: UpdatePayrollRatesDto) {
         this.service.updateRates(body);
         return { success: true };
     }

@@ -10,6 +10,7 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
 import { SITREPService } from './sitrep.service';
 import { DecisionType } from './entities/decision-log.entity';
 import { KeyEvent, ResourceStatus } from './entities/sitrep.entity';
+import { LogDecisionDto } from './dto/decision-log.dto';
 
 // 定級理由：SITREP 含傷亡數字（casualties）與資源缺口，未經核准即外流會造成錯誤情資與家屬恐慌 → class 基準 L2。
 // 「核准 SITREP」＝對外發布定稿情勢報告，屬指揮官發言權 → 收緊 L3。
@@ -123,18 +124,7 @@ export class SITREPController {
     @ApiOperation({ summary: '記錄決策' })
     async logDecision(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            decisionType: DecisionType;
-            description: string;
-            rationale?: string;
-            relatedEntityType?: string;
-            relatedEntityId?: string;
-            aiAssisted?: boolean;
-            aiJobId?: string;
-            aiConfidence?: number;
-            beforeState?: Record<string, any>;
-            afterState?: Record<string, any>;
-        },
+        @Body() body: LogDecisionDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const decision = await this.sitrepService.logDecision({

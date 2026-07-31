@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { EquipmentQrController } from './equipment-qr.controller';
 import { EquipmentQrService } from './equipment-qr.service';
 import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
+import { MaintenanceType } from './dto/equipment-qr.dto';
 
 describe('EquipmentQrController', () => {
     let controller: EquipmentQrController;
@@ -53,7 +54,7 @@ describe('EquipmentQrController', () => {
     });
 
     it('register registers new equipment', () => {
-        const result = controller.register({ name: 'Test' });
+        const result = controller.register({ name: 'Test', category: 'radio', location: 'A1' });
         expect(result).toBeDefined();
     });
 
@@ -78,7 +79,11 @@ describe('EquipmentQrController', () => {
     });
 
     it('scheduleMaintenance schedules maintenance', () => {
-        const result = controller.scheduleMaintenance({ equipmentId: 'eq1' });
+        const result = controller.scheduleMaintenance({
+            equipmentId: 'eq1',
+            type: MaintenanceType.ROUTINE,
+            scheduledAt: new Date('2026-02-01'),
+        });
         expect(result).toBeDefined();
     });
 

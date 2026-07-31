@@ -42,7 +42,13 @@ describe('ReportingController', () => {
     it('should be defined', () => expect(controller).toBeDefined());
     it('listDefinitions returns list', () => expect(controller.listDefinitions()).toBeDefined());
     it('getDefinition returns def', () => expect(controller.getDefinition('rd1')).toBeDefined());
-    it('createDefinition creates', () => expect(controller.createDefinition({})).toBeDefined());
+    it('createDefinition creates', () => expect(controller.createDefinition({
+        name: '任務週報',
+        type: 'mission',
+        sections: [],
+        filters: [],
+        createdBy: 'u1',
+    })).toBeDefined());
     it('generateReport generates', async () => expect(await controller.generateReport('rd1')).toBeDefined());
     it('listGeneratedReports returns list', () => expect(controller.listGeneratedReports()).toBeDefined());
     it('listSchedules returns schedules', () => expect(controller.listSchedules()).toBeDefined());

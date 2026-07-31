@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseG
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { LabelTemplatesService } from './label-templates.service';
+import { CreateLabelTemplateDto, UpdateLabelTemplateDto } from './dto/label-template.dto';
 
 /**
  * 貼紙模板管理 API
@@ -50,15 +51,7 @@ export class LabelTemplatesController {
     @UseGuards(UnifiedRolesGuard)
     @RequiredLevel(ROLE_LEVELS.OWNER)
     async create(
-        @Body() body: {
-            name: string;
-            description?: string;
-            targetTypes: string[];
-            controlLevels: string[];
-            width: number;
-            height: number;
-            layoutConfig: Record<string, any>;
-        },
+        @Body() body: CreateLabelTemplateDto,
         @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
@@ -78,16 +71,8 @@ export class LabelTemplatesController {
     @RequiredLevel(ROLE_LEVELS.OWNER)
     async update(
         @Param('id') id: string,
-        @Body() body: Partial<{
-            name: string;
-            description: string;
-            targetTypes: string[];
-            controlLevels: string[];
-            width: number;
-            height: number;
-            layoutConfig: Record<string, any>;
-            isActive: boolean;
-        }>,
+        @Body() body: UpdateLabelTemplateDto,
+        @Request() req: AuthenticatedRequest,
     ) {
         return this.templatesService.update(id, body);
     }

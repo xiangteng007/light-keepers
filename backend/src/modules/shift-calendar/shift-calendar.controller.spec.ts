@@ -83,8 +83,10 @@ describe('ShiftCalendarController', () => {
 
     describe('updateShift', () => {
         it('should update existing shift', async () => {
-            const updates = { status: 'confirmed' };
-            const updatedShift = { id: 's1', status: 'confirmed' };
+            // 註：`status` 並非可更新欄位（ShiftCalendarService.updateShift 從不寫入），
+            // 故 UpdateShiftDto 未將其列入白名單；改用實際可更新的欄位。
+            const updates = { volunteerId: 'v2', volunteerName: '志工B' };
+            const updatedShift = { id: 's1', volunteerId: 'v2', volunteerName: '志工B' };
             mockService.updateShift.mockResolvedValue(updatedShift);
 
             const result = await controller.updateShift('s1', updates);

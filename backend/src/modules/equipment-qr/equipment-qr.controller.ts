@@ -2,6 +2,7 @@ import { Controller, Get, Post, Patch, Param, Body, Query, UseGuards } from '@ne
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { EquipmentQrService } from './equipment-qr.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { RegisterEquipmentDto, ScheduleMaintenanceDto } from './dto/equipment-qr.dto';
 
 @ApiTags('Equipment QR API')
 @ApiBearerAuth()
@@ -33,7 +34,7 @@ export class EquipmentQrController {
     @Post('register')
     @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：建立裝備主檔
     @ApiOperation({ summary: '登錄新裝備' })
-    register(@Body() data: any) {
+    register(@Body() data: RegisterEquipmentDto) {
         return this.service.registerEquipment(data);
     }
 
@@ -86,7 +87,7 @@ export class EquipmentQrController {
     @Post('maintenance/schedule')
     @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：維護排程
     @ApiOperation({ summary: '排程維護' })
-    scheduleMaintenance(@Body() data: any) {
+    scheduleMaintenance(@Body() data: ScheduleMaintenanceDto) {
         return this.service.scheduleMaintenance(data);
     }
 

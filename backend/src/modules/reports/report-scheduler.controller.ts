@@ -19,6 +19,7 @@ import {
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { ReportSchedulerService, ScheduledReport } from './services/report-scheduler.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CreateScheduledReportDto } from './dto/scheduled-report.dto';
 
 @ApiTags('Report Scheduler')
 @Controller('reports/scheduler')
@@ -54,14 +55,7 @@ export class ReportSchedulerController {
 
     @Post()
     @ApiOperation({ summary: 'Create a new scheduled report' })
-    createScheduledReport(@Body() body: {
-        name: string;
-        type?: 'daily_summary' | 'weekly_digest' | 'monthly_report' | 'custom';
-        schedule: string;
-        recipients: string[];
-        format?: 'pdf' | 'csv' | 'json';
-        filters?: Record<string, any>;
-    }) {
+    createScheduledReport(@Body() body: CreateScheduledReportDto) {
         const report: ScheduledReport = {
             id: `report-${Date.now()}`,
             name: body.name,

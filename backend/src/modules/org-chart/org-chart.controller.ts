@@ -2,6 +2,7 @@ import { Controller, Get, Post, Put, Delete, Body, Param, Query, UseGuards } fro
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { OrgChartService } from './org-chart.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { CreateOrgNodeDto, UpdateOrgNodeDto } from './dto/org-chart.dto';
 
 @ApiTags('組織架構')
 @Controller('org-chart')
@@ -16,7 +17,7 @@ export class OrgChartController {
     @ApiOperation({ summary: '新增節點' })
     @ApiResponse({ status: 201, description: '節點已建立' })
     @ApiBearerAuth()
-    addNode(@Body() body: { id?: string; name: string; type: string; parentId: string | null; managerId?: string; metadata?: any }) {
+    addNode(@Body() body: CreateOrgNodeDto) {
         return this.service.addNode(body);
     }
 
@@ -32,7 +33,7 @@ export class OrgChartController {
     @ApiOperation({ summary: '更新節點' })
     @ApiResponse({ status: 200, description: '節點已更新' })
     @ApiBearerAuth()
-    updateNode(@Param('id') id: string, @Body() updates: any) {
+    updateNode(@Param('id') id: string, @Body() updates: UpdateOrgNodeDto) {
         return this.service.updateNode(id, updates);
     }
 

@@ -10,6 +10,7 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
 import { IAPService } from './iap.service';
 import { IAPDocumentType } from './entities/iap-document.entity';
 import { Objective, RiskAssessment, ResourceAllocation } from './entities/operational-period.entity';
+import { UpsertIapDocumentDto } from './dto/iap-document.dto';
 
 // 定級理由：IAP（事件行動計畫）＝作戰指揮文件。撰寫作戰週期目標、風險評估與資源配置屬幕僚作業 → L2；
 // 「核准」與「啟動/關閉作戰週期」是指揮權行為，一旦生效即改變全隊行動依據 → 收緊 L3。
@@ -142,7 +143,7 @@ export class IAPController {
     async upsertDocument(
         @Param('periodId') periodId: string,
         @Param('docType') docType: IAPDocumentType,
-        @Body() body: { content: Record<string, any> },
+        @Body() body: UpsertIapDocumentDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const document = await this.iapService.upsertDocument(
