@@ -79,7 +79,6 @@ import { RoutingModule } from './modules/routing/routing.module';
 // Community
 import { ReunificationModule } from './modules/reunification/reunification.module';
 import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module';
-import { CrowdReportingModule } from './modules/crowd-reporting/crowd-reporting.module';
 // Volunteer
 import { RewardsModule } from './modules/rewards/rewards.module';
 import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module';
@@ -96,15 +95,11 @@ import { SystemModule } from './modules/system/system.module';
 // Webhooks & Integrations
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { Fire119Module } from './modules/fire-119/fire-119.module';
-import { CitizenAppModule } from './modules/citizen-app/citizen-app.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
 import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module';
-import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module';
 import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
-import { DisasterSummaryModule } from './modules/disaster-summary/disaster-summary.module';
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
-import { DocumentOcrModule } from './modules/document-ocr/document-ocr.module';
 import { TranslationModule } from './modules/translation/translation.module';
 // Scheduling & Dispatch
 // Weather & Climate
@@ -129,19 +124,16 @@ import { InteroperabilityAdaptersModule } from './modules/interoperability-adapt
 // AR/VR
 // Offline & Mobile
 import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module';
-import { DeviceManagementModule } from './modules/device-management/device-management.module';
 // Push Notifications
 // LINE & Social - CONSOLIDATED into LineBotModule
 // LineLiffModule and LineNotifyModule services are now provided by LineBotModule
 // Blockchain & Security
-import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
 // REMOVED: SupplyChainBlockchainModule - use traditional database
 // REMOVED: GdprComplianceModule - consolidated to audit module
 // Simulation & Training
 import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module';
 // REMOVED: EvacuationSimModule - stub module deleted
-import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module';
 // Specialty
 // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
 // REMOVED: RobotRescueModule, SpectrumAnalysisModule - R&D/specialized equipment
@@ -318,7 +310,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Community
         ReunificationModule, // 👨‍👩‍👧 家庭團聚
         PsychologicalSupportModule, // 🧠 心理支援
-        CrowdReportingModule, // 📢 群眾回報
         // Volunteer
         RewardsModule, // 🏆 獎勵系統
         VolunteerPointsModule, // ⭐ 志工積分
@@ -334,15 +325,11 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Webhooks & Integrations
         WebhooksModule, // 🔗 Webhook 接收
         Fire119Module, // 🚒 119 消防整合
-        CitizenAppModule, // 📱 市民 App
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
         ImageRecognitionModule, // 🖼️ 影像辨識
-        ChatbotAssistantModule, // 💬 聊天機器人助理
         RagKnowledgeModule, // 📚 RAG 知識庫
-        DisasterSummaryModule, // 📊 災情摘要
         FatigueDetectionModule, // 😴 疲勞偵測
-        DocumentOcrModule, // 📄 文件 OCR
         TranslationModule, // 🌐 翻譯服務
         // Scheduling & Dispatch
         // Weather & Climate
@@ -356,16 +343,13 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         //
         // Offline & Mobile
         OfflineMeshModule, // 🔗 Mesh 網路
-        DeviceManagementModule, // 📲 裝置管理
         // Push Notifications
         // LINE & Social - CONSOLIDATED: LineLiffModule and LineNotifyModule merged into LineBotModule
         // Blockchain & Security
-        BlockchainModule, // ⛓️ 區塊鏈
         IntegrityLedgerModule, // 📜 完整性帳本
         // SupplyChainBlockchainModule - moved to STUB_MODULES (conditionally loaded)
         DrillSimulationModule, // 🎯 演習模擬
         // REMOVED: EvacuationSimModule, GdprComplianceModule - stub modules deleted
-        DamageSimulationModule, // 💥 損害模擬
         // Specialty
         // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
         // REMOVED: RobotRescueModule, SpectrumAnalysisModule, WearableModule - R&D/hardware dependent
