@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 心情日記頁面 (My Mood Page)
  * 模組 C 前端：心情追蹤與 AI 陪伴

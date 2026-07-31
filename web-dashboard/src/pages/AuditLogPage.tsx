@@ -1,11 +1,16 @@
 /**
  * Audit Log Page
- * 
+ *
  * View and filter system audit logs
  * Level 5+ only — connected to real API
+ *
+ * FE-4 遷移範本（3.1 示範頁 3/3）：utils/api → src/api/client + react-query
+ * 見 docs/architecture/API_CLIENT_CONSOLIDATION.md §「遷移模式 C：伺服器端篩選參數」
+ * 重點：篩選條件進 queryKey，react-query 自動 refetch + 快取每組條件的結果。
  */
 
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import {
     Search,
     Download,
@@ -20,7 +25,8 @@ import {
     Eye,
     Loader2,
 } from 'lucide-react';
-import api from '../utils/api';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import { Alert } from '../design-system';
 import styles from './AuditLogPage.module.css';
 
@@ -63,19 +69,25 @@ const RESOURCE_LABELS: Record<string, string> = {
     settings: '設定',
 };
 
+/** query key 慣例：[領域, 資源, 篩選條件物件] —— 篩選條件變動即自動 refetch */
+const auditKeys = {
+    logs: (filters: { status: string; action: string }) => ['audit', 'logs', filters] as const,
+};
+
 const AuditLogPage: React.FC = () => {
-    const [logs, setLogs] = useState<AuditLog[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<string>('all');
     const [actionFilter, setActionFilter] = useState<string>('all');
     const [expandedLogId, setExpandedLogId] = useState<string | null>(null);
 
-    const fetchLogs = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
+    const {
+        data: logs = [],
+        isFetching: loading,
+        error: queryError,
+        refetch: fetchLogs,
+    } = useQuery({
+        queryKey: auditKeys.logs({ status: statusFilter, action: actionFilter }),
+        queryFn: async ({ signal }): Promise<AuditLog[]> => {
             const params: Record<string, string> = { limit: '100' };
             if (statusFilter !== 'all') {
                 params.success = statusFilter === 'success' ? 'true' : 'false';
@@ -83,23 +95,14 @@ const AuditLogPage: React.FC = () => {
             if (actionFilter !== 'all') {
                 params.action = actionFilter;
             }
-            const response = await api.get('/audit/logs', { params });
+            const response = await api.get('/audit/logs', { params, signal });
             const data = response.data?.data || response.data || [];
             // Normalize: backend returns logs or items array
-            const items = Array.isArray(data) ? data : (data.items || data.logs || []);
-            setLogs(items);
-        } catch (err: any) {
-            console.error('Failed to fetch audit logs:', err);
-            setError(err?.response?.data?.message || '無法載入稽核日誌');
-            setLogs([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [statusFilter, actionFilter]);
+            return Array.isArray(data) ? data : (data.items || data.logs || []);
+        },
+    });
 
-    useEffect(() => {
-        fetchLogs();
-    }, [fetchLogs]);
+    const error = queryError ? getApiErrorMessage(queryError, '無法載入稽核日誌') : null;
 
     // Client-side search filter
     const filteredLogs = useMemo(() => {
@@ -138,7 +141,7 @@ const AuditLogPage: React.FC = () => {
                     </p>
                 </div>
                 <div className={styles.headerActions}>
-                    <button className={styles.actionButton} onClick={fetchLogs} disabled={loading}>
+                    <button className={styles.actionButton} onClick={() => fetchLogs()} disabled={loading}>
                         <RefreshCw size={18} className={loading ? 'spin' : ''} />
                         重新整理
                     </button>

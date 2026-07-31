@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 公開責信查詢頁面 (Transparency Page)
  * 模組 D 前端：物資流向公開查詢

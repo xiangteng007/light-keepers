@@ -7,7 +7,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Target, Calendar, Users, Clock, Play, CheckCircle, PauseCircle, Loader2, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
-import api from '../../utils/api';
+import api from '../../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
 import './DrillsPage.css';
 
 interface Drill {

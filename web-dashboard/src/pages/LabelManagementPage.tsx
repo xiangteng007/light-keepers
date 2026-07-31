@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Form, Alert, Badge, Modal } from 'react-bootstrap';
-import api from '../utils/api';
+import api from '../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
 
 interface LabelTemplate {
     id: string;
