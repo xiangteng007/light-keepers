@@ -1,5 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
-import api from '../../../utils/api';
+/**
+ * 組織架構圖
+ *
+ * FE-4 遷移範本（3.1 示範頁 2/3）：utils/api → src/api/client + react-query
+ * 見 docs/architecture/API_CLIENT_CONSOLIDATION.md §「遷移模式 B：串接式多請求」
+ *
+ * 重點：原本在 fetch 的 catch/finally 裡同時做「載入狀態」與「衍生 UI 狀態」
+ * （auto-expand 前兩層）。遷移後 queryFn 只負責取資料 + normalize，
+ * 衍生狀態改由 `useMemo` 從 query 結果推導，避免 setState-in-effect。
+ */
+import { useState, useMemo } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../../api/client';
+import { getApiErrorMessage } from '../../../api/errors';
 
 interface OrgNode {
     id: string;
@@ -10,65 +22,63 @@ interface OrgNode {
     children?: OrgNode[];
 }
 
-export default function OrgChartPage() {
-    const [orgData, setOrgData] = useState<OrgNode | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
+const orgChartKeys = {
+    tree: () => ['org-chart', 'tree'] as const,
+};
 
-    const fetchOrgChart = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            // Get full tree from root — try stats first to find root, then get tree
-            const statsRes = await api.get('/org-chart/stats');
+/** 後端 org node 格式 → 前端 interface */
+const normalizeNode = (node: any): OrgNode => ({
+    id: node.id || node._id,
+    name: node.name || node.managerName || '未命名',
+    title: node.title || node.type || '',
+    department: node.department || node.metadata?.department || node.type || '',
+    children: node.children?.map((c: any) => normalizeNode(c)),
+});
+
+export default function OrgChartPage() {
+    const [nodeOverrides, setNodeOverrides] = useState<Record<string, boolean>>({});
+
+    const {
+        data: orgData = null,
+        isFetching: loading,
+        error: queryError,
+        refetch: fetchOrgChart,
+    } = useQuery({
+        queryKey: orgChartKeys.tree(),
+        queryFn: async ({ signal }): Promise<OrgNode | null> => {
+            // 串接式請求：先取 stats 找 rootId，再取該 root 的樹
+            const statsRes = await api.get('/org-chart/stats', { signal });
             const stats = statsRes.data?.data || statsRes.data || {};
             const rootId = stats.rootId || 'root';
 
-            const treeRes = await api.get(`/org-chart/tree/${rootId}`);
+            const treeRes = await api.get(`/org-chart/tree/${rootId}`, { signal });
             const treeData = treeRes.data?.data || treeRes.data;
+            return treeData ? normalizeNode(treeData) : null;
+        },
+    });
 
-            if (treeData) {
-                // Normalize backend org node format to our interface
-                const normalizeNode = (node: any): OrgNode => ({
-                    id: node.id || node._id,
-                    name: node.name || node.managerName || '未命名',
-                    title: node.title || node.type || '',
-                    department: node.department || node.metadata?.department || node.type || '',
-                    children: node.children?.map((c: any) => normalizeNode(c)),
-                });
-                const tree = normalizeNode(treeData);
-                setOrgData(tree);
-                // Auto-expand first two levels
-                const idsToExpand = new Set<string>();
-                idsToExpand.add(tree.id);
-                tree.children?.forEach(c => idsToExpand.add(c.id));
-                setExpandedNodes(idsToExpand);
-            }
-        } catch (err: any) {
-            console.error('Failed to fetch org chart:', err);
-            setError(err?.response?.data?.message || '無法載入組織架構');
-            setOrgData(null);
-        } finally {
-            setLoading(false);
+    const error = queryError ? getApiErrorMessage(queryError, '無法載入組織架構') : null;
+
+    // 預設展開前兩層：由 query 結果推導（不再靠 setState-in-effect）
+    const defaultExpanded = useMemo(() => {
+        const ids = new Set<string>();
+        if (orgData) {
+            ids.add(orgData.id);
+            orgData.children?.forEach(c => ids.add(c.id));
         }
-    }, []);
+        return ids;
+    }, [orgData]);
 
-    useEffect(() => {
-        fetchOrgChart();
-    }, [fetchOrgChart]);
+    /** 使用者手動 toggle 的覆寫值；未覆寫者沿用 defaultExpanded */
+    const isNodeExpanded = (id: string) => nodeOverrides[id] ?? defaultExpanded.has(id);
 
     const toggleNode = (id: string) => {
-        setExpandedNodes(prev => {
-            const next = new Set(prev);
-            if (next.has(id)) next.delete(id); else next.add(id);
-            return next;
-        });
+        setNodeOverrides(prev => ({ ...prev, [id]: !(prev[id] ?? defaultExpanded.has(id)) }));
     };
 
     const renderNode = (node: OrgNode, level: number = 0) => {
         const hasChildren = node.children && node.children.length > 0;
-        const isExpanded = expandedNodes.has(node.id);
+        const isExpanded = isNodeExpanded(node.id);
         return (
             <div key={node.id} className="flex flex-col items-center">
                 <div className={`bg-slate-800/80 rounded-lg p-4 border border-slate-700 min-w-48 text-center cursor-pointer hover:border-amber-500 transition-colors ${level === 0 ? 'border-amber-500 bg-amber-500/10' : ''}`} onClick={() => hasChildren && toggleNode(node.id)}>
@@ -95,7 +105,7 @@ export default function OrgChartPage() {
             <div className="flex justify-between items-center">
                 <div><h1 className="text-2xl font-bold text-white">組織架構</h1><p className="text-gray-400">志工團隊架構</p></div>
                 <div className="flex gap-2">
-                    <button onClick={fetchOrgChart} disabled={loading} className="px-4 py-2 border border-slate-700 text-gray-300 rounded-lg hover:bg-slate-700 disabled:opacity-50">
+                    <button onClick={() => fetchOrgChart()} disabled={loading} className="px-4 py-2 border border-slate-700 text-gray-300 rounded-lg hover:bg-slate-700 disabled:opacity-50">
                         {loading ? '載入中...' : '重新整理'}
                     </button>
                     <button className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">編輯架構</button>

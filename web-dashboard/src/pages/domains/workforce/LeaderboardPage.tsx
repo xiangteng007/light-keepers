@@ -1,5 +1,13 @@
-import { useState, useEffect, useCallback } from 'react';
-import api from '../../../utils/api';
+/**
+ * 志工排行榜
+ *
+ * FE-4 遷移範本（3.1 示範頁 1/3）：utils/api → src/api/client + react-query
+ * 見 docs/architecture/API_CLIENT_CONSOLIDATION.md §「遷移模式 A：單一 GET 清單」
+ */
+import { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import api from '../../../api/client';
+import { getApiErrorMessage } from '../../../api/errors';
 
 interface LeaderboardEntry {
     rank: number;
@@ -10,42 +18,42 @@ interface LeaderboardEntry {
     points: number;
 }
 
-export default function LeaderboardPage() {
-    const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState<string | null>(null);
-    const [timeframe, setTimeframe] = useState<'week' | 'month' | 'year' | 'all'>('month');
+type Timeframe = 'week' | 'month' | 'year' | 'all';
 
-    const fetchLeaderboard = useCallback(async () => {
-        try {
-            setLoading(true);
-            setError(null);
-            // Try volunteer points ranking endpoint
+/** query key 慣例：[領域, 資源, ...參數] */
+const leaderboardKeys = {
+    ranking: (timeframe: Timeframe) => ['volunteer-points', 'ranking', timeframe] as const,
+};
+
+export default function LeaderboardPage() {
+    const [timeframe, setTimeframe] = useState<Timeframe>('month');
+
+    const {
+        data: entries = [],
+        isFetching: loading,
+        error: queryError,
+        refetch: fetchLeaderboard,
+    } = useQuery({
+        queryKey: leaderboardKeys.ranking(timeframe),
+        queryFn: async ({ signal }): Promise<LeaderboardEntry[]> => {
             const response = await api.get('/volunteer-points/ranking', {
-                params: { timeframe, limit: '20' },
+                params: { timeframe, limit: 20 },
+                signal,
             });
             const data = response.data?.data || response.data || [];
             const items = Array.isArray(data) ? data : (data.items || data.ranking || []);
-            setEntries(items.map((item: any, index: number) => ({
+            return items.map((item: any, index: number) => ({
                 rank: item.rank || index + 1,
                 volunteerId: item.volunteerId || item.id || String(index),
                 name: item.name || item.volunteerName || '未知',
                 hours: item.hours || item.totalHours || 0,
                 missions: item.missions || item.missionCount || 0,
                 points: item.points || item.totalPoints || 0,
-            })));
-        } catch (err: any) {
-            console.error('Failed to fetch leaderboard:', err);
-            setError(err?.response?.data?.message || '無法載入排行榜');
-            setEntries([]);
-        } finally {
-            setLoading(false);
-        }
-    }, [timeframe]);
+            }));
+        },
+    });
 
-    useEffect(() => {
-        fetchLeaderboard();
-    }, [fetchLeaderboard]);
+    const error = queryError ? getApiErrorMessage(queryError, '無法載入排行榜') : null;
 
     const getRankStyle = (rank: number) => {
         switch (rank) {
@@ -63,7 +71,7 @@ export default function LeaderboardPage() {
             <div className="flex justify-between items-center">
                 <div><h1 className="text-2xl font-bold text-white">志工排行榜</h1><p className="text-gray-400">表現優異的志工排名</p></div>
                 <div className="flex items-center gap-2">
-                    <button onClick={fetchLeaderboard} disabled={loading} className="px-3 py-2 text-gray-400 hover:text-white" title="重新整理">
+                    <button onClick={() => fetchLeaderboard()} disabled={loading} className="px-3 py-2 text-gray-400 hover:text-white" title="重新整理">
                         {loading ? '⏳' : '🔄'}
                     </button>
                     <div className="flex bg-slate-800 rounded-lg p-1">

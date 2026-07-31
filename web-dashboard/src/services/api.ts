@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * API Service - 通用 API 客戶端（fetch 版）
  * 提供類 axios 介面的 HTTP 請求方法

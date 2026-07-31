@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect } from 'react';
 import './SITREPViewerPage.css';
 

@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 網狀網路監控頁面 (Mesh Monitor Page)
  * 模組 B 前端：LoRa 節點拓樸與訊息監控

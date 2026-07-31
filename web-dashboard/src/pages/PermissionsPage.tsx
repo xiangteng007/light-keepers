@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { deleteAccount, blacklistAccount } from '../api/services';
 import './PermissionsPage.css';
-import api from '../utils/api';
+import api from '../utils/api'; // eslint-disable-line no-restricted-imports -- FE-4 遷移待辦（工作項 3.2）：改用 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md
 
 // Types
 interface AdminAccount {

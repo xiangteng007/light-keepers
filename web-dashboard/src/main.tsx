@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import App from './App.tsx'
 import ErrorBoundary from './components/ErrorBoundary'
+import { defaultQueryRetry } from './api/errors'
 import './i18n' // 多語系支援
 import './styles/theme.css'
 import './styles/a11y.css' // 無障礙樣式
@@ -21,7 +22,8 @@ if (window.location.pathname.startsWith('/__/')) {
     defaultOptions: {
       queries: {
         staleTime: 1000 * 60 * 5, // 5 分鐘
-        retry: 1,
+        // FE-4: 4xx（含 401/403/404）不重試——重試只會在 refresh 失敗後多打無效請求
+        retry: defaultQueryRetry,
       },
     },
   })
