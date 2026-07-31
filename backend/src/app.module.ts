@@ -79,7 +79,6 @@ import { RoutingModule } from './modules/routing/routing.module';
 import { ReunificationModule } from './modules/reunification/reunification.module';
 import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module';
 // Volunteer
-import { RewardsModule } from './modules/rewards/rewards.module';
 import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module';
 import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module';
 // Equipment & Misc
@@ -95,7 +94,6 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { Fire119Module } from './modules/fire-119/fire-119.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
-import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
 import { TranslationModule } from './modules/translation/translation.module';
 // Scheduling & Dispatch
@@ -137,20 +135,15 @@ import { DrillSimulationModule } from './modules/drill-simulation/drill-simulati
 import { WaterResourcesModule } from './modules/water-resources/water-resources.module';
 // REMOVED: WearableModule - hardware dependent, use third-party API
 // Communication
-import { PttModule } from './modules/ptt/ptt.module';
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
 // RealtimeChatModule - CONSOLIDATED into RealtimeModule
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
 // Infrastructure
 import { SentryModule } from './modules/sentry/sentry.module';
-import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module';
 // REMOVED: NfcModule - hardware dependent, use QR instead
 // Note: GeoIntelModule has no module file (only agents subfolder)
 // Resource Management
-import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module';
-import { ResourceOptimizationModule } from './modules/resource-optimization/resource-optimization.module';
-import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module';
 // Admin & Finance
 // REMOVED: MultiTenantModule - consolidated to tenants module
 import { PublicFinanceModule } from './modules/public-finance/public-finance.module';
@@ -303,7 +296,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         ReunificationModule, // 👨‍👩‍👧 家庭團聚
         PsychologicalSupportModule, // 🧠 心理支援
         // Volunteer
-        RewardsModule, // 🏆 獎勵系統
         VolunteerPointsModule, // ⭐ 志工積分
         VolunteerCertificationModule, // 🎓 志工認證
         // Equipment & Misc
@@ -318,7 +310,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         Fire119Module, // 🚒 119 消防整合
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
-        RagKnowledgeModule, // 📚 RAG 知識庫
         FatigueDetectionModule, // 😴 疲勞偵測
         TranslationModule, // 🌐 翻譯服務
         // Scheduling & Dispatch
@@ -345,19 +336,14 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // REMOVED: RobotRescueModule, SpectrumAnalysisModule, WearableModule - R&D/hardware dependent
         WaterResourcesModule, // 💧 水資源
         // Communication
-        PttModule, // 📻 PTT 對講
         // REMOVED: BluetoothAudioModule - hardware dependent
         // RealtimeChatModule - CONSOLIDATED into RealtimeModule
         SpeechToTextModule, // 🎤 語音轉文字
         VoiceAssistantModule, // 🗣️ 語音助理
         // Infrastructure
         SentryModule, // 🐛 Sentry 監控
-        QrScannerModule, // 📱 QR 掃描
         // REMOVED: NfcModule - hardware dependent, use QR instead
         // Resource Management
-        ResourceMatchingModule, // 🎯 資源媒合
-        ResourceOptimizationModule, // ⚡ 資源優化
-        PredictiveMaintenanceModule, // 🔧 預測維護
         // Admin & Finance
         // REMOVED: MultiTenantModule - consolidated to tenants
         PublicFinanceModule, // 💰 公共財務
