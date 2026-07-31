@@ -10,6 +10,7 @@ import {
     AlertTriangle, CheckCircle, Clock, ChevronRight, Loader2, RefreshCw
 } from 'lucide-react';
 import { PageTemplate } from '../../../components/PageTemplate';
+import { Alert } from '../../../design-system';
 import api from '../../../utils/api';
 import './CommunityCenterPage.css';
 
@@ -128,8 +129,8 @@ export default function CommunityCenterPage() {
 
                 {/* Error */}
                 {error && (
-                    <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <AlertTriangle size={16} /> {error}
+                    <div style={{ marginBottom: '1rem' }}>
+                        <Alert variant="danger" icon={<AlertTriangle size={16} />}>{error}</Alert>
                     </div>
                 )}
 
@@ -167,7 +168,7 @@ export default function CommunityCenterPage() {
 
                 {/* Loading */}
                 {loading && (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: '#94a3b8' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: 'var(--text-secondary, #94a3b8)' }}>
                         <Loader2 size={24} className="spin" />
                         <span>載入社區資料中...</span>
                     </div>
@@ -179,7 +180,7 @@ export default function CommunityCenterPage() {
                         <div className="community-list">
                             <h3>社區清單</h3>
                             {communities.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #64748b)' }}>
                                     暫無社區資料
                                 </div>
                             ) : communities.map(community => (
@@ -214,7 +215,7 @@ export default function CommunityCenterPage() {
                         <div className="activities-panel">
                             <h3><Calendar size={18} /> 近期活動</h3>
                             {activities.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #64748b)' }}>
                                     暫無活動
                                 </div>
                             ) : activities.map(activity => (

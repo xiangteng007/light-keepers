@@ -53,6 +53,9 @@ function getDateLabels(days: number): string[] {
 }
 
 // NCDR 類別配置
+// Chart.js renders to <canvas>, not the DOM, so dataset colors must be literal color strings
+// (CSS custom properties are not resolved inside canvas draw calls) — left as literal rgba,
+// same for the chart dataset backgroundColor arrays further below in this file
 const NCDR_CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
     weather: { label: '氣象', color: 'rgba(59, 130, 246, 0.8)' },
     earthquake: { label: '地震', color: 'rgba(239, 68, 68, 0.8)' },
