@@ -9,6 +9,20 @@
 
 ---
 
+## 執行進度（2026-07-31 更新）
+
+| 期別 | 狀態 | 明細 |
+|------|------|------|
+| **Phase E** | ✅ **全部完成** | E.1 JWT+deploy 閘門、E.2 憑證出 git（實際 11 檔，含 GCP 私鑰/DB 密碼/Gemini Key）、E.3 復原 17 個死模組＋後端 ESLint、E.4 LINE webhook、E.5 CI 阻擋式閘門、E.6 critical 漏洞歸零 |
+| **Phase 0** | ✅ 全部完成 | 0.1 devModeUser 後門（7 處）/token key/路徑 bug、0.3 前端測試 88 tests、0.4 ErrorBoundary、0.5 BASELINE_METRICS；0.2 併入 E.5＋後續 gate 工作 |
+| **Phase 1** | 🔄 進行中 | ✅ 1.1 SYNC_TABLES production 硬禁用（cloudbuild 源頭同步清除——**證實生產原本開著 synchronize**）、✅ 1.3 重複 entity 收斂、✅ 1.4 授權盤點（實際 43 裸 controller/361 端點）、✅ 1.5a+1.5b 共 55 controller/383 端點定級補 guard、🔄 1.6 guard 收斂執行中、⏸ 1.2 baseline migration **等 D7/D15 窗口**（範圍已擴充：損壞 migration＋稽核靜默失敗） |
+| Phase M 前置 | ✅ M.0 完成 | docker-compose env 修復，compose config 實測通過 |
+| 驗證基準 | — | 後端 357 suites / 3,499 tests 全綠；前端 vitest 88/88；tsc 雙側乾淨；coverage 門檻生效（52%/32%，實測 58.5%/37.4%） |
+
+**等 Owner 的動作**：①憑證輪換（`docs/security/CREDENTIAL_ROTATION_CHECKLIST.md`）②git 歷史清理確認 ③D7/D15 排窗口 ④D12–D14（NAS 規格/LLM 選型/通道）⑤下次部署將強制全員重新登入（JWT 更換）。
+
+---
+
 ## 1. 專案現況總評
 
 ### 1.1 專案是什麼
