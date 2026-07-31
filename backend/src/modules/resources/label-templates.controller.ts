@@ -1,15 +1,18 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../common/types/request.types';
+import { UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { LabelTemplatesService } from './label-templates.service';
-import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 /**
- * 貼紙模板管理 API（幹部專用）
+ * 貼紙模板管理 API
+ *
+ * 授權（1.5b 修正：檔頭註解原寫「幹部專用」，實際 inline 檢查是 roleLevel < 5，
+ * 也就是 L5 系統擁有者 (OWNER)。本次以宣告式 @RequiredLevel 對齊「實際行為」，
+ * 維持 L5 不變，只是把註解與程式碼修成一致）：
+ * - 查詢類 (findAll / findOne / getApplicable)：僅需登入（由 APP_GUARD GlobalAuthGuard 提供）
+ * - 異動類 (create / update / setActive / delete)：L5 OWNER 系統擁有者
  */
 @Controller('label-templates')
-// 定級理由：模板查詢為倉儲列印作業所需（L1）；模板增修刪為管制品標籤設定，宣告 L2（各 handler 內既有的 roleLevel < 5 檢查更嚴，維持不動，兩者取交集）。
-@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class LabelTemplatesController {
     constructor(private readonly templatesService: LabelTemplatesService) { }
 
@@ -40,11 +43,12 @@ export class LabelTemplatesController {
     }
 
     /**
-     * 創建模板（幹部專用）
+     * 創建模板（L5 系統擁有者專用）
      * POST /api/label-templates
      */
     @Post()
-    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：建立標籤模板
+    @UseGuards(UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OWNER)
     async create(
         @Body() body: {
             name: string;
@@ -59,11 +63,6 @@ export class LabelTemplatesController {
     ) {
         const user = req.user;
 
-        // 僅幹部可創建
-        if (!user || (user.roleLevel ?? 0) < 5) {
-            throw new ForbiddenException('僅幹部可創建模板');
-        }
-
         return this.templatesService.create({
             ...body,
             createdBy: user.uid || user.id,
@@ -71,11 +70,12 @@ export class LabelTemplatesController {
     }
 
     /**
-     * 更新模板（幹部專用）
+     * 更新模板（L5 系統擁有者專用）
      * PATCH /api/label-templates/:id
      */
     @Patch(':id')
-    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：修改標籤模板
+    @UseGuards(UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OWNER)
     async update(
         @Param('id') id: string,
         @Body() body: Partial<{
@@ -88,53 +88,34 @@ export class LabelTemplatesController {
             layoutConfig: Record<string, any>;
             isActive: boolean;
         }>,
-        @Request() req: AuthenticatedRequest,
     ) {
-        const user = req.user;
-
-        if (!user || (user.roleLevel ?? 0) < 5) {
-            throw new ForbiddenException('僅幹部可編輯模板');
-        }
-
         return this.templatesService.update(id, body);
     }
 
     /**
-     * 啟用/停用模板
+     * 啟用/停用模板（L5 系統擁有者專用）
      * PATCH /api/label-templates/:id/active
      */
     @Patch(':id/active')
-    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：啟用／停用模板
+    @UseGuards(UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OWNER)
     async setActive(
         @Param('id') id: string,
         @Body('isActive') isActive: boolean,
-        @Request() req: AuthenticatedRequest,
     ) {
-        const user = req.user;
-
-        if (!user || (user.roleLevel ?? 0) < 5) {
-            throw new ForbiddenException('僅幹部可啟用/停用模板');
-        }
-
         return this.templatesService.setActive(id, isActive);
     }
 
     /**
-     * 刪除模板（軟刪除）
+     * 刪除模板（軟刪除，L5 系統擁有者專用）
      * DELETE /api/label-templates/:id
      */
     @Delete(':id')
-    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：軟刪除模板
+    @UseGuards(UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OWNER)
     async delete(
         @Param('id') id: string,
-        @Request() req: AuthenticatedRequest,
     ) {
-        const user = req.user;
-
-        if (!user || (user.roleLevel ?? 0) < 5) {
-            throw new ForbiddenException('僅幹部可刪除模板');
-        }
-
         await this.templatesService.delete(id);
         return { message: '模板已刪除' };
     }

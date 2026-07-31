@@ -24,6 +24,8 @@ export class ReunificationController {
     constructor(private readonly reunificationService: ReunificationService) { }
 
     // ============ 憑查詢碼查詢 ============
+    // 定級 L1（非 L0）：是否真正對外公開屬 public surface 決策，
+    // 需先更新 docs/policy/public-surface.policy.json 再放寬（見 AUTHZ_LEVELS_APPLIED_A.md）。
 
     @Get('search')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -34,6 +36,9 @@ export class ReunificationController {
     }
 
     // ============ 管理端 API ============
+    // 定級原則（管理端 L2-L3，對齊 shelters.controller 的同類災民資料端點）：
+    // - 失蹤者名單/統計/報案登錄屬第一線協尋作業 → L2 幹部 (OFFICER)
+    // - 標記已團聚 = 個案結案（不可逆的記錄狀態） → L3 常務理事 (DIRECTOR)
 
     @Post('reports')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
@@ -84,7 +89,7 @@ export class ReunificationController {
 
     @Put(':id/reunited')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-    @RequiredLevel(ROLE_LEVELS.OFFICER)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 個案結案（不可逆），對齊 shelters 同類端點定 L3
     @ApiBearerAuth()
     @ApiOperation({ summary: '標記已團聚' })
     @ApiParam({ name: 'id' })

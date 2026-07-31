@@ -38,7 +38,7 @@ describe('LabelTemplatesController', () => {
         expect(result).toBeDefined();
     });
     it('delete deletes template', async () => {
-        const result = await controller.delete('t1', req);
+        const result = await controller.delete('t1');
         expect(result.message).toContain('刪除');
     });
     it('getApplicable returns applicable', async () => {

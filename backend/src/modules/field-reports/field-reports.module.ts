@@ -46,7 +46,7 @@ import { Account } from '../accounts/entities/account.entity';
             LocationHistory,
             Account,
         ]),
-        forwardRef(() => AuthModule), // For JwtAuthGuard
+        forwardRef(() => AuthModule), // For AuthService / JwtModule (原註解寫 JwtAuthGuard，該 guard 已於 1.6 收斂中移除)
         forwardRef(() => NotificationsModule), // For EmergencyNotificationService
         forwardRef(() => LineBotModule), // For EmergencyNotificationService
     ],
