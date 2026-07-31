@@ -1,7 +1,8 @@
-import { Controller, Get, Param, Patch, Delete, Body, UseGuards, Request } from '@nestjs/common';
+import { Controller, Get, Param, Patch, Delete, Body, UseGuards, UseInterceptors, Request } from '@nestjs/common';
 import { IsArray, IsString, IsNumber, IsBoolean, IsOptional } from 'class-validator';
 import { AccountsService } from './accounts.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
 import { RoleLevel } from './entities/role.entity';
 
 // DTOs
@@ -35,7 +36,10 @@ class UpdatePagePermissionDto {
 // `page-permissions` 是前端導覽列可見性的設定來源，PermissionsProvider 會為「每一位」登入者載入，
 //   拉高等級會讓一般志工的選單退回前端寫死的預設值 → L1（志工）；真正的防線在寫入端
 //   （`PATCH page-permissions/:pageKey` 已是 OWNER）。
+// 🔐 F-M2 敏感資料遮罩：帳號列表含 email 與電話，L2 幹部可列出帳號但只看得到遮罩後的聯絡方式；
+// 本人帳號（`id` === JWT sub）與 L3+ 不受影響。
 @Controller('accounts')
+@UseInterceptors(SensitiveDataInterceptor)
 export class AccountsController {
     constructor(private readonly accountsService: AccountsService) { }
 

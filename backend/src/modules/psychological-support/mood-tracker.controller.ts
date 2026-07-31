@@ -3,9 +3,10 @@
  * 模組 C: REST API
  */
 
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
 import { MoodTrackerService } from './mood-tracker.service';
 import { PFAChatbotService } from './pfa-chatbot.service';
 
@@ -16,9 +17,12 @@ import { PFAChatbotService } from './pfa-chatbot.service';
 //   直接點名高風險個人，外洩會造成二次傷害 → 收緊 L3（常務理事，對齊 sensitive-audit 的 L3 閘門）。
 // 殘留風險：mood/chat 相關端點以 path param 帶 userId 且無擁有者比對，L1 仍可查他人心情與對話紀錄
 //   （IDOR），這是本模組最高風險項，須另案以 ResourceOwnerGuard／改由 JWT 取 userId 修補。
+// 🔐 F-M2 敏感資料遮罩：心理健康屬特種個資，此處掛載可讓夾帶的聯絡欄位（如需關注名單附帶的
+// 電話／Email）對 L1-L2 遮罩。注意這不會遮罩 mood 分數本身，上方註記的 IDOR 殘留風險仍須另案修補。
 @ApiTags('care')
 @Controller('api/care')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@UseInterceptors(SensitiveDataInterceptor)
 @RequiredLevel(ROLE_LEVELS.DIRECTOR)
 export class MoodTrackerController {
     constructor(

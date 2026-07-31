@@ -17,7 +17,7 @@
 | AAR 自動彙整 | `aar.service.ts` | ✅ |
 | WebSocket 即時同步 | `mission-session.gateway.ts` | ✅ |
 | 報表匯出 (CSV/JSON) | `reports-export.service.ts` | ✅ |
-| 敏感資料遮罩 | `sensitive-masking.interceptor.ts` | ✅ |
+| 敏感資料遮罩 (F-M2) | `sensitive-data.interceptor.ts` + `constants/sensitive-fields.constants.ts` | ✅ |
 | Service Worker Cache | `vite.config.ts` | ✅ |
 | Offline SOP | `offlineSOP.ts` | ✅ |
 | Offline Sync | `offlineSync.ts` | ✅ |
