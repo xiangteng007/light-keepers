@@ -1,0 +1,903 @@
+/**
+ * tokens.css — Light Keepers Design Token 單一真相來源 (Single Source of Truth)
+ * ═══════════════════════════════════════════════════════════════════════════
+ *
+ * 本檔為全站唯一的 CSS custom property 宣告處。
+ * 由以下四套原本互相競爭的 token 檔合併而成（FULL_SYSTEM_REDESIGN_PLAN 2.3 / FE-2）：
+ *
+ *   A  src/styles/design-tokens.css      (K1 亮鋼 / K2 銅鋼，語義色主幹)
+ *   B  src/styles/tokens/index.css       (+ globals.css :root，排版/間距/surface)
+ *   C  src/styles/theme.css              (.dark 舊別名覆寫層)
+ *   D  src/design-system/variables.css   (品牌色階、動效、玻璃態、元件 token)
+ *
+ * ── 衝突解析policy（94 個重複變數）────────────────────────────────────────
+ *   宣告順序 = D → C(dark) → B → A，故 **A > B > D**。
+ *   此順序刻意複製「合併前 entry bundle 的實際串接順序」，因此所有
+ *   非 design-system 頁面（Login/Dashboard/表單頁…）的解析值 100% 不變。
+ *   dark 區塊的選擇器字串與相對順序亦逐字保留（C 的 `:root[data-theme='dark']`
+ *   specificity 為 0,2,0，會壓過 A 的 `[data-theme="dark"]` 0,1,0 — 不可調換）。
+ *
+ * ── 命名慣例 ──────────────────────────────────────────────────────────────
+ *   L1 Primitive   --color-{brown|beige|gold}-{100..900}   原始色階，元件不得直接使用
+ *   L2 Scale       --space-* --radius-* --shadow-* --text-* --font-* --z-* --duration-*
+ *   L3 Semantic    --bg-* --surface-* --text-* --border-* --color-{success|warning|danger|info}
+ *   L4 Component   --btn-* --card-* --badge-* --input-* --modal-* --toast-* …
+ *   新增 token 一律加在對應 Layer；**不要**在其他 css 檔宣告 :root 自訂屬性。
+ *
+ * @version 3.0.0  (consolidated)
+ * @see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md
+ */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 1 — PRIMITIVES  (來源 D)
+   原始品牌色階。只供 Layer 3 語義層引用，元件 CSS 請勿直接使用。
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+    /* ── Brand / Brown ── */
+    --color-brown-900: #3D2E24;
+    --color-brown-800: #4A3728;
+    --color-brown-700: #5C4739;
+    --color-brown-600: #6B5B4F;
+    --color-brown-500: #7E6B5B;
+    --color-brown-400: #9A8A7A;
+    --color-brown-300: #B5A595;
+
+    /* ── Brand / Beige ── */
+    --color-beige-50: #FDFCFB;
+    --color-beige-100: #FAF8F5;
+    --color-beige-200: #F5EDE4;
+    --color-beige-300: #E8DDD0;
+    --color-beige-400: #D9CCC0;
+    --color-beige-500: #C4B5A5;
+
+    /* ── Brand / Gold ── */
+    --color-gold-300: #D4BC96;
+    --color-gold-400: #C4A77D;
+    --color-gold-500: #B8976F;
+    --color-gold-600: #A68660;
+    --color-gold-700: #8F7352;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 2a — SCALE (來源 D，優先度最低)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+    /* ── Typography ── */
+    --font-family-primary: 'Inter', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --font-family-display: 'Inter', sans-serif;
+    --font-family-monospace: 'JetBrains Mono', 'Fira Code', monospace;
+
+    --font-size-2xs: 10px;
+    --font-size-xs: 11px;
+    --font-size-sm: 12px;
+    --font-size-base: 14px;
+    --font-size-md: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 28px;
+    --font-size-4xl: 32px;
+    --font-size-5xl: 40px;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+    --letter-spacing-wider: 0.05em;
+
+    /* ── Spacing (D 專屬別名尺標，與 --space-* 並存) ── */
+    --spacing-0: 0;
+    --spacing-0-5: 2px;
+    --spacing-1: 4px;
+    --spacing-1-5: 6px;
+    --spacing-2: 8px;
+    --spacing-2-5: 10px;
+    --spacing-3: 12px;
+    --spacing-4: 16px;
+    --spacing-5: 20px;
+    --spacing-6: 24px;
+    --spacing-8: 32px;
+    --spacing-10: 40px;
+    --spacing-12: 48px;
+    --spacing-16: 64px;
+    --spacing-20: 80px;
+    --spacing-24: 96px;
+
+    /* ── Radius ── */
+    --radius-none: 0;
+    --radius-xs: 2px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 20px;
+    --radius-3xl: 24px;
+    --radius-full: 9999px;
+
+    /* ── Shadows ── */
+    --shadow-xs: 0 1px 2px rgba(61, 46, 36, 0.04);
+    --shadow-sm: 0 1px 3px rgba(61, 46, 36, 0.08), 0 1px 2px rgba(61, 46, 36, 0.06);
+    --shadow-md: 0 4px 6px rgba(61, 46, 36, 0.08), 0 2px 4px rgba(61, 46, 36, 0.06);
+    --shadow-lg: 0 10px 15px rgba(61, 46, 36, 0.10), 0 4px 6px rgba(61, 46, 36, 0.05);
+    --shadow-xl: 0 20px 25px rgba(61, 46, 36, 0.10), 0 10px 10px rgba(61, 46, 36, 0.04);
+    --shadow-2xl: 0 25px 50px rgba(61, 46, 36, 0.15);
+    --shadow-inner: inset 0 2px 4px rgba(61, 46, 36, 0.06);
+    --shadow-none: none;
+
+    /* ── Glow ── */
+    --shadow-glow-sm: 0 0 10px rgba(196, 167, 125, 0.2);
+    --shadow-glow: 0 0 20px rgba(196, 167, 125, 0.3);
+    --shadow-glow-lg: 0 0 40px rgba(196, 167, 125, 0.4);
+    --shadow-glow-success: 0 0 20px rgba(107, 142, 92, 0.3);
+    --shadow-glow-warning: 0 0 20px rgba(201, 162, 86, 0.3);
+    --shadow-glow-danger: 0 0 20px rgba(184, 92, 92, 0.3);
+    --shadow-glow-info: 0 0 20px rgba(92, 123, 142, 0.3);
+
+    /* ── Motion ── */
+    --ease-linear: linear;
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ease-in-out-back: cubic-bezier(0.68, -0.6, 0.32, 1.6);
+    --ease-elastic: cubic-bezier(0.5, 1.5, 0.5, 1);
+
+    --duration-instant: 50ms;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --duration-slow: 400ms;
+    --duration-slower: 600ms;
+    --duration-slowest: 1000ms;
+
+    /* ── Glassmorphism ── */
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-bg-light: rgba(255, 255, 255, 0.85);
+    --glass-bg-subtle: rgba(255, 255, 255, 0.5);
+    --glass-bg-dark: rgba(61, 46, 36, 0.85);
+    --glass-bg-dark-subtle: rgba(61, 46, 36, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-border-light: rgba(255, 255, 255, 0.3);
+    --glass-blur: 20px;
+    --glass-blur-sm: 10px;
+    --glass-blur-lg: 40px;
+
+    /* ── Gradients ── */
+    --gradient-gold: linear-gradient(135deg, #C4A77D 0%, #A68660 100%);
+    --gradient-gold-soft: linear-gradient(135deg, #D4BC96 0%, #B8976F 50%, #A68660 100%);
+    --gradient-gold-radial: radial-gradient(circle at top left, #C4A77D 0%, #A68660 100%);
+    --gradient-warm: linear-gradient(135deg, #FAF8F5 0%, #F5EDE4 100%);
+    --gradient-warm-soft: linear-gradient(180deg, #FDFCFB 0%, #FAF8F5 50%, #F5EDE4 100%);
+    --gradient-sidebar: linear-gradient(180deg,
+            rgba(245, 237, 228, 0.95) 0%,
+            rgba(250, 248, 245, 0.92) 50%,
+            rgba(253, 252, 251, 0.9) 100%);
+    --gradient-card: linear-gradient(180deg,
+            rgba(255, 255, 255, 1) 0%,
+            rgba(250, 248, 245, 0.8) 100%);
+    --gradient-success: linear-gradient(135deg, #7DA86B 0%, #6B8E5C 100%);
+    --gradient-warning: linear-gradient(135deg, #D4B366 0%, #C9A256 100%);
+    --gradient-danger: linear-gradient(135deg, #C96B6B 0%, #B85C5C 100%);
+    --gradient-info: linear-gradient(135deg, #6B8A9D 0%, #5C7B8E 100%);
+
+    /* ── Z-Index (D 版；下方 B/A 會覆寫重疊項) ── */
+    --z-below: -1;
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-overlay: 300;
+    --z-modal: 400;
+    --z-popover: 500;
+    --z-toast: 600;
+    --z-tooltip: 700;
+    --z-max: 9999;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 2b — SCALE + SEMANTIC (來源 B：tokens/index.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+    /* ── Brand Colors ── */
+    --color-brand-primary: #001F3F;
+    /* Navy Blue */
+    --color-brand-accent: #D97706;
+    /* Golden Amber */
+    --color-brand-accent-light: #FBBF24;
+    --color-brand-accent-dark: #B45309;
+
+    /* ── Semantic Status Colors (災難應變專用) ── */
+    --color-safe: #059669;
+    --color-safe-bg: rgba(5, 150, 105, 0.1);
+    --color-warning: #D97706;
+    --color-warning-bg: rgba(217, 119, 6, 0.1);
+    --color-danger: #DC2626;
+    --color-danger-bg: rgba(220, 38, 38, 0.1);
+    --color-critical: #7C3AED;
+    --color-critical-bg: rgba(124, 58, 237, 0.1);
+    --color-info: #3B82F6;
+    --color-info-bg: rgba(59, 130, 246, 0.1);
+
+    /* ── Surface Layers ── */
+    --surface-ground: #F8FAFC;
+    --surface-card: #FFFFFF;
+    --surface-raised: #FFFFFF;
+    --surface-overlay: rgba(255, 255, 255, 0.95);
+    --surface-hover: #F1F5F9;
+    --surface-pressed: #E2E8F0;
+
+    /* ── Text Hierarchy ── */
+    --text-heading: #0F172A;
+    --text-body: #1F2937;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --text-disabled: #D1D5DB;
+    --text-inverse: #FFFFFF;
+    --text-link: #001F3F;
+    --text-accent: #D97706;
+
+    /* ── Border Colors ── */
+    --border-default: #E2E8F0;
+    --border-light: #F1F5F9;
+    --border-focus: #001F3F;
+    --border-accent: #D97706;
+    --border-danger: #DC2626;
+
+    /* ── Spacing Scale (4px base) ── */
+    --space-0: 0;
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+    --space-20: 80px;
+
+    /* ── Border Radius ── */
+    --radius-none: 0;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-2xl: 24px;
+    --radius-full: 9999px;
+
+    /* ── Typography ── */
+    --font-display: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-body: 'Inter', 'Noto Sans TC', sans-serif;
+    --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+
+    --font-size-xs: 12px;
+    --font-size-sm: 14px;
+    --font-size-base: 16px;
+    --font-size-lg: 18px;
+    --font-size-xl: 20px;
+    --font-size-2xl: 24px;
+    --font-size-3xl: 30px;
+    --font-size-4xl: 36px;
+
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+
+    --line-height-tight: 1.25;
+    --line-height-normal: 1.5;
+    --line-height-relaxed: 1.75;
+
+    --letter-spacing-tight: -0.025em;
+    --letter-spacing-normal: 0;
+    --letter-spacing-wide: 0.025em;
+
+    /* ── Shadows ── */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07), 0 2px 4px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.08), 0 4px 6px rgba(0, 0, 0, 0.04);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+    --shadow-glow-accent: 0 0 20px rgba(217, 119, 6, 0.25);
+    --shadow-glow-primary: 0 0 20px rgba(0, 31, 63, 0.15);
+
+    /* ── Motion / Animation ── */
+    --transition-fast: 100ms ease;
+    --transition-normal: 200ms ease;
+    --transition-slow: 300ms ease-out;
+    --transition-spring: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+
+    /* ── Effects ── */
+    --hover-lift: translateY(-2px);
+    --press-scale: scale(0.98);
+    --focus-ring: 0 0 0 3px rgba(0, 31, 63, 0.2);
+    --focus-ring-accent: 0 0 0 3px rgba(217, 119, 6, 0.3);
+
+    /* ── Z-Index Scale ── */
+    --z-base: 0;
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+    --z-toast: 800;
+    --z-emergency: 999;
+
+    /* ── Layout Dimensions ── */
+    --sidebar-width: 280px;
+    --sidebar-collapsed-width: 64px;
+    --header-height: 64px;
+    --footer-height: 48px;
+    --mobile-nav-height: 64px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 2c — SEMANTIC (來源 B：globals.css :root)
+   Expert Council Light Theme：Navy + Amber 舊別名，仍有 100+ 檔案引用
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+    /* ── Core Colors ── */
+    --primary: #001F3F;
+    /* Navy Blue - 主色 */
+    --accent: #D97706;
+    /* Golden Amber - 輔色 */
+    --success: #276749;
+    /* Forest Green - 低風險 */
+    --warning: #C05621;
+    /* Orange - 中風險 */
+    --danger: #9B2C2C;
+    /* Deep Red - 高風險 */
+    --critical: #702459;
+    /* Purple Red - 極危 */
+
+    /* ── Background ── */
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;
+    --bg-card: #FFFFFF;
+    --bg-hover: #F1F5F9;
+
+    /* ── Text ── */
+    --text-primary: #1F2937;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+
+    /* ── Borders ── */
+    --border-color: #E2E8F0;
+    --border-light: #F1F5F9;
+
+    /* ── Legacy V2 Variables (for compatibility) ── */
+    --v2-bg-void: #FFFFFF;
+    --v2-bg-glass: rgba(255, 255, 255, 0.95);
+    --v2-bg-glass-heavy: rgba(248, 250, 252, 0.98);
+    --v2-bg-dim: rgba(0, 0, 0, 0.05);
+    --v2-border-subtle: #E2E8F0;
+    --v2-border-neon: rgba(0, 31, 63, 0.2);
+    --v2-border-amber: rgba(217, 119, 6, 0.3);
+    --v2-text-primary: #1F2937;
+    --v2-text-secondary: #6B7280;
+    --v2-text-dim: #9CA3AF;
+    --v2-text-accent: #001F3F;
+    --v2-primary: #D97706;
+    --v2-secondary: #001F3F;
+    --v2-critical: #9B2C2C;
+    --v2-success: #276749;
+
+    /* ── Effects ── */
+    --v2-glow-amber: 0 2px 8px rgba(217, 119, 6, 0.15);
+    --v2-glow-cyan: 0 2px 8px rgba(0, 31, 63, 0.1);
+    --v2-backdrop-blur: 8px;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.07);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+
+    /* ── Layout Dimensions ── */
+    --v2-nav-width: 24px;
+    --v2-header-height: 64px;
+    --v2-ticker-height: 32px;
+
+    /* ── Typography ── */
+    --font-family: 'Noto Sans TC', 'Inter', sans-serif;
+    --radius: 8px;
+    --radius-small: 4px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 3 — SEMANTIC LIGHT / K1 亮鋼 (來源 A：design-tokens.css)
+   ★ 主幹：所有重複變數以本區塊為準（宣告最後 = 勝出）
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root,
+[data-theme="light"],
+[data-theme="bright-steel"] {
+    /* === 品牌色 === */
+    --color-primary: #52525B;
+    --color-primary-light: #71717A;
+    --color-primary-dark: #3F3F46;
+
+    --color-secondary: #F97316;
+    --color-secondary-light: #FB923C;
+    --color-secondary-dark: #EA580C;
+
+    --color-accent: #FACC15;
+    --color-accent-light: #FDE047;
+    --color-accent-dark: #EAB308;
+
+    /* === 語義色 === */
+    --color-success: #22C55E;
+    --color-success-light: #4ADE80;
+    --color-success-dark: #16A34A;
+
+    --color-warning: #F59E0B;
+    --color-warning-light: #FBBF24;
+    --color-warning-dark: #D97706;
+
+    --color-danger: #EF4444;
+    --color-danger-light: #F87171;
+    --color-danger-dark: #DC2626;
+
+    --color-info: #3B82F6;
+    --color-info-light: #60A5FA;
+    --color-info-dark: #2563EB;
+
+    /* === 背景色 === */
+    --bg-primary: #F4F4F5;
+    --bg-secondary: #E4E4E7;
+    --bg-tertiary: #D4D4D8;
+    --bg-inverse: #27272A;
+
+    /* === 表面色 === */
+    --surface-default: #FFFFFF;
+    --surface-raised: #FAFAFA;
+    --surface-overlay: rgba(0, 0, 0, 0.5);
+    --surface-hover: #F4F4F5;
+    --surface-active: #E4E4E7;
+
+    /* === 文字色 === */
+    --text-primary: #18181B;
+    --text-secondary: #52525B;
+    --text-tertiary: #71717A;
+    --text-inverse: #FAFAFA;
+    --text-link: #F97316;
+    --text-link-hover: #EA580C;
+
+    /* === 邊框色 === */
+    --border-default: #D4D4D8;
+    --border-light: #E4E4E7;
+    --border-dark: #A1A1AA;
+    --border-focus: #F97316;
+
+    /* === 陰影 === */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.12);
+
+    /* === 圓角 === */
+    --radius-xs: 4px;
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* === 字體 === */
+    --font-sans: 'Inter', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', 'Noto Sans Mono CJK TC', 'Consolas', monospace;
+
+    /* === 字體大小 === */
+    --text-xs: 12px;
+    --text-sm: 14px;
+    --text-base: 16px;
+    --text-lg: 18px;
+    --text-xl: 20px;
+    --text-2xl: 24px;
+    --text-3xl: 32px;
+    --text-4xl: 40px;
+
+    /* === 行高 === */
+    --leading-tight: 1.2;
+    --leading-snug: 1.35;
+    --leading-normal: 1.5;
+    --leading-relaxed: 1.625;
+
+    /* === 字重 === */
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
+    /* === 間距 === */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* === 過渡動畫 === */
+    --transition-fast: 150ms ease;
+    --transition-base: 200ms ease;
+    --transition-slow: 300ms ease;
+
+    /* === Z-index === */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-fixed: 300;
+    --z-modal-backdrop: 400;
+    --z-modal: 500;
+    --z-popover: 600;
+    --z-tooltip: 700;
+    --z-toast: 800;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 4 — DARK THEME
+   ⚠ 三個區塊的「選擇器字串」與「相對順序」逐字沿用合併前的串接結果，
+     不可調換：C 的 `:root[data-theme='dark']` specificity 0,2,0 高於
+     A 的 `[data-theme="dark"]` 0,1,0，順序 + specificity 共同決定解析值。
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── 4a. Legacy dark 別名層 (來源 C：theme.css) ── */
+:root[data-theme='dark'],
+.dark {
+    /* 背景色 */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: #1e293b;
+    --bg-hover: #334155;
+    --bg-active: #475569;
+
+    /* 文字色 */
+    --text-primary: #f1f5f9;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --text-disabled: #475569;
+
+    /* 邊框色 */
+    --border-color: #334155;
+    --border-light: #1e293b;
+
+    /* 主色調整 */
+    --primary-color: #60a5fa;
+    --primary-hover: #3b82f6;
+    --primary-light: rgba(96, 165, 250, 0.15);
+
+    /* 狀態色 */
+    --success-color: #34d399;
+    --success-light: rgba(52, 211, 153, 0.15);
+    --warning-color: #fbbf24;
+    --warning-light: rgba(251, 191, 36, 0.15);
+    --danger-color: #f87171;
+    --danger-light: rgba(248, 113, 113, 0.15);
+    --info-color: #38bdf8;
+    --info-light: rgba(56, 189, 248, 0.15);
+
+    /* 玻璃態效果 */
+    --glass-bg: rgba(30, 41, 59, 0.8);
+    --glass-bg-light: rgba(30, 41, 59, 0.9);
+    --glass-bg-subtle: rgba(30, 41, 59, 0.6);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-border-light: rgba(255, 255, 255, 0.15);
+
+    /* 陰影 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+
+    /* 滾動條 */
+    --scrollbar-track: #1e293b;
+    --scrollbar-thumb: #475569;
+    --scrollbar-thumb-hover: #64748b;
+
+    /* 北歐金色調整（深色模式下更亮） */
+    --color-gold-400: #d4a373;
+    --color-gold-500: #c4956c;
+    --color-beige-400: #475569;
+
+    /* 漸變 */
+    --gradient-gold: linear-gradient(135deg, #d4a373 0%, #c4956c 100%);
+}
+
+/* ── 4b. Surface / text dark 覆寫 (來源 B：tokens/index.css) ── */
+[data-theme="dark"],
+.dark {
+    /* ── Surface Layers (Dark) ── */
+    --surface-ground: #0F172A;
+    --surface-card: #1E293B;
+    --surface-raised: #334155;
+    --surface-overlay: rgba(30, 41, 59, 0.95);
+    --surface-hover: #334155;
+    --surface-pressed: #475569;
+
+    /* ── Text Hierarchy (Dark) ── */
+    --text-heading: #F8FAFC;
+    --text-body: #E2E8F0;
+    --text-secondary: #94A3B8;
+    --text-muted: #64748B;
+    --text-disabled: #475569;
+    --text-inverse: #0F172A;
+    --text-link: #FBBF24;
+
+    /* ── Border Colors (Dark) ── */
+    --border-default: #334155;
+    --border-light: #1E293B;
+    --border-focus: #FBBF24;
+
+    /* ── Shadows (Dark) ── */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4), 0 2px 4px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5), 0 4px 6px rgba(0, 0, 0, 0.2);
+    --shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6), 0 10px 10px rgba(0, 0, 0, 0.3);
+    --shadow-glow-accent: 0 0 30px rgba(217, 119, 6, 0.4);
+    --shadow-glow-primary: 0 0 30px rgba(0, 31, 63, 0.4);
+
+    /* ── Effects (Dark) ── */
+    --focus-ring: 0 0 0 3px rgba(251, 191, 36, 0.3);
+    --focus-ring-accent: 0 0 0 3px rgba(217, 119, 6, 0.4);
+}
+
+/* ── 4c. K2 銅鋼版 dark (來源 A：design-tokens.css) ── */
+[data-theme="dark"],
+[data-theme="copper-steel"] {
+    /* === 品牌色 === */
+    --color-primary: #A8A29E;
+    --color-primary-light: #D6D3D1;
+    --color-primary-dark: #78716C;
+
+    --color-secondary: #B87333;
+    --color-secondary-light: #D4956A;
+    --color-secondary-dark: #8B5A2B;
+
+    --color-accent: #B8860B;
+    --color-accent-light: #DAA520;
+    --color-accent-dark: #8B6914;
+
+    /* === 語義色 === */
+    --color-success: #4D7C0F;
+    --color-success-light: #65A30D;
+    --color-success-dark: #3F6212;
+
+    --color-warning: #CA8A04;
+    --color-warning-light: #EAB308;
+    --color-warning-dark: #A16207;
+
+    --color-danger: #B91C1C;
+    --color-danger-light: #DC2626;
+    --color-danger-dark: #991B1B;
+
+    --color-info: #0369A1;
+    --color-info-light: #0284C7;
+    --color-info-dark: #075985;
+
+    /* === 背景色 - OLED 優化 === */
+    --bg-primary: #1C1917;
+    --bg-secondary: #292524;
+    --bg-tertiary: #3D3835;
+    --bg-inverse: #FAFAF9;
+
+    /* === 表面色 === */
+    --surface-default: #292524;
+    --surface-raised: #3D3835;
+    --surface-overlay: rgba(0, 0, 0, 0.8);
+    --surface-hover: #3D3835;
+    --surface-active: #57534E;
+
+    /* === 文字色 === */
+    --text-primary: #FAFAF9;
+    --text-secondary: #D6D3D1;
+    --text-tertiary: #A8A29E;
+    --text-inverse: #1C1917;
+    --text-link: #D4956A;
+    --text-link-hover: #B87333;
+
+    /* === 邊框色 === */
+    --border-default: #57534E;
+    --border-light: #78716C;
+    --border-dark: #44403C;
+    --border-focus: #B87333;
+
+    /* === 銅色裝飾 === */
+    --copper-accent: #B87333;
+    --copper-glow: rgba(184, 115, 51, 0.3);
+
+    /* === 陰影 - OLED 優化 === */
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 8px 16px rgba(0, 0, 0, 0.4);
+    --shadow-xl: 0 16px 32px rgba(0, 0, 0, 0.5);
+
+    /* === 圓角 - 略小以符合工業風 === */
+    --radius-xs: 3px;
+    --radius-sm: 4px;
+    --radius-md: 6px;
+    --radius-lg: 8px;
+    --radius-xl: 12px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 5 — OPT-IN 品牌主題 A / B (來源 D：variables.css)
+   ⚠ 合併前 D 的選擇器為 `[data-theme="A"], :root`，而 D 被打包進
+     lazy chunk（Indicators-*.css）。使用者一旦進入任何 design-system 頁面，
+     `:root` 的 --bg-primary 就會被改寫成 brown-900 並且不會復原。
+     這裡移除 `:root`，主題 A 改為「明確 opt-in」。
+     若要恢復舊行為，只需在下一行選擇器加回 `, :root`（單點回滾）。
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-theme="A"] {
+    --bg-primary: var(--color-brown-900);
+    --bg-secondary: var(--color-brown-800);
+    --bg-tertiary: var(--color-brown-700);
+    --bg-card: var(--color-brown-700);
+    --bg-hover: var(--color-brown-600);
+    --bg-active: var(--color-brown-500);
+
+    --text-primary: var(--color-beige-100);
+    --text-secondary: var(--color-beige-400);
+    --text-muted: var(--color-beige-500);
+
+    --border-color: var(--color-brown-600);
+    --border-light: var(--color-brown-500);
+    --border-lighter: var(--color-brown-400);
+
+    --accent-primary: var(--color-gold-400);
+    --accent-hover: var(--color-gold-500);
+    --accent-active: var(--color-gold-600);
+}
+
+[data-theme="B"] {
+    --bg-primary: var(--color-beige-100);
+    --bg-secondary: var(--color-beige-200);
+    --bg-tertiary: var(--color-beige-300);
+    --bg-card: #FFFFFF;
+    --bg-hover: var(--color-beige-300);
+    --bg-active: var(--color-beige-400);
+
+    --text-primary: var(--color-brown-900);
+    --text-secondary: var(--color-brown-700);
+    --text-muted: var(--color-brown-500);
+
+    --border-color: var(--color-beige-300);
+    --border-light: var(--color-beige-400);
+    --border-lighter: var(--color-beige-500);
+
+    --accent-primary: var(--color-gold-500);
+    --accent-hover: var(--color-gold-600);
+    --accent-active: var(--color-brown-600);
+}
+
+/* ⚠ --accent-primary / --accent-hover 刻意 **不** 在此宣告 :root 預設值。
+   全站 accent 目前由 src/App.css :root 提供（Senteng slate #334155 / #475569），
+   而 App.css 在 module graph 中先於 tokens.css 載入。若在此宣告，
+   tokens.css 會蓋掉 App.css，導致 App.css 內 29 條規則（按鈕/邊框/連結/導覽）
+   由 slate 變成金色 — 那是「換皮」而不是「收斂」。
+   收斂結果：design-system 元件改為跟隨 App.css 的 slate accent，
+   與其餘頁面一致（合併前 design-system 頁面會單方面翻成金色）。
+   App.css :root 的清理屬於後續 2.5/3.1「每頁換皮」批次工序。 */
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 6 — COMPONENT TOKENS (來源 D：variables.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root {
+    /* Button */
+    --btn-height-xs: 28px;
+    --btn-height-sm: 32px;
+    --btn-height-md: 40px;
+    --btn-height-lg: 48px;
+    --btn-height-xl: 56px;
+    --btn-padding-xs: 4px 10px;
+    --btn-padding-sm: 6px 12px;
+    --btn-padding-md: 10px 20px;
+    --btn-padding-lg: 12px 24px;
+    --btn-padding-xl: 16px 32px;
+    --btn-radius: var(--radius-lg);
+
+    /* Card */
+    --card-padding-sm: var(--spacing-4);
+    --card-padding: var(--spacing-6);
+    --card-padding-lg: var(--spacing-8);
+    --card-radius: var(--radius-2xl);
+    --card-border: 1px solid var(--border-color);
+
+    /* Badge */
+    --badge-padding-xs: 2px 4px;
+    --badge-padding-sm: 2px 6px;
+    --badge-padding: 4px 10px;
+    --badge-padding-lg: 6px 14px;
+    --badge-font-size: var(--font-size-xs);
+    --badge-radius: var(--radius-md);
+
+    /* Alert */
+    --alert-padding: var(--spacing-4) var(--spacing-5);
+    --alert-radius: var(--radius-lg);
+    --alert-border-width: 4px;
+
+    /* Input */
+    --input-height-sm: 36px;
+    --input-height-md: 44px;
+    --input-height-lg: 52px;
+    --input-padding: var(--spacing-3) var(--spacing-4);
+    --input-radius: var(--radius-lg);
+    --input-border: 1px solid var(--border-color);
+
+    /* Modal */
+    --modal-padding: var(--spacing-8);
+    --modal-radius: var(--radius-3xl);
+    --modal-width-sm: 400px;
+    --modal-width-md: 560px;
+    --modal-width-lg: 720px;
+    --modal-width-xl: 900px;
+
+    /* Toast */
+    --toast-padding: var(--spacing-4) var(--spacing-5);
+    --toast-radius: var(--radius-xl);
+    --toast-width: 360px;
+
+    /* Widget */
+    --widget-padding: var(--spacing-6);
+    --widget-radius: var(--radius-2xl);
+    --widget-header-height: 56px;
+
+    /* Tag */
+    --tag-padding: 2px 8px;
+    --tag-font-size: 10px;
+    --tag-radius: var(--radius-md);
+
+    /* Navbar */
+    --navbar-height: 64px;
+    --navbar-padding: 0 var(--spacing-6);
+
+    /* Sidebar */
+    --sidebar-width: 280px;
+    --sidebar-width-collapsed: 80px;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 7 — 條件式覆寫 (來源 A：design-tokens.css)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 響應式排版調整 */
+@media (max-width: 768px) {
+    :root {
+        --text-3xl: 28px;
+        --text-4xl: 32px;
+        --space-6: 20px;
+        --space-8: 24px;
+    }
+}
+
+/* 系統偏好適應：未指定 data-theme 時自動跟隨系統切換到 K2 銅鋼版 */
+@media (prefers-color-scheme: dark) {
+    :root:not([data-theme]) {
+        --bg-primary: #1C1917;
+        --bg-secondary: #292524;
+        --surface-default: #292524;
+        --text-primary: #FAFAF9;
+        --text-secondary: #D6D3D1;
+        --border-default: #57534E;
+        --color-secondary: #B87333;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    :root {
+        --transition-fast: 0ms;
+        --transition-base: 0ms;
+        --transition-slow: 0ms;
+    }
+}

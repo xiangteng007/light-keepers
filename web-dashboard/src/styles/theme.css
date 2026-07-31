@@ -1,68 +1,18 @@
 /* ============================================
-   Dark Theme Variables & Toggle Styles
-   深色主題系統
+   Dark Theme Styles & Theme Toggle
+   深色主題樣式層
+   ============================================
+
+   @deprecated(tokens) 自 FE-2 (redesign plan 2.3) 起，本檔原有的
+     `:root[data-theme='dark'], .dark { --bg-*: … }` 變數區塊已搬遷至
+     單一真相來源 → src/styles/tokens.css （Layer 4a）。
+     選擇器字串與相對順序在 tokens.css 中逐字保留，
+     因為 `:root[data-theme='dark']` 的 specificity (0,2,0) 高於
+     design-tokens 的 `[data-theme="dark"]` (0,1,0)，順序不可調換。
+
+   ⚠ 請勿在此新增變數；新增請至 src/styles/tokens.css。
+   @see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md
 ============================================ */
-
-/* 深色主題 CSS 變數覆蓋 */
-:root[data-theme='dark'],
-.dark {
-    /* 背景色 */
-    --bg-primary: #0f172a;
-    --bg-secondary: #1e293b;
-    --bg-card: #1e293b;
-    --bg-hover: #334155;
-    --bg-active: #475569;
-
-    /* 文字色 */
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --text-muted: #64748b;
-    --text-disabled: #475569;
-
-    /* 邊框色 */
-    --border-color: #334155;
-    --border-light: #1e293b;
-
-    /* 主色調整 */
-    --primary-color: #60a5fa;
-    --primary-hover: #3b82f6;
-    --primary-light: rgba(96, 165, 250, 0.15);
-
-    /* 狀態色 */
-    --success-color: #34d399;
-    --success-light: rgba(52, 211, 153, 0.15);
-    --warning-color: #fbbf24;
-    --warning-light: rgba(251, 191, 36, 0.15);
-    --danger-color: #f87171;
-    --danger-light: rgba(248, 113, 113, 0.15);
-    --info-color: #38bdf8;
-    --info-light: rgba(56, 189, 248, 0.15);
-
-    /* 玻璃態效果 */
-    --glass-bg: rgba(30, 41, 59, 0.8);
-    --glass-bg-light: rgba(30, 41, 59, 0.9);
-    --glass-bg-subtle: rgba(30, 41, 59, 0.6);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-border-light: rgba(255, 255, 255, 0.15);
-
-    /* 陰影 */
-    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
-
-    /* 滾動條 */
-    --scrollbar-track: #1e293b;
-    --scrollbar-thumb: #475569;
-    --scrollbar-thumb-hover: #64748b;
-
-    /* 北歐金色調整（深色模式下更亮） */
-    --color-gold-400: #d4a373;
-    --color-gold-500: #c4956c;
-    --color-beige-400: #475569;
-
-    /* 漸變 */
-    --gradient-gold: linear-gradient(135deg, #d4a373 0%, #c4956c 100%);
-}
 
 /* 深色模式下的特定元素調整 */
 .dark body {

@@ -5,7 +5,9 @@
  * Using Bento Grid Layout System
  */
 import { Link } from 'react-router-dom';
-import { Badge } from '../../../components/ui';
+// FE-2: 已由 deprecated 的 components/ui 遷移至單一元件庫 design-system。
+// variant 對照：safe→success、critical→danger + dot + pulse、neutral→default。
+import { Badge } from '../../../design-system';
 
 interface StatCard { 
     icon: string; 
@@ -39,10 +41,10 @@ const activeMissions: Mission[] = [
 export default function DashboardPage() {
     const getSeverityBadge = (severity: string) => {
         switch (severity) {
-            case 'critical': return <Badge variant="critical" dot>{severity.toUpperCase()}</Badge>;
+            case 'critical': return <Badge variant="danger" dot pulse>{severity.toUpperCase()}</Badge>;
             case 'high': return <Badge variant="danger">{severity.toUpperCase()}</Badge>;
             case 'medium': return <Badge variant="warning">{severity.toUpperCase()}</Badge>;
-            default: return <Badge variant="safe">{severity.toUpperCase()}</Badge>;
+            default: return <Badge variant="success">{severity.toUpperCase()}</Badge>;
         }
     };
 
@@ -176,7 +178,7 @@ export default function DashboardPage() {
                     <div className="space-y-2">
                         <div className="flex items-center justify-between p-2 rounded" style={{ background: 'var(--surface-hover)' }}>
                             <span style={{ color: 'var(--text-body)' }}>Alpha Team</span>
-                            <Badge variant="safe" size="sm">Deployed</Badge>
+                            <Badge variant="success" size="sm">Deployed</Badge>
                         </div>
                         <div className="flex items-center justify-between p-2 rounded" style={{ background: 'var(--surface-hover)' }}>
                             <span style={{ color: 'var(--text-body)' }}>Bravo Team</span>
@@ -184,7 +186,7 @@ export default function DashboardPage() {
                         </div>
                         <div className="flex items-center justify-between p-2 rounded" style={{ background: 'var(--surface-hover)' }}>
                             <span style={{ color: 'var(--text-body)' }}>Charlie Team</span>
-                            <Badge variant="neutral" size="sm">Standby</Badge>
+                            <Badge variant="default" size="sm">Standby</Badge>
                         </div>
                     </div>
                 </div>
