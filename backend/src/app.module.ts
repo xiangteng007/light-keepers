@@ -1,5 +1,5 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
@@ -246,7 +246,11 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         TrainingModule,
         NotificationsModule,
         ResourcesModule,
-        RealtimeModule,LineBotModule,        AnnouncementsModule, // 📢 公告系統
+        RealtimeModule,
+        LineBotModule,
+        MenuConfigModule, // 📱 LINE 選單設定
+        DonationsModule, // 💝 物資捐贈
+        AnnouncementsModule, // 📢 公告系統
         ActivitiesModule, // 📅 活動報名
         CommunityModule, // 💬 社群牆
         AnalyticsModule, // 📊 AI 趨勢預測
@@ -271,7 +275,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         OverlaysModule, // 🗺️ 戰術地圖圖層
         // PR4: 觀測性
         MetricsModule, // 📊 API 效能監控
-        // PR5: 重構整併        // PR6: P1 缺失模組 (E2E 閉環必需)
+        // PR5: 重構整併
+        // PR6: P1 缺失模組 (E2E 閉環必需)
         TriageModule, // 🏥 檢傷分類 (START)
         LocationModule, // 📍 地理圍欄服務
         TaskDispatchModule, // 🔄 智慧任務派遣
@@ -302,11 +307,18 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // ==============================================
         // Batch 3: Low Side-Effect Modules (CRUD-only)
         // ==============================================
-        // Dashboard & Visualization        TimelineVisualizationModule, // 📅 時間軸視覺化        // Reports        PerformanceReportModule, // 📊 效能報告        // Operations
-        DroneOpsModule, // 🚁 無人機運作        TacticalMapsModule, // 🗺️ 戰術地圖
+        // Dashboard & Visualization
+        TimelineVisualizationModule, // 📅 時間軸視覺化
+        // Reports
+        PerformanceReportModule, // 📊 效能報告
+        // Operations
+        DroneOpsModule, // 🚁 無人機運作
+        TacticalMapsModule, // 🗺️ 戰術地圖
         RoutingModule, // 🛣️ 路徑規劃
         // Community
-        ReunificationModule, // 👨‍👩‍👧 家庭團聚        PsychologicalSupportModule, // 🧠 心理支援        CrowdReportingModule, // 📢 群眾回報
+        ReunificationModule, // 👨‍👩‍👧 家庭團聚
+        PsychologicalSupportModule, // 🧠 心理支援
+        CrowdReportingModule, // 📢 群眾回報
         // Volunteer
         RewardsModule, // 🏆 獎勵系統
         VolunteerPointsModule, // ⭐ 志工積分
@@ -315,24 +327,36 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         EquipmentQrModule, // 📱 裝備 QR 碼
         // REMOVED: MockDataModule, SwaggerAutoDocsModule - deleted
         I18nApiModule, // 🌐 多語系 API
-        SystemModule, // ⚙️ 系統管理        // ==============================================
+        SystemModule, // ⚙️ 系統管理
+        // ==============================================
         // Batch 4: High Side-Effect Modules
         // ==============================================
         // Webhooks & Integrations
-        WebhooksModule, // 🔗 Webhook 接收        Fire119Module, // 🚒 119 消防整合
+        WebhooksModule, // 🔗 Webhook 接收
+        Fire119Module, // 🚒 119 消防整合
         CitizenAppModule, // 📱 市民 App
         // REMOVED: SatelliteCommModule - requires specialized equipment
+        // AI & ML
+        ImageRecognitionModule, // 🖼️ 影像辨識
+        ChatbotAssistantModule, // 💬 聊天機器人助理
+        RagKnowledgeModule, // 📚 RAG 知識庫
         DisasterSummaryModule, // 📊 災情摘要
         FatigueDetectionModule, // 😴 疲勞偵測
         DocumentOcrModule, // 📄 文件 OCR
         TranslationModule, // 🌐 翻譯服務
-        // Scheduling & Dispatch        TrendPredictionModule, // 📈 趨勢預測
+        // Scheduling & Dispatch
+        // Weather & Climate
+        TccipClimateModule, // 🌦️ TCCIP 氣候資料
+        TrendPredictionModule, // 📈 趨勢預測
         SocialMediaMonitorModule, // 📱 社群監控
         // ==============================================
         // Batch 5: Remaining Infrastructure Modules (FINAL)
         // ==============================================
         // AR/VR (CONDITIONALLY LOADED - see STUB_MODULES)
-        //        // Offline & Mobile        OfflineMeshModule, // 🔗 Mesh 網路        DeviceManagementModule, // 📲 裝置管理
+        //
+        // Offline & Mobile
+        OfflineMeshModule, // 🔗 Mesh 網路
+        DeviceManagementModule, // 📲 裝置管理
         // Push Notifications
         // LINE & Social - CONSOLIDATED: LineLiffModule and LineNotifyModule merged into LineBotModule
         // Blockchain & Security
@@ -353,11 +377,14 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // RealtimeChatModule - CONSOLIDATED into RealtimeModule
         SpeechToTextModule, // 🎤 語音轉文字
         VoiceAssistantModule, // 🗣️ 語音助理
-        // Infrastructure        SentryModule, // 🐛 Sentry 監控
+        // Infrastructure
+        SentryModule, // 🐛 Sentry 監控
         QrScannerModule, // 📱 QR 掃描
         // REMOVED: NfcModule - hardware dependent, use QR instead
+        // Resource Management
         ResourceMatchingModule, // 🎯 資源媒合
-        ResourceOptimizationModule, // ⚡ 資源優化        PredictiveMaintenanceModule, // 🔧 預測維護
+        ResourceOptimizationModule, // ⚡ 資源優化
+        PredictiveMaintenanceModule, // 🔧 預測維護
         // Admin & Finance
         MultiEocModule, // 🏢 多 EOC
         // REMOVED: MultiTenantModule - consolidated to tenants
@@ -365,7 +392,9 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         ExpenseReimbursementModule, // 💳 費用報銷
         PowerBiModule, // 📊 Power BI
         // Misc
-        MicroTaskModule, // ✅ 微任務        // STUB MODULES (Conditionally Loaded)
+        MicroTaskModule, // ✅ 微任務
+        // ==============================================
+        // STUB MODULES (Conditionally Loaded)
         // Only enabled when ENABLE_STUB_MODULES=true
         // @see docs/proof/security/public-surface.md
         // ==============================================
