@@ -1,13 +1,14 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * useCoreObjects.ts
- * 
+ *
  * P8: Frontend API Hooks for Core Objects
- * 
+ *
  * Provides consistent data fetching and mutation hooks for:
  * - Alert, Incident, Task, Resource, Person, Comms
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import {
     Alert,
     Incident,
@@ -19,28 +20,26 @@ import {
     TaskStatus,
 } from '../types/core-objects.types';
 
-const API_BASE = import.meta.env.VITE_API_URL || '';
-
 // ============================================================
 // Generic Fetch Helpers
 // ============================================================
 
-async function fetchApi<T>(endpoint: string, options?: RequestInit): Promise<T> {
-    const response = await fetch(`${API_BASE}${endpoint}`, {
-        headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers,
-        },
-        credentials: 'include',
-        ...options,
-    });
+interface FetchApiOptions {
+    method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
+    body?: string;
+}
 
-    if (!response.ok) {
-        const error = await response.json().catch(() => ({}));
-        throw new Error(error.message || `API Error: ${response.status}`);
+async function fetchApi<T>(endpoint: string, options?: FetchApiOptions): Promise<T> {
+    try {
+        const response = await api.request<T>({
+            url: endpoint,
+            method: options?.method || 'GET',
+            data: options?.body ? JSON.parse(options.body) : undefined,
+        });
+        return response.data;
+    } catch (err) {
+        throw new Error(getApiErrorMessage(err, 'API Error'));
     }
-
-    return response.json();
 }
 
 // ============================================================
@@ -52,7 +51,7 @@ export function useAlerts(params?: { severity?: string; category?: string }) {
     return useQuery({
         queryKey: ['alerts', params],
         queryFn: () => fetchApi<{ data: Alert[]; total: number }>(
-            `/api/alerts${queryParams ? `?${queryParams}` : ''}`
+            `/alerts${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 30000, // 30 seconds
     });
@@ -61,7 +60,7 @@ export function useAlerts(params?: { severity?: string; category?: string }) {
 export function useAlert(id: string) {
     return useQuery({
         queryKey: ['alert', id],
-        queryFn: () => fetchApi<Alert>(`/api/alerts/${id}`),
+        queryFn: () => fetchApi<Alert>(`/alerts/${id}`),
         enabled: !!id,
     });
 }
@@ -84,7 +83,7 @@ export function useIncidents(params?: {
     return useQuery({
         queryKey: ['incidents', params],
         queryFn: () => fetchApi<{ data: Incident[]; total: number }>(
-            `/api/incidents${queryParams ? `?${queryParams}` : ''}`
+            `/incidents${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 10000, // 10 seconds - incidents change frequently
     });
@@ -93,7 +92,7 @@ export function useIncidents(params?: {
 export function useIncident(id: string) {
     return useQuery({
         queryKey: ['incident', id],
-        queryFn: () => fetchApi<Incident>(`/api/incidents/${id}`),
+        queryFn: () => fetchApi<Incident>(`/incidents/${id}`),
         enabled: !!id,
     });
 }
@@ -103,7 +102,7 @@ export function useCreateIncident() {
 
     return useMutation({
         mutationFn: (data: Partial<Incident>) =>
-            fetchApi<Incident>('/api/incidents', {
+            fetchApi<Incident>('/incidents', {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),
@@ -118,7 +117,7 @@ export function useUpdateIncidentStatus() {
 
     return useMutation({
         mutationFn: ({ id, status }: { id: string; status: IncidentStatus }) =>
-            fetchApi<Incident>(`/api/incidents/${id}/status`, {
+            fetchApi<Incident>(`/incidents/${id}/status`, {
                 method: 'PATCH',
                 body: JSON.stringify({ status }),
             }),
@@ -147,7 +146,7 @@ export function useTasks(params?: {
     return useQuery({
         queryKey: ['tasks', params],
         queryFn: () => fetchApi<{ data: Task[]; total: number }>(
-            `/api/tasks${queryParams ? `?${queryParams}` : ''}`
+            `/tasks${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 10000,
     });
@@ -156,7 +155,7 @@ export function useTasks(params?: {
 export function useTask(id: string) {
     return useQuery({
         queryKey: ['task', id],
-        queryFn: () => fetchApi<Task>(`/api/tasks/${id}`),
+        queryFn: () => fetchApi<Task>(`/tasks/${id}`),
         enabled: !!id,
     });
 }
@@ -166,7 +165,7 @@ export function useCreateTask() {
 
     return useMutation({
         mutationFn: (data: Partial<Task>) =>
-            fetchApi<Task>('/api/tasks', {
+            fetchApi<Task>('/tasks', {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),
@@ -181,7 +180,7 @@ export function useUpdateTaskStatus() {
 
     return useMutation({
         mutationFn: ({ id, status }: { id: string; status: TaskStatus }) =>
-            fetchApi<Task>(`/api/tasks/${id}/status`, {
+            fetchApi<Task>(`/tasks/${id}/status`, {
                 method: 'PATCH',
                 body: JSON.stringify({ status }),
             }),
@@ -210,7 +209,7 @@ export function useResources(params?: {
     return useQuery({
         queryKey: ['resources', params],
         queryFn: () => fetchApi<{ data: Resource[]; total: number }>(
-            `/api/resources${queryParams ? `?${queryParams}` : ''}`
+            `/resources${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 60000, // 1 minute
     });
@@ -219,7 +218,7 @@ export function useResources(params?: {
 export function useResource(id: string) {
     return useQuery({
         queryKey: ['resource', id],
-        queryFn: () => fetchApi<Resource>(`/api/resources/${id}`),
+        queryFn: () => fetchApi<Resource>(`/resources/${id}`),
         enabled: !!id,
     });
 }
@@ -242,7 +241,7 @@ export function usePersonnel(params?: {
     return useQuery({
         queryKey: ['personnel', params],
         queryFn: () => fetchApi<{ data: Person[]; total: number }>(
-            `/api/personnel${queryParams ? `?${queryParams}` : ''}`
+            `/personnel${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 30000,
     });
@@ -251,7 +250,7 @@ export function usePersonnel(params?: {
 export function usePerson(id: string) {
     return useQuery({
         queryKey: ['person', id],
-        queryFn: () => fetchApi<Person>(`/api/personnel/${id}`),
+        queryFn: () => fetchApi<Person>(`/personnel/${id}`),
         enabled: !!id,
     });
 }
@@ -262,7 +261,7 @@ export function useUpdateLocation() {
             id: string;
             location: { latitude: number; longitude: number }
         }) =>
-            fetchApi<Person>(`/api/personnel/${id}/location`, {
+            fetchApi<Person>(`/personnel/${id}/location`, {
                 method: 'PATCH',
                 body: JSON.stringify(location),
             }),
@@ -287,7 +286,7 @@ export function useComms(params?: {
     return useQuery({
         queryKey: ['comms', params],
         queryFn: () => fetchApi<{ data: Comms[]; total: number }>(
-            `/api/comms${queryParams ? `?${queryParams}` : ''}`
+            `/comms${queryParams ? `?${queryParams}` : ''}`
         ),
         staleTime: 5000, // 5 seconds - comms are time-sensitive
     });
@@ -298,7 +297,7 @@ export function useSendComms() {
 
     return useMutation({
         mutationFn: (data: Partial<Comms>) =>
-            fetchApi<Comms>('/api/comms', {
+            fetchApi<Comms>('/comms', {
                 method: 'POST',
                 body: JSON.stringify(data),
             }),

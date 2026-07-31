@@ -45,6 +45,10 @@ const BARE_FETCH_MESSAGE = [
  *  - service worker / 離線同步層：需要在無 React context、
  *    背景 sync、Capacitor 檔案系統等環境下運作，axios instance 不適用。
  *    （其正確性由工作項 3.4「離線 outbox 三套收斂」負責，不在 3.2 遷移範圍）
+ *  - `src/pages/MonitorPage.tsx`：類別 E（見 API_CLIENT_CONSOLIDATION.md §3.3/§4）。
+ *    對 `service.url`（外部健檢端點，非本站後端 API）做 timeout 健康檢查，
+ *    刻意不經過 `src/api/client.ts`（該 client 的 baseURL/攔截器只適用於本站
+ *    `/api/v1` 端點，對外部 URL 沒有意義，且此處需要 `AbortSignal.timeout()`）。
  */
 const FETCH_EXEMPT_FILES = [
   'src/api/**',
@@ -55,6 +59,7 @@ const FETCH_EXEMPT_FILES = [
   'src/services/syncManager.ts',
   'src/services/capacitorFilesystem.ts',
   'src/services/push-notification.service.ts',
+  'src/pages/MonitorPage.tsx',
 ]
 
 export default defineConfig([
