@@ -43,7 +43,7 @@
 
 .stat-label {
     font-size: 12px;
-    color: var(--text-muted, #5f6368);
+    color: var(--text-tertiary, #5f6368);
     margin-top: 4px;
 }
 
@@ -60,7 +60,7 @@
     background: var(--accent-gold, #d4a84b);
     border: none;
     border-radius: 10px;
-    color: #0b111b;
+    color: var(--text-primary, #0b111b);
     font-weight: 500;
     cursor: pointer;
     transition: filter 0.2s;
@@ -110,7 +110,7 @@
 .incident-number {
     font-size: 12px;
     font-family: monospace;
-    color: var(--text-muted, #5f6368);
+    color: var(--text-tertiary, #5f6368);
 }
 
 .status-badge {
@@ -135,7 +135,7 @@
     display: flex;
     gap: 20px;
     font-size: 12px;
-    color: var(--text-muted, #5f6368);
+    color: var(--text-tertiary, #5f6368);
 }
 
 .incident-meta span {

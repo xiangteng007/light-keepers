@@ -25,16 +25,23 @@ interface Incident {
     assignedTeams?: number;
 }
 
+// Status colors: mapped to semantic status tokens where the hue matches exactly
+// (var(--token, original-hex) keeps the fallback identical, so no visual change).
+// `reported` (#6b7280) is a neutral/inactive gray with no matching semantic status
+// token — left as a bespoke literal.
 const STATUS_INFO: Record<string, { label: string; color: string; icon: React.ElementType }> = {
     reported: { label: '已通報', color: '#6b7280', icon: Clock },
-    confirmed: { label: '已確認', color: '#3b82f6', icon: AlertTriangle },
-    active: { label: '進行中', color: '#f59e0b', icon: AlertTriangle },
-    in_progress: { label: '處理中', color: '#f59e0b', icon: AlertTriangle },
-    resolved: { label: '已解決', color: '#22c55e', icon: CheckCircle },
-    closed: { label: '已結案', color: '#10b981', icon: CheckCircle },
+    confirmed: { label: '已確認', color: 'var(--color-info, #3b82f6)', icon: AlertTriangle },
+    active: { label: '進行中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle },
+    in_progress: { label: '處理中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle },
+    resolved: { label: '已解決', color: 'var(--color-success, #22c55e)', icon: CheckCircle },
+    closed: { label: '已結案', color: 'var(--color-success-dark, #10b981)', icon: CheckCircle },
 };
 
-const PRIORITY_COLORS = ['', '#ef4444', '#f97316', '#f59e0b', '#84cc16', '#22c55e'];
+// Priority gradient: end points map to danger/warning/success semantics; the two
+// mid-scale hues (#f97316 orange, #84cc16 lime) don't correspond to a semantic
+// status token and are kept as bespoke literals for the gradient.
+const PRIORITY_COLORS = ['', 'var(--color-danger, #ef4444)', '#f97316', 'var(--color-warning, #f59e0b)', '#84cc16', 'var(--color-success, #22c55e)'];
 
 export default function IncidentsPage() {
     const [incidents, setIncidents] = useState<Incident[]>([]);
@@ -106,14 +113,14 @@ export default function IncidentsPage() {
 
                 {/* Error */}
                 {error && (
-                    <div className="error-banner" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <div className="error-banner" style={{ background: 'rgba(239,68,68,0.1)' /* color-danger tint, no rgba token variant available */, color: 'var(--color-danger, #ef4444)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md, 8px)', marginBottom: 'var(--space-4, 1rem)' }}>
                         <AlertTriangle size={16} /> {error}
                     </div>
                 )}
 
                 {/* Loading */}
                 {loading && (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: '#94a3b8' }}>
+                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: 'var(--space-2, 0.5rem)', color: 'var(--text-tertiary, #94a3b8)' }}>
                         <Loader2 size={24} className="spin" />
                         <span>載入事件中...</span>
                     </div>
@@ -123,7 +130,7 @@ export default function IncidentsPage() {
                 {!loading && (
                     <div className="incident-list">
                         {filtered.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
+                            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-tertiary, #64748b)' }}>
                                 {error ? '載入失敗' : '暫無事件'}
                             </div>
                         ) : filtered.map(incident => {
