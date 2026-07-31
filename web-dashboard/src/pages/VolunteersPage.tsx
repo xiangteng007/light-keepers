@@ -17,10 +17,11 @@ const SKILL_OPTIONS = [
     { value: 'social', label: '社工關懷', icon: '💝' },
 ];
 
+// 顏色使用 design tokens（含原始 hex fallback，語義對應：available→success/safe、busy→warning、offline→中性文字色）
 const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgColor: string }> = {
-    available: { label: '可用', color: '#4CAF50', bgColor: 'rgba(76, 175, 80, 0.15)' },
-    busy: { label: '執勤中', color: '#FF9800', bgColor: 'rgba(255, 152, 0, 0.15)' },
-    offline: { label: '離線', color: '#9E9E9E', bgColor: 'rgba(158, 158, 158, 0.15)' },
+    available: { label: '可用', color: 'var(--color-success, #4CAF50)', bgColor: 'var(--color-safe-bg, rgba(76, 175, 80, 0.15))' },
+    busy: { label: '執勤中', color: 'var(--color-warning, #FF9800)', bgColor: 'var(--color-warning-bg, rgba(255, 152, 0, 0.15))' },
+    offline: { label: '離線', color: 'var(--text-tertiary, #9E9E9E)', bgColor: 'rgba(158, 158, 158, 0.15)' /* 中性離線狀態,暫無對應語義背景 token */ },
 };
 
 interface AssignmentForm {

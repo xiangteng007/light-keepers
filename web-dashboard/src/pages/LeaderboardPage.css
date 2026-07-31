@@ -1,5 +1,8 @@
 /**
  * 志工排行榜頁面樣式
+ *
+ * 註：獎盃/獎牌相關的金/銀/銅/紫色漸層與 my-rank-card 慶祝色塊為品牌裝飾色，
+ * 語義上不對應 success/warning/danger/info，故保留為字面 hex（見各區塊註解）。
  */
 
 .leaderboard-page {
@@ -17,7 +20,7 @@
     font-size: 1.75rem;
     font-weight: 700;
     margin: 0 0 4px;
-    color: var(--text-color, #1f2937);
+    color: var(--text-primary, #1f2937);
 }
 
 .leaderboard-header__title p {
@@ -31,8 +34,8 @@
     align-items: center;
     gap: 16px;
     padding: 16px 20px;
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-    border-radius: 16px;
+    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); /* 慶祝色塊品牌裝飾漸層，非 warning 語義，保留字面值 */
+    border-radius: var(--radius-xl, 16px);
     margin-bottom: 20px;
     cursor: pointer;
     transition: transform 0.2s;
@@ -45,7 +48,7 @@
 .my-rank-card__icon {
     width: 48px;
     height: 48px;
-    background: #fbbf24;
+    background: var(--color-warning-light, #fbbf24);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -60,13 +63,13 @@
 .my-rank-card__content .label {
     display: block;
     font-size: 0.75rem;
-    color: #92400e;
+    color: #92400e; /* 慶祝色塊品牌裝飾色，非 warning 語義，保留字面值 */
 }
 
 .my-rank-card__content .rank {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #78350f;
+    color: #78350f; /* 慶祝色塊品牌裝飾色，非 warning 語義，保留字面值 */
 }
 
 /* Tabs */
@@ -85,7 +88,7 @@
     padding: 10px 20px;
     border: none;
     background: transparent;
-    border-radius: 8px;
+    border-radius: var(--radius-md, 8px);
     font-size: 0.95rem;
     font-weight: 500;
     cursor: pointer;
@@ -94,11 +97,11 @@
 }
 
 .tab-btn:hover {
-    background: var(--hover-bg, #f3f4f6);
+    background: var(--surface-hover, #f3f4f6);
 }
 
 .tab-btn.active {
-    background: #3b82f6;
+    background: var(--color-info, #3b82f6);
     color: white;
 }
 
@@ -108,8 +111,8 @@
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
+    background: var(--surface-default, #ffffff);
+    border-radius: var(--radius-lg, 12px);
     margin-bottom: 20px;
     overflow-x: auto;
     border: 1px solid var(--border-color, #e5e7eb);
@@ -124,7 +127,7 @@
     padding: 8px 14px;
     border: none;
     background: transparent;
-    border-radius: 8px;
+    border-radius: var(--radius-md, 8px);
     font-size: 0.875rem;
     color: var(--text-muted, #6b7280);
     cursor: pointer;
@@ -133,11 +136,11 @@
 }
 
 .filter-btn:hover {
-    background: var(--hover-bg, #f3f4f6);
+    background: var(--surface-hover, #f3f4f6);
 }
 
 .filter-btn.active {
-    background: #3b82f6;
+    background: var(--color-info, #3b82f6);
     color: white;
 }
 
@@ -156,8 +159,8 @@
     flex-direction: column;
     align-items: center;
     padding: 20px 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 16px;
+    background: var(--surface-default, #ffffff);
+    border-radius: var(--radius-xl, 16px);
     border: 2px solid var(--border-color, #e5e7eb);
     min-width: 120px;
     transition: all 0.2s;
@@ -168,7 +171,7 @@
 }
 
 .top-card.rank-1 {
-    border-color: #fbbf24;
+    border-color: var(--color-warning-light, #fbbf24);
     transform: translateY(-10px);
     box-shadow: 0 8px 24px rgba(251, 191, 36, 0.3);
 }
@@ -178,11 +181,11 @@
 }
 
 .top-card.rank-2 {
-    border-color: #94a3b8;
+    border-color: #94a3b8; /* 銀牌品牌裝飾色，無對應語義 token，保留字面值 */
 }
 
 .top-card.rank-3 {
-    border-color: #d97706;
+    border-color: var(--color-warning-dark, #d97706);
 }
 
 .top-card__medal {
@@ -193,7 +196,7 @@
     width: 56px;
     height: 56px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%);
+    background: linear-gradient(135deg, #3b82f6 0%, #6366f1 100%); /* 頭像裝飾漸層，保留字面值 */
     color: white;
     display: flex;
     align-items: center;
@@ -218,7 +221,7 @@
 .top-card__hours {
     font-size: 1.1rem;
     font-weight: 700;
-    color: #3b82f6;
+    color: var(--color-info, #3b82f6);
 }
 
 .top-card__events {
@@ -250,26 +253,26 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
+    background: var(--surface-default, #ffffff);
+    border-radius: var(--radius-lg, 12px);
     border: 1px solid var(--border-color, #e5e7eb);
     transition: all 0.2s;
 }
 
 .leaderboard-item:hover {
-    border-color: #3b82f6;
+    border-color: var(--color-info, #3b82f6);
 }
 
 .leaderboard-item.is-me {
-    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
-    border-color: #3b82f6;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); /* 「本人」高亮裝飾漸層，保留字面值 */
+    border-color: var(--color-info, #3b82f6);
 }
 
 .leaderboard-item__rank {
     width: 32px;
     height: 32px;
     border-radius: 50%;
-    background: var(--hover-bg, #f3f4f6);
+    background: var(--surface-hover, #f3f4f6);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -282,7 +285,7 @@
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%);
+    background: linear-gradient(135deg, #9ca3af 0%, #6b7280 100%); /* 頭像裝飾漸層，保留字面值 */
     color: white;
     display: flex;
     align-items: center;
@@ -312,7 +315,7 @@
     align-items: center;
     gap: 4px;
     font-weight: 600;
-    color: #3b82f6;
+    color: var(--color-info, #3b82f6);
 }
 
 /* Recognitions */
@@ -326,8 +329,8 @@
     display: flex;
     gap: 16px;
     padding: 20px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 16px;
+    background: var(--surface-default, #ffffff);
+    border-radius: var(--radius-xl, 16px);
     border: 1px solid var(--border-color, #e5e7eb);
     transition: all 0.2s;
 }
@@ -346,6 +349,7 @@
     flex-shrink: 0;
 }
 
+/* 表揚徽章金/銀/銅/特殊漸層為品牌裝飾色，非 success/warning/danger/info 語義，保留字面值 */
 .recognition-card__badge.gold {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
     color: white;
@@ -373,7 +377,7 @@
 
 .recognition-card__title {
     font-weight: 600;
-    color: var(--text-color, #1f2937);
+    color: var(--text-primary, #1f2937);
     margin: 0 0 8px;
 }
 
@@ -402,10 +406,11 @@
 [data-theme="dark"] .top-card,
 [data-theme="dark"] .recognition-card,
 [data-theme="dark"] .time-filter {
-    background: var(--card-bg, #1f2937);
+    background: var(--surface-default, #1f2937);
     border-color: var(--border-color, #374151);
 }
 
+/* my-rank-card 慶祝色塊品牌裝飾色（dark 對應版本），非 warning 語義，保留字面值 */
 [data-theme="dark"] .my-rank-card {
     background: linear-gradient(135deg, #78350f 0%, #92400e 100%);
 }

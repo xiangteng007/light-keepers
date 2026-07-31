@@ -33,11 +33,11 @@ const TIME_PERIODS = [
     { value: 'all', label: '全部' },
 ];
 
-// 排名對應獎牌
+// 排名對應獎牌（金/銅為 --color-warning-light/-dark 精確對應；銀牌無語義 token，保留品牌裝飾色）
 const RANK_MEDALS: Record<number, { icon: typeof Crown; color: string }> = {
-    1: { icon: Crown, color: '#fbbf24' },
+    1: { icon: Crown, color: 'var(--color-warning-light, #fbbf24)' },
     2: { icon: Medal, color: '#94a3b8' },
-    3: { icon: Medal, color: '#d97706' },
+    3: { icon: Medal, color: 'var(--color-warning-dark, #d97706)' },
 };
 
 export default function LeaderboardPage() {

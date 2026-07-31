@@ -9,33 +9,33 @@ import './TrainingPage.css';
 
 const logger = createLogger('Training');
 
-// 🏷️ 爬取課程分類
+// 🏷️ 爬取課程分類（顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
 const SCRAPED_CATEGORY_CONFIG = {
-    all: { label: '全部', icon: '📋', color: '#64748b' },
-    emt: { label: 'EMT 救護', icon: '🚑', color: '#DC2626' },
-    tecc: { label: 'TECC', icon: '⚔️', color: '#7C3AED' },
-    tccc: { label: 'TCCC', icon: '🎖️', color: '#059669' },
-    drone: { label: '無人機', icon: '🚁', color: '#2563EB' },
-    rescue: { label: '搜救', icon: '🔍', color: '#EA580C' },
-    first_aid: { label: '急救', icon: '🏥', color: '#10B981' },
-    disaster: { label: '防災', icon: '🌊', color: '#0891B2' },
-    other: { label: '其他', icon: '📚', color: '#6B7280' },
+    all: { label: '全部', icon: '📋', color: 'var(--text-secondary, #64748b)' },
+    emt: { label: 'EMT 救護', icon: '🚑', color: 'var(--color-danger-dark, #DC2626)' },
+    tecc: { label: 'TECC', icon: '⚔️', color: 'var(--color-critical, #7C3AED)' },
+    tccc: { label: 'TCCC', icon: '🎖️', color: 'var(--color-safe, #059669)' },
+    drone: { label: '無人機', icon: '🚁', color: 'var(--color-info-dark, #2563EB)' },
+    rescue: { label: '搜救', icon: '🔍', color: 'var(--color-secondary-dark, #EA580C)' },
+    first_aid: { label: '急救', icon: '🏥', color: 'var(--color-success, #10B981)' },
+    disaster: { label: '防災', icon: '🌊', color: '#0891B2' /* 品牌裝飾色，無對應語義 token */ },
+    other: { label: '其他', icon: '📚', color: 'var(--text-secondary, #6B7280)' },
 };
 
-// 內部課程分類
+// 內部課程分類（顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
 const INTERNAL_CATEGORY_CONFIG = {
-    disaster_basics: { label: '災害基礎', icon: '📚', color: '#2196F3' },
-    first_aid: { label: '急救技能', icon: '🏥', color: '#4CAF50' },
-    rescue: { label: '搜救技術', icon: '🚒', color: '#FF5722' },
-    logistics: { label: '物資調度', icon: '📦', color: '#FF9800' },
-    communication: { label: '通訊聯絡', icon: '📡', color: '#9C27B0' },
-    leadership: { label: '領導管理', icon: '👔', color: '#607D8B' },
+    disaster_basics: { label: '災害基礎', icon: '📚', color: '#2196F3' /* 品牌裝飾色，無對應語義 token */ },
+    first_aid: { label: '急救技能', icon: '🏥', color: 'var(--color-success, #4CAF50)' },
+    rescue: { label: '搜救技術', icon: '🚒', color: '#FF5722' /* 品牌裝飾色，無對應語義 token */ },
+    logistics: { label: '物資調度', icon: '📦', color: 'var(--color-warning, #FF9800)' },
+    communication: { label: '通訊聯絡', icon: '📡', color: '#9C27B0' /* 品牌裝飾色，無對應語義 token */ },
+    leadership: { label: '領導管理', icon: '👔', color: 'var(--text-secondary, #607D8B)' },
 };
 
 const LEVEL_CONFIG = {
-    beginner: { label: '初級', color: '#4CAF50' },
-    intermediate: { label: '中級', color: '#FF9800' },
-    advanced: { label: '高級', color: '#F44336' },
+    beginner: { label: '初級', color: 'var(--color-success, #4CAF50)' },
+    intermediate: { label: '中級', color: 'var(--color-warning, #FF9800)' },
+    advanced: { label: '高級', color: 'var(--color-danger, #F44336)' },
 };
 
 // 內部課程類型
