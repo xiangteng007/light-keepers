@@ -1,0 +1,271 @@
+# =============================================================================
+# Light Keepers - NAS 生產棧（INF-1 / 工作項 M.1）
+#
+# 目標硬體：ASUSTOR AS5404T（Celeron N5105 4C4T / 16GB DDR4 / ADM 5.1.1）
+#   - 4× M.2 NVMe RAID 10 → DB 與 uploads（熱資料，高 IOPS）
+#   - 4× 3.5" HDD RAID 6  → 每日 pg_dump 與 uploads 快照（冷資料）
+#   - 2× 2.5GbE           → 內網連 RTX 5090 工作站（Ollama 推論）
+#
+# 設計原則（回雲四原則，見 README §4）：
+#   1) 運行單位是 Docker image  2) 組態全部走 env
+#   3) schema 走 migration      4) storage / LLM 走 provider 抽象
+#   任何一項被打破，未來回雲就得改業務碼。
+#
+# 啟動：
+#   cd infra/nas
+#   cp .env.nas.example .env && chmod 600 .env && vi .env
+#   docker compose -f docker-compose.nas.yml --env-file .env up -d
+#
+# ⚠ 本檔不含任何秘密；所有機敏值一律從 .env 注入。
+# ⚠ AI 推論「不」在此棧內：LLM_BASE_URL 指向內網 RTX 5090 工作站。
+#
+# 記憶體規劃（實體 16GB，預留 ~4GB 給 ADM 本身與檔案系統快取）：
+#   postgres 4G / backend 2G / nginx 256M / cloudflared 256M / backup 512M
+#   合計上限約 7GB，尖峰仍有餘裕。
+# =============================================================================
+
+name: lightkeepers-nas
+
+# --- 共用片段 -----------------------------------------------------------------
+x-logging: &default-logging
+  driver: json-file
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+x-restart: &default-restart
+  restart: unless-stopped
+
+services:
+  # ---------------------------------------------------------------------------
+  # PostgreSQL + PostGIS —— 資料落在 NVMe RAID 10
+  # ---------------------------------------------------------------------------
+  postgres:
+    image: postgis/postgis:15-3.3-alpine
+    container_name: lk-postgres
+    <<: *default-restart
+    logging: *default-logging
+    environment:
+      POSTGRES_USER: ${DB_USERNAME:?DB_USERNAME is required}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      POSTGRES_DB: ${DB_DATABASE:?DB_DATABASE is required}
+      # 明確指定，避免 initdb 沿用主機 locale 造成排序行為與雲端不一致
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+      TZ: ${TZ:-Asia/Taipei}
+    volumes:
+      # NVMe RAID 10：DB 資料本體
+      - ${NVME_DATA_ROOT:?NVME_DATA_ROOT is required}/pgdata:/var/lib/postgresql/data
+      # 初始化 SQL（僅在 pgdata 為空時執行一次）
+      - ../docker/init-db:/docker-entrypoint-initdb.d:ro
+    # 不對外 publish：只有同 network 的 backend / backup 需要連。
+    # 需用 pgAdmin 或 psql 除錯時，改用 `docker compose exec postgres psql`，
+    # 或臨時加 ports 綁 127.0.0.1，切勿綁 0.0.0.0。
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_DATABASE}"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+    mem_limit: 4g
+    mem_reservation: 1g
+    shm_size: 512m
+    stop_grace_period: 60s
+    networks: [lk-internal]
+
+  # ---------------------------------------------------------------------------
+  # NestJS 後端 —— 沿用 backend/Dockerfile（production stage）
+  # ---------------------------------------------------------------------------
+  backend:
+    build:
+      context: ../../backend
+      dockerfile: Dockerfile
+    image: ${BACKEND_IMAGE:-lightkeepers/backend:local}
+    container_name: lk-backend
+    <<: *default-restart
+    logging: *default-logging
+    environment:
+      NODE_ENV: production
+      PORT: 8080
+      API_PREFIX: api/v1
+      TZ: ${TZ:-Asia/Taipei}
+
+      # --- 資料庫（backend 只讀 DB_* 系列，src 內無 DATABASE_URL 讀取點）---
+      DB_REQUIRED: "true"
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: ${DB_USERNAME:?DB_USERNAME is required}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      DB_DATABASE: ${DB_DATABASE:?DB_DATABASE is required}
+      # 生產環境 schema 一律走 migration；resolveSynchronize() 也會硬性擋掉
+      SYNC_TABLES: "false"
+
+      # --- 秘密 ---
+      JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required}
+      JWT_OFFLINE_SECRET: ${JWT_OFFLINE_SECRET:-}
+      JWT_ISSUER: ${JWT_ISSUER:-lightkeepers}
+      JWT_AUDIENCE: ${JWT_AUDIENCE:-lightkeepers-app}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-}
+
+      # --- 對外 URL / CORS ---
+      CORS_ORIGIN: ${CORS_ORIGIN:?CORS_ORIGIN is required}
+      BASE_URL: ${BASE_URL:-https://${PUBLIC_DOMAIN}}
+      FRONTEND_URL: ${FRONTEND_URL:-https://${PUBLIC_DOMAIN}}
+      API_URL: ${BASE_URL:-https://${PUBLIC_DOMAIN}}
+
+      # --- 檔案儲存：NAS 上切 local driver（回雲時改回 gcs 即可）---
+      STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
+      LOCAL_STORAGE_PATH: ${LOCAL_STORAGE_PATH:-/app/uploads}
+      LOCAL_STORAGE_URL: ${LOCAL_STORAGE_URL:-https://${PUBLIC_DOMAIN}/uploads}
+      UPLOAD_DIR: ${UPLOAD_DIR:-/app/uploads}
+      EXPORT_DIR: /app/uploads/exports
+      BACKUP_DIR: /app/uploads/exports
+
+      # --- 本地 LLM：內網 RTX 5090 工作站的 OpenAI-compatible endpoint ---
+      # 接線本身是工作項 M.2；此處先把組態面備妥，M.2 落地即可直接讀。
+      LLM_BASE_URL: ${LLM_BASE_URL:?LLM_BASE_URL is required - point to workstation Ollama}
+      LLM_MODEL: ${LLM_MODEL:-qwen2.5:32b-instruct}
+      LLM_API_KEY: ${LLM_API_KEY:-ollama}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+
+      # --- 外部服務（不受 GCP 租約影響）---
+      LINE_CHANNEL_ID: ${LINE_CHANNEL_ID:-}
+      LINE_CHANNEL_SECRET: ${LINE_CHANNEL_SECRET:-}
+      LINE_CHANNEL_ACCESS_TOKEN: ${LINE_CHANNEL_ACCESS_TOKEN:-}
+      LINE_CLIENT_ID: ${LINE_CLIENT_ID:-}
+      LINE_CLIENT_SECRET: ${LINE_CLIENT_SECRET:-}
+      LINE_REDIRECT_URI: ${LINE_REDIRECT_URI:-}
+      LIFF_ID: ${LIFF_ID:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+      GOOGLE_REDIRECT_URI: ${GOOGLE_REDIRECT_URI:-}
+      GOOGLE_MAPS_API_KEY: ${GOOGLE_MAPS_API_KEY:-}
+      FIREBASE_SERVICE_ACCOUNT: ${FIREBASE_SERVICE_ACCOUNT:-}
+      FCM_SERVER_KEY: ${FCM_SERVER_KEY:-}
+      CWA_API_KEY: ${CWA_API_KEY:-}
+      WRA_API_KEY: ${WRA_API_KEY:-}
+      SENTRY_DSN: ${SENTRY_DSN:-}
+    volumes:
+      # NVMe RAID 10：使用者上傳（local storage driver 的 basePath）
+      - ${NVME_DATA_ROOT:?NVME_DATA_ROOT is required}/uploads:/app/uploads
+    expose:
+      - "8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # 用 /health/live（不碰 DB），避免 DB 短暫抖動就把 app 判成不健康
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:8080/api/v1/health/live || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 90s
+    mem_limit: 2g
+    mem_reservation: 512m
+    stop_grace_period: 30s
+    networks: [lk-internal]
+
+  # ---------------------------------------------------------------------------
+  # nginx —— 前端靜態檔 + /api 反代 + /uploads 直出
+  # ---------------------------------------------------------------------------
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: lk-nginx
+    <<: *default-restart
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-Asia/Taipei}
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # 前端 build 產物（web-dashboard/dist）
+      - ${WEB_DIST_PATH:?WEB_DIST_PATH is required}:/usr/share/nginx/html:ro
+      # uploads 直接由 nginx 出檔，不經 Node.js（backend 沒有 static 路由）
+      - ${NVME_DATA_ROOT:?NVME_DATA_ROOT is required}/uploads:/usr/share/nginx/uploads:ro
+    ports:
+      # 內網直連用；對外流量走 cloudflared，不需要在路由器開 port
+      - "${NGINX_HTTP_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O- http://127.0.0.1:8080/healthz || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    mem_limit: 256m
+    networks: [lk-internal]
+
+  # ---------------------------------------------------------------------------
+  # Cloudflare Tunnel —— 對外入口，免在中華電信固定 IP 上開 port
+  #
+  # 路由設定在 Cloudflare Zero Trust 主控台（token 模式為主控台管理）：
+  #   Public hostname: ${PUBLIC_DOMAIN}  →  Service: http://nginx:8080
+  # ---------------------------------------------------------------------------
+  cloudflared:
+    image: cloudflare/cloudflared:2024.12.2
+    container_name: lk-cloudflared
+    <<: *default-restart
+    logging: *default-logging
+    command: tunnel --no-autoupdate --metrics 0.0.0.0:2000 run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}
+      TZ: ${TZ:-Asia/Taipei}
+    depends_on:
+      nginx:
+        condition: service_started
+    healthcheck:
+      test: ["CMD-SHELL", "cloudflared --version || exit 1"]
+      interval: 60s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    mem_limit: 256m
+    networks: [lk-internal]
+
+  # ---------------------------------------------------------------------------
+  # 備份 job —— 每日 pg_dump + uploads rsync → HDD RAID 6，保留 14 天
+  #
+  # 沒有用 host crond：ADM 的排程與容器生命週期分離，容器一停排程就變孤兒。
+  # 改用容器內常駐迴圈（entrypoint.sh），與棧同生共死，狀態也看得到。
+  # ---------------------------------------------------------------------------
+  backup:
+    build:
+      context: ./backup
+      dockerfile: Dockerfile
+    image: lightkeepers/backup:local
+    container_name: lk-backup
+    <<: *default-restart
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-Asia/Taipei}
+      PGHOST: postgres
+      PGPORT: 5432
+      PGUSER: ${DB_USERNAME:?DB_USERNAME is required}
+      PGPASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+      PGDATABASE: ${DB_DATABASE:?DB_DATABASE is required}
+      BACKUP_AT: ${BACKUP_AT:-03:30}
+      BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+    volumes:
+      # 來源：NVMe 上的 uploads（唯讀，備份程序不該有寫權限）
+      - ${NVME_DATA_ROOT:?NVME_DATA_ROOT is required}/uploads:/source/uploads:ro
+      # 目的：HDD RAID 6 備份池
+      - ${HDD_BACKUP_ROOT:?HDD_BACKUP_ROOT is required}:/backup
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # 心跳檔超過 26 小時沒更新即視為不健康（日備 + 2 小時容許誤差）
+      test: ["CMD-SHELL", "test -f /backup/.heartbeat && test $$(( $$(date +%s) - $$(stat -c %Y /backup/.heartbeat) )) -lt 93600"]
+      interval: 300s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    mem_limit: 512m
+    networks: [lk-internal]
+
+networks:
+  lk-internal:
+    name: lightkeepers-nas
+    driver: bridge

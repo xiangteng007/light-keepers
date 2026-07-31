@@ -1,0 +1,9 @@
+# 本目錄的檔案全部會被送進 Linux 容器執行。
+# Windows 開發機的 core.autocrlf=true 會把 checkout 出來的 .sh 變成 CRLF，
+# 若直接把工作目錄 rsync 到 NAS，容器內會出現 `bad interpreter: /bin/sh^M`。
+# 這裡強制 LF，讓行尾與執行環境一致。
+*.sh            text eol=lf
+*.conf          text eol=lf
+*.yml           text eol=lf
+Dockerfile      text eol=lf
+.env.nas.example text eol=lf

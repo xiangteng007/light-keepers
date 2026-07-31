@@ -4,7 +4,7 @@
  * P4: Storage Abstraction - Local File System Implementation
  * For development and testing environments
  */
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs/promises';
 import * as path from 'path';
@@ -33,7 +33,17 @@ export class LocalStorageProvider implements StorageProvider {
         this.publicUrl = this.configService.get<string>('LOCAL_STORAGE_URL') || 'http://localhost:3000/uploads';
 
         this.logger.log(`Local Storage initialized - Path: ${this.basePath}`);
-        this.ensureDirectoryExists(this.basePath);
+
+        // INF-1: the base directory is a bind-mounted NAS volume. If the mount is
+        // missing or not writable the failure must be visible at boot, not surface
+        // as an unhandled rejection on the first upload hours later.
+        this.ensureDirectoryExists(this.basePath).catch((error) => {
+            this.logger.error(
+                `Failed to create local storage base directory "${this.basePath}". ` +
+                `Uploads will fail until this is fixed (check volume mount and permissions).`,
+                error instanceof Error ? error.stack : String(error),
+            );
+        });
     }
 
     private async ensureDirectoryExists(dirPath: string): Promise<void> {
@@ -44,8 +54,25 @@ export class LocalStorageProvider implements StorageProvider {
         }
     }
 
+    /**
+     * Resolve a caller-supplied path against the storage root.
+     *
+     * SAFETY INVARIANT: the result must stay inside `basePath`.
+     * `path.join(base, '../../etc/passwd')` happily escapes the root, so every
+     * path coming from a caller (and therefore potentially from a request body,
+     * a filename, or a DB column) is resolved and re-checked here. On the NAS
+     * deployment the root is a real filesystem mount, so an escape is arbitrary
+     * read/write on the host — this check is the only thing preventing it.
+     */
     private getFullPath(filePath: string): string {
-        return path.join(this.basePath, filePath);
+        const root = path.resolve(this.basePath);
+        const resolved = path.resolve(root, filePath);
+
+        if (resolved !== root && !resolved.startsWith(root + path.sep)) {
+            throw new BadRequestException(`Invalid storage path: ${filePath}`);
+        }
+
+        return resolved;
     }
 
     private getMimeType(filePath: string): string {
@@ -162,9 +189,12 @@ export class LocalStorageProvider implements StorageProvider {
     }
 
     async list(options?: StorageListOptions): Promise<StorageListResult> {
+        // getFullPath returns an absolute path, so the root used for the
+        // relative-path calculation below must be absolute too.
+        const root = path.resolve(this.basePath);
         const searchPath = options?.prefix
             ? this.getFullPath(options.prefix)
-            : this.basePath;
+            : root;
 
         const files: StorageFileInfo[] = [];
 
@@ -188,7 +218,7 @@ export class LocalStorageProvider implements StorageProvider {
         }
 
         try {
-            await walkDir(searchPath, this.basePath);
+            await walkDir(searchPath, root);
         } catch {
             // Directory doesn't exist
         }
