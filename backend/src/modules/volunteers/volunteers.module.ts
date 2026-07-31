@@ -49,8 +49,9 @@ import { MobilizationController } from './mobilization.controller';
 // Location tracking
 import { VolunteerLocationController } from './volunteer-location.controller';
 
-// Shared JWT Module (breaks circular dependency with AuthModule)
-import { SharedJwtModule } from '../shared/shared-jwt.module';
+// JWT 由 @Global 的 SharedAuthModule 提供（原 SharedJwtModule/SimpleJwtGuard
+// 已於 1.6 guard 收斂中移除；SharedAuthModule 同樣以相同 JWT_SECRET 註冊
+// JwtModule，並匯出 CoreJwtGuard / UnifiedRolesGuard，仍可避免與 AuthModule 的循環依賴）
 
 // Import AccountsModule for permission sync
 import { AccountsModule } from '../accounts/accounts.module';
@@ -59,7 +60,6 @@ import { AccountsModule } from '../accounts/accounts.module';
 
 @Module({
     imports: [
-        SharedJwtModule,
         AccountsModule,
         TypeOrmModule.forFeature([
             Volunteer,

@@ -5,7 +5,6 @@ import { ConfigService } from '@nestjs/config';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { AuthOAuthController } from './auth-oauth.controller';
-import { JwtAuthGuard, RolesGuard } from './guards';
 import { Account, Role, PagePermission } from '../accounts/entities';
 import { OtpCode, PasswordResetToken } from './entities';
 import { RefreshToken } from './entities/refresh-token.entity';
@@ -38,8 +37,6 @@ import { LineBotModule } from '../line-bot/line-bot.module';
     controllers: [AuthController, AuthOAuthController, TwoFactorController],
     providers: [
         AuthService,
-        JwtAuthGuard,
-        RolesGuard,
         SmsService,
         OtpService,
         PasswordResetService,
@@ -50,7 +47,9 @@ import { LineBotModule } from '../line-bot/line-bot.module';
         TwoFactorService,
         AccountManagementService,
     ],
-    exports: [TypeOrmModule, AuthService, JwtAuthGuard, RolesGuard, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, OAuthService, TwoFactorService, AccountManagementService],
+    // 註：JwtAuthGuard / RolesGuard 已於 1.6 guard 收斂中移除，
+    // 統一改用 shared/guards 的 CoreJwtGuard + UnifiedRolesGuard。
+    exports: [TypeOrmModule, AuthService, JwtModule, OtpService, PasswordResetService, FirebaseAdminService, RefreshTokenService, OAuthService, TwoFactorService, AccountManagementService],
 })
 export class AuthModule { }
 

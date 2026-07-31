@@ -13,7 +13,9 @@ export * from './guards';
  * 
  * 解決的問題：
  * 1. JwtModule 重複註冊在多個模組 (AuthModule, AccountsModule)
- * 2. 多種不同的 Guard 實作 (JwtAuthGuard, SimpleJwtGuard, RolesGuard, AdminGuard)
+ * 2. 多種不同的 Guard 實作 —— 舊版 JwtAuthGuard / SimpleJwtGuard / RolesGuard /
+ *    AdminGuard 已於 1.6 guard 收斂中全數移除，統一收斂到本模組的
+ *    CoreJwtGuard + UnifiedRolesGuard（見 docs/audit/GUARD_CONSOLIDATION.md）
  * 3. 循環依賴問題 (AuthModule ↔ VolunteersModule)
  * 
  * 提供的功能：

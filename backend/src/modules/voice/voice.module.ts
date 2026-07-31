@@ -12,7 +12,7 @@ import { AuthModule } from '../auth/auth.module';
 @Module({
     imports: [
         ConfigModule,
-        forwardRef(() => AuthModule), // For JwtAuthGuard
+        forwardRef(() => AuthModule), // For AuthService / JwtModule (原註解寫 JwtAuthGuard，該 guard 已於 1.6 收斂中移除)
     ],
     controllers: [VoiceController],
     providers: [VoiceTranscriptionService],

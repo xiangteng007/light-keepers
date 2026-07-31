@@ -1,4 +1,4 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException, SetMetadata } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext, ForbiddenException, Logger, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { JwtPayload } from './core-jwt.guard';
 
@@ -63,9 +63,19 @@ export const RequiredRoles = (...roles: string[]) => SetMetadata(REQUIRED_ROLES_
  * @RequiredLevel(ROLE_LEVELS.OFFICER)
  * @Get('admin')
  * adminEndpoint(@CurrentUser() user: JwtPayload) { }
+ *
+ * ⚠️ 未標記 @RequiredLevel / @RequiredRoles 時本 Guard 一律放行
+ * （端點實際上只剩「已登入」保護）。為避免大面積破壞既有行為，
+ * 這個 fail-open 語意保留，但會在第一次命中時輸出 warn 級 log，
+ * 標示 Controller.handler，方便逐步補齊定級。
  */
 @Injectable()
 export class UnifiedRolesGuard implements CanActivate {
+    private readonly logger = new Logger(UnifiedRolesGuard.name);
+
+    /** 已警告過的 Controller.handler，確保每個端點只 warn 一次 */
+    private static readonly warnedHandlers = new Set<string>();
+
     constructor(private readonly reflector: Reflector) { }
 
     canActivate(context: ExecutionContext): boolean {
@@ -88,8 +98,9 @@ export class UnifiedRolesGuard implements CanActivate {
             [context.getHandler(), context.getClass()],
         );
 
-        // 沒有設定權限需求，允許存取
+        // 沒有設定權限需求，允許存取（fail-open，但記錄 warn 提示補定級）
         if (requiredLevel === undefined && (!requiredRoles || requiredRoles.length === 0)) {
+            this.warnMissingAuthzMetadata(context);
             return true;
         }
 
@@ -132,6 +143,27 @@ export class UnifiedRolesGuard implements CanActivate {
         }
 
         return true;
+    }
+
+    /**
+     * 端點掛了 UnifiedRolesGuard 卻沒有任何授權標記時，輸出一次性 warn。
+     * 這類端點實際上只驗證了「有沒有登入」，容易被誤認為已做權限控制。
+     */
+    private warnMissingAuthzMetadata(context: ExecutionContext): void {
+        const controllerName = context.getClass?.()?.name ?? 'UnknownController';
+        const handlerName = context.getHandler?.()?.name ?? 'unknownHandler';
+        const key = `${controllerName}.${handlerName}`;
+
+        if (UnifiedRolesGuard.warnedHandlers.has(key)) {
+            return;
+        }
+        UnifiedRolesGuard.warnedHandlers.add(key);
+
+        this.logger.warn(
+            `[authz-unmarked] ${key} 掛載了 UnifiedRolesGuard，` +
+            `但未標記 @RequiredLevel / @RequiredRoles；此端點實際上只驗證「已登入」，` +
+            `未做任何權限等級檢查。請補上明確的 @RequiredLevel。`,
+        );
     }
 
     private getLevelName(level: number): string {

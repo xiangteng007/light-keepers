@@ -1,6 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext, createParamDecorator, UnauthorizedException } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { JwtService } from '@nestjs/jwt';
 import { Request } from 'express';
+import { IS_PUBLIC_KEY } from './public.decorator';
 
 /**
  * JWT Payload 介面
@@ -32,15 +34,43 @@ export interface JwtPayload {
  * - 需要認證但不需要完整用戶資料的端點
  * - 有循環依賴問題的模組
  * - 效能敏感的端點
- * 
+ *
  * 注意：如果需要 roleLevel 權限檢查，請搭配 UnifiedRolesGuard 使用
+ *
+ * @Public() 支援 (1.6 收斂修正)：
+ * 與 GlobalAuthGuard 使用同一個 metadata key ('isPublic')。標記 @Public() 的
+ * handler / class 一律放行，因此可以在 controller class 上掛 CoreJwtGuard，
+ * 再於個別 handler 上以 @Public() 開放匿名存取（例如 intake 匿名通報）。
+ * 放行時若仍帶有有效 token，會盡力解析並填入 request.user；解析失敗不拋錯。
  */
 @Injectable()
 export class CoreJwtGuard implements CanActivate {
-    constructor(private readonly jwtService: JwtService) { }
+    constructor(
+        private readonly jwtService: JwtService,
+        private readonly reflector: Reflector,
+    ) { }
 
     async canActivate(context: ExecutionContext): Promise<boolean> {
         const request = context.switchToHttp().getRequest<Request>();
+
+        // @Public() 端點：放行，但仍盡力解析 token（若有）以便 handler 取得使用者
+        const isPublic = this.reflector?.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
+            context.getHandler(),
+            context.getClass(),
+        ]);
+
+        if (isPublic) {
+            const publicToken = this.extractTokenFromHeader(request);
+            if (publicToken) {
+                try {
+                    this.attachUser(request, this.jwtService.verify<JwtPayload>(publicToken));
+                } catch {
+                    // 公開端點不因無效 token 而失敗
+                }
+            }
+            return true;
+        }
+
         const token = this.extractTokenFromHeader(request);
 
         if (!token) {
@@ -51,17 +81,7 @@ export class CoreJwtGuard implements CanActivate {
             const payload = this.jwtService.verify<JwtPayload>(token);
 
             // 將 payload 放入 request.user
-            (request as any).user = {
-                id: payload.sub,
-                sub: payload.sub,
-                uid: payload.sub,           // AuthUser compat
-                email: payload.email,
-                name: payload.name,
-                displayName: payload.name,  // AuthUser compat
-                role: payload.roles?.[0] || '',
-                roleLevel: payload.roleLevel ?? 0,
-                roles: payload.roles ?? [],
-            };
+            this.attachUser(request, payload);
 
             return true;
         } catch (error) {
@@ -70,6 +90,20 @@ export class CoreJwtGuard implements CanActivate {
             }
             throw new UnauthorizedException('Invalid token');
         }
+    }
+
+    private attachUser(request: Request, payload: JwtPayload): void {
+        (request as any).user = {
+            id: payload.sub,
+            sub: payload.sub,
+            uid: payload.sub,           // AuthUser compat
+            email: payload.email,
+            name: payload.name,
+            displayName: payload.name,  // AuthUser compat
+            role: payload.roles?.[0] || '',
+            roleLevel: payload.roleLevel ?? 0,
+            roles: payload.roles ?? [],
+        };
     }
 
     private extractTokenFromHeader(request: Request): string | null {

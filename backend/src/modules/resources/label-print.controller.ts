@@ -4,6 +4,19 @@ import { LabelPrintService } from './label-print.service';
 
 /**
  * 貼紙列印 API
+ *
+ * TODO(Phase 3 - DTO/授權重構)：本 controller 以中文字串硬編授權
+ * （`user.role !== '倉管'`），問題有三：
+ * 1. 角色以顯示名稱（中文字串）比對，不是穩定的 role key，改名即失效。
+ * 2. JWT payload 實際上只帶 `roles: string[]`，沒有 `role` 欄位，
+ *    因此 `user.role !== '倉管'` 目前恆為 true，實際生效的條件只有
+ *    `roleLevel < 3`（等同 L3 DIRECTOR 以上）。
+ * 3. 授權寫在 handler 內而非宣告式 guard，無法被授權盤點工具掃描。
+ * 1.6 guard 收斂為「行為保持」重構，因此這裡刻意不改行為，
+ * 僅標記為 Phase 3 DTO/授權重構項；屆時應改為
+ * `@UseGuards(CoreJwtGuard, UnifiedRolesGuard)` + `@RequiredLevel(...)`
+ * 或 `@RequiredRoles('warehouse')` 之類的穩定角色 key。
+ * @see docs/audit/GUARD_CONSOLIDATION.md
  */
 @Controller('labels')
 export class LabelPrintController {

@@ -16,7 +16,7 @@ import { AccountsModule } from '../accounts/accounts.module';
     imports: [
         TypeOrmModule.forFeature([DispatchTask, TaskAssignment]),
         EventEmitterModule.forRoot(),
-        forwardRef(() => AuthModule), // For JwtAuthGuard
+        forwardRef(() => AuthModule), // For AuthService / JwtModule (原註解寫 JwtAuthGuard，該 guard 已於 1.6 收斂中移除)
         forwardRef(() => LineBotModule), // For LINE notifications
         forwardRef(() => NotificationsModule), // For push notifications
         forwardRef(() => AccountsModule), // For Account repository
