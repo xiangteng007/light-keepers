@@ -356,11 +356,12 @@ D+14  確認穩定後才關閉雲端資源（保留兩週回退空間）
 | `STORAGE_PROVIDER` | `local` | `storage.module.ts` 依此選 provider；未設定時預設就是 `local`，但**請明確寫出**，避免日後誤判 |
 | `LOCAL_STORAGE_PATH` | `/app/uploads` | 容器內路徑，對應 host 的 `${NVME_DATA_ROOT}/uploads` |
 | `LOCAL_STORAGE_URL` | `https://<網域>/uploads` | 對外可讀的 URL 前綴。**必須指向 nginx 的 `/uploads/` location**——backend 本身沒有靜態檔路由（`main.ts` 無 `useStaticAssets`），若指向 backend 會 404 |
+| `LOCAL_STORAGE_SIGNING_SECRET` | （選填，預設留空） | 設定後 `getSignedUrl()` 會在 URL 帶上 `expires`+`signature`。留空時回傳純 `/uploads/` 路徑，與現行 nginx 設定完全相容 |
 | `UPLOAD_DIR` | `/app/uploads` | `FileStorageService` 走的另一條路徑，一併對齊到同一個目錄 |
 | `BASE_URL` | `https://<網域>` | 同上，`FileStorageService` 組 URL 用 |
 | `GCS_*` | 全部留空 | local 模式下不會被讀到 |
 
-回雲時只需把 `STORAGE_PROVIDER` 改成 `gcs` 並填 `GCS_BUCKET_NAME`，其餘不動。
+回雲時把 `STORAGE_PROVIDER` 改成 `gcs`，並填回三個服務各自的 bucket（`GCS_BUCKET`、`GCS_BUCKET_NAME`、`GCS_MAP_PACKAGES_BUCKET`），其餘不動。
 
 nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重點有二：
 
@@ -375,21 +376,22 @@ nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重�
 
 但有四點需要知道：
 
-1. **抽象層目前無人使用**（重要）
-   全 repo 找不到任何 `@Inject(STORAGE_PROVIDER)` 的注入點。實際處理檔案的是這三個服務，它們**直接使用 GCS SDK**，沒有走抽象層：
+1. **抽象層已接上三個服務**（M.3b 完成）
+   原本三個實際處理檔案的服務都**直接使用 GCS SDK**，`STORAGE_PROVIDER=local` 對它們無效。現已改為注入各自的 feature token：
 
-   | 檔案 | bucket env key |
-   |---|---|
-   | `modules/field-reports/gcs-storage.service.ts` | `GCS_BUCKET` |
-   | `modules/line-bot/disaster-report/image-upload.service.ts` | `GCS_BUCKET_NAME` |
-   | `modules/overlays/cloud-storage.service.ts` | `GCS_MAP_PACKAGES_BUCKET` |
+   | 檔案 | bucket env key | 注入 token |
+   |---|---|---|
+   | `modules/field-reports/gcs-storage.service.ts` | `GCS_BUCKET` | `FIELD_REPORT_STORAGE` |
+   | `modules/line-bot/disaster-report/image-upload.service.ts` | `GCS_BUCKET_NAME` | `DISASTER_REPORT_IMAGE_STORAGE` |
+   | `modules/overlays/cloud-storage.service.ts` | `GCS_MAP_PACKAGES_BUCKET` | `MAP_PACKAGE_STORAGE` |
 
-   **影響**：把 `STORAGE_PROVIDER` 設成 `local` **不會**讓這三處改用本地磁碟——它們仍會嘗試連 GCS，在雲端資源關閉後會失敗。
-   **這是 M.3 尚未收尾的部分**：需要把這三個服務改成注入 `STORAGE_PROVIDER`。屬於會動到業務碼的變更，不在 M.1 的設定檔範圍內，應以獨立工作項處理，並附回歸測試。
+   這三個 bucket env key 在 GCS 上是**三個不同的 bucket**，所以用的是 `StorageModule.forFeature()` 而非全域的 `STORAGE_PROVIDER` token：`STORAGE_PROVIDER=gcs` 時每個服務仍寫回自己原本的 bucket，`=local` 時三者共用同一個 `/uploads/` 樹（物件路徑本來就已用 `reports/`、`packages/` 分好命名空間）。
    `modules/files/file-storage.service.ts` 則是自己用 `fs` 寫本地磁碟（讀 `UPLOAD_DIR`），在 NAS 上可正常運作，`.env.nas.example` 已把它指到同一個 uploads 目錄。
 
-2. **`getSignedUrl()` 沒有簽章**
-   local provider 的實作直接回傳公開 URL（原始碼註解也寫明 `In production, implement JWT-based access tokens`）。因此 uploads 目錄在 NAS 上等同**公開可讀**——這與先前 GCS public object 的行為一致，不算搬遷造成的退步，但若日後要做授權出檔，正確作法是在 nginx 加 `auth_request` 打到 backend 的驗證端點，而不是把 alias 拿掉。
+2. **`getSignedUrl()` 的簽章仍未被強制驗證**
+   local provider 預設回傳 nginx `/uploads/` 直出的公開 URL。因此 uploads 目錄在 NAS 上等同**公開可讀**——這與先前 GCS public object 的行為一致，不算搬遷造成的退步。
+   設定 `LOCAL_STORAGE_SIGNING_SECRET` 後，URL 會多帶 `?action=&expires=&signature=`（HMAC-SHA256）。nginx 以 `$uri` 比對、不含 query string，所以出檔行為完全不變；要真的擋下來，仍需在 nginx 加 `auth_request` 打到 backend——驗證端的對應實作是 `LocalStorageProvider.verifySignedUrl()`。
+   ⚠ **`action: 'write'` 的簽名 URL 在 local 模式尚無對應的落地端點**：nginx 的 `/uploads/` 只做靜態出檔（無 `dav_methods`），客戶端直接 PUT 會拿到 405。目前唯一使用寫入 URL 的是 field-reports 附件的「前端直傳」流程；搬遷後若要保留該流程，需補一個驗證簽章並落檔的 backend 端點（見 §8）。
 
 3. **路徑穿越 —— 已修**
    原本的 `getFullPath()` 是 `path.join(this.basePath, filePath)`，對含 `../` 的路徑會逃出 basePath。在 NAS 上 basePath 是真實的 bind mount，逃出去等同對主機任意讀寫。目前因無人注入此 provider 而不可觸發，但接上抽象層的當下就會變成可利用的漏洞，所以**趁現在零呼叫端、零回歸風險時先修**：改為 `path.resolve` 後驗證結果仍在 root 之內，否則丟 `BadRequestException`。
@@ -404,8 +406,9 @@ nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重�
 
 | 項目 | 說明 | 建議歸屬 |
 |---|---|---|
-| 三個服務接上 storage 抽象層 | §7.2-1，`STORAGE_PROVIDER=local` 目前對它們無效。**這是搬遷的實質阻斷項**：雲端關掉後這三處會直接失效 | M.3 收尾（獨立工作項，含回歸測試） |
-| `getSignedUrl()` 無簽章 | §7.2-2，若要做授權出檔需在 nginx 加 `auth_request` | 視需求，非搬遷阻斷項 |
+| ~~三個服務接上 storage 抽象層~~ | §7.2-1，已於 M.3b 完成（`StorageModule.forFeature()` + GCS/local 雙模式回歸測試） | ✅ 已完成 |
+| local 模式的簽名上傳落地端點 | §7.2-2，`action: 'write'` 的 URL 在 NAS 上無人接收（nginx 只做靜態出檔）。若要保留 field-reports 附件的前端直傳流程需補此端點 | 獨立工作項 |
+| `getSignedUrl()` 的簽章未被強制驗證 | §7.2-2，簽章已可產生（`LOCAL_STORAGE_SIGNING_SECRET`）與驗證（`verifySignedUrl()`），但要實際擋下未授權讀取需在 nginx 加 `auth_request` | 視需求，非搬遷阻斷項 |
 | LLM provider 接線 | `LLM_BASE_URL` 等 env 已備妥，實際的 OpenAI-compatible provider 尚未實作 | 工作項 M.2 |
 | Cloud Logging 替換 | winston 本地檔＋Sentry | 工作項 M.6 |
 | cloudbuild → GitHub Actions | build image 推到 NAS 可拉的 registry | 工作項 M.6 |

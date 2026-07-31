@@ -118,6 +118,8 @@ services:
       STORAGE_PROVIDER: ${STORAGE_PROVIDER:-local}
       LOCAL_STORAGE_PATH: ${LOCAL_STORAGE_PATH:-/app/uploads}
       LOCAL_STORAGE_URL: ${LOCAL_STORAGE_URL:-https://${PUBLIC_DOMAIN}/uploads}
+      # 選填：設定後簽名 URL 會帶 expires+signature（nginx 出檔行為不變）
+      LOCAL_STORAGE_SIGNING_SECRET: ${LOCAL_STORAGE_SIGNING_SECRET:-}
       UPLOAD_DIR: ${UPLOAD_DIR:-/app/uploads}
       EXPORT_DIR: /app/uploads/exports
       BACKUP_DIR: /app/uploads/exports

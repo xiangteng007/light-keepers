@@ -31,6 +31,8 @@ import { AuthModule } from '../auth/auth.module';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { LineBotModule } from '../line-bot/line-bot.module';
 import { Account } from '../accounts/entities/account.entity';
+import { StorageModule } from '../../common/storage/storage.module';
+import { FIELD_REPORT_STORAGE_FEATURE } from '../../common/storage/storage.tokens';
 
 @Module({
     imports: [
@@ -49,6 +51,9 @@ import { Account } from '../accounts/entities/account.entity';
         forwardRef(() => AuthModule), // For AuthService / JwtModule (原註解寫 JwtAuthGuard，該 guard 已於 1.6 收斂中移除)
         forwardRef(() => NotificationsModule), // For EmergencyNotificationService
         forwardRef(() => LineBotModule), // For EmergencyNotificationService
+        // INF-1 / M.3b: attachments go through the storage abstraction, bound to
+        // the bucket field reports have always used (GCS_BUCKET).
+        StorageModule.forFeature(FIELD_REPORT_STORAGE_FEATURE),
     ],
     controllers: [
         FieldReportsController,
