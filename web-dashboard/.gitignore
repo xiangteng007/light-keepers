@@ -24,3 +24,6 @@ dist-ssr
 *.sw?
 
 .vercel
+
+# CI lint 報告（Lint 棘輪閘門產生）
+eslint-report.json

@@ -6,6 +6,7 @@ import { MenuConfig } from './menu-config.entity';
 import { MenuConfigService } from './menu-config.service';
 import { MenuConfigController } from './menu-config.controller';
 import { Account } from '../accounts/entities';
+import { getRequiredJwtSecret } from '../../common/config/jwt.config';
 
 @Module({
     imports: [
@@ -13,7 +14,7 @@ import { Account } from '../accounts/entities';
         JwtModule.registerAsync({
             inject: [ConfigService],
             useFactory: (configService: ConfigService) => ({
-                secret: configService.get('JWT_SECRET', 'light-keepers-jwt-secret-2024'),
+                secret: getRequiredJwtSecret(configService),
                 signOptions: { expiresIn: '7d' },
             }),
         }),
