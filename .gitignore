@@ -111,3 +111,6 @@ docs/proof/gates/gate-summary.json
 docs/proof/gates/gate-summary.md
 docs/proof/logs/runtime-start.log
 docs/proof/api/T7a-requests-responses.txt
+
+# Test-generated upload artifacts
+backend/uploads/
