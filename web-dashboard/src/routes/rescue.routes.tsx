@@ -21,7 +21,9 @@ export const rescueRoutes = (
   <>
     {/* Rescue Operations */}
     <Route path="/rescue/shelters" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-shelters"><SheltersPage /></PageWrapper></ProtectedRoute>} />
-    <Route path="/rescue/triage" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
+    {/* FE-4/3.3: 真版 TriagePage 以 useParams<{missionSessionId}> 讀取場次 ID，未提供時
+        fetchVictims/fetchStats 會 early-return，畫面顯示空列表而非 crash。:missionSessionId? 選填。 */}
+    <Route path="/rescue/triage/:missionSessionId?" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-triage"><TriagePage /></PageWrapper></ProtectedRoute>} />
     <Route path="/rescue/search-rescue" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-search"><SearchRescuePage /></PageWrapper></ProtectedRoute>} />
     <Route path="/rescue/reunification" element={<ProtectedRoute requiredLevel={1}><PageWrapper pageId="rescue-reunification"><ReunificationPage /></PageWrapper></ProtectedRoute>} />
     <Route path="/rescue/medical-transport" element={<ProtectedRoute requiredLevel={2}><PageWrapper pageId="rescue-medical"><MedicalTransportPage /></PageWrapper></ProtectedRoute>} />

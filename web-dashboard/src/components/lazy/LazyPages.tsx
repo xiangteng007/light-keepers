@@ -139,11 +139,14 @@ export const BiometricPage = lazyWithSuspense(() => import('../../pages/governan
 export const SettingsPage = lazyWithSuspense(() => import('../../pages/governance/SettingsPage'));
 
 // ===== Domain Pages =====
-export const MissionCommandPage = lazyWithSuspense(() => 
-  import('../../pages/domains/mission-command').then(m => ({ default: m.MissionCommandPage }))
+// FE-4/3.3: 改掛真實 API 版頁面（原掛 pages/domains/mission-command/* 的靜態假資料版，
+// 真版 pages/MissionCommandPage.tsx、pages/TriagePage.tsx 過去是孤兒，見
+// docs/audit/ROUTE_IA_RECONCILIATION.md §4b）。假資料版檔案保留未刪，去留另案（D2）。
+export const MissionCommandPage = lazyWithSuspense(() =>
+  import('../../pages/MissionCommandPage')
 );
-export const TriagePage = lazyWithSuspense(() => 
-  import('../../pages/domains/mission-command').then(m => ({ default: m.TriagePage }))
+export const TriagePage = lazyWithSuspense(() =>
+  import('../../pages/TriagePage')
 );
 export const SheltersPage = lazyWithSuspense(() => 
   import('../../pages/rescue').then(m => ({ default: m.SheltersPage }))
