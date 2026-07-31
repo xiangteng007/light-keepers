@@ -1,5 +1,6 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect } from 'react';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 import './PackageLibraryPage.css';
 
 interface MapPackage {
@@ -31,13 +32,7 @@ export const PackageLibraryPage: React.FC = () => {
         const fetchPackages = async () => {
             setIsLoading(true);
             try {
-                const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
-                const token = localStorage.getItem('accessToken');
-
-                const response = await fetch(`${API_URL}/map-packages`, {
-                    headers: { Authorization: `Bearer ${token}` },
-                });
-                const data = await response.json();
+                const { data } = await api.get('/map-packages');
 
                 // Check local storage for downloaded status (stub)
                 const packagesWithStatus = data.map((pkg: MapPackage) => ({
@@ -46,8 +41,8 @@ export const PackageLibraryPage: React.FC = () => {
                 }));
 
                 setPackages(packagesWithStatus);
-            } catch (err: any) {
-                setError(err.message || '無法載入套件庫');
+            } catch (err) {
+                setError(getApiErrorMessage(err, '無法載入套件庫'));
             } finally {
                 setIsLoading(false);
             }

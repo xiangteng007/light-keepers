@@ -1,9 +1,9 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Task Dispatch API Service
  */
 
-const API_URL = import.meta.env.VITE_API_URL || '';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // Constants (using const objects for erasableSyntaxOnly compatibility)
 export const TaskPriority = {
@@ -113,16 +113,14 @@ export const taskDispatchApi = {
      * Create a new task
      */
     async createTask(input: CreateTaskInput, token: string): Promise<DispatchTask> {
-        const res = await fetch(`${API_URL}/tasks`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(input),
-        });
-        if (!res.ok) throw new Error(`Failed to create task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<DispatchTask>('/tasks', input, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to create task'));
+        }
     },
 
     /**
@@ -133,37 +131,47 @@ export const taskDispatchApi = {
         token: string,
         filters?: { status?: TaskStatus; priority?: TaskPriority }
     ): Promise<DispatchTask[]> {
-        const params = new URLSearchParams({ missionSessionId });
-        if (filters?.status) params.set('status', filters.status);
-        if (filters?.priority !== undefined) params.set('priority', String(filters.priority));
-
-        const res = await fetch(`${API_URL}/tasks?${params}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get tasks: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get<DispatchTask[]>('/tasks', {
+                params: {
+                    missionSessionId,
+                    status: filters?.status,
+                    priority: filters?.priority,
+                },
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get tasks'));
+        }
     },
 
     /**
      * Get tasks assigned to current user
      */
     async getMyTasks(token: string): Promise<DispatchTask[]> {
-        const res = await fetch(`${API_URL}/tasks/my`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get my tasks: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get<DispatchTask[]>('/tasks/my', {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get my tasks'));
+        }
     },
 
     /**
      * Get a single task
      */
     async getTask(taskId: string, token: string): Promise<DispatchTask> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get<DispatchTask>(`/tasks/${taskId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get task'));
+        }
     },
 
     /**
@@ -174,100 +182,109 @@ export const taskDispatchApi = {
         volunteerIds: string[],
         token: string
     ): Promise<TaskAssignment[]> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/assign`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ volunteerIds }),
-        });
-        if (!res.ok) throw new Error(`Failed to assign task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<TaskAssignment[]>(
+                `/tasks/${taskId}/assign`,
+                { volunteerIds },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to assign task'));
+        }
     },
 
     /**
      * Accept a task
      */
     async acceptTask(taskId: string, token: string, note?: string): Promise<TaskAssignment> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/accept`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ note }),
-        });
-        if (!res.ok) throw new Error(`Failed to accept task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<TaskAssignment>(
+                `/tasks/${taskId}/accept`,
+                { note },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to accept task'));
+        }
     },
 
     /**
      * Decline a task
      */
     async declineTask(taskId: string, reason: string, token: string): Promise<TaskAssignment> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/decline`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ reason }),
-        });
-        if (!res.ok) throw new Error(`Failed to decline task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<TaskAssignment>(
+                `/tasks/${taskId}/decline`,
+                { reason },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to decline task'));
+        }
     },
 
     /**
      * Start working on a task
      */
     async startTask(taskId: string, token: string): Promise<DispatchTask> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/start`, {
-            method: 'POST',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to start task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<DispatchTask>(
+                `/tasks/${taskId}/start`,
+                undefined,
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to start task'));
+        }
     },
 
     /**
      * Complete a task
      */
     async completeTask(taskId: string, token: string, notes?: string): Promise<DispatchTask> {
-        const res = await fetch(`${API_URL}/tasks/${taskId}/complete`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ notes }),
-        });
-        if (!res.ok) throw new Error(`Failed to complete task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post<DispatchTask>(
+                `/tasks/${taskId}/complete`,
+                { notes },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to complete task'));
+        }
     },
 
     /**
      * Cancel a task
      */
     async cancelTask(taskId: string, token: string, reason?: string): Promise<DispatchTask> {
-        const params = reason ? `?reason=${encodeURIComponent(reason)}` : '';
-        const res = await fetch(`${API_URL}/tasks/${taskId}${params}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to cancel task: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.delete<DispatchTask>(`/tasks/${taskId}`, {
+                params: reason ? { reason } : undefined,
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to cancel task'));
+        }
     },
 
     /**
      * Get task statistics
      */
     async getStats(missionSessionId: string, token: string): Promise<TaskStats> {
-        const res = await fetch(`${API_URL}/tasks/stats/${missionSessionId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get stats: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get<TaskStats>(`/tasks/stats/${missionSessionId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get stats'));
+        }
     },
 };
 

@@ -1,10 +1,9 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * AI Queue API Service
  * Handles REST API calls for AI Queue operations
  */
-
-const API_URL = import.meta.env.VITE_API_URL || '';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // Types
 export type AiUseCaseId = 'report.summarize.v1' | 'report.cluster.v1' | 'task.draftFromReport.v1';
@@ -52,47 +51,49 @@ export const aiQueueApi = {
         token: string,
         priority?: number
     ): Promise<CreateJobResponse> {
-        const res = await fetch(`${API_URL}/ai/jobs`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({
-                missionSessionId,
-                useCaseId,
-                entityType,
-                entityId,
-                priority,
-            }),
-        });
-        if (!res.ok) {
-            const error = await res.json().catch(() => ({}));
-            throw new Error(error.message || `Failed to create AI job: ${res.status}`);
+        try {
+            const { data } = await api.post(
+                '/ai/jobs',
+                {
+                    missionSessionId,
+                    useCaseId,
+                    entityType,
+                    entityId,
+                    priority,
+                },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to create AI job'));
         }
-        return res.json();
     },
 
     /**
      * Get AI job status
      */
     async getJobStatus(jobId: string, token: string): Promise<AiJob> {
-        const res = await fetch(`${API_URL}/ai/jobs/${jobId}`, {
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to get job status: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.get(`/ai/jobs/${jobId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to get job status'));
+        }
     },
 
     /**
      * Cancel an AI job
      */
     async cancelJob(jobId: string, token: string): Promise<void> {
-        const res = await fetch(`${API_URL}/ai/jobs/${jobId}`, {
-            method: 'DELETE',
-            headers: { Authorization: `Bearer ${token}` },
-        });
-        if (!res.ok) throw new Error(`Failed to cancel job: ${res.status}`);
+        try {
+            await api.delete(`/ai/jobs/${jobId}`, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to cancel job'));
+        }
     },
 
     /**
@@ -103,16 +104,16 @@ export const aiQueueApi = {
         applyChanges: boolean,
         token: string
     ): Promise<{ applied: boolean }> {
-        const res = await fetch(`${API_URL}/ai/results/${jobId}/accept`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ applyChanges }),
-        });
-        if (!res.ok) throw new Error(`Failed to accept result: ${res.status}`);
-        return res.json();
+        try {
+            const { data } = await api.post(
+                `/ai/results/${jobId}/accept`,
+                { applyChanges },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+            return data;
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to accept result'));
+        }
     },
 
     /**
@@ -123,15 +124,15 @@ export const aiQueueApi = {
         reason: string,
         token: string
     ): Promise<void> {
-        const res = await fetch(`${API_URL}/ai/results/${jobId}/reject`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify({ reason }),
-        });
-        if (!res.ok) throw new Error(`Failed to reject result: ${res.status}`);
+        try {
+            await api.post(
+                `/ai/results/${jobId}/reject`,
+                { reason },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+        } catch (err) {
+            throw new Error(getApiErrorMessage(err, 'Failed to reject result'));
+        }
     },
 };
 
