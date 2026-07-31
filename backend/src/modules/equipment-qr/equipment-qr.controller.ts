@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Patch, Param, Body, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { EquipmentQrService } from './equipment-qr.service';
+import { RegisterEquipmentDto, ScheduleMaintenanceDto } from './dto/equipment-qr.dto';
 
 @ApiTags('Equipment QR API')
 @ApiBearerAuth()
@@ -28,7 +29,7 @@ export class EquipmentQrController {
 
     @Post('register')
     @ApiOperation({ summary: '登錄新裝備' })
-    register(@Body() data: any) {
+    register(@Body() data: RegisterEquipmentDto) {
         return this.service.registerEquipment(data);
     }
 
@@ -78,7 +79,7 @@ export class EquipmentQrController {
 
     @Post('maintenance/schedule')
     @ApiOperation({ summary: '排程維護' })
-    scheduleMaintenance(@Body() data: any) {
+    scheduleMaintenance(@Body() data: ScheduleMaintenanceDto) {
         return this.service.scheduleMaintenance(data);
     }
 

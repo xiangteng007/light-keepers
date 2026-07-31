@@ -1,8 +1,27 @@
-import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, ParseArrayPipe } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { InternationalStandardsService } from './international-standards.service';
 import { IcsFormType } from './services/ics-forms.service';
 import { SphereStandard } from './services/sphere-standards.service';
+import {
+    Add3WRecordDto,
+    Export3WHxlItemDto,
+    ExportMissionHxlItemDto,
+    ExportResourceHxlItemDto,
+    GenerateIcs201Dto,
+    GenerateIcs214Dto,
+    Import3WItemDto,
+    QuickSphereCheckDto,
+} from './dto/international-standards.dto';
+
+/**
+ * 這些端點的 body 為裸陣列（非物件），全域 ValidationPipe 無法直接套用 DTO，
+ * 需改用 ParseArrayPipe 並顯式帶入與全域一致的 whitelist 設定。
+ */
+const ARRAY_BODY_PIPE_OPTIONS = {
+    whitelist: true,
+    forbidNonWhitelisted: true,
+} as const;
 
 @ApiTags('International Standards')
 @Controller('standards')
@@ -19,19 +38,22 @@ export class InternationalStandardsController {
 
     @Post('ics/201')
     @ApiOperation({ summary: '生成 ICS-201 事件概述' })
-    generateIcs201(@Body() data: any) {
+    generateIcs201(@Body() data: GenerateIcs201Dto) {
         return this.standards.generateIcs201(data);
     }
 
     @Post('ics/214')
     @ApiOperation({ summary: '生成 ICS-214 活動日誌' })
-    generateIcs214(@Body() data: any) {
+    generateIcs214(@Body() data: GenerateIcs214Dto) {
         return this.standards.generateIcs214(data);
     }
 
     @Post('ics/validate/:formType')
     @ApiOperation({ summary: '驗證 ICS 表單' })
-    validateIcsForm(@Param('formType') formType: IcsFormType, @Body() data: any) {
+    // 刻意不建 DTO：本端點的用途就是驗證「任意/部分填寫」的 ICS 表單，
+    // 套用白名單 DTO 會讓它無法接收待驗證的草稿資料。
+    // IcsFormsService.validateForm() 自身即為防禦性讀取，只取 incidentName 等少數欄位。
+    validateIcsForm(@Param('formType') formType: IcsFormType, @Body() data: Record<string, unknown>) {
         return this.standards.validateIcsForm(formType, data);
     }
 
@@ -45,21 +67,30 @@ export class InternationalStandardsController {
 
     @Post('hxl/missions')
     @ApiOperation({ summary: '匯出任務資料為 HXL 格式' })
-    exportMissionsHxl(@Body() missions: any[]) {
+    exportMissionsHxl(
+        @Body(new ParseArrayPipe({ items: ExportMissionHxlItemDto, ...ARRAY_BODY_PIPE_OPTIONS }))
+        missions: ExportMissionHxlItemDto[],
+    ) {
         const dataset = this.standards.exportMissionsToHxl(missions);
         return this.standards.hxlToJson(dataset);
     }
 
     @Post('hxl/resources')
     @ApiOperation({ summary: '匯出資源資料為 HXL 格式' })
-    exportResourcesHxl(@Body() resources: any[]) {
+    exportResourcesHxl(
+        @Body(new ParseArrayPipe({ items: ExportResourceHxlItemDto, ...ARRAY_BODY_PIPE_OPTIONS }))
+        resources: ExportResourceHxlItemDto[],
+    ) {
         const dataset = this.standards.exportResourcesToHxl(resources);
         return this.standards.hxlToJson(dataset);
     }
 
     @Post('hxl/3w')
     @ApiOperation({ summary: '匯出 3W 資料為 HXL 格式' })
-    export3WHxl(@Body() activities: any[]) {
+    export3WHxl(
+        @Body(new ParseArrayPipe({ items: Export3WHxlItemDto, ...ARRAY_BODY_PIPE_OPTIONS }))
+        activities: Export3WHxlItemDto[],
+    ) {
         const dataset = this.standards.export3WToHxl(activities);
         return this.standards.hxlToJson(dataset);
     }
@@ -88,7 +119,7 @@ export class InternationalStandardsController {
 
     @Post('ocha/3w')
     @ApiOperation({ summary: '新增 3W 記錄' })
-    add3WRecord(@Body() data: any) {
+    add3WRecord(@Body() data: Add3WRecordDto) {
         return this.standards.add3WRecord(data);
     }
 
@@ -106,7 +137,10 @@ export class InternationalStandardsController {
 
     @Post('ocha/import')
     @ApiOperation({ summary: '匯入 OCHA 資料' })
-    import3WData(@Body() data: any[]) {
+    import3WData(
+        @Body(new ParseArrayPipe({ items: Import3WItemDto, ...ARRAY_BODY_PIPE_OPTIONS }))
+        data: Import3WItemDto[],
+    ) {
         return { imported: this.standards.import3WData(data) };
     }
 
@@ -135,7 +169,7 @@ export class InternationalStandardsController {
 
     @Post('sphere/quick-check')
     @ApiOperation({ summary: '快速 Sphere 檢核' })
-    quickSphereCheck(@Body() data: any) {
+    quickSphereCheck(@Body() data: QuickSphereCheckDto) {
         return this.standards.quickSphereCheck(data);
     }
 }

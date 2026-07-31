@@ -9,6 +9,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { IAPService } from './iap.service';
 import { IAPDocumentType } from './entities/iap-document.entity';
 import { Objective, RiskAssessment, ResourceAllocation } from './entities/operational-period.entity';
+import { UpsertIapDocumentDto } from './dto/iap-document.dto';
 
 @ApiTags('iap')
 @Controller('api/missions/:sessionId/iap')
@@ -128,7 +129,7 @@ export class IAPController {
     async upsertDocument(
         @Param('periodId') periodId: string,
         @Param('docType') docType: IAPDocumentType,
-        @Body() body: { content: Record<string, any> },
+        @Body() body: UpsertIapDocumentDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const document = await this.iapService.upsertDocument(

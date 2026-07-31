@@ -9,6 +9,7 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { SITREPService } from './sitrep.service';
 import { DecisionType } from './entities/decision-log.entity';
 import { KeyEvent, ResourceStatus } from './entities/sitrep.entity';
+import { LogDecisionDto } from './dto/decision-log.dto';
 
 @ApiTags('sitrep')
 @Controller('api/missions/:sessionId/sitrep')
@@ -114,18 +115,7 @@ export class SITREPController {
     @ApiOperation({ summary: '記錄決策' })
     async logDecision(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            decisionType: DecisionType;
-            description: string;
-            rationale?: string;
-            relatedEntityType?: string;
-            relatedEntityId?: string;
-            aiAssisted?: boolean;
-            aiJobId?: string;
-            aiConfidence?: number;
-            beforeState?: Record<string, any>;
-            afterState?: Record<string, any>;
-        },
+        @Body() body: LogDecisionDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const decision = await this.sitrepService.logDecision({

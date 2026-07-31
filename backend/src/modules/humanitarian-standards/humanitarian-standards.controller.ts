@@ -6,10 +6,18 @@
 import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
-import { HxlExportService, HxlExportOptions } from './services/hxl-export.service';
+import { HxlExportService } from './services/hxl-export.service';
 import { IatiReportingService } from './services/iati-reporting.service';
 import { ThreeWMatrixService } from './services/three-w-matrix.service';
-import { SphereStandardsService, SphereStandardCategory } from './services/sphere-standards.service';
+import { SphereStandardsService } from './services/sphere-standards.service';
+import {
+    AssessSphereComplianceDto,
+    ExportReportsHxlDto,
+    ExportResourcesHxlDto,
+    GenerateIatiXmlDto,
+    GenerateSphereReportDto,
+    GenerateThreeWMatrixDto,
+} from './dto/humanitarian-standards.dto';
 
 @ApiTags('Humanitarian Standards')
 @Controller('api/v1/humanitarian-standards')
@@ -34,7 +42,7 @@ export class HumanitarianStandardsController {
     @Post('hxl/export/reports')
     @ApiOperation({ summary: 'Export reports in HXL format' })
     async exportReportsHxl(
-        @Body() data: { reports: any[]; options?: HxlExportOptions }
+        @Body() data: ExportReportsHxlDto
     ) {
         const result = await this.hxlExport.exportDisasterReports(
             data.reports,
@@ -46,7 +54,7 @@ export class HumanitarianStandardsController {
     @Post('hxl/export/resources')
     @ApiOperation({ summary: 'Export resource distribution in HXL format' })
     async exportResourcesHxl(
-        @Body() data: { distributions: any[]; options?: HxlExportOptions }
+        @Body() data: ExportResourcesHxlDto
     ) {
         const result = await this.hxlExport.exportResourceDistribution(
             data.distributions,
@@ -59,7 +67,7 @@ export class HumanitarianStandardsController {
 
     @Post('iati/generate')
     @ApiOperation({ summary: 'Generate IATI XML for a mission' })
-    async generateIatiXml(@Body() mission: any) {
+    async generateIatiXml(@Body() mission: GenerateIatiXmlDto) {
         const xml = await this.iatiReporting.generateIatiXml(mission);
         return { xml, version: '2.03' };
     }
@@ -69,10 +77,7 @@ export class HumanitarianStandardsController {
     @Post('3w/generate')
     @ApiOperation({ summary: 'Generate 3W Matrix from missions' })
     async generateThreeWMatrix(
-        @Body() data: { 
-            missions: any[]; 
-            period: { start: string; end: string } 
-        }
+        @Body() data: GenerateThreeWMatrixDto
     ) {
         const matrix = await this.threeWMatrix.generateMatrix(
             data.missions,
@@ -84,10 +89,7 @@ export class HumanitarianStandardsController {
     @Post('3w/export/csv')
     @ApiOperation({ summary: 'Export 3W Matrix as CSV' })
     async exportThreeWCsv(
-        @Body() data: { 
-            missions: any[]; 
-            period: { start: string; end: string } 
-        }
+        @Body() data: GenerateThreeWMatrixDto
     ) {
         const matrix = await this.threeWMatrix.generateMatrix(
             data.missions,
@@ -108,10 +110,7 @@ export class HumanitarianStandardsController {
     @Post('sphere/assess')
     @ApiOperation({ summary: 'Assess Sphere compliance for a facility' })
     async assessSphereCompliance(
-        @Body() data: { 
-            facilityData: any; 
-            category: SphereStandardCategory;
-        }
+        @Body() data: AssessSphereComplianceDto
     ) {
         const assessments = await this.sphereStandards.assessCompliance(
             data.facilityData,
@@ -123,7 +122,7 @@ export class HumanitarianStandardsController {
     @Post('sphere/report')
     @ApiOperation({ summary: 'Generate full Sphere compliance report' })
     async generateSphereReport(
-        @Body() data: { facilityData: any; assessor: string }
+        @Body() data: GenerateSphereReportDto
     ) {
         return this.sphereStandards.generateReport(
             data.facilityData,

@@ -43,7 +43,7 @@ describe('HumanitarianStandardsController', () => {
     });
 
     it('generateIatiXml generates XML', async () => {
-        const result = await controller.generateIatiXml({});
+        const result = await controller.generateIatiXml({ id: 'm1' });
         expect(result.xml).toBeDefined();
     });
 

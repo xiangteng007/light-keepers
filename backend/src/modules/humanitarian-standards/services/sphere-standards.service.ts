@@ -35,7 +35,14 @@ export interface SphereComplianceReport {
     recommendations: string[];
 }
 
-/** Facility data structure for Sphere assessments */
+/**
+ * Facility data structure for Sphere assessments
+ *
+ * 原本帶有 `[key: string]: unknown` index signature。改由 FacilityDataDto
+ * 於 controller 入口做白名單驗證後，未具名欄位不再會進入本層，
+ * 故移除 index signature 讓型別反映實際契約
+ * （class 不具備 implicit index signature，保留會導致 DTO 無法指派）。
+ */
 export interface FacilityData {
     location?: string;
     population?: number;
@@ -44,7 +51,6 @@ export interface FacilityData {
     coveredAreaM2?: number;
     dailyKcal?: number;
     drugAvailabilityPercent?: number;
-    [key: string]: unknown;
 }
 
 @Injectable()

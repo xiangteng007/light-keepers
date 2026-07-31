@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Param, Body, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { ExpenseReimbursementService } from './expense-reimbursement.service';
+import { MarkPaidDto, ReviewClaimDto, SubmitClaimDto } from './dto/expense.dto';
 
 @ApiTags('Expense 經費核銷')
 @Controller('api/expenses')
@@ -9,20 +10,24 @@ export class ExpenseReimbursementController {
 
     @Post()
     @ApiOperation({ summary: '提交報銷', description: '提交經費報銷申請' })
-    submitClaim(@Body() body: any): any {
+    submitClaim(@Body() body: SubmitClaimDto): any {
         return this.expenseService.submitClaim(body);
     }
 
     @Post(':id/review')
     @ApiOperation({ summary: '審核報銷', description: '審核經費報銷' })
-    reviewClaim(@Param('id') id: string, @Body() body: any): any {
+    reviewClaim(@Param('id') id: string, @Body() body: ReviewClaimDto): any {
         return this.expenseService.reviewClaim(id, body);
     }
 
     @Post(':id/pay')
     @ApiOperation({ summary: '標記已付款', description: '標記報銷已付款' })
-    markAsPaid(@Param('id') id: string, @Body() body: any): any {
-        return this.expenseService.markAsPaid(id, body);
+    markAsPaid(@Param('id') id: string, @Body() body: MarkPaidDto): any {
+        // paidAt 為選填，未提供時以伺服器時間補上（service 端 PaymentInfo 要求必填）
+        return this.expenseService.markAsPaid(id, {
+            ...body,
+            paidAt: body.paidAt ?? new Date(),
+        });
     }
 
     @Get('pending')
