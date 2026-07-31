@@ -5,6 +5,7 @@ import type { Report, ReportStatus, ReportType, ReportSeverity } from '../api/se
 import './ReportsAdminPage.css';
 
 // 回報類型設定
+// Bespoke categorical palette (8 disaster types) — no 1:1 semantic token equivalent, left as literal hex
 const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
     earthquake: { label: '地震', icon: '🌍', color: '#795548' },
     flood: { label: '淹水', icon: '🌊', color: '#2196F3' },
@@ -18,17 +19,17 @@ const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: stri
 
 // 狀態設定
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
-    pending: { label: '待審核', color: '#FF9800' },
-    confirmed: { label: '已確認', color: '#4CAF50' },
-    rejected: { label: '已駁回', color: '#F44336' },
+    pending: { label: '待審核', color: 'var(--color-warning, #FF9800)' },
+    confirmed: { label: '已確認', color: 'var(--color-success, #4CAF50)' },
+    rejected: { label: '已駁回', color: 'var(--color-danger, #F44336)' },
 };
 
 // 嚴重程度設定
 const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; color: string }> = {
-    low: { label: '低', color: '#4CAF50' },
-    medium: { label: '中', color: '#FF9800' },
-    high: { label: '高', color: '#F44336' },
-    critical: { label: '緊急', color: '#9C27B0' },
+    low: { label: '低', color: 'var(--color-success, #4CAF50)' },
+    medium: { label: '中', color: 'var(--color-warning, #FF9800)' },
+    high: { label: '高', color: 'var(--color-danger, #F44336)' },
+    critical: { label: '緊急', color: 'var(--color-critical, #9C27B0)' },
 };
 
 export default function ReportsAdminPage() {

@@ -7,6 +7,7 @@ import { useAuth } from '../context/AuthContext';
 import './EventsPage.css';
 
 // 類型配置
+// Bespoke categorical palette (8 disaster types) — no 1:1 semantic token equivalent, left as literal hex
 const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
     earthquake: { label: '地震', icon: '🌍', color: '#795548' },
     flood: { label: '淹水', icon: '🌊', color: '#2196F3' },
@@ -18,6 +19,7 @@ const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: stri
     other: { label: '其他', icon: '📋', color: '#607D8B' },
 };
 
+// Bespoke severity color scale (distinct from success/warning/danger — 4 discrete levels), left as literal hex
 const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; color: string }> = {
     low: { label: '輕微', stars: 1, color: '#4CAF50' },
     medium: { label: '中等', stars: 2, color: '#FF9800' },
@@ -25,6 +27,7 @@ const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; co
     critical: { label: '緊急', stars: 4, color: '#9C27B0' },
 };
 
+// Source brand colors (LINE official green, generic web blue) — no semantic token equivalent, left as literal hex
 const SOURCE_CONFIG: Record<ReportSource, { label: string; icon: string; color: string }> = {
     line: { label: 'LINE', icon: '💬', color: '#00B900' },
     web: { label: '網頁', icon: '🌐', color: '#1976D2' },
@@ -608,19 +611,19 @@ export default function EventsPage() {
                         </div>
 
                         <div className="event-detail__actions">
-                            <button
-                                className="btn-neutral"
+                            <Button
+                                variant="secondary"
                                 onClick={() => window.open(`/map?lat=${selectedReport.latitude}&lng=${selectedReport.longitude}`, '_self')}
                             >
                                 📍 在地圖查看
-                            </button>
+                            </Button>
                             {canAssignTask && (
-                                <button
-                                    className="btn-primary"
+                                <Button
+                                    variant="primary"
                                     onClick={() => { setShowDetailModal(false); openTaskModal(selectedReport); }}
                                 >
                                     分派任務
-                                </button>
+                                </Button>
                             )}
                         </div>
                     </div>
