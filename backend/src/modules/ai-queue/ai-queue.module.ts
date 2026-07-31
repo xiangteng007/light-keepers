@@ -24,8 +24,8 @@ import { AiWorkerService } from './workers/ai-worker.service';
 import { RateLimiterService } from './workers/rate-limiter.service';
 import { CircuitBreakerService } from './workers/circuit-breaker.service';
 
-// Providers
-import { GeminiProvider } from './providers/gemini.provider';
+// Providers (M.2: routed through LlmProviderService, see providers/llm.module.ts)
+import { LlmModule } from './providers/llm.module';
 
 // Use Cases
 import {
@@ -49,6 +49,7 @@ import { AuthModule } from '../auth/auth.module';
             AuditLog,
         ]),
         ConfigModule,
+        LlmModule, // GeminiProvider + OpenAiCompatibleProvider + LlmProviderService
         forwardRef(() => AuthModule), // For AuthService / JwtModule (原註解寫 JwtAuthGuard，該 guard 已於 1.6 收斂中移除)
     ],
     controllers: [
@@ -66,9 +67,6 @@ import { AuthModule } from '../auth/auth.module';
         AiWorkerService,
         RateLimiterService,
         CircuitBreakerService,
-
-        // Providers
-        GeminiProvider,
 
         // Use Cases
         ReportSummarizeUseCase,

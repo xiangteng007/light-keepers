@@ -1,10 +1,10 @@
-/**
+﻿/**
  * Smart Assignment AI Use Case
  * Automatically matches volunteers to tasks based on skills, location, and availability
  */
 
 import { Injectable, Logger } from '@nestjs/common';
-import { GeminiProvider } from '../providers/gemini.provider';
+import { LlmProviderService } from '../providers/llm-provider.service';
 
 export interface VolunteerProfile {
     id: string;
@@ -99,7 +99,7 @@ export class SmartAssignmentUseCase {
     public static readonly ID = 'assignment.smart.v1';
     private readonly logger = new Logger(SmartAssignmentUseCase.name);
 
-    constructor(private readonly gemini: GeminiProvider) { }
+    constructor(private readonly llm: LlmProviderService) { }
 
     /**
      * Get smart volunteer recommendations for a task
@@ -150,7 +150,7 @@ ${v.location ? `- 位置: (${v.location.lat}, ${v.location.lng})` : ''}`).join('
 
 請推薦最多 ${maxRecs} 位最適合的志工，依匹配度排序。`;
 
-            const response = await this.gemini.run({
+            const response = await this.llm.run({
                 useCaseId: SmartAssignmentUseCase.ID,
                 prompt: `${SYSTEM_PROMPT}\n\n${prompt}`,
                 schema: OUTPUT_SCHEMA,

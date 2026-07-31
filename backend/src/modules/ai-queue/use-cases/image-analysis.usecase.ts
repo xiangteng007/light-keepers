@@ -104,6 +104,11 @@ export class ImageAnalysisUseCase {
     public static readonly ID = 'image.analysis.v1';
     private readonly logger = new Logger(ImageAnalysisUseCase.name);
 
+    // M.2: intentionally NOT routed through LlmProviderService.
+    // This use case needs vision input (`generateWithImage`), which the
+    // OpenAI-compatible provider does not implement - the candidate local models
+    // (Qwen2.5-32B/14B-Instruct) are text-only. Revisit if a VLM (e.g. Qwen2-VL)
+    // is deployed on the workstation.
     constructor(private readonly gemini: GeminiProvider) { }
 
     /**

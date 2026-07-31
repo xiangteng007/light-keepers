@@ -18,6 +18,8 @@ import { FlexMessageService } from './services/flex-message.service';
 // Consolidated from line-notify and line-liff modules
 import { LineNotifyService } from '../line-notify/line-notify.service';
 import { LineLiffService } from '../line-liff/line-liff.service';
+// M.2: shared LLM access layer (gemini / local / hybrid routing)
+import { LlmModule } from '../ai-queue/providers/llm.module';
 
 /**
  * LINE Bot Module - Consolidated LINE Integration
@@ -32,6 +34,7 @@ import { LineLiffService } from '../line-liff/line-liff.service';
     imports: [
         TypeOrmModule.forFeature([Account, Report, Task]),
         forwardRef(() => ReportsModule),
+        LlmModule,
     ],
     controllers: [LineBotController, AiVisionController],
     providers: [

@@ -1,9 +1,9 @@
-import { Injectable, Logger } from '@nestjs/common';
+﻿import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseUseCase } from './base.usecase';
 import { AiJob } from '../entities';
-import { GeminiProvider } from '../providers/gemini.provider';
+import { LlmProviderService } from '../providers/llm-provider.service';
 import { FieldReport } from '../../field-reports/entities';
 
 /**
@@ -80,7 +80,7 @@ export class ResourceRecommendUseCase extends BaseUseCase {
     private readonly logger = new Logger(ResourceRecommendUseCase.name);
 
     constructor(
-        private readonly gemini: GeminiProvider,
+        private readonly llm: LlmProviderService,
         @InjectRepository(FieldReport)
         private readonly reportRepo: Repository<FieldReport>,
     ) {
@@ -112,7 +112,7 @@ export class ResourceRecommendUseCase extends BaseUseCase {
             occurredAt: report.occurredAt?.toISOString() || '未知',
         });
 
-        const result = await this.gemini.run({
+        const result = await this.llm.run({
             useCaseId: this.useCaseId,
             prompt,
             schema: OUTPUT_SCHEMA,

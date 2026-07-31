@@ -1,53 +1,38 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import {
+    AiProviderError,
+    LlmHealth,
+    LlmProvider,
+    LlmRequest,
+    LlmResponse,
+    LlmTextRequest,
+    LlmTextResponse,
+    RateLimitError,
+    ValidationError,
+} from './llm-provider.interface';
 
-/**
- * Error types for AI provider
- */
-export class AiProviderError extends Error {
-    constructor(
-        message: string,
-        public readonly code: string,
-        public readonly isRetryable: boolean,
-    ) {
-        super(message);
-        this.name = 'AiProviderError';
-    }
-}
+// The error taxonomy is shared with the local provider and now lives in
+// `llm-provider.interface.ts`. Re-exported here so existing imports keep working.
+export {
+    AiProviderError,
+    RateLimitError,
+    ValidationError,
+} from './llm-provider.interface';
 
-export class RateLimitError extends AiProviderError {
-    constructor(message: string, public readonly retryAfterMs?: number) {
-        super(message, 'RATE_LIMITED', true);
-        this.name = 'RateLimitError';
-    }
-}
-
-export class ValidationError extends AiProviderError {
-    constructor(message: string) {
-        super(message, 'VALIDATION_FAILED', false);
-        this.name = 'ValidationError';
-    }
-}
-
-export interface GeminiRequest {
-    useCaseId: string;
-    prompt: string;
-    schema: object;
-    maxOutputTokens?: number;
-}
-
-export interface GeminiResponse {
-    outputJson: object;
-    modelName: string;
-    processingTimeMs: number;
-}
+/** @deprecated use `LlmRequest` from `llm-provider.interface` */
+export type GeminiRequest = LlmRequest;
+/** @deprecated use `LlmResponse` from `llm-provider.interface` */
+export type GeminiResponse = LlmResponse;
 
 /**
  * Gemini API Provider
  * Wraps Gemini API calls with schema validation and error handling
  */
 @Injectable()
-export class GeminiProvider {
+export class GeminiProvider implements LlmProvider {
+    readonly providerName = 'gemini';
+
     private readonly logger = new Logger(GeminiProvider.name);
     private readonly apiKey: string;
     // v1beta required for structured JSON output (responseMimeType/responseSchema)
@@ -178,6 +163,119 @@ export class GeminiProvider {
      */
     isConfigured(): boolean {
         return !!this.apiKey;
+    }
+
+    /**
+     * Free-form text generation (no JSON schema constraint).
+     *
+     * Added in M.2 so `LlmProviderService` can route unstructured prompts - such
+     * as the LINE bot disaster classification - to either provider.
+     */
+    async generateText(request: LlmTextRequest): Promise<LlmTextResponse> {
+        const startTime = Date.now();
+        const modelName = 'gemini-2.0-flash-exp';
+
+        if (!this.apiKey) {
+            throw new AiProviderError('Gemini API key not configured', 'NOT_CONFIGURED', false);
+        }
+
+        const url = `${this.baseUrl}/models/${modelName}:generateContent?key=${this.apiKey}`;
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const body: any = {
+            contents: [{ parts: [{ text: request.prompt }] }],
+            generationConfig: {
+                maxOutputTokens: request.maxOutputTokens || 2048,
+                temperature: request.temperature ?? 0.3,
+            },
+        };
+        if (request.systemPrompt) {
+            body.systemInstruction = { parts: [{ text: request.systemPrompt }] };
+        }
+
+        try {
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+                signal: AbortSignal.timeout(30000),
+            });
+
+            if (response.status === 429) {
+                const retryAfter = response.headers?.get?.('Retry-After');
+                throw new RateLimitError(
+                    'Gemini rate limit exceeded',
+                    retryAfter ? parseInt(retryAfter, 10) * 1000 : 60000,
+                );
+            }
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                throw new AiProviderError(
+                    `Gemini API error: ${response.status} - ${errorText}`,
+                    'API_ERROR',
+                    response.status >= 500,
+                );
+            }
+
+            const data = await response.json();
+            const text = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+            if (!text) {
+                throw new ValidationError('Empty response from Gemini');
+            }
+
+            return { text: text.trim(), modelName, processingTimeMs: Date.now() - startTime };
+        } catch (error) {
+            if (error instanceof AiProviderError) {
+                throw error;
+            }
+            if (error.name === 'AbortError' || error.name === 'TimeoutError') {
+                throw new AiProviderError('Gemini request timeout', 'TIMEOUT', true);
+            }
+            throw new AiProviderError(
+                `Gemini request failed: ${error.message}`,
+                'UNKNOWN_ERROR',
+                false,
+            );
+        }
+    }
+
+    /**
+     * Lightweight reachability probe used by `/health/llm`. Never throws.
+     */
+    async healthCheck(): Promise<LlmHealth> {
+        const base: LlmHealth = {
+            provider: this.providerName,
+            configured: this.isConfigured(),
+            reachable: false,
+            model: 'gemini-2.0-flash-exp',
+            baseUrl: this.baseUrl,
+        };
+
+        if (!this.apiKey) {
+            return { ...base, error: 'GEMINI_API_KEY not configured' };
+        }
+
+        const startTime = Date.now();
+        try {
+            const response = await fetch(`${this.baseUrl}/models?key=${this.apiKey}`, {
+                method: 'GET',
+                signal: AbortSignal.timeout(5000),
+            });
+            return {
+                ...base,
+                reachable: response.ok,
+                latencyMs: Date.now() - startTime,
+                error: response.ok ? undefined : `probe returned HTTP ${response.status}`,
+            };
+        } catch (error) {
+            return {
+                ...base,
+                latencyMs: Date.now() - startTime,
+                error: (error as Error)?.message || String(error),
+            };
+        }
     }
 
     /**
