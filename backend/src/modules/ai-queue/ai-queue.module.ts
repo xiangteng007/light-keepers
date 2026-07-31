@@ -4,7 +4,8 @@ import { ConfigModule } from '@nestjs/config';
 
 // Entities
 import { AiJob, AiResult, AiCircuitBreaker } from './entities';
-import { FieldReport, AuditLog } from '../field-reports/entities';
+import { FieldReport } from '../field-reports/entities';
+import { AuditLog } from '../audit/audit-log.entity';
 
 // Controllers
 import { AiJobsController } from './ai-jobs.controller';

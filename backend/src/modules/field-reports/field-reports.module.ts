@@ -7,10 +7,10 @@ import {
     LiveLocationShare,
     TaskClaim,
     TaskProgressUpdate,
-    AuditLog,
     EntityLock,
     LocationHistory,
 } from './entities';
+import { AuditLog } from '../audit/audit-log.entity';
 import { FieldReportsController } from './field-reports.controller';
 import { FieldReportsService } from './field-reports.service';
 import { AttachmentsController } from './attachments.controller';
