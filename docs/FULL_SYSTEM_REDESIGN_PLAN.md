@@ -265,7 +265,7 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | 0.4 | ErrorBoundary 未 commit 工作審查收尾 | OPUS | 🟢 | P0 |
 | 0.5 | docs 計數對帳＋superseded 標記（XC-2） | SONNET | 🟢 | P0 |
 | 1.1 | SYNC_TABLES production 禁用＋JWT secret 單點化（BE-2a/e） | OPUS | 🔴 | P1 |
-| 1.2 | baseline migration 生成與驗證（BE-2b/c） | OPUS | 🔴 | P1 |
+| 1.2 | baseline migration 生成與驗證（BE-2b/c）。**範圍擴充（1.3 執行時發現）**：① `1768494672978-AddDeletedAtColumns` migration 是重複 entity bug 的損壞產物（對不存在的欄位 DROP，真 DB 上必 throw，幾乎可確定從未套用 → **soft-delete 欄位在生產可能根本不存在**）② 生產 `audit_logs` 實體 schema 極可能仍是 snake_case 版，audit 模組的 camelCase 寫入一直被 `AuditService.log()` 吞錯靜默失敗 → **生產稽核記錄疑似長期空轉**。1.2 需一併：廢棄/重寫損壞 migration、對照生產實際 schema 產 reconciliation migration、驗證 audit 寫入真的落庫 | OPUS | 🔴 | P1（需 D7 窗口） |
 | 1.3 | audit_logs/attendance 重複 entity 收斂（BE-2d） | OPUS | 🟡 | P1 |
 | 1.4 | 31 裸 controller 掃描清單 | SONNET | 🟢 | P1 |
 | 1.5 | 逐端點定 RequiredLevel＋補 guard（BE-1） | OPUS | 🔴 | P1 |
