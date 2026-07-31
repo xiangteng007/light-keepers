@@ -19,7 +19,9 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
  * - POST endpoints: 需要 OFFICER 以上權限
  */
 @Controller('ncdr-alerts')
-@Throttle({ default: { limit: 30, ttl: 60000 } }) // 預設：每分鐘 30 次
+// 預設：每分鐘 30 次
+// 覆核（2026-08-01, BE-5）：30/min per IP 合理，維持——符合「public 查詢類 30/min」基準。
+@Throttle({ default: { limit: 30, ttl: 60000 } })
 export class NcdrAlertsController {
     constructor(private readonly ncdrAlertsService: NcdrAlertsService) { }
 

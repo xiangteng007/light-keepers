@@ -27,6 +27,9 @@ export class ReportsController {
     /**
      * 提交新災情回報 (公開，但需要速率限制)
      * 每分鐘最多 5 次請求
+     *
+     * 覆核（2026-08-01, BE-5）：5/min per IP 合理，維持。
+     * 匿名可寫入端點，為垃圾資料灌入面。
      */
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post()

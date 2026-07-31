@@ -21,6 +21,7 @@ import {
 import { getErrorMessage } from '../../common/utils/error-utils';
 import { Response, Request } from 'express';
 import { ApiTags, ApiOperation, ApiQuery, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, Public } from '../shared/guards';
 import { OAuthService } from './services/oauth.service';
 import { AuthService } from './auth.service';
@@ -59,6 +60,8 @@ export class AuthOAuthController {
     // ===== LINE OAuth =====
 
     @Public()
+    // 限流：10/min per IP —— 匿名可觸發的 OAuth 起始重導向
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Get('line')
     @ApiOperation({ summary: 'Redirect to LINE Login authorization page' })
     @ApiQuery({ name: 'redirect', required: false, description: 'URL to redirect after login' })
@@ -75,6 +78,8 @@ export class AuthOAuthController {
     }
 
     @Public()
+    // 限流：10/min per IP —— OAuth code 交換（IdP 已先驗證，非暴力破解面）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Get('line/callback')
     @ApiOperation({ summary: 'LINE OAuth callback handler' })
     async lineCallback(
@@ -174,6 +179,8 @@ export class AuthOAuthController {
     // ===== Google OAuth =====
 
     @Public()
+    // 限流：10/min per IP —— 匿名可觸發的 OAuth 起始重導向
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Get('google')
     @ApiOperation({ summary: 'Redirect to Google OAuth authorization page' })
     @ApiQuery({ name: 'redirect', required: false, description: 'URL to redirect after login' })
@@ -189,6 +196,8 @@ export class AuthOAuthController {
     }
 
     @Public()
+    // 限流：10/min per IP —— OAuth code 交換（IdP 已先驗證，非暴力破解面）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Get('google/callback')
     @ApiOperation({ summary: 'Google OAuth callback handler' })
     async googleCallback(

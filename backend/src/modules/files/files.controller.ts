@@ -5,6 +5,7 @@
 
 import { Controller, Get, Post, Delete, Param, Query, UseGuards, UseInterceptors, UploadedFile, Res, StreamableFile } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { Response } from 'express';
 import { FileStorageService } from './file-storage.service';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, CurrentUser } from '../shared/guards';
@@ -19,6 +20,9 @@ export class FilesController {
     /**
      * Upload a file
      */
+    // 限流：20/min —— 上傳類：單次請求即消耗儲存空間與頻寬，
+    // 為儲存濫用（storage abuse）主要面。志工現場連續上傳照片仍有餘裕。
+    @Throttle({ default: { limit: 20, ttl: 60000 } })
     @Post('upload')
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     @UseInterceptors(FileInterceptor('file'))

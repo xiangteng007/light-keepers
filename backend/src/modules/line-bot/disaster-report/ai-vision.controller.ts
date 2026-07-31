@@ -12,8 +12,13 @@ import {
     BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 import { AiClassificationService } from './ai-classification.service';
 
+// 限流：20/min（controller 級，套用全部 AI 分析端點）
+// 理由：等同上傳類——每次請求挾帶 base64 圖片並轉發至計費的外部 LLM Vision API，
+// 為成本濫用（cost abuse）主要面。個別端點可於方法上以 @Throttle 覆寫。
+@Throttle({ default: { limit: 20, ttl: 60000 } })
 @Controller('ai')
 export class AiVisionController {
     constructor(private readonly aiService: AiClassificationService) { }

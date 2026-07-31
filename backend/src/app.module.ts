@@ -1,8 +1,9 @@
 import { Module, NestModule, MiddlewareConsumer } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { ThrottlerModule, ThrottlerGuard, ThrottlerModuleOptions } from '@nestjs/throttler';
 import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { THROTTLER_CONFIG } from './common/config/throttler.config';
 import { DatabaseModule } from './modules/database/database.module';
 import { SharedAuthModule, GlobalAuthGuard } from './modules/shared/shared-auth.module';
 import { HealthModule } from './modules/health/health.module';
@@ -202,17 +203,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         ScheduleModule.forRoot(),
 
         // Rate Limiting (API Gateway)
-        ThrottlerModule.forRoot([
-            {
-                name: 'short',
-                ttl: 1000,   // 1秒
-                limit: 10,   // 最多10請求
-            },
-            {
-                name: 'long',
-                ttl: 60000,  // 1分鐘
-                limit: 100,  // 最多100請求
-            }]),
+        // 設定為 SSOT，見 common/config/throttler.config.ts（含 'default' 命名契約說明）
+        ThrottlerModule.forRoot(THROTTLER_CONFIG as unknown as ThrottlerModuleOptions),
 
         // Cloud SQL 連線 - 條件式初始化
         // 當 DB_REQUIRED=false 時，完全跳過 TypeORM 和 database 依賴
@@ -252,7 +244,7 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         AnalyticsModule, // 📊 AI 趨勢預測
         IntegrationsModule, // 🔗 外部 API 整合
         BackupModule, // 💾 數據備份
-        TenantModule, // 🏢 多租戶
+        TenantModule, // 🏢 組織資料管理（單租戶；歷史命名，見 ADR-001 Superseded）
         // ==============================================
         // P0: International NGO Standards (v5.0)
         // ==============================================

@@ -24,6 +24,7 @@ export class AuthController {
     ) { }
 
     @Public()
+    // 限流：5/min per IP —— 匿名建帳號，防批次註冊灌水
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('register')
     async register(@Body() dto: RegisterDto) {
@@ -31,7 +32,8 @@ export class AuthController {
     }
 
     @Public()
-    @Throttle({ default: { limit: 10, ttl: 60000 } })
+    // 限流：5/min per IP（原 10/min 收緊）—— 密碼登入為憑證暴力破解主要面
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('login')
     async login(
         @Body() dto: LoginDto,
@@ -115,6 +117,9 @@ export class AuthController {
      * LINE OAuth Callback
      * 前端重導向回來時，用 authorization code 換取 access token
      */
+    // 限流：10/min per IP —— OAuth code 交換，由 LINE 端先行驗證，
+    // 非密碼暴力破解面，故較密碼登入寬鬆；仍收緊於全域 100/min 基準。
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('line/callback')
     async lineCallback(
         @Body() body: { code: string; redirectUri: string },
@@ -140,6 +145,8 @@ export class AuthController {
      * LINE 登入
      * 前端透過 LINE SDK 取得 access token 後呼叫此 API
      */
+    // 限流：10/min per IP —— 社群登入（access token 交換）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('line/login')
     async loginWithLine(
         @Body() body: { accessToken: string },
@@ -165,6 +172,8 @@ export class AuthController {
      * LINE 註冊新帳號
      * 若 LINE 帳號未綁定，使用此 API 建立新帳號
      */
+    // 限流：5/min per IP —— 建帳號路徑，與 /auth/register 同級
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('line/register')
     async registerWithLine(@Body() body: { accessToken: string; displayName: string; email?: string; phone?: string }) {
         return this.authService.registerWithLine(body.accessToken, body.displayName, body.email, body.phone);
@@ -205,6 +214,8 @@ export class AuthController {
      * 前端在 LINE App 內透過 LIFF SDK 取得 ID Token 後呼叫此 API
      * 用於 SSO 無縫登入體驗
      */
+    // 限流：10/min per IP —— LIFF ID Token 登入
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('liff/login')
     async loginWithLiffToken(
         @Body() body: { idToken: string },
@@ -234,6 +245,8 @@ export class AuthController {
      * Google OAuth Callback
      * 前端重導向回來時，用 authorization code 換取 access token
      */
+    // 限流：10/min per IP —— OAuth code 交換（同 line/callback 理由）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('google/callback')
     async googleCallback(
         @Body() body: { code: string; redirectUri: string },
@@ -259,6 +272,8 @@ export class AuthController {
      * Google 登入
      * 前端透過 Google SDK 取得 access token 後呼叫此 API
      */
+    // 限流：10/min per IP —— 社群登入（access token 交換）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('google/login')
     async loginWithGoogle(
         @Body() body: { accessToken: string },
@@ -284,6 +299,8 @@ export class AuthController {
      * Google 註冊新帳號
      * 若 Google 帳號未綁定，使用此 API 建立新帳號
      */
+    // 限流：5/min per IP —— 建帳號路徑，與 /auth/register 同級
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('google/register')
     async registerWithGoogle(@Body() body: { accessToken: string; displayName?: string }) {
         return this.authService.registerWithGoogle(body.accessToken, body.displayName);
@@ -329,6 +346,8 @@ export class AuthController {
      * 前端透過 Firebase SDK 取得 ID Token 後呼叫此 API
      * 用於 Email/Password 和 Google Popup 登入方式
      */
+    // 限流：10/min per IP —— Firebase ID Token 登入（含 Email/Password popup 流程）
+    @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('firebase/login')
     async loginWithFirebaseToken(
         @Body() body: { idToken: string },
@@ -368,6 +387,8 @@ export class AuthController {
     /**
      * 變更密碼
      */
+    // 限流：5/min —— 需帶現行密碼，防已竊 token 者暴力猜舊密碼
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('change-password')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async changePassword(
@@ -381,6 +402,8 @@ export class AuthController {
      * 設定密碼（針對 OAuth 帳號）
      * 只有透過 LINE/Google 登入且尚未設定密碼的帳號可用
      */
+    // 限流：5/min —— 帳號接管敏感操作
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('set-password')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async setPassword(
@@ -427,6 +450,8 @@ export class AuthController {
     /**
      * 發送手機 OTP 驗證碼 (SMS - 備用)
      */
+    // 限流：5/min per IP —— OTP 發送，防簡訊轟炸與計費濫用
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-otp')
     async sendPhoneOtp(@Body() body: { phone: string }) {
         return this.authService.sendPhoneOtp(body.phone);
@@ -435,6 +460,8 @@ export class AuthController {
     /**
      * 發送 LINE OTP 驗證碼
      */
+    // 限流：5/min —— OTP 發送，防訊息轟炸
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-line-otp')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async sendLineOtp(@Request() req: { user: { lineUserId?: string } }) {
@@ -447,6 +474,8 @@ export class AuthController {
     /**
      * 驗證 LINE OTP
      */
+    // 限流：5/min —— OTP 驗證，防 6 位數驗證碼窮舉
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('verify-line-otp')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async verifyLineOtp(
@@ -462,6 +491,8 @@ export class AuthController {
     /**
      * 驗證手機 OTP
      */
+    // 限流：5/min per IP —— OTP 驗證，防驗證碼窮舉
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('verify-otp')
     async verifyPhoneOtp(@Body() body: { phone: string; code: string }) {
         return this.authService.verifyPhoneOtp(body.phone, body.code);
@@ -470,6 +501,8 @@ export class AuthController {
     /**
      * 發送 Email OTP 驗證碼
      */
+    // 限流：5/min per IP —— OTP 發送，防 email 轟炸與寄信配額濫用
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-email-otp')
     async sendEmailOtp(@Body() body: { email: string }) {
         return this.authService.sendEmailOtp(body.email);
@@ -478,6 +511,8 @@ export class AuthController {
     /**
      * 驗證 Email OTP
      */
+    // 限流：5/min per IP —— OTP 驗證，防驗證碼窮舉
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('verify-email-otp')
     async verifyEmailOtp(@Body() body: { email: string; code: string }) {
         return this.authService.verifyEmailOtp(body.email, body.code);
@@ -487,6 +522,8 @@ export class AuthController {
      * 發送自訂 Email 驗證信（使用 Resend）
      * 連結將使用 lightkeepers.ngo 網域
      */
+    // 限流：5/min per IP —— 觸發外部寄信，防濫發
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-custom-verification')
     async sendCustomVerificationEmail(@Body() body: { email: string; displayName?: string }) {
         return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
@@ -495,6 +532,8 @@ export class AuthController {
     /**
      * 重新發送驗證信
      */
+    // 限流：5/min per IP —— 觸發外部寄信，防濫發
+    @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('resend-verification')
     async resendVerificationEmail(@Body() body: { email: string; displayName?: string }) {
         return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
@@ -504,6 +543,8 @@ export class AuthController {
      * 檢查 Email 驗證狀態
      * 用於 Firebase 驗證連結後的狀態同步
      */
+    // 限流：30/min per IP —— 前端輪詢驗證狀態，屬查詢類
+    @Throttle({ default: { limit: 30, ttl: 60000 } })
     @Get('check-email-verification')
     async checkEmailVerification(@Body() body: { email: string }) {
         return this.authService.checkEmailVerificationStatus(body.email);
@@ -518,6 +559,7 @@ export class AuthController {
      * @Public - No auth required
      */
     @Public()
+    // 限流：5/min per IP —— 覆核：合理。觸發外部寄信＋帳號列舉探測面
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('forgot-password')
     async forgotPassword(@Body() body: { email?: string; phone?: string }) {
@@ -529,6 +571,7 @@ export class AuthController {
      * @Public - No auth required (uses reset token for verification)
      */
     @Public()
+    // 限流：5/min per IP —— 覆核：合理。防重設 token 窮舉
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('reset-password')
     async resetPassword(@Body() body: { token: string; newPassword: string }) {
@@ -570,6 +613,8 @@ export class AuthController {
      * Returns: new accessToken
      */
     @Public()
+    // 限流：30/min per IP —— 覆核：維持。多分頁／多裝置會正常併發換發，
+    // 過嚴會誤傷正常使用；refresh token 本身為高熵值，窮舉不可行。
     @Throttle({ default: { limit: 30, ttl: 60000 } })
     @Post('refresh')
     async refreshToken(
