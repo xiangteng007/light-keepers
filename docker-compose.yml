@@ -34,7 +34,12 @@ services:
     environment:
       NODE_ENV: development
       PORT: 3000
-      DATABASE_URL: postgresql://postgres:${DB_PASSWORD:?DB_PASSWORD is required}@postgres:5432/lightkeepers
+      # backend 只讀這些 DB_* 變數（src 內無 DATABASE_URL 的讀取點）
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_USERNAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required - set in .env file}
+      DB_DATABASE: lightkeepers
       JWT_SECRET: ${JWT_SECRET:?JWT_SECRET is required - set in .env file}
       GEMINI_API_KEY: ${GEMINI_API_KEY}
     ports:
