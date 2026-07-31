@@ -8,14 +8,19 @@ import {
     Param,
     Query,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { VolunteersService, CreateVolunteerDto, UpdateVolunteerDto, VolunteerFilter, EligibilityFilter } from './volunteers.service';
 import { VolunteerStatus } from './volunteers.entity';
 // Use unified guards from SharedAuthModule
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
 
+// 🔐 F-M2 敏感資料遮罩：志工資料含身分證、電話、地址、生日、緊急聯絡人，
+// L2（幹部）在此可讀取名單但看不到完整個資；L3+ 或本人才看得到原文。
 @Controller('volunteers')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard) // 🔐 統一認證 + 權限守衛
+@UseInterceptors(SensitiveDataInterceptor)
 @RequiredLevel(ROLE_LEVELS.OFFICER) // 預設需要幹部以上等級
 export class VolunteersController {
     constructor(private readonly volunteersService: VolunteersService) { }

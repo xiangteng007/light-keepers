@@ -8,9 +8,11 @@ import {
     ParseUUIDPipe,
     HttpStatus,
     UseGuards,
+    UseInterceptors,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { Throttle } from '@nestjs/throttler';
+import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
 import { IntakeService } from './intake.service';
 import { CreateIntakeDto, IntakeResponseDto } from './dto/intake.dto';
 import { IntakeReport, IntakeReportStatus, IntakeReportType } from './entities/intake-report.entity';
@@ -22,8 +24,13 @@ import { Public, CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } f
 // 全部查詢端點定為 L2（幹部），修正「任何登入者可列出全部災情通報個資」的缺口。
 // 注意：Guard 只能掛在 handler 而不能掛 class——CoreJwtGuard 不認 `@Public()`（見 core-jwt.guard.ts），
 // 一旦掛在 class 上會連匿名通報一起擋掉。
+// 🔐 F-M2 敏感資料遮罩：通報記錄含通報人電話（reporterPhone）與 geo.address，
+// 對 L2 幹部遮罩，L3+ 才看得到原文。
+// 掛在 class 上是安全的：唯一的 `@Public()` 端點（建立通報）只回傳 IntakeResponseDto
+// （intakeId / incidentId / isNewIncident），不含任何個資，不受遮罩影響。
 @ApiTags('Intake (統一通報入口)')
 @Controller('intake')
+@UseInterceptors(SensitiveDataInterceptor)
 export class IntakeController {
     constructor(private readonly intakeService: IntakeService) { }
 

@@ -3,9 +3,10 @@
  * Phase 5.4: 災民協尋 API
  */
 
-import { Controller, Get, Post, Put, Param, Body, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Put, Param, Body, Query, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-data.interceptor';
 import { ReunificationService } from './reunification.service';
 import { MissingPerson, MissingPersonStatus } from './entities';
 
@@ -18,8 +19,10 @@ import { MissingPerson, MissingPersonStatus } from './entities';
 //   的實作，未設定等級即直接放行，等於只驗登入。本次補上實際等級：
 //   `reports`（新增報案）L2、依任務列出失蹤者／統計 L2（跨人員個資清單）、
 //   標記尋獲／團聚 L2（改寫個案狀態，會連動對外通知與家屬期待，屬督導職權）。
+// 🔐 F-M2 敏感資料遮罩：失蹤者與報案者的聯絡電話對 L2 幹部遮罩，L3+ 才看得到原文。
 @ApiTags('reunification')
 @Controller('reunification')
+@UseInterceptors(SensitiveDataInterceptor)
 export class ReunificationController {
     constructor(private readonly reunificationService: ReunificationService) { }
 

@@ -9,10 +9,12 @@ import {
     Param,
     Query,
     UseGuards,
+    UseInterceptors,
     ParseUUIDPipe,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
+import { SensitiveDataInterceptor, SkipSensitiveMask } from '../../common/interceptors/sensitive-data.interceptor';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { SheltersService } from './shelters.service';
 import {
@@ -31,8 +33,11 @@ import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 @ApiTags('Shelters')
 @ApiBearerAuth()
+// 🔐 F-M2 敏感資料遮罩：收容者（ShelterEvacuee）含身分證、電話、緊急聯絡人，
+// L1 志工可執行報到／查床位但看不到完整個資；L3+ 才看得到原文。
 @Controller('shelters')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@UseInterceptors(SensitiveDataInterceptor)
 export class SheltersController {
     constructor(private sheltersService: SheltersService) {}
 
@@ -48,8 +53,13 @@ export class SheltersController {
         return this.toShelterResponse(shelter);
     }
 
+    // ShelterResponseDto.address 是「收容所設施地點」而非個人住址，遮罩會讓志工無法導航到收容所，
+    // 因此設施型端點一律略過遮罩。
+    // 註：create / activate / deactivate 同樣回傳 ShelterResponseDto，但已要求 L3，
+    //     依 SENSITIVE_MASK_MIN_ROLE_LEVEL 本來就不會被遮罩，毋須標記。
     @Get()
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
+    @SkipSensitiveMask()
     @ApiOperation({ summary: 'List all shelters' })
     @ApiQuery({ name: 'status', enum: ShelterStatus, required: false })
     async findAll(
@@ -63,6 +73,7 @@ export class SheltersController {
 
     @Get(':id')
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
+    @SkipSensitiveMask()
     @ApiOperation({ summary: 'Get shelter by ID' })
     @ApiParam({ name: 'id', type: 'string' })
     async findById(
