@@ -3,8 +3,41 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 /**
+ * Resolve the TypeORM `synchronize` flag.
+ *
+ * SAFETY INVARIANT: schema auto-sync is HARD-DISABLED in production.
+ * `SYNC_TABLES=true` lets TypeORM rewrite the live schema (drop/alter columns,
+ * drop indexes) on every boot. In production that is unrecoverable data loss,
+ * so a single stray env var must never be able to enable it.
+ *
+ * Non-production (development / staging / test) keeps the existing behaviour:
+ * staging currently still relies on SYNC_TABLES=true until the baseline
+ * migration lands, at which point this flag can be removed entirely.
+ *
+ * Exported for unit testing.
+ */
+export function resolveSynchronize(env: NodeJS.ProcessEnv = process.env): boolean {
+    const isProduction = env.NODE_ENV === 'production';
+    const syncRequested = env.SYNC_TABLES === 'true';
+
+    if (isProduction) {
+        if (syncRequested) {
+            console.error(
+                '[TypeORM] SECURITY: SYNC_TABLES=true was requested while NODE_ENV=production. ' +
+                'Schema auto-synchronize is HARD-DISABLED in production and this setting has been ignored. ' +
+                'Use migrations (npm run migration:run) to change the production schema. ' +
+                'Remove SYNC_TABLES from the production deployment configuration.',
+            );
+        }
+        return false;
+    }
+
+    return syncRequested;
+}
+
+/**
  * Conditional Database Module
- * 
+ *
  * This module provides conditional TypeORM initialization based on the DB_REQUIRED environment variable.
  * When DB_REQUIRED=false, it returns an empty module to allow the application to start without database access.
  * This is useful for CI health checks and environments where the database is unavailable.
@@ -61,7 +94,8 @@ export class DatabaseModule {
                             password: process.env.DB_PASSWORD,
                             database: process.env.DB_DATABASE || 'lightkeepers',
                             autoLoadEntities: true,
-                            synchronize: process.env.SYNC_TABLES === 'true',
+                            // Hard-disabled in production regardless of SYNC_TABLES (see resolveSynchronize)
+                            synchronize: resolveSynchronize(process.env),
                             logging: !isProduction ? ['error', 'warn', 'query'] : ['error'],
                             retryAttempts: isProduction ? 5 : 3,
                             retryDelay: isProduction ? 5000 : 3000,
