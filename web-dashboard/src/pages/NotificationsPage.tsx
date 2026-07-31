@@ -17,11 +17,15 @@ const EMPTY_NOTIFICATIONS: Array<{
     read: boolean;
 }> = [];
 
+// `color` is not currently consumed by any inline style in this file (Badge
+// variants below are set via an independent ternary), but is tokenized here
+// per the design-token migration so any future usage points at the semantic
+// source of truth. Fallback hex kept identical for zero visual change.
 const TYPE_CONFIG = {
-    alert: { label: '警報', color: '#F44336' },
-    assignment: { label: '任務', color: '#2196F3' },
-    training: { label: '培訓', color: '#4CAF50' },
-    system: { label: '系統', color: '#607D8B' },
+    alert: { label: '警報', color: 'var(--color-danger, #F44336)' },
+    assignment: { label: '任務', color: 'var(--color-info, #2196F3)' },
+    training: { label: '培訓', color: 'var(--color-success, #4CAF50)' },
+    system: { label: '系統', color: 'var(--text-tertiary, #607D8B)' },
 };
 
 type NotificationType = keyof typeof TYPE_CONFIG;

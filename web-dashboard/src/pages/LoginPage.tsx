@@ -4,6 +4,23 @@ import { useState, useEffect } from 'react';
  * Light Keepers Login Page
  * Design: Industrial Cyberpunk Command Center
  * Key Feature: Digital Clock Display + OAuth Buttons
+ *
+ * FE-2 (2.5) skin-migration note (see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md §4):
+ * This page does NOT import `LoginPage.css` (that file is actually consumed by
+ * BindLinePage / ForgotPasswordPage / ResetPasswordPage — a pre-existing naming
+ * collision, left untouched here to avoid scope creep). All visual styling below
+ * lives in the inline `styles` object plus an injected <style> keyframes block,
+ * not in a page .css file, so the checklist's `git grep "#[0-9a-fA-F]{3,8}" <page>.css`
+ * step matches nothing.
+ * The look is an intentionally bespoke, fully dark "industrial cyberpunk" auth
+ * experience (amber/cyan HUD on navy gradient) that does not participate in the
+ * light/dark `data-theme` toggle by design — converting its ~30 inline hex/rgba
+ * literals to app-semantic tokens would risk breaking this deliberate one-off
+ * brand identity for no visual-parity benefit, so it is left as a documented
+ * exception rather than force-fitted. Only the one value that is an exact,
+ * coincidental match for an existing semantic token (`--color-success`) was
+ * swapped below; everything else (amber accents, HUD cyan, navy gradients) is
+ * kept as bespoke brand color.
  */
 
 // Keyframe animations as style element
@@ -323,12 +340,12 @@ const LoginPage: React.FC = () => {
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: '#22C55E',
+            background: 'var(--color-success, #22C55E)',
             animation: 'pulse-glow 2s ease-in-out infinite',
         },
         statusText: {
             fontSize: '11px',
-            color: '#22C55E',
+            color: 'var(--color-success, #22C55E)',
             letterSpacing: '0.2em',
         },
         // Right form panel (main content, always visible)

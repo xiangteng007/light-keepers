@@ -40,6 +40,11 @@ const DISASTER_TYPES = [
 ];
 
 // 嚴重程度選項
+// NOTE: these must stay literal hex (not var(--token, ...)) because they are
+// consumed via string concatenation for an alpha-blend hack (`${color}20`,
+// see below) which requires an actual hex string, not a CSS custom property
+// reference. `critical` (#9C27B0 purple) also has no semantic token
+// equivalent — it's a 4th escalation tier beyond --color-danger.
 const SEVERITY_LEVELS = [
     { value: 'low', label: '輕微', color: '#4CAF50', description: '無立即危險' },
     { value: 'medium', label: '中等', color: '#FF9800', description: '需要關注' },

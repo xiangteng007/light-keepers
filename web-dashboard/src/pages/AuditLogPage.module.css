@@ -94,7 +94,7 @@
     background: transparent;
     border: none;
     outline: none;
-    color: #fff;
+    color: var(--text-primary, #fff);
     font-size: 14px;
 }
 
@@ -118,7 +118,7 @@
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    color: #fff;
+    color: var(--text-primary, #fff);
     font-size: 14px;
     cursor: pointer;
 }
@@ -126,6 +126,25 @@
 .filterSelect option {
     background: var(--surface-default, #111B2E);
     color: var(--text-primary, #fff);
+}
+
+/* Error banner wrapper (holds the design-system Alert) */
+.errorBannerWrap {
+    margin-bottom: 20px;
+}
+
+/* Loading overlay
+   NOTE: this class was referenced in AuditLogPage.tsx (styles.loadingOverlay)
+   but never defined here, so the loading state previously rendered
+   completely unstyled. Added as part of the token migration since it is a
+   trivial, low-risk style-only fix in scope with cleaning up this page. */
+.loadingOverlay {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 48px 0;
+    color: rgba(255, 255, 255, 0.5);
 }
 
 /* Stats */
@@ -149,7 +168,7 @@
 .statValue {
     font-size: 24px;
     font-weight: 600;
-    color: #fff;
+    color: var(--text-primary, #fff);
 }
 
 .statLabel {

@@ -1,5 +1,16 @@
 /* 📣 回報系統頁面樣式 - Wizard 版本 */
 
+/* NOTE (design-token migration): the two-stop brand gradients in this file
+   (#667eea → #764ba2 "wizard purple", plus the light-tint success/warning/
+   danger gradient chips such as #d1fae5→#a7f3d0, #fef3c7→#fde68a,
+   #FEE2E2→#FECACA, #eef2ff→#e0e7ff) are page-private decorative brand
+   treatments with no 1:1 semantic token equivalent (tokens.css has flat
+   status colors, not two-stop gradients), so they are intentionally left as
+   literal hex rather than forced into a var(). Solid text/border/background/
+   status colors below are converted to var(--token, original-hex) so the
+   page still renders identically today while pointing at the semantic
+   source of truth. */
+
 .report-page {
     padding: 1rem;
     max-width: 720px;
@@ -28,7 +39,7 @@
 }
 
 .report-page .page-subtitle {
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     font-size: 0.9rem;
 }
 
@@ -60,8 +71,8 @@
     justify-content: center;
     font-weight: 600;
     font-size: 1rem;
-    background: #e2e8f0;
-    color: #94a3b8;
+    background: var(--border-light, #e2e8f0);
+    color: var(--text-tertiary, #94a3b8);
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
@@ -82,17 +93,17 @@
     margin-top: 0.5rem;
     font-size: 0.75rem;
     font-weight: 500;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
     text-align: center;
 }
 
 .wizard-progress__step.active .wizard-progress__label {
-    color: #667eea;
+    color: #667eea; /* bespoke wizard brand accent, see file-header note */
     font-weight: 600;
 }
 
 .wizard-progress__step.completed .wizard-progress__label {
-    color: #059669;
+    color: var(--color-success-dark, #059669);
 }
 
 .wizard-progress__line {
@@ -101,7 +112,7 @@
     left: calc(50% + 25px);
     width: calc(100% - 50px);
     height: 3px;
-    background: #e2e8f0;
+    background: var(--border-light, #e2e8f0);
     z-index: 0;
 }
 
@@ -141,12 +152,12 @@
 .wizard-step__title {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
     margin-bottom: 0.25rem;
 }
 
 .wizard-step__subtitle {
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
 }
@@ -160,7 +171,7 @@
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1.5rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-light, #e2e8f0);
 }
 
 .wizard-navigation__spacer {
@@ -193,11 +204,11 @@
 .disaster-type-card:hover {
     transform: translateY(-4px);
     box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #cbd5e1;
+    border-color: var(--border-default, #cbd5e1);
 }
 
 .disaster-type-card.active {
-    border-color: #667eea;
+    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
     background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
     box-shadow: 0 8px 20px -3px rgba(102, 126, 234, 0.3);
 }
@@ -210,17 +221,17 @@
 .disaster-type-card__label {
     font-size: 0.95rem;
     font-weight: 600;
-    color: #334155;
+    color: var(--text-primary, #334155);
     margin-bottom: 0.25rem;
 }
 
 .disaster-type-card.active .disaster-type-card__label {
-    color: #667eea;
+    color: #667eea; /* bespoke wizard brand accent, see file-header note */
 }
 
 .disaster-type-card__desc {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
 }
 
 /* =====================================
@@ -238,7 +249,7 @@
     align-items: center;
     gap: 0.375rem;
     padding: 1rem 0.5rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 14px;
     background: white;
     cursor: pointer;
@@ -247,7 +258,7 @@
 }
 
 .severity-btn:hover {
-    background: #f8fafc;
+    background: var(--bg-secondary, #f8fafc);
     transform: scale(1.02);
 }
 
@@ -265,12 +276,12 @@
 .severity-label {
     font-weight: 600;
     font-size: 0.9rem;
-    color: #334155;
+    color: var(--text-primary, #334155);
 }
 
 .severity-desc {
     font-size: 0.7rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
 }
 
 /* =====================================
@@ -313,23 +324,23 @@
 
 .location-status-label {
     font-weight: 600;
-    color: #334155;
+    color: var(--text-primary, #334155);
 }
 
 .location-status-coords {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     font-family: 'Monaco', 'Courier New', monospace;
 }
 
 .location-status-hint {
     font-size: 0.85rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
 }
 
 .location-refresh-btn {
     padding: 0.625rem 1rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 10px;
     background: white;
     font-size: 0.85rem;
@@ -340,8 +351,8 @@
 }
 
 .location-refresh-btn:hover {
-    background: #f8fafc;
-    border-color: #667eea;
+    background: var(--bg-secondary, #f8fafc);
+    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
     color: #667eea;
 }
 
@@ -359,8 +370,8 @@
     height: 200px;
     background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
     border-radius: 16px;
-    border: 2px dashed #cbd5e1;
-    color: #94a3b8;
+    border: 2px dashed var(--border-default, #cbd5e1);
+    color: var(--text-tertiary, #94a3b8);
     margin-top: 1rem;
 }
 
@@ -375,7 +386,7 @@
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    background: #f8fafc;
+    background: var(--bg-secondary, #f8fafc);
     padding: 1.5rem;
     border-radius: 16px;
     margin-bottom: 1.5rem;
@@ -396,23 +407,23 @@
 .confirm-label {
     font-size: 0.85rem;
     font-weight: 500;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     min-width: 80px;
 }
 
 .confirm-value {
     font-weight: 600;
-    color: #334155;
+    color: var(--text-primary, #334155);
 }
 
 .confirm-description {
     background: white;
     padding: 1rem;
     border-radius: 10px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-light, #e2e8f0);
     width: 100%;
     margin: 0;
-    color: #475569;
+    color: var(--text-secondary, #475569);
     line-height: 1.6;
 }
 
@@ -427,7 +438,7 @@
     height: 60px;
     object-fit: cover;
     border-radius: 10px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
 }
 
 .severity-badge {
@@ -440,7 +451,7 @@
 }
 
 .contact-section {
-    background: #f8fafc;
+    background: var(--bg-secondary, #f8fafc);
     padding: 1.25rem;
     border-radius: 14px;
 }
@@ -448,7 +459,7 @@
 .contact-section h4 {
     margin: 0 0 1rem 0;
     font-size: 0.95rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 /* =====================================
@@ -463,41 +474,41 @@
 
 .form-label {
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
     font-size: 0.95rem;
 }
 
 .form-input,
 .form-textarea {
     padding: 0.875rem 1rem;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     border-radius: 12px;
     font-size: 1rem;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: #f8fafc;
+    background: var(--bg-secondary, #f8fafc);
 }
 
 .form-input:focus,
 .form-textarea:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
     background: white;
     box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
 }
 
 .form-input::placeholder,
 .form-textarea::placeholder {
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
 }
 
 .report-error {
     background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: #DC2626;
+    color: var(--color-danger, #DC2626);
     padding: 0.875rem 1rem;
     border-radius: 12px;
     font-size: 0.9rem;
     font-weight: 500;
-    border-left: 4px solid #DC2626;
+    border-left: 4px solid var(--color-danger, #DC2626);
     margin-bottom: 1rem;
 }
 
@@ -522,7 +533,7 @@
     aspect-ratio: 1;
     border-radius: 14px;
     overflow: hidden;
-    border: 2px solid #e2e8f0;
+    border: 2px solid var(--border-light, #e2e8f0);
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -569,18 +580,18 @@
     gap: 0.5rem;
     width: 100%;
     aspect-ratio: 1;
-    border: 2px dashed #cbd5e1;
+    border: 2px dashed var(--border-default, #cbd5e1);
     border-radius: 14px;
     background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
     cursor: pointer;
     transition: all 0.3s;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     font-size: 0.7rem;
     font-weight: 500;
 }
 
 .photo-add-btn:hover {
-    border-color: #667eea;
+    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
     background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
     color: #667eea;
     transform: scale(1.02);
@@ -592,12 +603,12 @@
 
 .photo-hint {
     font-size: 0.8rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
     margin: 0;
     padding: 0.5rem 0.75rem;
-    background: #f8fafc;
+    background: var(--bg-secondary, #f8fafc);
     border-radius: 8px;
-    border-left: 3px solid #667eea;
+    border-left: 3px solid #667eea; /* bespoke wizard brand accent, see file-header note */
 }
 
 /* =====================================
@@ -631,12 +642,12 @@
 .report-success h2 {
     font-size: 1.5rem;
     font-weight: 700;
-    color: #059669;
+    color: var(--color-success-dark, #059669);
     margin-bottom: 0.5rem;
 }
 
 .report-success p {
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     margin-bottom: 0;
 }
 

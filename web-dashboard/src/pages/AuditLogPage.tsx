@@ -21,6 +21,7 @@ import {
     Loader2,
 } from 'lucide-react';
 import api from '../utils/api';
+import { Alert } from '../design-system';
 import styles from './AuditLogPage.module.css';
 
 interface AuditLog {
@@ -191,8 +192,8 @@ const AuditLogPage: React.FC = () => {
 
             {/* Error */}
             {error && (
-                <div className={styles.errorBanner}>
-                    <AlertTriangle size={16} /> {error}
+                <div className={styles.errorBannerWrap}>
+                    <Alert variant="danger" icon={<AlertTriangle size={16} />}>{error}</Alert>
                 </div>
             )}
 
@@ -242,7 +243,7 @@ const AuditLogPage: React.FC = () => {
                         <tbody>
                             {filteredLogs.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                                    <td colSpan={7} style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #64748b)' }}>
                                         {error ? '載入失敗' : '暫無稽核日誌'}
                                     </td>
                                 </tr>

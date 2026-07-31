@@ -103,12 +103,13 @@ const saveStoredTypes = (types: number[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(types));
 };
 
-// 嚴重程度顏色
+// 嚴重程度顏色 (muted variants mapped to the matching semantic status token;
+// fallback hex kept identical so the deliberately desaturated tone is preserved)
 const getSeverityColor = (severity: string) => {
     switch (severity) {
-        case 'critical': return '#B85C5C';
-        case 'warning': return '#C9A256';
-        default: return '#5C7B8E';
+        case 'critical': return 'var(--color-danger, #B85C5C)';
+        case 'warning': return 'var(--color-warning, #C9A256)';
+        default: return 'var(--color-info, #5C7B8E)';
     }
 };
 
@@ -372,7 +373,10 @@ export default function NcdrAlertsPage() {
                         )}
                         {/* 管理員推播按鈕 */}
                         {isAdmin && lineBotStats?.botEnabled && (
-                            <div className="ncdr-alert__actions" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
+                            /* NOTE: var(--color-border) has no fallback and no matching definition in
+                               tokens.css, so this border-top currently renders as invalid/no-op.
+                               Fixed below to use the canonical --border-default token with a fallback. */
+                            <div className="ncdr-alert__actions" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-default, #E2E8F0)' }}>
                                 <Button
                                     variant="secondary"
                                     size="sm"
@@ -396,7 +400,7 @@ export default function NcdrAlertsPage() {
                         right: '2rem',
                         padding: '1rem 1.5rem',
                         borderRadius: '0.5rem',
-                        backgroundColor: broadcastResult.success ? 'var(--color-success)' : 'var(--color-danger)',
+                        backgroundColor: broadcastResult.success ? 'var(--color-success, #22C55E)' : 'var(--color-danger, #EF4444)',
                         color: 'white',
                         boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
                         zIndex: 1000,

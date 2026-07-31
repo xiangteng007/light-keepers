@@ -41,7 +41,7 @@
 .kpi-card__title {
     font-size: 0.75rem;
     font-weight: 600;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
@@ -49,41 +49,41 @@
 .kpi-card__value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
     line-height: 1.1;
 }
 
 .kpi-card__subtitle {
     font-size: 0.875rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     margin-top: 0.25rem;
 }
 
 .kpi-card__detail {
     margin-top: 0.75rem;
     padding-top: 0.75rem;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid var(--border-default, #e2e8f0);
     font-size: 0.8rem;
 }
 
 .kpi-detail--success {
-    color: #16a34a;
+    color: var(--color-success-dark, #16a34a);
 }
 
 .kpi-detail--warning {
-    color: #d97706;
+    color: var(--color-warning-dark, #d97706);
 }
 
 .kpi-detail--danger {
-    color: #dc2626;
+    color: var(--color-danger-dark, #dc2626);
 }
 
 .kpi-detail--info {
-    color: #0891b2;
+    color: var(--color-info-dark, #0891b2);
 }
 
 .kpi-detail--neutral {
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 /* 圖表卡片 */
@@ -114,7 +114,7 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 .no-data-placeholder span {
@@ -153,62 +153,65 @@
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem;
-    background: #f8fafc;
-    border-radius: 8px;
+    background: var(--bg-secondary, #f8fafc);
+    border-radius: var(--radius-md, 8px);
     transition: background 0.2s;
 }
 
 .activity-item:hover {
-    background: #f1f5f9;
+    background: var(--surface-hover, #f1f5f9);
 }
 
 .activity-badge {
     font-size: 0.7rem;
     font-weight: 600;
     padding: 0.25rem 0.5rem;
-    border-radius: 4px;
+    border-radius: var(--radius-xs, 4px);
     white-space: nowrap;
 }
 
 .badge-success {
-    background: #dcfce7;
-    color: #16a34a;
+    /* --color-success-bg has no equivalent in tokens.css (unlike warning/danger/info);
+       use color-mix to derive a matching tint from --color-success, same pattern as
+       ResourcesPage.css .log-type--in */
+    background: color-mix(in srgb, var(--color-success, #16a34a) 12%, transparent);
+    color: var(--color-success-dark, #16a34a);
 }
 
 .badge-danger {
-    background: #fee2e2;
-    color: #dc2626;
+    background: var(--color-danger-bg, #fee2e2);
+    color: var(--color-danger-dark, #dc2626);
 }
 
 .badge-warning {
-    background: #fef3c7;
-    color: #d97706;
+    background: var(--color-warning-bg, #fef3c7);
+    color: var(--color-warning-dark, #d97706);
 }
 
 .badge-info {
-    background: #e0f2fe;
-    color: #0284c7;
+    background: var(--color-info-bg, #e0f2fe);
+    color: var(--color-info-dark, #0284c7);
 }
 
 .badge-primary {
-    background: #dbeafe;
-    color: #2563eb;
+    background: var(--color-info-bg, #dbeafe);
+    color: var(--color-info-dark, #2563eb);
 }
 
 .badge-secondary {
-    background: #e2e8f0;
-    color: #475569;
+    background: var(--border-default, #e2e8f0);
+    color: var(--text-secondary, #475569);
 }
 
 .badge-critical {
-    background: #fee2e2;
-    color: #dc2626;
+    background: var(--color-danger-bg, #fee2e2);
+    color: var(--color-danger-dark, #dc2626);
 }
 
 .activity-text {
     flex: 1;
     font-size: 0.875rem;
-    color: #334155;
+    color: var(--text-primary, #334155);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -216,14 +219,14 @@
 
 .activity-meta {
     font-size: 0.75rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
     white-space: nowrap;
 }
 
 .activity-empty {
     text-align: center;
     padding: 2rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
     font-size: 0.875rem;
 }
 

@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import api from '../../../utils/api';
+import { Alert } from '../../../design-system';
+import './AttendancePage.css';
 
 interface AttendanceRecord {
     id: string;
@@ -56,11 +58,11 @@ export default function AttendancePage() {
     }, [fetchRecords]);
 
     const getStatusBadge = (status: string) => {
-        const config: Record<string, { bg: string; label: string }> = {
-            present: { bg: 'bg-green-500', label: '出席' },
-            absent: { bg: 'bg-red-500', label: '缺席' },
-            late: { bg: 'bg-yellow-500', label: '遲到' },
-            'early-leave': { bg: 'bg-orange-500', label: '早退' },
+        const config: Record<string, { modifier: string; label: string }> = {
+            present: { modifier: 'attendance-badge--present', label: '出席' },
+            absent: { modifier: 'attendance-badge--absent', label: '缺席' },
+            late: { modifier: 'attendance-badge--late', label: '遲到' },
+            'early-leave': { modifier: 'attendance-badge--early-leave', label: '早退' },
         };
         return config[status] || config.present;
     };
@@ -73,54 +75,50 @@ export default function AttendancePage() {
     };
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div><h1 className="text-2xl font-bold text-white">出勤追蹤</h1><p className="text-gray-400">志工簽到管理</p></div>
-                <div className="flex gap-4">
-                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="px-4 py-2 bg-slate-800 border border-slate-700 rounded-lg text-white" aria-label="選擇日期" />
-                    <button onClick={fetchRecords} disabled={loading} className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400 disabled:opacity-50">
+        <div className="attendance-page">
+            <div className="attendance-header">
+                <div><h1 className="attendance-title">出勤追蹤</h1><p className="attendance-subtitle">志工簽到管理</p></div>
+                <div className="attendance-controls">
+                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="attendance-date-input" aria-label="選擇日期" />
+                    <button onClick={fetchRecords} disabled={loading} className="attendance-refresh-btn">
                         {loading ? '載入中...' : '重新整理'}
                     </button>
                 </div>
             </div>
 
             {/* Error */}
-            {error && (
-                <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                    ⚠️ {error}
-                </div>
-            )}
+            {error && <Alert variant="danger">{error}</Alert>}
 
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"><p className="text-gray-400 text-sm">總計</p><p className="text-2xl font-bold text-white">{stats.total}</p></div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"><p className="text-gray-400 text-sm">出席</p><p className="text-2xl font-bold text-green-400">{stats.present}</p></div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"><p className="text-gray-400 text-sm">缺席</p><p className="text-2xl font-bold text-red-400">{stats.absent}</p></div>
-                <div className="bg-slate-800/50 rounded-lg p-4 border border-slate-700"><p className="text-gray-400 text-sm">遲到</p><p className="text-2xl font-bold text-yellow-400">{stats.late}</p></div>
+            <div className="attendance-stats-grid">
+                <div className="attendance-stat-card"><p className="attendance-stat-label">總計</p><p className="attendance-stat-value">{stats.total}</p></div>
+                <div className="attendance-stat-card"><p className="attendance-stat-label">出席</p><p className="attendance-stat-value attendance-stat-value--success">{stats.present}</p></div>
+                <div className="attendance-stat-card"><p className="attendance-stat-label">缺席</p><p className="attendance-stat-value attendance-stat-value--danger">{stats.absent}</p></div>
+                <div className="attendance-stat-card"><p className="attendance-stat-label">遲到</p><p className="attendance-stat-value attendance-stat-value--warning">{stats.late}</p></div>
             </div>
 
             {/* Loading */}
             {loading && (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', color: '#94a3b8' }}>
+                <div className="attendance-loading">
                     載入中...
                 </div>
             )}
 
             {!loading && (
-                <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
-                    <table className="w-full">
-                        <thead><tr className="border-b border-slate-700"><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">志工</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">簽到</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">簽退</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">時數</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">狀態</th></tr></thead>
-                        <tbody className="divide-y divide-slate-700">
+                <div className="attendance-table-wrapper">
+                    <table className="attendance-table">
+                        <thead><tr className="attendance-table__head-row"><th className="attendance-table__th">志工</th><th className="attendance-table__th">簽到</th><th className="attendance-table__th">簽退</th><th className="attendance-table__th">時數</th><th className="attendance-table__th">狀態</th></tr></thead>
+                        <tbody className="attendance-table__body">
                             {records.length === 0 ? (
-                                <tr><td colSpan={5} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>暫無出勤記錄</td></tr>
+                                <tr><td colSpan={5} className="attendance-empty-cell">暫無出勤記錄</td></tr>
                             ) : records.map((record) => {
                                 const badge = getStatusBadge(record.status);
                                 return (
-                                    <tr key={record.id} className="hover:bg-slate-700/50">
-                                        <td className="px-6 py-4"><div className="flex items-center"><div className="w-8 h-8 rounded-full bg-amber-500 flex items-center justify-center text-black font-medium text-sm">{record.volunteerName.charAt(0)}</div><span className="ml-3 text-white">{record.volunteerName}</span></div></td>
-                                        <td className="px-6 py-4 text-gray-300">{record.checkIn || '-'}</td>
-                                        <td className="px-6 py-4 text-gray-300">{record.checkOut || '-'}</td>
-                                        <td className="px-6 py-4 text-gray-300">{record.hoursWorked}h</td>
-                                        <td className="px-6 py-4"><span className={`px-2 py-1 text-xs rounded-full text-white ${badge.bg}`}>{badge.label}</span></td>
+                                    <tr key={record.id} className="attendance-table__row">
+                                        <td><div className="attendance-name-cell"><div className="attendance-avatar">{record.volunteerName.charAt(0)}</div><span className="attendance-name-text">{record.volunteerName}</span></div></td>
+                                        <td className="attendance-cell-muted">{record.checkIn || '-'}</td>
+                                        <td className="attendance-cell-muted">{record.checkOut || '-'}</td>
+                                        <td className="attendance-cell-muted">{record.hoursWorked}h</td>
+                                        <td><span className={`attendance-badge ${badge.modifier}`}>{badge.label}</span></td>
                                     </tr>
                                 );
                             })}

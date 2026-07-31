@@ -1,4 +1,7 @@
-/* 📚 培訓中心頁面樣式 */
+/* 📚 培訓中心頁面樣式
+ * 註：#667eea 系列（indigo 強調色）為本頁專屬品牌互動色（分頁/焦點/核取方塊強調），
+ * 語義上不對應既有 success/warning/danger/info，故保留字面值；漸層背景同理。
+ */
 
 .training-page {
     padding: 1rem;
@@ -9,9 +12,9 @@
     display: flex;
     gap: 0.5rem;
     margin-bottom: 1.5rem;
-    background: #f1f5f9;
+    background: var(--bg-secondary, #f1f5f9);
     padding: 0.25rem;
-    border-radius: 12px;
+    border-radius: var(--radius-lg, 12px);
 }
 
 .training-tab {
@@ -22,18 +25,18 @@
     background: transparent;
     font-weight: 600;
     font-size: 0.95rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     cursor: pointer;
     transition: all 0.3s;
 }
 
 .training-tab:hover {
-    color: #334155;
+    color: var(--text-primary, #334155);
 }
 
 .training-tab.active {
     background: white;
-    color: #667eea;
+    color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
@@ -52,28 +55,28 @@
 .stat-card__value {
     font-size: 2rem;
     font-weight: 700;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
 }
 
 .stat-card__label {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 .stat-card--success .stat-card__value {
-    color: #10b981;
+    color: var(--color-success, #10b981);
 }
 
 .stat-card--warning .stat-card__value {
-    color: #f59e0b;
+    color: var(--color-warning, #f59e0b);
 }
 
 .stat-card--info .stat-card__value {
-    color: #3b82f6;
+    color: var(--color-info, #3b82f6);
 }
 
 .stat-card--danger .stat-card__value {
-    color: #ef4444;
+    color: var(--color-danger, #ef4444);
 }
 
 /* 🌐 爬取課程分類 */
@@ -83,7 +86,7 @@
     flex-wrap: wrap;
     margin-bottom: 1.5rem;
     padding: 0.5rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); /* 裝飾漸層，保留字面值 */
     border-radius: 14px;
 }
 
@@ -97,7 +100,7 @@
     background: white;
     font-size: 0.85rem;
     font-weight: 500;
-    color: #475569;
+    color: var(--text-secondary, #475569);
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -130,14 +133,14 @@
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color, #e2e8f0);
     transition: all 0.3s;
 }
 
 .scraped-course-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #667eea;
+    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
 }
 
 .scraped-course-header {
@@ -148,7 +151,7 @@
 .scraped-course-title {
     font-size: 1.05rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
     margin: 0;
     line-height: 1.4;
 }
@@ -158,7 +161,7 @@
     flex-wrap: wrap;
     gap: 0.75rem;
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 .scraped-course-meta span {
@@ -170,14 +173,14 @@
 .scraped-course-actions {
     margin-top: auto;
     padding-top: 0.5rem;
-    border-top: 1px solid #f1f5f9;
+    border-top: 1px solid var(--border-light, #f1f5f9);
 }
 
-/* 資料來源說明 */
+/* 資料來源說明（indigo 資訊框為品牌裝飾色，保留字面值） */
 .data-source-info {
     background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
     padding: 1rem 1.25rem;
-    border-radius: 12px;
+    border-radius: var(--radius-lg, 12px);
     border-left: 4px solid #667eea;
 }
 
@@ -197,7 +200,7 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 3rem;
-    color: #94a3b8;
+    color: var(--text-tertiary, #94a3b8);
 }
 
 .empty-icon {
@@ -209,15 +212,15 @@
 /* 大型空狀態 */
 .empty-state--large {
     padding: 4rem 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 16px;
-    border: 2px dashed #e2e8f0;
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); /* 裝飾漸層，保留字面值 */
+    border-radius: var(--radius-xl, 16px);
+    border: 2px dashed var(--border-color, #e2e8f0);
 }
 
 .empty-state--large h3 {
     margin: 0.5rem 0;
     font-size: 1.25rem;
-    color: #334155;
+    color: var(--text-primary, #334155);
 }
 
 .empty-state--large p {
@@ -252,14 +255,14 @@
 .form-group label {
     font-size: 0.85rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-secondary, #374151);
 }
 
 .form-group select,
 .form-group input[type="number"] {
     padding: 0.625rem 0.875rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
+    border: 1px solid var(--border-color, #e2e8f0);
+    border-radius: var(--radius-md, 8px);
     font-size: 0.9rem;
     background: white;
     transition: border-color 0.2s;
@@ -268,7 +271,7 @@
 .form-group select:focus,
 .form-group input[type="number"]:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -303,7 +306,7 @@
 
 .category-btn {
     padding: 0.5rem 1rem;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 20px;
     background: white;
     font-size: 0.85rem;
@@ -312,12 +315,12 @@
 }
 
 .category-btn:hover {
-    border-color: #667eea;
-    background: #f8fafc;
+    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
+    background: var(--surface-hover, #f8fafc);
 }
 
 .category-btn.active {
-    background: #667eea;
+    background: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
     color: white;
     border-color: #667eea;
 }
@@ -356,13 +359,13 @@
 .course-card__title {
     font-size: 1rem;
     font-weight: 600;
-    color: #1e293b;
+    color: var(--text-primary, #1e293b);
     margin: 0;
 }
 
 .course-card__desc {
     font-size: 0.85rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
     margin: 0;
     flex: 1;
 }
@@ -375,7 +378,7 @@
 
 .progress-bar {
     height: 6px;
-    background: #e2e8f0;
+    background: var(--bg-tertiary, #e2e8f0);
     border-radius: 3px;
     overflow: hidden;
 }
@@ -394,14 +397,14 @@
 
 .progress-text {
     font-size: 0.8rem;
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 /* Modal */
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--surface-overlay, rgba(0, 0, 0, 0.5));
     display: flex;
     align-items: center;
     justify-content: center;
@@ -421,7 +424,7 @@
 }
 
 .modal-desc {
-    color: #64748b;
+    color: var(--text-secondary, #64748b);
 }
 
 .modal-actions {
@@ -432,9 +435,9 @@
 }
 
 .course-content {
-    background: #f8fafc;
+    background: var(--surface-raised, #f8fafc);
     padding: 1rem;
-    border-radius: 8px;
+    border-radius: var(--radius-md, 8px);
     margin-top: 1rem;
 }
 
