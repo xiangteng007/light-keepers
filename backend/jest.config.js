@@ -19,12 +19,14 @@ module.exports = {
         '!**/dist/**',
     ],
     coverageDirectory: '../coverage',
-    coverageThresholds: {
+    // 棘輪門檻：2026-07-31 實測 lines 58.5% / branches 37.4% / functions 61.3% / statements 58.2%
+    // 門檻設在實測值下方留緩衝，擋大幅倒退；覆蓋率提升後同步調高
+    coverageThreshold: {
         global: {
-            lines: 15,
-            branches: 10,
-            functions: 10,
-            statements: 15,
+            lines: 52,
+            branches: 32,
+            functions: 55,
+            statements: 52,
         },
     },
     testEnvironment: 'node',
