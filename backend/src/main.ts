@@ -58,6 +58,10 @@ async function bootstrap() {
 
         const app = await NestFactory.create(AppModuleToLoad, {
             logger: ['error', 'warn', 'log'],
+            // 保留原始請求 body（req.rawBody），供 webhook HMAC 簽章驗證使用
+            // （LINE Bot webhook 必須用原始位元組計算簽章，不能用 JSON.stringify 還原）
+            // 僅在既有預設 body parser 上加掛 verify callback，不改變其他端點的解析行為
+            rawBody: true,
         });
         console.log(`[STARTUP] NestJS created in ${Date.now() - bootstrapStart}ms`);
 

@@ -4,18 +4,19 @@ import {
     Post,
     Body,
     Headers,
+    Req,
     Res,
     HttpStatus,
     Logger,
     UseGuards,
     Param,
+    RawBodyRequest,
 } from '@nestjs/common';
-import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
-import { Response } from 'express';
-import * as crypto from 'crypto';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS, Public } from '../shared/guards';
+import { Request, Response } from 'express';
 import { LineBotService } from './line-bot.service';
 import { DisasterReportService } from './disaster-report';
-import { WebhookEvent, MessageEvent, TextEventMessage, ImageEventMessage, LocationEventMessage } from '@line/bot-sdk';
+import { WebhookEvent, MessageEvent, TextEventMessage, ImageEventMessage, LocationEventMessage, validateSignature } from '@line/bot-sdk';
 
 @Controller('line-bot')
 export class LineBotController {
@@ -27,10 +28,16 @@ export class LineBotController {
     ) { }
 
     // Webhook 端點 - LINE 會發送事件到這裡
+    //
+    // ⚠️ 必須是公開端點：LINE 平台的請求不會帶 JWT，
+    // 全域 GlobalAuthGuard 為 default-deny，未標記 @Public() 會一律 401。
+    // 端點本身的認證由 x-line-signature HMAC 簽章驗證負責。
+    @Public()
     @Post('webhook')
     async handleWebhook(
         @Headers('x-line-signature') signature: string,
         @Body() body: { events: WebhookEvent[] },
+        @Req() req: RawBodyRequest<Request>,
         @Res() res: Response,
     ) {
         if (!this.lineBotService.isEnabled()) {
@@ -38,14 +45,25 @@ export class LineBotController {
         }
 
         // 驗證簽章
+        // 必須使用「原始 raw body」計算 HMAC（JSON.stringify 會改變位元組序列而導致驗證失敗），
+        // 比對交由 SDK 的 validateSignature（內部使用 timingSafeEqual，constant-time）。
         const config = this.lineBotService.getConfig();
-        const bodyString = JSON.stringify(body);
-        const expectedSignature = crypto
-            .createHmac('sha256', config.channelSecret)
-            .update(bodyString)
-            .digest('base64');
+        const rawBody = req.rawBody;
 
-        if (signature !== expectedSignature) {
+        if (!rawBody) {
+            this.logger.error('Raw body unavailable - ensure NestFactory.create({ rawBody: true })');
+            return res.status(HttpStatus.UNAUTHORIZED).send('Invalid signature');
+        }
+
+        let signatureValid = false;
+        try {
+            signatureValid = !!signature && validateSignature(rawBody, config.channelSecret, signature);
+        } catch {
+            // 簽章非合法 base64 等格式問題一律視為驗證失敗
+            signatureValid = false;
+        }
+
+        if (!signatureValid) {
             this.logger.warn('Invalid signature');
             return res.status(HttpStatus.UNAUTHORIZED).send('Invalid signature');
         }
