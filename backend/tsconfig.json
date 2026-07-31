@@ -15,6 +15,18 @@
         "strictNullChecks": true,
         "noImplicitAny": true,
         "strictBindCallApply": true,
+        "strictFunctionTypes": true,
+        // BE-5 (docs/FULL_SYSTEM_REDESIGN_PLAN.md 4.5): progressive `strict` rollout.
+        // Full `strict: true` currently produces ~1900 errors (mostly
+        // strictPropertyInitialization across DTOs/entities/gateways, not
+        // concentrated enough in TypeORM entities to batch-fix safely) — deferred.
+        // `noImplicitThis` is blocked by exactly one error in
+        // src/modules/privacy/ai-governance.service.ts, a stub module slated for
+        // deletion under work item 4.2; do not fix it here to avoid conflicting
+        // with that parallel removal. Re-attempt noImplicitThis once 4.2 lands
+        // (see src/modules/tactical-maps/insarag-marking.service.ts for the fix
+        // pattern used there: replace `ReturnType<typeof this.method>` with
+        // `ReturnType<ClassName['method']>`).
         "forceConsistentCasingInFileNames": true,
         "noFallthroughCasesInSwitch": true,
         "types": ["jest", "node"],
