@@ -94,8 +94,6 @@ export const LEGACY = {
     publicTransparency: legacyPath('public/transparency'),
     /** public-finance.controller.ts */
     publicFinance: legacyPath('public/finance'),
-    /** rag-knowledge.controller.ts */
-    knowledge: legacyPath('knowledge'),
     /** tccip-climate.controller.ts */
     climate: legacyPath('climate'),
     /** trend-prediction.controller.ts */
