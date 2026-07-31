@@ -28,11 +28,39 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Security audit
-        run: npm audit --audit-level=high || true
+      # 安全稽核（暫時非阻擋）
+      # 現況：web-dashboard 有 5 個 critical / 21 個 high，backend 有 4 個 critical / 22 個 high，
+      # 全部來自傳遞依賴。deploy 已改為必須等 CI 成功才執行，因此現在把 audit 設成阻擋式
+      # 會讓 CI 永遠紅燈 → 所有發布（含緊急修復）被凍結。
+      # 折衷：改用 continue-on-error（UI 顯示為黃色的「失敗但繼續」）取代 `|| true`
+      #      （`|| true` 會讓步驟偽裝成綠燈，等於完全看不到問題）。
+      # TODO(Phase F): 先跑 `npm audit fix` 清掉 critical，再把此步驟改為
+      #                `npm audit --audit-level=critical` 並移除 continue-on-error。
+      - name: Security audit (non-blocking, 見上方 TODO)
+        run: npm audit --audit-level=critical
+        continue-on-error: true
 
-      - name: Lint check
-        run: npm run lint || true
+      # Lint 閘門（棘輪式阻擋）
+      # 現況：main 上已累積 229 個 eslint error（多為 react-refresh/only-export-components、
+      # no-unused-vars、ban-ts-comment），直接改成阻擋式同樣會凍結所有發布。
+      # 折衷：error 數量只能「持平或下降」，任何新增的 error 一律擋下 CI。
+      # TODO(Phase F): 把既有 error 逐步清到 0，之後改成 `npm run lint -- --max-warnings=0`。
+      - name: Lint check (error 數不得超過基準線)
+        env:
+          LINT_ERROR_BASELINE: 229
+        run: |
+          npx eslint . --format json --output-file eslint-report.json || true
+          ERRORS=$(node -p "require('./eslint-report.json').reduce((a, f) => a + f.errorCount, 0)")
+          WARNINGS=$(node -p "require('./eslint-report.json').reduce((a, f) => a + f.warningCount, 0)")
+          echo "ESLint: ${ERRORS} errors / ${WARNINGS} warnings (baseline: ${LINT_ERROR_BASELINE})"
+          if [ "$ERRORS" -gt "$LINT_ERROR_BASELINE" ]; then
+            echo "::error::ESLint error 數 ${ERRORS} 超過基準線 ${LINT_ERROR_BASELINE}，請修正本次新增的問題。"
+            npx eslint .
+            exit 1
+          fi
+          if [ "$ERRORS" -lt "$LINT_ERROR_BASELINE" ]; then
+            echo "::notice::ESLint error 已降到 ${ERRORS}，請同步調降 LINT_ERROR_BASELINE 以鎖住成果。"
+          fi
 
       - name: Run tests
         run: npm run test:run
@@ -71,6 +99,11 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
+      # E2E 暫時維持 non-blocking：
+      # 目前的 Playwright spec 需要一個真實可用的後端（登入、API 資料），CI 內沒有起
+      # backend + Postgres，因此結果不具決定性，改成阻擋式會產生大量偽陽性紅燈。
+      # TODO(Phase F): 在 e2e job 加上 postgres service + 啟動 backend（或改用 API mock），
+      #                確認穩定後移除 continue-on-error。
       - name: Run E2E tests
         run: npx playwright test --reporter=list
         continue-on-error: true
@@ -96,8 +129,12 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      - name: Security audit
-        run: npm audit --audit-level=high || true
+      # 同 frontend：backend 目前有 4 個 critical / 22 個 high 傳遞依賴弱點，
+      # 阻擋式 gate 會凍結發布。改用 continue-on-error 讓失敗至少在 UI 上可見。
+      # TODO(Phase F): `npm audit fix` 後改為阻擋式並移除 continue-on-error。
+      - name: Security audit (non-blocking, 見上方 TODO)
+        run: npm audit --audit-level=critical
+        continue-on-error: true
 
       - name: Run tests
         run: npm test -- --passWithNoTests
