@@ -19,7 +19,7 @@ import { DecisionLog } from './entities/decision-log.entity';
 import { SITREP } from './entities/sitrep.entity';
 import { FieldReport } from '../field-reports/entities/field-report.entity';
 import { Task } from '../tasks/entities/task.entity';
-import { AuditLog } from '../field-reports/entities/audit-log.entity';
+import { AuditLog } from '../audit/audit-log.entity';
 import { ANALYTICS_EVENTS } from '../../common/events';
 
 @Injectable()

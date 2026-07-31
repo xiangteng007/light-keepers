@@ -25,7 +25,7 @@ describe('AARService', () => {
 
         try { FieldReport = (await import('../field-reports/entities/field-report.entity')).FieldReport; } catch { FieldReport = class {}; }
         try { Task = (await import('../tasks/entities/task.entity')).Task; } catch { Task = class {}; }
-        try { AuditLog = (await import('../field-reports/entities/audit-log.entity')).AuditLog; } catch { AuditLog = class {}; }
+        try { AuditLog = (await import('../audit/audit-log.entity')).AuditLog; } catch { AuditLog = class {}; }
 
         const module: TestingModule = await Test.createTestingModule({
             providers: [
