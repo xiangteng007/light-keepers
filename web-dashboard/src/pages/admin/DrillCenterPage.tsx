@@ -1,10 +1,12 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 演練導播台 (Drill Center Page)
  * 模組 A 前端
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { LEGACY } from '../../api/paths';
 import './DrillCenterPage.css';
 
 interface DrillEvent {
@@ -57,37 +59,28 @@ const DrillCenterPage: React.FC = () => {
 
     const loadScenarios = async () => {
         try {
-            const response = await fetch('/api/drill/scenarios');
-            if (response.ok) {
-                const data = await response.json();
-                setScenarios(data.data || []);
-            }
+            const { data } = await api.get(`${LEGACY.drill}/scenarios`);
+            setScenarios(data.data || []);
         } catch (error) {
-            console.error('Failed to load scenarios:', error);
+            console.error('Failed to load scenarios:', getApiErrorMessage(error, '載入演練腳本失敗'));
         }
     };
 
     const loadDrillStatus = async () => {
         try {
-            const response = await fetch('/api/drill/status');
-            if (response.ok) {
-                const data = await response.json();
-                setDrillState(data.data);
-            }
+            const { data } = await api.get(`${LEGACY.drill}/status`);
+            setDrillState(data.data);
         } catch (error) {
-            console.error('Failed to load drill status:', error);
+            console.error('Failed to load drill status:', getApiErrorMessage(error, '載入演練狀態失敗'));
         }
     };
 
     const loadTemplates = async () => {
         try {
-            const response = await fetch('/api/drill/templates');
-            if (response.ok) {
-                await response.json();
-                // Templates loaded, can be used for quick scenario creation
-            }
+            await api.get(`${LEGACY.drill}/templates`);
+            // Templates loaded, can be used for quick scenario creation
         } catch (error) {
-            console.error('Failed to load templates:', error);
+            console.error('Failed to load templates:', getApiErrorMessage(error, '載入演練範本失敗'));
         }
     };
 
@@ -95,14 +88,13 @@ const DrillCenterPage: React.FC = () => {
         if (!confirm('確定要開始演練嗎？系統將進入演練模式。')) return;
 
         try {
-            const response = await fetch(`/api/drill/start/${scenarioId}`, { method: 'POST' });
-            const data = await response.json();
+            const { data } = await api.post(`${LEGACY.drill}/start/${scenarioId}`);
             if (data.success) {
                 alert(data.message);
                 loadDrillStatus();
             }
         } catch (error) {
-            console.error('Failed to start drill:', error);
+            console.error('Failed to start drill:', getApiErrorMessage(error, '開始演練失敗'));
         }
     };
 
@@ -110,15 +102,14 @@ const DrillCenterPage: React.FC = () => {
         if (!confirm('確定要結束演練嗎？')) return;
 
         try {
-            const response = await fetch('/api/drill/stop', { method: 'POST' });
-            const data = await response.json();
+            const { data } = await api.post(`${LEGACY.drill}/stop`);
             if (data.success) {
                 alert('演練已結束');
                 loadDrillStatus();
                 loadScenarios();
             }
         } catch (error) {
-            console.error('Failed to stop drill:', error);
+            console.error('Failed to stop drill:', getApiErrorMessage(error, '結束演練失敗'));
         }
     };
 

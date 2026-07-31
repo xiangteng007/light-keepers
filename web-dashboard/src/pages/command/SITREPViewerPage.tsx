@@ -1,6 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect } from 'react';
 import './SITREPViewerPage.css';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { missionPath } from '../../api/paths';
 
 interface KeyEvent {
     time: string;
@@ -66,8 +68,7 @@ const SITREPViewerPage: React.FC = () => {
     const fetchSITREPs = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/missions/${sessionId}/sitrep`);
-            const data = await response.json();
+            const { data } = await api.get(missionPath(sessionId, 'sitrep'));
             if (data.success) {
                 setSitreps(data.data);
                 if (data.data.length > 0) {
@@ -75,20 +76,19 @@ const SITREPViewerPage: React.FC = () => {
                 }
             }
         } catch (error) {
-            console.error('Failed to fetch SITREPs:', error);
+            console.error('Failed to fetch SITREPs:', getApiErrorMessage(error, '無法取得情勢報告'));
         }
         setLoading(false);
     };
 
     const fetchDecisions = async () => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/sitrep/decisions`);
-            const data = await response.json();
+            const { data } = await api.get(`${missionPath(sessionId, 'sitrep')}/decisions`);
             if (data.success) {
                 setDecisions(data.data);
             }
         } catch (error) {
-            console.error('Failed to fetch decisions:', error);
+            console.error('Failed to fetch decisions:', getApiErrorMessage(error, '無法取得決策紀錄'));
         }
     };
 
@@ -98,36 +98,28 @@ const SITREPViewerPage: React.FC = () => {
         const hourAgo = new Date(now.getTime() - 60 * 60 * 1000);
 
         try {
-            const response = await fetch(`/api/missions/${sessionId}/sitrep/generate`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    periodStart: hourAgo.toISOString(),
-                    periodEnd: now.toISOString(),
-                }),
+            const { data } = await api.post(`${missionPath(sessionId, 'sitrep')}/generate`, {
+                periodStart: hourAgo.toISOString(),
+                periodEnd: now.toISOString(),
             });
-            const data = await response.json();
             if (data.success) {
                 fetchSITREPs();
                 setActiveTab('sitrep');
             }
         } catch (error) {
-            console.error('Failed to generate SITREP:', error);
+            console.error('Failed to generate SITREP:', getApiErrorMessage(error, '無法生成情勢報告'));
         }
         setGenerating(false);
     };
 
     const approveSITREP = async (sitrepId: string) => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/sitrep/${sitrepId}/approve`, {
-                method: 'POST',
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'sitrep')}/${sitrepId}/approve`);
             if (data.success) {
                 fetchSITREPs();
             }
         } catch (error) {
-            console.error('Failed to approve SITREP:', error);
+            console.error('Failed to approve SITREP:', getApiErrorMessage(error, '無法核准情勢報告'));
         }
     };
 

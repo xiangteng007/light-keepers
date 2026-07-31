@@ -1,6 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect } from 'react';
 import './AARPlaybackPage.css';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { missionPath } from '../../api/paths';
 
 interface TimelineEvent {
     timestamp: string;
@@ -68,13 +70,12 @@ const AARPlaybackPage: React.FC = () => {
     const fetchAAR = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/missions/${sessionId}/aar`);
-            const data = await response.json();
+            const { data } = await api.get(missionPath(sessionId, 'aar'));
             if (data.success && data.data) {
                 setAAR(data.data);
             }
         } catch (error) {
-            console.error('Failed to fetch AAR:', error);
+            console.error('Failed to fetch AAR:', getApiErrorMessage(error, '無法取得事後復盤報告'));
         }
         setLoading(false);
     };
@@ -82,15 +83,12 @@ const AARPlaybackPage: React.FC = () => {
     const generateAAR = async () => {
         setGenerating(true);
         try {
-            const response = await fetch(`/api/missions/${sessionId}/aar/generate`, {
-                method: 'POST',
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'aar')}/generate`);
             if (data.success) {
                 setAAR(data.data);
             }
         } catch (error) {
-            console.error('Failed to generate AAR:', error);
+            console.error('Failed to generate AAR:', getApiErrorMessage(error, '無法生成事後復盤報告'));
         }
         setGenerating(false);
     };
@@ -98,15 +96,12 @@ const AARPlaybackPage: React.FC = () => {
     const finalizeAAR = async () => {
         if (!aar) return;
         try {
-            const response = await fetch(`/api/missions/${sessionId}/aar/${aar.id}/finalize`, {
-                method: 'POST',
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'aar')}/${aar.id}/finalize`);
             if (data.success) {
                 setAAR(data.data);
             }
         } catch (error) {
-            console.error('Failed to finalize AAR:', error);
+            console.error('Failed to finalize AAR:', getApiErrorMessage(error, '無法定稿事後復盤報告'));
         }
     };
 

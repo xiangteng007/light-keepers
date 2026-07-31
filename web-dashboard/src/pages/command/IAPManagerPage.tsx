@@ -1,6 +1,8 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 import React, { useState, useEffect } from 'react';
 import './IAPManagerPage.css';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { missionPath } from '../../api/paths';
 
 interface Objective {
     id: string;
@@ -68,8 +70,7 @@ const IAPManagerPage: React.FC = () => {
     const fetchPeriods = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`/api/missions/${sessionId}/iap/periods`);
-            const data = await response.json();
+            const { data } = await api.get(`${missionPath(sessionId, 'iap')}/periods`);
             if (data.success) {
                 setPeriods(data.data);
                 if (data.data.length > 0 && !selectedPeriod) {
@@ -77,65 +78,53 @@ const IAPManagerPage: React.FC = () => {
                 }
             }
         } catch (error) {
-            console.error('Failed to fetch periods:', error);
+            console.error('Failed to fetch periods:', getApiErrorMessage(error, '無法取得作戰週期'));
         }
         setLoading(false);
     };
 
     const fetchDocuments = async (periodId: string) => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/iap/periods/${periodId}/documents`);
-            const data = await response.json();
+            const { data } = await api.get(`${missionPath(sessionId, 'iap')}/periods/${periodId}/documents`);
             if (data.success) {
                 setDocuments(data.data);
             }
         } catch (error) {
-            console.error('Failed to fetch documents:', error);
+            console.error('Failed to fetch documents:', getApiErrorMessage(error, '無法取得 IAP 文件'));
         }
     };
 
     const createPeriod = async (formData: any) => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/iap/periods`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'iap')}/periods`, formData);
             if (data.success) {
                 fetchPeriods();
                 setShowNewPeriodForm(false);
             }
         } catch (error) {
-            console.error('Failed to create period:', error);
+            console.error('Failed to create period:', getApiErrorMessage(error, '無法建立作戰週期'));
         }
     };
 
     const approvePeriod = async (periodId: string) => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/iap/periods/${periodId}/approve`, {
-                method: 'POST',
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'iap')}/periods/${periodId}/approve`);
             if (data.success) {
                 fetchPeriods();
             }
         } catch (error) {
-            console.error('Failed to approve period:', error);
+            console.error('Failed to approve period:', getApiErrorMessage(error, '無法核准作戰週期'));
         }
     };
 
     const activatePeriod = async (periodId: string) => {
         try {
-            const response = await fetch(`/api/missions/${sessionId}/iap/periods/${periodId}/activate`, {
-                method: 'POST',
-            });
-            const data = await response.json();
+            const { data } = await api.post(`${missionPath(sessionId, 'iap')}/periods/${periodId}/activate`);
             if (data.success) {
                 fetchPeriods();
             }
         } catch (error) {
-            console.error('Failed to activate period:', error);
+            console.error('Failed to activate period:', getApiErrorMessage(error, '無法啟動作戰週期'));
         }
     };
 

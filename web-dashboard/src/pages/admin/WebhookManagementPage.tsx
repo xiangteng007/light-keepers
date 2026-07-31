@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Webhook Management Page
  * Admin page for managing outbound webhooks
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './WebhookManagementPage.css';
 
 interface Webhook {
@@ -50,13 +51,10 @@ const WebhookManagementPage: React.FC = () => {
 
     const loadWebhooks = async () => {
         try {
-            const response = await fetch('/api/webhooks');
-            if (response.ok) {
-                const data = await response.json();
-                setWebhooks(data.data || []);
-            }
+            const { data } = await api.get('/webhooks');
+            setWebhooks(data.data || []);
         } catch (error) {
-            console.error('Failed to load webhooks:', error);
+            console.error('Failed to load webhooks:', getApiErrorMessage(error, '載入 Webhook 失敗'));
         } finally {
             setLoading(false);
         }
@@ -80,21 +78,18 @@ const WebhookManagementPage: React.FC = () => {
     };
 
     const saveWebhook = async () => {
-        const method = editingWebhook ? 'PUT' : 'POST';
-        const url = editingWebhook ? `/api/webhooks/${editingWebhook.id}` : '/api/webhooks';
+        const url = editingWebhook ? `/webhooks/${editingWebhook.id}` : '/webhooks';
 
         try {
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-            if (response.ok) {
-                setShowModal(false);
-                loadWebhooks();
+            if (editingWebhook) {
+                await api.put(url, formData);
+            } else {
+                await api.post(url, formData);
             }
+            setShowModal(false);
+            loadWebhooks();
         } catch (error) {
-            console.error('Failed to save webhook:', error);
+            console.error('Failed to save webhook:', getApiErrorMessage(error, '儲存 Webhook 失敗'));
         }
     };
 
@@ -102,21 +97,19 @@ const WebhookManagementPage: React.FC = () => {
         if (!confirm('確定要刪除此 Webhook？')) return;
 
         try {
-            await fetch(`/api/webhooks/${id}`, { method: 'DELETE' });
+            await api.delete(`/webhooks/${id}`);
             loadWebhooks();
         } catch (error) {
-            console.error('Failed to delete webhook:', error);
+            console.error('Failed to delete webhook:', getApiErrorMessage(error, '刪除 Webhook 失敗'));
         }
     };
 
     const testWebhook = async (id: string) => {
         try {
-            const response = await fetch(`/api/webhooks/${id}/test`, { method: 'POST' });
-            if (response.ok) {
-                alert('測試 Webhook 已發送');
-            }
+            await api.post(`/webhooks/${id}/test`);
+            alert('測試 Webhook 已發送');
         } catch (error) {
-            console.error('Failed to test webhook:', error);
+            console.error('Failed to test webhook:', getApiErrorMessage(error, '測試 Webhook 失敗'));
         }
     };
 

@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Feature Flags Management Page
  * Admin page for managing feature flags and A/B testing
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './FeatureFlagsPage.css';
 
 interface FeatureFlag {
@@ -43,13 +44,10 @@ const FeatureFlagsPage: React.FC = () => {
 
     const loadFlags = async () => {
         try {
-            const response = await fetch('/api/features');
-            if (response.ok) {
-                const data = await response.json();
-                setFlags(data.data || []);
-            }
+            const { data } = await api.get('/features');
+            setFlags(data.data || []);
         } catch (error) {
-            console.error('Failed to load feature flags:', error);
+            console.error('Failed to load feature flags:', getApiErrorMessage(error, '載入功能旗標失敗'));
         } finally {
             setLoading(false);
         }
@@ -87,21 +85,18 @@ const FeatureFlagsPage: React.FC = () => {
             allowedRoles: formData.allowedRoles ? formData.allowedRoles.split(',').map(s => s.trim()) : [],
         };
 
-        const method = editingFlag ? 'PUT' : 'POST';
-        const url = editingFlag ? `/api/features/${editingFlag.key}` : '/api/features';
+        const url = editingFlag ? `/features/${editingFlag.key}` : '/features';
 
         try {
-            const response = await fetch(url, {
-                method,
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (response.ok) {
-                setShowModal(false);
-                loadFlags();
+            if (editingFlag) {
+                await api.put(url, payload);
+            } else {
+                await api.post(url, payload);
             }
+            setShowModal(false);
+            loadFlags();
         } catch (error) {
-            console.error('Failed to save feature flag:', error);
+            console.error('Failed to save feature flag:', getApiErrorMessage(error, '儲存功能旗標失敗'));
         }
     };
 
@@ -109,23 +104,19 @@ const FeatureFlagsPage: React.FC = () => {
         if (!confirm('確定要刪除此功能旗標？')) return;
 
         try {
-            await fetch(`/api/features/${key}`, { method: 'DELETE' });
+            await api.delete(`/features/${key}`);
             loadFlags();
         } catch (error) {
-            console.error('Failed to delete feature flag:', error);
+            console.error('Failed to delete feature flag:', getApiErrorMessage(error, '刪除功能旗標失敗'));
         }
     };
 
     const toggleFlag = async (flag: FeatureFlag) => {
         try {
-            await fetch(`/api/features/${flag.key}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...flag, enabled: !flag.enabled }),
-            });
+            await api.put(`/features/${flag.key}`, { ...flag, enabled: !flag.enabled });
             loadFlags();
         } catch (error) {
-            console.error('Failed to toggle feature flag:', error);
+            console.error('Failed to toggle feature flag:', getApiErrorMessage(error, '切換功能旗標失敗'));
         }
     };
 

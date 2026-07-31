@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Scheduler Management Page
  * Admin page for managing scheduled tasks
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './SchedulerPage.css';
 
 interface ScheduledTask {
@@ -51,13 +52,10 @@ const SchedulerPage: React.FC = () => {
 
     const loadTasks = async () => {
         try {
-            const response = await fetch('/api/scheduler/tasks');
-            if (response.ok) {
-                const data = await response.json();
-                setTasks(data.data || []);
-            }
+            const { data } = await api.get('/scheduler/tasks');
+            setTasks(data.data || []);
         } catch (error) {
-            console.error('Failed to load tasks:', error);
+            console.error('Failed to load tasks:', getApiErrorMessage(error, '載入排程任務失敗'));
         } finally {
             setLoading(false);
         }
@@ -65,38 +63,30 @@ const SchedulerPage: React.FC = () => {
 
     const createTask = async () => {
         try {
-            const response = await fetch('/api/scheduler/tasks', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData),
-            });
-            if (response.ok) {
-                setShowModal(false);
-                loadTasks();
-            }
+            await api.post('/scheduler/tasks', formData);
+            setShowModal(false);
+            loadTasks();
         } catch (error) {
-            console.error('Failed to create task:', error);
+            console.error('Failed to create task:', getApiErrorMessage(error, '建立排程任務失敗'));
         }
     };
 
     const toggleTask = async (id: string) => {
         try {
-            await fetch(`/api/scheduler/tasks/${id}/toggle`, { method: 'POST' });
+            await api.post(`/scheduler/tasks/${id}/toggle`);
             loadTasks();
         } catch (error) {
-            console.error('Failed to toggle task:', error);
+            console.error('Failed to toggle task:', getApiErrorMessage(error, '切換排程任務狀態失敗'));
         }
     };
 
     const runTask = async (id: string) => {
         try {
-            const response = await fetch(`/api/scheduler/tasks/${id}/run`, { method: 'POST' });
-            if (response.ok) {
-                alert('任務已觸發');
-                loadTasks();
-            }
+            await api.post(`/scheduler/tasks/${id}/run`);
+            alert('任務已觸發');
+            loadTasks();
         } catch (error) {
-            console.error('Failed to run task:', error);
+            console.error('Failed to run task:', getApiErrorMessage(error, '執行排程任務失敗'));
         }
     };
 
@@ -104,10 +94,10 @@ const SchedulerPage: React.FC = () => {
         if (!confirm('確定要刪除此排程任務？')) return;
 
         try {
-            await fetch(`/api/scheduler/tasks/${id}`, { method: 'DELETE' });
+            await api.delete(`/scheduler/tasks/${id}`);
             loadTasks();
         } catch (error) {
-            console.error('Failed to delete task:', error);
+            console.error('Failed to delete task:', getApiErrorMessage(error, '刪除排程任務失敗'));
         }
     };
 

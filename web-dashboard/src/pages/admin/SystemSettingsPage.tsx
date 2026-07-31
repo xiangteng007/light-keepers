@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * System Settings Page
  * Admin page for managing system configuration
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './SystemSettingsPage.css';
 
 interface SystemSettings {
@@ -69,15 +70,12 @@ const SystemSettingsPage: React.FC = () => {
 
     const loadSettings = async () => {
         try {
-            const response = await fetch('/api/system/settings');
-            if (response.ok) {
-                const data = await response.json();
-                if (data.success && data.data) {
-                    setSettings(data.data);
-                }
+            const { data } = await api.get('/system/settings');
+            if (data.success && data.data) {
+                setSettings(data.data);
             }
         } catch (error) {
-            console.error('Failed to load settings:', error);
+            console.error('Failed to load settings:', getApiErrorMessage(error, '載入系統設定失敗'));
         } finally {
             setLoading(false);
         }
@@ -86,17 +84,11 @@ const SystemSettingsPage: React.FC = () => {
     const saveSettings = async () => {
         setSaving(true);
         try {
-            const response = await fetch('/api/system/settings', {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(settings),
-            });
-            if (response.ok) {
-                alert('設定已儲存');
-            }
+            await api.put('/system/settings', settings);
+            alert('設定已儲存');
         } catch (error) {
             console.error('Failed to save settings:', error);
-            alert('儲存失敗');
+            alert(getApiErrorMessage(error, '儲存失敗'));
         } finally {
             setSaving(false);
         }

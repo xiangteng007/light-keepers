@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Geofencing Editor Page
  * Admin page for managing geofence zones
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './GeofencingPage.css';
 
 interface GeoZone {
@@ -40,13 +41,10 @@ const GeofencingPage: React.FC = () => {
 
     const loadZones = async () => {
         try {
-            const response = await fetch('/api/geofence/zones');
-            if (response.ok) {
-                const data = await response.json();
-                setZones(data.data || []);
-            }
+            const { data } = await api.get('/geofence/zones');
+            setZones(data.data || []);
         } catch (error) {
-            console.error('Failed to load zones:', error);
+            console.error('Failed to load zones:', getApiErrorMessage(error, '載入地理圍欄失敗'));
         } finally {
             setLoading(false);
         }
@@ -67,18 +65,12 @@ const GeofencingPage: React.FC = () => {
         };
 
         try {
-            const response = await fetch('/api/geofence/zones', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload),
-            });
-            if (response.ok) {
-                setShowModal(false);
-                loadZones();
-                resetForm();
-            }
+            await api.post('/geofence/zones', payload);
+            setShowModal(false);
+            loadZones();
+            resetForm();
         } catch (error) {
-            console.error('Failed to create zone:', error);
+            console.error('Failed to create zone:', getApiErrorMessage(error, '建立地理圍欄失敗'));
         }
     };
 
@@ -86,23 +78,19 @@ const GeofencingPage: React.FC = () => {
         if (!confirm('確定要刪除此區域？')) return;
 
         try {
-            await fetch(`/api/geofence/zones/${id}`, { method: 'DELETE' });
+            await api.delete(`/geofence/zones/${id}`);
             loadZones();
         } catch (error) {
-            console.error('Failed to delete zone:', error);
+            console.error('Failed to delete zone:', getApiErrorMessage(error, '刪除地理圍欄失敗'));
         }
     };
 
     const toggleZone = async (zone: GeoZone) => {
         try {
-            await fetch(`/api/geofence/zones/${zone.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...zone, enabled: !zone.enabled }),
-            });
+            await api.put(`/geofence/zones/${zone.id}`, { ...zone, enabled: !zone.enabled });
             loadZones();
         } catch (error) {
-            console.error('Failed to toggle zone:', error);
+            console.error('Failed to toggle zone:', getApiErrorMessage(error, '切換地理圍欄狀態失敗'));
         }
     };
 
