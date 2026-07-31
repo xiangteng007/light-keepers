@@ -73,7 +73,6 @@ import { TimelineVisualizationModule } from './modules/timeline-visualization/ti
 // Reports
 import { PerformanceReportModule } from './modules/performance-report/performance-report.module';
 // Operations
-import { DroneOpsModule } from './modules/drone-ops/drone-ops.module';
 import { TacticalMapsModule } from './modules/tactical-maps/tactical-maps.module';
 import { RoutingModule } from './modules/routing/routing.module';
 // Community
@@ -86,7 +85,6 @@ import { VolunteerCertificationModule } from './modules/volunteer-certification/
 // Equipment & Misc
 import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module';
 // REMOVED: MockDataModule - deleted
-import { I18nApiModule } from './modules/i18n-api/i18n-api.module';
 // REMOVED: SwaggerAutoDocsModule - Swagger handled by decorators
 import { SystemModule } from './modules/system/system.module';
 // ==============================================
@@ -97,7 +95,6 @@ import { WebhooksModule } from './modules/webhooks/webhooks.module';
 import { Fire119Module } from './modules/fire-119/fire-119.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
-import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module';
 import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
 import { TranslationModule } from './modules/translation/translation.module';
@@ -142,7 +139,6 @@ import { WaterResourcesModule } from './modules/water-resources/water-resources.
 // Communication
 import { PttModule } from './modules/ptt/ptt.module';
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
-import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module';
 // RealtimeChatModule - CONSOLIDATED into RealtimeModule
 import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
 import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
@@ -156,13 +152,10 @@ import { ResourceMatchingModule } from './modules/resource-matching/resource-mat
 import { ResourceOptimizationModule } from './modules/resource-optimization/resource-optimization.module';
 import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module';
 // Admin & Finance
-import { MultiEocModule } from './modules/multi-eoc/multi-eoc.module';
 // REMOVED: MultiTenantModule - consolidated to tenants module
 import { PublicFinanceModule } from './modules/public-finance/public-finance.module';
 import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module';
-import { PowerBiModule } from './modules/power-bi/power-bi.module';
 // Misc
-import { MicroTaskModule } from './modules/micro-task/micro-task.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { EventPublisherModule } from './common/services/event-publisher.module';
 import { StorageModule } from './common/storage';
@@ -304,7 +297,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Reports
         PerformanceReportModule, // 📊 效能報告
         // Operations
-        DroneOpsModule, // 🚁 無人機運作
         TacticalMapsModule, // 🗺️ 戰術地圖
         RoutingModule, // 🛣️ 路徑規劃
         // Community
@@ -317,7 +309,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Equipment & Misc
         EquipmentQrModule, // 📱 裝備 QR 碼
         // REMOVED: MockDataModule, SwaggerAutoDocsModule - deleted
-        I18nApiModule, // 🌐 多語系 API
         SystemModule, // ⚙️ 系統管理
         // ==============================================
         // Batch 4: High Side-Effect Modules
@@ -327,7 +318,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         Fire119Module, // 🚒 119 消防整合
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
-        ImageRecognitionModule, // 🖼️ 影像辨識
         RagKnowledgeModule, // 📚 RAG 知識庫
         FatigueDetectionModule, // 😴 疲勞偵測
         TranslationModule, // 🌐 翻譯服務
@@ -357,7 +347,6 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Communication
         PttModule, // 📻 PTT 對講
         // REMOVED: BluetoothAudioModule - hardware dependent
-        MediaStreamingModule, // 📺 媒體串流
         // RealtimeChatModule - CONSOLIDATED into RealtimeModule
         SpeechToTextModule, // 🎤 語音轉文字
         VoiceAssistantModule, // 🗣️ 語音助理
@@ -370,13 +359,10 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         ResourceOptimizationModule, // ⚡ 資源優化
         PredictiveMaintenanceModule, // 🔧 預測維護
         // Admin & Finance
-        MultiEocModule, // 🏢 多 EOC
         // REMOVED: MultiTenantModule - consolidated to tenants
         PublicFinanceModule, // 💰 公共財務
         ExpenseReimbursementModule, // 💳 費用報銷
-        PowerBiModule, // 📊 Power BI
         // Misc
-        MicroTaskModule, // ✅ 微任務
         // ==============================================
         // STUB MODULES (Conditionally Loaded)
         // Only enabled when ENABLE_STUB_MODULES=true
