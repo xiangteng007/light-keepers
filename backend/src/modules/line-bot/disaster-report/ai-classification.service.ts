@@ -1,12 +1,16 @@
-/**
+﻿/**
  * AI 災情類型分類服務
- * 使用 Gemini API 自動判斷災情類型
+ *
+ * M.2: 文字分類改走 LlmProviderService（LLM_PROVIDER=gemini/local/hybrid），
+ * 不再直接 new GoogleGenerativeAI。影像分析（Vision）仍直接使用 Gemini，
+ * 因為本地候選模型 Qwen2.5-Instruct 是純文字模型，沒有對應能力。
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ReportType } from '../../reports/reports.entity';
+import { LlmProviderService } from '../../ai-queue/providers/llm-provider.service';
 
 export interface ClassificationResult {
     type: ReportType;
@@ -14,34 +18,9 @@ export interface ClassificationResult {
     reasoning?: string;
 }
 
-@Injectable()
-export class AiClassificationService {
-    private readonly logger = new Logger(AiClassificationService.name);
-    private genAI: GoogleGenerativeAI | null = null;
-
-    constructor(private readonly configService: ConfigService) {
-        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-        if (apiKey) {
-            this.genAI = new GoogleGenerativeAI(apiKey);
-            this.logger.log('Gemini AI initialized');
-        } else {
-            this.logger.warn('GEMINI_API_KEY not configured, AI classification disabled');
-        }
-    }
-
-    /**
-     * 使用 AI 判斷災情類型
-     */
-    async classifyDisasterType(description: string): Promise<ClassificationResult> {
-        if (!this.genAI) {
-            // Fallback to keyword-based detection
-            return this.fallbackClassification(description);
-        }
-
-        try {
-            const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-
-            const prompt = `
+/** 災情分類的 prompt，抽出成常數供 llm-benchmark 腳本重用 */
+export function buildClassificationPrompt(description: string): string {
+    return `
 你是一個災害類型分類專家。請根據以下災情描述，判斷最可能的災害類型。
 
 災情描述：
@@ -66,21 +45,63 @@ ${description}
 
 只回覆 JSON，不要包含其他文字。
 `.trim();
+}
 
-            const result = await model.generateContent(prompt);
-            const response = result.response;
-            const text = response.text().trim();
+@Injectable()
+export class AiClassificationService {
+    private readonly logger = new Logger(AiClassificationService.name);
+    /** Vision-only client. Text classification goes through `llm`. */
+    private genAI: GoogleGenerativeAI | null = null;
 
-            // 解析 JSON 回應
-            const parsed = this.parseAIResponse(text);
+    constructor(
+        private readonly configService: ConfigService,
+        @Optional() private readonly llm?: LlmProviderService,
+    ) {
+        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
+        if (apiKey) {
+            this.genAI = new GoogleGenerativeAI(apiKey);
+            this.logger.log('Gemini Vision client initialized');
+        } else {
+            this.logger.warn('GEMINI_API_KEY not configured, image analysis disabled');
+        }
 
-            this.logger.log(`AI classification: ${parsed.type} (${parsed.confidence})`);
+        if (!this.llm?.isAvailable()) {
+            this.logger.warn('No LLM provider available, classification will use keywords only');
+        }
+    }
+
+    /**
+     * 使用 AI 判斷災情類型
+     *
+     * 走 LlmProviderService，因此 LLM_PROVIDER=hybrid 時工作站離線會自動降級到
+     * Gemini；兩者都失敗才落到關鍵字比對。
+     */
+    async classifyDisasterType(description: string): Promise<ClassificationResult> {
+        if (!this.llm?.isAvailable()) {
+            // Fallback to keyword-based detection
+            return this.fallbackClassification(description);
+        }
+
+        try {
+            const response = await this.llm.generateText({
+                useCaseId: 'linebot.disaster.classify.v1',
+                prompt: buildClassificationPrompt(description),
+                maxOutputTokens: 512,
+                temperature: 0.2,
+            });
+
+            const parsed = this.parseAIResponse(response.text.trim());
+
+            this.logger.log(
+                `AI classification: ${parsed.type} (${parsed.confidence}) via ${response.modelName}`,
+            );
             return parsed;
         } catch (error) {
             this.logger.error(`AI classification failed: ${error.message}`);
             return this.fallbackClassification(description);
         }
     }
+
 
     /**
      * 解析 AI 回應

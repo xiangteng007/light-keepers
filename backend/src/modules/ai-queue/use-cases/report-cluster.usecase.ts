@@ -1,9 +1,9 @@
-import { Injectable } from '@nestjs/common';
+﻿import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { BaseUseCase } from './base.usecase';
 import { AiJob } from '../entities';
-import { GeminiProvider } from '../providers/gemini.provider';
+import { LlmProviderService } from '../providers/llm-provider.service';
 import { FieldReport } from '../../field-reports/entities';
 
 /**
@@ -67,7 +67,7 @@ export class ReportClusterUseCase extends BaseUseCase {
     readonly useCaseId = 'report.cluster.v1';
 
     constructor(
-        private gemini: GeminiProvider,
+        private readonly llm: LlmProviderService,
         @InjectRepository(FieldReport)
         private reportRepo: Repository<FieldReport>,
     ) {
@@ -94,7 +94,7 @@ export class ReportClusterUseCase extends BaseUseCase {
             reports: reportsText,
         });
 
-        const result = await this.gemini.run({
+        const result = await this.llm.run({
             useCaseId: this.useCaseId,
             prompt,
             schema: CLUSTER_SCHEMA,

@@ -23,8 +23,8 @@ import { AiWorkerService } from './workers/ai-worker.service';
 import { RateLimiterService } from './workers/rate-limiter.service';
 import { CircuitBreakerService } from './workers/circuit-breaker.service';
 
-// Providers
-import { GeminiProvider } from './providers/gemini.provider';
+// Providers (M.2: routed through LlmProviderService, see providers/llm.module.ts)
+import { LlmModule } from './providers/llm.module';
 
 // Use Cases
 import {
@@ -48,6 +48,7 @@ import { AuthModule } from '../auth/auth.module';
             AuditLog,
         ]),
         ConfigModule,
+        LlmModule, // GeminiProvider + OpenAiCompatibleProvider + LlmProviderService
         forwardRef(() => AuthModule), // For JwtAuthGuard
     ],
     controllers: [
@@ -65,9 +66,6 @@ import { AuthModule } from '../auth/auth.module';
         AiWorkerService,
         RateLimiterService,
         CircuitBreakerService,
-
-        // Providers
-        GeminiProvider,
 
         // Use Cases
         ReportSummarizeUseCase,

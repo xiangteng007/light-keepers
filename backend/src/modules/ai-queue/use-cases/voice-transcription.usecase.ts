@@ -69,6 +69,10 @@ export class VoiceTranscriptionUseCase {
     public static readonly ID = 'voice.transcription.v1';
     private readonly logger = new Logger(VoiceTranscriptionUseCase.name);
 
+    // M.2: intentionally NOT routed through LlmProviderService.
+    // This use case needs audio input (`generateWithAudio`); the local stack has
+    // no ASR endpoint yet. Revisit once Whisper (or similar) runs on the
+    // workstation alongside Ollama.
     constructor(private readonly gemini: GeminiProvider) { }
 
     /**

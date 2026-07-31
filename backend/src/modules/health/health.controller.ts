@@ -1,7 +1,8 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Optional } from '@nestjs/common';
 import { InjectDataSource } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { Public } from '../shared/shared-auth.module';
+import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
 
 /**
  * Health Controller for Cloud Run
@@ -20,6 +21,7 @@ export class HealthController {
 
     constructor(
         @InjectDataSource() private readonly dataSource: DataSource,
+        @Optional() private readonly llm?: LlmProviderService,
     ) {
         this.startTime = new Date();
     }
@@ -75,6 +77,43 @@ export class HealthController {
             checks,
             timestamp: new Date().toISOString(),
         };
+    }
+
+    /**
+     * LLM availability (M.2).
+     *
+     * Deliberately NOT part of /health or /health/ready: the local inference host
+     * is a workstation that may be offline, and a probe costs up to
+     * LLM_CONNECT_TIMEOUT_MS. Keeping it on its own endpoint means Cloud Run
+     * probes stay fast and the API never flaps because a desktop was powered off.
+     *
+     * Always returns 200 - `active: "none"` is the signal, not an HTTP error.
+     */
+    @Get('llm')
+    async llmHealth() {
+        if (!this.llm) {
+            return {
+                status: 'not_configured',
+                mode: null,
+                active: 'none',
+                timestamp: new Date().toISOString(),
+            };
+        }
+
+        try {
+            const status = await this.llm.healthCheck();
+            return {
+                status: status.active === 'none' ? 'unavailable' : 'ok',
+                ...status,
+                timestamp: new Date().toISOString(),
+            };
+        } catch (error) {
+            return {
+                status: 'error',
+                error: (error as Error).message,
+                timestamp: new Date().toISOString(),
+            };
+        }
     }
 
     /**
