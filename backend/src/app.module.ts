@@ -70,25 +70,19 @@ import { PrometheusModule } from './modules/prometheus/prometheus.module';
 // Batch 3: Low Side-Effect Modules (CRUD-only)
 // ==============================================
 // Dashboard & Visualization (Note: DashboardModule has no module file)
-import { TimelineVisualizationModule } from './modules/timeline-visualization/timeline-visualization.module';
 // Reports
 import { PerformanceReportModule } from './modules/performance-report/performance-report.module';
 // Operations
-import { DroneOpsModule } from './modules/drone-ops/drone-ops.module';
 import { TacticalMapsModule } from './modules/tactical-maps/tactical-maps.module';
 import { RoutingModule } from './modules/routing/routing.module';
 // Community
 import { ReunificationModule } from './modules/reunification/reunification.module';
 import { PsychologicalSupportModule } from './modules/psychological-support/psychological-support.module';
-import { CrowdReportingModule } from './modules/crowd-reporting/crowd-reporting.module';
 // Volunteer
-import { RewardsModule } from './modules/rewards/rewards.module';
 import { VolunteerPointsModule } from './modules/volunteer-points/volunteer-points.module';
-import { VolunteerCertificationModule } from './modules/volunteer-certification/volunteer-certification.module';
 // Equipment & Misc
 import { EquipmentQrModule } from './modules/equipment-qr/equipment-qr.module';
 // REMOVED: MockDataModule - deleted
-import { I18nApiModule } from './modules/i18n-api/i18n-api.module';
 // REMOVED: SwaggerAutoDocsModule - Swagger handled by decorators
 import { SystemModule } from './modules/system/system.module';
 // ==============================================
@@ -96,17 +90,9 @@ import { SystemModule } from './modules/system/system.module';
 // ==============================================
 // Webhooks & Integrations
 import { WebhooksModule } from './modules/webhooks/webhooks.module';
-import { Fire119Module } from './modules/fire-119/fire-119.module';
-import { CitizenAppModule } from './modules/citizen-app/citizen-app.module';
 // REMOVED: SatelliteCommModule - requires specialized equipment
 // AI & ML
-import { ImageRecognitionModule } from './modules/image-recognition/image-recognition.module';
-import { ChatbotAssistantModule } from './modules/chatbot-assistant/chatbot-assistant.module';
-import { RagKnowledgeModule } from './modules/rag-knowledge/rag-knowledge.module';
-import { DisasterSummaryModule } from './modules/disaster-summary/disaster-summary.module';
 import { FatigueDetectionModule } from './modules/fatigue-detection/fatigue-detection.module';
-import { DocumentOcrModule } from './modules/document-ocr/document-ocr.module';
-import { TranslationModule } from './modules/translation/translation.module';
 // Scheduling & Dispatch
 // Weather & Climate
 import { TccipClimateModule } from './modules/tccip-climate/tccip-climate.module';
@@ -130,48 +116,34 @@ import { InteroperabilityAdaptersModule } from './modules/interoperability-adapt
 // AR/VR
 // Offline & Mobile
 import { OfflineMeshModule } from './modules/offline-mesh/offline-mesh.module';
-import { DeviceManagementModule } from './modules/device-management/device-management.module';
 // Push Notifications
 // LINE & Social - CONSOLIDATED into LineBotModule
 // LineLiffModule and LineNotifyModule services are now provided by LineBotModule
 // Blockchain & Security
-import { BlockchainModule } from './modules/blockchain/blockchain.module';
 import { IntegrityLedgerModule } from './modules/integrity-ledger/integrity-ledger.module';
 // REMOVED: SupplyChainBlockchainModule - use traditional database
 // REMOVED: GdprComplianceModule - consolidated to audit module
 // Simulation & Training
 import { DrillSimulationModule } from './modules/drill-simulation/drill-simulation.module';
 // REMOVED: EvacuationSimModule - stub module deleted
-import { DamageSimulationModule } from './modules/damage-simulation/damage-simulation.module';
 // Specialty
 // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
 // REMOVED: RobotRescueModule, SpectrumAnalysisModule - R&D/specialized equipment
 import { WaterResourcesModule } from './modules/water-resources/water-resources.module';
 // REMOVED: WearableModule - hardware dependent, use third-party API
 // Communication
-import { PttModule } from './modules/ptt/ptt.module';
 // REMOVED: BluetoothAudioModule - hardware dependent, use native app
-import { MediaStreamingModule } from './modules/media-streaming/media-streaming.module';
 // RealtimeChatModule - CONSOLIDATED into RealtimeModule
-import { SpeechToTextModule } from './modules/speech-to-text/speech-to-text.module';
-import { VoiceAssistantModule } from './modules/voice-assistant/voice-assistant.module';
 // Infrastructure
 import { SentryModule } from './modules/sentry/sentry.module';
-import { QrScannerModule } from './modules/qr-scanner/qr-scanner.module';
 // REMOVED: NfcModule - hardware dependent, use QR instead
 // Note: GeoIntelModule has no module file (only agents subfolder)
 // Resource Management
-import { ResourceMatchingModule } from './modules/resource-matching/resource-matching.module';
-import { ResourceOptimizationModule } from './modules/resource-optimization/resource-optimization.module';
-import { PredictiveMaintenanceModule } from './modules/predictive-maintenance/predictive-maintenance.module';
 // Admin & Finance
-import { MultiEocModule } from './modules/multi-eoc/multi-eoc.module';
 // REMOVED: MultiTenantModule - consolidated to tenants module
 import { PublicFinanceModule } from './modules/public-finance/public-finance.module';
 import { ExpenseReimbursementModule } from './modules/expense-reimbursement/expense-reimbursement.module';
-import { PowerBiModule } from './modules/power-bi/power-bi.module';
 // Misc
-import { MicroTaskModule } from './modules/micro-task/micro-task.module';
 import { CloudLoggerService } from './common/services/cloud-logger.service';
 import { EventPublisherModule } from './common/services/event-publisher.module';
 import { StorageModule } from './common/storage';
@@ -300,42 +272,28 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         // Batch 3: Low Side-Effect Modules (CRUD-only)
         // ==============================================
         // Dashboard & Visualization
-        TimelineVisualizationModule, // 📅 時間軸視覺化
         // Reports
         PerformanceReportModule, // 📊 效能報告
         // Operations
-        DroneOpsModule, // 🚁 無人機運作
         TacticalMapsModule, // 🗺️ 戰術地圖
         RoutingModule, // 🛣️ 路徑規劃
         // Community
         ReunificationModule, // 👨‍👩‍👧 家庭團聚
         PsychologicalSupportModule, // 🧠 心理支援
-        CrowdReportingModule, // 📢 群眾回報
         // Volunteer
-        RewardsModule, // 🏆 獎勵系統
         VolunteerPointsModule, // ⭐ 志工積分
-        VolunteerCertificationModule, // 🎓 志工認證
         // Equipment & Misc
         EquipmentQrModule, // 📱 裝備 QR 碼
         // REMOVED: MockDataModule, SwaggerAutoDocsModule - deleted
-        I18nApiModule, // 🌐 多語系 API
         SystemModule, // ⚙️ 系統管理
         // ==============================================
         // Batch 4: High Side-Effect Modules
         // ==============================================
         // Webhooks & Integrations
         WebhooksModule, // 🔗 Webhook 接收
-        Fire119Module, // 🚒 119 消防整合
-        CitizenAppModule, // 📱 市民 App
         // REMOVED: SatelliteCommModule - requires specialized equipment
         // AI & ML
-        ImageRecognitionModule, // 🖼️ 影像辨識
-        ChatbotAssistantModule, // 💬 聊天機器人助理
-        RagKnowledgeModule, // 📚 RAG 知識庫
-        DisasterSummaryModule, // 📊 災情摘要
         FatigueDetectionModule, // 😴 疲勞偵測
-        DocumentOcrModule, // 📄 文件 OCR
-        TranslationModule, // 🌐 翻譯服務
         // Scheduling & Dispatch
         // Weather & Climate
         TccipClimateModule, // 🌦️ TCCIP 氣候資料
@@ -348,43 +306,29 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         //
         // Offline & Mobile
         OfflineMeshModule, // 🔗 Mesh 網路
-        DeviceManagementModule, // 📲 裝置管理
         // Push Notifications
         // LINE & Social - CONSOLIDATED: LineLiffModule and LineNotifyModule merged into LineBotModule
         // Blockchain & Security
-        BlockchainModule, // ⛓️ 區塊鏈
         IntegrityLedgerModule, // 📜 完整性帳本
         // SupplyChainBlockchainModule - moved to STUB_MODULES (conditionally loaded)
         DrillSimulationModule, // 🎯 演習模擬
         // REMOVED: EvacuationSimModule, GdprComplianceModule - stub modules deleted
-        DamageSimulationModule, // 💥 損害模擬
         // Specialty
         // REMOVED: AarAnalysisModule, BimIntegrationModule, InsaragModule - stub modules deleted
         // REMOVED: RobotRescueModule, SpectrumAnalysisModule, WearableModule - R&D/hardware dependent
         WaterResourcesModule, // 💧 水資源
         // Communication
-        PttModule, // 📻 PTT 對講
         // REMOVED: BluetoothAudioModule - hardware dependent
-        MediaStreamingModule, // 📺 媒體串流
         // RealtimeChatModule - CONSOLIDATED into RealtimeModule
-        SpeechToTextModule, // 🎤 語音轉文字
-        VoiceAssistantModule, // 🗣️ 語音助理
         // Infrastructure
         SentryModule, // 🐛 Sentry 監控
-        QrScannerModule, // 📱 QR 掃描
         // REMOVED: NfcModule - hardware dependent, use QR instead
         // Resource Management
-        ResourceMatchingModule, // 🎯 資源媒合
-        ResourceOptimizationModule, // ⚡ 資源優化
-        PredictiveMaintenanceModule, // 🔧 預測維護
         // Admin & Finance
-        MultiEocModule, // 🏢 多 EOC
         // REMOVED: MultiTenantModule - consolidated to tenants
         PublicFinanceModule, // 💰 公共財務
         ExpenseReimbursementModule, // 💳 費用報銷
-        PowerBiModule, // 📊 Power BI
         // Misc
-        MicroTaskModule, // ✅ 微任務
         // ==============================================
         // STUB MODULES (Conditionally Loaded)
         // Only enabled when ENABLE_STUB_MODULES=true
