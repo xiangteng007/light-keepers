@@ -118,7 +118,7 @@
 | `fire-119` | 消防署 119 介接 | 保留 | P2 |
 | `insarag` | 國際搜救隊標準 | 合併至 `triage` | P2 |
 | `multi-eoc` | 多 EOC 協調 | 合併至 `mission-sessions` | P2 |
-| `multi-tenant` | 多租戶支援 | 合併至 `tenants` | P1 |
+| `multi-tenant` | ~~多租戶支援~~ | **已移除** — 平台降級為單租戶（D9, 2026-08-01），見 ADR-001（Superseded） | ➖ |
 
 ---
 

@@ -115,6 +115,7 @@ export interface BaseEventPayload {
     timestamp?: Date;
     correlationId?: string;
     userId?: string;
+    /** 單租戶模式下恆為預設值／undefined，保留供未來回遷。見 ADR-001（Superseded）。 */
     tenantId?: string;
 }
 

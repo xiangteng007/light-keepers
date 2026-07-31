@@ -1,3 +1,14 @@
+/**
+ * Tenant Controller —— 組織資料管理 API（Organization Profile Management）
+ *
+ * 【定位（2026-08-01, D9 / DA-2 單租戶降級後）】
+ * 本控制器管理**協會自身**的組織檔案、成員名冊與方案配額，
+ * **不**提供跨租戶隔離。詳見 docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）。
+ *
+ * 路由 `admin/tenants` 為歷史名稱，刻意保留以避免 API breaking change。
+ * 存取控制：OWNER（L5）——由 UnifiedRolesGuard 強制，非租戶邊界。
+ */
+
 import {
     Controller,
     Get,

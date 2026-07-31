@@ -53,6 +53,13 @@ export class DomainEventOutbox {
     @Column({ type: 'jsonb', nullable: true })
     metadata: {
         userId?: string;
+        /**
+         * 組織 ID（歷史欄位）。
+         * 【單租戶模式（D9, 2026-08-01）】恆為預設值／undefined——平台已降級為單租戶，
+         * 本欄位不參與任何過濾或授權判斷。保留不移除以避免 schema 變更，
+         * 供未來若回遷多租戶時使用。
+         * @see docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）
+         */
         tenantId?: string;
         correlationId?: string;
         version?: number;

@@ -31,7 +31,7 @@
 |------|:----:|------|
 | `auth` | 1035 | JWT認證、OAuth、登入登出 |
 | `accounts` | 391 | 使用者帳戶 CRUD |
-| `tenants` | 215 | 多租戶管理 |
+| `tenants` | 215 | 組織資料管理（單租戶；歷史命名，見 ADR-001 Superseded） |
 | `audit` | 172 | 稽核日誌 |
 | `audit-log` | 150 | 存取日誌 |
 | `access-log` | 66 | API 存取記錄 |
@@ -272,7 +272,7 @@
 | `spectrum-analysis` | 299 | 頻譜分析 |
 | `disaster-summary` | 170 | 災情摘要 |
 | `public-finance` | 153 | 公共財務 |
-| `multi-tenant` | 101 | 多租戶 |
+| `multi-tenant` | - | *(已移除，單租戶降級 D9)* |
 | `ai-prediction` *(dup)* | - | *(見 AI 分類)* |
 
 ---

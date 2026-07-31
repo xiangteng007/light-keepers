@@ -126,7 +126,7 @@ graph TB
 ### 5.1 核心基礎設施
 - `auth` - 認證授權
 - `accounts` - 帳號管理
-- `tenants` - 多租戶
+- `tenants` - 組織資料管理（單租戶；歷史命名，見 ADR-001 Superseded）
 - `cache` - 快取管理
 - `database` - 資料庫連線
 - `health` - 健康檢查

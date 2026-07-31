@@ -9,8 +9,7 @@
 | id | UUID | 主鍵 |
 | email | string | 電子郵件 |
 | displayName | string | 顯示名稱 |
-| roleLevel | int | 權限等級 (0-6) |
-| tenantId | UUID | 所屬租戶 |
+| roleLevel | int | 權限等級 (0-5)，經 `roles` 關聯推導 |
 | isActive | boolean | 啟用狀態 |
 | createdAt | timestamp | 建立時間 |
 
@@ -84,12 +83,12 @@ Account ──1:1── Volunteer
     │
     └──1:N── Task (as assignee)
     
-Tenant ──1:N── Account
-       │
-       └──1:N── Resource
-       │
-       └──1:N── Mission
+Tenant ──1:N── TenantMember ──1:1── Account
 ```
+
+> 註（2026-08-01, D9）：平台為**單租戶**，`Tenant` 僅一筆紀錄（協會自身），
+> 代表「組織資料」而非隔離邊界。`Account` / `Resource` / `Mission` **不帶** `tenantId`
+> 外鍵，亦無租戶範圍查詢。見 `docs/adr/ADR-001-multi-tenant-isolation.md`（Superseded）。
 
 ---
 

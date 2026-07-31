@@ -30,7 +30,7 @@
 | 威脅 | 風險 | 緩解措施 | 狀態 |
 |------|------|---------|------|
 | IDOR | 高 | ResourceOwnerGuard | ✅ |
-| 跨租戶存取 | 高 | TenantGuard | ✅ |
+| 跨租戶存取 | N/A | 平台為單租戶（單一協會自用），不存在跨租戶面；原 TenantGuard 為死碼已移除，見 ADR-001（Superseded） | ➖ |
 | 錯誤訊息洩露 | 中 | 通用錯誤訊息 | ⚠️ |
 | Log 中 PII | 中 | PII Masking | ⚠️ |
 

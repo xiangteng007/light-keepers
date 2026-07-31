@@ -34,6 +34,12 @@ export interface BaseEntity {
     updatedAt: ISODateString;
     createdBy?: UUID;
     updatedBy?: UUID;
+    /**
+     * 組織 ID（歷史欄位）。
+     * 【單租戶模式（D9, 2026-08-01）】後端已降級為單租戶，本欄位恆為預設值／undefined，
+     * 前端不得據此做任何過濾或權限判斷。保留供未來回遷。
+     * @see docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）
+     */
     tenantId?: UUID;
 }
 

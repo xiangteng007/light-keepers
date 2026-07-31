@@ -57,6 +57,13 @@ export class AuditLog {
     @CreateDateColumn()
     performedAt: Date;
 
+    /**
+     * 組織 ID（歷史欄位）。
+     * 【單租戶模式（D9, 2026-08-01）】恆為預設值／null——平台已降級為單租戶，
+     * 本欄位不參與任何查詢過濾或授權判斷。保留不移除以避免 schema 變更，
+     * 供未來若回遷多租戶時使用。
+     * @see docs/adr/ADR-001-multi-tenant-isolation.md（Superseded）
+     */
     @Column({ type: 'uuid', nullable: true })
     tenantId: string;
 
