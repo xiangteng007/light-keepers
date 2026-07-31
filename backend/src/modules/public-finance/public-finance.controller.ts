@@ -1,8 +1,11 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { PublicFinanceService } from './public-finance.service';
+import { Public } from '../shared/guards';
 
 @ApiTags('Public Finance 公開財報')
+// 定級理由：非營利組織對外財務揭露（年度摘要、重大支出、捐款人感謝、年報下載），回傳皆為彙總數據且不含個資，default-deny 下補標 @Public()。
+@Public()
 @Controller('api/public/finance')
 export class PublicFinanceController {
     constructor(private readonly financeService: PublicFinanceService) { }

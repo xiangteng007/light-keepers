@@ -7,9 +7,13 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards } from '@nes
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { DrillSimulationService } from './drill.service';
 import { DrillScenario, DrillEvent } from './entities/drill-scenario.entity';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('drill')
 @Controller('api/drill')
+// 定級理由：演練狀態／腳本／範本查詢為參演志工的唯讀需求（L1）；腳本增修為 L2；啟停演練會切換全系統演練模式（影響真實災況判讀），提升至 L3。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class DrillController {
     constructor(private readonly drillService: DrillSimulationService) { }
 
@@ -51,6 +55,7 @@ export class DrillController {
     }
 
     @Post('scenarios')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：建立演練腳本
     @ApiOperation({ summary: '建立演練腳本' })
     async createScenario(
         @Body() body: {
@@ -71,6 +76,7 @@ export class DrillController {
     }
 
     @Put('scenarios/:id')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：更新演練腳本
     @ApiOperation({ summary: '更新演練腳本' })
     async updateScenario(
         @Param('id') id: string,
@@ -86,6 +92,7 @@ export class DrillController {
     // ==================== 演練執行 ====================
 
     @Post('start/:scenarioId')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 全域狀態：切換全系統為演練模式
     @ApiOperation({ summary: '啟動演練' })
     async startDrill(@Param('scenarioId') scenarioId: string) {
         const result = await this.drillService.startDrill(scenarioId);
@@ -96,6 +103,7 @@ export class DrillController {
     }
 
     @Post('stop')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 全域狀態：結束演練模式
     @ApiOperation({ summary: '停止演練' })
     async stopDrill() {
         const result = await this.drillService.stopDrill();

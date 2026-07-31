@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { SocialMediaMonitorController } from './social-media-monitor.controller';
 import { SocialMediaMonitorService } from './social-media-monitor.service';
 import { NotificationService } from './services/notification.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('SocialMediaMonitorController', () => {
     let controller: SocialMediaMonitorController;
@@ -32,7 +33,10 @@ describe('SocialMediaMonitorController', () => {
                 { provide: SocialMediaMonitorService, useValue: monitorService },
                 { provide: NotificationService, useValue: notificationService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<SocialMediaMonitorController>(SocialMediaMonitorController);
     });
 

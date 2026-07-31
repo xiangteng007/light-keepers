@@ -3,12 +3,16 @@
  * 模組 B: REST API
  */
 
-import { Controller, Get, Post, Param, Query } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { MeshSyncService } from './mesh-sync.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('mesh')
 @Controller('api/mesh')
+// 定級理由：LoRa 節點狀態為斷網現場志工的必要唯讀情境資料（L1）；觸發離線資料同步會回寫正式資料，提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class MeshController {
     constructor(private readonly meshService: MeshSyncService) { }
 
@@ -59,6 +63,7 @@ export class MeshController {
     }
 
     @Post('sync')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：將離線訊息回寫正式資料
     @ApiOperation({ summary: '觸發離線資料同步' })
     async syncOfflineData() {
         const result = await this.meshService.syncOfflineMessages();

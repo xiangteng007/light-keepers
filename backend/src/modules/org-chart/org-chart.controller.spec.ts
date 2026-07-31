@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { OrgChartController } from './org-chart.controller';
 import { OrgChartService } from './org-chart.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('OrgChartController', () => {
     let controller: OrgChartController;
@@ -26,7 +27,10 @@ describe('OrgChartController', () => {
             providers: [
                 { provide: OrgChartService, useValue: mockService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<OrgChartController>(OrgChartController);
         service = module.get<OrgChartService>(OrgChartService);

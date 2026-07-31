@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PrometheusController } from './prometheus.controller';
 import { PrometheusService } from './prometheus.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('PrometheusController', () => {
     let controller: PrometheusController;
@@ -14,7 +15,10 @@ describe('PrometheusController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [PrometheusController],
             providers: [{ provide: PrometheusService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<PrometheusController>(PrometheusController);
     });

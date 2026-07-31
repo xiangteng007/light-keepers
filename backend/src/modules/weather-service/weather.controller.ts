@@ -1,10 +1,14 @@
-import { Controller, Get, Post, Delete, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Delete, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { WeatherService } from './weather.service';
 import { WeatherAlert } from './services/alert.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Weather')
 @Controller('weather')
+// 定級理由：氣象查詢屬出勤情境資料，對外的匿名版本已由 /public（Level 0 façade）提供，本 controller 維持登入後可讀（L1）；建立／解除警報與同步等寫入提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class WeatherController {
     constructor(private readonly weatherService: WeatherService) {}
 
@@ -101,6 +105,7 @@ export class WeatherController {
     }
 
     @Post('alerts')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：手動發布天氣警報
     @ApiOperation({ summary: '建立手動警報' })
     @ApiBody({ description: '警報資料' })
     createAlert(@Body() data: Omit<WeatherAlert, 'id' | 'createdAt'>) {
@@ -108,6 +113,7 @@ export class WeatherController {
     }
 
     @Delete('alerts/:id')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：解除天氣警報
     @ApiOperation({ summary: '解除警報' })
     @ApiParam({ name: 'id', description: '警報 ID' })
     resolveAlert(@Param('id') id: string) {
@@ -115,6 +121,7 @@ export class WeatherController {
     }
 
     @Post('alerts/sync')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：外部同步作業
     @ApiOperation({ summary: '從 CWA 同步警報' })
     async syncAlerts() {
         const count = await this.weatherService.syncAlertsFromCwa();
@@ -151,6 +158,7 @@ export class WeatherController {
     // === Sync ===
 
     @Post('sync')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：外部同步作業
     @ApiOperation({ summary: '手動同步天氣資料' })
     async syncWeatherData() {
         await this.weatherService.syncWeatherData();

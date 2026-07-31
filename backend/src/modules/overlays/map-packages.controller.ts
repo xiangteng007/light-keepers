@@ -5,6 +5,7 @@ import {
     Query,
     ParseUUIDPipe,
     NotFoundException,
+    UseGuards,
 } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 import { MapPackagesService } from './map-packages.service';
@@ -13,9 +14,13 @@ import {
     PackageRecommendationDto,
     PackageManifestDto,
 } from './dto';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Map Packages')
 @Controller('map-packages')
+// 定級理由：離線地圖包清單與 manifest 供出勤志工事前下載（全為唯讀，無管理端點），最低登記志工（L1）。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class MapPackagesController {
     constructor(private readonly packagesService: MapPackagesService) { }
 

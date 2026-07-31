@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TrendPredictionController } from './trend-prediction.controller';
 import { TrendPredictionService } from './trend-prediction.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('TrendPredictionController', () => {
     let controller: TrendPredictionController;
@@ -15,7 +16,10 @@ describe('TrendPredictionController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [TrendPredictionController],
             providers: [{ provide: TrendPredictionService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<TrendPredictionController>(TrendPredictionController);
     });
 

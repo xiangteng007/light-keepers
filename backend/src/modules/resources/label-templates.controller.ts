@@ -1,11 +1,15 @@
-import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException, UseGuards } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { LabelTemplatesService } from './label-templates.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 /**
  * 貼紙模板管理 API（幹部專用）
  */
 @Controller('label-templates')
+// 定級理由：模板查詢為倉儲列印作業所需（L1）；模板增修刪為管制品標籤設定，宣告 L2（各 handler 內既有的 roleLevel < 5 檢查更嚴，維持不動，兩者取交集）。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class LabelTemplatesController {
     constructor(private readonly templatesService: LabelTemplatesService) { }
 
@@ -40,6 +44,7 @@ export class LabelTemplatesController {
      * POST /api/label-templates
      */
     @Post()
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：建立標籤模板
     async create(
         @Body() body: {
             name: string;
@@ -70,6 +75,7 @@ export class LabelTemplatesController {
      * PATCH /api/label-templates/:id
      */
     @Patch(':id')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：修改標籤模板
     async update(
         @Param('id') id: string,
         @Body() body: Partial<{
@@ -98,6 +104,7 @@ export class LabelTemplatesController {
      * PATCH /api/label-templates/:id/active
      */
     @Patch(':id/active')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：啟用／停用模板
     async setActive(
         @Param('id') id: string,
         @Body('isActive') isActive: boolean,
@@ -117,6 +124,7 @@ export class LabelTemplatesController {
      * DELETE /api/label-templates/:id
      */
     @Delete(':id')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：軟刪除模板
     async delete(
         @Param('id') id: string,
         @Request() req: AuthenticatedRequest,

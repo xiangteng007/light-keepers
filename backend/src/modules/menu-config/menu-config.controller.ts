@@ -8,7 +8,13 @@ import {
 } from '@nestjs/common';
 import { MenuConfigService, MenuConfigItem } from './menu-config.service';
 // Use unified guards from SharedAuthModule
-import { CoreJwtGuard, CurrentUser as CurrentUserDecorator } from '../shared/guards';
+import {
+    CoreJwtGuard,
+    CurrentUser as CurrentUserDecorator,
+    UnifiedRolesGuard,
+    RequiredLevel,
+    ROLE_LEVELS,
+} from '../shared/guards';
 import { JwtPayload } from '../shared/guards/core-jwt.guard';
 
 interface UpdateMenuConfigDto {
@@ -16,6 +22,9 @@ interface UpdateMenuConfigDto {
 }
 
 @Controller('menu-config')
+// 定級理由：選單設定為登入後 UI 渲染所需，讀取開放全體志工（L1）；updateAll 可竄改全站選單，維持既有「僅系統擁有者」政策並以 @RequiredLevel(OWNER) 宣告化。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class MenuConfigController {
     constructor(private readonly menuConfigService: MenuConfigService) { }
 
@@ -26,7 +35,7 @@ export class MenuConfigController {
     }
 
     @Put()
-    @UseGuards(CoreJwtGuard)
+    @RequiredLevel(ROLE_LEVELS.OWNER) // 管理設定：竄改全站選單，僅系統擁有者（與下方既有 inline 檢查一致）
     async updateAll(
         @Body() dto: UpdateMenuConfigDto,
         @CurrentUserDecorator() user: JwtPayload,

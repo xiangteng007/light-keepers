@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Body, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { RagKnowledgeService } from './rag-knowledge.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('RAG Knowledge 知識庫')
 @Controller('api/knowledge')
+// 定級理由：知識庫問答與檢索為志工現場查詢 SOP 所需（L1，內容為內部文件故不公開）；新增文件會改變全體檢索結果，提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class RagKnowledgeController {
     constructor(private readonly ragService: RagKnowledgeService) { }
 
@@ -26,6 +30,7 @@ export class RagKnowledgeController {
     }
 
     @Post('documents')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：新增知識庫文件，影響全體檢索結果
     @ApiOperation({ summary: '新增文件', description: '新增知識庫文件' })
     addDocument(@Body() body: { title: string; category: string; content: string }): any {
         return this.ragService.addDocument(body);

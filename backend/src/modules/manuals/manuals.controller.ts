@@ -4,10 +4,15 @@ import { OptionalJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from 
 
 /**
  * 實務手冊 Controller
- * 公開存取（Level 0）- 匿名訪客可瀏覽
+ *
+ * 註：原註解寫「公開存取（Level 0）- 匿名訪客可瀏覽」，但全域 GlobalAuthGuard 為 default-deny，
+ * OptionalJwtGuard 並無放行匿名的效果，實際上匿名本來就進不來；手冊內容為內部 SOP，
+ * 故正式定為登入後可讀而非公開。
  */
 @Controller('manuals')
-@UseGuards(OptionalJwtGuard) // 可選認證，支援匿名存取
+// 定級理由：SOP 實務手冊全為唯讀且是志工執勤必需，開放全體登記志工（L1）；內容屬內部文件，不列入公開面（未標 @Public()）。
+@UseGuards(OptionalJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class ManualsController {
     constructor(private readonly manualsService: ManualsService) { }
 

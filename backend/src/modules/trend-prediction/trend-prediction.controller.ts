@@ -1,9 +1,13 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import { Controller, Get, Param, Query, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import { TrendPredictionService } from './trend-prediction.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Trend Prediction 趨勢預測')
 @Controller('api/trends')
+// 定級理由：全為唯讀的區域災害風險／資源需求推估，是派遣前情境判斷的基本資料，全體登記志工可讀（L1）。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class TrendPredictionController {
     constructor(private readonly trendService: TrendPredictionService) { }
 

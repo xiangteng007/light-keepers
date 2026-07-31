@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { TccipClimateController } from './tccip-climate.controller';
 import { TccipClimateService } from './tccip-climate.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('TccipClimateController', () => {
     let controller: TccipClimateController;
@@ -16,7 +17,10 @@ describe('TccipClimateController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [TccipClimateController],
             providers: [{ provide: TccipClimateService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<TccipClimateController>(TccipClimateController);
     });
 

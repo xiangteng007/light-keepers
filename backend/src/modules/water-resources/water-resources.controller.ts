@@ -1,9 +1,13 @@
-import { Controller, Get, Post, Param, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation } from '@nestjs/swagger';
 import { WaterResourcesService } from './water-resources.service';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
 @ApiTags('Water Resources 水利署')
 @Controller('api/water')
+// 定級理由：水情／淹水潛勢為出勤情境唯讀資料（L1）；訂閱警報會登記外部 callbackUrl（SSRF 與濫發風險），提升至 L2。
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class WaterResourcesController {
     constructor(private readonly waterService: WaterResourcesService) { }
 
@@ -32,6 +36,7 @@ export class WaterResourcesController {
     }
 
     @Post('subscribe')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：登記外部 callbackUrl（SSRF／濫發風險）
     @ApiOperation({ summary: '訂閱警報', description: '訂閱特定區域的水情警報' })
     subscribeAlerts(@Body() body: { regions: string[]; callbackUrl: string }): unknown {
         return this.waterService.subscribeToAlerts(body.regions, body.callbackUrl);
