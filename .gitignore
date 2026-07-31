@@ -7,8 +7,15 @@ dist/
 .env.local
 .env.*.local
 .env.credentials
+.env.production
+.env.staging
+.env.development
 *.tmp
 .dbpass*
+
+# 範例檔仍需版控（放在 .env* 規則之後，用否定規則還原）
+!.env.example
+!**/.env.example
 
 # IDE
 .idea/
@@ -34,7 +41,41 @@ build/
 # Secrets
 **/serviceAccountKey.json
 **/firebase-adminsdk*.json
+**/serviceAccount*.json
+**/*service-account*.json
+**/*-service-account.json
 temp_env.json
+temp-firebase-key.json
+**/temp-firebase-key.json
+*.pem
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.key
+
+# ===========================================
+# Phase E.2 緊急止血：已洩漏的憑證/個資檔案
+# 詳見 docs/security/CREDENTIAL_ROTATION_CHECKLIST.md
+# 這些檔案保留在本機，但絕不可再進入版控
+# ===========================================
+# Firebase 使用者匯出檔（含真實 email + scrypt passwordHash + salt）
+backend/users.json
+backend/src/scripts/exported-users.json
+**/exported-users.json
+# 舊專案 GCP 服務帳號私鑰
+backend/src/scripts/old-project-service-account.json
+# App Engine 部署設定（含生產 DB 密碼與 Gemini API Key）
+backend/app.yaml
+# 內含硬編碼帳密的一次性維運腳本
+backend/create-owner.js
+backend/fix-schema.js
+backend/fix-all-schema.js
+backend/get-columns.js
+backend/scripts/firebase-reset.ts
+backend/src/scripts/set-owner-password.ts
+# 前端生產環境變數（由 CI Secrets 注入，不需版控）
+web-dashboard/.env.production
 
 # Generated logs & debug files
 backend-startup.log
