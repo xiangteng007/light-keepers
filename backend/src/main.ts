@@ -51,7 +51,7 @@ async function bootstrap() {
                 });
                 console.log('[STARTUP] Cloud Error Reporting enabled');
             } catch (err) {
-                console.warn('[STARTUP] Cloud Error Reporting initialization failed (will continue without it):', err.message);
+                console.warn(`[STARTUP] Cloud Error Reporting initialization failed (will continue without it): ${err.message}`);
                 // 繼續執行，不讓 error reporting 阻塞啟動
             }
         }
@@ -198,29 +198,29 @@ async function bootstrap() {
         const port = parseInt(process.env.PORT || '8080', 10);
         const host = '0.0.0.0';
 
-        console.log(`[STARTUP] ✓ Port from ENV: ${process.env.PORT || '(using default 8080)'}`);
-        console.log(`[STARTUP] ✓ Binding to: ${host}:${port}`);
+        console.log(`[STARTUP] Port from ENV: ${process.env.PORT || '(using default 8080)'}`);
+        console.log(`[STARTUP] Binding to: ${host}:${port}`);
         console.log('[STARTUP] Starting HTTP server...');
         await app.listen(port, host);
 
         const totalStartupTime = Date.now() - START_TIME;
         console.log('='.repeat(60));
-        console.log('✅ Light Keepers API - READY');
-        console.log(`📦 Version: 0.1.0`);
-        console.log(`🔗 Commit: ${GIT_COMMIT.substring(0, 7)}`);
-        console.log(`🌍 Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
-        console.log(`🔌 Listening on: http://${host}:${port}`);
-        console.log(`⏱️  Startup time: ${totalStartupTime}ms`);
-        console.log(`📅 Ready at: ${new Date().toISOString()}`);
+        console.log('[STARTUP] Light Keepers API - READY');
+        console.log('[STARTUP] Version: 0.1.0');
+        console.log(`[STARTUP] Commit: ${GIT_COMMIT.substring(0, 7)}`);
+        console.log(`[STARTUP] Environment: ${isProduction ? 'PRODUCTION' : 'DEVELOPMENT'}`);
+        console.log(`[STARTUP] Listening on: http://${host}:${port}`);
+        console.log(`[STARTUP] Startup time: ${totalStartupTime}ms`);
+        console.log(`[STARTUP] Ready at: ${new Date().toISOString()}`);
         console.log('='.repeat(60));
 
     } catch (error) {
         const failTime = Date.now() - START_TIME;
         console.error('='.repeat(60));
-        console.error('❌ STARTUP FAILED');
-        console.error(`⏱️  Failed after: ${failTime}ms`);
-        console.error(`💥 Error: ${error.message}`);
-        console.error(`📋 Stack: ${error.stack}`);
+        console.error('[STARTUP] STARTUP FAILED');
+        console.error(`[STARTUP] Failed after: ${failTime}ms`);
+        console.error(`[STARTUP] Error: ${error.message}`);
+        console.error(`[STARTUP] Stack: ${error.stack}`);
         console.error('='.repeat(60));
         process.exit(1);
     }
