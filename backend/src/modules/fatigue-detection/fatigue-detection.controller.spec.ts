@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { FatigueDetectionController } from './fatigue-detection.controller';
 import { FatigueDetectionService } from './fatigue-detection.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('FatigueDetectionController', () => {
     let controller: FatigueDetectionController;
@@ -17,7 +18,10 @@ describe('FatigueDetectionController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [FatigueDetectionController],
             providers: [{ provide: FatigueDetectionService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<FatigueDetectionController>(FatigueDetectionController);
     });

@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ReportingController } from './reporting.controller';
 import { ReportingEngineService } from './reporting-engine.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('ReportingController', () => {
     let controller: ReportingController;
@@ -30,7 +31,10 @@ describe('ReportingController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ReportingController],
             providers: [{ provide: ReportingEngineService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<ReportingController>(ReportingController);
     });

@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { MoodTrackerController } from './mood-tracker.controller';
 import { MoodTrackerService } from './mood-tracker.service';
 import { PFAChatbotService } from './pfa-chatbot.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('MoodTrackerController', () => {
     let controller: MoodTrackerController;
@@ -31,7 +32,10 @@ describe('MoodTrackerController', () => {
                 { provide: MoodTrackerService, useValue: moodService },
                 { provide: PFAChatbotService, useValue: chatService },
             ],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<MoodTrackerController>(MoodTrackerController);
     });

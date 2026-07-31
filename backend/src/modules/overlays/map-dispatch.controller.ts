@@ -3,8 +3,9 @@
  * COP 地圖即操作 API
  */
 
-import { Controller, Get, Post, Put, Body, Param, Query, Req } from '@nestjs/common';
+import { Controller, Get, Post, Put, Body, Param, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { MapDispatchService } from './map-dispatch.service';
 import { SectorType, SectorStatus } from './entities/sector.entity';
 import { RallyPointType, RallyPointStatus } from './entities/rally-point.entity';
@@ -15,8 +16,14 @@ interface AuthenticatedRequest {
     user?: { uid: string };
 }
 
+// 定級理由：COP 戰術地圖「地圖即操作」。建立責任區、集結點、路徑與框選派遣皆直接產生實地任務並
+// 指派小隊，屬派遣權責 → class 基準 L2（幹部）。
+// 讀取類（責任區/集結點/路徑圖層、ETA 試算）是外勤人員執行任務時的必要態勢資訊 → 放寬 L1。
+// 註：集結點含 contactName/contactPhone 等聯絡個資，故讀取仍要求登入志工，不開放 L0。
 @ApiTags('map-dispatch')
 @Controller('api/missions/:sessionId/map')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 @ApiBearerAuth()
 export class MapDispatchController {
     constructor(private readonly service: MapDispatchService) { }
@@ -25,6 +32,7 @@ export class MapDispatchController {
 
     @Get('sectors')
     @ApiOperation({ summary: '取得所有責任區' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getSectors(@Param('sessionId') sessionId: string) {
         const sectors = await this.service.getSectors(sessionId);
         return { success: true, data: sectors };
@@ -85,6 +93,7 @@ export class MapDispatchController {
 
     @Get('rally-points')
     @ApiOperation({ summary: '取得所有集結點' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getRallyPoints(@Param('sessionId') sessionId: string) {
         const points = await this.service.getRallyPoints(sessionId);
         return { success: true, data: points };
@@ -129,6 +138,7 @@ export class MapDispatchController {
 
     @Get('routes')
     @ApiOperation({ summary: '取得所有規劃路徑' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getRoutes(@Param('sessionId') sessionId: string) {
         const routes = await this.service.getRoutes(sessionId);
         return { success: true, data: routes };
@@ -211,6 +221,7 @@ export class MapDispatchController {
 
     @Get('eta')
     @ApiOperation({ summary: '計算 ETA' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async calculateETA(
         @Query('fromLat') fromLat: string,
         @Query('fromLng') fromLng: string,

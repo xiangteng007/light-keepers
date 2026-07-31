@@ -15,6 +15,17 @@ interface RequestWithCookies {
     cookies?: { refresh_token?: string };
 }
 
+// 定級理由（本次只處理 `GET /auth/permissions`、`GET /auth/roles` 兩個真缺口）：
+// 1. 已標 `@Public()` 者（register/login/forgot-password/reset-password/refresh）依任務界線不動。
+// 2. 已掛 `@UseGuards(CoreJwtGuard, UnifiedRolesGuard)` 但未標 `@RequiredLevel` 者（me、profile、
+//    change-password、preferences、sessions、bind 系列…）刻意維持「僅需登入」：這些是本人自助操作，
+//    加上 L1 反而會把「已註冊但尚未核准、roleLevel 仍為 0」的帳號鎖在改密碼與補件流程之外。
+// 3. 登入前流程（line/google/liff/firebase 的 login/callback/register、OTP 與 Email 驗證系列）與
+//    `POST /auth/logout`（以 refresh cookie 運作、須能在 access token 過期後仍可登出）本次**不加 Guard**：
+//    它們語意上需要 `@Public()`，加上等級標記會讓日後無法只靠 `@Public()` 修復；
+//    且全域 `GlobalAuthGuard` 已 default-deny，目前不存在「任何人可存取」的授權缺口。
+//    正確修法是把它們補進 `docs/policy/public-surface.policy.json` 後再標 `@Public()`，屬功能面決策，
+//    已列入 docs/audit/AUTHZ_LEVELS_APPLIED_A.md 的後續建議。
 @Controller('auth')
 export class AuthController {
     constructor(
@@ -81,18 +92,28 @@ export class AuthController {
 
     /**
      * 獲取頁面權限配置
-     * 公開 API，用於前端判斷頁面可見性
+     *
+     * 定級理由：此端點與 `GET /accounts/page-permissions` 回傳同一份權限配置，屬重複端點，
+     * 且全庫（含 web-dashboard）查無任何呼叫端。既然沒有前端相依，就以「權限設定讀取」的
+     * 保守標準定為 L3（常務理事），避免留一條沒人用卻可被拿來枚舉權限矩陣的旁路。
+     * 前端實際使用的是 `/accounts/page-permissions`（定為 L1），兩者刻意不同級。
      */
     @Get('permissions')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async getPermissions() {
         return this.accountManagementService.getPagePermissions();
     }
 
     /**
      * 獲取所有角色
-     * 公開 API，用於前端顯示角色資訊
+     *
+     * 定級理由：同上，與 `GET /accounts/roles` 重複且無呼叫端。角色清單含 level 對照，
+     * 是提權偵察的起點 → L3，與 `/accounts/roles` 一致。
      */
     @Get('roles')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     async getRoles() {
         return this.accountManagementService.getAllRoles();
     }

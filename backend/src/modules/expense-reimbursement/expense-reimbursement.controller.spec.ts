@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ExpenseReimbursementController } from './expense-reimbursement.controller';
 import { ExpenseReimbursementService } from './expense-reimbursement.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('ExpenseReimbursementController', () => {
     let controller: ExpenseReimbursementController;
@@ -19,7 +20,10 @@ describe('ExpenseReimbursementController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [ExpenseReimbursementController],
             providers: [{ provide: ExpenseReimbursementService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<ExpenseReimbursementController>(ExpenseReimbursementController);
     });

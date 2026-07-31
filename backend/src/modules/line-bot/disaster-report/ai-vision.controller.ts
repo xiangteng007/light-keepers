@@ -10,11 +10,19 @@ import {
     UseInterceptors,
     UploadedFile,
     BadRequestException,
+    UseGuards,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../../shared/guards';
 import { AiClassificationService } from './ai-classification.service';
 
+// 定級理由：現場影像可能拍到受災者、傷患與門牌住址，送入 AI 分析＝把個資交給外部模型；
+// 同時每次呼叫都會消耗付費 AI 額度，無門檻等於開放成本濫用管道。
+// 回報災情是第一線志工的核心動作 → 單張影像/單筆文字分析 L1；
+// `classify/batch`（一次最多 10 筆）屬批次作業，成本與資料量級不同 → L2。
 @Controller('ai')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 export class AiVisionController {
     constructor(private readonly aiService: AiClassificationService) { }
 
@@ -114,6 +122,7 @@ export class AiVisionController {
      * 批量文字分類
      */
     @Post('classify/batch')
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     async classifyBatch(@Body('descriptions') descriptions: string[]) {
         if (!descriptions || !Array.isArray(descriptions) || descriptions.length === 0) {
             throw new BadRequestException('descriptions array is required');

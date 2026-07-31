@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { IAPController } from './iap.controller';
 import { IAPService } from './iap.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('IAPController', () => {
     let controller: IAPController;
@@ -24,7 +25,10 @@ describe('IAPController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [IAPController],
             providers: [{ provide: IAPService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<IAPController>(IAPController);
     });

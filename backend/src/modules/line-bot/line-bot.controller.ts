@@ -17,6 +17,14 @@ import { LineBotService } from './line-bot.service';
 import { DisasterReportService } from './disaster-report';
 import { WebhookEvent, MessageEvent, TextEventMessage, ImageEventMessage, LocationEventMessage } from '@line/bot-sdk';
 
+// 定級理由（本次補 rich-menu-config／binding-status／stats 三個缺口）：
+// `rich-menu-config` 是 LINE 官方帳號的選單結構與操作指引，屬對外通道的系統設定 → L3。
+// `binding-status` 供使用者確認自己的 LINE 綁定狀態，屬本人帳號自助查詢 → L1。
+// `stats` 揭露已綁定用戶總數（組織規模指標）→ L2。
+// `handleWebhook` 刻意不加 Guard：它是 LINE 平台的 callback，呼叫方永遠沒有 JWT，
+//   來源驗證改由 method 內的 x-line-signature HMAC 比對負責（見下方實作）。
+//   它真正需要的是 `@Public()` + 納入 public-surface.policy.json，屬功能面決策，本次不動；
+//   目前受全域 GlobalAuthGuard default-deny 保護，不存在授權缺口。
 @Controller('line-bot')
 export class LineBotController {
     private readonly logger = new Logger(LineBotController.name);
@@ -312,6 +320,8 @@ export class LineBotController {
 
     // Rich Menu 配置 (手動上傳用)
     @Get('rich-menu-config')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     getRichMenuConfig() {
         return {
             success: true,
@@ -348,6 +358,8 @@ export class LineBotController {
 
     // 取得綁定狀態
     @Get('binding-status/:lineUserId')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getBindingStatus(@Headers('x-line-user-id') lineUserId: string) {
         const status = await this.lineBotService.getBindingStatus(lineUserId);
         return { success: true, ...status };
@@ -355,6 +367,8 @@ export class LineBotController {
 
     // 取得已綁定用戶數
     @Get('stats')
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.OFFICER)
     async getStats() {
         const boundUserCount = await this.lineBotService.getBoundUserCount();
         return {

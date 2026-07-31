@@ -16,19 +16,29 @@ import { ReportsService, CreateReportDto, ReviewReportDto, ReportFilter } from '
 import { ReportStatus, ReportType, ReportSeverity } from './reports.entity';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 
+// 定級理由（本次補 create／map／stats 三個缺口，其餘 handler 既有定級不動）：
+// 三者原本標註為「公開」但實際沒有任何 Guard，本次統一定為 L1（志工）。
+// `create`：災情回報是第一線志工的核心動作，不能收到 L2；但也不宜開放匿名——
+//   系統已有專屬的匿名通報管道 `POST /intake`（`@Public()` + 已列入 public-surface.policy.json），
+//   本端點維持 L1 可避免未認證來源灌入未經審核的回報（審核端 `PATCH :id/review` 仍為 L2）。
+// `map`／`stats`：僅回傳已確認（confirmed）的回報，敏感度低，但含災情位置，維持 L1。
+// 與 ncdr-alerts 同一原則：不以 `@RequiredLevel(0)` 單方面擴大公開介面，
+// 若確定要匿名開放，應先更新 docs/policy/public-surface.policy.json 再改標 `@Public()`。
 @Controller('reports')
 export class ReportsController {
     constructor(private readonly reportsService: ReportsService) { }
 
     // =========================================
-    // 公開端點 (需要 Rate Limiting)
+    // 低權限端點 (L1 + Rate Limiting)
     // =========================================
 
     /**
-     * 提交新災情回報 (公開，但需要速率限制)
+     * 提交新災情回報 (需登入志工，並套用速率限制)
      * 每分鐘最多 5 次請求
      */
     @Throttle({ default: { limit: 5, ttl: 60000 } })
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     @Post()
     async create(@Body() dto: CreateReportDto) {
         const report = await this.reportsService.create(dto);
@@ -40,9 +50,11 @@ export class ReportsController {
     }
 
     /**
-     * 取得地圖用回報 (公開，僅限已確認的回報)
+     * 取得地圖用回報 (需登入志工，僅限已確認的回報)
      */
     @Throttle({ default: { limit: 30, ttl: 60000 } })
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     @Get('map')
     async findForMap() {
         const reports = await this.reportsService.findForMap();
@@ -54,9 +66,11 @@ export class ReportsController {
     }
 
     /**
-     * 取得統計 (公開)
+     * 取得統計 (需登入志工)
      */
     @Throttle({ default: { limit: 30, ttl: 60000 } })
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     @Get('stats')
     async getStats() {
         const stats = await this.reportsService.getStats();

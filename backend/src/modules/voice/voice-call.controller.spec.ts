@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { VoiceCallController } from './voice-call.controller';
 import { VoiceCallService } from './voice-call.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('VoiceCallController', () => {
     let controller: VoiceCallController;
@@ -15,7 +16,10 @@ describe('VoiceCallController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [VoiceCallController],
             providers: [{ provide: VoiceCallService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
         controller = module.get<VoiceCallController>(VoiceCallController);
     });
 

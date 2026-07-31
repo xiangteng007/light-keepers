@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { AiVisionController } from './ai-vision.controller';
 import { AiClassificationService } from './ai-classification.service';
 import { BadRequestException } from '@nestjs/common';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../../shared/guards';
 
 describe('AiVisionController', () => {
     let controller: AiVisionController;
@@ -18,7 +19,10 @@ describe('AiVisionController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [AiVisionController],
             providers: [{ provide: AiClassificationService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<AiVisionController>(AiVisionController);
     });

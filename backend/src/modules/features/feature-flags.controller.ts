@@ -26,6 +26,10 @@ class CreateFlagDto {
     expiresAt?: string;
 }
 
+// 定級理由（本次僅補三個 evaluate 類端點的缺口，管理類 handler 既有定級不動）：
+// `evaluate/*` 與 `client/enabled` 是用戶端啟動時判斷自己看得到哪些功能的必要呼叫，
+// 回傳的是「針對本人情境的評估結果」而非旗標定義全文（定義查詢 `GET /features` 已是 L2）→ L1。
+// 原本僅掛 `CoreJwtGuard`（只驗登入、無角色判斷），現補上 `UnifiedRolesGuard` 讓等級真正生效。
 @Controller('features')
 export class FeatureFlagsController {
     constructor(private featureFlagsService: FeatureFlagsService) { }
@@ -106,7 +110,8 @@ export class FeatureFlagsController {
      * Evaluate flags for current user
      */
     @Get('evaluate/all')
-    @UseGuards(CoreJwtGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async evaluateAll(@CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,
@@ -120,7 +125,8 @@ export class FeatureFlagsController {
      * Evaluate a single flag
      */
     @Get('evaluate/:key')
-    @UseGuards(CoreJwtGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async evaluateFlag(@Param('key') key: string, @CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,
@@ -134,7 +140,8 @@ export class FeatureFlagsController {
      * Get enabled features for current user (client-side)
      */
     @Get('client/enabled')
-    @UseGuards(CoreJwtGuard)
+    @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async getEnabledFeatures(@CurrentUser() user: JwtPayload) {
         const context: UserContext = {
             userId: user?.uid || user?.id,

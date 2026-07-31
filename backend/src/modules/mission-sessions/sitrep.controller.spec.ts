@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SITREPController } from './sitrep.controller';
 import { SITREPService } from './sitrep.service';
+import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('SITREPController', () => {
     let controller: SITREPController;
@@ -20,7 +21,10 @@ describe('SITREPController', () => {
         const module: TestingModule = await Test.createTestingModule({
             controllers: [SITREPController],
             providers: [{ provide: SITREPService, useValue: service }],
-        }).compile();
+        })
+            .overrideGuard(CoreJwtGuard).useValue({ canActivate: () => true })
+            .overrideGuard(UnifiedRolesGuard).useValue({ canActivate: () => true })
+            .compile();
 
         controller = module.get<SITREPController>(SITREPController);
     });

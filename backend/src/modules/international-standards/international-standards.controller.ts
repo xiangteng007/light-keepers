@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Param, Query, Body } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Body, UseGuards } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { InternationalStandardsService } from './international-standards.service';
 import { IcsFormType } from './services/ics-forms.service';
 import { SphereStandard } from './services/sphere-standards.service';
 
+// 定級理由：ICS/HXL/OCHA-3W/Sphere 皆為對外（跨機構、國際組織）交換的作戰與資源資料，
+// 匯出即等於把任務、資源分佈與受助對象統計送出組織邊界 → class 基準 L2（幹部）。
+// 純標準定義查詢（表單範本、指標清單）不含營運資料 → 放寬 L1；
+// `ocha/import` 為批次寫入共用 3W 資料集（可覆蓋整份跨機構協調資料）→ 收緊 L3。
 @ApiTags('International Standards')
 @Controller('standards')
+@UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 export class InternationalStandardsController {
     constructor(private readonly standards: InternationalStandardsService) {}
 
@@ -13,6 +20,7 @@ export class InternationalStandardsController {
 
     @Get('ics/templates/:formType')
     @ApiOperation({ summary: '取得 ICS 表單範本' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     getIcsTemplate(@Param('formType') formType: IcsFormType) {
         return this.standards.getIcsFormTemplate(formType);
     }
@@ -37,6 +45,7 @@ export class InternationalStandardsController {
 
     @Get('ics/forms')
     @ApiOperation({ summary: '列出所有 ICS 表單' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     listIcsForms() {
         return this.standards.listIcsForms();
     }
@@ -106,6 +115,7 @@ export class InternationalStandardsController {
 
     @Post('ocha/import')
     @ApiOperation({ summary: '匯入 OCHA 資料' })
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR)
     import3WData(@Body() data: any[]) {
         return { imported: this.standards.import3WData(data) };
     }
@@ -114,12 +124,14 @@ export class InternationalStandardsController {
 
     @Get('sphere/indicators')
     @ApiOperation({ summary: '取得所有 Sphere 指標' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     getSphereIndicators() {
         return this.standards.getSphereIndicators();
     }
 
     @Get('sphere/indicators/:standard')
     @ApiOperation({ summary: '依標準取得 Sphere 指標' })
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     getSphereIndicatorsByStandard(@Param('standard') standard: SphereStandard) {
         return this.standards.getSphereIndicatorsByStandard(standard);
     }
