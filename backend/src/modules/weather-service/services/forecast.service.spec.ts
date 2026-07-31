@@ -4,11 +4,14 @@ import { CwaApiService } from './cwa-api.service';
 
 describe('ForecastService', () => {
     let service: ForecastService;
+    // ForecastService 實際呼叫的是 CwaApiService.fetch()，
+    // 先前 mock 成 fetchData 導致 service 呼叫到 undefined 而拋錯。
     const mockCwa = {
-        fetchData: jest.fn().mockResolvedValue(null),
+        fetch: jest.fn().mockResolvedValue(null),
     };
 
     beforeEach(async () => {
+        mockCwa.fetch.mockClear();
         const module: TestingModule = await Test.createTestingModule({
             providers: [
                 ForecastService,
