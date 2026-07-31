@@ -1,4 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('RenameMissionEventsTable1736124000000');
 
 export class RenameMissionEventsTable1736124000000 implements MigrationInterface {
     name = 'RenameMissionEventsTable1736124000000';
@@ -14,7 +17,7 @@ export class RenameMissionEventsTable1736124000000 implements MigrationInterface
         `);
 
         if (!missionSessionsExists[0].exists) {
-            console.log('mission_sessions table does not exist yet, creating it first...');
+            logger.log('mission_sessions table does not exist yet, creating it first...');
 
             // Create mission_sessions table if it doesn't exist
             await queryRunner.query(`
@@ -45,11 +48,11 @@ export class RenameMissionEventsTable1736124000000 implements MigrationInterface
         `);
 
         if (missionEventsExists[0].exists) {
-            console.log('mission_events table already exists, skipping');
+            logger.log('mission_events table already exists, skipping');
             return;
         }
 
-        console.log('Creating mission_events table...');
+        logger.log('Creating mission_events table...');
 
         // Create the mission_events table
         await queryRunner.query(`
@@ -74,7 +77,7 @@ export class RenameMissionEventsTable1736124000000 implements MigrationInterface
             CREATE INDEX "IDX_mission_events_session_id" ON "mission_events" ("session_id")
         `);
 
-        console.log('mission_events table created successfully');
+        logger.log('mission_events table created successfully');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {

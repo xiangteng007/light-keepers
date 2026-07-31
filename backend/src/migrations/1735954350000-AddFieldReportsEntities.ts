@@ -1,4 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
+import { Logger } from '@nestjs/common';
+
+const logger = new Logger('AddFieldReportsEntities1735954350000');
 
 export class AddFieldReportsEntities1735954350000 implements MigrationInterface {
     name = 'AddFieldReportsEntities1735954350000';
@@ -208,7 +211,7 @@ export class AddFieldReportsEntities1735954350000 implements MigrationInterface 
             CREATE UNIQUE INDEX IF NOT EXISTS "idx_entity_locks_entity" ON "entity_locks" ("entity_type", "entity_id");
         `);
 
-        console.log('✅ Field Reports entities migration completed');
+        logger.log('Field Reports entities migration completed');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -222,6 +225,6 @@ export class AddFieldReportsEntities1735954350000 implements MigrationInterface 
         await queryRunner.query(`DROP TABLE IF EXISTS "report_attachments" CASCADE;`);
         await queryRunner.query(`DROP TABLE IF EXISTS "field_reports" CASCADE;`);
 
-        console.log('✅ Field Reports entities rollback completed');
+        logger.log('Field Reports entities rollback completed');
     }
 }
