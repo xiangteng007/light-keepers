@@ -1,9 +1,10 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 離線回報管理 Hook
  * 使用 IndexedDB 儲存離線時的災情回報，並在上線後自動同步
  */
 import { useState, useEffect, useCallback } from 'react';
+import api from '../api/client';
+import { getApiErrorMessage } from '../api/errors';
 
 // IndexedDB 配置
 const DB_NAME = 'lightkeepers-offline';
@@ -204,33 +205,24 @@ export function useOfflineReports() {
         for (const report of reports) {
             try {
                 // 嘗試上傳
-                const response = await fetch('/api/v1/reports', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        type: report.type,
-                        title: report.title,
-                        description: report.description,
-                        latitude: report.latitude,
-                        longitude: report.longitude,
-                        address: report.address,
-                        photos: report.photos,
-                        contactName: report.contactName,
-                        contactPhone: report.contactPhone,
-                        source: 'offline',
-                    }),
+                await api.post('/reports', {
+                    type: report.type,
+                    title: report.title,
+                    description: report.description,
+                    latitude: report.latitude,
+                    longitude: report.longitude,
+                    address: report.address,
+                    photos: report.photos,
+                    contactName: report.contactName,
+                    contactPhone: report.contactPhone,
+                    source: 'offline',
                 });
 
-                if (response.ok) {
-                    // 同步成功，刪除本地記錄
-                    await deleteReport(report.id);
-                    console.log(`Synced offline report: ${report.id}`);
-                } else {
-                    const errorText = await response.text();
-                    await updateReportSyncStatus(report.id, errorText);
-                }
+                // 同步成功，刪除本地記錄
+                await deleteReport(report.id);
+                console.log(`Synced offline report: ${report.id}`);
             } catch (error) {
-                await updateReportSyncStatus(report.id, (error as Error).message);
+                await updateReportSyncStatus(report.id, getApiErrorMessage(error, '同步離線回報失敗'));
             }
         }
 

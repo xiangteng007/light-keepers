@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Two-Factor Authentication Setup Page
  * User interface for enabling/managing 2FA
  */
 
 import React, { useState, useCallback } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './TwoFactorSetupPage.css';
 
 interface TOTPSetup {
@@ -25,8 +26,8 @@ const TwoFactorSetupPage: React.FC = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch('/api/auth/2fa/setup', { method: 'POST' });
-            const data = await response.json();
+            const response = await api.post('/auth/2fa/setup');
+            const data = response.data;
             if (data.success) {
                 setTotpData(data.data);
                 setStep('setup');
@@ -34,7 +35,7 @@ const TwoFactorSetupPage: React.FC = () => {
                 setError(data.message || '設定失敗');
             }
         } catch (err) {
-            setError('無法啟動設定流程');
+            setError(getApiErrorMessage(err, '無法啟動設定流程'));
         } finally {
             setLoading(false);
         }
@@ -49,12 +50,8 @@ const TwoFactorSetupPage: React.FC = () => {
         setLoading(true);
         setError('');
         try {
-            const response = await fetch('/api/auth/2fa/verify', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ token: verificationCode }),
-            });
-            const data = await response.json();
+            const response = await api.post('/auth/2fa/verify', { token: verificationCode });
+            const data = response.data;
             if (data.success) {
                 setBackupCodes(data.data.backupCodes);
                 setStep('backup');
@@ -62,7 +59,7 @@ const TwoFactorSetupPage: React.FC = () => {
                 setError('驗證碼錯誤，請重試');
             }
         } catch (err) {
-            setError('驗證失敗');
+            setError(getApiErrorMessage(err, '驗證失敗'));
         } finally {
             setLoading(false);
         }

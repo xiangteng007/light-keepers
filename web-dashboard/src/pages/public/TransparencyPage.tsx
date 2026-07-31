@@ -1,10 +1,12 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 公開責信查詢頁面 (Transparency Page)
  * 模組 D 前端：物資流向公開查詢
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { LEGACY } from '../../api/paths';
 import './TransparencyPage.css';
 
 interface TimelineStep {
@@ -59,25 +61,19 @@ const TransparencyPage: React.FC = () => {
 
     const loadStats = async () => {
         try {
-            const response = await fetch('/api/public/transparency/stats');
-            if (response.ok) {
-                const data = await response.json();
-                setStats(data.data);
-            }
+            const { data } = await api.get(`${LEGACY.publicTransparency}/stats`);
+            setStats(data.data);
         } catch (error) {
-            console.error('Failed to load stats:', error);
+            console.error('Failed to load stats:', getApiErrorMessage(error, '統計資料載入失敗'));
         }
     };
 
     const loadRecentActivity = async () => {
         try {
-            const response = await fetch('/api/public/transparency/recent?limit=10');
-            if (response.ok) {
-                const data = await response.json();
-                setRecentActivity(data.data || []);
-            }
+            const { data } = await api.get(`${LEGACY.publicTransparency}/recent`, { params: { limit: 10 } });
+            setRecentActivity(data.data || []);
         } catch (error) {
-            console.error('Failed to load activity:', error);
+            console.error('Failed to load activity:', getApiErrorMessage(error, '最近異動載入失敗'));
         }
     };
 
@@ -92,8 +88,9 @@ const TransparencyPage: React.FC = () => {
         setSearchResult(null);
 
         try {
-            const response = await fetch(`/api/public/transparency/search?receipt=${encodeURIComponent(receiptNumber)}`);
-            const data = await response.json();
+            const { data } = await api.get(`${LEGACY.publicTransparency}/search`, {
+                params: { receipt: receiptNumber },
+            });
 
             if (data.success) {
                 setSearchResult(data.data);
@@ -101,7 +98,7 @@ const TransparencyPage: React.FC = () => {
                 setError(data.message || '查無此收據');
             }
         } catch (error) {
-            setError('查詢失敗，請稍後再試');
+            setError(getApiErrorMessage(error, '查詢失敗，請稍後再試'));
         } finally {
             setSearching(false);
         }

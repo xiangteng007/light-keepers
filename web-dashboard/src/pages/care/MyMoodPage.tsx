@@ -1,10 +1,12 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * 心情日記頁面 (My Mood Page)
  * 模組 C 前端：心情追蹤與 AI 陪伴
  */
 
 import React, { useState, useEffect, useRef } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { LEGACY } from '../../api/paths';
 import './MyMoodPage.css';
 
 interface MoodLog {
@@ -68,72 +70,52 @@ const MyMoodPage: React.FC = () => {
 
     const loadMoodSummary = async () => {
         try {
-            const response = await fetch(`/api/care/mood/summary/${userId}`);
-            if (response.ok) {
-                const data = await response.json();
-                setSummary(data.data);
-            }
+            const { data } = await api.get(`${LEGACY.care}/mood/summary/${userId}`);
+            setSummary(data.data);
         } catch (error) {
-            console.error('Failed to load summary:', error);
+            console.error('Failed to load summary:', getApiErrorMessage(error, '無法載入心情摘要'));
         }
     };
 
     const loadHistory = async () => {
         try {
-            const response = await fetch(`/api/care/mood/history/${userId}?days=30`);
-            if (response.ok) {
-                const data = await response.json();
-                setHistory(data.data || []);
-            }
+            const { data } = await api.get(`${LEGACY.care}/mood/history/${userId}`, { params: { days: 30 } });
+            setHistory(data.data || []);
         } catch (error) {
-            console.error('Failed to load history:', error);
+            console.error('Failed to load history:', getApiErrorMessage(error, '無法載入歷史記錄'));
         }
     };
 
     const submitMood = async () => {
         try {
-            const response = await fetch('/api/care/mood', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    score: moodScore,
-                    tags: selectedTags,
-                    note,
-                }),
+            await api.post(`${LEGACY.care}/mood`, {
+                userId,
+                score: moodScore,
+                tags: selectedTags,
+                note,
             });
 
-            if (response.ok) {
-                alert('心情已記錄 💙');
-                setMoodScore(5);
-                setSelectedTags([]);
-                setNote('');
-                loadMoodSummary();
-                loadHistory();
-            }
+            alert('心情已記錄 💙');
+            setMoodScore(5);
+            setSelectedTags([]);
+            setNote('');
+            loadMoodSummary();
+            loadHistory();
         } catch (error) {
-            console.error('Failed to submit mood:', error);
+            console.error('Failed to submit mood:', getApiErrorMessage(error, '心情記錄失敗，請稍後再試'));
         }
     };
 
     const startNewChat = async () => {
         try {
-            const response = await fetch('/api/care/chat/new-session', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ sessionId: sessionId.current }),
-            });
-
-            if (response.ok) {
-                const data = await response.json();
-                setMessages([{
-                    role: 'assistant',
-                    content: data.data.greeting,
-                    timestamp: new Date(),
-                }]);
-            }
+            const { data } = await api.post(`${LEGACY.care}/chat/new-session`, { sessionId: sessionId.current });
+            setMessages([{
+                role: 'assistant',
+                content: data.data.greeting,
+                timestamp: new Date(),
+            }]);
         } catch (error) {
-            console.error('Failed to start chat:', error);
+            console.error('Failed to start chat:', getApiErrorMessage(error, '無法開始對話'));
         }
     };
 
@@ -151,37 +133,30 @@ const MyMoodPage: React.FC = () => {
         }]);
 
         try {
-            const response = await fetch('/api/care/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    userId,
-                    sessionId: sessionId.current,
-                    message: userMessage,
-                }),
+            const { data } = await api.post(`${LEGACY.care}/chat`, {
+                userId,
+                sessionId: sessionId.current,
+                message: userMessage,
             });
 
-            if (response.ok) {
-                const data = await response.json();
-                setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: data.data.response,
-                    timestamp: new Date(),
-                }]);
+            setMessages(prev => [...prev, {
+                role: 'assistant',
+                content: data.data.response,
+                timestamp: new Date(),
+            }]);
 
-                // 如果有危機資源
-                if (data.data.resources) {
-                    setTimeout(() => {
-                        setMessages(prev => [...prev, {
-                            role: 'assistant',
-                            content: data.data.resources.join('\n'),
-                            timestamp: new Date(),
-                        }]);
-                    }, 1000);
-                }
+            // 如果有危機資源
+            if (data.data.resources) {
+                setTimeout(() => {
+                    setMessages(prev => [...prev, {
+                        role: 'assistant',
+                        content: data.data.resources.join('\n'),
+                        timestamp: new Date(),
+                    }]);
+                }, 1000);
             }
         } catch (error) {
-            console.error('Chat error:', error);
+            console.error('Chat error:', getApiErrorMessage(error, '對話發生錯誤，請稍後再試'));
         } finally {
             setChatLoading(false);
         }

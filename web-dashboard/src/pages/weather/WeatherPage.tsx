@@ -1,10 +1,11 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Weather Dashboard Page
  * Real-time weather data and alerts visualization
  */
 
 import React, { useState, useEffect } from 'react';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
 import './WeatherPage.css';
 
 interface WeatherData {
@@ -53,13 +54,10 @@ const WeatherPage: React.FC = () => {
 
     const loadWeatherData = async () => {
         try {
-            const response = await fetch('/api/weather/current');
-            if (response.ok) {
-                const data = await response.json();
-                setCurrentWeather(data.data || []);
-            }
+            const response = await api.get('/weather/current');
+            setCurrentWeather(response.data.data || []);
         } catch (error) {
-            console.error('Failed to load weather:', error);
+            console.error('Failed to load weather:', getApiErrorMessage(error, '無法載入天氣資料'));
         } finally {
             setLoading(false);
         }
@@ -67,36 +65,30 @@ const WeatherPage: React.FC = () => {
 
     const loadAlerts = async () => {
         try {
-            const response = await fetch('/api/weather/alerts');
-            if (response.ok) {
-                const data = await response.json();
-                setAlerts(data.data || []);
-            }
+            const response = await api.get('/weather/alerts');
+            setAlerts(response.data.data || []);
         } catch (error) {
-            console.error('Failed to load alerts:', error);
+            console.error('Failed to load alerts:', getApiErrorMessage(error, '無法載入天氣警報'));
         }
     };
 
     const loadForecast = async (location: string) => {
         try {
-            const response = await fetch(`/api/weather/forecast/${encodeURIComponent(location)}`);
-            if (response.ok) {
-                const data = await response.json();
-                setForecasts(data.data?.forecasts || []);
-            }
+            const response = await api.get(`/weather/forecast/${encodeURIComponent(location)}`);
+            setForecasts(response.data.data?.forecasts || []);
         } catch (error) {
-            console.error('Failed to load forecast:', error);
+            console.error('Failed to load forecast:', getApiErrorMessage(error, '無法載入天氣預報'));
         }
     };
 
     const triggerSync = async () => {
         setLoading(true);
         try {
-            await fetch('/api/weather/sync');
+            await api.get('/weather/sync');
             await loadWeatherData();
             await loadAlerts();
         } catch (error) {
-            console.error('Sync failed:', error);
+            console.error('Sync failed:', getApiErrorMessage(error, '同步天氣資料失敗'));
         } finally {
             setLoading(false);
         }

@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax -- FE-4 遷移待辦（工作項 3.2）：本檔裸 fetch 待遷移至 src/api/client；見 docs/architecture/API_CLIENT_CONSOLIDATION.md */
 /**
  * Voice Call Page
  * WebRTC voice communication interface with LINE integration
@@ -6,6 +5,9 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { io, Socket } from 'socket.io-client';
+import api from '../../api/client';
+import { getApiErrorMessage } from '../../api/errors';
+import { LEGACY } from '../../api/paths';
 import './VoiceCallPage.css';
 
 interface OnlineUser {
@@ -264,20 +266,15 @@ const VoiceCallPage: React.FC = () => {
 
     const initiateLineCall = async (userId: string) => {
         try {
-            const response = await fetch('/api/voice/call/line', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    lineUserId: userId,
-                    callerId: localStorage.getItem('userId'),
-                }),
+            const { data } = await api.post(`${LEGACY.voice}/call/line`, {
+                lineUserId: userId,
+                callerId: localStorage.getItem('userId'),
             });
-            const data = await response.json();
             if (data.success) {
                 alert('通話邀請已發送至 LINE');
             }
         } catch (error) {
-            console.error('Failed to initiate LINE call:', error);
+            console.error('Failed to initiate LINE call:', getApiErrorMessage(error, '無法發送 LINE 通話邀請'));
         }
     };
 
