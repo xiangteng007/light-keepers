@@ -129,16 +129,17 @@ export default defineConfig({
           // Charts (~185KB)
           'vendor-charts': ['chart.js', 'react-chartjs-2'],
           // Realtime (~42KB)
-          'vendor-realtime': ['socket.io-client', 'rxjs'],
+          // rxjs 已隨 rxdb 離線層刪除（FE-4 工作項 3.4）
+          'vendor-realtime': ['socket.io-client'],
           // i18n (~55KB)
           'vendor-i18n': ['i18next', 'react-i18next', 'i18next-browser-languagedetector'],
           // Data fetching (~35KB)
           'vendor-query': ['@tanstack/react-query'],
           // Bootstrap UI (~37KB) — used by 4 legacy pages
           'vendor-bootstrap': ['react-bootstrap'],
-          // Note: firebase, exceljs, maplibre/leaflet, rxdb/idb are
-          // already code-split via LazyPages dynamic imports — no need
-          // for manual chunks (they were generating empty 0KB chunks)
+          // Note: firebase, exceljs, maplibre/leaflet are already code-split
+          // via LazyPages dynamic imports — no need for manual chunks
+          // (they were generating empty 0KB chunks)
         },
       },
     },

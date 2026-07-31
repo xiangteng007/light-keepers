@@ -42,17 +42,21 @@ const BARE_FETCH_MESSAGE = [
 /**
  * 允許直接使用 fetch 的層：
  *  - `src/api/**`：單一 client 出口本身（含 axios 之外的低階實作）
- *  - service worker / 離線同步層：需要在無 React context、
- *    背景 sync、Capacitor 檔案系統等環境下運作，axios instance 不適用。
- *    （其正確性由工作項 3.4「離線 outbox 三套收斂」負責，不在 3.2 遷移範圍）
+ *  - `capacitorFilesystem`：下載任意資產 URL，不是 API 呼叫，axios instance 不適用
+ *  - `push-notification.service`：SW / FCM 情境，已正確使用 `API_BASE`（含 `/api/v1`）
+ *  - `uploadQueue`：presigned URL 直傳 GCS，夾在 initiate/complete 之間，
+ *    無法走 axios baseURL；已改為即時讀取 token + 401 refresh 重試
+ *
+ * 工作項 3.4 已完成離線層收斂：`offlineOutbox` / `offlineSOP` / `syncManager` /
+ * `rxdbSyncService` 全數刪除（孤兒或端點不存在），豁免清單由 7 檔縮減為 3 檔。
+ * 盤點見 `docs/architecture/OFFLINE_LAYER_CONSOLIDATION.md`。
+ *
+ * 離線寫入請一律使用 `src/services/offline/offline.service.ts` 的 outbox，
+ * 它內部經 `src/api/client.ts` 送出，不需要豁免。
  */
 const FETCH_EXEMPT_FILES = [
   'src/api/**',
-  'src/services/offlineOutbox.ts',
-  'src/services/offlineSOP.ts',
   'src/services/uploadQueue.ts',
-  'src/services/rxdbSyncService.ts',
-  'src/services/syncManager.ts',
   'src/services/capacitorFilesystem.ts',
   'src/services/push-notification.service.ts',
 ]
