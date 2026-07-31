@@ -11,6 +11,16 @@
     margin: 0 auto;
 }
 
+.spin {
+    animation: shelters-spin 1s linear infinite;
+}
+
+@keyframes shelters-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* Header */
 .shelters-header {
     display: flex;
