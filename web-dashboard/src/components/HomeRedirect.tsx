@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { isDevModeUser } from '../utils/devMode';
 
 /**
  * 首頁智能導向
@@ -12,8 +13,8 @@ import { useAuth } from '../context/AuthContext';
 export default function HomeRedirect() {
     const { isAuthenticated, authReady } = useAuth();
 
-    // DevMode 跳過
-    const devMode = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    // DevMode 跳過（僅 DEV build 有效）
+    const devMode = isDevModeUser();
 
     if (!authReady && !devMode) {
         return (

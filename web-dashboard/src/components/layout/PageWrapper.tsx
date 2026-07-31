@@ -10,6 +10,7 @@ import React from 'react';
 import AppShellLayout from './AppShellLayout';
 import { PermissionLevel, PAGE_WIDGET_CONFIGS } from './widget.types';
 import { useAuth } from '../../context/AuthContext';
+import { isDevModeUser } from '../../utils/devMode';
 
 interface PageWrapperProps {
     children?: React.ReactNode;
@@ -26,7 +27,8 @@ export default function PageWrapper({
 
     // Map user role to PermissionLevel
     // 🔧 DevMode: Use SystemOwner level to show all sidebar items
-    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    // ⚠️ DEV build 專用 — production build 中 isDevModeUser() 會被 tree-shaking 成 false
+    const devModeEnabled = isDevModeUser();
     const userLevel = devModeEnabled
         ? PermissionLevel.SystemOwner
         : (user?.roleLevel as PermissionLevel) ?? PermissionLevel.Guest;

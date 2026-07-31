@@ -1,5 +1,6 @@
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { isDevModeUser } from '../utils/devMode';
 
 interface ProtectedRouteProps {
     children: React.ReactNode;
@@ -26,8 +27,8 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
     const { isAuthenticated, user, authReady } = useAuth();
     const location = useLocation();
 
-    // DevMode 完整跳過認證（開發測試用）
-    const devModeEnabled = typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+    // DevMode 完整跳過認證（僅開發測試用；production build 恆為 false 且被 tree-shaking 移除）
+    const devModeEnabled = isDevModeUser();
 
     // 🔐 Auth Ready Gating：權限載入完成前不做任何 redirect 決策
     // 這解決了「isLoading 期間誤導頁」的問題

@@ -15,6 +15,7 @@ import type { ReactNode } from 'react';
 import { getProfile, logout as apiLogout } from '../api/services';
 import { getStoredToken, storeToken, clearToken, refreshAccessToken } from '../api/client';
 import { authLogger } from '../utils/logger';
+import { isDevModeUser } from '../utils/devMode';
 
 // 使用者資訊介面
 export interface User {
@@ -45,11 +46,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// DevMode 檢查
-const isDevMode = (): boolean =>
-    typeof window !== 'undefined' && localStorage.getItem('devModeUser') === 'true';
+// DevMode 檢查（僅 DEV build 有效，見 utils/devMode.ts）
+const isDevMode = isDevModeUser;
 
-// DevMode 模擬用戶
+// DevMode 模擬用戶（production build 中因 isDevMode() 常數摺疊為 false 而被 tree-shaking 移除）
 const DEV_USER: User = {
     id: 'dev-user-001',
     email: 'xiangteng007@gmail.com',
