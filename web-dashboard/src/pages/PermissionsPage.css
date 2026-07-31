@@ -37,13 +37,13 @@
 }
 
 .permissions-message--success {
-    background: rgba(92, 184, 92, 0.1);
+    background: rgba(92, 184, 92, 0.1); /* 與 var(--success) 搭配的既有淡色底，非精確色階換算，保留字面值 */
     border: 1px solid var(--success);
     color: var(--success);
 }
 
 .permissions-message--error {
-    background: rgba(184, 92, 92, 0.1);
+    background: rgba(184, 92, 92, 0.1); /* 與 var(--danger) 搭配的既有淡色底，非精確色階換算，保留字面值 */
     border: 1px solid var(--danger);
     color: var(--danger);
 }
@@ -378,7 +378,7 @@
 }
 
 .user-card__level.level-0 {
-    background: rgba(156, 163, 175, 0.1);
+    background: rgba(156, 163, 175, 0.1); /* 中性 level-0 徽章底色，無對應語義 token，保留字面值 */
     color: var(--text-muted);
 }
 
