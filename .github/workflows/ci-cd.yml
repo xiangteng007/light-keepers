@@ -28,17 +28,12 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      # 安全稽核（暫時非阻擋）
-      # 現況：web-dashboard 有 5 個 critical / 21 個 high，backend 有 4 個 critical / 22 個 high，
-      # 全部來自傳遞依賴。deploy 已改為必須等 CI 成功才執行，因此現在把 audit 設成阻擋式
-      # 會讓 CI 永遠紅燈 → 所有發布（含緊急修復）被凍結。
-      # 折衷：改用 continue-on-error（UI 顯示為黃色的「失敗但繼續」）取代 `|| true`
-      #      （`|| true` 會讓步驟偽裝成綠燈，等於完全看不到問題）。
-      # TODO(Phase F): 先跑 `npm audit fix` 清掉 critical，再把此步驟改為
-      #                `npm audit --audit-level=critical` 並移除 continue-on-error。
-      - name: Security audit (non-blocking, 見上方 TODO)
+      # 安全稽核（阻擋式，critical 級）
+      # E.6 已將兩包 critical 清零（見 docs/security/DEPENDENCY_AUDIT_2026-07-31.md），
+      # 因此 critical 級可安全設為阻擋。high 級仍有傳遞依賴殘餘（需 breaking 升版），
+      # 待該文件列出的升版完成後再收緊為 --audit-level=high。
+      - name: Security audit (blocking, critical)
         run: npm audit --audit-level=critical
-        continue-on-error: true
 
       # Lint 閘門（棘輪式阻擋）
       # 現況：main 上已累積 229 個 eslint error（多為 react-refresh/only-export-components、
@@ -129,12 +124,10 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
-      # 同 frontend：backend 目前有 4 個 critical / 22 個 high 傳遞依賴弱點，
-      # 阻擋式 gate 會凍結發布。改用 continue-on-error 讓失敗至少在 UI 上可見。
-      # TODO(Phase F): `npm audit fix` 後改為阻擋式並移除 continue-on-error。
-      - name: Security audit (non-blocking, 見上方 TODO)
+      # 同 frontend：E.6 已將 critical 清零，critical 級設為阻擋；
+      # high 級殘餘（需 breaking 升版）見 docs/security/DEPENDENCY_AUDIT_2026-07-31.md。
+      - name: Security audit (blocking, critical)
         run: npm audit --audit-level=critical
-        continue-on-error: true
 
       - name: Run tests
         run: npm test -- --passWithNoTests
