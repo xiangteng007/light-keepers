@@ -1,6 +1,11 @@
 import { Controller, Get, Post, Put, Param, Query, Body, Headers } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody, ApiHeader } from '@nestjs/swagger';
 import { ScalabilityService } from './scalability.service';
+import {
+    QueueOfflineOperationDto,
+    ResolveConflictDto,
+    UpdateRateLimitConfigDto,
+} from './dto/scalability.dto';
 
 @ApiTags('Scalability')
 @Controller('scalability')
@@ -37,7 +42,7 @@ export class ScalabilityController {
 
     @Post('offline/queue')
     @ApiOperation({ summary: '排隊離線操作' })
-    queueOperation(@Body() data: any) {
+    queueOperation(@Body() data: QueueOfflineOperationDto) {
         return this.scalability.queueOfflineOperation(data);
     }
 
@@ -45,7 +50,7 @@ export class ScalabilityController {
     @ApiOperation({ summary: '解決衝突' })
     resolveConflict(
         @Param('operationId') operationId: string,
-        @Body() body: { resolution: 'use_client' | 'use_server' | 'merge'; mergedData?: any }
+        @Body() body: ResolveConflictDto
     ) {
         return { resolved: this.scalability.resolveConflict(operationId, body.resolution, body.mergedData) };
     }
@@ -145,7 +150,7 @@ export class ScalabilityController {
 
     @Put('rate-limits/:name')
     @ApiOperation({ summary: '更新限流配置' })
-    updateRateLimitConfig(@Param('name') name: string, @Body() updates: any) {
+    updateRateLimitConfig(@Param('name') name: string, @Body() updates: UpdateRateLimitConfigDto) {
         return { updated: this.scalability.updateRateLimitConfig(name, updates) };
     }
 

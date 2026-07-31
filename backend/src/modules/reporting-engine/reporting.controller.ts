@@ -1,9 +1,16 @@
-import { Controller, Get, Post, Put, Delete, Param, Query, Body, Res, Header } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Query, Body, Res, Header, BadRequestException } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiQuery, ApiParam, ApiBody } from '@nestjs/swagger';
 import { Response } from 'express';
 import { ReportingEngineService } from './reporting-engine.service';
 import { ReportFilter } from './services/report-builder.service';
 import { ExportOptions } from './services/export.service';
+import {
+    CreateReportDefinitionDto,
+    CreateReportScheduleDto,
+    CreateReportTemplateDto,
+    UpdateReportScheduleDto,
+    findInvalidTemplateVariableKeys,
+} from './dto/reporting.dto';
 
 @ApiTags('Reports')
 @Controller('reports')
@@ -26,7 +33,7 @@ export class ReportingController {
 
     @Post('definitions')
     @ApiOperation({ summary: '建立報表定義' })
-    createDefinition(@Body() data: any) {
+    createDefinition(@Body() data: CreateReportDefinitionDto) {
         return this.reportingEngine.createReportDefinition(data);
     }
 
@@ -111,13 +118,13 @@ export class ReportingController {
 
     @Post('schedules')
     @ApiOperation({ summary: '建立排程' })
-    createSchedule(@Body() data: any) {
+    createSchedule(@Body() data: CreateReportScheduleDto) {
         return this.reportingEngine.createSchedule(data);
     }
 
     @Put('schedules/:id')
     @ApiOperation({ summary: '更新排程' })
-    updateSchedule(@Param('id') id: string, @Body() updates: any) {
+    updateSchedule(@Param('id') id: string, @Body() updates: UpdateReportScheduleDto) {
         return this.reportingEngine.updateSchedule(id, updates);
     }
 
@@ -149,13 +156,21 @@ export class ReportingController {
 
     @Post('templates')
     @ApiOperation({ summary: '建立範本' })
-    createTemplate(@Body() data: any) {
+    createTemplate(@Body() data: CreateReportTemplateDto) {
         return this.reportingEngine.createTemplate(data);
     }
 
     @Post('templates/:id/render')
     @ApiOperation({ summary: '渲染範本' })
-    renderTemplate(@Param('id') id: string, @Body() variables: Record<string, any>) {
+    // `variables` 的鍵由各範本自行宣告，屬真正的動態結構，無法 DTO 化；
+    // 但鍵名會被 TemplateService.render() 直接組進 RegExp，故在入口限制格式。
+    renderTemplate(@Param('id') id: string, @Body() variables: Record<string, unknown>) {
+        const invalidKeys = findInvalidTemplateVariableKeys(variables);
+        if (invalidKeys.length > 0) {
+            throw new BadRequestException(
+                `範本變數名稱僅允許英數與底線，不合法的鍵：${invalidKeys.join(', ')}`,
+            );
+        }
         return { content: this.reportingEngine.renderTemplate(id, variables) };
     }
 }

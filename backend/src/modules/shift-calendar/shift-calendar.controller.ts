@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Put, Delete, Body, Param, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { ShiftCalendarService } from './shift-calendar.service';
+import { UpdateShiftDto } from './dto/shift-calendar.dto';
 
 @ApiTags('排班管理')
 @Controller('shift-calendar')
@@ -39,7 +40,7 @@ export class ShiftCalendarController {
     @ApiOperation({ summary: '更新班次' })
     @ApiResponse({ status: 200, description: '班次已更新' })
     @ApiBearerAuth()
-    updateShift(@Param('shiftId') shiftId: string, @Body() body: any) {
+    updateShift(@Param('shiftId') shiftId: string, @Body() body: UpdateShiftDto) {
         return this.service.updateShift(shiftId, body);
     }
 

@@ -1,6 +1,7 @@
 import { Controller, Get, Post, Patch, Delete, Body, Param, Query, Request, ForbiddenException } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { LabelTemplatesService } from './label-templates.service';
+import { CreateLabelTemplateDto, UpdateLabelTemplateDto } from './dto/label-template.dto';
 
 /**
  * 貼紙模板管理 API（幹部專用）
@@ -41,15 +42,7 @@ export class LabelTemplatesController {
      */
     @Post()
     async create(
-        @Body() body: {
-            name: string;
-            description?: string;
-            targetTypes: string[];
-            controlLevels: string[];
-            width: number;
-            height: number;
-            layoutConfig: Record<string, any>;
-        },
+        @Body() body: CreateLabelTemplateDto,
         @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;
@@ -72,16 +65,7 @@ export class LabelTemplatesController {
     @Patch(':id')
     async update(
         @Param('id') id: string,
-        @Body() body: Partial<{
-            name: string;
-            description: string;
-            targetTypes: string[];
-            controlLevels: string[];
-            width: number;
-            height: number;
-            layoutConfig: Record<string, any>;
-            isActive: boolean;
-        }>,
+        @Body() body: UpdateLabelTemplateDto,
         @Request() req: AuthenticatedRequest,
     ) {
         const user = req.user;

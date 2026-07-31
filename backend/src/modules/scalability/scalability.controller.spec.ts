@@ -1,6 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { ScalabilityController } from './scalability.controller';
 import { ScalabilityService } from './scalability.service';
+import { OfflineOperationType } from './services/offline-sync.service';
 
 describe('ScalabilityController', () => {
     let controller: ScalabilityController;
@@ -40,7 +41,14 @@ describe('ScalabilityController', () => {
     it('getSystemHealth', async () => expect(await controller.getSystemHealth()).toBeDefined());
     it('getPendingOperations', () => expect(controller.getPendingOperations('c1')).toEqual([]));
     it('syncOperations', async () => expect(await controller.syncOperations('c1')).toBeDefined());
-    it('queueOperation', () => expect(controller.queueOperation({})).toBeDefined());
+    it('queueOperation', () => expect(controller.queueOperation({
+        clientId: 'c1',
+        entityType: 'task',
+        entityId: 't1',
+        operation: OfflineOperationType.UPDATE,
+        data: { status: 'done' },
+        timestamp: new Date('2026-01-01T00:00:00Z'),
+    })).toBeDefined());
     it('resolveConflict', () => expect(controller.resolveConflict('op1', { resolution: 'use_client' }).resolved).toBe(true));
     it('getApiVersions', () => expect(controller.getApiVersions()).toEqual([]));
     it('getCurrentApiVersion', () => expect(controller.getCurrentApiVersion().version).toBe('1.0'));
