@@ -114,3 +114,7 @@ docs/proof/api/T7a-requests-responses.txt
 
 # Test-generated upload artifacts
 backend/uploads/
+
+# 測試覆蓋率產物（CI 現在會跑 `npm test -- --coverage`，不進版控）
+backend/coverage/
+web-dashboard/coverage/
