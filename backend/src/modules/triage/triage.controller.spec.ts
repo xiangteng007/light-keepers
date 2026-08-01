@@ -5,9 +5,10 @@ import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
 
 describe('TriageController', () => {
     let controller: TriageController;
+    let service: Record<string, jest.Mock>;
 
     beforeEach(async () => {
-        const service = {
+        service = {
             createVictim: jest.fn().mockResolvedValue({ id: 'v1' }),
             getVictim: jest.fn().mockResolvedValue({ id: 'v1' }),
             getVictimByBracelet: jest.fn().mockResolvedValue({ id: 'v1' }),
@@ -29,10 +30,33 @@ describe('TriageController', () => {
         controller = module.get<TriageController>(TriageController);
     });
 
-    const req = { user: { userId: 'u1', displayName: 'Medic' } } as any;
+    // 複製 CoreJwtGuard `attachUser()` 實際掛的欄位（id/sub），舊 mock 用的 `userId` 並不存在。
+    const req = { user: { id: 'u1', sub: 'u1', displayName: 'Medic' } } as any;
 
     it('should be defined', () => expect(controller).toBeDefined());
     it('createVictim', async () => expect(await controller.createVictim({} as any, req)).toBeDefined());
+
+    // 迴歸測試：留痕欄位必須真的填到操作者，不能是 undefined。
+    // MCI 傷票的評估者/處置者是法律證據鏈的一部分（見 docs/architecture/MCI_DESIGN.md）。
+    it('createVictim 會把評估者填成當前使用者', async () => {
+        await controller.createVictim({} as any, req);
+        expect(service.createVictim).toHaveBeenCalledWith(
+            expect.objectContaining({ assessorId: 'u1', assessorName: 'Medic' }),
+        );
+    });
+
+    it('updateTriage 會把改判者傳給 service', async () => {
+        await controller.updateTriage('v1', {} as any, req);
+        expect(service.updateTriage).toHaveBeenCalledWith('v1', expect.anything(), 'u1', 'Medic');
+    });
+
+    it('addMedicalLog 會把處置執行者填成當前使用者', async () => {
+        await controller.addMedicalLog('v1', {} as any, req);
+        expect(service.addMedicalLog).toHaveBeenCalledWith(
+            'v1',
+            expect.objectContaining({ performerId: 'u1', performerName: 'Medic' }),
+        );
+    });
     it('getVictim', async () => expect(await controller.getVictim('v1')).toBeDefined());
     it('getVictimByBracelet', async () => expect(await controller.getVictimByBracelet('br1')).toBeDefined());
     it('getVictimsByMission', async () => expect(await controller.getVictimsByMission('m1')).toEqual([]));
