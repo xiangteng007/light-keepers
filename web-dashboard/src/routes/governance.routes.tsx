@@ -1,7 +1,7 @@
 /**
  * Governance Routes — 權限、稽核、安全、Webhooks
  */
-import { Route } from 'react-router-dom';
+import { Route, Navigate } from 'react-router-dom';
 import {
   PermissionsPage,
   AuditLogPage,
@@ -25,8 +25,8 @@ export const governanceRoutes = (
     <Route path="/governance/settings" element={<ProtectedRoute requiredLevel={4}><PageWrapper pageId="governance-settings"><SettingsPage /></PageWrapper></ProtectedRoute>} />
     <Route path="/governance/interoperability" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-interoperability"><InteroperabilityPage /></PageWrapper></ProtectedRoute>} />
 
-    {/* Admin Audit Route (alias) */}
-    <Route path="/admin/audit-logs" element={<ProtectedRoute requiredLevel={5}><PageWrapper pageId="admin-audit-logs"><AuditLogPage /></PageWrapper></ProtectedRoute>} />
+    {/* R1 IA 收斂：審計日誌 canonical 為 /governance/audit（原 L3/L5 雙掛，以 policy L3 為準） */}
+    <Route path="/admin/audit-logs" element={<Navigate to="/governance/audit" replace />} />
     {/* System Monitor */}
     <Route path="/governance/monitor" element={<ProtectedRoute requiredLevel={3}><PageWrapper pageId="governance-monitor"><MonitorPage /></PageWrapper></ProtectedRoute>} />
   </>
