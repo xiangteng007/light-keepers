@@ -7,11 +7,19 @@
 # =============================================================================
 FROM postgres:15-alpine
 
-RUN apk add --no-cache rsync tzdata coreutils
+# openssh-client / rclone：第二副本推送用（CD-6 / 工作項 C1.3）
+#   openssh-client → 方案 A，rsync over SSH 推到內網 Mac mini
+#   rclone         → 方案 B，加密（crypt）後推到 S3 相容冷儲存
+# 兩者都裝：REPLICA_MODE 是 runtime 決定的，image 不該綁死走哪條路。
+# rclone 位於 alpine community repo，官方 postgres:15-alpine 已啟用該 repo。
+RUN apk add --no-cache rsync tzdata coreutils openssh-client rclone
 
-COPY entrypoint.sh /usr/local/bin/entrypoint.sh
-COPY backup.sh     /usr/local/bin/backup.sh
-RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/backup.sh
+COPY entrypoint.sh   /usr/local/bin/entrypoint.sh
+COPY backup.sh       /usr/local/bin/backup.sh
+COPY replicate.sh    /usr/local/bin/replicate.sh
+COPY healthcheck.sh  /usr/local/bin/healthcheck.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/backup.sh \
+             /usr/local/bin/replicate.sh /usr/local/bin/healthcheck.sh
 
 # 不需要 postgres server，覆寫官方 image 的 entrypoint
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

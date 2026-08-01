@@ -13,11 +13,22 @@
 #   4. uploads 備份的檔案數與線上一致
 #   5. 記錄 RTO（實際還原耗時）
 #
+# 兩種來源（--source，CD-6 / 工作項 C1.3）：
+#   primary   （預設）從 NAS 的 HDD RAID 6 池還原。驗證「備份本身是好的」。
+#   secondary 從第二副本（Mac mini / 加密雲端冷儲存）拉回來再還原。
+#             驗證的是完全不同的一件事：**當整台 NAS 不在了，你還救得回來嗎**。
+#             primary 演練通過不代表 secondary 通過——金鑰輪換、crypt 密碼記錯、
+#             遠端目錄被清空、保留策略誤刪，這些只有真的拉一次才會發現。
+#             備份未經還原驗證等於不存在，第二副本尤其如此。
+#
 # 用法：
-#   ./restore-drill.sh --dry-run          # 只檢查備份存在與完整性
-#   ./restore-drill.sh                    # 完整演練（用最新備份）
+#   ./restore-drill.sh --dry-run                  # 只檢查備份存在與完整性
+#   ./restore-drill.sh                            # 完整演練（本地最新備份）
 #   ./restore-drill.sh --dump-file /backup/db/xxx.dump
-#   ./restore-drill.sh --keep             # 演練後保留臨時容器供人工查驗
+#   ./restore-drill.sh --keep                     # 演練後保留臨時容器供人工查驗
+#   ./restore-drill.sh --source=secondary         # 跨目標演練（預設走 REPLICA_MODE）
+#   ./restore-drill.sh --source=secondary --secondary-mode=rclone
+#   ./restore-drill.sh --source=secondary --dry-run   # 只拉回 + 驗 sha256，不還原（快、可常跑）
 # =============================================================================
 set -uo pipefail
 
@@ -29,8 +40,11 @@ ENV_FILE="$NAS_DIR/.env"
 DRY_RUN=false
 KEEP=false
 DUMP_FILE=""
+SOURCE="primary"
+SECONDARY_MODE=""
 DRILL_CONTAINER="lk-restore-drill"
 DRILL_PORT="${DRILL_PORT:-55432}"
+STAGE_DIR=""          # 第二副本拉回來的暫存（host 路徑，演練後清掉）
 
 c_reset=$'\033[0m'; c_red=$'\033[31m'; c_yellow=$'\033[33m'; c_green=$'\033[32m'; c_dim=$'\033[2m'
 log()  { echo "${c_dim}[$(date '+%H:%M:%S')]${c_reset} $*"; }
@@ -43,20 +57,34 @@ cleanup() {
     if ! $KEEP && ! $DRY_RUN; then
         docker rm -f "$DRILL_CONTAINER" >/dev/null 2>&1 || true
     fi
+    # 從第二副本拉回的暫存檔會佔掉一份 dump 的空間，演練完就該清掉；
+    # --keep 時保留，讓人可以自己再驗一次或留作證據。
+    if [[ -n "$STAGE_DIR" && -d "$STAGE_DIR" ]] && ! $KEEP; then
+        rm -rf "$STAGE_DIR"
+    fi
 }
 trap cleanup EXIT
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
-        --dry-run)   DRY_RUN=true ;;
-        --keep)      KEEP=true ;;
-        --dump-file) DUMP_FILE="${2:?}"; shift ;;
-        --env-file)  ENV_FILE="${2:?}"; shift ;;
+        --dry-run)          DRY_RUN=true ;;
+        --keep)             KEEP=true ;;
+        --dump-file)        DUMP_FILE="${2:?}"; shift ;;
+        --env-file)         ENV_FILE="${2:?}"; shift ;;
+        --source)           SOURCE="${2:?}"; shift ;;
+        --source=*)         SOURCE="${1#*=}" ;;
+        --secondary-mode)   SECONDARY_MODE="${2:?}"; shift ;;
+        --secondary-mode=*) SECONDARY_MODE="${1#*=}" ;;
         -h|--help)   sed -n '2,/^# ====/p' "${BASH_SOURCE[0]}" | sed 's/^# \{0,1\}//'; exit 0 ;;
         *) die "未知參數：$1" ;;
     esac
     shift
 done
+
+case "$SOURCE" in
+    primary|secondary) ;;
+    *) die "--source 需為 primary 或 secondary，收到：$SOURCE" ;;
+esac
 
 [[ -f "$ENV_FILE" ]] || die "找不到 $ENV_FILE"
 set -a; # shellcheck disable=SC1090
@@ -70,6 +98,38 @@ source "$ENV_FILE"; set +a
 compose() { docker compose -f "$COMPOSE_FILE" --env-file "$ENV_FILE" "$@"; }
 
 DRILL_START=$(date +%s)
+SECONDARY_UPLOADS=""
+
+# --- 0. 第二副本：先拉回來（--source=secondary）--------------------------------
+if [[ "$SOURCE" == "secondary" ]]; then
+    step "0. 從第二副本拉回（CD-6 跨目標演練）"
+
+    [[ "${REPLICA_ENABLED:-false}" == "true" ]] \
+        || die "REPLICA_ENABLED 不是 true——第二副本尚未啟用，沒有東西可演練（見 .env §7.1）"
+
+    mode="${SECONDARY_MODE:-${REPLICA_MODE:-rsync}}"
+    [[ "$mode" == "both" ]] && mode="rsync"
+
+    STAGE_DIR="$HDD_BACKUP_ROOT/.drill-stage"
+    rm -rf "$STAGE_DIR"; mkdir -p "$STAGE_DIR"
+
+    # 刻意透過 backup 容器執行，而不是在 host 上直接跑 rsync/rclone：
+    #   1. 遠端存取邏輯只有一份（replicate.sh），host 與容器不會漂移
+    #   2. SSH 私鑰與 rclone.conf 只掛在容器裡，host 上根本不該有第二份
+    #   3. ADM 上不一定裝得到 rclone
+    # 用 run --rm --no-deps：生產棧沒開也能演練（不會順手把 postgres 拉起來）。
+    log "透過 backup 容器從第二副本拉取（mode=$mode）…"
+    compose run --rm --no-deps \
+        --entrypoint /usr/local/bin/replicate.sh \
+        backup --pull /backup/.drill-stage --mode "$mode" \
+        || die "第二副本拉取失敗——這代表災難當下你拿不回資料，請立即排查（Mac mini 是否關機／金鑰是否被輪換／雲端憑證是否過期）"
+
+    DUMP_FILE=$(cat "$STAGE_DIR/.pulled-dump" 2>/dev/null | sed "s#^/backup/.drill-stage#$STAGE_DIR#")
+    [[ -n "$DUMP_FILE" && -f "$DUMP_FILE" ]] || die "拉取回報成功但暫存目錄沒有 dump：$STAGE_DIR"
+    SECONDARY_UPLOADS=$(cat "$STAGE_DIR/.secondary-uploads-count" 2>/dev/null || echo "?")
+
+    ok "已從第二副本（$mode）取回 $(basename "$DUMP_FILE")，遠端 uploads 檔案數：${SECONDARY_UPLOADS}"
+fi
 
 # --- 1. 備份完整性 ------------------------------------------------------------
 step "1. 備份檔完整性"
@@ -83,8 +143,14 @@ fi
 log "使用備份：$DUMP_FILE（$(du -h "$DUMP_FILE" | cut -f1)，$(date -r "$DUMP_FILE" '+%Y-%m-%d %H:%M')）"
 
 if [[ -f "${DUMP_FILE}.sha256" ]]; then
-    (cd "$(dirname "$DUMP_FILE")" && sha256sum -c "$(basename "$DUMP_FILE").sha256" >/dev/null) \
-        || die "sha256 驗證失敗——這份備份已損毀，還原前務必找出原因"
+    # 只比對雜湊值本身，不用 `sha256sum -c`：.sha256 內記的檔名可能是產生當下的
+    # 容器路徑（/backup/db/...）或第二副本上的路徑，跟現在的位置對不起來，
+    # `-c` 會直接報 "No such file or directory" 而不是真的去驗內容。
+    expected=$(awk '{print $1; exit}' "${DUMP_FILE}.sha256")
+    actual=$(sha256sum "$DUMP_FILE" | awk '{print $1}')
+    [[ -n "$expected" ]] || die "${DUMP_FILE}.sha256 內容為空"
+    [[ "$expected" == "$actual" ]] \
+        || die "sha256 驗證失敗——這份備份已損毀，還原前務必找出原因（期望 $expected，實得 $actual）"
     ok "sha256 通過"
 else
     warn "缺少 .sha256（舊備份可能沒有），略過完整性驗證"
@@ -114,7 +180,13 @@ else
 fi
 
 if $DRY_RUN; then
-    echo; ok "dry-run：備份檔存在且完整，未執行實際還原"
+    echo
+    if [[ "$SOURCE" == "secondary" ]]; then
+        ok "dry-run（secondary）：第二副本可連線、可取回、sha256 完整，未執行實際還原"
+        echo "   —— 這是最便宜的每月檢查；季度／戰備期的完整演練請拿掉 --dry-run"
+    else
+        ok "dry-run：備份檔存在且完整，未執行實際還原"
+    fi
     exit 0
 fi
 
@@ -192,7 +264,19 @@ fi
 # --- 5. uploads ---------------------------------------------------------------
 step "5. uploads 備份"
 
-if [[ -d "$HDD_BACKUP_ROOT/uploads/current" ]]; then
+if [[ "$SOURCE" == "secondary" && -n "$SECONDARY_UPLOADS" ]]; then
+    # 第二副本的 uploads 只比檔案數（把幾十 GB 的附件全拉回來只為了數一次不划算）。
+    # 逐檔內容的比對由每日推送後的 rsync --checksum 回驗負責（REPLICA_VERIFY_UPLOADS）。
+    ok "第二副本 uploads 檔案數：${SECONDARY_UPLOADS}"
+    if [[ -d "$HDD_BACKUP_ROOT/uploads/current" ]]; then
+        pri_files=$(find "$HDD_BACKUP_ROOT/uploads/current" -type f | wc -l | tr -d '[:space:]')
+        log "主副本 uploads 檔案數：${pri_files}"
+        if [[ "${SECONDARY_UPLOADS}" =~ ^[0-9]+$ && "${SECONDARY_UPLOADS}" -lt "${pri_files}" ]]; then
+            warn "第二副本比主副本少 $(( pri_files - SECONDARY_UPLOADS )) 個檔案——推送可能中斷過，請查 backup.log"
+        fi
+    fi
+    [[ "${SECONDARY_UPLOADS}" != "0" ]] || warn "第二副本 uploads 為空（若系統本來就沒有附件則屬正常）"
+elif [[ -d "$HDD_BACKUP_ROOT/uploads/current" ]]; then
     bak_files=$(find "$HDD_BACKUP_ROOT/uploads/current" -type f | wc -l | tr -d '[:space:]')
     ok "uploads 備份檔案數：${bak_files}"
     if [[ -n "${NVME_DATA_ROOT:-}" && -d "${NVME_DATA_ROOT}/uploads" ]]; then
@@ -208,14 +292,27 @@ fi
 
 # --- 彙總 --------------------------------------------------------------------
 DRILL_SEC=$(( $(date +%s) - DRILL_START ))
+if [[ "$SOURCE" == "secondary" ]]; then
+    SRC_LABEL="第二副本（${SECONDARY_MODE:-${REPLICA_MODE:-rsync}}）—— 整台 NAS 消失也救得回"
+else
+    SRC_LABEL="主副本（NAS HDD RAID 6）"
+fi
 echo
 echo "================================================"
 echo "  ${c_green}還原演練通過${c_reset}"
+echo "  來源       ：${SRC_LABEL}"
 echo "  備份檔     ：$(basename "$DUMP_FILE")"
 echo "  DB 還原 RTO：${RESTORE_SEC} 秒"
 echo "  演練總耗時 ：${DRILL_SEC} 秒"
 echo "================================================"
 echo
-echo "請把上述結果記錄到 docs/RUNBOOK.md 的演練紀錄，並註明執行日期與執行人。"
+echo "請把上述結果填進 docs/RUNBOOK.md §7.3 的演練紀錄表（日期／來源／RTO／執行人）。"
+echo "注意：${DRILL_SEC} 秒只是「還原這一步」的時間，不等於 RTO——"
+echo "      RTO 還要加上發現故障、決策、備援硬體上線與服務驗證。換算方式見 §7.2。"
+if [[ "$SOURCE" == "primary" ]]; then
+    echo
+    echo "${c_yellow}提醒${c_reset}：本次只驗了主副本。CD-6 要求第二副本也必須經過還原驗證："
+    echo "      ./restore-drill.sh --source=secondary"
+fi
 $KEEP && echo "臨時容器保留中：docker exec -it $DRILL_CONTAINER psql -U $DB_USERNAME -d $DB_DATABASE"
 $KEEP || echo "臨時容器已清除。"

@@ -13,6 +13,9 @@
 #
 # 手動觸發一次（不必等到排程時間）：
 #   docker compose -f docker-compose.nas.yml exec backup /usr/local/bin/backup.sh
+#
+# 只補推第二副本（例：Mac mini 修好後）：
+#   docker compose -f docker-compose.nas.yml exec backup /usr/local/bin/replicate.sh
 # =============================================================================
 set -eu
 
@@ -54,10 +57,14 @@ while true; do
     sleep "$sleep_sec"
 
     if /usr/local/bin/backup.sh; then
-        log "備份完成"
+        log "備份完成（含第二副本）"
     else
         # 單日失敗不讓容器退出（否則 restart 迴圈會反覆重跑），
         # 由 healthcheck 的心跳過期偵測負責告警。
-        log "ERROR: 備份失敗，等待下一個排程週期"
+        #
+        # 注意：非零退出可能來自兩件不同的事——本地 pg_dump 失敗，
+        # 或本地成功但第二副本推不出去。兩者的心跳分開（.heartbeat /
+        # .replica-heartbeat），跑 healthcheck.sh 會直接說是哪一條。
+        log "ERROR: 備份流程有步驟失敗，等待下一個排程週期（跑 healthcheck.sh 看是哪一段）"
     fi
 done

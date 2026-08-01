@@ -1,0 +1,78 @@
+# =============================================================================
+# rclone 設定骨架 —— 方案 B：加密雲端冷儲存（CD-6 / 工作項 C1.3）
+#
+# 使用方式：
+#   1. 複製到 NAS 上「不會進版控」的秘密目錄，權限鎖死：
+#        mkdir -p /volume1/docker/secrets
+#        cp infra/nas/backup/rclone.conf.example /volume1/docker/secrets/rclone.conf
+#        chmod 600 /volume1/docker/secrets/rclone.conf
+#   2. 填入下面所有 CHANGE_ME
+#   3. 在 infra/nas/.env 設定：
+#        REPLICA_RCLONE_CONF_HOST=/volume1/docker/secrets/rclone.conf
+#        REPLICA_RCLONE_REMOTE=lk-cold-crypt:
+#        REPLICA_MODE=both
+#
+# ⚠ 本檔（.example）只放佔位值，永遠不可寫入真實憑證。
+#
+# 兩層結構的理由 —— 為什麼不直接用 s3 remote：
+#   lk-cold        = 對象儲存本身（明文，業者看得到檔名與內容）
+#   lk-cold-crypt  = 包在它外面的加密層（**推送目標一律指向這一層**）
+#   資料在離開 NAS 之前就加密完畢，雲端業者、機房人員、被扣押的硬碟，
+#   拿到的都只有密文與被混淆的檔名。在戰時威脅模型下，
+#   「資料寄放在別人機器上」的前提就是他們解不開。
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# 第 1 層：S3 相容儲存（Backblaze B2 / Cloudflare R2 / Wasabi / MinIO 皆可）
+#
+# provider 對照：
+#   Backblaze B2      → provider = Other，endpoint = s3.us-west-004.backblazeb2.com
+#   Cloudflare R2     → provider = Cloudflare，endpoint = https://<account>.r2.cloudflarestorage.com
+#   Wasabi            → provider = Wasabi，endpoint = s3.ap-northeast-1.wasabisys.com
+#   自架 MinIO        → provider = Minio，endpoint = https://minio.internal:9000
+#
+# ⚠ 用**唯讀以外**權限的 application key，但務必限定到單一 bucket。
+#   若這把 key 外洩，攻擊者能刪掉的應該只有這個 bucket，不是整個帳號。
+# ⚠ 強烈建議在 bucket 上開啟**物件版本控制 + 生命週期保留**：
+#   勒索軟體若拿到 key，最有效的攻擊是「把備份刪光再加密本體」。
+#   版本控制讓刪除只是加一個刪除標記，原物件仍可救回。
+# -----------------------------------------------------------------------------
+[lk-cold]
+type = s3
+provider = CHANGE_ME_provider
+access_key_id = CHANGE_ME_access_key_id
+secret_access_key = CHANGE_ME_secret_access_key
+endpoint = CHANGE_ME_endpoint
+region = CHANGE_ME_region
+# 冷儲存等級（B2 無此概念可留空；R2 用 STANDARD；S3 可用 GLACIER_IR）
+# ⚠ 選了需要「解凍」才能讀的等級（GLACIER / DEEP_ARCHIVE）會直接讓 RTO 破表，
+#   還原時要等數小時到數天。RTO ≤ 4h 的目標下請用即時可取回的等級。
+storage_class = CHANGE_ME_storage_class
+# 避免大檔重傳整包
+chunk_size = 64M
+upload_concurrency = 4
+
+# -----------------------------------------------------------------------------
+# 第 2 層：crypt 加密包裝 —— 推送與還原都用這個 remote
+#
+# 產生密碼（**不要**自己想，用 rclone 產生 obscured 值）：
+#   docker run --rm rclone/rclone obscure '<你的長密碼>'
+#   docker run --rm rclone/rclone obscure '<你的長 salt>'
+#
+# ⚠⚠ password / password2 遺失 = 雲端那份**永久解不開**。
+#   obscure 只是混淆不是加密，但這兩個值仍等同金鑰，必須：
+#     1. 離線抄一份（紙本，放保險箱或與 NAS 不同地點）
+#     2. 存進團隊密碼管理器
+#     3. 絕不放進本 repo、聊天室、雲端筆記
+#   還原演練（restore-drill.sh --source=secondary --secondary-mode=rclone）
+#   同時也是在驗證「這兩個值還救得回來」。
+# -----------------------------------------------------------------------------
+[lk-cold-crypt]
+type = crypt
+remote = lk-cold:CHANGE_ME_bucket_name/lightkeepers
+# 檔名也加密，避免從 lightkeepers-20260801-033000.dump 這種名字推斷出
+# 系統規模、備份時間與停機窗口
+filename_encryption = standard
+directory_name_encryption = true
+password = CHANGE_ME_obscured_password
+password2 = CHANGE_ME_obscured_salt

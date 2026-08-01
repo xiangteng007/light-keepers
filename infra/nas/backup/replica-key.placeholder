@@ -1,0 +1,16 @@
+# 這不是金鑰，是佔位檔。
+#
+# compose 的 backup 服務會把 REPLICA_SSH_KEY_HOST 掛到容器內 /secrets/replica_key。
+# 未啟用第二副本（REPLICA_ENABLED=false）時該變數是空的，Docker 會因為
+# 來源路徑不存在而拒絕啟動整個服務，所以用本檔當預設值讓 mount 有東西可掛。
+#
+# 真正啟用時請在 infra/nas/.env 設定：
+#   REPLICA_SSH_KEY_HOST=/volume1/docker/secrets/lk_replica_ed25519
+#
+# 產生金鑰（在 NAS 上執行，不要用既有的個人金鑰）：
+#   ssh-keygen -t ed25519 -N '' -C 'lk-nas-backup-replica' \
+#       -f /volume1/docker/secrets/lk_replica_ed25519
+#   chmod 600 /volume1/docker/secrets/lk_replica_ed25519
+#
+# 授權到 Mac mini（建議在 authorized_keys 加上限制，見 infra/nas/README.md §5.4）：
+#   ssh-copy-id -i /volume1/docker/secrets/lk_replica_ed25519.pub <user>@<mac-mini>
