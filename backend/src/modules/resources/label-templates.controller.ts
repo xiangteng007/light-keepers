@@ -22,6 +22,7 @@ export class LabelTemplatesController {
      * GET /api/label-templates
      */
     @Get()
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER) // P0：把檔頭寫的「僅需登入」改成宣告式，避免 guard fail-open
     async findAll(
         @Query('isActive') isActive?: string,
         @Query('targetType') targetType?: string,
@@ -39,6 +40,7 @@ export class LabelTemplatesController {
      * GET /api/label-templates/:id
      */
     @Get(':id')
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER) // P0：同上
     async findOne(@Param('id') id: string) {
         return this.templatesService.findOne(id);
     }
@@ -110,6 +112,7 @@ export class LabelTemplatesController {
      * GET /api/label-templates/applicable
      */
     @Get('applicable/list')
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER) // P0：同上
     async getApplicable(
         @Query('targetType') targetType: 'lot' | 'asset' | 'bin',
         @Query('controlLevel') controlLevel: 'controlled' | 'medical' | 'asset',
