@@ -22,6 +22,8 @@ import {
     Users,
     ChevronRight,
 } from 'lucide-react';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './LeaderboardPage.css';
 
 // 時間區間選項
@@ -111,7 +113,7 @@ export default function LeaderboardPage() {
             {/* 頁面標題 */}
             <header className="leaderboard-header">
                 <div className="leaderboard-header__title">
-                    <h1>🏆 志工表揚</h1>
+                    <h1><Trophy size={24} aria-hidden="true" /> 志工表揚</h1>
                     <p>服務時數排行榜與表揚紀錄</p>
                 </div>
             </header>
@@ -119,31 +121,37 @@ export default function LeaderboardPage() {
             {/* 我的排名卡片 */}
             {user && myRank && (
                 <div className="my-rank-card">
-                    <div className="my-rank-card__icon">
+                    <div className="my-rank-card__icon" aria-hidden="true">
                         <Star size={24} />
                     </div>
                     <div className="my-rank-card__content">
                         <span className="label">我的排名</span>
-                        <span className="rank">第 {myRank} 名</span>
+                        <span className="rank tabular-nums">第 {myRank} 名</span>
                     </div>
-                    <ChevronRight size={20} />
+                    <ChevronRight size={20} aria-hidden="true" />
                 </div>
             )}
 
             {/* Tab 切換 */}
-            <div className="leaderboard-tabs">
+            <div className="leaderboard-tabs" role="tablist" aria-label="檢視切換">
                 <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'leaderboard'}
                     className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
                     onClick={() => setActiveTab('leaderboard')}
                 >
-                    <Trophy size={16} />
+                    <Trophy size={16} aria-hidden="true" />
                     排行榜
                 </button>
                 <button
+                    type="button"
+                    role="tab"
+                    aria-selected={activeTab === 'recognitions'}
                     className={`tab-btn ${activeTab === 'recognitions' ? 'active' : ''}`}
                     onClick={() => setActiveTab('recognitions')}
                 >
-                    <Award size={16} />
+                    <Award size={16} aria-hidden="true" />
                     表揚紀錄
                 </button>
             </div>
@@ -151,11 +159,13 @@ export default function LeaderboardPage() {
             {activeTab === 'leaderboard' && (
                 <>
                     {/* 時間篩選 */}
-                    <div className="time-filter">
-                        <Clock size={16} />
+                    <div className="time-filter" role="group" aria-label="時間區間篩選">
+                        <Clock size={16} aria-hidden="true" />
                         {TIME_PERIODS.map(period => (
                             <button
                                 key={period.value}
+                                type="button"
+                                aria-pressed={timePeriod === period.value}
                                 className={`filter-btn ${timePeriod === period.value ? 'active' : ''}`}
                                 onClick={() => setTimePeriod(period.value)}
                             >
@@ -188,10 +198,10 @@ export default function LeaderboardPage() {
                                             {entry.volunteerName.charAt(0)}
                                         </div>
                                         <span className="top-card__name">{entry.volunteerName}</span>
-                                        <span className="top-card__hours">
+                                        <span className="top-card__hours tabular-nums">
                                             {formatHours(entry.totalHours)} 小時
                                         </span>
-                                        <span className="top-card__events">
+                                        <span className="top-card__events tabular-nums">
                                             {entry.eventCount} 場活動
                                         </span>
                                     </div>
@@ -203,30 +213,27 @@ export default function LeaderboardPage() {
                     {/* 排行榜列表 */}
                     <div className="leaderboard-list">
                         {loading ? (
-                            <div className="loading">載入中...</div>
+                            <Skeleton variant="text" count={5} height={56} />
                         ) : leaderboard.length === 0 ? (
-                            <div className="empty">
-                                <Trophy size={48} />
-                                <p>尚無服務記錄</p>
-                            </div>
+                            <EmptyState icon={Trophy} title="尚無服務記錄" />
                         ) : (
                             leaderboard.slice(3).map((entry, idx) => (
                                 <div
                                     key={entry.volunteerId}
                                     className={`leaderboard-item ${entry.volunteerId === user?.id ? 'is-me' : ''}`}
                                 >
-                                    <span className="leaderboard-item__rank">{idx + 4}</span>
-                                    <div className="leaderboard-item__avatar">
+                                    <span className="leaderboard-item__rank tabular-nums">{idx + 4}</span>
+                                    <div className="leaderboard-item__avatar" aria-hidden="true">
                                         {entry.volunteerName.charAt(0)}
                                     </div>
                                     <div className="leaderboard-item__info">
                                         <span className="name">{entry.volunteerName}</span>
                                         <span className="meta">
-                                            <Users size={12} /> {entry.eventCount} 場活動
+                                            <Users size={12} aria-hidden="true" /> <span className="tabular-nums">{entry.eventCount}</span> 場活動
                                         </span>
                                     </div>
-                                    <div className="leaderboard-item__hours">
-                                        <TrendingUp size={14} />
+                                    <div className="leaderboard-item__hours tabular-nums">
+                                        <TrendingUp size={14} aria-hidden="true" />
                                         {formatHours(entry.totalHours)} 小時
                                     </div>
                                 </div>
@@ -239,16 +246,13 @@ export default function LeaderboardPage() {
             {activeTab === 'recognitions' && (
                 <div className="recognitions-list">
                     {loading ? (
-                        <div className="loading">載入中...</div>
+                        <Skeleton variant="card" count={3} height={110} />
                     ) : recognitions.length === 0 ? (
-                        <div className="empty">
-                            <Award size={48} />
-                            <p>尚無表揚紀錄</p>
-                        </div>
+                        <EmptyState icon={Award} title="尚無表揚紀錄" />
                     ) : (
                         recognitions.map(rec => (
                             <article key={rec.id} className="recognition-card">
-                                <div className={`recognition-card__badge ${rec.badgeType}`}>
+                                <div className={`recognition-card__badge ${rec.badgeType}`} aria-hidden="true">
                                     <Award size={24} />
                                 </div>
                                 <div className="recognition-card__content">
@@ -256,7 +260,7 @@ export default function LeaderboardPage() {
                                     <p className="recognition-card__title">{rec.title}</p>
                                     <p className="recognition-card__reason">{rec.reason}</p>
                                     <div className="recognition-card__meta">
-                                        <span><Calendar size={12} /> {formatDate(rec.awardedAt)}</span>
+                                        <span><Calendar size={12} aria-hidden="true" /> {formatDate(rec.awardedAt)}</span>
                                         {rec.awardedBy && <span>頒發人：{rec.awardedBy}</span>}
                                     </div>
                                 </div>

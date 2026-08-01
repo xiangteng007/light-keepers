@@ -3,11 +3,21 @@
  *
  * FE-4 遷移範本（3.1 示範頁 1/3）：utils/api → src/api/client + react-query
  * 見 docs/architecture/API_CLIENT_CONSOLIDATION.md §「遷移模式 A：單一 GET 清單」
+ *
+ * R3b 視覺重建：archetype = List（排名清單，rank/hours/missions/points 皆
+ * tabular-nums）。原本整頁依賴專案未啟用 PostCSS 的 Tailwind className，
+ * 改為語義 token；領獎台（Top 3）維持自訂視覺，獎牌色為裝飾色（非狀態色），
+ * 取自品牌 gold/brown 色階，不挪用 danger/warning/success token。
  */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { RefreshCw, Trophy } from 'lucide-react';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
+import { Alert, Button } from '../../../design-system';
+import EmptyState from '../../../components/shared/EmptyState';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import './LeaderboardPage.css';
 
 interface LeaderboardEntry {
     rank: number;
@@ -19,6 +29,13 @@ interface LeaderboardEntry {
 }
 
 type Timeframe = 'week' | 'month' | 'year' | 'all';
+
+const TIMEFRAME_LABELS: Record<Timeframe, string> = {
+    week: '本週',
+    month: '本月',
+    year: '本年',
+    all: '全部',
+};
 
 /** query key 慣例：[領域, 資源, ...參數] */
 const leaderboardKeys = {
@@ -55,29 +72,43 @@ export default function LeaderboardPage() {
 
     const error = queryError ? getApiErrorMessage(queryError, '無法載入排行榜') : null;
 
-    const getRankStyle = (rank: number) => {
+    const getRankModifier = (rank: number) => {
         switch (rank) {
-            case 1: return 'bg-yellow-500 text-black';
-            case 2: return 'bg-gray-400 text-black';
-            case 3: return 'bg-amber-700 text-white';
-            default: return 'bg-slate-600 text-white';
+            case 1: return 'leaderboard-rank--gold';
+            case 2: return 'leaderboard-rank--silver';
+            case 3: return 'leaderboard-rank--bronze';
+            default: return 'leaderboard-rank--default';
         }
     };
 
     const topThree = entries.slice(0, 3);
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div><h1 className="text-2xl font-bold text-white">志工排行榜</h1><p className="text-gray-400">表現優異的志工排名</p></div>
-                <div className="flex items-center gap-2">
-                    <button onClick={() => fetchLeaderboard()} disabled={loading} className="px-3 py-2 text-gray-400 hover:text-white" title="重新整理">
-                        {loading ? '⏳' : '🔄'}
-                    </button>
-                    <div className="flex bg-slate-800 rounded-lg p-1">
+        <div className="leaderboard-page">
+            <div className="page-header">
+                <div className="page-header__titles">
+                    <h1>志工排行榜</h1>
+                    <p className="page-header__subtitle">表現優異的志工排名</p>
+                </div>
+                <div className="leaderboard-page__actions">
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => fetchLeaderboard()}
+                        disabled={loading}
+                        icon={<RefreshCw size={16} aria-hidden="true" />}
+                        aria-label="重新整理"
+                    />
+                    <div className="leaderboard-timeframe" role="tablist" aria-label="時間範圍">
                         {(['week', 'month', 'year', 'all'] as const).map((t) => (
-                            <button key={t} onClick={() => setTimeframe(t)} className={`px-4 py-2 rounded capitalize ${timeframe === t ? 'bg-amber-500 text-black' : 'text-gray-400 hover:text-white'}`}>
-                                {t === 'all' ? '全部' : t === 'week' ? '本週' : t === 'month' ? '本月' : '本年'}
+                            <button
+                                key={t}
+                                role="tab"
+                                aria-selected={timeframe === t}
+                                onClick={() => setTimeframe(t)}
+                                className={`leaderboard-timeframe__btn ${timeframe === t ? 'is-active' : ''}`}
+                            >
+                                {TIMEFRAME_LABELS[t]}
                             </button>
                         ))}
                     </div>
@@ -86,49 +117,97 @@ export default function LeaderboardPage() {
 
             {/* Error */}
             {error && (
-                <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px' }}>
-                    ⚠️ {error}
-                </div>
+                <Alert variant="danger" title="載入失敗" className="leaderboard-page__alert">
+                    <div className="leaderboard-page__alert-body">
+                        <span>{error}</span>
+                        <Button variant="secondary" size="sm" onClick={() => fetchLeaderboard()}>重試</Button>
+                    </div>
+                </Alert>
             )}
 
             {/* Loading */}
             {loading && (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', color: '#94a3b8' }}>
-                    載入排行榜中...
+                <div className="leaderboard-skeleton" role="status" aria-label="載入排行榜中">
+                    <Skeleton variant="card" height={48} count={5} />
                 </div>
             )}
 
             {!loading && entries.length > 0 && (
                 <>
-                    <div className="flex justify-center items-end gap-4 py-8">
-                        {topThree[1] && <div className="text-center"><div className="w-20 h-20 rounded-full bg-gray-400 mx-auto mb-2 flex items-center justify-center text-black text-2xl font-bold">{topThree[1].name.charAt(0)}</div><p className="text-white font-medium">{topThree[1].name}</p><p className="text-gray-400 text-sm">{topThree[1].points} 分</p><div className="h-24 w-24 bg-gray-400/20 rounded-t-lg mt-2 flex items-center justify-center"><span className="text-3xl font-bold text-gray-400">2</span></div></div>}
-                        {topThree[0] && <div className="text-center"><div className="w-24 h-24 rounded-full bg-yellow-500 mx-auto mb-2 flex items-center justify-center text-black text-3xl font-bold">{topThree[0].name.charAt(0)}</div><p className="text-white font-medium text-lg">{topThree[0].name}</p><p className="text-amber-400">{topThree[0].points} 分</p><div className="h-32 w-28 bg-yellow-500/20 rounded-t-lg mt-2 flex items-center justify-center"><span className="text-4xl font-bold text-yellow-500">1</span></div></div>}
-                        {topThree[2] && <div className="text-center"><div className="w-20 h-20 rounded-full bg-amber-700 mx-auto mb-2 flex items-center justify-center text-white text-2xl font-bold">{topThree[2].name.charAt(0)}</div><p className="text-white font-medium">{topThree[2].name}</p><p className="text-gray-400 text-sm">{topThree[2].points} 分</p><div className="h-16 w-24 bg-amber-700/20 rounded-t-lg mt-2 flex items-center justify-center"><span className="text-3xl font-bold text-amber-700">3</span></div></div>}
+                    {/* 領獎台（Top 3，裝飾視覺） */}
+                    <div className="leaderboard-podium">
+                        {topThree[1] && (
+                            <div className="leaderboard-podium__slot leaderboard-podium__slot--2">
+                                <div className="leaderboard-podium__avatar leaderboard-rank--silver">{topThree[1].name.charAt(0)}</div>
+                                <p className="leaderboard-podium__name">{topThree[1].name}</p>
+                                <p className="leaderboard-podium__points">{topThree[1].points} 分</p>
+                                <div className="leaderboard-podium__bar leaderboard-podium__bar--2">2</div>
+                            </div>
+                        )}
+                        {topThree[0] && (
+                            <div className="leaderboard-podium__slot leaderboard-podium__slot--1">
+                                <div className="leaderboard-podium__avatar leaderboard-podium__avatar--lg leaderboard-rank--gold">{topThree[0].name.charAt(0)}</div>
+                                <p className="leaderboard-podium__name leaderboard-podium__name--lg">{topThree[0].name}</p>
+                                <p className="leaderboard-podium__points leaderboard-podium__points--accent">{topThree[0].points} 分</p>
+                                <div className="leaderboard-podium__bar leaderboard-podium__bar--1">1</div>
+                            </div>
+                        )}
+                        {topThree[2] && (
+                            <div className="leaderboard-podium__slot leaderboard-podium__slot--3">
+                                <div className="leaderboard-podium__avatar leaderboard-rank--bronze">{topThree[2].name.charAt(0)}</div>
+                                <p className="leaderboard-podium__name">{topThree[2].name}</p>
+                                <p className="leaderboard-podium__points">{topThree[2].points} 分</p>
+                                <div className="leaderboard-podium__bar leaderboard-podium__bar--3">3</div>
+                            </div>
+                        )}
                     </div>
 
-                    <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
-                        <table className="w-full">
-                            <thead><tr className="border-b border-slate-700"><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">名次</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">志工</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">時數</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">任務</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">積分</th></tr></thead>
-                            <tbody className="divide-y divide-slate-700">
+                    {/* 桌機：完整排名表格 */}
+                    <div className="leaderboard-table-wrapper">
+                        <table className="leaderboard-table">
+                            <thead>
+                                <tr>
+                                    <th>名次</th>
+                                    <th>志工</th>
+                                    <th>時數</th>
+                                    <th>任務</th>
+                                    <th>積分</th>
+                                </tr>
+                            </thead>
+                            <tbody>
                                 {entries.map((entry) => (
-                                    <tr key={entry.volunteerId} className="hover:bg-slate-700/50">
-                                        <td className="px-6 py-4"><span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${getRankStyle(entry.rank)}`}>{entry.rank}</span></td>
-                                        <td className="px-6 py-4 text-white font-medium">{entry.name}</td>
-                                        <td className="px-6 py-4 text-gray-300">{entry.hours}h</td>
-                                        <td className="px-6 py-4 text-gray-300">{entry.missions}</td>
-                                        <td className="px-6 py-4 text-amber-400 font-medium">{entry.points}</td>
+                                    <tr key={entry.volunteerId}>
+                                        <td>
+                                            <span className={`leaderboard-rank ${getRankModifier(entry.rank)}`}>{entry.rank}</span>
+                                        </td>
+                                        <td className="leaderboard-table__name">{entry.name}</td>
+                                        <td className="leaderboard-table__num">{entry.hours}h</td>
+                                        <td className="leaderboard-table__num">{entry.missions}</td>
+                                        <td className="leaderboard-table__num leaderboard-table__points">{entry.points}</td>
                                     </tr>
                                 ))}
                             </tbody>
                         </table>
                     </div>
+
+                    {/* 行動端：Card 直列 */}
+                    <div className="leaderboard-card-list">
+                        {entries.map((entry) => (
+                            <div key={entry.volunteerId} className="leaderboard-record-card">
+                                <span className={`leaderboard-rank ${getRankModifier(entry.rank)}`}>{entry.rank}</span>
+                                <div className="leaderboard-record-card__main">
+                                    <span className="leaderboard-record-card__name">{entry.name}</span>
+                                    <span className="leaderboard-record-card__meta">{entry.hours}h · {entry.missions} 任務</span>
+                                </div>
+                                <span className="leaderboard-record-card__points">{entry.points} 分</span>
+                            </div>
+                        ))}
+                    </div>
                 </>
             )}
 
             {!loading && entries.length === 0 && !error && (
-                <div style={{ textAlign: 'center', padding: '3rem', color: '#64748b' }}>
-                    暫無排行資料
-                </div>
+                <EmptyState icon={Trophy} variant="minimal" title="暫無排行資料" description="請選擇其他時間範圍，或稍後再試" />
             )}
         </div>
     );
