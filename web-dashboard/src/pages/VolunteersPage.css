@@ -1,0 +1,176 @@
+/**
+ * VolunteersPage.css — R3b 列表頁骨架（DESIGN_LANGUAGE.md §7.1）
+ * 全部語義 token；補齊先前缺漏的 .volunteers-tabs / .tab-btn / 待審核卡片樣式。
+ */
+
+.volunteers-page .page-header__left h1 {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Tabs ── */
+
+.volunteers-tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.volunteers-tabs .tab-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-medium, 500);
+    cursor: pointer;
+}
+
+.volunteers-tabs .tab-btn:hover {
+    color: var(--text-primary);
+}
+
+.volunteers-tabs .tab-btn:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.volunteers-tabs .tab-btn.active {
+    color: var(--accent-primary, var(--color-secondary));
+    border-bottom-color: var(--accent-primary, var(--color-secondary));
+}
+
+/* ── 統計摘要列 ── */
+
+.volunteers-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+@media (min-width: 768px) {
+    .volunteers-stats {
+        grid-template-columns: repeat(5, 1fr);
+    }
+}
+
+/* ── 狀態篩選 ── */
+
+.status-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
+    cursor: pointer;
+}
+
+.status-filter-btn:hover {
+    background: var(--surface-hover);
+}
+
+.status-filter-btn:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.status-filter-btn--active {
+    border-color: var(--accent-primary, var(--color-secondary));
+    background: var(--surface-hover);
+}
+
+/* ── 待審核卡片 ── */
+
+.pending-volunteers-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.pending-volunteer-card {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.pending-volunteer-info {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    min-width: 0;
+}
+
+.pending-volunteer-avatar {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-full);
+    background: var(--accent-primary, var(--color-secondary));
+    color: var(--text-inverse);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: var(--font-weight-bold, 700);
+    font-size: var(--font-size-lg, 18px);
+}
+
+.pending-volunteer-details h3 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+.pending-volunteer-details p {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 2px 0;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.pending-volunteer-skills {
+    flex-wrap: wrap;
+    gap: var(--space-1) !important;
+}
+
+.pending-volunteer-actions {
+    display: flex;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}
+
+/* ── 列表 loading / error ── */
+
+.volunteers-list__skeleton {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.volunteers-list__error {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    align-items: flex-start;
+}

@@ -1,9 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Card, Button, Badge } from '../design-system';
+import { MapPin, Phone, Clock, ClipboardList, Users, Check, X } from 'lucide-react';
+import { Card, Button, Badge, Alert, ToastContainer, StatIndicator } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import { getApprovedVolunteers, getVolunteerStats, getPendingVolunteers, approveVolunteer, rejectVolunteer } from '../api/services';
 import { useAuth } from '../context/AuthContext';
 import type { Volunteer as VolunteerType, VolunteerStatus } from '../api/services';
+import './VolunteersPage.css';
 
 // 技能選項
 const SKILL_OPTIONS = [
@@ -17,11 +21,18 @@ const SKILL_OPTIONS = [
     { value: 'social', label: '社工關懷', icon: '💝' },
 ];
 
-// 顏色使用 design tokens（含原始 hex fallback，語義對應：available→success/safe、busy→warning、offline→中性文字色）
-const STATUS_CONFIG: Record<VolunteerStatus, { label: string; color: string; bgColor: string }> = {
-    available: { label: '可用', color: 'var(--color-success, #4CAF50)', bgColor: 'var(--color-safe-bg, rgba(76, 175, 80, 0.15))' },
-    busy: { label: '執勤中', color: 'var(--color-warning, #FF9800)', bgColor: 'var(--color-warning-bg, rgba(255, 152, 0, 0.15))' },
-    offline: { label: '離線', color: 'var(--text-tertiary, #9E9E9E)', bgColor: 'rgba(158, 158, 158, 0.15)' /* 中性離線狀態,暫無對應語義背景 token */ },
+// 狀態語意對照（DESIGN_LANGUAGE.md §3）：available→success、busy→warning、offline→default(中性)
+// 顏色一律交給 design-system 的 Badge variant 處理，頁面不再持有色碼。
+const STATUS_LABEL: Record<VolunteerStatus, string> = {
+    available: '可用',
+    busy: '執勤中',
+    offline: '離線',
+};
+
+const STATUS_BADGE_VARIANT: Record<VolunteerStatus, 'success' | 'warning' | 'default'> = {
+    available: 'success',
+    busy: 'warning',
+    offline: 'default',
 };
 
 interface AssignmentForm {
@@ -123,7 +134,6 @@ export default function VolunteersPage() {
 
         setShowAssignModal(false);
         setSuccessMessage(`已成功指派任務給 ${assignmentForm.volunteerName}`);
-        setTimeout(() => setSuccessMessage(''), 3000);
     };
 
     // 審核通過
@@ -133,7 +143,6 @@ export default function VolunteersPage() {
             await approveVolunteer(id, user?.id || '', '管理員核准');
             setPendingVolunteers(prev => prev.filter(v => v.id !== id));
             setSuccessMessage('志工已核准');
-            setTimeout(() => setSuccessMessage(''), 3000);
             // 重新載入列表
             const res = await getApprovedVolunteers({});
             setVolunteers(res.data.data);
@@ -153,7 +162,6 @@ export default function VolunteersPage() {
             await rejectVolunteer(id, user?.id || '', note || '');
             setPendingVolunteers(prev => prev.filter(v => v.id !== id));
             setSuccessMessage('志工申請已拒絕');
-            setTimeout(() => setSuccessMessage(''), 3000);
         } catch (err) {
             console.error('Failed to reject volunteer:', err);
             setError('拒絕失敗');
@@ -166,56 +174,50 @@ export default function VolunteersPage() {
         <div className="page volunteers-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>👥 志工管理</h2>
+                    <h1>志工管理</h1>
                     <p className="page-subtitle">志工動員與調度系統</p>
                 </div>
             </div>
 
             {/* Tab 切換 */}
-            <div className="volunteers-tabs">
+            <div className="volunteers-tabs" role="tablist" aria-label="志工檢視">
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'pending'}
                     className={`tab-btn ${activeTab === 'pending' ? 'active' : ''}`}
                     onClick={() => setActiveTab('pending')}
                 >
-                    ⏳ 待審核 {pendingVolunteers.length > 0 && <Badge variant="warning" size="sm">{pendingVolunteers.length}</Badge>}
+                    待審核 {pendingVolunteers.length > 0 && <Badge variant="warning" size="sm">{pendingVolunteers.length}</Badge>}
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'list'}
                     className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}
                     onClick={() => setActiveTab('list')}
                 >
-                    👥 志工名單
+                    <Users size={14} aria-hidden="true" /> 志工名單
                 </button>
             </div>
 
             {/* 成功訊息 */}
-            {successMessage && (
-                <div className="success-toast">
-                    ✅ {successMessage}
-                </div>
-            )}
+            <ToastContainer
+                toasts={successMessage ? [{
+                    id: 'volunteers-success',
+                    variant: 'success',
+                    message: successMessage,
+                    duration: 3000,
+                    onClose: () => setSuccessMessage(''),
+                }] : []}
+                onClose={() => setSuccessMessage('')}
+            />
 
             {/* 統計卡片 */}
-            <div className="volunteers-stats">
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__value">{stats.total}</div>
-                    <div className="stat-card__label">總志工數</div>
-                </Card>
-                <Card className="stat-card stat-card--success" padding="md">
-                    <div className="stat-card__value">{stats.available}</div>
-                    <div className="stat-card__label">可用</div>
-                </Card>
-                <Card className="stat-card stat-card--warning" padding="md">
-                    <div className="stat-card__value">{stats.busy}</div>
-                    <div className="stat-card__label">執勤中</div>
-                </Card>
-                <Card className="stat-card stat-card--info" padding="md">
-                    <div className="stat-card__value">{stats.totalServiceHours}</div>
-                    <div className="stat-card__label">總服務時數</div>
-                </Card>
-                <Card className="stat-card stat-card--primary" padding="md">
-                    <div className="stat-card__value">{stats.offline}</div>
-                    <div className="stat-card__label">離線</div>
-                </Card>
+            <div className="volunteers-stats" role="list">
+                <StatIndicator label="總志工數" value={stats.total} />
+                <StatIndicator variant="success" label="可用" value={stats.available} />
+                <StatIndicator variant="warning" label="執勤中" value={stats.busy} />
+                <StatIndicator label="總服務時數" value={stats.totalServiceHours} />
+                <StatIndicator label="離線" value={stats.offline} />
             </div>
 
             {/* 搜尋與篩選 - 只在志工名單 Tab 顯示 */}
@@ -225,27 +227,30 @@ export default function VolunteersPage() {
                         type="text"
                         className="form-input volunteers-search"
                         placeholder="搜尋姓名或地區..."
+                        aria-label="搜尋姓名或地區"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                     />
-                    <div className="volunteers-status-filters">
+                    <div className="volunteers-status-filters" role="group" aria-label="依狀態篩選">
                         <button
-                            className={`status-filter-btn ${filterStatus === '' ? 'active' : ''}`}
+                            type="button"
+                            className={`status-filter-btn ${filterStatus === '' ? 'status-filter-btn--active' : ''}`}
+                            aria-pressed={filterStatus === ''}
                             onClick={() => setFilterStatus('')}
                         >
                             全部
                         </button>
-                        {Object.entries(STATUS_CONFIG).map(([key, config]) => (
+                        {(Object.keys(STATUS_LABEL) as VolunteerStatus[]).map((status) => (
                             <button
-                                key={key}
-                                className={`status-filter-btn ${filterStatus === key ? 'active' : ''}`}
-                                style={{
-                                    borderColor: filterStatus === key ? config.color : undefined,
-                                    backgroundColor: filterStatus === key ? config.bgColor : undefined,
-                                }}
-                                onClick={() => setFilterStatus(key as VolunteerStatus)}
+                                key={status}
+                                type="button"
+                                className={`status-filter-btn ${filterStatus === status ? 'status-filter-btn--active' : ''}`}
+                                aria-pressed={filterStatus === status}
+                                onClick={() => setFilterStatus(status)}
                             >
-                                {config.label}
+                                <Badge variant={STATUS_BADGE_VARIANT[status]} size="sm" dot>
+                                    {STATUS_LABEL[status]}
+                                </Badge>
                             </button>
                         ))}
                     </div>
@@ -256,21 +261,18 @@ export default function VolunteersPage() {
             {activeTab === 'pending' && (
                 <div className="pending-volunteers-list">
                     {pendingVolunteers.length === 0 ? (
-                        <div className="volunteers-empty">
-                            <span>✅</span>
-                            <p>沒有待審核的志工申請</p>
-                        </div>
+                        <EmptyState title="沒有待審核的志工申請" variant="minimal" />
                     ) : (
                         pendingVolunteers.map(volunteer => (
                             <Card key={volunteer.id} className="pending-volunteer-card" padding="md">
                                 <div className="pending-volunteer-info">
-                                    <div className="pending-volunteer-avatar">
+                                    <div className="pending-volunteer-avatar" aria-hidden="true">
                                         {volunteer.name.charAt(0)}
                                     </div>
                                     <div className="pending-volunteer-details">
-                                        <h4>{volunteer.name}</h4>
-                                        <p>📍 {volunteer.region}</p>
-                                        <p>📞 {volunteer.phone}</p>
+                                        <h3>{volunteer.name}</h3>
+                                        <p><MapPin size={14} aria-hidden="true" /> {volunteer.region}</p>
+                                        <p><Phone size={14} aria-hidden="true" /> {volunteer.phone}</p>
                                         <p className="pending-volunteer-skills">
                                             {volunteer.skills.map(skill => (
                                                 <span key={skill} className="skill-tag">{getSkillLabel(skill)}</span>
@@ -282,18 +284,20 @@ export default function VolunteersPage() {
                                     <Button
                                         variant="primary"
                                         size="sm"
+                                        icon={<Check size={16} aria-hidden="true" />}
                                         onClick={() => handleApprove(volunteer.id)}
                                         disabled={processingId === volunteer.id}
                                     >
-                                        {processingId === volunteer.id ? '處理中...' : '✅ 核准'}
+                                        {processingId === volunteer.id ? '處理中...' : '核准'}
                                     </Button>
                                     <Button
                                         variant="secondary"
                                         size="sm"
+                                        icon={<X size={16} aria-hidden="true" />}
                                         onClick={() => handleReject(volunteer.id)}
                                         disabled={processingId === volunteer.id}
                                     >
-                                        ❌ 拒絕
+                                        拒絕
                                     </Button>
                                 </div>
                             </Card>
@@ -305,14 +309,14 @@ export default function VolunteersPage() {
             {/* 志工列表 - 只在志工名單 Tab 顯示 */}
             {activeTab === 'list' && (<div className="volunteers-list">
                 {isLoading ? (
-                    <div className="volunteers-empty">
-                        <span>⏳</span>
-                        <p>載入志工資料中...</p>
+                    <div className="volunteers-list__skeleton">
+                        <Skeleton variant="card" count={3} height={180} />
                     </div>
                 ) : error ? (
-                    <div className="volunteers-empty">
-                        <span>⚠️</span>
-                        <p>{error}</p>
+                    <div className="volunteers-list__error">
+                        <Alert variant="danger" title="載入失敗">
+                            {error}
+                        </Alert>
                         <Button variant="secondary" onClick={() => window.location.reload()}>
                             重新載入
                         </Button>
@@ -321,20 +325,15 @@ export default function VolunteersPage() {
                     filteredVolunteers.map(volunteer => (
                         <Card key={volunteer.id} className="volunteer-card" padding="md">
                             <div className="volunteer-card__header">
-                                <div className="volunteer-card__avatar">
+                                <div className="volunteer-card__avatar" aria-hidden="true">
                                     {volunteer.name.charAt(0)}
                                 </div>
                                 <div className="volunteer-card__info">
-                                    <h4 className="volunteer-card__name">{volunteer.name}</h4>
-                                    <p className="volunteer-card__region">📍 {volunteer.region}</p>
+                                    <h3 className="volunteer-card__name">{volunteer.name}</h3>
+                                    <p className="volunteer-card__region"><MapPin size={13} aria-hidden="true" /> {volunteer.region}</p>
                                 </div>
-                                <Badge
-                                    variant={
-                                        volunteer.status === 'available' ? 'success' :
-                                            volunteer.status === 'busy' ? 'warning' : 'default'
-                                    }
-                                >
-                                    {STATUS_CONFIG[volunteer.status as VolunteerStatus].label}
+                                <Badge variant={STATUS_BADGE_VARIANT[volunteer.status as VolunteerStatus]} dot>
+                                    {STATUS_LABEL[volunteer.status as VolunteerStatus]}
                                 </Badge>
                             </div>
 
@@ -347,9 +346,9 @@ export default function VolunteersPage() {
                             </div>
 
                             <div className="volunteer-card__stats">
-                                <span>📞 {volunteer.phone}</span>
-                                <span>⏱️ {volunteer.serviceHours} 小時</span>
-                                <span>📋 {volunteer.taskCount} 次任務</span>
+                                <span><Phone size={13} aria-hidden="true" /> {volunteer.phone}</span>
+                                <span className="tabular-nums"><Clock size={13} aria-hidden="true" /> {volunteer.serviceHours} 小時</span>
+                                <span className="tabular-nums"><ClipboardList size={13} aria-hidden="true" /> {volunteer.taskCount} 次任務</span>
                             </div>
 
                             <div className="volunteer-card__actions">
@@ -361,19 +360,17 @@ export default function VolunteersPage() {
                                 <Button
                                     variant="primary"
                                     size="sm"
+                                    icon={<ClipboardList size={16} aria-hidden="true" />}
                                     onClick={() => openAssignModal(volunteer)}
                                     disabled={volunteer.status !== 'available'}
                                 >
-                                    📋 指派任務
+                                    指派任務
                                 </Button>
                             </div>
                         </Card>
                     ))
                 ) : (
-                    <div className="volunteers-empty">
-                        <span>👥</span>
-                        <p>沒有符合條件的志工</p>
-                    </div>
+                    <EmptyState title="沒有符合條件的志工" description="試試調整搜尋或篩選條件" />
                 )}
             </div>)}
 
@@ -381,7 +378,7 @@ export default function VolunteersPage() {
             {showAssignModal && (
                 <div className="modal-overlay" onClick={() => setShowAssignModal(false)}>
                     <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>📋 指派任務給 {assignmentForm.volunteerName}</h3>
+                        <h3>指派任務給 {assignmentForm.volunteerName}</h3>
 
                         <div className="form-section">
                             <label className="form-label">任務標題 *</label>
@@ -440,4 +437,3 @@ export default function VolunteersPage() {
         </div>
     );
 }
-

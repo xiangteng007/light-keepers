@@ -1,7 +1,9 @@
 import { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { Search, X, ArrowLeft, ArrowRight, Inbox } from 'lucide-react';
 import Fuse from 'fuse.js';
-import { Card, Badge } from '../design-system';
+import { Card, Tag } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 
 // 手冊分類（10 大類別）
 const MANUAL_CATEGORIES = [
@@ -374,26 +376,30 @@ export default function ManualsPage() {
         <div className="page manuals-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📖 實務手冊</h2>
+                    <h1>實務手冊</h1>
                     <p className="page-subtitle">災難應變知識庫，支援離線存取</p>
                 </div>
             </div>
 
             {/* 搜尋欄 */}
             <div className="manuals-search">
+                <Search size={18} className="manuals-search__icon" aria-hidden="true" />
                 <input
                     type="text"
                     placeholder="搜尋手冊標題、內容或標籤..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="manuals-search__input"
+                    aria-label="搜尋手冊"
                 />
                 {searchQuery && (
                     <button
                         className="manuals-search__clear"
                         onClick={() => setSearchQuery('')}
+                        aria-label="清除搜尋"
+                        type="button"
                     >
-                        ✕
+                        <X size={14} aria-hidden="true" />
                     </button>
                 )}
             </div>
@@ -417,9 +423,7 @@ export default function ManualsPage() {
                             <div className="category-card__content">
                                 <h3 className="category-card__title">{category.name}</h3>
                                 <p className="category-card__desc">{category.description}</p>
-                                <Badge variant="default" size="sm">
-                                    {category.manualCount} 篇手冊
-                                </Badge>
+                                <Tag size="sm">{category.manualCount} 篇手冊</Tag>
                             </div>
                         </Card>
                     ))}
@@ -433,12 +437,13 @@ export default function ManualsPage() {
                         <button
                             className="manuals-back-btn"
                             onClick={() => setSelectedCategory(null)}
+                            type="button"
                         >
-                            ← 返回分類
+                            <ArrowLeft size={16} aria-hidden="true" /> 返回分類
                         </button>
                         <div className="manuals-list-title">
-                            <span style={{ fontSize: '24px' }}>{selectedCategoryInfo?.icon}</span>
-                            <h3>{selectedCategoryInfo?.name}</h3>
+                            <span aria-hidden="true" className="manuals-list-title__icon">{selectedCategoryInfo?.icon}</span>
+                            <h2>{selectedCategoryInfo?.name}</h2>
                         </div>
                     </div>
 
@@ -451,24 +456,23 @@ export default function ManualsPage() {
                                     className="manual-item"
                                 >
                                     <div className="manual-item__content">
-                                        <h4 className="manual-item__title">{manual.title}</h4>
+                                        <h3 className="manual-item__title">{manual.title}</h3>
                                         <p className="manual-item__summary">{manual.summary}</p>
                                         <div className="manual-item__tags">
                                             {manual.tags.map((tag) => (
-                                                <Badge key={tag} variant="default" size="sm">
-                                                    {tag}
-                                                </Badge>
+                                                <Tag key={tag} size="sm">{tag}</Tag>
                                             ))}
                                         </div>
                                     </div>
-                                    <span className="manual-item__arrow">→</span>
+                                    <ArrowRight size={20} className="manual-item__arrow" aria-hidden="true" />
                                 </Link>
                             ))
                         ) : (
-                            <div className="manuals-empty">
-                                <span>📭</span>
-                                <p>找不到符合條件的手冊</p>
-                            </div>
+                            <EmptyState
+                                icon={Inbox}
+                                title="找不到符合條件的手冊"
+                                description="試試其他分類或搜尋關鍵字"
+                            />
                         )}
                     </div>
                 </div>
@@ -477,7 +481,7 @@ export default function ManualsPage() {
             {/* 搜尋結果 (全域搜尋) */}
             {!selectedCategory && searchQuery && (
                 <div className="manuals-search-results">
-                    <h3>搜尋結果 ({filteredManuals.length})</h3>
+                    <h2>搜尋結果 ({filteredManuals.length})</h2>
                     <div className="manuals-list">
                         {filteredManuals.length > 0 ? (
                             filteredManuals.map((manual) => {
@@ -488,22 +492,23 @@ export default function ManualsPage() {
                                         to={`/manuals/${manual.id}`}
                                         className="manual-item"
                                     >
-                                        <div className="manual-item__category">
+                                        <div className="manual-item__category" aria-hidden="true">
                                             <span>{category?.icon}</span>
                                         </div>
                                         <div className="manual-item__content">
-                                            <h4 className="manual-item__title">{manual.title}</h4>
+                                            <h3 className="manual-item__title">{manual.title}</h3>
                                             <p className="manual-item__summary">{manual.summary}</p>
                                         </div>
-                                        <span className="manual-item__arrow">→</span>
+                                        <ArrowRight size={20} className="manual-item__arrow" aria-hidden="true" />
                                     </Link>
                                 );
                             })
                         ) : (
-                            <div className="manuals-empty">
-                                <span>🔍</span>
-                                <p>找不到「{searchQuery}」相關的手冊</p>
-                            </div>
+                            <EmptyState
+                                variant="search"
+                                title={`找不到「${searchQuery}」相關的手冊`}
+                                description="換個關鍵字試試看"
+                            />
                         )}
                     </div>
                 </div>

@@ -1,5 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { Card, Badge, Button } from '../design-system';
+import { ArrowLeft, Wifi, Inbox } from 'lucide-react';
+import { Card, Tag, Button, Alert, Badge } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 
 // 手冊分類
 const MANUAL_CATEGORIES: Record<string, { name: string; icon: string; color: string }> = {
@@ -631,14 +633,12 @@ export default function ManualDetailPage() {
     if (!manual || !category) {
         return (
             <div className="page manual-detail-page">
-                <div className="manual-not-found">
-                    <span style={{ fontSize: '64px' }}>📭</span>
-                    <h2>找不到手冊</h2>
-                    <p>這本手冊可能已被移除或連結錯誤</p>
-                    <Button onClick={() => navigate('/manuals')}>
-                        返回手冊列表
-                    </Button>
-                </div>
+                <EmptyState
+                    icon={Inbox}
+                    title="找不到手冊"
+                    description="這本手冊可能已被移除或連結錯誤"
+                    action={{ label: '返回手冊列表', onClick: () => navigate('/manuals') }}
+                />
             </div>
         );
     }
@@ -650,8 +650,9 @@ export default function ManualDetailPage() {
                 <button
                     className="manual-back-btn"
                     onClick={() => navigate('/manuals')}
+                    type="button"
                 >
-                    ← 返回手冊列表
+                    <ArrowLeft size={16} aria-hidden="true" /> 返回手冊列表
                 </button>
                 <div className="manual-breadcrumb">
                     <span style={{ color: category.color }}>{category.icon} {category.name}</span>
@@ -665,19 +666,16 @@ export default function ManualDetailPage() {
                     <p className="manual-detail-summary">{manual.summary}</p>
                     <div className="manual-detail-tags">
                         {manual.tags.map((tag) => (
-                            <Badge key={tag} variant="default" size="sm">
-                                {tag}
-                            </Badge>
+                            <Tag key={tag} size="sm">{tag}</Tag>
                         ))}
                     </div>
                 </div>
 
                 {/* 警告區塊 */}
                 {manual.warning && (
-                    <div className="manual-warning">
-                        <span className="manual-warning__icon">⚠️</span>
-                        <p>{manual.warning}</p>
-                    </div>
+                    <Alert variant="danger" className="manual-warning">
+                        {manual.warning}
+                    </Alert>
                 )}
 
                 {/* 內容 */}
@@ -785,9 +783,9 @@ export default function ManualDetailPage() {
             </Card>
 
             {/* 離線可用標籤 */}
-            <div className="manual-offline-badge">
-                <span>📶</span> 此手冊支援離線存取
-            </div>
+            <Badge variant="info" size="md" icon={<Wifi size={14} aria-hidden="true" />} className="manual-offline-badge">
+                此手冊支援離線存取
+            </Badge>
         </div>
     );
 }
