@@ -38,6 +38,38 @@
     border-color: transparent;
 }
 
+/* CD-1: 災型下拉與大量傷患開關（沿用 filter-btn 的形狀與 design token） */
+.filter-select {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: 20px;
+    background: var(--surface-default, white);
+    color: var(--text-primary, inherit);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-select:hover {
+    background: var(--bg-secondary, #f1f5f9);
+}
+
+.filter-checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-default, #e2e8f0);
+    border-radius: 20px;
+    background: var(--surface-default, white);
+    color: var(--text-primary, inherit);
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.filter-checkbox:hover {
+    background: var(--bg-secondary, #f1f5f9);
+}
+
 /* 回報列表 */
 .reports-list {
     display: flex;

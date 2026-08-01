@@ -11,6 +11,7 @@ import { SessionStateService } from './session-state.service';
 import { ImageUploadService } from './image-upload.service';
 import { AiClassificationService } from './ai-classification.service';
 import { ReportsService } from '../../reports/reports.service';
+import { getDefaultSeverity } from '../../reports/disaster-types';
 import {
     ReportSession,
     ReportSessionState,
@@ -284,9 +285,12 @@ export class DisasterReportService {
             this.logger.log(`AI classification result: ${classification.type} (confidence: ${classification.confidence})`);
 
             // 建立回報（來自 LINE Bot）
+            // CD-1: severity 改由災型預設值決定。既有 8 類的預設值都是 'medium'，
+            // 等同擴充前的硬編值；只有民防災型會自動拉高。
             const report = await this.reportsService.create({
                 type: classification.type,
-                severity: 'medium',
+                severity: getDefaultSeverity(classification.type),
+                isMassCasualty: classification.massCasualty ?? false,
                 title: session.data.text.substring(0, 50),
                 description: session.data.text,
                 latitude: session.data.location.lat,

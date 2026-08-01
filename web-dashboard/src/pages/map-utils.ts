@@ -1,5 +1,6 @@
 // Map utility functions: severity colors, marker icons, map options
 import { NCDR_CORE_TYPES, NCDR_EXTENDED_TYPES } from './map-constants';
+import { getDisasterTypeMeta } from '../constants/disasterTypes';
 
 // 嚴重程度對應的顏色和標記圖標
 export const getSeverityColor = (severity: number) => {
@@ -29,6 +30,31 @@ export const createMarkerIcon = (severity: number) => {
         strokeWeight: 2,
         scale: 1.8,
         anchor: new google.maps.Point(12, 22),
+    };
+};
+
+/**
+ * 災害回報 marker（CD-1）。
+ *
+ * 向後相容：既有 8 類災型回傳的物件與 `createMarkerIcon(severity)` **完全相同**
+ * （同樣的 path / severity 配色 / strokeWeight），因此既有地圖視覺零變化。
+ * 只有民防災型改用災型專屬色並加粗外框，讓空襲／爆裂物／恐攻／CBRN 在滿是
+ * 回報點的地圖上一眼可辨。
+ */
+export const createDisasterReportMarkerIcon = (
+    type: string | undefined,
+    severity: number,
+) => {
+    const base = createMarkerIcon(severity);
+    const meta = getDisasterTypeMeta(type);
+    if (!meta.civilDefense) {
+        return base;
+    }
+    return {
+        ...base,
+        fillColor: meta.color,
+        strokeWeight: 3,
+        scale: 2.1,
     };
 };
 

@@ -24,7 +24,7 @@
  *
  * 旗標：
  *   --only=local|gemini|both   預設 both
- *   --dataset=<path>           測資 JSON；未指定則用內建 20 筆
+ *   --dataset=<path>           測資 JSON；未指定則用內建 32 筆（含 12 筆民防）
  *   --repeat=<n>               每題重複次數，預設 1
  *   --limit=<n>                只跑前 n 題
  *   --csv=<path>               另存逐題結果 CSV
@@ -50,12 +50,17 @@ export interface BenchmarkCase {
     description: string;
     /** 期望的災害類型代碼 */
     expected: string;
+    /** 期望的大量傷患（MCI）旗標；未指定則不納入 MCI 統計 */
+    expectedMassCasualty?: boolean;
 }
 
 /**
  * 內建測資：取自 line-bot 分類的關鍵字 fixture 與既有 spec 案例，
- * 涵蓋 8 種類型 + 邊界情境（多重災害、口語化、無明確關鍵字）。
+ * 涵蓋 12 種類型 + 邊界情境（多重災害、口語化、無明確關鍵字）。
  * Owner 應以真實 LINE 回報資料替換（--dataset）。
+ *
+ * 前 20 題是 D13 時期的原始測資，**一題未改**，作為 CD-1 擴充的回歸基準；
+ * 後 12 題是 CD-1 新增的民防口語通報（含兩條易混界線的正反例）。
  */
 export const DEFAULT_CASES: BenchmarkCase[] = [
     { description: '淹水了，水很深，已經淹到膝蓋', expected: 'flood' },
@@ -80,6 +85,34 @@ export const DEFAULT_CASES: BenchmarkCase[] = [
     { description: '颱風過後淹水，社區地下室全滿了', expected: 'flood' },
     // 邊界：口語、沒有典型關鍵字
     { description: '阿伯家後面那片山昨晚整個垮下來', expected: 'landslide' },
+
+    // ===== CD-1 民防案例（D16）=====
+    // air_raid
+    { description: '剛剛防空警報響了，遠處聽到好幾聲爆炸', expected: 'air_raid' },
+    { description: '飛彈打過來了，我們這邊整排房子都在震', expected: 'air_raid' },
+    { description: '一直有砲彈落在附近，煙很大，大家都躲在地下室', expected: 'air_raid' },
+    // explosion（爆裂物/不明爆炸）
+    { description: '路邊垃圾桶突然爆炸，地上都是碎片', expected: 'explosion' },
+    { description: '車站置物櫃旁邊有個沒人認領的可疑包裹，一直在響', expected: 'explosion' },
+    // 邊界：瓦斯氣爆維持既有的 fire（不得被 explosion 奪走）
+    { description: '樓下餐廳瓦斯外洩氣爆，整個店面炸掉還在燒', expected: 'fire' },
+    // terror_attack
+    { description: '有人在夜市持刀亂砍，見人就砍，大家都在逃', expected: 'terror_attack' },
+    { description: '百貨公司門口有槍手開槍，聽說還有同夥在另一個出口', expected: 'terror_attack' },
+    // cbrn
+    { description: '巷子裡飄來一股很刺鼻的味道，好幾個人開始咳嗽流眼淚', expected: 'cbrn' },
+    { description: '收到一封信裡面有不明白色粉末，拆信的同事說喉嚨怪怪的', expected: 'cbrn' },
+    // mass_casualty 旗標（跨災型，災型仍須判對）
+    {
+        description: '遊覽車翻覆在山路上，車上一堆人倒在地上，救護車根本不夠',
+        expected: 'traffic',
+        expectedMassCasualty: true,
+    },
+    {
+        description: '化學工廠外洩，現場很多人受傷倒地，聞到刺鼻氣體',
+        expected: 'cbrn',
+        expectedMassCasualty: true,
+    },
 ];
 
 // ---------------------------------------------------------------------------
@@ -96,6 +129,9 @@ interface CaseResult {
     confidence: number | null;
     latencyMs: number;
     error?: string;
+    /** CD-1: 大量傷患旗標對測（測資未指定期望值時為 undefined） */
+    expectedMassCasualty?: boolean;
+    actualMassCasualty?: boolean;
 }
 
 interface ProviderSummary {
@@ -110,7 +146,19 @@ interface ProviderSummary {
     latencyAvgMs: number;
     latencyP50Ms: number;
     latencyP95Ms: number;
+    /** CD-1: 民防新災型（air_raid/explosion/terror_attack/cbrn）子集準確率 */
+    civilDefenseTotal: number;
+    civilDefenseCorrect: number;
+    /** CD-1: 既有 8 類子集準確率（回歸基準） */
+    legacyTotal: number;
+    legacyCorrect: number;
+    /** CD-1: MCI 旗標準確率（與災型分開統計，不混入 accuracy） */
+    massCasualtyTotal: number;
+    massCasualtyCorrect: number;
 }
+
+/** CD-1 民防新災型 */
+const CIVIL_DEFENSE_EXPECTED = new Set(['air_raid', 'explosion', 'terror_attack', 'cbrn']);
 
 function parseArgs(argv: string[]): Record<string, string> {
     const args: Record<string, string> = {};
@@ -148,7 +196,9 @@ function loadCases(datasetPath?: string, limit?: number): BenchmarkCase[] {
 }
 
 /** 從 LLM 的自由文字輸出中萃取分類 JSON */
-export function extractClassification(text: string): { type: string; confidence: number } | null {
+export function extractClassification(
+    text: string,
+): { type: string; confidence: number; massCasualty: boolean } | null {
     const cleaned = text
         .replace(/^```(?:json)?\s*/i, '')
         .replace(/```\s*$/, '')
@@ -165,6 +215,8 @@ export function extractClassification(text: string): { type: string; confidence:
         return {
             type: String(parsed.type),
             confidence: typeof parsed.confidence === 'number' ? parsed.confidence : NaN,
+            // 缺欄位（舊 prompt / 模型漏回）一律視為 false
+            massCasualty: parsed.massCasualty === true,
         };
     } catch {
         return null;
@@ -224,6 +276,8 @@ async function runProvider(
                     confidence: parsed && Number.isFinite(parsed.confidence) ? parsed.confidence : null,
                     latencyMs,
                     error: parsed ? undefined : 'unparseable response',
+                    expectedMassCasualty: testCase.expectedMassCasualty,
+                    actualMassCasualty: parsed?.massCasualty,
                 };
             } catch (error) {
                 const latencyMs = Date.now() - startTime;
@@ -238,6 +292,7 @@ async function runProvider(
                     confidence: null,
                     latencyMs,
                     error: (error as Error).message,
+                    expectedMassCasualty: testCase.expectedMassCasualty,
                 };
             }
         }
@@ -255,6 +310,10 @@ async function runProvider(
     const correct = results.filter((r) => r.correct).length;
     const errors = results.filter((r) => r.error).length;
 
+    const civilDefense = results.filter((r) => CIVIL_DEFENSE_EXPECTED.has(r.expected));
+    const legacy = results.filter((r) => !CIVIL_DEFENSE_EXPECTED.has(r.expected));
+    const mci = results.filter((r) => r.expectedMassCasualty !== undefined);
+
     return {
         summary: {
             provider: name,
@@ -267,6 +326,14 @@ async function runProvider(
             latencyAvgMs: average(latencies),
             latencyP50Ms: percentile(latencies, 50),
             latencyP95Ms: percentile(latencies, 95),
+            civilDefenseTotal: civilDefense.length,
+            civilDefenseCorrect: civilDefense.filter((r) => r.correct).length,
+            legacyTotal: legacy.length,
+            legacyCorrect: legacy.filter((r) => r.correct).length,
+            massCasualtyTotal: mci.length,
+            massCasualtyCorrect: mci.filter(
+                (r) => (r.actualMassCasualty ?? false) === r.expectedMassCasualty,
+            ).length,
         },
         results,
     };
@@ -285,6 +352,12 @@ function emptySummary(provider: string, model: string, reason: string): Provider
         latencyAvgMs: 0,
         latencyP50Ms: 0,
         latencyP95Ms: 0,
+        civilDefenseTotal: 0,
+        civilDefenseCorrect: 0,
+        legacyTotal: 0,
+        legacyCorrect: 0,
+        massCasualtyTotal: 0,
+        massCasualtyCorrect: 0,
     };
 }
 
@@ -334,6 +407,24 @@ function printComparison(summaries: ProviderSummary[]): void {
         );
     }
 
+    // CD-1 分組：民防新災型是 C1.1 的驗收門檻（≥90%），既有 8 類是回歸基準
+    const pct = (n: number, d: number) => (d ? `${((n / d) * 100).toFixed(1)}%` : 'n/a');
+    const scored = summaries.filter((s) => !s.skipped);
+    if (scored.length) {
+        console.log('\n--- CD-1 分組（民防新災型 / 既有 8 類 / MCI 旗標）---');
+        console.log(
+            pad('Provider', 10) + num('民防', 17) + num('既有', 17) + num('MCI旗標', 17),
+        );
+        for (const s of scored) {
+            console.log(
+                pad(s.provider, 10) +
+                num(`${pct(s.civilDefenseCorrect, s.civilDefenseTotal)} (${s.civilDefenseCorrect}/${s.civilDefenseTotal})`, 17) +
+                num(`${pct(s.legacyCorrect, s.legacyTotal)} (${s.legacyCorrect}/${s.legacyTotal})`, 17) +
+                num(`${pct(s.massCasualtyCorrect, s.massCasualtyTotal)} (${s.massCasualtyCorrect}/${s.massCasualtyTotal})`, 17),
+            );
+        }
+    }
+
     const active = summaries.filter((s) => !s.skipped);
     if (active.length === 2) {
         const [a, b] = active;
@@ -378,11 +469,13 @@ function printPerCaseDisagreements(results: CaseResult[], cases: BenchmarkCase[]
 
 function writeCsv(filePath: string, results: CaseResult[]): void {
     const escape = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`;
-    const header = 'provider,index,expected,actual,correct,confidence,latency_ms,error,description';
+    const header = 'provider,index,expected,actual,correct,confidence,latency_ms,expected_mci,actual_mci,error,description';
     const lines = results.map((r) =>
         [
             r.provider, r.index, r.expected, r.actual ?? '', r.correct,
-            r.confidence ?? '', r.latencyMs, r.error ?? '', r.description,
+            r.confidence ?? '', r.latencyMs,
+            r.expectedMassCasualty ?? '', r.actualMassCasualty ?? '',
+            r.error ?? '', r.description,
         ].map(escape).join(','),
     );
     const resolved = path.resolve(process.cwd(), filePath);

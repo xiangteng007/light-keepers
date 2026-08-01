@@ -3,21 +3,21 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { getReports, createTask, getAccounts, deleteReport, getTasks, getReportStats } from '../api/services';
 import type { Report, ReportType, ReportSeverity, ReportSource, Task } from '../api/services';
 import { Modal, Button, Card } from '../design-system';
+import { DISASTER_TYPE_META, MASS_CASUALTY_META } from '../constants/disasterTypes';
 import { useAuth } from '../context/AuthContext';
 import './EventsPage.css';
 
 // 類型配置
-// Bespoke categorical palette (8 disaster types) — no 1:1 semantic token equivalent, left as literal hex
-const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
-    earthquake: { label: '地震', icon: '🌍', color: '#795548' },
-    flood: { label: '淹水', icon: '🌊', color: '#2196F3' },
-    fire: { label: '火災', icon: '🔥', color: '#FF5722' },
-    typhoon: { label: '颱風', icon: '🌀', color: '#00BCD4' },
-    landslide: { label: '土石流', icon: '⛰️', color: '#795548' },
-    traffic: { label: '交通事故', icon: '🚗', color: '#FF9800' },
-    infrastructure: { label: '設施損壞', icon: '🏗️', color: '#F44336' },
-    other: { label: '其他', icon: '📋', color: '#607D8B' },
-};
+// CD-1: 改讀 disasterTypes SSOT（既有 8 類的 label/emoji/色碼在 SSOT 中逐字沿用
+// 原值，本頁視覺輸出與擴充前相同）；bespoke categorical palette 的 literal hex
+// 說明見 constants/disasterTypes.ts
+const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> =
+    Object.fromEntries(
+        Object.entries(DISASTER_TYPE_META).map(([type, meta]) => [
+            type,
+            { label: meta.label, icon: meta.emoji, color: meta.color },
+        ]),
+    ) as Record<ReportType, { label: string; icon: string; color: string }>;
 
 // Bespoke severity color scale (distinct from success/warning/danger — 4 discrete levels), left as literal hex
 const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; color: string }> = {
@@ -555,6 +555,16 @@ export default function EventsPage() {
                             >
                                 {TYPE_CONFIG[selectedReport.type]?.icon} {TYPE_CONFIG[selectedReport.type]?.label}
                             </span>
+                            {/* CD-1: 大量傷患是跨災型旗標，與災型徽章並列而非取代 */}
+                            {selectedReport.isMassCasualty && (
+                                <span
+                                    className="event-detail__type"
+                                    style={{ backgroundColor: MASS_CASUALTY_META.color }}
+                                >
+                                    {MASS_CASUALTY_META.emoji} {MASS_CASUALTY_META.label}
+                                    {selectedReport.casualtyEstimate ? `（約 ${selectedReport.casualtyEstimate} 人）` : ''}
+                                </span>
+                            )}
                             <span
                                 className="event-detail__source"
                                 style={{ backgroundColor: SOURCE_CONFIG[selectedReport.source || 'web']?.color }}
