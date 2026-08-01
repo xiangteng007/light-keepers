@@ -257,6 +257,7 @@ export default function SheltersPage() {
                                                 className={`shelter-occupancy__fill shelter-occupancy__fill--${getOccupancyColor(shelter.currentOccupancy, shelter.capacity)}`}
                                                 style={{ width: `${Math.min(shelter.occupancyRate, 100)}%` }}
                                                 role="progressbar"
+                                                aria-label={`收容佔用率 ${Math.round(Math.min(shelter.occupancyRate, 100))}%`}
                                                 aria-valuenow={Math.min(shelter.occupancyRate, 100)}
                                                 aria-valuemin={0}
                                                 aria-valuemax={100}

@@ -387,7 +387,7 @@
 }
 
 .confirmDialogBtn:hover {
-    background: #DC2626;
+    background: var(--account-danger-hover, #DC2626);
 }
 
 /* Responsive */

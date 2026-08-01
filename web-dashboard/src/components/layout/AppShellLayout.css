@@ -75,8 +75,11 @@
     font-weight: 600;
     padding: 2px 8px;
     border-radius: var(--radius-full, 9999px);
-    background: var(--color-info-bg);
-    color: var(--color-info);
+    /* R4 a11y：var(--color-info-bg) 是半透明疊色，跟 var(--color-info) 字色疊在
+       實際頁面背景上只有 3.28:1（低於 AA 4.5:1，見 A11Y_AUDIT_R4.md）。
+       改用不透明淺藍底＋深藍字，對比與底下背景無關，穩定 ≥4.5:1。 */
+    background: #DBEAFE;
+    color: #1E40AF;
     white-space: nowrap;
 }
 

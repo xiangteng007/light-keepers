@@ -43,7 +43,8 @@
 
 .resources-page .page-subtitle {
   font-size: var(--text-sm);
-  color: var(--text-tertiary);
+  /* R4 a11y：--text-tertiary 對比不足（4.39:1），見 A11Y_AUDIT_R4.md */
+  color: var(--text-secondary);
   margin: 0;
 }
 
@@ -85,8 +86,14 @@
 }
 
 .resources-tabs .tab-btn.active {
-  background: var(--color-secondary);
-  color: var(--text-inverse);
+  /* R4 a11y：--color-secondary（#F97316）配白字只有 2.68:1；--color-secondary-dark
+     （#EA580C）也只有 3.56:1，仍不夠——直接指定過 AA 的深橘（5.18:1），
+     維持橘色識別（見 A11Y_AUDIT_R4.md）。
+     文字固定用白色（不用 --text-inverse）：這個底色是寫死的深橘，不隨主題變化，
+     但 --text-inverse 在 dark/tactical 主題會變成深色，配上固定深橘底就會
+     「深字疊深底」——量到 dark 3.37:1／tactical 3.23:1，仍未過 AA。 */
+  background: var(--tab-active-bg, #C2410C);
+  color: var(--tab-active-text, #FFFFFF);
   box-shadow: var(--shadow-sm);
 }
 
@@ -199,9 +206,12 @@
 }
 
 .resources-categories .category-btn.active {
-  background: var(--color-secondary);
-  color: var(--text-inverse);
-  border-color: var(--color-secondary);
+  /* R4 a11y：--color-secondary（#F97316）配白字只有 2.68:1，見 A11Y_AUDIT_R4.md。
+     文字固定白色，理由同 .resources-tabs .tab-btn.active（--text-inverse 在
+     dark/tactical 主題會變深色，跟固定深橘底疊在一起還是不夠深）。 */
+  background: var(--tab-active-bg, #C2410C);
+  color: var(--tab-active-text, #FFFFFF);
+  border-color: var(--tab-active-bg, #C2410C);
   box-shadow: 0 2px 8px color-mix(in srgb, var(--color-secondary) 25%, transparent);
 }
 

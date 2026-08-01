@@ -52,6 +52,17 @@
     border-bottom-color: var(--accent-primary, var(--color-secondary));
 }
 
+/* R4 a11y：App.css 有一份舊版「Senteng」:root 區塊把 --accent-primary 定死成
+   #334155（深板岩色，本意是深色底上的 active 背景，不是可讀文字色）；這個
+   flat 值蓋過了 tokens.css 原本刻意讓 --accent-primary 留白、退回
+   --color-secondary 的設計，導致 dark 主題下這裡的作用中分頁字幾乎融進背景
+   （1.72:1）。在能安全改到 App.css 全域前，先在這裡局部改用
+   --color-secondary-light 補足對比（見 A11Y_AUDIT_R4.md）。 */
+[data-theme="dark"] .volunteers-tabs .tab-btn.active {
+    color: var(--color-secondary-light);
+    border-bottom-color: var(--color-secondary-light);
+}
+
 /* ── 統計摘要列 ── */
 
 .volunteers-stats {

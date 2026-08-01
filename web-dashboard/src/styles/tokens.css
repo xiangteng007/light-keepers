@@ -467,8 +467,10 @@
     --text-secondary: #52525B;
     --text-tertiary: #71717A;
     --text-inverse: #FAFAFA;
-    --text-link: #F97316;
-    --text-link-hover: #EA580C;
+    /* R4 a11y：原本 #F97316 在白底上只有 2.8:1（見 A11Y_AUDIT_R4.md），
+       換成同色相但更深的 orange-700，維持橘色識別但過 AA 4.5:1 */
+    --text-link: #C2410C;
+    --text-link-hover: #9A3412;
 
     /* === 邊框色 === */
     --border-default: #D4D4D8;

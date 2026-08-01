@@ -655,7 +655,10 @@ export default function ManualDetailPage() {
                     <ArrowLeft size={16} aria-hidden="true" /> 返回手冊列表
                 </button>
                 <div className="manual-breadcrumb">
-                    <span style={{ color: category.color }}>{category.icon} {category.name}</span>
+                    {/* R4 a11y：10 種分類色多數在頁面底色上不到 4.5:1（如地震
+                        #5BA3C0 只有 2.57:1，見 A11Y_AUDIT_R4.md）；分類識別
+                        改靠 emoji 圖示＋下方數字圓圈背景色，文字用一般可讀色 */}
+                    <span>{category.icon} {category.name}</span>
                 </div>
             </div>
 

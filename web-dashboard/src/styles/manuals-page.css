@@ -15,7 +15,10 @@
 }
 
 .page-subtitle {
-  color: var(--text-muted);
+  /* R4 a11y：--text-muted 對比不足（見 A11Y_AUDIT_R4.md）；注意這條規則沒有
+     scope 在 .manuals-page 下，其實是全站共用的 .page-subtitle（例如
+     VolunteersPage 也用同一個 class），一併受惠 */
+  color: var(--text-secondary);
   font-size: 14px;
   margin-top: 4px;
 }

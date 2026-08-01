@@ -25,7 +25,9 @@
 /* Colors */
 .lk-tag--default {
     background: var(--bg-hover);
-    color: var(--text-secondary);
+    /* R4 a11y：--text-secondary 在 dark 主題的 --bg-hover 底色上只有 4.03:1
+       （9px 粗體不算 WCAG 大字，門檻仍是 4.5:1），見 A11Y_AUDIT_R4.md */
+    color: var(--text-primary);
 }
 
 .lk-tag--brown {

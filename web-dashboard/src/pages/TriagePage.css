@@ -296,10 +296,28 @@
     color: var(--text-secondary);
 }
 
+/* a11y：實體 <button>（見 TriagePage.tsx VictimCard），視覺上維持原本文字樣式，
+   不要有 button 預設外框/底色，同時保留鍵盤焦點環。 */
+.victim-card__identifier--btn {
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+    font: inherit;
+}
+
+.victim-card__identifier--btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm, 2px);
+}
+
 .victim-card__time {
     margin-left: auto;
     font-size: var(--font-size-xs, 12px);
-    color: var(--text-tertiary, var(--text-secondary));
+    /* R4 a11y：--text-tertiary 對比不足（4.39:1），見 A11Y_AUDIT_R4.md */
+    color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
 }
 
@@ -338,6 +356,28 @@
 
 .victim-card__transport--in_transit { color: var(--color-info); }
 .victim-card__transport--arrived { color: var(--color-success); }
+
+/*
+ * R4 a11y：--color-info/--color-success 是小面積圖示/邊框設計的語意色
+ * （3:1 門檻），直接當 12px 小字文字色在 light/dark 兩主題都量到 <3.5:1
+ * （見 A11Y_AUDIT_R4.md）。這裡改用同色相但過 AA 文字門檻（4.5:1）的深/淺變體。
+ */
+[data-theme="light"] .victim-card__transport--in_transit,
+[data-theme="bright-steel"] .victim-card__transport--in_transit {
+    color: var(--transport-info-text, #1D4ED8);
+}
+[data-theme="light"] .victim-card__transport--arrived,
+[data-theme="bright-steel"] .victim-card__transport--arrived {
+    color: var(--transport-success-text, #15803D);
+}
+[data-theme="dark"] .victim-card__transport--in_transit,
+[data-theme="copper-steel"] .victim-card__transport--in_transit {
+    color: var(--transport-info-text, #7DD3FC);
+}
+[data-theme="dark"] .victim-card__transport--arrived,
+[data-theme="copper-steel"] .victim-card__transport--arrived {
+    color: var(--transport-success-text, #86EFAC);
+}
 
 /* 卡片內快速操作按鈕：design-system Button size=sm 桌機高度可 <44px，
    本頁為高壓/戴手套情境使用，補足點擊熱區至 44px（§2.3）。 */
