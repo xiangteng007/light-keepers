@@ -1,124 +1,125 @@
+/**
+ * VehicleManagementPage.css — 我的車輛（List archetype，DESIGN_LANGUAGE.md §7.1）
+ * 語義 token only；light/dark/tactical 三態自動生效。
+ */
+
 .vehicle-management-page {
-    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 .vehicle-management-page .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
+    align-items: flex-start;
+    gap: var(--space-4);
+    flex-wrap: wrap;
 }
 
-.header-left h2 {
+.header-left h1 {
     margin: 0;
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
 }
 
 .page-subtitle {
-    color: var(--color-text-secondary);
-    margin-top: var(--spacing-xs);
-}
-
-/* Loading & Empty States */
-.loading-state,
-.empty-state {
-    text-align: center;
-    padding: var(--spacing-xl) !important;
-}
-
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: var(--spacing-md);
-}
-
-.empty-state h3 {
-    margin-bottom: var(--spacing-sm);
-}
-
-.empty-state p {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-lg);
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+    font-size: var(--font-size-sm);
 }
 
 /* Vehicles Grid */
 .vehicles-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 /* Vehicle Card */
 .vehicle-card {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .vehicle-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border);
+    gap: var(--space-2);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-default);
 }
 
 .vehicle-icon {
-    font-size: 1.5rem;
+    font-size: var(--font-size-2xl);
 }
 
 .vehicle-plate {
-    font-size: 1.25rem;
-    font-weight: 700;
-    font-family: monospace;
-    letter-spacing: 1px;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    font-family: var(--font-mono);
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
 }
 
 .vehicle-info {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--space-2);
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    font-size: 0.875rem;
+    font-size: var(--font-size-sm);
+    gap: var(--space-2);
 }
 
 .info-label {
-    color: var(--color-text-secondary);
+    color: var(--text-secondary);
+    flex-shrink: 0;
 }
 
 .info-value {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    text-align: right;
 }
 
 .purpose-tags {
     display: flex;
-    gap: var(--spacing-xs);
+    gap: var(--space-1);
     flex-wrap: wrap;
+    justify-content: flex-end;
 }
 
 .vehicle-actions {
     display: flex;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     margin-top: auto;
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--color-border);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-default);
+}
+
+.vehicle-actions > * {
+    min-height: 44px;
 }
 
 /* Form Styles */
 .vehicle-form {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 @media (max-width: 600px) {
@@ -130,37 +131,44 @@
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--space-2);
 }
 
 .form-label {
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
-.form-input,
 .form-select,
 .form-textarea {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-family: inherit;
+    min-height: 44px;
+    transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.form-textarea {
+    resize: vertical;
+    min-height: unset;
+}
+
+.form-select:focus-visible,
+.form-textarea:focus-visible {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
 }
 
 .form-divider {
     display: flex;
     align-items: center;
-    margin: var(--spacing-md) 0;
+    margin: var(--space-2) 0;
 }
 
 .form-divider::before,
@@ -168,31 +176,33 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--color-border);
+    background: var(--border-default);
 }
 
 .form-divider span {
-    padding: 0 var(--spacing-md);
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 0 var(--space-4);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
 }
 
 /* Purpose Options */
 .purpose-options {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .purpose-btn {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-border);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-full);
     background: transparent;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .purpose-btn:hover {
@@ -200,18 +210,33 @@
     color: var(--color-primary);
 }
 
-.purpose-btn.selected {
+.purpose-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.purpose-btn.is-selected {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: white;
+    color: var(--text-inverse);
 }
 
 /* Modal Actions */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-sm);
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--color-border);
-    margin-top: var(--spacing-md);
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-default);
+    margin-top: var(--space-2);
+}
+
+@media (max-width: 767px) {
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .modal-actions > * {
+        width: 100%;
+    }
 }

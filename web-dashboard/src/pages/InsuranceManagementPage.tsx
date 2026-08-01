@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
+import { ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { insuranceApi } from '../api/vms';
 import type { VolunteerInsurance, InsuranceType } from '../api/vms';
-import { Card, Button, Badge, Alert, Modal } from '../design-system';
+import { Card, Button, Badge, Tag, Alert, Modal, InputField } from '../design-system';
+import type { BadgeProps } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './InsuranceManagementPage.css';
 
 // 保險類型選項
@@ -150,18 +154,18 @@ export default function InsuranceManagementPage() {
         }
     };
 
-    const getInsuranceStatus = (insurance: VolunteerInsurance) => {
+    const getInsuranceStatus = (insurance: VolunteerInsurance): { status: string; label: string; variant: BadgeProps['variant'] } => {
         const now = new Date();
         const validFrom = new Date(insurance.validFrom);
         const validTo = new Date(insurance.validTo);
 
-        if (now < validFrom) return { status: 'pending', label: '尚未生效', color: 'secondary' };
-        if (now > validTo) return { status: 'expired', label: '已過期', color: 'danger' };
+        if (now < validFrom) return { status: 'pending', label: '尚未生效', variant: 'default' };
+        if (now > validTo) return { status: 'expired', label: '已過期', variant: 'danger' };
 
         const daysLeft = Math.ceil((validTo.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
-        if (daysLeft <= 30) return { status: 'expiring', label: `${daysLeft}天後到期`, color: 'warning' };
+        if (daysLeft <= 30) return { status: 'expiring', label: `${daysLeft}天後到期`, variant: 'warning' };
 
-        return { status: 'active', label: '有效', color: 'success' };
+        return { status: 'active', label: '有效', variant: 'success' };
     };
 
     const formatDate = (dateStr: string) => {
@@ -181,7 +185,7 @@ export default function InsuranceManagementPage() {
         <div className="page insurance-management-page">
             <div className="page-header">
                 <div className="header-left">
-                    <h2>🛡️ 我的保險</h2>
+                    <h1>我的保險</h1>
                     <p className="page-subtitle">管理您的志工保險紀錄</p>
                 </div>
                 <Button onClick={handleAdd}>+ 新增保險</Button>
@@ -196,7 +200,7 @@ export default function InsuranceManagementPage() {
             {/* 保障狀態摘要 */}
             <Card padding="md" className="coverage-summary">
                 <div className="summary-content">
-                    <span className="summary-icon">🛡️</span>
+                    <ShieldCheck size={28} aria-hidden="true" className="summary-icon" />
                     <div className="summary-text">
                         <strong>保障狀態：</strong>
                         {insurances.some(ins => getInsuranceStatus(ins).status === 'active') ? (
@@ -209,14 +213,16 @@ export default function InsuranceManagementPage() {
             </Card>
 
             {isLoading ? (
-                <div className="loading-state">載入中...</div>
+                <div className="insurances-list" aria-busy="true" aria-label="載入保險資料中">
+                    <Skeleton variant="card" height={180} count={3} />
+                </div>
             ) : insurances.length === 0 ? (
-                <Card padding="lg" className="empty-state">
-                    <div className="empty-icon">🛡️</div>
-                    <h3>尚無保險紀錄</h3>
-                    <p>新增您的保險資料以確保任務出勤時有保障</p>
-                    <Button onClick={handleAdd}>新增第一筆保險</Button>
-                </Card>
+                <EmptyState
+                    icon={ShieldCheck}
+                    title="尚無保險紀錄"
+                    description="新增您的保險資料以確保任務出勤時有保障"
+                    action={{ label: '新增第一筆保險', onClick: handleAdd }}
+                />
             ) : (
                 <div className="insurances-list">
                     {insurances.map(insurance => {
@@ -232,7 +238,7 @@ export default function InsuranceManagementPage() {
                                             {typeInfo?.name || '保險'}
                                         </Badge>
                                     </div>
-                                    <Badge variant={status.color as any} size="sm">
+                                    <Badge variant={status.variant} size="sm">
                                         {status.label}
                                     </Badge>
                                 </div>
@@ -262,9 +268,9 @@ export default function InsuranceManagementPage() {
                                             <span className="tasks-label">保障任務：</span>
                                             <div className="task-tags">
                                                 {insurance.coversTasks.map(taskCode => (
-                                                    <Badge key={taskCode} size="sm">
+                                                    <Tag key={taskCode} size="sm">
                                                         {TASK_TYPES.find(t => t.code === taskCode)?.name || taskCode}
-                                                    </Badge>
+                                                    </Tag>
                                                 ))}
                                             </div>
                                         </div>
@@ -295,8 +301,9 @@ export default function InsuranceManagementPage() {
                 <div className="insurance-form">
                     <div className="form-row">
                         <div className="form-section">
-                            <label className="form-label">保險類型 *</label>
+                            <label className="form-label" htmlFor="insurance-type">保險類型 *</label>
                             <select
+                                id="insurance-type"
                                 className="form-select"
                                 value={form.insuranceType}
                                 onChange={e => setForm({ ...form, insuranceType: e.target.value as InsuranceType })}
@@ -308,81 +315,67 @@ export default function InsuranceManagementPage() {
                                 ))}
                             </select>
                         </div>
-                        <div className="form-section">
-                            <label className="form-label">保險公司 *</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="新光產險"
-                                value={form.insuranceCompany}
-                                onChange={e => setForm({ ...form, insuranceCompany: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-row">
-                        <div className="form-section">
-                            <label className="form-label">保單編號</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="保單編號"
-                                value={form.policyNumber}
-                                onChange={e => setForm({ ...form, policyNumber: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">保障金額 (TWD)</label>
-                            <input
-                                type="number"
-                                className="form-input"
-                                placeholder="1000000"
-                                value={form.coverageAmount}
-                                onChange={e => setForm({ ...form, coverageAmount: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label className="form-label">保障類型說明</label>
-                        <input
-                            type="text"
-                            className="form-input"
-                            placeholder="例如：意外險、醫療險"
-                            value={form.coverageType}
-                            onChange={e => setForm({ ...form, coverageType: e.target.value })}
+                        <InputField
+                            label="保險公司 *"
+                            placeholder="新光產險"
+                            value={form.insuranceCompany}
+                            onChange={e => setForm({ ...form, insuranceCompany: e.target.value })}
+                            fullWidth
                         />
                     </div>
 
                     <div className="form-row">
-                        <div className="form-section">
-                            <label className="form-label">生效日期 *</label>
-                            <input
-                                type="date"
-                                className="form-input"
-                                value={form.validFrom}
-                                onChange={e => setForm({ ...form, validFrom: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">到期日期 *</label>
-                            <input
-                                type="date"
-                                className="form-input"
-                                value={form.validTo}
-                                onChange={e => setForm({ ...form, validTo: e.target.value })}
-                            />
-                        </div>
+                        <InputField
+                            label="保單編號"
+                            placeholder="保單編號"
+                            value={form.policyNumber}
+                            onChange={e => setForm({ ...form, policyNumber: e.target.value })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="保障金額 (TWD)"
+                            type="number"
+                            placeholder="1000000"
+                            value={form.coverageAmount}
+                            onChange={e => setForm({ ...form, coverageAmount: e.target.value })}
+                            fullWidth
+                        />
+                    </div>
+
+                    <InputField
+                        label="保障類型說明"
+                        placeholder="例如：意外險、醫療險"
+                        value={form.coverageType}
+                        onChange={e => setForm({ ...form, coverageType: e.target.value })}
+                        fullWidth
+                    />
+
+                    <div className="form-row">
+                        <InputField
+                            label="生效日期 *"
+                            type="date"
+                            value={form.validFrom}
+                            onChange={e => setForm({ ...form, validFrom: e.target.value })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="到期日期 *"
+                            type="date"
+                            value={form.validTo}
+                            onChange={e => setForm({ ...form, validTo: e.target.value })}
+                            fullWidth
+                        />
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label">涵蓋任務類型</label>
-                        <div className="task-options">
+                        <span className="form-label" id="task-coverage-label">涵蓋任務類型</span>
+                        <div className="task-options" role="group" aria-labelledby="task-coverage-label">
                             {TASK_TYPES.map(task => (
                                 <button
                                     key={task.code}
                                     type="button"
-                                    className={`task-btn ${form.coversTasks.includes(task.code) ? 'selected' : ''}`}
+                                    aria-pressed={form.coversTasks.includes(task.code)}
+                                    className={`task-btn ${form.coversTasks.includes(task.code) ? 'is-selected' : ''}`}
                                     onClick={() => toggleTaskCoverage(task.code)}
                                 >
                                     {task.name}
@@ -394,8 +387,9 @@ export default function InsuranceManagementPage() {
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label">備註</label>
+                        <label className="form-label" htmlFor="insurance-notes">備註</label>
                         <textarea
+                            id="insurance-notes"
                             className="form-textarea"
                             placeholder="其他備註事項"
                             value={form.notes}
@@ -408,8 +402,8 @@ export default function InsuranceManagementPage() {
                         <Button variant="secondary" onClick={() => setShowModal(false)}>
                             取消
                         </Button>
-                        <Button onClick={handleSubmit} disabled={isSubmitting}>
-                            {isSubmitting ? '儲存中...' : '儲存'}
+                        <Button onClick={handleSubmit} loading={isSubmitting}>
+                            儲存
                         </Button>
                     </div>
                 </div>

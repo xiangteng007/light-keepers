@@ -1,74 +1,109 @@
+/**
+ * PointsReportPage.css — 志工積分報表（List archetype，DESIGN_LANGUAGE.md §7.1）
+ * 語義 token only；light/dark/tactical 三態自動生效。
+ */
+
 .points-report-page {
-    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 .points-report-page .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
+    align-items: flex-start;
     flex-wrap: wrap;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
-.header-left h2 {
+.header-left h1 {
     margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+    font-size: var(--font-size-sm);
 }
 
 .header-controls {
     display: flex;
-    gap: var(--spacing-md);
+    gap: var(--space-3);
     align-items: center;
+    flex-wrap: wrap;
 }
 
 .year-selector {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-border);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    background: var(--color-surface);
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+}
+
+.year-selector:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .view-toggle {
     display: flex;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     overflow: hidden;
 }
 
 .toggle-btn {
-    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
     border: none;
     background: transparent;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
 .toggle-btn:hover {
-    background: var(--color-surface-hover);
+    background: var(--surface-hover);
 }
 
-.toggle-btn.active {
+.toggle-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.toggle-btn.is-active {
     background: var(--color-primary);
-    color: white;
+    color: var(--text-inverse);
+}
+
+.points-report-page__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 /* Performance Card */
 .performance-card {
-    border-left-width: 4px !important;
-    margin-bottom: var(--spacing-lg);
+    border-left: 4px solid var(--color-primary);
 }
 
 .performance-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    gap: var(--space-4);
+    margin-bottom: var(--space-4);
 }
 
 .performance-icon {
-    font-size: 2.5rem;
+    font-size: var(--font-size-4xl, 2.5rem);
 }
 
 .performance-info {
@@ -77,19 +112,19 @@
 }
 
 .performance-level {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
 }
 
 .performance-year {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 .performance-stats {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 @media (max-width: 768px) {
@@ -98,64 +133,40 @@
     }
 }
 
-.stat-item {
-    text-align: center;
-    padding: var(--spacing-md);
-    background: var(--color-surface);
-    border-radius: var(--radius-md);
-}
-
-.stat-item--primary {
-    background: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark, var(--color-primary)));
-    color: white;
-}
-
-.stat-value {
-    display: block;
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.2;
-}
-
-.stat-label {
-    display: block;
-    font-size: 0.75rem;
-    color: inherit;
-    opacity: 0.8;
-    margin-top: var(--spacing-xs);
-}
-
 /* Section Title */
 .section-title {
-    margin: var(--spacing-lg) 0 var(--spacing-md);
-    font-size: 1.125rem;
+    margin: var(--space-2) 0 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 /* Category Stats */
 .category-stats {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .category-card {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .category-header {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .category-icon {
-    font-size: 1.5rem;
+    font-size: var(--font-size-xl);
 }
 
 .category-name {
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .category-data {
@@ -169,46 +180,43 @@
 
 .cat-value {
     display: block;
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
     color: var(--color-primary);
 }
 
 .cat-label {
     display: block;
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
 }
 
 /* Info Card */
 .info-card {
-    margin-top: var(--spacing-lg);
-    background: var(--color-surface-alt, #f8fafc);
+    background: var(--surface-hover);
 }
 
-.info-card h4 {
-    margin: 0 0 var(--spacing-sm);
+.info-card h3 {
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .info-list {
     margin: 0;
-    padding-left: var(--spacing-lg);
+    padding-left: var(--space-6);
 }
 
 .info-list li {
-    margin-bottom: var(--spacing-xs);
-    color: var(--color-text-secondary);
+    margin-bottom: var(--space-1);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
 }
 
 /* Records Table */
 .records-list {
     overflow-x: auto;
-}
-
-.empty-records {
-    padding: var(--spacing-xl);
-    text-align: center;
-    color: var(--color-text-secondary);
 }
 
 .records-table {
@@ -218,20 +226,20 @@
 
 .records-table th,
 .records-table td {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--space-3) var(--space-4);
     text-align: left;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--border-default);
 }
 
 .records-table th {
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    font-size: 0.875rem;
-    background: var(--color-surface);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    background: var(--surface-hover);
 }
 
 .records-table tbody tr:hover {
-    background: var(--color-surface-hover);
+    background: var(--surface-hover);
 }
 
 .description-cell {
@@ -243,27 +251,57 @@
 
 .multiplier-badge {
     display: inline-block;
-    padding: 2px 8px;
-    background: var(--color-warning-bg, #fef3c7);
-    color: var(--color-warning, #d97706);
+    padding: 2px var(--space-2);
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 600;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
 }
 
-.points-cell .positive {
-    color: var(--color-success, #10b981);
-    font-weight: 600;
+.points-cell .is-positive {
+    color: var(--color-success);
+    font-weight: var(--font-weight-semibold);
 }
 
-.points-cell .negative {
-    color: var(--color-danger, #ef4444);
-    font-weight: 600;
+.points-cell .is-negative {
+    color: var(--color-danger);
+    font-weight: var(--font-weight-semibold);
 }
 
-/* Loading */
-.loading-state {
-    text-align: center;
-    padding: var(--spacing-xl);
-    color: var(--color-text-secondary);
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* Mobile: 表格改為卡片式（避免橫向捲動遮擋內容） */
+@media (max-width: 767px) {
+    .records-table thead {
+        display: none;
+    }
+
+    .records-table,
+    .records-table tbody,
+    .records-table tr,
+    .records-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .records-table tr {
+        padding: var(--space-3) var(--space-4);
+        border-bottom: 1px solid var(--border-default);
+    }
+
+    .records-table td {
+        border-bottom: none;
+        padding: var(--space-1) 0;
+        display: flex;
+        justify-content: space-between;
+        gap: var(--space-2);
+    }
+
+    .description-cell {
+        max-width: none;
+        white-space: normal;
+    }
 }

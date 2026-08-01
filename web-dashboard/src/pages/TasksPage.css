@@ -1,0 +1,312 @@
+/**
+ * TasksPage.css — 任務看板（Board archetype，DESIGN_LANGUAGE.md §7.3 canonical 範例）
+ * 語義 token only；light/dark/tactical 三態自動生效。
+ * 桌機：欄水平排列；行動端：頂部 segmented tabs 切一欄，不做水平多欄捲動。
+ */
+
+.tasks-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.tasks-page .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.tasks-page .page-header__left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+}
+
+.tasks-page .page-header h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+/* ── 行動端 segmented tabs（欄切換）───────────────────────────── */
+.tasks-page__mobile-tabs {
+    display: none;
+}
+
+@media (max-width: 767px) {
+    .tasks-page__mobile-tabs {
+        display: flex;
+        gap: var(--space-1);
+        background: var(--surface-hover);
+        border-radius: var(--radius-md);
+        padding: var(--space-1);
+    }
+
+    .tasks-page__mobile-tab {
+        flex: 1;
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--space-2);
+        border: none;
+        background: transparent;
+        border-radius: var(--radius-sm);
+        font-size: var(--font-size-sm);
+        font-weight: var(--font-weight-medium);
+        color: var(--text-secondary);
+        cursor: pointer;
+    }
+
+    .tasks-page__mobile-tab:focus-visible {
+        outline: none;
+        box-shadow: var(--focus-ring);
+    }
+
+    .tasks-page__mobile-tab.is-active {
+        background: var(--surface-default);
+        color: var(--text-primary);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .tasks-page__mobile-tab-count {
+        font-size: var(--font-size-xs);
+        color: var(--text-tertiary);
+    }
+}
+
+/* ── Board：欄水平排列（桌機），行動端只顯示 active 欄 ───────────── */
+.task-board {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-4);
+    align-items: start;
+}
+
+@media (max-width: 767px) {
+    .task-board {
+        display: block;
+    }
+
+    .task-column {
+        display: none;
+    }
+
+    .task-column.is-active-mobile {
+        display: flex;
+    }
+}
+
+.task-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: var(--surface-hover);
+    border-radius: var(--radius-lg);
+    padding: var(--space-3);
+    min-height: 120px;
+}
+
+.task-column__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--space-2) var(--space-2);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.task-column__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* ── Task Card ──────────────────────────────────────────────── */
+.task-card {
+    background: var(--surface-default);
+    transition: box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.task-card--completed {
+    opacity: 0.75;
+}
+
+.task-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.task-card__toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    flex: 1;
+    min-width: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    padding: 0;
+    color: var(--text-tertiary);
+    text-align: left;
+}
+
+.task-card__toggle:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.task-card__title {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-card__actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    flex-shrink: 0;
+}
+
+.task-card__quick-status,
+.task-card__delete {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    background: var(--surface-default);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+}
+
+/* 觸控熱區補足 44x44（視覺尺寸維持 32px 避免卡片過度膨脹） */
+.task-card__quick-status,
+.task-card__delete {
+    position: relative;
+}
+
+.task-card__quick-status::after,
+.task-card__delete::after {
+    content: '';
+    position: absolute;
+    inset: -6px;
+}
+
+.task-card__quick-status:hover {
+    border-color: var(--color-info);
+    color: var(--color-info);
+}
+
+.task-card__delete:hover {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
+.task-card__quick-status:focus-visible,
+.task-card__delete:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.task-card__content {
+    margin-top: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-light);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.task-card__desc {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--line-height-normal);
+}
+
+.task-card__due {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Modal 表單 ─────────────────────────────────────────────── */
+.tasks-page__form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.tasks-page__form .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.tasks-page__form label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.tasks-page__form textarea,
+.tasks-page__form select {
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-family: inherit;
+    min-height: 44px;
+}
+
+.tasks-page__form textarea {
+    resize: vertical;
+}
+
+.tasks-page__form textarea:focus-visible,
+.tasks-page__form select:focus-visible {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+}
+
+.tasks-page__modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+@media (max-width: 767px) {
+    .tasks-page__modal-actions {
+        flex-direction: column-reverse;
+    }
+
+    .tasks-page__modal-actions > * {
+        width: 100%;
+    }
+}
