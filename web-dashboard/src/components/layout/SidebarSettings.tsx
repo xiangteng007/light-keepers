@@ -1,14 +1,14 @@
 /**
  * SidebarSettings.tsx
- * 
+ *
  * Modal for editing sidebar navigation items
- * Features: rename items, drag-drop reorder, toggle visibility, RBAC level adjustment
- * v2.1 - Added per-item RBAC level customization
+ * Features: rename items, drag-drop reorder, toggle visibility
+ * R1/FE-7: 權限等級調整已移除 —— 權限唯一來源是 src/config/page-policy.ts，
+ *          此處僅顯示唯讀等級徽章（消滅第二份 minLevel）。
  */
 import React, { useState, useRef } from 'react';
-import { X, GripVertical, Eye, EyeOff, RotateCcw, Check, Shield, ChevronDown } from 'lucide-react';
+import { X, GripVertical, Eye, EyeOff, RotateCcw, Check, Shield } from 'lucide-react';
 import { NavItemConfig, NavGroup, NAV_GROUPS, ICON_MAP } from './useSidebarConfig';
-import { PermissionLevel } from './widget.types';
 import './SidebarSettings.css';
 
 interface SidebarSettingsProps {
@@ -19,16 +19,6 @@ interface SidebarSettingsProps {
     onReorder: (oldIndex: number, newIndex: number) => void;
     onReset: () => void;
 }
-
-// Permission level labels
-const PERMISSION_LABELS: Record<PermissionLevel, string> = {
-    [PermissionLevel.Anonymous]: 'L0 訪客',
-    [PermissionLevel.Volunteer]: 'L1 志工',
-    [PermissionLevel.Supervisor]: 'L2 督導',
-    [PermissionLevel.Manager]: 'L3 管理',
-    [PermissionLevel.Admin]: 'L4 管理員',
-    [PermissionLevel.SystemOwner]: 'L5 系統擁有者',
-};
 
 export function SidebarSettings({
     isOpen,
@@ -42,7 +32,6 @@ export function SidebarSettings({
     const [editValue, setEditValue] = useState('');
     const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
     const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
-    const [levelDropdownId, setLevelDropdownId] = useState<string | null>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     if (!isOpen) return null;
@@ -90,12 +79,6 @@ export function SidebarSettings({
         setDragOverIndex(null);
     };
 
-    // RBAC level change
-    const handleLevelChange = (itemId: string, level: PermissionLevel) => {
-        onUpdateItem(itemId, { minLevel: level });
-        setLevelDropdownId(null);
-    };
-
     // Group items by domain
     const getItemsByGroup = (group: NavGroup) => {
         return navItems
@@ -121,7 +104,7 @@ export function SidebarSettings({
 
                 <div className="sidebar-settings__content">
                     <p className="sidebar-settings__hint">
-                        拖曳調整順序 · 點擊名稱編輯 · 調整權限等級 · 共 {navItems.length} 個頁面
+                        拖曳調整順序 · 點擊名稱編輯 · 權限由 page-policy 統一管理 · 共 {navItems.length} 個頁面
                     </p>
 
                     <div className="sidebar-settings__groups">
@@ -145,7 +128,6 @@ export function SidebarSettings({
                                             const IconComponent = ICON_MAP[item.icon];
                                             const isDragging = draggedIndex === flatIndex;
                                             const isDragOver = dragOverIndex === flatIndex;
-                                            const isLevelOpen = levelDropdownId === item.id;
 
                                             return (
                                                 <div
@@ -182,31 +164,14 @@ export function SidebarSettings({
                                                         </span>
                                                     )}
 
-                                                    {/* RBAC Level Selector */}
-                                                    <div className="sidebar-settings__level-wrapper">
-                                                        <button
-                                                            className="sidebar-settings__level-btn"
-                                                            onClick={() => setLevelDropdownId(isLevelOpen ? null : item.id)}
-                                                            title="調整權限等級"
-                                                        >
-                                                            <Shield size={12} />
-                                                            <span>L{item.minLevel ?? 0}</span>
-                                                            <ChevronDown size={12} />
-                                                        </button>
-                                                        {isLevelOpen && (
-                                                            <div className="sidebar-settings__level-dropdown">
-                                                                {Object.entries(PERMISSION_LABELS).map(([level, label]) => (
-                                                                    <button
-                                                                        key={level}
-                                                                        className={`sidebar-settings__level-option ${Number(level) === item.minLevel ? 'active' : ''}`}
-                                                                        onClick={() => handleLevelChange(item.id, Number(level) as PermissionLevel)}
-                                                                    >
-                                                                        {label}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
+                                                    {/* 權限等級（唯讀 —— 由 page-policy.ts 管理） */}
+                                                    <span
+                                                        className="sidebar-settings__level-btn sidebar-settings__level-btn--readonly"
+                                                        title="權限等級由 page-policy.ts 統一管理，此處僅顯示"
+                                                    >
+                                                        <Shield size={12} />
+                                                        <span>L{item.minLevel ?? 0}</span>
+                                                    </span>
 
                                                     <button
                                                         className="sidebar-settings__visibility"

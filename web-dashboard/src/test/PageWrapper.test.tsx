@@ -48,6 +48,15 @@ describe('PageWrapper modes', () => {
         expect(document.querySelector('.page-content')).not.toBeInTheDocument();
     });
 
+    it('forced placeholder: a pageId WITH a widget config still renders 建置中 when placeholder is set (R1 IA 收斂)', () => {
+        renderPage(<PageWrapper pageId="triage" placeholder />);
+
+        expect(screen.getByText('頁面建置中')).toBeInTheDocument();
+        expect(document.querySelector('.widget-grid')).not.toBeInTheDocument();
+        // 刻意標記的 placeholder 不應觸發 dev warning
+        expect(warnSpy).not.toHaveBeenCalledWith(expect.stringContaining('triage'));
+    });
+
     it('placeholder mode: unknown pageId renders an explicit EmptyState instead of a blank shell', () => {
         renderPage(<PageWrapper pageId="not-a-configured-page" />);
 

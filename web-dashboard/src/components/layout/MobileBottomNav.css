@@ -226,9 +226,22 @@
 }
 
 /* ==========================================
-   Show on Mobile Only (≤767px)
+   災時模式（R1 / FE-7）：高對比戰術底欄
+   顏色由 tokens.css LAYER 8 換色，此處僅結構性強化
    ========================================== */
-@media (max-width: 767px) {
+.mobile-bottom-nav--emergency {
+    border-top: 2px solid var(--color-warning);
+}
+
+.mobile-bottom-nav--emergency .mobile-nav-item.active {
+    color: var(--accent-primary, #C39B6F);
+    background: rgba(195, 155, 111, 0.16);
+}
+
+/* ==========================================
+   Show on Mobile Only (≤900px — 與 AppShellLayout 斷點一致)
+   ========================================== */
+@media (max-width: 900px) {
     .mobile-fab-sos,
     .mobile-bottom-nav,
     .mobile-more-overlay {

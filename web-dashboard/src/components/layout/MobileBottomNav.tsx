@@ -1,30 +1,37 @@
 /**
- * MobileBottomNav.tsx
- * 
- * Expert Council Navigation Design v3.0
- * Mobile bottom navigation bar (≤767px)
- * Per expert_council_navigation_design.md §3.1
- * 
- * Features:
- * - 5 main navigation icons
- * - Overflow menu for additional items
- * - Floating Action Button for SOS
+ * MobileBottomNav.tsx — R1 / FE-7 重建
+ *
+ * 行動端底部導覽（≤900px 顯示，樣式由 AppShellLayout.css 控制）
+ * 雙模式（DESIGN_LANGUAGE.md §1.2 / §6）：
+ * - 平時：指揮艙 / 地圖 / 任務 / 通知 + 更多
+ * - 災時：通報 / 任務 / 地圖 / 傷檢 + 更多（應變核心，高對比）
+ * - SOS 永遠是紅色 FAB（單手可及、1 次點擊）
+ * 權限：候選項以 page-policy 過濾（單一來源），不足 4 格時遞補。
  */
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
     LayoutDashboard,
     Map,
+    ClipboardList,
+    BellRing,
+    Bell,
+    FileWarning,
+    Stethoscope,
+    MapPin,
     Package,
     Users,
+    BarChart3,
+    GraduationCap,
+    BookOpen,
     MoreHorizontal,
     AlertCircle,
-    Building,
-    BarChart3,
-    Settings,
     X,
-    LucideIcon
+    LucideIcon,
 } from 'lucide-react';
+import { pagePolicy } from '../../config/page-policy';
+import { PermissionLevel } from './widget.types';
+import type { AppMode } from './useSidebarConfig';
 import './MobileBottomNav.css';
 
 interface NavItem {
@@ -34,53 +41,90 @@ interface NavItem {
     path: string;
 }
 
-const MAIN_NAV: NavItem[] = [
+/** 平時主 tab 候選（依權限遞補，取前 4） */
+const NORMAL_MAIN: NavItem[] = [
     { id: 'dashboard', icon: LayoutDashboard, label: '指揮艙', path: '/command-center' },
     { id: 'map', icon: Map, label: '地圖', path: '/geo/map' },
-    { id: 'rescue', icon: Building, label: '救援', path: '/rescue/shelters' },
-    { id: 'resources', icon: Package, label: '後勤', path: '/logistics/inventory' },
-    { id: 'more', icon: MoreHorizontal, label: '更多', path: '#more' },
+    { id: 'tasks', icon: ClipboardList, label: '任務', path: '/tasks' },
+    { id: 'notifications', icon: BellRing, label: '通知', path: '/hub/notifications' },
+    { id: 'alerts', icon: Bell, label: '警報', path: '/hub/geo-alerts' },
+    { id: 'shelters', icon: MapPin, label: '避難所', path: '/geo/shelters' },
 ];
 
-const MORE_NAV: NavItem[] = [
+/** 災時主 tab 候選（應變核心，依權限遞補，取前 4）— DESIGN_LANGUAGE.md §1.2 */
+const EMERGENCY_MAIN: NavItem[] = [
+    { id: 'report', icon: FileWarning, label: '通報', path: '/intake' },
+    { id: 'tasks', icon: ClipboardList, label: '任務', path: '/tasks' },
+    { id: 'map', icon: Map, label: '地圖', path: '/geo/map' },
+    { id: 'triage', icon: Stethoscope, label: '傷檢', path: '/rescue/triage' },
+    { id: 'alerts', icon: Bell, label: '警報', path: '/hub/geo-alerts' },
+    { id: 'shelters', icon: MapPin, label: '避難所', path: '/geo/shelters' },
+];
+
+/** 「更多」選單候選 */
+const NORMAL_MORE: NavItem[] = [
+    { id: 'report', icon: FileWarning, label: '快速通報', path: '/intake' },
     { id: 'workforce', icon: Users, label: '人員動員', path: '/workforce/people' },
-    { id: 'analytics', icon: BarChart3, label: '分析知識', path: '/hub/analytics' },
-    { id: 'settings', icon: Settings, label: '系統管理', path: '/governance/settings' },
+    { id: 'inventory', icon: Package, label: '物資庫存', path: '/logistics/inventory' },
+    { id: 'analytics', icon: BarChart3, label: '分析儀表板', path: '/hub/analytics' },
+    { id: 'training', icon: GraduationCap, label: '訓練課程', path: '/training' },
+    { id: 'manuals', icon: BookOpen, label: '作業手冊', path: '/knowledge/manuals' },
 ];
 
-export default function MobileBottomNav() {
+const EMERGENCY_MORE: NavItem[] = [
+    { id: 'command-center', icon: LayoutDashboard, label: '戰情儀表板', path: '/command-center' },
+    { id: 'alerts', icon: Bell, label: '警報中心', path: '/hub/geo-alerts' },
+    { id: 'shelters', icon: MapPin, label: '避難所', path: '/geo/shelters' },
+    { id: 'inventory', icon: Package, label: '物資庫存', path: '/logistics/inventory' },
+    { id: 'workforce', icon: Users, label: '人員名冊', path: '/workforce/people' },
+];
+
+interface MobileBottomNavProps {
+    mode?: AppMode;
+    userLevel?: PermissionLevel;
+}
+
+export default function MobileBottomNav({
+    mode = 'normal',
+    userLevel = PermissionLevel.Anonymous,
+}: MobileBottomNavProps) {
     const location = useLocation();
     const [isMoreOpen, setIsMoreOpen] = useState(false);
 
-    const handleMoreClick = (e: React.MouseEvent) => {
-        e.preventDefault();
-        setIsMoreOpen(!isMoreOpen);
-    };
+    const allowed = (item: NavItem) =>
+        userLevel >= pagePolicy.getRequiredLevelByPath(item.path);
+
+    const mainCandidates = mode === 'emergency' ? EMERGENCY_MAIN : NORMAL_MAIN;
+    const moreCandidates = mode === 'emergency' ? EMERGENCY_MORE : NORMAL_MORE;
+
+    const mainNav = mainCandidates.filter(allowed).slice(0, 4);
+    const mainIds = new Set(mainNav.map(i => i.id));
+    const moreNav = moreCandidates.filter(item => allowed(item) && !mainIds.has(item.id));
 
     return (
         <>
-            {/* SOS Floating Action Button */}
-            <Link to="/emergency/sos" className="mobile-fab-sos" title="SOS 緊急求救">
-                <AlertCircle size={28} strokeWidth={2} />
+            {/* SOS FAB — 紅色僅用於生命安全（DESIGN_LANGUAGE.md §3） */}
+            <Link to="/emergency/sos" className="mobile-fab-sos" title="SOS 緊急求救" aria-label="SOS 緊急求救">
+                <AlertCircle size={28} strokeWidth={2} aria-hidden />
             </Link>
 
-            {/* More Menu Overlay */}
+            {/* More Menu（bottom sheet） */}
             {isMoreOpen && (
                 <div className="mobile-more-overlay" onClick={() => setIsMoreOpen(false)}>
-                    <div className="mobile-more-menu" onClick={e => e.stopPropagation()}>
+                    <div className="mobile-more-menu" onClick={e => e.stopPropagation()} role="menu">
                         <div className="mobile-more-header">
                             <span>更多功能</span>
-                            <button 
-                                onClick={() => setIsMoreOpen(false)} 
+                            <button
+                                type="button"
+                                onClick={() => setIsMoreOpen(false)}
                                 className="mobile-more-close"
                                 aria-label="關閉選單"
-                                title="關閉選單"
                             >
                                 <X size={20} />
                             </button>
                         </div>
                         <div className="mobile-more-items">
-                            {MORE_NAV.map(item => {
+                            {moreNav.map(item => {
                                 const Icon = item.icon;
                                 const isActive = location.pathname.startsWith(item.path);
                                 return (
@@ -89,8 +133,9 @@ export default function MobileBottomNav() {
                                         to={item.path}
                                         className={`mobile-more-item ${isActive ? 'active' : ''}`}
                                         onClick={() => setIsMoreOpen(false)}
+                                        role="menuitem"
                                     >
-                                        <Icon size={24} strokeWidth={1.5} />
+                                        <Icon size={24} strokeWidth={1.5} aria-hidden />
                                         <span>{item.label}</span>
                                     </Link>
                                 );
@@ -101,36 +146,35 @@ export default function MobileBottomNav() {
             )}
 
             {/* Bottom Navigation Bar */}
-            <nav className="mobile-bottom-nav" aria-label="Mobile navigation">
-                {MAIN_NAV.map(item => {
+            <nav
+                className={`mobile-bottom-nav ${mode === 'emergency' ? 'mobile-bottom-nav--emergency' : ''}`}
+                aria-label="行動端導覽"
+            >
+                {mainNav.map(item => {
                     const Icon = item.icon;
-                    const isActive = item.path !== '#more' && location.pathname.startsWith(item.path);
-                    const isMore = item.id === 'more';
-
-                    if (isMore) {
-                        return (
-                            <button
-                                key={item.id}
-                                className={`mobile-nav-item ${isMoreOpen ? 'active' : ''}`}
-                                onClick={handleMoreClick}
-                            >
-                                <Icon size={22} strokeWidth={1.5} />
-                                <span>{item.label}</span>
-                            </button>
-                        );
-                    }
-
+                    const isActive = location.pathname.startsWith(item.path);
                     return (
                         <Link
                             key={item.id}
                             to={item.path}
                             className={`mobile-nav-item ${isActive ? 'active' : ''}`}
+                            aria-current={isActive ? 'page' : undefined}
                         >
-                            <Icon size={22} strokeWidth={1.5} />
+                            <Icon size={22} strokeWidth={1.5} aria-hidden />
                             <span>{item.label}</span>
                         </Link>
                     );
                 })}
+                <button
+                    type="button"
+                    className={`mobile-nav-item ${isMoreOpen ? 'active' : ''}`}
+                    onClick={() => setIsMoreOpen(!isMoreOpen)}
+                    aria-haspopup="menu"
+                    aria-expanded={isMoreOpen}
+                >
+                    <MoreHorizontal size={22} strokeWidth={1.5} aria-hidden />
+                    <span>更多</span>
+                </button>
             </nav>
         </>
     );
