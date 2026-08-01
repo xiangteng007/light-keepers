@@ -1,0 +1,265 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   situational.css — 態勢類旗艦頁共用元件樣式（R2a / FE-7）
+   規則（DESIGN_LANGUAGE.md）：
+   - 只用語義 token（--surface-* / --text-* / --border-* / --color-* / --space-*）
+     → light / dark / tactical（災時）三態由 tokens.css 自動切換，本檔不寫死顏色
+   - 災時模式只允許調整密度（spacing），不得另寫顏色
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── KPI 卡 ───────────────────────────────────────────────── */
+.sit-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+    min-height: 44px;
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-left: 3px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition:
+        border-color var(--duration-fast) var(--ease-smooth),
+        box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+.sit-kpi:hover {
+    box-shadow: var(--shadow-sm);
+    border-color: var(--border-dark);
+}
+
+.sit-kpi:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* 狀態語意著色（§3）：只染左緣與圖示，文字維持預設對比（AA） */
+.sit-kpi--info { border-left-color: var(--color-info); }
+.sit-kpi--success { border-left-color: var(--color-success); }
+.sit-kpi--warning { border-left-color: var(--color-warning); }
+.sit-kpi--danger { border-left-color: var(--color-danger); }
+
+.sit-kpi__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.sit-kpi__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+}
+
+.sit-kpi__icon {
+    display: inline-flex;
+    color: var(--text-tertiary);
+}
+
+.sit-kpi--info .sit-kpi__icon { color: var(--color-info); }
+.sit-kpi--success .sit-kpi__icon { color: var(--color-success); }
+.sit-kpi--warning .sit-kpi__icon { color: var(--color-warning); }
+.sit-kpi--danger .sit-kpi__icon { color: var(--color-danger); }
+
+.sit-kpi__value {
+    font-size: var(--font-size-3xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    font-variant-numeric: tabular-nums;
+}
+
+.sit-kpi__sub {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.sit-sparkline {
+    margin-top: auto;
+    color: var(--color-info);
+    max-width: 100%;
+}
+
+/* ── Panel 容器 ───────────────────────────────────────────── */
+.sit-panel {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+.sit-panel__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-light);
+}
+
+.sit-panel__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.sit-panel__count {
+    min-width: 20px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--surface-hover);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+}
+
+.sit-panel__link {
+    /* 觸控熱區補足（§2.3）：視覺小、熱區大 */
+    padding: var(--space-2) var(--space-2);
+    margin: calc(-1 * var(--space-2));
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-sm);
+    color: var(--text-link);
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.sit-panel__link:hover { text-decoration: underline; }
+
+.sit-panel__link:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.sit-panel__body {
+    flex: 1;
+    min-height: 0;
+    padding: var(--space-4);
+}
+
+/* ── 列表 rows（feed / 待辦 / 清單共用）──────────────────── */
+.sit-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.sit-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--surface-hover);
+}
+
+.sit-row__emoji {
+    flex: none;
+    font-size: var(--font-size-lg);
+    line-height: 1;
+}
+
+.sit-row__main {
+    flex: 1;
+    min-width: 0;
+}
+
+.sit-row__title {
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sit-row__meta {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.sit-row__time {
+    flex: none;
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 行內統計（面板內 3–4 個數字）────────────────────────── */
+.sit-inline-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-bottom: var(--space-3);
+}
+
+.sit-inline-stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 64px;
+}
+
+.sit-inline-stat__value {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.sit-inline-stat__label {
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+}
+
+/* ── 載入 skeleton ────────────────────────────────────────── */
+.sit-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.sit-skeleton__row {
+    height: 40px;
+    border-radius: var(--radius-md);
+    background: var(--surface-hover);
+    animation: sit-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+@keyframes sit-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sit-skeleton__row { animation: none; }
+}
+
+/* ── 災時模式：密度提高（只調 spacing，顏色由 tokens LAYER 8 處理）── */
+[data-app-mode="emergency"] .sit-kpi { padding: var(--space-3); gap: var(--space-1); }
+[data-app-mode="emergency"] .sit-panel__body { padding: var(--space-3); }
+[data-app-mode="emergency"] .sit-panel__header { padding: var(--space-2) var(--space-3); }
+[data-app-mode="emergency"] .sit-list { gap: var(--space-1); }
+[data-app-mode="emergency"] .sit-skeleton__row { animation: none; }
