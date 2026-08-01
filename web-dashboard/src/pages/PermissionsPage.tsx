@@ -11,10 +11,12 @@ import {
     AlertTriangle,
     Trash2,
     Ban,
-    X,
     ArrowUpDown,
 } from 'lucide-react';
 import { deleteAccount, blacklistAccount } from '../api/services';
+import { Button, Badge, Alert, Modal, InputField } from '../design-system';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
+import EmptyState from '../components/shared/EmptyState';
 import './PermissionsPage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
@@ -50,6 +52,17 @@ interface PagePermission {
     sortOrder: number;
     isVisible: boolean;
 }
+
+// 角色層級徽章 variant 對照——這是行政角色分級，非 DESIGN_LANGUAGE §3 的危急/警戒狀態色，
+// 因此刻意避開 danger（保留給生命安全語意），改用中性/裝飾性 variant 做視覺分層。
+const LEVEL_BADGE_VARIANT: Record<number, 'default' | 'info' | 'success' | 'subtle' | 'warning' | 'gradient'> = {
+    0: 'default',
+    1: 'info',
+    2: 'success',
+    3: 'subtle',
+    4: 'warning',
+    5: 'gradient',
+};
 
 export default function PermissionsPage() {
     const { user } = useAuth();
@@ -276,13 +289,15 @@ export default function PermissionsPage() {
         const currentRole = account.roles[0] || '';
 
         return (
-            <div className="role-badges">
+            <div className="role-badges" role="group" aria-label="選擇角色">
                 {availableRoles.map(role => {
                     const isSelected = currentRole === role.name;
                     return (
-                        <button
+                        <Button
                             key={role.name}
-                            className={`role-badge ${isSelected ? 'role-badge--active' : ''}`}
+                            type="button"
+                            size="sm"
+                            variant={isSelected ? 'primary' : 'secondary'}
                             onClick={() => {
                                 // 單選模式 - 只設定這一個角色
                                 if (!isSelected) {
@@ -290,72 +305,93 @@ export default function PermissionsPage() {
                                 }
                             }}
                             disabled={savingUser === account.id || !canModify(account.roleLevel) || isSelected}
+                            aria-pressed={isSelected}
                         >
                             {role.displayName}
-                            {isSelected && <span className="role-badge__check">✓</span>}
-                        </button>
+                            {isSelected ? ' ✓' : ''}
+                        </Button>
                     );
                 })}
             </div>
         );
     };
 
-    if (isLoading) {
-        return (
-            <div className="permissions-page">
-                <div className="loading-screen">
-                    <div className="loading-spinner"></div>
-                    <p>載入中...</p>
+    const renderLoadingSkeleton = () => (
+        <div className="users-list" aria-hidden="true">
+            {Array.from({ length: 4 }).map((_, i) => (
+                <div key={i} className="user-card user-card--skeleton">
+                    <div className="user-card__header">
+                        <div className="user-card__info">
+                            <Skeleton variant="avatar" width={40} height={40} />
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-1)' }}>
+                                <Skeleton width={140} height={14} />
+                                <Skeleton width={180} height={12} />
+                            </div>
+                        </div>
+                        <Skeleton width={72} height={24} />
+                    </div>
                 </div>
-            </div>
-        );
-    }
+            ))}
+        </div>
+    );
 
     return (
         <div className="permissions-page">
-            <div className="permissions-header">
-                <div className="permissions-header__left">
-                    <h1><Shield size={28} /> 權限管理</h1>
+            <div className="page-header">
+                <div className="page-header__text">
+                    <h1><Shield size={24} aria-hidden="true" /> 權限管理</h1>
                     <p>管理用戶角色和頁面存取權限</p>
                 </div>
-                <button className="lk-btn lk-btn--secondary" onClick={fetchData}>
-                    <RefreshCw size={16} /> 重新載入
-                </button>
+                <Button variant="secondary" onClick={fetchData} icon={<RefreshCw size={16} />} disabled={isLoading}>
+                    重新載入
+                </Button>
             </div>
 
             {message && (
-                <div className={`permissions-message permissions-message--${message.type}`}>
+                <Alert variant={message.type === 'success' ? 'success' : 'danger'}>
                     {message.text}
-                </div>
+                </Alert>
             )}
 
             {error && (
-                <div className="permissions-error">
-                    <AlertTriangle size={20} />
-                    {error}
-                </div>
+                <Alert
+                    variant="danger"
+                    title="載入失敗"
+                    icon={<AlertTriangle size={16} />}
+                >
+                    <div className="permissions-error__body">
+                        <span>{error}</span>
+                        <Button size="sm" variant="secondary" onClick={fetchData}>重試</Button>
+                    </div>
+                </Alert>
             )}
 
-            <div className="permissions-tabs">
+            <div className="permissions-tabs" role="tablist" aria-label="權限管理分頁">
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'users'}
                     className={`permissions-tab ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                 >
-                    <Users size={18} />
+                    <Users size={18} aria-hidden="true" />
                     志工權限
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'general'}
                     className={`permissions-tab ${activeTab === 'general' ? 'active' : ''}`}
                     onClick={() => setActiveTab('general')}
                 >
-                    <Users size={18} />
+                    <Users size={18} aria-hidden="true" />
                     一般民眾
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'pages'}
                     className={`permissions-tab ${activeTab === 'pages' ? 'active' : ''}`}
                     onClick={() => setActiveTab('pages')}
                 >
-                    <FileKey size={18} />
+                    <FileKey size={18} aria-hidden="true" />
                     頁面權限配置
                 </button>
             </div>
@@ -365,29 +401,36 @@ export default function PermissionsPage() {
                 {activeTab === 'general' && (
                     <div className="general-section">
                         <div className="general-toolbar">
-                            <div className="users-search">
-                                <Search size={18} />
-                                <input
-                                    type="text"
-                                    placeholder="搜尋一般民眾..."
-                                    value={searchTerm}
-                                    onChange={e => setSearchTerm(e.target.value)}
-                                />
-                            </div>
+                            <InputField
+                                prefix={<Search size={18} aria-hidden="true" />}
+                                placeholder="搜尋一般民眾..."
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                aria-label="搜尋一般民眾"
+                                fullWidth
+                            />
                             <div className="sort-dropdown">
-                                <ArrowUpDown size={16} />
-                                <select value={sortBy} onChange={e => setSortBy(e.target.value as 'date' | 'name')}>
+                                <ArrowUpDown size={16} aria-hidden="true" />
+                                <select
+                                    value={sortBy}
+                                    onChange={e => setSortBy(e.target.value as 'date' | 'name')}
+                                    aria-label="排序方式"
+                                >
                                     <option value="date">註冊時間</option>
                                     <option value="name">名稱</option>
                                 </select>
                             </div>
                         </div>
 
-                        <div className="users-list">
-                            {sortedGeneralAccounts.length === 0 ? (
-                                <div className="users-empty">沒有一般民眾帳號</div>
-                            ) : (
-                                sortedGeneralAccounts.map(account => (
+                        {isLoading ? renderLoadingSkeleton() : sortedGeneralAccounts.length === 0 ? (
+                            <EmptyState
+                                variant="search"
+                                title="沒有找到符合條件的帳號"
+                                description="試試調整搜尋關鍵字，或清空搜尋條件查看全部一般民眾帳號。"
+                            />
+                        ) : (
+                            <div className="users-list">
+                                {sortedGeneralAccounts.map(account => (
                                     <div
                                         key={account.id}
                                         className={`user-card user-card--general ${!account.isActive ? 'user-card--blacklisted' : ''}`}
@@ -400,7 +443,11 @@ export default function PermissionsPage() {
                                             <div className="user-card__details">
                                                 <span className="user-card__name">
                                                     {account.displayName || '未設定名稱'}
-                                                    {!account.isActive && <span className="user-card__badge--blacklisted">🚫 黑名單</span>}
+                                                    {!account.isActive && (
+                                                        <Badge variant="danger" size="sm" icon={<Ban size={11} aria-hidden="true" />}>
+                                                            黑名單
+                                                        </Badge>
+                                                    )}
                                                 </span>
                                                 <span className="user-card__email">{account.email}</span>
                                                 <span className="user-card__date">
@@ -417,9 +464,10 @@ export default function PermissionsPage() {
                                                         handleBlacklistAccount(account.id, account.displayName || account.email);
                                                     }}
                                                     disabled={processingId === account.id}
+                                                    aria-label="加入黑名單"
                                                     title="加入黑名單"
                                                 >
-                                                    <Ban size={16} />
+                                                    <Ban size={16} aria-hidden="true" />
                                                 </button>
                                             )}
                                             <button
@@ -429,75 +477,89 @@ export default function PermissionsPage() {
                                                     handleDeleteAccount(account.id, account.displayName || account.email);
                                                 }}
                                                 disabled={processingId === account.id}
+                                                aria-label="刪除帳號"
                                                 title="刪除帳號"
                                             >
-                                                <Trash2 size={16} />
+                                                <Trash2 size={16} aria-hidden="true" />
                                             </button>
                                         </div>
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {/* 帳號詳情彈窗 */}
-                {selectedAccount && (
-                    <div className="modal-overlay" onClick={() => setSelectedAccount(null)}>
-                        <div className="modal-content" onClick={e => e.stopPropagation()}>
-                            <div className="modal-header">
-                                <h3>帳號詳情</h3>
-                                <button className="modal-close" onClick={() => setSelectedAccount(null)}>
-                                    <X size={20} />
-                                </button>
+                <Modal
+                    isOpen={!!selectedAccount}
+                    onClose={() => setSelectedAccount(null)}
+                    title="帳號詳情"
+                    size="sm"
+                >
+                    {selectedAccount && (
+                        <div className="account-detail">
+                            <div className="account-detail__avatar">
+                                {selectedAccount.displayName?.charAt(0) || selectedAccount.email?.charAt(0) || '?'}
                             </div>
-                            <div className="modal-body">
-                                <div className="account-detail">
-                                    <div className="account-detail__avatar">
-                                        {selectedAccount.displayName?.charAt(0) || selectedAccount.email?.charAt(0) || '?'}
-                                    </div>
-                                    <div className="account-detail__info">
-                                        <p><strong>名稱：</strong>{selectedAccount.displayName || '未設定'}</p>
-                                        <p><strong>Email：</strong>{selectedAccount.email}</p>
-                                        <p><strong>角色：</strong>{selectedAccount.roleDisplayName}</p>
-                                        <p><strong>狀態：</strong>{selectedAccount.isActive ? '正常' : '🚫 黑名單'}</p>
-                                        <p><strong>註冊時間：</strong>{new Date(selectedAccount.createdAt).toLocaleString('zh-TW')}</p>
-                                        {selectedAccount.lastLoginAt && (
-                                            <p><strong>最後登入：</strong>{new Date(selectedAccount.lastLoginAt).toLocaleString('zh-TW')}</p>
-                                        )}
-                                    </div>
-                                </div>
+                            <div className="account-detail__info">
+                                <p><strong>名稱：</strong>{selectedAccount.displayName || '未設定'}</p>
+                                <p><strong>Email：</strong>{selectedAccount.email}</p>
+                                <p><strong>角色：</strong>{selectedAccount.roleDisplayName}</p>
+                                <p>
+                                    <strong>狀態：</strong>
+                                    {selectedAccount.isActive
+                                        ? <Badge variant="success" size="sm">正常</Badge>
+                                        : <Badge variant="danger" size="sm" icon={<Ban size={11} aria-hidden="true" />}>黑名單</Badge>}
+                                </p>
+                                <p><strong>註冊時間：</strong>{new Date(selectedAccount.createdAt).toLocaleString('zh-TW')}</p>
+                                {selectedAccount.lastLoginAt && (
+                                    <p><strong>最後登入：</strong>{new Date(selectedAccount.lastLoginAt).toLocaleString('zh-TW')}</p>
+                                )}
                             </div>
                         </div>
-                    </div>
-                )}
+                    )}
+                </Modal>
 
                 {activeTab === 'users' && (
                     <div className="users-section">
-                        <div className="users-search">
-                            <Search size={18} />
-                            <input
-                                type="text"
-                                placeholder="搜尋用戶..."
-                                value={searchTerm}
-                                onChange={e => setSearchTerm(e.target.value)}
-                            />
-                        </div>
+                        <InputField
+                            prefix={<Search size={18} aria-hidden="true" />}
+                            placeholder="搜尋用戶..."
+                            value={searchTerm}
+                            onChange={e => setSearchTerm(e.target.value)}
+                            aria-label="搜尋用戶"
+                            fullWidth
+                        />
 
-                        <div className="users-list">
-                            {sortedFilteredAccounts.length === 0 ? (
-                                <div className="users-empty">沒有找到符合條件的用戶</div>
-                            ) : (
-                                sortedFilteredAccounts.map(account => (
+                        {isLoading ? renderLoadingSkeleton() : sortedFilteredAccounts.length === 0 ? (
+                            <EmptyState
+                                variant="search"
+                                title="沒有找到符合條件的用戶"
+                                description="試試調整搜尋關鍵字。"
+                            />
+                        ) : (
+                            <div className="users-list">
+                                {sortedFilteredAccounts.map(account => (
                                     <div
                                         key={account.id}
                                         className={`user-card ${expandedUser === account.id ? 'expanded' : ''}`}
                                     >
+                                        {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions */}
                                         <div
                                             className="user-card__header"
+                                            role="button"
+                                            tabIndex={0}
                                             onClick={() =>
                                                 setExpandedUser(expandedUser === account.id ? null : account.id)
                                             }
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' || e.key === ' ') {
+                                                    e.preventDefault();
+                                                    setExpandedUser(expandedUser === account.id ? null : account.id);
+                                                }
+                                            }}
+                                            aria-expanded={expandedUser === account.id}
                                         >
                                             <div className="user-card__info">
                                                 <div className="user-card__avatar">
@@ -511,36 +573,42 @@ export default function PermissionsPage() {
                                                 </div>
                                             </div>
                                             <div className="user-card__right">
-                                                <span className={`user-card__level level-${account.roleLevel}`}>
+                                                <Badge variant={LEVEL_BADGE_VARIANT[account.roleLevel] ?? 'default'} size="sm">
                                                     {account.roleDisplayName}
-                                                </span>
+                                                </Badge>
                                                 {/* 理事長(level 4)以上可見刪除/黑名單按鈕 */}
                                                 {(user?.roleLevel ?? 0) >= 4 && canModify(account.roleLevel) && (
-                                                    <div className="user-card__actions" onClick={e => e.stopPropagation()}>
+                                                    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+                                                    <span
+                                                        className="user-card__actions"
+                                                        onClick={e => e.stopPropagation()}
+                                                    >
                                                         {account.isActive && (
                                                             <button
                                                                 className="action-btn action-btn--warning"
                                                                 onClick={() => handleBlacklistAccount(account.id, account.displayName || account.email)}
                                                                 disabled={processingId === account.id}
+                                                                aria-label="加入黑名單"
                                                                 title="加入黑名單"
                                                             >
-                                                                <Ban size={16} />
+                                                                <Ban size={16} aria-hidden="true" />
                                                             </button>
                                                         )}
                                                         <button
                                                             className="action-btn action-btn--danger"
                                                             onClick={() => handleDeleteAccount(account.id, account.displayName || account.email)}
                                                             disabled={processingId === account.id}
+                                                            aria-label="刪除帳號"
                                                             title="刪除帳號"
                                                         >
-                                                            <Trash2 size={16} />
+                                                            <Trash2 size={16} aria-hidden="true" />
                                                         </button>
-                                                    </div>
+                                                    </span>
                                                 )}
                                                 {expandedUser === account.id ? (
-                                                    <ChevronUp size={20} />
+                                                    <ChevronUp size={20} aria-hidden="true" />
                                                 ) : (
-                                                    <ChevronDown size={20} />
+                                                    <ChevronDown size={20} aria-hidden="true" />
                                                 )}
                                             </div>
                                         </div>
@@ -553,129 +621,134 @@ export default function PermissionsPage() {
                                                         {renderRoleBadges(account)}
                                                         {savingUser === account.id && (
                                                             <div className="user-card__saving">
-                                                                <RefreshCw size={14} className="spin" />
+                                                                <RefreshCw size={14} className="spin" aria-hidden="true" />
                                                                 儲存中...
                                                             </div>
                                                         )}
                                                     </>
                                                 ) : (
                                                     <div className="user-card__readonly">
-                                                        <AlertTriangle size={16} />
+                                                        <AlertTriangle size={16} aria-hidden="true" />
                                                         無法修改權限等於或高於自己的用戶
                                                     </div>
                                                 )}
                                             </div>
                                         )}
                                     </div>
-                                ))
-                            )}
-                        </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 
                 {activeTab === 'pages' && (
                     <div className="pages-section">
-                        <div className="pages-notice">
-                            <AlertTriangle size={16} />
+                        <Alert variant="warning" icon={<AlertTriangle size={16} />}>
                             頁面權限配置僅限系統擁有者 (Owner) 可以修改
-                        </div>
+                        </Alert>
 
-                        <div className="pages-list">
-                            {pagePermissions
-                                .sort((a, b) => a.sortOrder - b.sortOrder)
-                                .map(page => (
-                                    <div key={page.pageKey} className="page-card">
-                                        <div className="page-card__info">
-                                            <div className="page-card__name-row">
-                                                <input
-                                                    type="text"
-                                                    className="page-card__name-input"
-                                                    value={page.pageName}
-                                                    onChange={e => {
-                                                        // Update local state immediately
-                                                        setPagePermissions(prev =>
-                                                            prev.map(p =>
-                                                                p.pageKey === page.pageKey
-                                                                    ? { ...p, pageName: e.target.value }
-                                                                    : p
-                                                            )
-                                                        );
-                                                    }}
-                                                    onBlur={e =>
-                                                        handlePagePermissionChange(page.pageKey, {
-                                                            pageName: e.target.value,
-                                                        })
-                                                    }
-                                                    disabled={(user?.roleLevel ?? 0) < 5}
-                                                    placeholder="頁面名稱"
-                                                />
-                                                <span className="page-card__path">{page.pagePath}</span>
-                                            </div>
-                                        </div>
-                                        <div className="page-card__controls">
-                                            <div className="page-card__sort-arrows">
-                                                <button
-                                                    className="sort-arrow-btn"
-                                                    onClick={() => movePageOrder(page.pageKey, 'up')}
-                                                    disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === 0}
-                                                    title="上移"
-                                                >
-                                                    <ChevronUp size={18} />
-                                                </button>
-                                                <span className="sort-order-display">{page.sortOrder}</span>
-                                                <button
-                                                    className="sort-arrow-btn"
-                                                    onClick={() => movePageOrder(page.pageKey, 'down')}
-                                                    disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === pagePermissions.length - 1}
-                                                    title="下移"
-                                                >
-                                                    <ChevronDown size={18} />
-                                                </button>
-                                            </div>
-                                            <div className="page-card__level">
-                                                <label>最低權限</label>
-                                                <select
-                                                    value={page.requiredLevel}
-                                                    onChange={e =>
-                                                        handlePagePermissionChange(page.pageKey, {
-                                                            requiredLevel: parseInt(e.target.value),
-                                                        })
-                                                    }
-                                                    disabled={(user?.roleLevel ?? 0) < 5}
-                                                >
-                                                    {/* 只顯示唯一的 level，避免重複選項 */}
-                                                    {roles
-                                                        .filter((role, index, self) =>
-                                                            index === self.findIndex(r => r.level === role.level)
-                                                        )
-                                                        .sort((a, b) => a.level - b.level)
-                                                        .map(role => (
-                                                            <option key={role.level} value={role.level}>
-                                                                {role.displayName}
-                                                            </option>
-                                                        ))
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div className="page-card__visible">
-                                                <label>
+                        {isLoading ? renderLoadingSkeleton() : (
+                            <div className="pages-list">
+                                {pagePermissions
+                                    .sort((a, b) => a.sortOrder - b.sortOrder)
+                                    .map(page => (
+                                        <div key={page.pageKey} className="page-card">
+                                            <div className="page-card__info">
+                                                <div className="page-card__name-row">
                                                     <input
-                                                        type="checkbox"
-                                                        checked={page.isVisible}
-                                                        onChange={e =>
+                                                        type="text"
+                                                        className="page-card__name-input"
+                                                        value={page.pageName}
+                                                        onChange={e => {
+                                                            // Update local state immediately
+                                                            setPagePermissions(prev =>
+                                                                prev.map(p =>
+                                                                    p.pageKey === page.pageKey
+                                                                        ? { ...p, pageName: e.target.value }
+                                                                        : p
+                                                                )
+                                                            );
+                                                        }}
+                                                        onBlur={e =>
                                                             handlePagePermissionChange(page.pageKey, {
-                                                                isVisible: e.target.checked,
+                                                                pageName: e.target.value,
                                                             })
                                                         }
                                                         disabled={(user?.roleLevel ?? 0) < 5}
+                                                        placeholder="頁面名稱"
+                                                        aria-label={`頁面名稱 - ${page.pagePath}`}
                                                     />
-                                                    顯示
-                                                </label>
+                                                    <span className="page-card__path">{page.pagePath}</span>
+                                                </div>
+                                            </div>
+                                            <div className="page-card__controls">
+                                                <div className="page-card__sort-arrows">
+                                                    <button
+                                                        className="sort-arrow-btn"
+                                                        onClick={() => movePageOrder(page.pageKey, 'up')}
+                                                        disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === 0}
+                                                        aria-label={`「${page.pageName}」上移`}
+                                                        title="上移"
+                                                    >
+                                                        <ChevronUp size={18} aria-hidden="true" />
+                                                    </button>
+                                                    <span className="sort-order-display">{page.sortOrder}</span>
+                                                    <button
+                                                        className="sort-arrow-btn"
+                                                        onClick={() => movePageOrder(page.pageKey, 'down')}
+                                                        disabled={(user?.roleLevel ?? 0) < 5 || pagePermissions.sort((a, b) => a.sortOrder - b.sortOrder).findIndex(p => p.pageKey === page.pageKey) === pagePermissions.length - 1}
+                                                        aria-label={`「${page.pageName}」下移`}
+                                                        title="下移"
+                                                    >
+                                                        <ChevronDown size={18} aria-hidden="true" />
+                                                    </button>
+                                                </div>
+                                                <div className="page-card__level">
+                                                    <label htmlFor={`level-${page.pageKey}`}>最低權限</label>
+                                                    <select
+                                                        id={`level-${page.pageKey}`}
+                                                        value={page.requiredLevel}
+                                                        onChange={e =>
+                                                            handlePagePermissionChange(page.pageKey, {
+                                                                requiredLevel: parseInt(e.target.value),
+                                                            })
+                                                        }
+                                                        disabled={(user?.roleLevel ?? 0) < 5}
+                                                    >
+                                                        {/* 只顯示唯一的 level，避免重複選項 */}
+                                                        {roles
+                                                            .filter((role, index, self) =>
+                                                                index === self.findIndex(r => r.level === role.level)
+                                                            )
+                                                            .sort((a, b) => a.level - b.level)
+                                                            .map(role => (
+                                                                <option key={role.level} value={role.level}>
+                                                                    {role.displayName}
+                                                                </option>
+                                                            ))
+                                                        }
+                                                    </select>
+                                                </div>
+                                                <div className="page-card__visible">
+                                                    <label>
+                                                        <input
+                                                            type="checkbox"
+                                                            checked={page.isVisible}
+                                                            onChange={e =>
+                                                                handlePagePermissionChange(page.pageKey, {
+                                                                    isVisible: e.target.checked,
+                                                                })
+                                                            }
+                                                            disabled={(user?.roleLevel ?? 0) < 5}
+                                                        />
+                                                        顯示
+                                                    </label>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
-                        </div>
+                                    ))}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -1,194 +1,144 @@
 .biometric-page {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: var(--space-6);
 }
 
-.biometric-page__header h1 {
-    margin: 0;
-    font-size: 24px;
-    color: #fff;
-}
-
-.biometric-page__header p {
-    margin: 4px 0 0;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 14px;
-}
-
-.info-card {
-    display: flex;
-    gap: 16px;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 12px;
-    padding: 16px;
-}
-
-.info-icon {
-    font-size: 32px;
-}
-
-.info-card h3 {
-    margin: 0 0 4px;
-    font-size: 16px;
-    color: #60A5FA;
-}
-
-.info-card p {
-    margin: 0;
-    font-size: 14px;
-    color: rgba(255, 255, 255, 0.7);
-}
-
-.section-header {
+.page-header {
     display: flex;
     justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.page-header__text h1 {
+    display: flex;
     align-items: center;
-    margin-bottom: 16px;
-}
-
-.section-header h2 {
+    gap: var(--space-3);
     margin: 0;
-    font-size: 18px;
-    color: #fff;
+    font-size: var(--font-size-2xl);
+    color: var(--text-primary);
 }
 
-.register-btn {
-    background: linear-gradient(135deg, #D4AF37, #B8960C);
-    border: none;
-    color: #0F172A;
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+.page-header__text p {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
 }
 
-.register-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
+.section-title {
+    margin: 0 0 var(--space-4);
+    font-size: var(--font-size-lg);
+    color: var(--text-primary);
+}
+
+.biometric-page__credentials {
+    display: flex;
+    flex-direction: column;
 }
 
 .credentials-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .credential-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    background: rgba(30, 41, 59, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 16px 20px;
+    gap: var(--space-4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4) var(--space-5);
+    flex-wrap: wrap;
 }
 
 .credential-icon {
-    font-size: 32px;
     width: 48px;
     height: 48px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-lg);
     display: flex;
     align-items: center;
     justify-content: center;
+    color: var(--accent-primary, var(--color-secondary));
+    flex-shrink: 0;
 }
 
 .credential-info {
     flex: 1;
+    min-width: 200px;
 }
 
 .credential-info h4 {
-    margin: 0 0 4px;
-    font-size: 16px;
-    color: #fff;
+    margin: 0 0 var(--space-2);
+    font-size: var(--font-size-md, 16px);
+    color: var(--text-primary);
 }
 
 .credential-info p {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
     margin: 0;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.credential-registered {
+    color: var(--text-tertiary);
 }
 
 .last-used {
     display: block;
-    margin-top: 4px;
-    font-size: 11px;
-    color: rgba(255, 255, 255, 0.4);
-}
-
-.remove-btn {
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #EF4444;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 12px;
-    cursor: pointer;
-}
-
-.remove-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
-}
-
-.empty-state {
-    text-align: center;
-    padding: 60px 20px;
-    background: rgba(30, 41, 59, 0.5);
-    border-radius: 12px;
-}
-
-.empty-state span {
-    font-size: 48px;
-    display: block;
-    margin-bottom: 16px;
-}
-
-.empty-state p {
-    color: rgba(255, 255, 255, 0.6);
-    margin-bottom: 16px;
-}
-
-.empty-state button {
-    background: #D4AF37;
-    border: none;
-    color: #0F172A;
-    padding: 10px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
+    margin-top: var(--space-1);
+    font-size: var(--font-size-2xs, 10px);
+    color: var(--text-tertiary);
 }
 
 .biometric-page__support h3 {
-    margin: 0 0 12px;
-    font-size: 16px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
 }
 
 .support-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .support-item {
-    background: rgba(30, 41, 59, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-lg);
+    padding: var(--space-4);
     text-align: center;
-}
-
-.support-item span {
-    font-size: 28px;
-    display: block;
-    margin-bottom: 8px;
+    color: var(--text-secondary);
 }
 
 .support-item p {
     margin: 0;
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.6);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .page-header {
+        flex-direction: column;
+    }
+
+    .page-header button {
+        width: 100%;
+    }
+
+    .credential-card {
+        flex-direction: column;
+        align-items: stretch;
+    }
 }
