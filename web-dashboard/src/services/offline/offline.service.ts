@@ -79,7 +79,7 @@ export interface CachedReport {
 }
 
 export type OutboxOperation = 'create' | 'update' | 'delete';
-export type OutboxEntity = 'task' | 'resource' | 'report' | 'sos' | 'location';
+export type OutboxEntity = 'task' | 'resource' | 'report' | 'sos' | 'location' | 'intake_report';
 
 export interface PendingSync {
     id?: number;
@@ -325,6 +325,20 @@ class OfflineService {
         });
     }
 
+    /**
+     * 離線「公開通報」入列（R2b：/intake 通報頁）。
+     *
+     * 與 `queueReport()` 的差異：intake 通報不隸屬任何任務場次
+     * （POST `/reports`，非 `/mission-sessions/:id/reports`），因此使用獨立的
+     * `intake_report` entity —— `report` entity 維持「缺 missionSessionId 即
+     * malformed」的既有語意不變。
+     */
+    async queueIntakeReport(report: Record<string, any>): Promise<void> {
+        await this.queueSync('create', 'intake_report', this.localId('intake'), {
+            payload: report,
+        });
+    }
+
     /** 離線 SOS 入列 */
     async queueSos(missionSessionId: string, sos: Record<string, any>): Promise<void> {
         await this.queueSync('create', 'sos', this.localId('sos'), {
@@ -374,6 +388,11 @@ class OfflineService {
                 if (type === 'create') return { method: 'post', url: '/resources', data };
                 if (type === 'update') return { method: 'patch', url: `/resources/${entityId}`, data };
                 return { method: 'delete', url: `/resources/${entityId}` };
+
+            case 'intake_report':
+                // intake 公開通報（無任務場次，R2b）：只支援 create → POST /reports
+                if (type === 'create') return { method: 'post', url: '/reports', data: payload };
+                return null;
 
             case 'report': {
                 if (!missionSessionId) return null;

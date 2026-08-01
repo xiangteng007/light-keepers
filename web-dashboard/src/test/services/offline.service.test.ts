@@ -122,6 +122,44 @@ describe('offline.service — 離線 outbox', () => {
             });
         });
 
+        it('queueIntakeReport（R2b /intake 公開通報）重放為 POST /reports，成功後清除', async () => {
+            await offlineService.queueIntakeReport({
+                type: 'air_raid',
+                title: '空襲通報',
+                isMassCasualty: true,
+            });
+
+            const pending = await offlineService.getPendingChanges();
+            expect(pending).toHaveLength(1);
+            expect(pending[0].entity).toBe('intake_report');
+            // intake 通報刻意不帶 missionSessionId（與任務場次通報區分）
+            expect(pending[0].data.missionSessionId).toBeUndefined();
+
+            setOnline(true);
+            const result = await offlineService.attemptSync({ force: true });
+
+            expect(result.success).toBe(1);
+            expect(mockRequest).toHaveBeenCalledWith(
+                expect.objectContaining({
+                    method: 'post',
+                    url: '/reports',
+                    data: expect.objectContaining({ type: 'air_raid', isMassCasualty: true }),
+                })
+            );
+            expect(await offlineService.getPendingCount()).toBe(0);
+        });
+
+        it('queueIntakeReport 重放失敗時資料保留（不遺失不變式）', async () => {
+            await offlineService.queueIntakeReport({ type: 'flood', title: '淹水通報' });
+            mockRequest.mockRejectedValue(new Error('Network Error'));
+
+            setOnline(true);
+            const result = await offlineService.attemptSync({ force: true });
+
+            expect(result).toMatchObject({ success: 0, failed: 1 });
+            expect(await offlineService.getPendingCount()).toBe(1);
+        });
+
         it('updateTaskOffline 同時更新本地快取與入列', async () => {
             await offlineService.cacheTasks([
                 {
