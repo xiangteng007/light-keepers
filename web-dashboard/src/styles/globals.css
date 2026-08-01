@@ -20,7 +20,6 @@
    ═══════════════════════════════════════════════════════════════ */
 @import './tokens/index.css';
 @import './tokens/components.css';
-@import './tokens/bento-grid.css';
 @import './tokens/motion.css';
 @import './tokens/accessibility.css';
 
