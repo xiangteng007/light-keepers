@@ -1,401 +1,520 @@
 /**
- * Triage Page Styles
+ * Triage Page Styles — R3a 重建（DESIGN_LANGUAGE.md §7.3 看板頁 Board archetype）
+ *
+ * 全部改語意 token；不寫 light/dark/tactical 主題分支選擇器（切換由 tokens.css
+ * 的 [data-theme]/[data-app-mode] 覆寫層處理，頁面 CSS 只認語義變數）。
+ *
+ * BLACK（死亡）色說明：START 檢傷法的黑色為國際標準色，但 DESIGN_LANGUAGE §3
+ * 語意色表沒有對應 token（危急=紅、警戒=黃、安全=綠都已被 RED/YELLOW/GREEN
+ * 佔用，黑不屬於這三種語意）。依 R3a 指示，改用最接近的中性深色 token
+ * --text-primary 作為 BLACK 的識別色（欄頭圓點、卡片左邊框、統計卡邊框），
+ * 不生造新 token。
  */
 
 .triage-page {
-    padding: 1.5rem;
-    min-height: 100vh;
-    background: var(--bg-primary, #0a0a0f);
-    color: var(--text-primary, #e0e0e0);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+    padding: var(--space-3, 12px);
 }
 
-.triage-page.loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
+@media (min-width: 768px) {
+    .triage-page {
+        padding: var(--space-4, 16px);
+    }
 }
+
+@media (min-width: 1024px) {
+    .triage-page {
+        padding: var(--space-6, 24px);
+    }
+}
+
+/* ── Header ─────────────────────────────────────────────────── */
 
 .triage-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.5rem;
+    gap: var(--space-3, 12px);
 }
 
 .triage-header h1 {
     margin: 0;
-    color: var(--accent-gold, #d4af37);
+    font-size: var(--font-size-xl, 20px);
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-.btn-new {
-    padding: 0.75rem 1.5rem;
-    background: linear-gradient(135deg, #d4af37, #b8960c);
-    border: none;
-    border-radius: 8px;
-    color: #000;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s;
+@media (min-width: 1024px) {
+    .triage-header h1 {
+        font-size: var(--font-size-2xl, 24px);
+    }
 }
 
-.btn-new:hover {
-    transform: scale(1.05);
-}
+/* ── Stats Panel ────────────────────────────────────────────── */
 
-/* Stats Panel */
 .stats-panel {
-    display: flex;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3, 12px);
+}
+
+@media (min-width: 640px) {
+    .stats-panel {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (min-width: 1024px) {
+    .stats-panel {
+        grid-template-columns: repeat(6, 1fr);
+    }
 }
 
 .stat-card {
-    flex: 1;
-    min-width: 80px;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
+    min-width: 0;
+    padding: var(--space-3, 12px);
+    background: var(--surface-card, var(--bg-secondary));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md, 8px);
+    border-left-width: 4px;
+    border-left-style: solid;
     text-align: center;
-    border-left: 4px solid;
 }
 
 .stat-card .label {
     display: block;
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-bottom: 0.25rem;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-1, 4px);
 }
 
 .stat-card .value {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: var(--font-size-xl, 20px);
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
-.stat-card.total {
-    border-color: #3b82f6;
-}
+.stat-card--total { border-left-color: var(--color-info); }
+.stat-card--black { border-left-color: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
+.stat-card--red { border-left-color: var(--color-danger); }
+.stat-card--yellow { border-left-color: var(--color-warning); }
+.stat-card--green { border-left-color: var(--color-success); }
+.stat-card--transport { border-left-color: var(--color-info); }
 
-.stat-card.black {
-    border-color: #1a1a1a;
-}
+/* ── 行動端 segmented tabs（§7.3：欄切換用頂部 tabs，不做水平多欄）───── */
 
-.stat-card.red {
-    border-color: #ef4444;
-}
-
-.stat-card.yellow {
-    border-color: #f59e0b;
-}
-
-.stat-card.green {
-    border-color: #22c55e;
-}
-
-.stat-card.transport {
-    border-color: #8b5cf6;
-}
-
-/* Filter Bar */
-.filter-bar {
+.board-tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+    overflow-x: auto;
+    padding-bottom: var(--space-1, 4px);
+    -webkit-overflow-scrolling: touch;
 }
 
-.filter-btn {
-    padding: 0.5rem 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    color: var(--text-secondary, #aaa);
+@media (min-width: 768px) {
+    .board-tabs {
+        display: none;
+    }
+}
+
+.board-tab {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 var(--space-4, 16px);
+    border-radius: var(--radius-full, 9999px);
+    border: 1px solid var(--border-default);
+    background: var(--surface-card, var(--bg-secondary));
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+    font-weight: 600;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background var(--duration-fast, 150ms), color var(--duration-fast, 150ms), border-color var(--duration-fast, 150ms);
 }
 
-.filter-btn:hover,
-.filter-btn.active {
-    background: rgba(255, 255, 255, 0.1);
-    color: #fff;
+.board-tab:hover {
+    background: var(--surface-hover, var(--bg-secondary));
 }
 
-/* Victim List */
-.victim-list {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+.board-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
-.victim-card {
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border-left: 5px solid;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
+.board-tab--all.is-active {
+    background: var(--color-info);
+    border-color: var(--color-info);
+    color: var(--text-inverse);
 }
 
-.victim-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+.board-tab--black.is-active {
+    background: var(--text-primary);
+    border-color: var(--text-primary);
+    color: var(--bg-inverse, var(--text-inverse));
 }
 
-.victim-header {
+.board-tab--red.is-active {
+    background: var(--color-danger);
+    border-color: var(--color-danger);
+    color: var(--text-inverse);
+}
+
+.board-tab--yellow.is-active {
+    background: var(--color-warning);
+    border-color: var(--color-warning);
+    color: var(--text-inverse);
+}
+
+.board-tab--green.is-active {
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: var(--text-inverse);
+}
+
+/* ── 看板欄位（桌機水平並列，行動端單欄）───────────────────────── */
+
+.board-columns {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+}
+
+@media (min-width: 768px) {
+    .board-columns {
+        flex-direction: row;
+        align-items: flex-start;
+        overflow-x: auto;
+        padding-bottom: var(--space-2, 8px);
+    }
+}
+
+.board-column {
+    display: none;
+    flex-direction: column;
+    background: var(--surface-card, var(--bg-secondary));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md, 8px);
+    overflow: hidden;
+}
+
+.board-column.is-active {
+    display: flex;
+}
+
+@media (min-width: 768px) {
+    .board-column {
+        display: flex !important;
+        flex: 1 1 260px;
+        min-width: 260px;
+        max-height: calc(100vh - 280px);
+        min-height: 200px;
+    }
+}
+
+.board-column__header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
+    gap: var(--space-2, 8px);
+    padding: var(--space-3, 12px);
+    border-bottom: 1px solid var(--border-default);
+    background: var(--surface-card, var(--bg-secondary));
 }
 
-.level-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 4px;
-    font-size: 0.75rem;
-    font-weight: bold;
-    color: #fff;
+.board-column__dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full, 9999px);
+    flex-shrink: 0;
 }
 
-.bracelet-id {
-    font-size: 0.8rem;
-    opacity: 0.7;
+.board-column__dot--black { background: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
+.board-column__dot--red { background: var(--color-danger); }
+.board-column__dot--yellow { background: var(--color-warning); }
+.board-column__dot--green { background: var(--color-success); }
+
+.board-column__title {
+    flex: 1;
+    margin: 0;
+    font-size: var(--font-size-base, 16px);
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-.victim-card .description {
-    margin: 0.5rem 0;
-    font-size: 0.95rem;
-}
-
-.victim-card .location {
-    margin: 0.25rem 0;
-    font-size: 0.85rem;
-    opacity: 0.7;
-}
-
-.victim-footer {
+.board-column__body {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.transport-status {
-    font-size: 0.85rem;
-}
-
-.btn-transport,
-.btn-arrived {
-    padding: 0.4rem 0.8rem;
-    border: none;
-    border-radius: 4px;
-    font-size: 0.8rem;
-    cursor: pointer;
-}
-
-.btn-transport {
-    background: #3b82f6;
-    color: #fff;
-}
-
-.btn-arrived {
-    background: #22c55e;
-    color: #fff;
-}
-
-/* Modal */
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
-}
-
-.modal-content {
-    background: var(--bg-secondary, #1a1a2e);
-    border-radius: 12px;
-    padding: 1.5rem;
-    max-width: 500px;
-    width: 100%;
-    max-height: 90vh;
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+    padding: var(--space-3, 12px);
     overflow-y: auto;
 }
 
-.modal-content h2 {
-    margin: 0 0 1rem 0;
-    color: var(--accent-gold, #d4af37);
+/* ── Victim Card（Board 卡片：識別+檢傷等級+位置+傷勢+後送+快速操作）──── */
+
+.victim-card {
+    padding: var(--space-3, 12px);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-left-width: 4px;
+    border-left-style: solid;
+    border-radius: var(--radius-md, 8px);
+    cursor: pointer;
+    transition: transform var(--duration-fast, 150ms), box-shadow var(--duration-fast, 150ms);
 }
 
-/* START Flow */
+.victim-card:hover,
+.victim-card:focus-visible {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.victim-card:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring), var(--shadow-md);
+}
+
+.victim-card--black { border-left-color: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
+.victim-card--red { border-left-color: var(--color-danger); }
+.victim-card--yellow { border-left-color: var(--color-warning); }
+.victim-card--green { border-left-color: var(--color-success); }
+
+.victim-card__header {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px);
+    margin-bottom: var(--space-2, 8px);
+}
+
+.victim-card__identifier {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-secondary);
+}
+
+.victim-card__time {
+    margin-left: auto;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-tertiary, var(--text-secondary));
+    font-variant-numeric: tabular-nums;
+}
+
+.victim-card__desc {
+    margin: var(--space-2, 8px) 0;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-primary);
+}
+
+.victim-card__location,
+.victim-card__injuries {
+    display: flex;
+    align-items: flex-start;
+    gap: 4px;
+    margin: var(--space-1, 4px) 0;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-secondary);
+}
+
+.victim-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    margin-top: var(--space-3, 12px);
+    padding-top: var(--space-2, 8px);
+    border-top: 1px solid var(--border-default);
+}
+
+.victim-card__transport {
+    font-size: var(--font-size-xs, 12px);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.victim-card__transport--in_transit { color: var(--color-info); }
+.victim-card__transport--arrived { color: var(--color-success); }
+
+/* 卡片內快速操作按鈕：design-system Button size=sm 桌機高度可 <44px，
+   本頁為高壓/戴手套情境使用，補足點擊熱區至 44px（§2.3）。 */
+.victim-card__footer .lk-btn {
+    min-height: 44px;
+}
+
+/* ── 載入 Skeleton（§7.1，≥3 列，本地版本）──────────────────────── */
+
+.triage-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4, 16px);
+}
+
+@media (min-width: 768px) {
+    .triage-skeleton {
+        flex-direction: row;
+    }
+}
+
+.triage-skeleton__column {
+    flex: 1 1 260px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3, 12px);
+}
+
+.triage-skeleton__card {
+    height: 96px;
+    border-radius: var(--radius-md, 8px);
+    background: linear-gradient(90deg, var(--surface-hover, var(--bg-secondary)) 25%, var(--bg-secondary) 50%, var(--surface-hover, var(--bg-secondary)) 75%);
+    background-size: 200% 100%;
+    animation: triage-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .triage-skeleton__card {
+        animation: none;
+    }
+}
+
+@keyframes triage-skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+/* ── START Flow（Modal 內）───────────────────────────────────── */
+
 .start-flow {
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    padding: 1rem;
-    margin-bottom: 1rem;
+    background: var(--surface-hover, var(--bg-secondary));
+    border-radius: var(--radius-md, 8px);
+    padding: var(--space-3, 12px);
+    margin-bottom: var(--space-4, 16px);
 }
 
 .question {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4, 16px);
+}
+
+.question:last-child {
+    margin-bottom: 0;
 }
 
 .question label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-weight: 500;
+    margin-bottom: var(--space-2, 8px);
+    font-weight: 600;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-primary);
 }
 
 .question .btn-group {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2, 8px);
 }
 
 .question .btn-group button {
     flex: 1;
-    padding: 0.75rem;
-    border: 2px solid rgba(255, 255, 255, 0.2);
+    min-height: 44px;
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    border: 2px solid var(--border-default);
     background: transparent;
-    color: #fff;
-    border-radius: 6px;
+    color: var(--text-primary);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--font-size-sm, 14px);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: border-color var(--duration-fast, 150ms), background var(--duration-fast, 150ms);
+}
+
+.question .btn-group button:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .question .btn-group button.active.yes {
-    border-color: #22c55e;
-    background: rgba(34, 197, 94, 0.2);
+    border-color: var(--color-success);
+    background: var(--color-safe-bg, var(--color-success));
 }
 
 .question .btn-group button.active.no {
-    border-color: #ef4444;
-    background: rgba(239, 68, 68, 0.2);
+    border-color: var(--color-danger);
+    background: var(--color-danger-bg);
 }
 
 .question input[type="number"] {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
-    border-radius: 6px;
+    min-height: 44px;
+    padding: var(--space-2, 8px) var(--space-3, 12px);
+    border: 1px solid var(--border-default);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--font-size-base, 16px);
+}
+
+.question input[type="number"]:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .question .hint {
     display: block;
-    font-size: 0.75rem;
-    opacity: 0.6;
-    margin-top: 0.25rem;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-secondary);
+    margin-top: var(--space-1, 4px);
 }
 
-/* Form Sections */
+/* ── Form Sections（Modal 內非 InputField 欄位：傷勢 textarea）───────── */
+
 .form-section {
-    margin-bottom: 1rem;
+    margin-bottom: var(--space-4, 16px);
 }
 
-.form-section label {
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-section > label {
     display: block;
-    margin-bottom: 0.5rem;
-    font-size: 0.9rem;
-    opacity: 0.8;
+    margin-bottom: var(--space-2, 8px);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
 }
 
-.form-section input,
 .form-section textarea {
     width: 100%;
-    padding: 0.75rem;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    background: rgba(0, 0, 0, 0.3);
-    color: #fff;
-    border-radius: 6px;
-    font-size: 0.95rem;
-}
-
-.form-section textarea {
-    min-height: 80px;
+    min-height: 88px;
+    padding: var(--space-3, 12px);
+    border: 1px solid var(--border-default);
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm, 4px);
+    font-size: var(--font-size-base, 16px);
     resize: vertical;
 }
 
-/* Modal Actions */
-.modal-actions {
-    display: flex;
-    gap: 1rem;
-    margin-top: 1.5rem;
+.form-section textarea:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
-.btn-cancel {
-    flex: 1;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 6px;
-    color: #fff;
-    cursor: pointer;
+/* ── 傷患詳情 Modal ─────────────────────────────────────────── */
+
+.victim-detail p {
+    margin: 0 0 var(--space-3, 12px) 0;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-primary);
+    line-height: 1.5;
 }
 
-.btn-save {
-    flex: 1;
-    padding: 0.75rem;
-    background: linear-gradient(135deg, #d4af37, #b8960c);
-    border: none;
-    border-radius: 6px;
-    color: #000;
+.victim-detail p:last-child {
+    margin-bottom: 0;
+}
+
+.victim-detail strong {
+    color: var(--text-secondary);
     font-weight: 600;
-    cursor: pointer;
-}
-
-/* Triage Level Classes */
-.filter-btn.level-BLACK {
-    border-color: #1a1a1a;
-}
-
-.filter-btn.level-RED {
-    border-color: #ef4444;
-}
-
-.filter-btn.level-YELLOW {
-    border-color: #f59e0b;
-}
-
-.filter-btn.level-GREEN {
-    border-color: #22c55e;
-}
-
-.victim-card.level-BLACK {
-    border-left-color: #1a1a1a;
-}
-
-.victim-card.level-RED {
-    border-left-color: #ef4444;
-}
-
-.victim-card.level-YELLOW {
-    border-left-color: #f59e0b;
-}
-
-.victim-card.level-GREEN {
-    border-left-color: #22c55e;
-}
-
-.level-badge.level-BLACK {
-    background-color: #1a1a1a;
-}
-
-.level-badge.level-RED {
-    background-color: #ef4444;
-}
-
-.level-badge.level-YELLOW {
-    background-color: #f59e0b;
-}
-
-.level-badge.level-GREEN {
-    background-color: #22c55e;
+    margin-right: var(--space-1, 4px);
 }

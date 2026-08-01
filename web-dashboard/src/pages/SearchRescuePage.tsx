@@ -1,74 +1,66 @@
 /**
  * SearchRescuePage.tsx
- * 
+ *
  * 搜救任務管理頁面 - 山搜/水域/城市倒塌搜救
+ *
+ * R3a 重設計：移除原本的假資料統計卡（3 進行中任務 / 24 出勤人員 / 12 已救援，
+ * 皆為寫死數字，非 API 回傳），改為誠實的「頁面建置中」狀態（DESIGN_LANGUAGE §0.1、§4）。
+ * 下方保留「預期功能」卡片作為規劃預覽，不冒充即時資料。
  */
-import './placeholder-pages.css';
-import { AlertTriangle, MapPin, Users, Plus } from 'lucide-react';
+import { Construction, MapPin, Users, Plus } from 'lucide-react';
+import EmptyState from '../components/shared/EmptyState';
+import { Card } from '../design-system';
+import './SearchRescuePage.css';
+
+const PLANNED_FEATURES = [
+    {
+        icon: MapPin,
+        title: '任務地圖',
+        description: '即時搜救範圍與人員位置',
+    },
+    {
+        icon: Users,
+        title: '人員調度',
+        description: '搜救小隊分配與追蹤',
+    },
+    {
+        icon: Plus,
+        title: '新增任務',
+        description: '快速建立搜救任務',
+    },
+];
 
 export default function SearchRescuePage() {
     return (
-        <div className="placeholder-page">
-            <h1 className="placeholder-page__title">🔍 搜救任務</h1>
-            <p className="placeholder-page__subtitle">
-                山搜、水域、城市倒塌結構救援任務管理
-            </p>
+        <div className="search-rescue-page">
+            <header className="search-rescue-page__header">
+                <h1 className="search-rescue-page__title">搜救任務</h1>
+                <p className="search-rescue-page__subtitle">
+                    山搜、水域、城市倒塌結構救援任務管理
+                </p>
+            </header>
 
-            {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice">
-                <AlertTriangle size={20} color="#92400E" />
-                <div>
-                    <strong className="placeholder-page__dev-notice-title">🚧 功能開發中</strong>
-                    <p className="placeholder-page__dev-notice-text">
-                        搜救任務管理系統正在開發中，預計包含：任務建立、GPS 追蹤、人員調度、即時通訊等功能。
-                    </p>
-                </div>
-            </div>
+            <EmptyState
+                icon={Construction}
+                variant="minimal"
+                title="頁面建置中"
+                description="搜救任務管理系統正在開發中，預計包含：任務建立、GPS 追蹤、人員調度、即時通訊等功能。"
+            />
 
-            <div className="placeholder-page__grid">
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">🏔️</div>
-                    <div className="placeholder-page__card-value">3</div>
-                    <div className="placeholder-page__card-label">進行中任務</div>
+            <section className="search-rescue-page__preview">
+                <h2 className="search-rescue-page__preview-title">預期功能</h2>
+                <div className="search-rescue-page__preview-grid">
+                    {PLANNED_FEATURES.map(({ icon: Icon, title, description }) => (
+                        <Card key={title} padding="md">
+                            <div className="search-rescue-page__feature">
+                                <Icon size={24} className="search-rescue-page__feature-icon" aria-hidden="true" />
+                                <div className="search-rescue-page__feature-title">{title}</div>
+                                <div className="search-rescue-page__feature-desc">{description}</div>
+                            </div>
+                        </Card>
+                    ))}
                 </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">👥</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--blue">24</div>
-                    <div className="placeholder-page__card-label">出勤人員</div>
-                </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">✅</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--green">12</div>
-                    <div className="placeholder-page__card-label">已救援</div>
-                </div>
-            </div>
-
-            {/* 預期功能區塊 */}
-            <div className="placeholder-page__expected-features">
-                <h3 className="placeholder-page__expected-features-title">
-                    📋 預期功能
-                </h3>
-                <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <MapPin size={24} color="#3B82F6" />
-                        <div className="placeholder-page__feature-card-title">任務地圖</div>
-                        <div className="placeholder-page__card-label">即時搜救範圍與人員位置</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Users size={24} color="#8B5CF6" />
-                        <div className="placeholder-page__feature-card-title">人員調度</div>
-                        <div className="placeholder-page__card-label">搜救小隊分配與追蹤</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Plus size={24} color="#10B981" />
-                        <div className="placeholder-page__feature-card-title">新增任務</div>
-                        <div className="placeholder-page__card-label">快速建立搜救任務</div>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     );
 }
-

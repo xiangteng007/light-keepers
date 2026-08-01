@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
+import { ResourcesTabSkeleton } from './ResourcesSkeleton';
 import './AuditTab.css';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
@@ -124,7 +125,7 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
     };
 
     if (isLoading) {
-        return <div className="loading-state"><div className="spinner"></div><p>載入中...</p></div>;
+        return <ResourcesTabSkeleton />;
     }
 
     return (

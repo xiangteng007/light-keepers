@@ -1,10 +1,15 @@
 /**
  * ICSFormsPage.tsx
- * 
+ *
  * ICS表單目錄頁面 - 顯示所有可用的ICS表單
+ *
+ * R3a 批次重設計：依 DESIGN_LANGUAGE.md §7.1 列表頁 archetype 重建
+ * （page-header → 內容 panel → 卡片式列表；本頁無搜尋/篩選需求，省略 toolbar）。
+ * 狀態一律用 design-system Badge，語意對照 §3：success=可用、default=開發中。
  */
 import { Link } from 'react-router-dom';
-import './placeholder-pages.css';
+import { Badge } from '../design-system';
+import './ICSFormsPage.css';
 
 const ICS_FORMS = [
     { id: '201', name: 'ICS 201 - 事件簡報', description: '初始事件簡報、資源概況、組織圖', path: '/ics/201', status: '可用' },
@@ -21,43 +26,50 @@ const ICS_FORMS = [
 
 export default function ICSFormsPage() {
     return (
-        <div className="placeholder-page">
-            <h1 className="placeholder-page__title">📋 ICS 表單</h1>
-            <p className="placeholder-page__subtitle">
-                事件指揮系統標準表單 (Incident Command System Forms)
-            </p>
+        <div className="page ics-forms-page">
+            <header className="ics-forms-page__header">
+                <h1 className="ics-forms-page__title">ICS 表單</h1>
+                <p className="ics-forms-page__subtitle">
+                    事件指揮系統標準表單 (Incident Command System Forms)
+                </p>
+            </header>
 
-            <div className="placeholder-page__form-grid">
-                {ICS_FORMS.map((form) => (
-                    <Link
-                        key={form.id}
-                        to={form.path}
-                        className={`placeholder-page__form-link ${
-                            form.status === '可用' 
-                                ? 'placeholder-page__form-link--available' 
-                                : 'placeholder-page__form-link--disabled'
-                        }`}
-                    >
-                        <div className="placeholder-page__form-header">
-                            <span className={`placeholder-page__form-name ${
-                                form.status !== '可用' ? 'placeholder-page__form-name--disabled' : ''
-                            }`}>
-                                {form.name}
-                            </span>
-                            <span className={`placeholder-page__form-status ${
-                                form.status === '可用' 
-                                    ? 'placeholder-page__form-status--available' 
-                                    : 'placeholder-page__form-status--dev'
-                            }`}>
-                                {form.status}
-                            </span>
-                        </div>
-                        <p className="placeholder-page__form-description">
-                            {form.description}
-                        </p>
-                    </Link>
-                ))}
-            </div>
+            <section className="ics-forms-page__panel" aria-label="ICS 表單清單">
+                <div className="ics-forms-page__grid">
+                    {ICS_FORMS.map((form) => {
+                        const available = form.status === '可用';
+                        const cardContent = (
+                            <>
+                                <div className="ics-form-card__header">
+                                    <span className="ics-form-card__name">{form.name}</span>
+                                    <Badge variant={available ? 'success' : 'default'} size="sm">
+                                        {form.status}
+                                    </Badge>
+                                </div>
+                                <p className="ics-form-card__description">{form.description}</p>
+                            </>
+                        );
+
+                        return available ? (
+                            <Link
+                                key={form.id}
+                                to={form.path}
+                                className="ics-form-card ics-form-card--available"
+                            >
+                                {cardContent}
+                            </Link>
+                        ) : (
+                            <div
+                                key={form.id}
+                                className="ics-form-card ics-form-card--disabled"
+                                aria-disabled="true"
+                            >
+                                {cardContent}
+                            </div>
+                        );
+                    })}
+                </div>
+            </section>
         </div>
     );
 }

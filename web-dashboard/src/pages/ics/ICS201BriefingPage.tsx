@@ -1,14 +1,23 @@
 /**
  * ICS201BriefingPage.tsx
- * 
+ *
  * ICS Form 201 - Incident Briefing
  * Per Expert Council Navigation Design §7.1
- * 
+ *
  * Covers:
  * - Incident overview and situation
  * - Objectives and strategy
  * - Organization chart
  * - Resources summary
+ *
+ * R3a redesign: Detail archetype (page-header -> section nav -> panel content).
+ * All colors are semantic tokens from tokens.css — no hardcoded hex/rgba,
+ * no light/dark/tactical branches (the token layer handles that).
+ * Mobile-first: base rules target the smallest viewport, wider layouts
+ * are added via min-width media queries.
+ * Buttons and single-line inputs use the design-system Button/InputField;
+ * multi-line fields keep native <textarea> (not supported by InputField)
+ * with token-based styling.
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
@@ -25,6 +34,7 @@ import {
     Share2,
     ChevronLeft,
 } from 'lucide-react';
+import { Button, InputField } from '../../design-system';
 import { createLogger } from '../../utils/logger';
 import './ICS201BriefingPage.css';
 
@@ -137,18 +147,15 @@ export default function ICS201BriefingPage() {
                     </div>
                 </div>
                 <div className="ics201-actions">
-                    <button className="ics201-btn secondary" onClick={handlePrint}>
-                        <Printer size={16} />
+                    <Button variant="secondary" size="sm" icon={<Printer size={16} />} onClick={handlePrint}>
                         列印
-                    </button>
-                    <button className="ics201-btn secondary">
-                        <Share2 size={16} />
+                    </Button>
+                    <Button variant="secondary" size="sm" icon={<Share2 size={16} />}>
                         分享
-                    </button>
-                    <button className="ics201-btn primary" onClick={handleSave}>
-                        <Save size={16} />
+                    </Button>
+                    <Button variant="primary" size="sm" icon={<Save size={16} />} onClick={handleSave}>
                         儲存
-                    </button>
+                    </Button>
                 </div>
             </header>
 
@@ -182,45 +189,47 @@ export default function ICS201BriefingPage() {
                         <h2>1. 基本資訊</h2>
                         <div className="ics201-form-grid">
                             <div className="ics201-field">
-                                <label htmlFor="incidentName">事件名稱</label>
-                                <input
+                                <InputField
                                     id="incidentName"
+                                    label="事件名稱"
                                     type="text"
                                     value={briefing.incidentName}
                                     onChange={e => updateField('incidentName', e.target.value)}
                                     placeholder="例：颱風蘇力救災行動"
+                                    fullWidth
                                 />
                             </div>
                             <div className="ics201-field">
-                                <label htmlFor="incidentNumber">事件編號</label>
-                                <input
+                                <InputField
                                     id="incidentNumber"
+                                    label="事件編號"
                                     type="text"
                                     value={briefing.incidentNumber}
                                     onChange={e => updateField('incidentNumber', e.target.value)}
                                     placeholder="例：TPE-2026-001"
+                                    fullWidth
                                 />
                             </div>
                             <div className="ics201-field">
-                                <label htmlFor="dateTimePrepared">
-                                    <Calendar size={14} />
-                                    製作日期時間
-                                </label>
-                                <input
+                                <InputField
                                     id="dateTimePrepared"
+                                    label="製作日期時間"
                                     type="datetime-local"
                                     value={briefing.dateTimePrepared}
                                     onChange={e => updateField('dateTimePrepared', e.target.value)}
+                                    prefix={<Calendar size={14} />}
+                                    fullWidth
                                 />
                             </div>
                             <div className="ics201-field full-width">
-                                <label htmlFor="preparedBy">製作人</label>
-                                <input
+                                <InputField
                                     id="preparedBy"
+                                    label="製作人"
                                     type="text"
                                     value={briefing.preparedBy}
                                     onChange={e => updateField('preparedBy', e.target.value)}
                                     placeholder="姓名 / 職稱"
+                                    fullWidth
                                 />
                             </div>
                         </div>
@@ -232,12 +241,13 @@ export default function ICS201BriefingPage() {
                     <section className="ics201-form-section">
                         <h2>2. 情況摘要</h2>
                         <div className="ics201-field full-width">
-                            <label htmlFor="situationSummary">
+                            <label htmlFor="situationSummary" className="ics201-label">
                                 <AlertTriangle size={14} />
                                 當前情況描述
                             </label>
                             <textarea
                                 id="situationSummary"
+                                className="ics201-textarea"
                                 value={briefing.situationSummary}
                                 onChange={e => updateField('situationSummary', e.target.value)}
                                 rows={8}
@@ -245,7 +255,7 @@ export default function ICS201BriefingPage() {
                             />
                         </div>
                         <div className="ics201-field full-width">
-                            <label>地圖/草圖</label>
+                            <label className="ics201-label">地圖/草圖</label>
                             <div className="ics201-map-placeholder">
                                 <MapPin size={32} />
                                 <p>點擊上傳地圖或草圖</p>
@@ -259,7 +269,7 @@ export default function ICS201BriefingPage() {
                     <section className="ics201-form-section">
                         <h2>3. 目標與策略</h2>
                         <div className="ics201-field full-width">
-                            <label>
+                            <label className="ics201-label">
                                 <Target size={14} />
                                 事件目標
                             </label>
@@ -267,12 +277,13 @@ export default function ICS201BriefingPage() {
                                 {briefing.objectives.map((obj, idx) => (
                                     <div key={idx} className="ics201-objective-item">
                                         <span className="ics201-obj-num">{idx + 1}.</span>
-                                        <input
+                                        <InputField
                                             type="text"
                                             value={obj}
                                             onChange={e => updateObjective(idx, e.target.value)}
                                             placeholder="輸入目標..."
                                             aria-label={`目標 ${idx + 1}`}
+                                            fullWidth
                                         />
                                     </div>
                                 ))}
@@ -286,9 +297,10 @@ export default function ICS201BriefingPage() {
                             </div>
                         </div>
                         <div className="ics201-field full-width">
-                            <label htmlFor="currentStrategy">當前策略</label>
+                            <label htmlFor="currentStrategy" className="ics201-label">當前策略</label>
                             <textarea
                                 id="currentStrategy"
+                                className="ics201-textarea"
                                 value={briefing.currentStrategy}
                                 onChange={e => updateField('currentStrategy', e.target.value)}
                                 rows={5}
@@ -308,21 +320,21 @@ export default function ICS201BriefingPage() {
                                     <div className="ics201-org-position">
                                         {assignment.position}
                                     </div>
-                                    <input
+                                    <InputField
                                         type="text"
                                         value={assignment.name}
                                         onChange={e => updateOrgAssignment(idx, 'name', e.target.value)}
                                         placeholder="姓名"
-                                        className="ics201-org-name"
                                         aria-label={`${assignment.position} 姓名`}
+                                        fullWidth
                                     />
-                                    <input
+                                    <InputField
                                         type="text"
                                         value={assignment.contact}
                                         onChange={e => updateOrgAssignment(idx, 'contact', e.target.value)}
                                         placeholder="聯絡方式"
-                                        className="ics201-org-contact"
                                         aria-label={`${assignment.position} 聯絡方式`}
+                                        fullWidth
                                     />
                                 </div>
                             ))}
@@ -334,73 +346,83 @@ export default function ICS201BriefingPage() {
                 {activeSection === 5 && (
                     <section className="ics201-form-section">
                         <h2>5. 資源摘要</h2>
-                        <table className="ics201-resources-table">
-                            <thead>
-                                <tr>
-                                    <th>資源類型</th>
-                                    <th>數量</th>
-                                    <th>位置</th>
-                                    <th>預計抵達</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {briefing.resourcesSummary.map((resource, idx) => (
-                                    <tr key={idx}>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={resource.resourceType}
-                                                onChange={e => {
-                                                    const newResources = [...briefing.resourcesSummary];
-                                                    newResources[idx] = { ...newResources[idx], resourceType: e.target.value };
-                                                    updateField('resourcesSummary', newResources);
-                                                }}
-                                                placeholder="例：消防車"
-                                                aria-label={`資源類型 ${idx + 1}`}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="number"
-                                                value={resource.quantity}
-                                                onChange={e => {
-                                                    const newResources = [...briefing.resourcesSummary];
-                                                    newResources[idx] = { ...newResources[idx], quantity: parseInt(e.target.value) || 0 };
-                                                    updateField('resourcesSummary', newResources);
-                                                }}
-                                                aria-label={`資源數量 ${idx + 1}`}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={resource.location}
-                                                onChange={e => {
-                                                    const newResources = [...briefing.resourcesSummary];
-                                                    newResources[idx] = { ...newResources[idx], location: e.target.value };
-                                                    updateField('resourcesSummary', newResources);
-                                                }}
-                                                placeholder="位置"
-                                                aria-label={`資源位置 ${idx + 1}`}
-                                            />
-                                        </td>
-                                        <td>
-                                            <input
-                                                type="text"
-                                                value={resource.eta || ''}
-                                                onChange={e => {
-                                                    const newResources = [...briefing.resourcesSummary];
-                                                    newResources[idx] = { ...newResources[idx], eta: e.target.value };
-                                                    updateField('resourcesSummary', newResources);
-                                                }}
-                                                placeholder="已到達"
-                                                aria-label={`預計抵達 ${idx + 1}`}
-                                            />
-                                        </td>
+                        <div className="ics201-table-container">
+                            <table className="ics201-resources-table">
+                                <thead>
+                                    <tr>
+                                        <th>資源類型</th>
+                                        <th>數量</th>
+                                        <th>位置</th>
+                                        <th>預計抵達</th>
                                     </tr>
-                                ))}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {briefing.resourcesSummary.map((resource, idx) => (
+                                        <tr key={idx}>
+                                            <td>
+                                                <InputField
+                                                    type="text"
+                                                    value={resource.resourceType}
+                                                    onChange={e => {
+                                                        const newResources = [...briefing.resourcesSummary];
+                                                        newResources[idx] = { ...newResources[idx], resourceType: e.target.value };
+                                                        updateField('resourcesSummary', newResources);
+                                                    }}
+                                                    placeholder="例：消防車"
+                                                    aria-label={`資源類型 ${idx + 1}`}
+                                                    size="sm"
+                                                    fullWidth
+                                                />
+                                            </td>
+                                            <td>
+                                                <InputField
+                                                    type="number"
+                                                    value={resource.quantity}
+                                                    onChange={e => {
+                                                        const newResources = [...briefing.resourcesSummary];
+                                                        newResources[idx] = { ...newResources[idx], quantity: parseInt(e.target.value) || 0 };
+                                                        updateField('resourcesSummary', newResources);
+                                                    }}
+                                                    aria-label={`資源數量 ${idx + 1}`}
+                                                    size="sm"
+                                                    fullWidth
+                                                />
+                                            </td>
+                                            <td>
+                                                <InputField
+                                                    type="text"
+                                                    value={resource.location}
+                                                    onChange={e => {
+                                                        const newResources = [...briefing.resourcesSummary];
+                                                        newResources[idx] = { ...newResources[idx], location: e.target.value };
+                                                        updateField('resourcesSummary', newResources);
+                                                    }}
+                                                    placeholder="位置"
+                                                    aria-label={`資源位置 ${idx + 1}`}
+                                                    size="sm"
+                                                    fullWidth
+                                                />
+                                            </td>
+                                            <td>
+                                                <InputField
+                                                    type="text"
+                                                    value={resource.eta || ''}
+                                                    onChange={e => {
+                                                        const newResources = [...briefing.resourcesSummary];
+                                                        newResources[idx] = { ...newResources[idx], eta: e.target.value };
+                                                        updateField('resourcesSummary', newResources);
+                                                    }}
+                                                    placeholder="已到達"
+                                                    aria-label={`預計抵達 ${idx + 1}`}
+                                                    size="sm"
+                                                    fullWidth
+                                                />
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
                         <button
                             type="button"
                             className="ics201-add-btn"

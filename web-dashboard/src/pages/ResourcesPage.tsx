@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 import { getResources, getResourceStats } from '../api/services';
 import type { Resource, ResourceCategory } from '../api/services';
 import { useAuth } from '../context/AuthContext';
@@ -13,8 +14,37 @@ import { getApiErrorMessage } from '../api/errors';
 import {
     Package, UtensilsCrossed, Droplets, Stethoscope, Home, Shirt, Wrench,
     ClipboardList, Factory, Settings, Truck, BarChart3, ScrollText,
-    Loader2, PackageOpen, Plus, type LucideIcon,
+    PackageOpen, Plus, AlertTriangle, type LucideIcon,
 } from 'lucide-react';
+
+/** 桌機表格載入骨架（≥3 列，DESIGN_LANGUAGE §7.1） */
+function TableSkeletonRows({ columns, rows = 4 }: { columns: number; rows?: number }) {
+    return (
+        <>
+            {Array.from({ length: rows }, (_, i) => (
+                <tr key={`skeleton-${i}`} className="table-skeleton-row" aria-hidden="true">
+                    {Array.from({ length: columns }, (_, j) => (
+                        <td key={j}><span className="table-skeleton-bar" /></td>
+                    ))}
+                </tr>
+            ))}
+        </>
+    );
+}
+
+/** 行動端卡片載入骨架（同一批資料的卡片版本） */
+function CardSkeletonRows({ rows = 4 }: { rows?: number }) {
+    return (
+        <div className="table-skeleton-cards" role="status" aria-label="載入中">
+            {Array.from({ length: rows }, (_, i) => (
+                <div key={`card-skeleton-${i}`} className="table-skeleton-card" aria-hidden="true">
+                    <span className="table-skeleton-bar" />
+                    <span className="table-skeleton-bar table-skeleton-bar--sm" />
+                </div>
+            ))}
+        </div>
+    );
+}
 
 // 物資分類
 const CATEGORY_CONFIG: Record<string, { label: string; icon: LucideIcon }> = {
@@ -213,13 +243,13 @@ export default function ResourcesPage() {
         }
     };
 
-    const getLogTypeLabel = (type: string) => {
+    const getLogTypeLabel = (type: string): { label: string; variant: 'success' | 'danger' | 'info' | 'default' } => {
         switch (type) {
-            case 'in': return { label: '入庫', className: 'log-type--in' };
-            case 'out': return { label: '出庫', className: 'log-type--out' };
-            case 'transfer': return { label: '調撥', className: 'log-type--transfer' };
-            case 'donate': return { label: '捐贈', className: 'log-type--in' };
-            default: return { label: type, className: '' };
+            case 'in': return { label: '入庫', variant: 'success' };
+            case 'out': return { label: '出庫', variant: 'danger' };
+            case 'transfer': return { label: '調撥', variant: 'info' };
+            case 'donate': return { label: '捐贈', variant: 'success' };
+            default: return { label: type, variant: 'default' };
         }
     };
 
@@ -335,88 +365,158 @@ export default function ResourcesPage() {
                         })}
                     </div>
 
-                    {/* 物資列表 */}
+                    {/* 物資列表：桌機表格 / 行動端卡片直列（DESIGN_LANGUAGE §7.1） */}
                     <div className="resources-list">
-                        <table className="resources-table">
-                            <thead>
-                                <tr>
-                                    <th>物資名稱</th>
-                                    <th>分類</th>
-                                    <th>數量</th>
-                                    <th>狀態</th>
-                                    <th>位置</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {isLoading ? (
+                        <div className="resources-table-wrap resources-table-wrap--has-cards">
+                            <table className="resources-table" aria-busy={isLoading || undefined}>
+                                <thead>
                                     <tr>
-                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                            <Loader2 size={16} className="spin-icon" /> 載入物資資料中...
-                                        </td>
+                                        <th>物資名稱</th>
+                                        <th>分類</th>
+                                        <th>數量</th>
+                                        <th>狀態</th>
+                                        <th>位置</th>
+                                        <th>操作</th>
                                     </tr>
-                                ) : error ? (
-                                    <tr>
-                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem', color: 'var(--color-danger)' }}>
-                                            ⚠️ {error}
-                                        </td>
-                                    </tr>
-                                ) : filteredResources.length === 0 ? (
-                                    <tr>
-                                        <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                            <PackageOpen size={16} /> 尚無物資資料
-                                        </td>
-                                    </tr>
-                                ) : (
-                                    filteredResources.map(resource => {
-                                        const category = CATEGORY_CONFIG[resource.category as ResourceCategory];
-                                        const status = STATUS_CONFIG[resource.status as ResourceStatus];
-                                        return (
-                                            <tr key={resource.id}>
-                                                <td>
-                                                    <span className="resource-name">
-                                                        {(() => { const CatIcon = category.icon; return <CatIcon size={14} />; })()} {resource.name}
-                                                    </span>
-                                                </td>
-                                                <td>{category.label}</td>
-                                                <td>
-                                                    <strong>{resource.quantity}</strong> {resource.unit}
-                                                </td>
-                                                <td>
-                                                    <Badge
-                                                        variant={resource.status === 'available' ? 'success' :
-                                                            resource.status === 'low' ? 'warning' : 'danger'}
-                                                    >
-                                                        {status.label}
-                                                    </Badge>
-                                                </td>
-                                                <td>{resource.location}</td>
-                                                <td>
-                                                    <div className="resource-actions">
-                                                        <button onClick={() => setStockModal({ resource, type: 'add', quantity: 0, notes: '' })}>
-                                                            入庫
-                                                        </button>
-                                                        <button onClick={() => setStockModal({ resource, type: 'deduct', quantity: 0, notes: '' })}>
-                                                            出庫
-                                                        </button>
-                                                        {canManage && (
-                                                            <>
-                                                                <button className="btn-edit" onClick={() => openEditModal(resource)}>
-                                                                    編輯
-                                                                </button>
-                                                                <button className="btn-delete" onClick={() => handleDeleteResource(resource)}>
-                                                                    刪除
-                                                                </button>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
-                                )}
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody>
+                                    {isLoading ? (
+                                        <TableSkeletonRows columns={6} />
+                                    ) : error ? (
+                                        <tr>
+                                            <td colSpan={6} className="table-message-cell">
+                                                <div className="table-message table-message--error">
+                                                    <AlertTriangle size={16} /> {error}
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) : filteredResources.length === 0 ? (
+                                        <tr>
+                                            <td colSpan={6} className="table-message-cell">
+                                                <EmptyState
+                                                    variant="minimal"
+                                                    icon={PackageOpen}
+                                                    title="尚無物資資料"
+                                                    description={canManage ? '點擊右上角「新增物資」開始建立庫存清單' : undefined}
+                                                    action={canManage ? { label: '新增物資', onClick: () => setShowAddModal(true) } : undefined}
+                                                />
+                                            </td>
+                                        </tr>
+                                    ) : (
+                                        filteredResources.map(resource => {
+                                            const category = CATEGORY_CONFIG[resource.category as ResourceCategory];
+                                            const status = STATUS_CONFIG[resource.status as ResourceStatus];
+                                            const CatIcon = category.icon;
+                                            return (
+                                                <tr key={resource.id}>
+                                                    <td>
+                                                        <span className="resource-name">
+                                                            <CatIcon size={14} /> {resource.name}
+                                                        </span>
+                                                    </td>
+                                                    <td>{category.label}</td>
+                                                    <td>
+                                                        <strong>{resource.quantity}</strong> {resource.unit}
+                                                    </td>
+                                                    <td>
+                                                        <Badge
+                                                            variant={resource.status === 'available' ? 'success' :
+                                                                resource.status === 'low' ? 'warning' : 'danger'}
+                                                        >
+                                                            {status.label}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>{resource.location}</td>
+                                                    <td>
+                                                        <div className="resource-actions">
+                                                            <Button size="sm" variant="secondary" onClick={() => setStockModal({ resource, type: 'add', quantity: 0, notes: '' })}>
+                                                                入庫
+                                                            </Button>
+                                                            <Button size="sm" variant="secondary" onClick={() => setStockModal({ resource, type: 'deduct', quantity: 0, notes: '' })}>
+                                                                出庫
+                                                            </Button>
+                                                            {canManage && (
+                                                                <>
+                                                                    <Button size="sm" variant="ghost" onClick={() => openEditModal(resource)}>
+                                                                        編輯
+                                                                    </Button>
+                                                                    <Button size="sm" variant="danger" onClick={() => handleDeleteResource(resource)}>
+                                                                        刪除
+                                                                    </Button>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            );
+                                        })
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        {/* 行動端：Card 直列（每卡＝一列，左資訊右狀態） */}
+                        <div className="resources-card-list" aria-busy={isLoading || undefined}>
+                            {isLoading ? (
+                                <CardSkeletonRows />
+                            ) : error ? (
+                                <div className="table-message table-message--error">
+                                    <AlertTriangle size={16} /> {error}
+                                </div>
+                            ) : filteredResources.length === 0 ? (
+                                <EmptyState
+                                    variant="minimal"
+                                    icon={PackageOpen}
+                                    title="尚無物資資料"
+                                    description={canManage ? '點擊右上角「新增物資」開始建立庫存清單' : undefined}
+                                    action={canManage ? { label: '新增物資', onClick: () => setShowAddModal(true) } : undefined}
+                                />
+                            ) : (
+                                filteredResources.map(resource => {
+                                    const category = CATEGORY_CONFIG[resource.category as ResourceCategory];
+                                    const status = STATUS_CONFIG[resource.status as ResourceStatus];
+                                    const CatIcon = category.icon;
+                                    return (
+                                        <Card key={resource.id} className="resource-row-card" padding="sm">
+                                            <div className="resource-row-card__main">
+                                                <span className="resource-name">
+                                                    <CatIcon size={14} /> {resource.name}
+                                                </span>
+                                                <Badge
+                                                    variant={resource.status === 'available' ? 'success' :
+                                                        resource.status === 'low' ? 'warning' : 'danger'}
+                                                >
+                                                    {status.label}
+                                                </Badge>
+                                            </div>
+                                            <div className="resource-row-card__meta">
+                                                <span>{category.label}</span>
+                                                <span><strong>{resource.quantity}</strong> {resource.unit}</span>
+                                                {resource.location && <span>{resource.location}</span>}
+                                            </div>
+                                            <div className="resource-actions">
+                                                <Button size="sm" variant="secondary" onClick={() => setStockModal({ resource, type: 'add', quantity: 0, notes: '' })}>
+                                                    入庫
+                                                </Button>
+                                                <Button size="sm" variant="secondary" onClick={() => setStockModal({ resource, type: 'deduct', quantity: 0, notes: '' })}>
+                                                    出庫
+                                                </Button>
+                                                {canManage && (
+                                                    <>
+                                                        <Button size="sm" variant="ghost" onClick={() => openEditModal(resource)}>
+                                                            編輯
+                                                        </Button>
+                                                        <Button size="sm" variant="danger" onClick={() => handleDeleteResource(resource)}>
+                                                            刪除
+                                                        </Button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        </Card>
+                                    );
+                                })
+                            )}
+                        </div>
                     </div>
                 </>
             )}
@@ -439,67 +539,60 @@ export default function ResourcesPage() {
 
             {activeTab === 'logs' && (
                 <div className="resources-list">
-                    <table className="logs-table">
-                        <thead>
-                            <tr>
-                                <th>時間</th>
-                                <th>物資名稱</th>
-                                <th>類型</th>
-                                <th>數量變更</th>
-                                <th>操作人</th>
-                                <th>備註</th>
-                                {isOwner && <th>操作</th>}
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {isLoading ? (
+                    <div className="resources-table-wrap">
+                        <table className="logs-table" aria-busy={isLoading || undefined}>
+                            <thead>
                                 <tr>
-                                    <td colSpan={isOwner ? 7 : 6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                        ⏳ 載入紀錄中...
-                                    </td>
+                                    <th>時間</th>
+                                    <th>物資名稱</th>
+                                    <th>類型</th>
+                                    <th>數量變更</th>
+                                    <th>操作人</th>
+                                    <th>備註</th>
+                                    {isOwner && <th>操作</th>}
                                 </tr>
-                            ) : logs.length === 0 ? (
-                                <tr>
-                                    <td colSpan={isOwner ? 7 : 6} style={{ textAlign: 'center', padding: '2rem' }}>
-                                        📜 尚無物資紀錄
-                                    </td>
-                                </tr>
-                            ) : (
-                                logs.map(log => {
-                                    const typeInfo = getLogTypeLabel(log.type);
-                                    return (
-                                        <tr key={log.id}>
-                                            <td>{new Date(log.createdAt).toLocaleString('zh-TW')}</td>
-                                            <td>{log.resource?.name || '-'}</td>
-                                            <td>
-                                                <span className={`log-type ${typeInfo.className}`}>
-                                                    {typeInfo.label}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                {log.beforeQuantity} → {log.afterQuantity}
-                                                <span className={log.quantity > 0 ? 'qty-increase' : 'qty-decrease'} style={{ marginLeft: '0.5rem' }}>
-                                                    ({log.quantity > 0 ? '+' : ''}{log.quantity})
-                                                </span>
-                                            </td>
-                                            <td>{log.operatorName}</td>
-                                            <td>{log.notes || '-'}</td>
-                                            {isOwner && (
+                            </thead>
+                            <tbody>
+                                {isLoading ? (
+                                    <TableSkeletonRows columns={isOwner ? 7 : 6} />
+                                ) : logs.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={isOwner ? 7 : 6} className="table-message-cell">
+                                            <EmptyState variant="minimal" icon={ScrollText} title="尚無物資紀錄" />
+                                        </td>
+                                    </tr>
+                                ) : (
+                                    logs.map(log => {
+                                        const typeInfo = getLogTypeLabel(log.type);
+                                        return (
+                                            <tr key={log.id}>
+                                                <td>{new Date(log.createdAt).toLocaleString('zh-TW')}</td>
+                                                <td>{log.resource?.name || '-'}</td>
                                                 <td>
-                                                    <button
-                                                        className="btn-delete"
-                                                        onClick={() => handleDeleteLog(log.id)}
-                                                    >
-                                                        刪除
-                                                    </button>
+                                                    <Badge variant={typeInfo.variant}>{typeInfo.label}</Badge>
                                                 </td>
-                                            )}
-                                        </tr>
-                                    );
-                                })
-                            )}
-                        </tbody>
-                    </table>
+                                                <td>
+                                                    {log.beforeQuantity} → {log.afterQuantity}
+                                                    <span className={`qty-delta ${log.quantity > 0 ? 'qty-increase' : 'qty-decrease'}`}>
+                                                        ({log.quantity > 0 ? '+' : ''}{log.quantity})
+                                                    </span>
+                                                </td>
+                                                <td>{log.operatorName}</td>
+                                                <td>{log.notes || '-'}</td>
+                                                {isOwner && (
+                                                    <td>
+                                                        <Button size="sm" variant="danger" onClick={() => handleDeleteLog(log.id)}>
+                                                            刪除
+                                                        </Button>
+                                                    </td>
+                                                )}
+                                            </tr>
+                                        );
+                                    })
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             )}
 

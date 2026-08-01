@@ -1,0 +1,316 @@
+/**
+ * UnifiedResourcesPage.css — 資源整合頁
+ * DESIGN_LANGUAGE.md §7.1 列表頁 archetype（統計摘要 + 排行榜列表變體）
+ *
+ * 規則：
+ * - 只用語義 token（--bg-* / --surface-* / --text-* / --border-* / --color-* /
+ *   --space-* / --radius-* / --font-size-* / --font-weight-*）
+ *   → light / dark / tactical 三態由 tokens.css 自動切換，本檔不寫死顏色。
+ * - 不寫 light/dark/tactical 主題分支選擇器；頁面全部使用語義 token 即可自動生效。
+ * - 手機優先：先寫 mobile 樣式，再用 min-width 往上加大螢幕樣式。
+ */
+
+/* ── 頁面容器 ─────────────────────────────────────────────── */
+.ures-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+    color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+    .ures-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .ures-page {
+        padding: var(--space-6);
+    }
+}
+
+/* ── page-header ──────────────────────────────────────────── */
+.ures-page__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+    .ures-page__header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+}
+
+.ures-page__title {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+    .ures-page__title {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+.ures-page__subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.ures-page__header .lk-btn {
+    align-self: flex-start;
+    min-height: 44px;
+}
+
+@media (min-width: 640px) {
+    .ures-page__header .lk-btn {
+        align-self: auto;
+    }
+}
+
+/* ── 錯誤 Alert 內的重試按鈕 ──────────────────────────────── */
+.ures-retry-btn {
+    margin-top: var(--space-3);
+    min-height: 44px;
+}
+
+/* ── 統計摘要列（4 張卡）───────────────────────────────────── */
+.ures-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .ures-stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-4);
+    }
+}
+
+.ures-stat-card {
+    min-height: 44px;
+}
+
+.ures-stat-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+.ures-stat-card__head svg {
+    color: var(--text-tertiary);
+    flex: none;
+}
+
+.ures-stat-card__value {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.ures-stat-card__sub {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Panel 容器（熱門物資類型 / 捐贈者排行榜）──────────────── */
+.ures-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+.ures-panel__title {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.ures-panel__title svg {
+    color: var(--text-tertiary);
+    flex: none;
+}
+
+/* ── 熱門物資類型 tag 列表 ───────────────────────────────── */
+.ures-tag-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.ures-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-hover);
+    border-radius: var(--radius-md);
+}
+
+.ures-tag__label {
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+}
+
+/* ── 捐贈者排行榜 ─────────────────────────────────────────── */
+.ures-leaderboard {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ures-leaderboard__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-3);
+    background: var(--surface-hover);
+    border-radius: var(--radius-md);
+}
+
+@media (min-width: 640px) {
+    .ures-leaderboard__row {
+        flex-wrap: nowrap;
+    }
+}
+
+.ures-leaderboard__rank {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: var(--space-8);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
+}
+
+.ures-leaderboard__rank--top {
+    color: var(--color-secondary);
+}
+
+.ures-leaderboard__info {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.ures-leaderboard__name {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.ures-leaderboard__meta {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+}
+
+.ures-leaderboard__items {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-1);
+    flex: none;
+    width: 100%;
+}
+
+@media (min-width: 640px) {
+    .ures-leaderboard__items {
+        width: auto;
+        justify-content: flex-end;
+    }
+}
+
+/* ── 載入 skeleton（≥3 列，DESIGN_LANGUAGE §7.1）──────────── */
+.ures-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.ures-skeleton__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .ures-skeleton__stats {
+        grid-template-columns: repeat(4, 1fr);
+        gap: var(--space-4);
+    }
+}
+
+.ures-skeleton__stat {
+    height: 84px;
+    border-radius: var(--radius-lg);
+    background: var(--surface-hover);
+    animation: ures-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+.ures-skeleton__rows {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.ures-skeleton__row {
+    height: 56px;
+    border-radius: var(--radius-md);
+    background: var(--surface-hover);
+    animation: ures-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+@keyframes ures-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ures-skeleton__stat,
+    .ures-skeleton__row {
+        animation: none;
+    }
+}

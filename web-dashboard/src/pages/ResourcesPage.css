@@ -64,6 +64,7 @@
 }
 
 .resources-tabs .tab-btn {
+  min-height: 44px;
   padding: 0.6rem 1.1rem;
   border: none;
   background: transparent;
@@ -178,6 +179,7 @@
 }
 
 .resources-categories .category-btn {
+  min-height: 44px;
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--border-light);
   background: var(--surface-default);
@@ -212,6 +214,12 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+.resources-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .resources-table {
@@ -262,48 +270,119 @@
 }
 
 /* ============================================
-   Action Buttons
+   Action Buttons（design-system Button，見 §4）
    ============================================ */
 .resource-actions {
   display: flex;
-  gap: var(--space-1);
+  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
-.resource-actions button {
-  padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--border-light);
-  background: var(--surface-default);
+/* ============================================
+   行動端卡片直列（DESIGN_LANGUAGE §7.1 List archetype）
+   桌機顯示表格、行動端顯示卡片，兩者互斥切換
+   ============================================ */
+.resources-card-list {
+  display: none;
+}
+
+.resource-row-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.resource-row-card__main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.resource-row-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
   color: var(--text-secondary);
+}
+
+/* ============================================
+   載入 skeleton（≥3 列，DESIGN_LANGUAGE §7.1）
+   ============================================ */
+.table-skeleton-row td {
+  padding: var(--space-3) var(--space-4);
+}
+
+.table-skeleton-bar {
+  display: block;
+  height: 16px;
+  width: 100%;
   border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: var(--text-xs);
-  font-family: var(--font-sans);
-  font-weight: var(--font-medium);
-  transition: all var(--transition-fast);
+  background: linear-gradient(
+    90deg,
+    var(--surface-hover) 25%,
+    var(--surface-raised) 50%,
+    var(--surface-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: resourcesSkeletonShimmer 1.4s ease-in-out infinite;
 }
 
-.resource-actions button:hover {
-  background: var(--surface-hover);
-  border-color: var(--border-dark);
-  color: var(--text-primary);
+.table-skeleton-bar--sm {
+  width: 60%;
+  height: 12px;
+  margin-top: var(--space-2);
 }
 
-.resource-actions button.btn-edit {
-  color: var(--color-info);
-  border-color: var(--color-info-light);
+@keyframes resourcesSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
 
-.resource-actions button.btn-edit:hover {
-  background: color-mix(in srgb, var(--color-info) 8%, transparent);
+@media (prefers-reduced-motion: reduce) {
+  .table-skeleton-bar {
+    animation: none;
+  }
 }
 
-.resource-actions button.btn-delete {
+.table-skeleton-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.table-skeleton-card {
+  padding: var(--space-4);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  background: var(--surface-default);
+}
+
+/* ============================================
+   表格內訊息列（載入錯誤／空狀態容器）
+   ============================================ */
+.table-message-cell {
+  padding: 0 !important;
+}
+
+.table-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  text-align: center;
+  color: var(--text-tertiary);
+  font-size: var(--text-sm);
+}
+
+.table-message--error {
   color: var(--color-danger);
-  border-color: var(--color-danger-light);
-}
-
-.resource-actions button.btn-delete:hover {
-  background: color-mix(in srgb, var(--color-danger) 8%, transparent);
 }
 
 /* ============================================
@@ -476,36 +555,13 @@
   background: var(--surface-hover);
 }
 
-/* Log Type Badges */
-.log-type {
-  display: inline-block;
-  padding: 2px var(--space-2);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-xs);
-  font-weight: var(--font-medium);
-}
-
-.log-type--in {
-  background: color-mix(in srgb, var(--color-success) 12%, transparent);
-  color: var(--color-success-dark);
-}
-
-.log-type--out {
-  background: color-mix(in srgb, var(--color-danger) 12%, transparent);
-  color: var(--color-danger-dark);
-}
-
-.log-type--transfer {
-  background: color-mix(in srgb, var(--color-info) 12%, transparent);
-  color: var(--color-info-dark);
-}
-
-.log-type--delete {
-  background: color-mix(in srgb, var(--color-warning) 12%, transparent);
-  color: var(--color-warning-dark);
-}
+/* 交易類型改用 design-system Badge（見 §3），此處不再自刻樣式 */
 
 /* Quantity change indicator */
+.qty-delta {
+  margin-left: var(--space-2);
+}
+
 .qty-increase {
   color: var(--color-success);
 }
@@ -551,6 +607,12 @@
 
   .resource-actions {
     flex-direction: column;
+    align-items: stretch;
+  }
+
+  .resource-actions .lk-btn {
+    min-height: 44px;
+    width: 100%;
   }
 
   .resources-tabs {
@@ -560,6 +622,21 @@
   .resources-tabs .tab-btn {
     padding: var(--space-2) var(--space-3);
     font-size: var(--text-xs);
+  }
+}
+
+/* mobile：桌機表格換成 Card 直列（§6 斷點策略）
+   僅套用於有卡片替代版面的表格（物資清單），其餘表格（如異動紀錄）
+   維持表格＋橫向捲動，不強制隱藏。 */
+@media (max-width: 767px) {
+  .resources-table-wrap--has-cards {
+    display: none;
+  }
+
+  .resources-card-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
   }
 }
 

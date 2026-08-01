@@ -1,0 +1,42 @@
+/* ReunificationPage.css
+ * 語意 token only（見 docs/architecture/DESIGN_LANGUAGE.md §2, §8）。
+ * 不寫死 px/顏色，不針對 light/dark/tactical 另寫分支——
+ * 換主題時語意 token 會自動切換。
+ */
+
+.reunification-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .reunification-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .reunification-page {
+        padding: var(--space-6);
+    }
+}
+
+.reunification-page__title {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.reunification-page__body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+}
