@@ -375,7 +375,7 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | D8 | Resources domain 是否動刀 | 待 6.1 分析報告 | 報告後再決 |
 | D11 | 多語系是真需求嗎？（現況 0/137 頁使用，13 語系檔 10 個未註冊） | 若是，工作量≈從零開始 | 需 owner 確認服務對象語言構成 |
 | D12 | **NAS 硬體與規格**：現有 NAS 型號/CPU/RAM/是否有 GPU？ | 決定本地 LLM 選型上限（無 GPU → 小模型或外接推論機）與 Docker 可行性 | 提供型號後由 OPUS 評估 |
-| D13 | **本地 LLM 模型選型**：中文災情分類場景 | D12 確認推論主機為 **RTX 5090（32GB VRAM）** → 選型上限大幅提高：建議 **Qwen2.5-32B-Instruct**（品質優先）或 14B（延遲優先），Ollama 起 server mode；以既有 line-bot 分類案例對測定案 | 對測後定案；混合模式：本地為主、保留雲端 API 為 fallback。**新增考量：工作站是桌機，需確認 24/7 開機意願**——若否，分類任務走「工作站在線→本地、離線→fallback」策略 |
+| D13 | **本地 LLM 模型選型**：中文災情分類場景 | **2026-08-01 實機修正**：GPU 主機實測為 **RTX 4080 SUPER 16GB**（非截圖所述 5090/32GB）→ 32B 裝不下，上限 ~14B。**Owner 要求與其他專案（ST）共用同一 Ollama、不切換模型**——實測該機 Ollama 已有 14 模型在庫，ST 常駐的是 `nomic-embed-text`（嵌入模型，0.3GB，與聊天模型不衝突）。建議 `LLM_MODEL=qwen3:14b`（9.3GB，庫存中文最強）或 `qwen2.5:7b-instruct`（更輕），benchmark 對比後定案；兩專案未來聊天模型統一同一顆即零切換 | 模型已在庫免下載；`qwen2.5vl:7b` 視覺模型也在庫，未來可評估把災情照片分析本地化 |
 | D14 | **對外通道方式** | D12 確認有**中華電信固定 IP** → 兩案皆可行：(a) Cloudflare Tunnel（仍建議：隱藏 IP、免開 port、擋 DDoS）(b) 固定 IP 直連＋nginx＋Let's Encrypt（延遲較低，需自管防火牆） | 建議仍取 (a)；LINE webhook 對來源 IP 無要求，Tunnel 完全相容 |
 | D15 | **搬遷停機窗口與租約到期日** | 決定 Phase M 是否插隊到 P1 之後 | 告知到期日後排定 |
 
