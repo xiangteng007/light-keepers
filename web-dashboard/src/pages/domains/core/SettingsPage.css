@@ -1,0 +1,193 @@
+/**
+ * SettingsPage.css — R3b 詳情頁骨架（設定表單，DESIGN_LANGUAGE.md §7.2）
+ * 全部語義 token。
+ */
+
+.settings-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .settings-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .settings-page {
+        padding: var(--space-6);
+    }
+}
+
+.settings-page__header h1 {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.settings-page__subtitle {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+}
+
+/* ── 主欄 8 + 側欄 4（此頁側欄＝分類 nav） ── */
+
+.settings-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+    .settings-page__body {
+        display: grid;
+        grid-template-columns: minmax(220px, 280px) 1fr;
+        align-items: start;
+        gap: var(--space-6);
+    }
+}
+
+.settings-nav {
+    display: flex;
+    flex-direction: row;
+    gap: var(--space-2);
+    overflow-x: auto;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+}
+
+@media (min-width: 1024px) {
+    .settings-nav {
+        flex-direction: column;
+        overflow-x: visible;
+    }
+}
+
+.settings-nav__item {
+    flex: 0 0 auto;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    text-align: left;
+    padding: var(--space-3);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.settings-nav__item:hover {
+    background: var(--surface-hover);
+}
+
+.settings-nav__item:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.settings-nav__item--active {
+    background: var(--accent-primary, var(--color-secondary));
+    color: var(--text-inverse);
+}
+
+.settings-nav__title {
+    font-weight: var(--font-weight-medium, 500);
+    font-size: var(--font-size-base, 14px);
+    white-space: nowrap;
+}
+
+.settings-nav__desc {
+    font-size: var(--font-size-sm, 14px);
+    opacity: 0.8;
+    white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+    .settings-nav__desc {
+        white-space: normal;
+    }
+}
+
+/* ── 內容 ── */
+
+.settings-content {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+}
+
+.settings-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.settings-section h2 {
+    margin: 0;
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+    .settings-grid:not(.settings-grid--single) {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+.settings-toggle-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.settings-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.settings-toggle input[type='checkbox'] {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--accent-primary, var(--color-secondary));
+}
+
+.settings-theme {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.settings-theme__label {
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+}
+
+.settings-theme__options {
+    display: flex;
+    gap: var(--space-3);
+}

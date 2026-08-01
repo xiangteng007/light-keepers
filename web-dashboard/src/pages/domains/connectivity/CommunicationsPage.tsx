@@ -1,20 +1,60 @@
 import { useState, useEffect } from 'react';
+import { Radio, Satellite, Wifi, Send, Plus, Users } from 'lucide-react';
+import { Button, Badge } from '../../../design-system';
+import { StatIndicator } from '../../../design-system/components/Indicators';
+import EmptyState from '../../../components/shared/EmptyState';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import './CommunicationsPage.css';
 
-interface Channel { id: string; name: string; type: 'radio' | 'satellite' | 'mesh'; status: 'online' | 'offline' | 'degraded'; members: number; lastActivity: string; }
-interface Message { id: string; channel: string; sender: string; content: string; timestamp: string; priority: 'normal' | 'urgent'; }
+interface Channel {
+    id: string;
+    name: string;
+    type: 'radio' | 'satellite' | 'mesh';
+    status: 'online' | 'offline' | 'degraded';
+    members: number;
+    lastActivity: string;
+}
+
+interface Message {
+    id: string;
+    channel: string;
+    sender: string;
+    content: string;
+    timestamp: string;
+    priority: 'normal' | 'urgent';
+}
+
+const TYPE_ICON: Record<Channel['type'], typeof Radio> = {
+    radio: Radio,
+    satellite: Satellite,
+    mesh: Wifi,
+};
+
+const TYPE_LABEL: Record<Channel['type'], string> = {
+    radio: '無線電',
+    satellite: '衛星',
+    mesh: '網狀網路',
+};
+
+function ChannelStatusBadge({ status }: { status: Channel['status'] }) {
+    if (status === 'online') return <Badge variant="success" dot size="xs">上線</Badge>;
+    if (status === 'degraded') return <Badge variant="warning" dot size="xs">降級</Badge>;
+    return <Badge variant="danger" dot size="xs">離線</Badge>;
+}
 
 export default function CommunicationsPage() {
     const [channels, setChannels] = useState<Channel[]>([]);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
+    const [draft, setDraft] = useState('');
 
     useEffect(() => {
         setChannels([
-            { id: 'ch-1', name: 'Command Net', type: 'radio', status: 'online', members: 12, lastActivity: '2min ago' },
-            { id: 'ch-2', name: 'Field Ops Alpha', type: 'radio', status: 'online', members: 8, lastActivity: '5min ago' },
-            { id: 'ch-3', name: 'Satellite Link', type: 'satellite', status: 'degraded', members: 3, lastActivity: '15min ago' },
-            { id: 'ch-4', name: 'Mesh Network', type: 'mesh', status: 'online', members: 24, lastActivity: '1min ago' },
+            { id: 'ch-1', name: 'Command Net', type: 'radio', status: 'online', members: 12, lastActivity: '2 分鐘前' },
+            { id: 'ch-2', name: 'Field Ops Alpha', type: 'radio', status: 'online', members: 8, lastActivity: '5 分鐘前' },
+            { id: 'ch-3', name: 'Satellite Link', type: 'satellite', status: 'degraded', members: 3, lastActivity: '15 分鐘前' },
+            { id: 'ch-4', name: 'Mesh Network', type: 'mesh', status: 'online', members: 24, lastActivity: '1 分鐘前' },
         ]);
         setMessages([
             { id: '1', channel: 'ch-1', sender: 'Commander Chen', content: 'All teams report status.', timestamp: '14:32', priority: 'normal' },
@@ -25,50 +65,143 @@ export default function CommunicationsPage() {
         setLoading(false);
     }, []);
 
-    const getStatusColor = (status: string) => {
-        switch (status) { case 'online': return 'bg-green-500'; case 'degraded': return 'bg-yellow-500'; case 'offline': return 'bg-red-500'; default: return 'bg-gray-500'; }
+    const channelMessages = messages.filter((m) => m.channel === selectedChannel);
+    const selected = channels.find((c) => c.id === selectedChannel);
+
+    const sendMessage = () => {
+        if (!draft.trim() || !selectedChannel) return;
+        setMessages((prev) => [
+            ...prev,
+            {
+                id: `${Date.now()}`,
+                channel: selectedChannel,
+                sender: '我',
+                content: draft.trim(),
+                timestamp: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' }),
+                priority: 'normal',
+            },
+        ]);
+        setDraft('');
     };
 
-    const channelMessages = messages.filter(m => m.channel === selectedChannel);
-
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div></div>;
-
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div><h1 className="text-2xl font-bold text-white">Communications Center</h1><p className="text-gray-400">Multi-channel communication management</p></div>
-                <button className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">+ New Channel</button>
-            </div>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="bg-green-500/20 rounded-lg p-4 border border-green-500/50"><p className="text-green-400 text-sm">Online</p><p className="text-2xl font-bold text-green-400">{channels.filter(c => c.status === 'online').length}</p></div>
-                <div className="bg-yellow-500/20 rounded-lg p-4 border border-yellow-500/50"><p className="text-yellow-400 text-sm">Degraded</p><p className="text-2xl font-bold text-yellow-400">{channels.filter(c => c.status === 'degraded').length}</p></div>
-                <div className="bg-red-500/20 rounded-lg p-4 border border-red-500/50"><p className="text-red-400 text-sm">Offline</p><p className="text-2xl font-bold text-red-400">{channels.filter(c => c.status === 'offline').length}</p></div>
-                <div className="bg-blue-500/20 rounded-lg p-4 border border-blue-500/50"><p className="text-blue-400 text-sm">Total Members</p><p className="text-2xl font-bold text-blue-400">{channels.reduce((sum, c) => sum + c.members, 0)}</p></div>
-            </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-                    <h3 className="text-lg font-medium text-white mb-4">Channels</h3>
-                    <div className="space-y-2">
-                        {channels.map((ch) => (
-                            <button key={ch.id} onClick={() => setSelectedChannel(ch.id)} className={`w-full p-3 rounded-lg text-left transition-colors ${selectedChannel === ch.id ? 'bg-amber-500/20 border-amber-500' : 'bg-slate-700/50 hover:bg-slate-700'} border border-slate-600`}>
-                                <div className="flex items-center gap-2 mb-1"><div className={`w-2 h-2 rounded-full ${getStatusColor(ch.status)}`}></div><span className="text-white font-medium">{ch.name}</span></div>
-                                <div className="flex justify-between text-xs text-gray-400"><span>{ch.type} • {ch.members} members</span><span>{ch.lastActivity}</span></div>
-                            </button>
-                        ))}
-                    </div>
+        <div className="comms-page">
+            <header className="comms-page__header">
+                <div>
+                    <h1>通訊中心</h1>
+                    <p className="comms-page__subtitle">多頻道通訊管理</p>
                 </div>
-                <div className="lg:col-span-2 bg-slate-800/50 rounded-lg border border-slate-700 p-4 flex flex-col">
-                    <h3 className="text-lg font-medium text-white mb-4">{channels.find(c => c.id === selectedChannel)?.name || 'Select a Channel'}</h3>
-                    <div className="flex-1 space-y-3 overflow-y-auto max-h-96">
-                        {channelMessages.map((msg) => (
-                            <div key={msg.id} className={`p-3 rounded-lg ${msg.priority === 'urgent' ? 'bg-red-500/20 border border-red-500/50' : 'bg-slate-700/50'}`}>
-                                <div className="flex justify-between mb-1"><span className="text-amber-400 font-medium">{msg.sender}</span><span className="text-gray-400 text-xs">{msg.timestamp}</span></div>
-                                <p className="text-gray-200">{msg.content}</p>
+                <Button icon={<Plus size={18} aria-hidden="true" />}>新增頻道</Button>
+            </header>
+
+            <div className="comms-page__stats" role="list">
+                <StatIndicator
+                    variant="success"
+                    label="上線"
+                    value={loading ? '—' : channels.filter((c) => c.status === 'online').length}
+                />
+                <StatIndicator
+                    variant="warning"
+                    label="降級"
+                    value={loading ? '—' : channels.filter((c) => c.status === 'degraded').length}
+                />
+                <StatIndicator
+                    variant="danger"
+                    label="離線"
+                    value={loading ? '—' : channels.filter((c) => c.status === 'offline').length}
+                />
+                <StatIndicator
+                    icon={<Users size={18} aria-hidden="true" />}
+                    label="總人數"
+                    value={loading ? '—' : channels.reduce((sum, c) => sum + c.members, 0)}
+                />
+            </div>
+
+            <div className="comms-page__body">
+                <section className="comms-page__panel comms-page__channels" aria-label="頻道列表">
+                    <h2 className="comms-page__panel-title">頻道</h2>
+                    {loading ? (
+                        <div className="comms-page__skeleton">
+                            <Skeleton variant="text" count={4} height={56} />
+                        </div>
+                    ) : channels.length === 0 ? (
+                        <EmptyState variant="minimal" title="尚無頻道" description="建立第一個通訊頻道" />
+                    ) : (
+                        <ul className="comms-channel-list" role="list">
+                            {channels.map((ch) => {
+                                const Icon = TYPE_ICON[ch.type];
+                                const active = selectedChannel === ch.id;
+                                return (
+                                    <li key={ch.id}>
+                                        <button
+                                            type="button"
+                                            className={`comms-channel ${active ? 'comms-channel--active' : ''}`}
+                                            aria-pressed={active}
+                                            onClick={() => setSelectedChannel(ch.id)}
+                                        >
+                                            <span className="comms-channel__top">
+                                                <Icon size={16} aria-hidden="true" />
+                                                <span className="comms-channel__name">{ch.name}</span>
+                                                <ChannelStatusBadge status={ch.status} />
+                                            </span>
+                                            <span className="comms-channel__meta">
+                                                <span>{TYPE_LABEL[ch.type]} · {ch.members} 人</span>
+                                                <span className="tabular-nums">{ch.lastActivity}</span>
+                                            </span>
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
+                    )}
+                </section>
+
+                <section className="comms-page__panel comms-page__thread" aria-label="訊息串">
+                    <h2 className="comms-page__panel-title">{selected?.name ?? '請選擇頻道'}</h2>
+                    <div className="comms-thread">
+                        {loading ? (
+                            <div className="comms-page__skeleton">
+                                <Skeleton variant="text" count={3} height={48} />
                             </div>
-                        ))}
+                        ) : channelMessages.length === 0 ? (
+                            <EmptyState variant="minimal" title="尚無訊息" description="這個頻道還沒有訊息" />
+                        ) : (
+                            channelMessages.map((msg) => (
+                                <div
+                                    key={msg.id}
+                                    className={`comms-message ${msg.priority === 'urgent' ? 'comms-message--urgent' : ''}`}
+                                >
+                                    <div className="comms-message__head">
+                                        <span className="comms-message__sender">{msg.sender}</span>
+                                        {msg.priority === 'urgent' && <Badge variant="danger" size="xs">緊急</Badge>}
+                                        <span className="comms-message__time tabular-nums">{msg.timestamp}</span>
+                                    </div>
+                                    <p className="comms-message__content">{msg.content}</p>
+                                </div>
+                            ))
+                        )}
                     </div>
-                    <div className="flex gap-2 mt-4"><input type="text" placeholder="Type a message..." className="flex-1 px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /><button className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">Send</button></div>
-                </div>
+                    <form
+                        className="comms-composer"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            sendMessage();
+                        }}
+                    >
+                        <input
+                            type="text"
+                            className="comms-composer__input"
+                            placeholder="輸入訊息…"
+                            aria-label="輸入訊息"
+                            value={draft}
+                            onChange={(e) => setDraft(e.target.value)}
+                            disabled={!selectedChannel}
+                        />
+                        <Button type="submit" icon={<Send size={16} aria-hidden="true" />} disabled={!selectedChannel || !draft.trim()}>
+                            傳送
+                        </Button>
+                    </form>
+                </section>
             </div>
         </div>
     );

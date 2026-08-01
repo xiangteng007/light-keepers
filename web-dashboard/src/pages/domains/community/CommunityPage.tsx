@@ -1,6 +1,26 @@
 import { useState, useEffect } from 'react';
+import { Heart, MessageCircle, Share2 } from 'lucide-react';
+import { Button, Card, Tag } from '../../../design-system';
+import EmptyState from '../../../components/shared/EmptyState';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import './CommunityPage.css';
 
-interface Post { id: string; author: string; authorRole: string; content: string; timestamp: string; likes: number; comments: number; category: 'announcement' | 'update' | 'discussion'; }
+interface Post {
+    id: string;
+    author: string;
+    authorRole: string;
+    content: string;
+    timestamp: string;
+    likes: number;
+    comments: number;
+    category: 'announcement' | 'update' | 'discussion';
+}
+
+const CATEGORY_META: Record<Post['category'], { label: string; color: 'danger' | 'default' | 'success' }> = {
+    announcement: { label: '公告', color: 'danger' },
+    update: { label: '進度更新', color: 'default' },
+    discussion: { label: '討論', color: 'success' },
+};
 
 export default function CommunityPage() {
     const [posts, setPosts] = useState<Post[]>([]);
@@ -16,45 +36,95 @@ export default function CommunityPage() {
         setLoading(false);
     }, []);
 
-    const handleSubmit = () => { if (newPost.trim()) { setPosts([{ id: String(Date.now()), author: 'You', authorRole: 'Volunteer', content: newPost, timestamp: 'Just now', likes: 0, comments: 0, category: 'discussion' }, ...posts]); setNewPost(''); } };
-
-    const getCategoryBadge = (category: string) => {
-        switch (category) {
-            case 'announcement': return 'bg-red-500/20 text-red-400';
-            case 'update': return 'bg-blue-500/20 text-blue-400';
-            case 'discussion': return 'bg-green-500/20 text-green-400';
-            default: return 'bg-gray-500/20 text-gray-400';
-        }
+    const handleSubmit = () => {
+        if (!newPost.trim()) return;
+        setPosts([
+            {
+                id: String(Date.now()),
+                author: '我',
+                authorRole: '志工',
+                content: newPost,
+                timestamp: '剛剛',
+                likes: 0,
+                comments: 0,
+                category: 'discussion',
+            },
+            ...posts,
+        ]);
+        setNewPost('');
     };
 
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div></div>;
-
     return (
-        <div className="p-6 space-y-6">
-            <div><h1 className="text-2xl font-bold text-white">Community Wall</h1><p className="text-gray-400">Team updates and announcements</p></div>
-            <div className="bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-                <textarea value={newPost} onChange={(e) => setNewPost(e.target.value)} placeholder="Share an update with your team..." className="w-full px-4 py-3 bg-slate-700 border border-slate-600 rounded-lg text-white resize-none" rows={3} />
-                <div className="flex justify-end mt-3"><button onClick={handleSubmit} disabled={!newPost.trim()} className="px-6 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400 disabled:opacity-50 disabled:cursor-not-allowed">Post</button></div>
-            </div>
-            <div className="space-y-4">
-                {posts.map((post) => (
-                    <div key={post.id} className="bg-slate-800/50 rounded-lg border border-slate-700 p-6">
-                        <div className="flex justify-between items-start mb-3">
-                            <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-amber-500 flex items-center justify-center text-black font-bold">{post.author.charAt(0)}</div>
-                                <div><p className="text-white font-medium">{post.author}</p><p className="text-gray-400 text-sm">{post.authorRole} • {post.timestamp}</p></div>
-                            </div>
-                            <span className={`px-2 py-1 rounded text-xs capitalize ${getCategoryBadge(post.category)}`}>{post.category}</span>
-                        </div>
-                        <p className="text-gray-200 mb-4">{post.content}</p>
-                        <div className="flex gap-4 text-sm text-gray-400">
-                            <button className="flex items-center gap-1 hover:text-amber-400">❤️ {post.likes}</button>
-                            <button className="flex items-center gap-1 hover:text-amber-400">💬 {post.comments}</button>
-                            <button className="hover:text-amber-400">Share</button>
-                        </div>
+        <div className="community-page">
+            <header className="community-page__header">
+                <h1>社群牆</h1>
+                <p className="community-page__subtitle">團隊更新與公告</p>
+            </header>
+
+            <section className="community-composer" aria-label="發布更新">
+                <textarea
+                    className="community-composer__input"
+                    value={newPost}
+                    onChange={(e) => setNewPost(e.target.value)}
+                    placeholder="與團隊分享最新狀況…"
+                    rows={3}
+                    aria-label="分享更新"
+                />
+                <div className="community-composer__actions">
+                    <Button onClick={handleSubmit} disabled={!newPost.trim()}>發布</Button>
+                </div>
+            </section>
+
+            <section className="community-page__panel" aria-label="貼文列表">
+                {loading ? (
+                    <div className="community-page__skeleton">
+                        <Skeleton variant="card" count={3} height={140} />
                     </div>
-                ))}
-            </div>
+                ) : posts.length === 0 ? (
+                    <EmptyState title="尚無貼文" description="成為第一個分享更新的人" />
+                ) : (
+                    <ul className="community-feed" role="list">
+                        {posts.map((post) => {
+                            const meta = CATEGORY_META[post.category];
+                            return (
+                                <li key={post.id}>
+                                    <Card padding="lg">
+                                        <div className="community-post__head">
+                                            <div className="community-post__author">
+                                                <span className="community-post__avatar" aria-hidden="true">
+                                                    {post.author.charAt(0)}
+                                                </span>
+                                                <div>
+                                                    <p className="community-post__name">{post.author}</p>
+                                                    <p className="community-post__role">
+                                                        {post.authorRole} · {post.timestamp}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                            <Tag color={meta.color}>{meta.label}</Tag>
+                                        </div>
+                                        <p className="community-post__content">{post.content}</p>
+                                        <div className="community-post__actions">
+                                            <button type="button" className="community-post__action">
+                                                <Heart size={16} aria-hidden="true" />
+                                                <span className="tabular-nums">{post.likes}</span>
+                                            </button>
+                                            <button type="button" className="community-post__action">
+                                                <MessageCircle size={16} aria-hidden="true" />
+                                                <span className="tabular-nums">{post.comments}</span>
+                                            </button>
+                                            <button type="button" className="community-post__action">
+                                                <Share2 size={16} aria-hidden="true" />
+                                                分享
+                                            </button>
+                                        </div>
+                                    </Card>
+                                </li>
+                            );
+                        })}
+                    </ul>
+                )}
+            </section>
         </div>
     );
 }

@@ -1,6 +1,31 @@
 import { useState, useEffect } from 'react';
+import { FileText, Download, Plus } from 'lucide-react';
+import { Button, Badge } from '../../../design-system';
+import EmptyState from '../../../components/shared/EmptyState';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import './ReportsPage.css';
 
-interface Report { id: string; name: string; type: 'mission' | 'resource' | 'volunteer' | 'analytics'; generatedAt: string; status: 'ready' | 'generating' | 'failed'; size: string; }
+interface Report {
+    id: string;
+    name: string;
+    type: 'mission' | 'resource' | 'volunteer' | 'analytics';
+    generatedAt: string;
+    status: 'ready' | 'generating' | 'failed';
+    size: string;
+}
+
+const TYPE_LABEL: Record<Report['type'], string> = {
+    mission: '任務',
+    resource: '物資',
+    volunteer: '志工',
+    analytics: '分析',
+};
+
+function StatusBadge({ status }: { status: Report['status'] }) {
+    if (status === 'ready') return <Badge variant="success" dot>已完成</Badge>;
+    if (status === 'generating') return <Badge variant="warning" dot pulse>產生中</Badge>;
+    return <Badge variant="danger" dot>失敗</Badge>;
+}
 
 export default function ReportsPage() {
     const [reports, setReports] = useState<Report[]>([]);
@@ -16,64 +41,105 @@ export default function ReportsPage() {
         setLoading(false);
     }, []);
 
-    const getTypeColor = (type: string) => {
-        switch (type) { case 'mission': return 'bg-red-500/20 text-red-400'; case 'resource': return 'bg-blue-500/20 text-blue-400'; case 'volunteer': return 'bg-green-500/20 text-green-400'; case 'analytics': return 'bg-purple-500/20 text-purple-400'; default: return 'bg-gray-500/20 text-gray-400'; }
-    };
-
-    const getStatusBadge = (status: string) => {
-        switch (status) { case 'ready': return 'bg-green-500'; case 'generating': return 'bg-yellow-500 animate-pulse'; case 'failed': return 'bg-red-500'; default: return 'bg-gray-500'; }
-    };
-
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div></div>;
+    const typeCounts = (['mission', 'resource', 'volunteer', 'analytics'] as const).map((type) => ({
+        type,
+        count: reports.filter((r) => r.type === type).length,
+    }));
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div><h1 className="text-2xl font-bold text-white">Reports Center</h1><p className="text-gray-400">Generate and download reports</p></div>
-                <button className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">+ Generate Report</button>
-            </div>
+        <div className="reports-page">
+            <header className="reports-page__header">
+                <div>
+                    <h1>報表中心</h1>
+                    <p className="reports-page__subtitle">產生並下載系統報表</p>
+                </div>
+                <Button icon={<Plus size={18} aria-hidden="true" />}>產生報表</Button>
+            </header>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {['mission', 'resource', 'volunteer', 'analytics'].map((type) => (
-                    <div key={type} className={`rounded-lg p-4 border ${getTypeColor(type).replace('text-', 'border-').replace('/20', '/50')}`}>
-                        <p className={`text-sm capitalize ${getTypeColor(type).split(' ')[1]}`}>{type} Reports</p>
-                        <p className="text-2xl font-bold text-white">{reports.filter(r => r.type === type).length}</p>
+            <div className="reports-page__stats" role="list">
+                {typeCounts.map(({ type, count }) => (
+                    <div key={type} className="reports-page__stat" role="listitem">
+                        <span className="reports-page__stat-label">{TYPE_LABEL[type]}報表</span>
+                        <span className="reports-page__stat-value">{loading ? '—' : count}</span>
                     </div>
                 ))}
             </div>
 
-            <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
-                <table className="w-full">
-                    <thead>
-                        <tr className="border-b border-slate-700">
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Report Name</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Type</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Generated</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Size</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Status</th>
-                            <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-700">
-                        {reports.map((report) => (
-                            <tr key={report.id} className="hover:bg-slate-700/50">
-                                <td className="px-6 py-4 text-white font-medium">{report.name}</td>
-                                <td className="px-6 py-4"><span className={`px-2 py-1 rounded text-xs capitalize ${getTypeColor(report.type)}`}>{report.type}</span></td>
-                                <td className="px-6 py-4 text-gray-300">{report.generatedAt}</td>
-                                <td className="px-6 py-4 text-gray-300">{report.size}</td>
-                                <td className="px-6 py-4"><span className={`w-2 h-2 rounded-full inline-block ${getStatusBadge(report.status)}`}></span><span className="ml-2 text-gray-300 capitalize">{report.status}</span></td>
-                                <td className="px-6 py-4">
-                                    {report.status === 'ready' ? (
-                                        <button className="text-amber-400 hover:text-amber-300 text-sm">Download</button>
-                                    ) : (
-                                        <span className="text-gray-500 text-sm">-</span>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
+            <section className="reports-page__panel" aria-label="報表列表">
+                {loading ? (
+                    <div className="reports-page__skeleton">
+                        <Skeleton variant="text" count={5} height={44} />
+                    </div>
+                ) : reports.length === 0 ? (
+                    <EmptyState
+                        title="尚無報表"
+                        description="點擊「產生報表」建立第一份報表"
+                        action={{ label: '產生報表', onClick: () => {} }}
+                    />
+                ) : (
+                    <>
+                        {/* 桌機：表格 */}
+                        <table className="reports-table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">報表名稱</th>
+                                    <th scope="col">類型</th>
+                                    <th scope="col">產生時間</th>
+                                    <th scope="col">大小</th>
+                                    <th scope="col">狀態</th>
+                                    <th scope="col">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {reports.map((report) => (
+                                    <tr key={report.id}>
+                                        <td className="reports-table__name">
+                                            <FileText size={16} aria-hidden="true" />
+                                            {report.name}
+                                        </td>
+                                        <td>{TYPE_LABEL[report.type]}</td>
+                                        <td className="tabular-nums">{report.generatedAt}</td>
+                                        <td className="tabular-nums">{report.size}</td>
+                                        <td><StatusBadge status={report.status} /></td>
+                                        <td>
+                                            {report.status === 'ready' ? (
+                                                <button type="button" className="reports-table__download" aria-label={`下載 ${report.name}`}>
+                                                    <Download size={16} aria-hidden="true" />
+                                                    下載
+                                                </button>
+                                            ) : (
+                                                <span className="reports-table__dash">—</span>
+                                            )}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+
+                        {/* 行動端：卡片直列 */}
+                        <ul className="reports-cards" role="list">
+                            {reports.map((report) => (
+                                <li key={report.id} className="reports-card">
+                                    <div className="reports-card__main">
+                                        <span className="reports-card__name">{report.name}</span>
+                                        <span className="reports-card__meta tabular-nums">
+                                            {TYPE_LABEL[report.type]} · {report.generatedAt} · {report.size}
+                                        </span>
+                                    </div>
+                                    <div className="reports-card__side">
+                                        <StatusBadge status={report.status} />
+                                        {report.status === 'ready' && (
+                                            <button type="button" className="reports-table__download" aria-label={`下載 ${report.name}`}>
+                                                <Download size={16} aria-hidden="true" />
+                                            </button>
+                                        )}
+                                    </div>
+                                </li>
+                            ))}
+                        </ul>
+                    </>
+                )}
+            </section>
         </div>
     );
 }

@@ -1,0 +1,238 @@
+/**
+ * CommunicationsPage.css — R3b 列表頁骨架（頻道清單 + 訊息串主從版型）
+ * DESIGN_LANGUAGE.md §7.1；全部語義 token。
+ */
+
+.comms-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .comms-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .comms-page {
+        padding: var(--space-6);
+    }
+}
+
+.comms-page__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.comms-page__header h1 {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.comms-page__subtitle {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+}
+
+.comms-page__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .comms-page__stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 主從版型 ── */
+
+.comms-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+    .comms-page__body {
+        display: grid;
+        grid-template-columns: minmax(240px, 320px) 1fr;
+        align-items: start;
+    }
+}
+
+.comms-page__panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.comms-page__panel-title {
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.comms-page__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* ── 頻道清單 ── */
+
+.comms-channel-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.comms-channel {
+    width: 100%;
+    min-height: 44px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    text-align: left;
+    padding: var(--space-3);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    color: var(--text-primary);
+}
+
+.comms-channel:hover {
+    background: var(--surface-hover);
+}
+
+.comms-channel:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.comms-channel--active {
+    border-color: var(--accent-primary, var(--color-secondary));
+    background: var(--surface-hover);
+}
+
+.comms-channel__top {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--font-weight-medium, 500);
+}
+
+.comms-channel__name {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.comms-channel__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+/* ── 訊息串 ── */
+
+.comms-page__thread {
+    min-height: 360px;
+}
+
+.comms-thread {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    overflow-y: auto;
+    max-height: 420px;
+    padding-right: var(--space-1);
+}
+
+.comms-message {
+    padding: var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+}
+
+.comms-message--urgent {
+    background: var(--color-danger-bg);
+    border-color: var(--color-danger);
+}
+
+.comms-message__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+}
+
+.comms-message__sender {
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+.comms-message__time {
+    margin-left: auto;
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-tertiary);
+}
+
+.comms-message__content {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: var(--font-size-base, 14px);
+    word-break: break-word;
+}
+
+/* ── 訊息輸入 ── */
+
+.comms-composer {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+}
+
+.comms-composer__input {
+    flex: 1;
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-base, 14px);
+}
+
+.comms-composer__input:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
