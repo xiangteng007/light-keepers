@@ -1,0 +1,142 @@
+/**
+ * ICSFormsPage（/ics 表單目錄）— R3a 批次重設計
+ *
+ * 規則（DESIGN_LANGUAGE.md）：
+ * - 全部使用語義 token（--bg-* / --surface-* / --text-* / --border-* / --space-* /
+ *   --radius-* / --font-size-*），light / dark / tactical 三態自動生效，
+ *   本檔不寫任何主題分支選擇器。
+ * - 間距 4px 節奏（--space-*）；可點擊卡片觸控目標 ≥44px；行動優先
+ *   （先寫 mobile 單欄，再用 @media (min-width: 768px) 放大為多欄）。
+ * - 狀態徽章由 design-system Badge 負責，本檔不宣告狀態色。
+ */
+
+.ics-forms-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-3);
+}
+
+/* ===== 頁首 ===== */
+
+.ics-forms-page__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.ics-forms-page__title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.ics-forms-page__subtitle {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin: 0;
+}
+
+/* ===== 內容 panel ===== */
+
+.ics-forms-page__panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-3);
+}
+
+/* ===== 卡片網格（行動優先：單欄） ===== */
+
+.ics-forms-page__grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+}
+
+.ics-form-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-4);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
+    text-decoration: none;
+    color: var(--text-primary);
+    transition: border-color var(--transition-fast, 0.15s ease), background var(--transition-fast, 0.15s ease);
+}
+
+.ics-form-card--available {
+    cursor: pointer;
+}
+
+.ics-form-card--available:hover {
+    background: var(--surface-hover);
+    border-color: var(--color-success);
+}
+
+.ics-form-card--available:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.ics-form-card--disabled {
+    background: var(--bg-secondary);
+    color: var(--text-tertiary);
+    cursor: not-allowed;
+}
+
+.ics-form-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.ics-form-card__name {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.ics-form-card--disabled .ics-form-card__name {
+    color: var(--text-tertiary);
+}
+
+.ics-form-card__description {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--line-height-normal, 1.5);
+}
+
+.ics-form-card--disabled .ics-form-card__description {
+    color: var(--text-tertiary);
+}
+
+/* ═════════ 平板以上：多欄 ═════════ */
+
+@media (min-width: 768px) {
+    .ics-forms-page {
+        padding: var(--space-6);
+        gap: var(--space-6);
+    }
+
+    .ics-forms-page__panel {
+        padding: var(--space-4);
+    }
+
+    .ics-forms-page__grid {
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: var(--space-4);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .ics-form-card {
+        transition: none;
+    }
+}

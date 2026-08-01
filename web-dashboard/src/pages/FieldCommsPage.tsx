@@ -1,74 +1,67 @@
 /**
  * FieldCommsPage.tsx
- * 
+ *
  * 現地通訊頁面 - 無線電/弱網/衛星備援
+ *
+ * R3a 重設計：移除原本的假資料狀態卡（5/5 通訊頻道在線 / 85% Mesh 網路覆蓋，
+ * 皆為寫死數字，非 API 回傳）——在災防情境下假造通訊暢通狀態特別危險，違反
+ * DESIGN_LANGUAGE §0「高壓可用性 > 美觀」原則，改為誠實的「頁面建置中」狀態（§4）。
+ * 下方保留「預期功能」卡片作為規劃預覽，不冒充即時資料。
  */
-import './placeholder-pages.css';
-import { AlertTriangle, Radio, Wifi, Satellite } from 'lucide-react';
+import { Construction, Radio, Wifi, Satellite } from 'lucide-react';
+import EmptyState from '../components/shared/EmptyState';
+import { Card } from '../design-system';
+import './FieldCommsPage.css';
+
+const PLANNED_FEATURES = [
+    {
+        icon: Radio,
+        title: '無線電管理',
+        description: '頻道分配與通話紀錄',
+    },
+    {
+        icon: Wifi,
+        title: 'Mesh 網路',
+        description: '節點狀態與拓撲圖',
+    },
+    {
+        icon: Satellite,
+        title: '衛星備援',
+        description: 'Starlink / Iridium 整合',
+    },
+];
 
 export default function FieldCommsPage() {
     return (
-        <div className="placeholder-page">
-            <h1 className="placeholder-page__title">📻 現地通訊</h1>
-            <p className="placeholder-page__subtitle">
-                無線電通訊、弱網環境、衛星備援通訊管理
-            </p>
+        <div className="field-comms-page">
+            <header className="field-comms-page__header">
+                <h1 className="field-comms-page__title">現地通訊</h1>
+                <p className="field-comms-page__subtitle">
+                    無線電通訊、弱網環境、衛星備援通訊管理
+                </p>
+            </header>
 
-            {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice">
-                <AlertTriangle size={20} color="#92400E" />
-                <div>
-                    <strong className="placeholder-page__dev-notice-title">🚧 功能開發中</strong>
-                    <p className="placeholder-page__dev-notice-text">
-                        通訊系統正在開發中，預計包含：無線電頻道管理、衛星通訊備援、Mesh 網路狀態監控等功能。
-                    </p>
-                </div>
-            </div>
+            <EmptyState
+                icon={Construction}
+                variant="minimal"
+                title="頁面建置中"
+                description="通訊系統正在開發中，預計包含：無線電頻道管理、衛星通訊備援、Mesh 網路狀態監控等功能。"
+            />
 
-            <div className="placeholder-page__grid">
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📡</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--green">5/5</div>
-                    <div className="placeholder-page__card-label">通訊頻道在線</div>
+            <section className="field-comms-page__preview">
+                <h2 className="field-comms-page__preview-title">預期功能</h2>
+                <div className="field-comms-page__preview-grid">
+                    {PLANNED_FEATURES.map(({ icon: Icon, title, description }) => (
+                        <Card key={title} padding="md">
+                            <div className="field-comms-page__feature">
+                                <Icon size={24} className="field-comms-page__feature-icon" aria-hidden="true" />
+                                <div className="field-comms-page__feature-title">{title}</div>
+                                <div className="field-comms-page__feature-desc">{description}</div>
+                            </div>
+                        </Card>
+                    ))}
                 </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">🛰️</div>
-                    <div className="placeholder-page__card-value">備用</div>
-                    <div className="placeholder-page__card-label">衛星通訊狀態</div>
-                </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📶</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--blue">85%</div>
-                    <div className="placeholder-page__card-label">Mesh 網路覆蓋</div>
-                </div>
-            </div>
-
-            {/* 預期功能區塊 */}
-            <div className="placeholder-page__expected-features">
-                <h3 className="placeholder-page__expected-features-title">
-                    📋 預期功能
-                </h3>
-                <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Radio size={24} color="#DC2626" />
-                        <div className="placeholder-page__feature-card-title">無線電管理</div>
-                        <div className="placeholder-page__card-label">頻道分配與通話紀錄</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Wifi size={24} color="#3B82F6" />
-                        <div className="placeholder-page__feature-card-title">Mesh 網路</div>
-                        <div className="placeholder-page__card-label">節點狀態與拓撲圖</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Satellite size={24} color="#8B5CF6" />
-                        <div className="placeholder-page__feature-card-title">衛星備援</div>
-                        <div className="placeholder-page__card-label">Starlink / Iridium 整合</div>
-                    </div>
-                </div>
-            </div>
+            </section>
         </div>
     );
 }
-

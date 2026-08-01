@@ -1,0 +1,52 @@
+/**
+ * MedicalTransportPage.css
+ *
+ * 「頁面建置中」誠實佔位頁的版型。僅使用語意 token（tokens.css），
+ * 不寫死顏色 / px，也不另寫 light/dark/tactical 分支——
+ * 語意 token 會在 AppShellLayout 的 data-app-mode / data-theme 切換時自動變色。
+ */
+.medical-transport-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .medical-transport-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .medical-transport-page {
+        padding: var(--space-6);
+    }
+}
+
+.medical-transport-page__header h1 {
+    margin: 0;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+    .medical-transport-page__header h1 {
+        font-size: var(--font-size-2xl);
+    }
+}
+
+.medical-transport-page__header p {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.medical-transport-page__body {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 320px;
+}

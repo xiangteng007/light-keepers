@@ -1,0 +1,82 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   FieldCommsPage.css — 現地通訊（建置中頁）R3a
+   顏色一律語義 token；不寫死 px 顏色；不另寫 light/dark/tactical 分支（DESIGN_LANGUAGE §1.3）
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.field-comms-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    max-width: 1600px;
+    margin: 0 auto;
+}
+
+/* ── 頁首 ── */
+.field-comms-page__header {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.field-comms-page__title {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    line-height: var(--line-height-tight);
+}
+
+.field-comms-page__subtitle {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* ── 預期功能預覽區 ── */
+.field-comms-page__preview {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.field-comms-page__preview-title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.field-comms-page__preview-grid {
+    display: grid;
+    grid-template-columns: repeat(1, 1fr);
+    gap: var(--space-4);
+}
+
+@media (min-width: 768px) {
+    .field-comms-page__preview-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+.field-comms-page__feature {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    min-height: 44px;
+}
+
+.field-comms-page__feature-icon {
+    color: var(--text-secondary);
+}
+
+.field-comms-page__feature-title {
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.field-comms-page__feature-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
