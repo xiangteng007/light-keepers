@@ -1,386 +1,417 @@
-/* 📣 回報系統頁面樣式 - Wizard 版本 */
-
-/* NOTE (design-token migration): the two-stop brand gradients in this file
-   (#667eea → #764ba2 "wizard purple", plus the light-tint success/warning/
-   danger gradient chips such as #d1fae5→#a7f3d0, #fef3c7→#fde68a,
-   #FEE2E2→#FECACA, #eef2ff→#e0e7ff) are page-private decorative brand
-   treatments with no 1:1 semantic token equivalent (tokens.css has flat
-   status colors, not two-stop gradients), so they are intentionally left as
-   literal hex rather than forced into a var(). Solid text/border/background/
-   status colors below are converted to var(--token, original-hex) so the
-   page still renders identically today while pointing at the semantic
-   source of truth. */
+/**
+ * ReportPage（/intake 通報）— R2b 重設計
+ *
+ * 規則（DESIGN_LANGUAGE.md）：
+ * - 全部使用語義 token（--bg-* / --surface-* / --text-* / --border-* / --color-*），
+ *   light / dark / tactical 三態自動生效，本檔不寫任何主題分支。
+ * - 間距 4px 節奏（--space-*）；觸控目標 ≥44px；行動優先（先寫 mobile 再放大）。
+ * - 狀態色語意嚴格：severity 顏色對照 §3（success/warning/danger/critical），
+ *   且一律搭配文字，不單靠顏色。
+ * - 災型卡片圖標色來自 constants/disasterTypes.ts（C1.1 SSOT 類別色盤），
+ *   非本檔宣告。
+ */
 
 .report-page {
-    padding: 1rem;
     max-width: 720px;
     margin: 0 auto;
-    min-height: 100vh;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 }
 
-.report-page--wizard {
-    max-width: 800px;
+/* ===== 頁首 ===== */
+
+.report-page__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
-/* 頁首標題 */
-.report-page .page-header {
-    margin-bottom: 1rem;
+.report-page__header h2 {
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
 }
 
-.report-page .page-header h2 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.25rem;
+/* 離線徽章：warning 語意（§3），圖示＋文字雙通道 */
+.report-offline-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-warning-bg);
+    color: var(--color-warning-dark, var(--color-warning));
+    border: 1px solid var(--color-warning);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
 }
 
-.report-page .page-subtitle {
-    color: var(--text-secondary, #64748b);
-    font-size: 0.9rem;
-}
+/* ===== 進度指示（3 步） ===== */
 
-/* =====================================
-   Wizard 進度指示器
-   ===================================== */
 .wizard-progress {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1.5rem;
-    padding: 0 0.5rem;
+    list-style: none;
+    margin: 0;
+    padding: 0 var(--space-2);
 }
 
 .wizard-progress__step {
     display: flex;
     flex-direction: column;
     align-items: center;
+    gap: var(--space-1);
     position: relative;
     flex: 1;
+}
+
+.wizard-progress__step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    top: 16px;
+    left: calc(50% + 24px);
+    width: calc(100% - 48px);
+    height: 2px;
+    background: var(--border-default);
+}
+
+.wizard-progress__step.completed:not(:last-child)::after {
+    background: var(--color-success);
 }
 
 .wizard-progress__circle {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 600;
-    font-size: 1rem;
-    background: var(--border-light, #e2e8f0);
-    color: var(--text-tertiary, #94a3b8);
-    transition: all 0.3s ease;
-    position: relative;
-    z-index: 1;
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    color: var(--text-tertiary);
+    font-variant-numeric: tabular-nums;
 }
 
 .wizard-progress__step.active .wizard-progress__circle {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    background: var(--color-secondary);
+    border-color: var(--color-secondary);
+    color: var(--text-inverse);
 }
 
 .wizard-progress__step.completed .wizard-progress__circle {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-    color: white;
+    background: var(--color-success);
+    border-color: var(--color-success);
+    color: #fff;
 }
 
 .wizard-progress__label {
-    margin-top: 0.5rem;
-    font-size: 0.75rem;
-    font-weight: 500;
-    color: var(--text-tertiary, #94a3b8);
-    text-align: center;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-tertiary);
 }
 
 .wizard-progress__step.active .wizard-progress__label {
-    color: #667eea; /* bespoke wizard brand accent, see file-header note */
-    font-weight: 600;
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
 }
 
 .wizard-progress__step.completed .wizard-progress__label {
-    color: var(--color-success-dark, #059669);
+    color: var(--color-success-dark, var(--color-success));
 }
 
-.wizard-progress__line {
-    position: absolute;
-    top: 20px;
-    left: calc(50% + 25px);
-    width: calc(100% - 50px);
-    height: 3px;
-    background: var(--border-light, #e2e8f0);
-    z-index: 0;
-}
+/* ===== 內容卡 ===== */
 
-.wizard-progress__step.completed .wizard-progress__line {
-    background: linear-gradient(90deg, #10b981 0%, #059669 100%);
-}
-
-/* =====================================
-   Wizard 內容區
-   ===================================== */
 .wizard-content {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow:
-        0 4px 6px -1px rgba(0, 0, 0, 0.1),
-        0 10px 40px -10px rgba(102, 126, 234, 0.15);
-    border-radius: 20px !important;
+    border-radius: var(--radius-lg);
 }
 
 .wizard-step {
-    animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    display: flex;
+    flex-direction: column;
 }
 
 .wizard-step__title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--text-primary, #1e293b);
-    margin-bottom: 0.25rem;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    margin: 0 0 var(--space-4);
 }
 
-.wizard-step__subtitle {
-    color: var(--text-secondary, #64748b);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
+/* ===== 錯誤訊息 ===== */
+
+.report-error {
+    background: var(--color-danger-bg);
+    color: var(--color-danger-dark, var(--color-danger));
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    border-left: 4px solid var(--color-danger);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    margin-bottom: var(--space-4);
 }
 
-/* =====================================
-   導航按鈕
-   ===================================== */
-.wizard-navigation {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 2rem;
-    padding-top: 1.5rem;
-    border-top: 1px solid var(--border-light, #e2e8f0);
-}
+/* ===== 災型選擇（C1.1 分組保留） ===== */
 
-.wizard-navigation__spacer {
-    flex: 1;
-}
-
-/* =====================================
-   災害類型卡片（Wizard 版本）
-   ===================================== */
-/* CD-1: 災型分組（天災／民防），民防類獨立成組避免誤選 */
 .disaster-type-group__title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--text-secondary, #64748b);
-    margin: 0 0 0.75rem;
-    letter-spacing: 0.05em;
-}
-
-/* CD-1: 大量傷患是跨災型旗標，樣式刻意與災型卡片區隔 */
-.mass-casualty-toggle {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    border: 1px solid var(--border-default, #cbd5e1);
-    border-radius: 12px;
-    background: var(--surface-default, #fff);
-    color: var(--text-primary, #334155);
-    cursor: pointer;
-    margin-bottom: 0.75rem;
-}
-
-.mass-casualty-toggle:hover {
-    background: var(--bg-secondary, #f1f5f9);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    letter-spacing: var(--letter-spacing-wide);
+    margin: 0 0 var(--space-2);
+    text-transform: none;
 }
 
 .disaster-type-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 2rem;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
 }
 
 .disaster-type-card {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 1.25rem 0.75rem;
-    border: 2px solid transparent;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    justify-content: center;
+    gap: var(--space-1);
+    min-height: 84px;
+    padding: var(--space-2) var(--space-1);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
+    color: var(--text-primary);
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .disaster-type-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: var(--border-default, #cbd5e1);
+    background: var(--surface-hover);
+}
+
+.disaster-type-card:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .disaster-type-card.active {
-    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-    box-shadow: 0 8px 20px -3px rgba(102, 126, 234, 0.3);
+    border-color: var(--color-secondary);
+    background: var(--surface-hover);
 }
 
 .disaster-type-card__icon {
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .disaster-type-card__label {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--text-primary, #334155);
-    margin-bottom: 0.25rem;
-}
-
-.disaster-type-card.active .disaster-type-card__label {
-    color: #667eea; /* bespoke wizard brand accent, see file-header note */
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    line-height: var(--line-height-tight);
 }
 
 .disaster-type-card__desc {
-    font-size: 0.75rem;
-    color: var(--text-tertiary, #94a3b8);
+    display: none;
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    line-height: var(--line-height-tight);
 }
 
-/* =====================================
-   嚴重程度（含描述）
-   ===================================== */
+/* ===== 大量傷患（C1.1 MCI 旗標） ===== */
+
+.mass-casualty-toggle {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.mass-casualty-toggle:hover {
+    background: var(--surface-hover);
+}
+
+.mass-casualty-toggle input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    accent-color: var(--color-danger);
+}
+
+.mass-casualty-toggle:focus-within {
+    box-shadow: var(--focus-ring);
+}
+
+/* ===== 嚴重程度（§3 語意色） ===== */
+
 .severity-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-2);
 }
 
 .severity-btn {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.375rem;
-    padding: 1rem 0.5rem;
-    border: 2px solid var(--border-light, #e2e8f0);
-    border-radius: 14px;
-    background: white;
+    gap: var(--space-1);
+    min-height: 64px;
+    padding: var(--space-2);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
     cursor: pointer;
-    transition: all 0.3s;
     text-align: center;
+    transition: border-color var(--transition-fast), background var(--transition-fast);
 }
 
 .severity-btn:hover {
-    background: var(--bg-secondary, #f8fafc);
-    transform: scale(1.02);
+    background: var(--surface-hover);
 }
 
-.severity-btn.active {
-    transform: scale(1.03);
+.severity-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .severity-dot {
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    box-shadow: 0 0 10px currentColor;
+    width: 14px;
+    height: 14px;
+    border-radius: var(--radius-full);
+    background: var(--severity-color, var(--text-tertiary));
+}
+
+.severity-btn--low { --severity-color: var(--color-success); --severity-bg: var(--color-safe-bg); }
+.severity-btn--medium { --severity-color: var(--color-warning); --severity-bg: var(--color-warning-bg); }
+.severity-btn--high { --severity-color: var(--color-danger); --severity-bg: var(--color-danger-bg); }
+.severity-btn--critical { --severity-color: var(--color-critical); --severity-bg: var(--color-critical-bg); }
+
+.severity-btn.active {
+    border-color: var(--severity-color);
+    background: var(--severity-bg);
 }
 
 .severity-label {
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: var(--text-primary, #334155);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
 }
 
 .severity-desc {
-    font-size: 0.7rem;
-    color: var(--text-tertiary, #94a3b8);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
 }
 
-/* =====================================
-   位置狀態卡片
-   ===================================== */
+/* 確認頁的 severity 徽章（文字＋底色，AA 對比） */
+.severity-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    border: 1px solid transparent;
+}
+
+.severity-badge--low { background: var(--color-safe-bg); color: var(--color-success-dark, var(--color-success)); border-color: var(--color-success); }
+.severity-badge--medium { background: var(--color-warning-bg); color: var(--color-warning-dark, var(--color-warning)); border-color: var(--color-warning); }
+.severity-badge--high { background: var(--color-danger-bg); color: var(--color-danger-dark, var(--color-danger)); border-color: var(--color-danger); }
+.severity-badge--critical { background: var(--color-critical-bg); color: var(--color-critical); border-color: var(--color-critical); }
+
+/* ===== 定位卡 ===== */
+
 .location-status-card {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1.25rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
 }
 
 .location-status-icon {
-    width: 50px;
-    height: 50px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.75rem;
+    background: var(--color-warning-bg);
+    color: var(--color-warning-dark, var(--color-warning));
 }
 
-.location-status-icon.success {
-    background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
-}
-
-.location-status-icon.warning {
-    background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+.location-status-card.located .location-status-icon {
+    background: var(--color-safe-bg);
+    color: var(--color-success-dark, var(--color-success));
 }
 
 .location-status-info {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: var(--space-1);
+    min-width: 0;
 }
 
 .location-status-label {
-    font-weight: 600;
-    color: var(--text-primary, #334155);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
 }
 
 .location-status-coords {
-    font-size: 0.85rem;
-    color: var(--text-secondary, #64748b);
-    font-family: 'Monaco', 'Courier New', monospace;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .location-status-hint {
-    font-size: 0.85rem;
-    color: var(--text-tertiary, #94a3b8);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
 }
 
 .location-refresh-btn {
-    padding: 0.625rem 1rem;
-    border: 2px solid var(--border-light, #e2e8f0);
-    border-radius: 10px;
-    background: white;
-    font-size: 0.85rem;
-    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: all 0.2s;
     white-space: nowrap;
 }
 
-.location-refresh-btn:hover {
-    background: var(--bg-secondary, #f8fafc);
-    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
-    color: #667eea;
+.location-refresh-btn:hover:not(:disabled) {
+    background: var(--surface-hover);
+    border-color: var(--color-secondary);
+}
+
+.location-refresh-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .location-refresh-btn:disabled {
@@ -388,215 +419,47 @@
     cursor: not-allowed;
 }
 
-.location-map-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    height: 200px;
-    background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
-    border-radius: 16px;
-    border: 2px dashed var(--border-default, #cbd5e1);
-    color: var(--text-tertiary, #94a3b8);
-    margin-top: 1rem;
-}
-
-.location-map-icon {
-    font-size: 2.5rem;
-}
-
-/* =====================================
-   確認頁面
-   ===================================== */
-.confirm-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    background: var(--bg-secondary, #f8fafc);
-    padding: 1.5rem;
-    border-radius: 16px;
-    margin-bottom: 1.5rem;
-}
-
-.confirm-item {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-}
-
-.confirm-item--full {
-    flex-direction: column;
-    align-items: flex-start;
-}
-
-.confirm-label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary, #64748b);
-    min-width: 80px;
-}
-
-.confirm-value {
-    font-weight: 600;
-    color: var(--text-primary, #334155);
-}
-
-.confirm-description {
-    background: white;
-    padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid var(--border-light, #e2e8f0);
-    width: 100%;
-    margin: 0;
-    color: var(--text-secondary, #475569);
-    line-height: 1.6;
-}
-
-.confirm-photos {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-}
-
-.confirm-photos img {
-    width: 60px;
-    height: 60px;
-    object-fit: cover;
-    border-radius: 10px;
-    border: 2px solid var(--border-light, #e2e8f0);
-}
-
-.severity-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.375rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-}
-
-.contact-section {
-    background: var(--bg-secondary, #f8fafc);
-    padding: 1.25rem;
-    border-radius: 14px;
-}
-
-.contact-section h4 {
-    margin: 0 0 1rem 0;
-    font-size: 0.95rem;
-    color: var(--text-secondary, #64748b);
-}
-
-/* =====================================
-   通用表單樣式
-   ===================================== */
-.form-section {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-}
-
-.form-label {
-    font-weight: 600;
-    color: var(--text-primary, #1e293b);
-    font-size: 0.95rem;
-}
-
-.form-input,
-.form-textarea {
-    padding: 0.875rem 1rem;
-    border: 2px solid var(--border-light, #e2e8f0);
-    border-radius: 12px;
-    font-size: 1rem;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    background: var(--bg-secondary, #f8fafc);
-}
-
-.form-input:focus,
-.form-textarea:focus {
-    outline: none;
-    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
-    background: white;
-    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-}
-
-.form-input::placeholder,
-.form-textarea::placeholder {
-    color: var(--text-tertiary, #94a3b8);
-}
-
-.report-error {
-    background: linear-gradient(135deg, #FEE2E2 0%, #FECACA 100%);
-    color: var(--color-danger, #DC2626);
-    padding: 0.875rem 1rem;
-    border-radius: 12px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    border-left: 4px solid var(--color-danger, #DC2626);
-    margin-bottom: 1rem;
-}
-
-/* =====================================
-   照片上傳
-   ===================================== */
-.photo-upload-section {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
+/* ===== 照片 ===== */
 
 .photo-preview-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 0.75rem;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-2);
 }
 
 .photo-preview-item {
     position: relative;
-    width: 100%;
     aspect-ratio: 1;
-    border-radius: 14px;
+    border-radius: var(--radius-md);
     overflow: hidden;
-    border: 2px solid var(--border-light, #e2e8f0);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    border: 1px solid var(--border-default);
 }
 
 .photo-preview-item img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s;
-}
-
-.photo-preview-item:hover img {
-    transform: scale(1.05);
 }
 
 .photo-remove-btn {
     position: absolute;
-    top: 6px;
-    right: 6px;
-    width: 26px;
-    height: 26px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-    color: white;
-    border: 2px solid white;
+    top: var(--space-1);
+    right: var(--space-1);
+    width: 28px;
+    height: 28px;
+    border-radius: var(--radius-full);
+    background: var(--color-danger);
+    color: #fff;
+    border: 2px solid var(--surface-default);
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 12px;
-    font-weight: bold;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    transition: all 0.2s;
 }
 
-.photo-remove-btn:hover {
-    transform: scale(1.1);
+.photo-remove-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .photo-add-btn {
@@ -604,194 +467,350 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    width: 100%;
+    gap: var(--space-1);
     aspect-ratio: 1;
-    border: 2px dashed var(--border-default, #cbd5e1);
-    border-radius: 14px;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+    min-height: 44px;
+    border: 2px dashed var(--border-default);
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    transition: all 0.3s;
-    color: var(--text-secondary, #64748b);
-    font-size: 0.7rem;
-    font-weight: 500;
 }
 
 .photo-add-btn:hover {
-    border-color: #667eea; /* bespoke wizard brand accent, see file-header note */
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    color: #667eea;
-    transform: scale(1.02);
+    border-color: var(--color-secondary);
+    color: var(--text-primary);
 }
 
-.photo-add-icon {
-    font-size: 1.75rem;
+.photo-add-btn:focus-within {
+    box-shadow: var(--focus-ring);
 }
 
-.photo-hint {
-    font-size: 0.8rem;
-    color: var(--text-tertiary, #94a3b8);
+/* ===== 語音輸入 ===== */
+
+.form-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.voice-input-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-full);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    cursor: pointer;
+}
+
+.voice-input-btn:hover {
+    background: var(--surface-hover);
+}
+
+.voice-input-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* 錄音中：danger 語意（進行中的即時採集），文字同步變更（雙通道） */
+.voice-input-btn.listening {
+    border-color: var(--color-danger);
+    color: var(--color-danger-dark, var(--color-danger));
+    background: var(--color-danger-bg);
+}
+
+/* ===== 通用表單 ===== */
+
+.form-section {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.form-label {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+}
+
+.form-input,
+.form-textarea {
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-family: inherit;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+    color: var(--text-tertiary);
+}
+
+/* ===== 確認頁 ===== */
+
+.confirm-summary {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.confirm-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.confirm-item--full {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-1);
+}
+
+.confirm-label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    flex-shrink: 0;
+}
+
+.confirm-value {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    text-align: right;
+}
+
+.confirm-value--type {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.confirm-value--coords {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-medium);
+}
+
+.confirm-description {
+    background: var(--surface-default);
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-light);
+    width: 100%;
     margin: 0;
-    padding: 0.5rem 0.75rem;
-    background: var(--bg-secondary, #f8fafc);
-    border-radius: 8px;
-    border-left: 3px solid #667eea; /* bespoke wizard brand accent, see file-header note */
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
 }
 
-/* =====================================
-   成功畫面
-   ===================================== */
+.confirm-photos {
+    display: flex;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+}
+
+.confirm-photos img {
+    width: 56px;
+    height: 56px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
+}
+
+/* 聯絡資訊：選填 → 收合（減少 30 秒流的視覺負擔） */
+.contact-section {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-4);
+}
+
+.contact-section summary {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    cursor: pointer;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
+}
+
+.contact-section summary:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
+}
+
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-2);
+    margin-top: var(--space-3);
+}
+
+.offline-submit-note {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--color-warning-bg);
+    color: var(--color-warning-dark, var(--color-warning));
+    border: 1px solid var(--color-warning);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+}
+
+/* ===== 導航（主要動作靠底，sticky 於捲動容器內） ===== */
+
+.wizard-navigation {
+    position: sticky;
+    bottom: 0;
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-default);
+    z-index: 2;
+}
+
+.wizard-navigation__primary {
+    flex: 1;
+}
+
+/* ===== 成功畫面 ===== */
+
 .report-success {
     text-align: center;
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(20px);
-    border-radius: 24px !important;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
 }
 
 .report-success__icon {
-    font-size: 4rem;
-    margin-bottom: 1rem;
-    animation: bounce 0.6s ease-out;
-}
-
-@keyframes bounce {
-
-    0%,
-    100% {
-        transform: translateY(0);
-    }
-
-    50% {
-        transform: translateY(-10px);
-    }
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-full);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-safe-bg);
+    color: var(--color-success-dark, var(--color-success));
 }
 
 .report-success h2 {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-success-dark, #059669);
-    margin-bottom: 0.5rem;
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    margin: 0;
 }
 
 .report-success p {
-    color: var(--text-secondary, #64748b);
-    margin-bottom: 0;
+    color: var(--text-secondary);
+    margin: 0;
+    font-size: var(--font-size-sm);
+    line-height: var(--line-height-normal);
 }
 
 .report-success__buttons {
     display: flex;
-    gap: 1rem;
-    justify-content: center;
-    margin-top: 1.5rem;
+    flex-direction: column;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 320px;
+    margin-top: var(--space-2);
 }
 
-/* =====================================
-   聯絡資訊
-   ===================================== */
-.contact-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 0.75rem;
-}
+/* ═════════ 平板以上（桌面是放大版） ═════════ */
 
-/* =====================================
-   RWD 響應式
-   ===================================== */
-@media (max-width: 768px) {
-    .wizard-progress__label {
-        font-size: 0.65rem;
+@media (min-width: 768px) {
+    .report-page {
+        padding: var(--space-6);
+        gap: var(--space-4);
     }
 
-    .wizard-progress__circle {
-        width: 35px;
-        height: 35px;
-        font-size: 0.9rem;
-    }
-
-    .wizard-progress__line {
-        top: 17px;
-        left: calc(50% + 20px);
-        width: calc(100% - 40px);
+    .report-page__header h2 {
+        font-size: var(--font-size-2xl);
     }
 
     .disaster-type-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.75rem;
+        gap: var(--space-3);
     }
 
     .disaster-type-card {
-        padding: 1rem 0.5rem;
-    }
-
-    .disaster-type-card__icon {
-        font-size: 2rem;
+        min-height: 104px;
+        padding: var(--space-3) var(--space-2);
     }
 
     .disaster-type-card__desc {
-        display: none;
+        display: block;
     }
 
     .severity-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(4, 1fr);
     }
 
     .photo-preview-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 540px) {
-    .report-page {
-        padding: 0.75rem;
-    }
-
-    .disaster-type-grid {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.5rem;
-    }
-
-    .disaster-type-card {
-        padding: 0.75rem 0.25rem;
-    }
-
-    .disaster-type-card__icon {
-        font-size: 1.5rem;
-    }
-
-    .disaster-type-card__label {
-        font-size: 0.75rem;
-    }
-
-    .wizard-step__title {
-        font-size: 1.25rem;
+        grid-template-columns: repeat(5, 1fr);
     }
 
     .contact-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
     }
 
-    .photo-preview-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-
-    .location-status-card {
-        flex-wrap: wrap;
-    }
-
-    .location-refresh-btn {
-        width: 100%;
-        margin-top: 0.5rem;
+    .report-success__buttons {
+        flex-direction: row;
+        justify-content: center;
+        max-width: none;
     }
 
     .wizard-navigation {
-        flex-wrap: wrap;
+        position: static;
+        border-top: 1px solid var(--border-default);
+        background: transparent;
     }
 
-    .wizard-navigation button {
-        flex: 1;
+    .wizard-navigation__primary {
+        flex: 0 0 auto;
+        margin-left: auto;
+        min-width: 200px;
     }
+}
 
-    .wizard-navigation__spacer {
-        display: none;
+/* 動效尊重使用者偏好；災時模式 token 已將 transition 縮到最短 */
+@media (prefers-reduced-motion: reduce) {
+    .disaster-type-card,
+    .severity-btn {
+        transition: none;
     }
 }
