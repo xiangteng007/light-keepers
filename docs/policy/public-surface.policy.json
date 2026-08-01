@@ -418,6 +418,36 @@
             "expiryDate": null,
             "dataClassification": "public",
             "risk": "low"
+        },
+        {
+            "id": "public-resources-air-raid-shelters",
+            "method": "GET",
+            "path": "/public-resources/air-raid-shelters",
+            "reason": "Public air-raid shelter directory (government open data) for civilian safety lookup on the map.",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
+        },
+        {
+            "id": "public-resources-air-raid-shelters-nearby",
+            "method": "GET",
+            "path": "/public-resources/air-raid-shelters/nearby",
+            "reason": "Nearest air-raid shelter lookup by coordinates for civilian safety during air-raid alerts.",
+            "owner": "Platform Team",
+            "throttle": {
+                "profile": "standard",
+                "requestsPerMinute": 30,
+                "burst": 60
+            },
+            "expiryDate": null,
+            "dataClassification": "public",
+            "risk": "low"
         }
     ]
 }
