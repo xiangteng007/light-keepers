@@ -49,7 +49,7 @@ const ROLE_MATRIX = [
     {
         level: 1,
         name: 'VOLUNTEER (L1)',
-        landingPage: '/dashboard',
+        landingPage: '/command-center',
         // Sidebar items expected to be visible at this level (indicative —
         // confirm against src/components/layout/useSidebarConfig.ts once
         // this test is unskipped, sidebar labels may have since changed).
@@ -58,7 +58,7 @@ const ROLE_MATRIX = [
     {
         level: 3,
         name: 'DIRECTOR (L3)',
-        landingPage: '/analytics',
+        landingPage: '/hub/analytics',
         expectedSidebarItem: '分析' /* Analytics, requiredLevel: DIRECTOR */,
     },
     {
