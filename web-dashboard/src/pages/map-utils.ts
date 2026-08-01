@@ -145,6 +145,21 @@ export const mapOptions: google.maps.MapOptions = {
     styles: [],
 };
 
+// 相對時間顯示（R2b：自 MapPage 移入共用）
+export function formatRelativeTime(dateString: string): string {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = now.getTime() - date.getTime();
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (minutes < 1) return '剛剛';
+    if (minutes < 60) return `${minutes}分鐘前`;
+    if (hours < 24) return `${hours}小時前`;
+    return `${days}天前`;
+}
+
 // 初始化所有類型為全選
 export const initNcdrFilters = (): Record<number, boolean> => {
     const filters: Record<number, boolean> = {};
