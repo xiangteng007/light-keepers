@@ -12,6 +12,7 @@ import { useSearchParams } from 'react-router-dom';
 import { User } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoginModal from '../../components/auth/LoginModal';
+import { Button } from '../../design-system';
 
 // Components
 import { AccountSummary } from './components/AccountSummary';
@@ -372,12 +373,12 @@ const AccountPage: React.FC = () => {
                     <div className={styles.leftColumn}>
                         <div className={styles.card} style={{ padding: '2rem', textAlign: 'center' }}>
                             <p style={{ marginBottom: '1rem' }}>您尚未登入</p>
-                            <button 
-                                className="lk-btn lk-btn--primary"
+                            <Button
+                                variant="primary"
                                 onClick={() => setIsLoginModalOpen(true)}
                             >
                                 登入
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </div>
@@ -414,10 +415,14 @@ const AccountPage: React.FC = () => {
                 {/* Right Column: Tab Content */}
                 <div className={styles.rightColumn}>
                     {/* Tab Navigation */}
-                    <nav className={styles.tabNavigation}>
+                    <nav className={styles.tabNavigation} role="tablist" aria-label="帳戶設定分頁">
                         {TABS.map((tab) => (
                             <button
                                 key={tab.id}
+                                role="tab"
+                                id={`account-tab-${tab.id}`}
+                                aria-selected={activeTab === tab.id}
+                                aria-controls={`account-tabpanel-${tab.id}`}
                                 className={`${styles.tabButton} ${activeTab === tab.id ? styles.tabButtonActive : ''}`}
                                 onClick={() => handleTabChange(tab.id)}
                             >
@@ -427,7 +432,13 @@ const AccountPage: React.FC = () => {
                     </nav>
 
                     {/* Tab Content */}
-                    <div className={styles.tabContent}>
+                    <div
+                        className={styles.tabContent}
+                        role="tabpanel"
+                        id={`account-tabpanel-${activeTab}`}
+                        aria-labelledby={`account-tab-${activeTab}`}
+                        tabIndex={0}
+                    >
                         {tabContent}
                     </div>
                 </div>

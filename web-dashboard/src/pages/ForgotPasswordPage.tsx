@@ -38,7 +38,7 @@ export default function ForgotPasswordPage() {
 
                 {success ? (
                     <div className="login-form">
-                        <div className="login-success">
+                        <div className="login-success" role="status">
                             ✅ 重設連結已發送至您的信箱，請檢查您的電子郵件（包含垃圾郵件資料夾）
                         </div>
                         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '20px' }}>
@@ -63,7 +63,7 @@ export default function ForgotPasswordPage() {
                         </div>
 
                         {error && (
-                            <div className="login-error">
+                            <div className="login-error" role="alert">
                                 ⚠️ {error}
                             </div>
                         )}
