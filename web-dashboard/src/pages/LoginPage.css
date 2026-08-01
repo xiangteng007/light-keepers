@@ -1,26 +1,32 @@
 /* ====================
    Minimal Luxury Login Page
    Editorial + Modern SaaS
+   Shared by: ForgotPasswordPage / ResetPasswordPage / BindLinePage
    ==================== */
 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
 
-/* Root Variables - Minimal Luxury Palette */
+/* Root Variables — Minimal Luxury Palette
+   R3 token pass: these are now LOCAL ALIASES pointing at tokens.css (single
+   source of truth, DESIGN_LANGUAGE.md §0.3) instead of self-declared hex.
+   Kept as named aliases (rather than rewriting every call site) to minimize
+   diff risk across the three pages that share this file; each alias resolves
+   to the closest matching tokens.css value. */
 :root {
-    --luxury-black: #555555;
-    /* Base text/dark elements - Medium Gray */
-    --luxury-dark: #666666;
-    /* Gradients/Backgrounds - Medium Lighter Gray */
-    --luxury-charcoal: #777777;
-    /* Secondary elements - Light Medium Gray */
-    --luxury-silver: #8b8b8b;
-    --luxury-light: #e5e5e5;
-    --luxury-white: #fafafa;
-    --luxury-accent: #c9a96e;
-    --luxury-accent-hover: #b8935a;
+    --luxury-black: var(--text-secondary);
+    /* Base text/dark elements — closest to former #555555 */
+    --luxury-dark: var(--text-tertiary);
+    /* Gradients/Backgrounds — closest to former #666666 */
+    --luxury-charcoal: var(--text-tertiary);
+    /* Secondary elements — closest to former #777777 */
+    --luxury-silver: var(--text-muted);
+    --luxury-light: var(--border-light);
+    --luxury-white: var(--surface-raised);
+    --luxury-accent: var(--color-gold-400);
+    --luxury-accent-hover: var(--color-gold-600);
 
-    --gradient-luxury: linear-gradient(135deg, #555555 0%, #444444 100%);
-    --gradient-subtle: linear-gradient(180deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0) 100%);
+    --gradient-luxury: linear-gradient(135deg, var(--text-secondary) 0%, var(--color-primary-dark) 100%);
+    --gradient-subtle: linear-gradient(180deg, color-mix(in srgb, var(--text-inverse) 10%, transparent) 0%, transparent 100%);
 }
 
 .login-page {
@@ -43,23 +49,23 @@
     right: 0;
     bottom: 0;
     background:
-        radial-gradient(circle at 20% 50%, rgba(201, 169, 110, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 80%, rgba(10, 10, 10, 0.02) 0%, transparent 50%);
+        radial-gradient(circle at 20% 50%, color-mix(in srgb, var(--color-gold-400) 3%, transparent) 0%, transparent 50%),
+        radial-gradient(circle at 80% 80%, color-mix(in srgb, var(--text-primary) 2%, transparent) 0%, transparent 50%);
     pointer-events: none;
 }
 
 .login-container {
-    background: white;
+    background: var(--surface-default, white);
     border-radius: 2px;
     box-shadow:
-        0 0 0 1px rgba(0, 0, 0, 0.04),
-        0 2px 4px rgba(0, 0, 0, 0.02),
-        0 12px 24px rgba(0, 0, 0, 0.06);
+        0 0 0 1px color-mix(in srgb, var(--text-primary) 4%, transparent),
+        0 2px 4px color-mix(in srgb, var(--text-primary) 2%, transparent),
+        0 12px 24px color-mix(in srgb, var(--text-primary) 6%, transparent);
     width: 100%;
     max-width: 480px;
     overflow: hidden;
     position: relative;
-    border: 1px solid rgba(0, 0, 0, 0.06);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);
 }
 
 /* Editorial Header */
@@ -69,7 +75,7 @@
     text-align: center;
     position: relative;
     overflow: hidden;
-    color: white;
+    color: var(--text-inverse);
 }
 
 .login-header::after {
@@ -79,11 +85,11 @@
     left: 0;
     right: 0;
     height: 1px;
-    background: rgba(255, 255, 255, 0.1);
+    background: color-mix(in srgb, var(--text-inverse) 10%, transparent);
 }
 
 .login-logo {
-    color: #ffffff;
+    color: var(--text-inverse);
     position: relative;
     z-index: 2;
 }
@@ -93,7 +99,7 @@
     display: block;
     margin-bottom: 24px;
     opacity: 1;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 4px 12px color-mix(in srgb, var(--text-primary) 30%, transparent);
 }
 
 .login-logo h1 {
@@ -103,14 +109,14 @@
     margin: 0;
     letter-spacing: 0.5px;
     line-height: 1.2;
-    color: #ffffff;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    color: var(--text-inverse);
+    text-shadow: 0 2px 4px color-mix(in srgb, var(--text-primary) 20%, transparent);
 }
 
 .login-subtitle {
     margin: 16px 0 0;
     font-size: 24px;
-    color: rgba(255, 255, 255, 0.9);
+    color: color-mix(in srgb, var(--text-inverse) 90%, transparent);
     letter-spacing: 2px;
     text-transform: uppercase;
     font-weight: 500;
@@ -119,8 +125,8 @@
 /* Minimalist Tabs */
 .login-tabs {
     display: flex;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-    background: white;
+    border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 6%, transparent);
+    background: var(--surface-default, white);
 }
 
 .login-tab {
@@ -135,6 +141,7 @@
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
     letter-spacing: 0.3px;
+    min-height: 44px;
 }
 
 .login-tab:hover {
@@ -178,23 +185,24 @@
     width: 100%;
     padding: 16px 0;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
     background: transparent;
     color: var(--luxury-black);
     font-size: 16px;
     font-weight: 400;
     transition: all 0.3s ease;
     letter-spacing: 0.2px;
+    min-height: 44px;
 }
 
 .login-form .form-group input:focus {
     outline: none;
     border-bottom-color: var(--luxury-black);
-    background: linear-gradient(to bottom, transparent 95%, rgba(0, 0, 0, 0.02) 100%);
+    background: linear-gradient(to bottom, transparent 95%, color-mix(in srgb, var(--text-primary) 2%, transparent) 100%);
 }
 
 .login-form .form-group input::placeholder {
-    color: #9ca3af;
+    color: var(--text-muted);
     font-weight: 300;
     opacity: 1;
 }
@@ -238,11 +246,11 @@
     color: var(--luxury-black);
 }
 
-/* Alert Messages */
+/* Alert Messages (status color semantics per DESIGN_LANGUAGE.md §3) */
 .login-error {
-    background: rgba(220, 53, 69, 0.05);
-    border-left: 3px solid #dc3545;
-    color: #721c24;
+    background: color-mix(in srgb, var(--color-danger) 5%, transparent);
+    border-left: 3px solid var(--color-danger-dark);
+    color: var(--danger, var(--color-danger-dark));
     padding: 16px 20px;
     font-size: 13px;
     margin-bottom: 24px;
@@ -250,9 +258,9 @@
 }
 
 .login-success {
-    background: rgba(40, 167, 69, 0.05);
-    border-left: 3px solid #28a745;
-    color: #155724;
+    background: color-mix(in srgb, var(--color-success) 5%, transparent);
+    border-left: 3px solid var(--color-success);
+    color: var(--success, var(--color-success-dark));
     padding: 16px 20px;
     font-size: 13px;
     margin-bottom: 24px;
@@ -263,7 +271,7 @@
 .verification-section {
     margin-top: 24px;
     padding-top: 24px;
-    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+    border-top: 1px dashed color-mix(in srgb, var(--text-primary) 10%, transparent);
 }
 
 .verification-section .form-group {
@@ -276,14 +284,14 @@
     letter-spacing: 8px !important;
     font-weight: 600 !important;
     padding: 16px !important;
-    background: rgba(201, 169, 110, 0.05) !important;
-    border: 1px solid rgba(201, 169, 110, 0.3) !important;
+    background: color-mix(in srgb, var(--luxury-accent) 5%, transparent) !important;
+    border: 1px solid color-mix(in srgb, var(--luxury-accent) 30%, transparent) !important;
     border-bottom: 2px solid var(--luxury-accent) !important;
 }
 
 .verification-input:focus {
     border-color: var(--luxury-accent) !important;
-    background: rgba(201, 169, 110, 0.08) !important;
+    background: color-mix(in srgb, var(--luxury-accent) 8%, transparent) !important;
 }
 
 .verification-input::placeholder {
@@ -314,8 +322,8 @@
 .inline-btn {
     flex-shrink: 0;
     padding: 16px 20px;
-    border: 1px solid rgba(0, 0, 0, 0.2);
-    background: white;
+    border: 1px solid color-mix(in srgb, var(--text-primary) 20%, transparent);
+    background: var(--surface-default, white);
     color: var(--luxury-dark);
     font-size: 13px;
     font-weight: 500;
@@ -323,11 +331,12 @@
     cursor: pointer;
     transition: all 0.2s ease;
     white-space: nowrap;
+    min-height: 44px;
 }
 
 .inline-btn:hover:not(:disabled) {
     background: var(--luxury-dark);
-    color: white;
+    color: var(--text-inverse);
     border-color: var(--luxury-dark);
 }
 
@@ -341,7 +350,7 @@
     width: 100%;
     padding: 14px 24px;
     border: 1px solid var(--luxury-accent);
-    background: rgba(201, 169, 110, 0.08);
+    background: color-mix(in srgb, var(--luxury-accent) 8%, transparent);
     color: var(--luxury-accent-hover);
     font-size: 13px;
     font-weight: 500;
@@ -349,11 +358,12 @@
     cursor: pointer;
     transition: all 0.3s ease;
     margin-bottom: 16px;
+    min-height: 44px;
 }
 
 .login-resend-btn:hover:not(:disabled) {
     background: var(--luxury-accent);
-    color: white;
+    color: var(--text-inverse);
 }
 
 .login-resend-btn:disabled {
@@ -398,11 +408,12 @@
     width: 100%;
     padding: 16px 0;
     border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+    border-bottom: 1px solid color-mix(in srgb, var(--text-primary) 15%, transparent);
     background: transparent;
     color: var(--luxury-black);
     font-size: 16px;
     transition: all 0.3s ease;
+    min-height: 44px;
 }
 
 .forgot-password-form .form-group input:focus {
@@ -422,6 +433,7 @@
     cursor: pointer;
     transition: color 0.2s ease;
     margin-top: 16px;
+    min-height: 44px;
 }
 
 .login-back-btn:hover {
@@ -465,12 +477,13 @@ button.forgot-password-link {
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    min-height: 44px;
 }
 
 .otp-send-btn:hover:not(:disabled),
 .otp-verify-btn:hover:not(:disabled) {
     background: var(--luxury-dark);
-    color: white;
+    color: var(--text-inverse);
 }
 
 .otp-send-btn:disabled,
@@ -482,8 +495,8 @@ button.forgot-password-link {
 .otp-verified-badge {
     flex-shrink: 0;
     padding: 14px 20px;
-    background: rgba(40, 167, 69, 0.08);
-    color: #28a745;
+    background: color-mix(in srgb, var(--color-success) 8%, transparent);
+    color: var(--success, var(--color-success-dark));
     font-size: 12px;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -492,10 +505,11 @@ button.forgot-password-link {
 /* Primary Submit Button */
 .login-submit {
     width: 100%;
+    min-height: 44px;
     padding: 18px 32px;
     border: none;
     background: var(--luxury-black);
-    color: white;
+    color: var(--text-inverse);
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 1.2px;
@@ -513,7 +527,7 @@ button.forgot-password-link {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--text-inverse) 10%, transparent), transparent);
     transition: left 0.5s ease;
 }
 
@@ -523,7 +537,7 @@ button.forgot-password-link {
 
 .login-submit:hover {
     background: var(--luxury-charcoal);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 8px 24px color-mix(in srgb, var(--text-primary) 15%, transparent);
 }
 
 .login-submit:disabled {
@@ -547,7 +561,7 @@ button.forgot-password-link {
     content: '';
     flex: 1;
     height: 1px;
-    background: rgba(0, 0, 0, 0.08);
+    background: color-mix(in srgb, var(--text-primary) 8%, transparent);
 }
 
 .login-divider span {
@@ -564,14 +578,16 @@ button.forgot-password-link {
     width: calc(100% - 96px);
     margin: 0 48px 16px;
     padding: 16px 24px;
-    border: 1px solid rgba(0, 0, 0, 0.1);
+    border: 1px solid color-mix(in srgb, var(--text-primary) 10%, transparent);
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
     transition: all 0.3s ease;
     letter-spacing: 0.3px;
+    min-height: 44px;
 }
 
+/* LINE 官方品牌綠 (#06C755) 依品牌規範保留原色，不套用 app token */
 .login-line-btn {
     background: #06C755;
     color: white;
@@ -585,13 +601,13 @@ button.forgot-password-link {
 }
 
 .login-google-btn {
-    background: white;
-    color: #1f1f1f;
+    background: var(--surface-default, white);
+    color: var(--text-primary);
 }
 
 .login-google-btn:hover {
-    background: #fafafa;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    background: var(--luxury-white);
+    box-shadow: 0 4px 16px color-mix(in srgb, var(--text-primary) 8%, transparent);
     transform: translateY(-1px);
 }
 
@@ -606,8 +622,8 @@ button.forgot-password-link {
 .login-footer {
     padding: 32px 48px;
     text-align: center;
-    border-top: 1px solid rgba(0, 0, 0, 0.04);
-    background: rgba(0, 0, 0, 0.01);
+    border-top: 1px solid color-mix(in srgb, var(--text-primary) 4%, transparent);
+    background: color-mix(in srgb, var(--text-primary) 1%, transparent);
 }
 
 .login-footer p {
@@ -722,4 +738,12 @@ button.forgot-password-link {
 
 .login-form .form-group:nth-child(4) {
     animation-delay: 0.2s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+
+    .login-container,
+    .login-form .form-group {
+        animation: none;
+    }
 }

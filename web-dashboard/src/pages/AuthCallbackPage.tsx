@@ -75,7 +75,9 @@ const AuthCallbackPage: React.FC = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    // Minimal Cyberpunk Loading UI
+    // Minimal Cyberpunk Loading UI — tokenized to match LoginPage's bespoke dark
+    // identity (see LoginPage.tsx R3b note). Locally pinned to the dark palette
+    // via the `dark` class so it reads consistently regardless of app-wide theme.
     const styles = {
         container: {
             minHeight: '100vh',
@@ -83,15 +85,15 @@ const AuthCallbackPage: React.FC = () => {
             flexDirection: 'column' as const,
             alignItems: 'center',
             justifyContent: 'center',
-            background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%)',
+            background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
             fontFamily: "'JetBrains Mono', monospace",
-            color: '#fff',
+            color: 'var(--text-primary)',
         },
         spinner: {
             width: '60px',
             height: '60px',
-            border: '3px solid rgba(255, 191, 36, 0.2)',
-            borderTop: '3px solid #FBBF24',
+            border: '3px solid color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
+            borderTop: '3px solid var(--color-warning-light)',
             borderRadius: '50%',
             animation: 'spin 1s linear infinite',
             marginBottom: '24px',
@@ -99,20 +101,20 @@ const AuthCallbackPage: React.FC = () => {
         title: {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '20px',
-            color: '#FBBF24',
+            color: 'var(--color-warning-light)',
             letterSpacing: '0.15em',
             marginBottom: '8px',
         },
         message: {
             fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.6)',
+            color: 'color-mix(in srgb, var(--text-primary) 60%, transparent)',
             letterSpacing: '0.1em',
         },
         error: {
-            color: '#EF4444',
+            color: 'var(--color-danger)',
         },
         success: {
-            color: '#22C55E',
+            color: 'var(--color-success)',
         },
     };
 
@@ -131,10 +133,10 @@ const AuthCallbackPage: React.FC = () => {
     }, []);
 
     return (
-        <div style={styles.container}>
+        <div className="dark" style={styles.container} role="status" aria-live="polite">
             {status === 'processing' && (
                 <>
-                    <div style={styles.spinner} />
+                    <div style={styles.spinner} aria-hidden="true" />
                     <h2 style={styles.title}>AUTHENTICATING...</h2>
                     <p style={styles.message}>Establishing secure connection</p>
                 </>

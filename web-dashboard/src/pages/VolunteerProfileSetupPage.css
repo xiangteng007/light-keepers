@@ -19,10 +19,10 @@
 }
 
 .volunteer-setup-header {
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--color-gold-600) 100%);
     padding: 32px;
     text-align: center;
-    color: var(--brown-900);
+    color: var(--color-brown-900);
 }
 
 .volunteer-setup-header h1 {
@@ -76,12 +76,12 @@
 
 .setup-step.active .setup-step__number {
     background: var(--accent-primary);
-    color: var(--brown-900);
+    color: var(--color-brown-900);
 }
 
 .setup-step.completed .setup-step__number {
-    background: #4CAF50;
-    color: white;
+    background: var(--color-success);
+    color: var(--text-inverse);
 }
 
 .setup-step__label {
@@ -110,8 +110,8 @@
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
-    color: var(--brown-900);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--color-gold-600) 100%);
+    color: var(--color-brown-900);
     margin-bottom: 16px;
 }
 
@@ -145,6 +145,7 @@
 .volunteer-setup-form .form-group select,
 .volunteer-setup-form .form-group textarea {
     width: 100%;
+    min-height: 44px;
     padding: 14px 16px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -159,7 +160,7 @@
 .volunteer-setup-form .form-group textarea:focus {
     outline: none;
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-gold-400) 20%, transparent);
 }
 
 .volunteer-setup-form .form-group input:disabled {
@@ -179,6 +180,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    min-height: 44px;
     padding: 12px 16px;
     border: 1px solid var(--border-color);
     border-radius: var(--radius-md);
@@ -192,7 +194,7 @@
 }
 
 .skill-chip.active {
-    background: rgba(196, 167, 125, 0.15);
+    background: color-mix(in srgb, var(--color-gold-400) 15%, transparent);
     border-color: var(--accent-primary);
 }
 
@@ -241,16 +243,10 @@
     color: var(--text-primary);
 }
 
-/* Error */
+/* Error — visuals now supplied by design-system Alert; page only adds spacing */
 .setup-error {
-    background: rgba(184, 92, 92, 0.1);
-    border: 1px solid var(--danger);
-    color: var(--danger);
-    padding: 12px 16px;
-    border-radius: var(--radius-md);
-    font-size: 14px;
     margin-top: 20px;
-    text-align: center;
+    text-align: left;
 }
 
 /* Actions */
@@ -268,6 +264,7 @@
     align-items: center;
     justify-content: center;
     gap: 8px;
+    min-height: 44px;
     padding: 14px 24px;
     border: none;
     border-radius: var(--radius-md);
@@ -279,8 +276,8 @@
 
 .setup-btn--primary {
     flex: 1;
-    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--gold-600) 100%);
-    color: var(--brown-900);
+    background: linear-gradient(135deg, var(--accent-primary) 0%, var(--color-gold-600) 100%);
+    color: var(--color-brown-900);
 }
 
 .setup-btn--primary:hover {
@@ -300,14 +297,14 @@
 
 .setup-btn--success {
     flex: 1;
-    background: #4CAF50;
-    color: white;
+    background: var(--color-success);
+    color: var(--text-inverse);
 }
 
 .setup-btn--success:hover:not(:disabled) {
-    background: #43A047;
+    background: var(--color-success-dark);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--color-success) 30%, transparent);
 }
 
 .setup-btn:disabled {

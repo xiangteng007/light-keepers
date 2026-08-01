@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createVolunteer, markVolunteerProfileCompleted } from '../api/services';
 import type { CreateVolunteerDto } from '../api/services';
-import { User, MapPin, Heart, AlertCircle, Save, ChevronRight } from 'lucide-react';
+import { User, MapPin, Heart, AlertCircle, Save, ChevronRight, Check } from 'lucide-react';
+import { Button, Alert } from '../design-system';
 import './VolunteerProfileSetupPage.css';
 
 // 台灣地區選項
@@ -135,7 +136,7 @@ export default function VolunteerProfileSetupPage() {
                 </div>
 
                 {/* 步驟指示器 */}
-                <div className="volunteer-setup-steps">
+                <div className="volunteer-setup-steps" role="list" aria-label="設定步驟">
                     {[
                         { num: 1, label: '基本資料' },
                         { num: 2, label: '服務區域' },
@@ -145,9 +146,14 @@ export default function VolunteerProfileSetupPage() {
                         <div
                             key={num}
                             className={`setup-step ${step === num ? 'active' : ''} ${step > num ? 'completed' : ''}`}
+                            role="listitem"
+                            aria-current={step === num ? 'step' : undefined}
                         >
-                            <div className="setup-step__number">{step > num ? '✓' : num}</div>
-                            <span className="setup-step__label">{label}</span>
+                            <div className="setup-step__number" aria-hidden="true">{step > num ? <Check size={16} /> : num}</div>
+                            <span className="setup-step__label">
+                                {label}
+                                {step > num && <span className="sr-only">（已完成）</span>}
+                            </span>
                         </div>
                     ))}
                 </div>
@@ -245,18 +251,22 @@ export default function VolunteerProfileSetupPage() {
                             <h2>專業技能</h2>
                             <p>選擇您具備的技能（可多選）</p>
 
-                            <div className="skills-grid">
-                                {SKILL_OPTIONS.map(skill => (
-                                    <button
-                                        key={skill.id}
-                                        type="button"
-                                        className={`skill-chip ${formData.skills.includes(skill.id) ? 'active' : ''}`}
-                                        onClick={() => toggleSkill(skill.id)}
-                                    >
-                                        <span className="skill-chip__icon">{skill.icon}</span>
-                                        <span className="skill-chip__label">{skill.label}</span>
-                                    </button>
-                                ))}
+                            <div className="skills-grid" role="group" aria-label="技能選項（可多選）">
+                                {SKILL_OPTIONS.map(skill => {
+                                    const selected = formData.skills.includes(skill.id);
+                                    return (
+                                        <button
+                                            key={skill.id}
+                                            type="button"
+                                            className={`skill-chip ${selected ? 'active' : ''}`}
+                                            onClick={() => toggleSkill(skill.id)}
+                                            aria-pressed={selected}
+                                        >
+                                            <span className="skill-chip__icon" aria-hidden="true">{skill.icon}</span>
+                                            <span className="skill-chip__label">{skill.label}</span>
+                                        </button>
+                                    );
+                                })}
                             </div>
 
                             <div className="form-group" style={{ marginTop: '20px' }}>
@@ -332,41 +342,45 @@ export default function VolunteerProfileSetupPage() {
                     )}
 
                     {error && (
-                        <div className="setup-error">
-                            ⚠️ {error}
-                        </div>
+                        <Alert variant="danger" className="setup-error">
+                            {error}
+                        </Alert>
                     )}
 
                     {/* 按鈕區 */}
                     <div className="setup-actions">
                         {step > 1 && (
-                            <button
+                            <Button
                                 type="button"
+                                variant="secondary"
                                 className="setup-btn setup-btn--secondary"
                                 onClick={prevStep}
                             >
                                 上一步
-                            </button>
+                            </Button>
                         )}
 
                         {step < 4 ? (
-                            <button
+                            <Button
                                 type="button"
+                                variant="primary"
                                 className="setup-btn setup-btn--primary"
+                                icon={<ChevronRight size={18} aria-hidden="true" />}
                                 onClick={nextStep}
                             >
-                                下一步 <ChevronRight size={18} />
-                            </button>
+                                下一步
+                            </Button>
                         ) : (
-                            <button
+                            <Button
                                 type="button"
+                                variant="primary"
                                 className="setup-btn setup-btn--success"
+                                icon={<Save size={18} aria-hidden="true" />}
                                 onClick={handleSubmit}
-                                disabled={isLoading}
+                                loading={isLoading}
                             >
-                                <Save size={18} />
                                 {isLoading ? '儲存中...' : '完成設定'}
-                            </button>
+                            </Button>
                         )}
                     </div>
                 </div>
