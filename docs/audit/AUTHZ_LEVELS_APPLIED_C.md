@@ -64,9 +64,31 @@ guard 自己的註解也寫明這件事，並且只在第一次命中時印一�
    掃描器附正／負向自我測試。
 2. **`@Body() x: any` 維持 0**。
 3. **已外洩的預設密鑰字串**只能出現在 `jwt.config.ts` 的「已知外洩清單」常數。
+4. **行內型別 `@Body() body: { ... }` 不得復發**：已 DTO 化的 8 個 controller 零容忍；
+   全專案總數棘輪（基準線 111，只能降不能升，降了要同步調降基準線）。
 
 `.github/workflows/ci-cd.yml` 另加：後端 lint 閘門、`npm test -- --coverage`（讓 coverageThreshold 真的生效）、
 前端 dist 不得含 `devModeUser`、production 部署設定不得啟用 `SYNC_TABLES` 且必須掛 `JWT_SECRET`。
+
+## 四之二、輸入驗證（同批處理，2026-08-02）
+
+真正的驗證缺口不是 `@Body() any`（那個已清零），而是**行內型別**：
+`@Body() body: { periodStart: string; ... }` 編譯後不留下 metatype，
+全域 ValidationPipe 拿不到可驗證的型別就整段跳過——端點看起來有驗證，實際上完全沒驗。
+全專案約 130 處，本輪處理最高風險的兩批：
+
+| 批次 | 端點數 | 內容 |
+|---|:---:|---|
+| auth／2FA（先前 session 完成，已整併在本分支） | 23 | OAuth code 交換、OTP、密碼重設；順修 `GET /auth/check-email-verification` 用 GET 讀 body 導致回傳任意帳號驗證狀態、`/auth/2fa/verify\|validate\|DELETE` 空 DTO 導致正式環境恆 400 |
+| 作戰情資／派遣／個資（本輪） | 24 | SITREP 3、IAP 作戰週期 2、AAR 1、map-dispatch 9、task-dispatch 簽到簽退 2、心理支持 care 4 |
+
+實作要點（踩到的坑，寫下來避免重複）：
+- 巢狀陣列必須 `class + @Type + @ValidateNested({ each: true })`，否則 whitelist 不下探到子物件
+- 必填的巢狀物件要加 `@IsDefined()`，只有 `@ValidateNested()` 時整包缺欄位會靜默通過
+- 自由鍵值物件（如 SITREP 的 `casualties`）不能用 `@IsNumber({}, { each: true })`：
+  class-validator 的 `each` 不走訪純物件，需自訂 constraint
+- mood-tracker 的 `req.user?.sub ?? body.userId` 退路一併移除（JWT 取不到身分時退回呼叫端自報 userId，
+  等於替剛補好的 IDOR 留後門），改為取不到即 403
 
 ## 五、留給 owner／後續的判斷題
 
@@ -76,3 +98,5 @@ guard 自己的註解也寫明這件事，並且只在第一次命中時印一�
 | C-2 | `staff-security` 的「查自己的簽到歷史」被 L2 一併擋掉 | 暫時 L2 | 正解是掛 `ResourceOwnerGuard`（ADR-003）而非降級，屬 P0 之後 |
 | C-3 | `auth` / `auth-oauth` 共 38 個端點仍未定級 | 列入 CI 棘輪基準線（只能降不能升） | 這些端點語意上需要 `@Public()`＋`public-surface.policy.json` 條目，屬公開介面決策 → owner |
 | C-4 | triage「降色需 L2+ 確認」 | 未實作 | 同一端點內依內容分級，`@RequiredLevel` 表達不了，留給 C2 MCI 實作（M2/M3） |
+| C-5 | 前端 2FA 呼叫 `/auth/2fa/verify` 只送 `token`，後端要 `secret + token` | 未修 | 功能面 bug（非 P0 安全洞）：前端要改成把 setup 回傳的 secret 一起送，或後端改由暫存的 pending secret 取用 → 需 owner 決定改哪一側 |
+| C-6 | 其餘約 106 處未驗證端點 | 列入 CI 棘輪基準線 | 建議照「碰個資／碰錢／碰指揮權」分批補，不必一次做完 → owner 排序 |
