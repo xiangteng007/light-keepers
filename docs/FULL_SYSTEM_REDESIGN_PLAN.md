@@ -306,6 +306,7 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | **Phase 5**（3–4 週） | 核心功能缺口 | XC-4（audit P0→P1）、BE-3 分頁/N+1（前後端成對 PR）、DA-1 索引 | 🟡–🔴 新 entity/欄位 | audit/05 Gherkin、explain 驗證 |
 | **Phase 6**（1–2 週） | 收尾 | DA-3 Resources 評估報告、API 版本 ADR、剩餘換皮批次、文件終稿 | 🟢（分析/文件） | 報告交付 |
 | **Phase M**（機動，2–3 週，**期限由 Google 租約到期日決定**） | 本地 NAS 搬遷 | INF-1：NAS Docker 棧、DB/檔案搬遷、本地 LLM provider、對外通道（Tunnel/反代）、備份演練 | 🟡-🔴 一次性停機搬資料 | NAS 全棧 e2e 綠燈、備份還原演練 |
+| **Phase R**（3–4 週，v1.7 新增，FABLE 主導） | 前端完整重設計 | FE-7：R1 設計語言＋Shell（含 2.2 IA 收斂）→ R2 旗艦頁 → R3 全站批次 → R4 回歸驗證 | 🟡 UI 大改（API/測試已穩） | 設計語言文件、災時走查、e2e＋a11y |
 | **Phase C1**（2 週，D16 新增） | 民防：資料與分類 | CD-1 災型擴充、CD-2 防空避難設施、CD-6 韌性升級 | 🟢-🟡 enum/資料為主 | 新災型全流程、避難處所離線可查、雙備份演練 |
 | **Phase C2**（3–4 週） | 民防：MCI＋降級 | CD-3 大量傷患流程、CD-4 通訊降級（含 LoRa spike 報告） | 🔴 新核心流程 | 50 傷患演練情境、四級降級 SOP |
 | **Phase C3**（機動） | 民防：介接 | CD-5 EDXL/CAP＋政府體系介接（依 D19 洽談進度） | 🟡 外部依賴 | 標準訊息 round-trip |
@@ -314,9 +315,24 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 
 ---
 
-## 4. 執行分工建議（OPUS / SONNET）
+## 4. 執行分工建議（FABLE 5 / OPUS 5 / SONNET 5）
 
-判準：**[OPUS]** ＝ 架構、資料模型、權限/正確性、需取捨判斷；**[SONNET]** ＝ UI 換皮、元件抽取、批次遷移、文案、機械性掃描。
+> **v1.7（2026-08-01）owner 指示**：分工由二層升級為三層，且**前端頁面由 FABLE 5 做完整重新設計**（見 FE-7 / Phase R）。已完成項維持原二層標記為歷史記錄。
+
+判準：
+- **[FABLE]** ＝ 全新設計與最高風險取捨：前端完整重設計（設計語言/IA/旗艦頁）、人命攸關流程設計（MCI）、跨系統架構決策
+- **[OPUS]** ＝ 正確性實作與複雜重構：資料模型、權限、migration、複雜後端邏輯、依 FABLE spec 的高難度實作
+- **[SONNET]** ＝ 機械性批次：依 spec 的頁面批次套用、掃描盤點、文案、重複遷移
+
+### FE-7 前端完整重新設計（FABLE 主導）— 取代原 FE-2 的「漸進換皮」路線
+
+原 FE-2（token 收斂＋2.5 首批 20 頁換皮）為過渡；owner 指示升級為**完整重新設計**：
+- **R1 設計語言與 Shell**［FABLE］：以 `tokens.css`＋戰術 UI spec（`lightkeepers_tactical_uiux_spec_utf8_bundle/`）為基礎定義完整設計語言（版型格線、密度、資訊層級、狀態色語意、動效、深淺色、行動端斷點），重新設計 AppShellLayout/Sidebar/導覽（整合 2.1 對帳表的 IA 收斂＝2.2 併入此項）；產出 `docs/architecture/DESIGN_LANGUAGE.md`＋核心版型元件實作
+- **R2 旗艦頁重設計**［FABLE］：CommandCenter（COP 態勢牆）、EmergencyResponse、Map、Intake 通報、Dashboard——逐頁從資訊架構層重新設計（不是套皮），災時單手操作/高壓場景可讀性為第一原則
+- **R3 全站批次套用**［SONNET 依 R1/R2 spec］：其餘頁面按新設計語言批次重建
+- **R4 視覺回歸與 a11y**［SONNET］：截圖基準、對比度、鍵盤導航、行動端驗證
+- **風險**: R1/R2 中（UI 大改但 API 層已穩定、測試防護網已建）；R3 低
+- **驗收**: 設計語言文件；旗艦頁在災時情境走查通過；e2e 全綠；a11y AA
 
 ### 工作項總表（工作項 × 執行者 × 風險 × 期別）
 
@@ -381,6 +397,13 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | C2.4 | LoRa/mesh spike 評估報告（硬體/覆蓋/法規/成本）（CD-4） | OPUS | 🟢(報告) | PC2 |
 | C3.1 | CAP 協定收發＋EDXL round-trip 沙盒（CD-5） | OPUS | 🟡 | PC3 |
 | C3.2 | 政府介接技術文件包（供洽談）（CD-5） | SONNET | 🟢 | PC3 |
+| R1 | 設計語言＋Shell/導覽重設計＋IA 收斂落地（FE-7，含原 2.2） | **FABLE** | 🟡 | PR |
+| R2 | 旗艦頁重設計（CommandCenter/EmergencyResponse/Map/Intake/Dashboard） | **FABLE** | 🟡 | PR |
+| R3 | 全站批次套用新設計語言 | SONNET（依 R1/R2 spec） | 🟢 | PR |
+| R4 | 視覺回歸基準＋a11y AA 驗證 | SONNET | 🟢 | PR |
+| C2.1 補註 | MCI 資料模型與傷票流程**設計**升級為 FABLE、實作 OPUS | FABLE 設計 / OPUS 實作 | 🔴 | PC2 |
+
+**三層重派原則（未完成項適用）**：R1/R2/C2.1 設計＝FABLE；1.2 baseline、M.4/M.5 搬遷、C2.3/C2.4/C3.1＝OPUS；R3/R4/C3.2 與各批次＝SONNET。
 
 **派工模式**: 每期 OPUS 先出細部 spec（端點清單/元件 API/遷移批次），SONNET 按清單批量執行，OPUS review 所有碰正確性的 PR。SONNET 批次工作以「每批一 PR＋e2e 綠燈」為節奏。
 
