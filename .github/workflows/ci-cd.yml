@@ -7,6 +7,42 @@ on:
     branches: [main]
 
 jobs:
+  # 部署設定安全檢查（純靜態、秒級，先跑）
+  config-safety:
+    name: Deploy Config Safety
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # BE-2a：SYNC_TABLES 會讓 TypeORM 直接改動正式 schema。
+      # 程式端已在 resolveSynchronize() 對 NODE_ENV=production 硬性停用，
+      # 這裡再擋一層設定面：production 的部署設定不得出現 SYNC_TABLES=true。
+      # （staging 目前刻意開著，屬既有決定，因此只檢查 production 相關檔案。）
+      - name: production 部署設定不得啟用 SYNC_TABLES
+        run: |
+          FILES=".github/workflows/deploy.yml cloudbuild.yaml"
+          FOUND=0
+          for f in $FILES; do
+            [ -f "$f" ] || continue
+            if grep -nE "SYNC_TABLES *[:=] *[\"']?true" "$f"; then
+              echo "::error file=$f::production 部署設定啟用了 SYNC_TABLES，會讓 TypeORM 直接改動正式 schema。"
+              FOUND=1
+            fi
+          done
+          if [ "$FOUND" -ne 0 ]; then exit 1; fi
+          echo "OK: production 部署設定未啟用 SYNC_TABLES"
+
+      # E.1：production 的 JWT_SECRET 必須由 Secret Manager 注入。
+      # 程式端缺值即 fail-fast（jwt.config.ts），但若 workflow 漏掛，容器會起不來——
+      # 與其等部署後才發現，不如在 CI 就擋下。
+      - name: production 部署必須注入 JWT_SECRET
+        run: |
+          if ! grep -q "JWT_SECRET=jwt-secret" .github/workflows/deploy.yml; then
+            echo "::error file=.github/workflows/deploy.yml::deploy.yml 的 --set-secrets 沒有掛 JWT_SECRET=jwt-secret:latest。"
+            exit 1
+          fi
+          echo "OK: deploy.yml 有掛 JWT_SECRET"
+
   # Frontend 建置與測試
   frontend:
     name: Frontend Build & Test
@@ -62,6 +98,19 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # P0 後門防復發：devMode 判斷以 `import.meta.env.DEV` 短路，Vite 在 production build
+      # 會把它常數摺疊成 false 並 tree-shake 掉整段（見 src/utils/devMode.ts）。
+      # 換句話說：production bundle 裡**不應該存在** 'devModeUser' 這個字串。
+      # 一旦有人繞過 devMode.ts 直接讀 localStorage，這個字串就會重新出現在 dist，
+      # 任何人都能在瀏覽器 console 把自己變成 Level 5。此檢查直接看建置產物，不看原始碼。
+      - name: Backdoor check (dist 不得含 devModeUser)
+        run: |
+          if grep -rl "devModeUser" dist/ 2>/dev/null; then
+            echo "::error::production bundle 含有 devModeUser 後門字串（上列檔案）。請一律改用 src/utils/devMode.ts 的 isDevModeUser()。"
+            exit 1
+          fi
+          echo "OK: dist 不含 devModeUser"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
@@ -129,8 +178,35 @@ jobs:
       - name: Security audit (blocking, critical)
         run: npm audit --audit-level=critical
 
-      - name: Run tests
-        run: npm test -- --passWithNoTests
+      # 後端 lint 閘門（E.3 已導入 ESLint，但一直沒接進 CI）
+      # error 阻擋（目前實測 0 個）；warning 採棘輪，只能持平或下降。
+      - name: Lint check (error 阻擋 / warning 不得超過基準線)
+        env:
+          LINT_WARNING_BASELINE: 304
+        run: |
+          npx eslint . --format json --output-file eslint-report.json || true
+          ERRORS=$(node -p "require('./eslint-report.json').reduce((a, f) => a + f.errorCount, 0)")
+          WARNINGS=$(node -p "require('./eslint-report.json').reduce((a, f) => a + f.warningCount, 0)")
+          echo "ESLint: ${ERRORS} errors / ${WARNINGS} warnings (warning baseline: ${LINT_WARNING_BASELINE})"
+          if [ "$ERRORS" -gt 0 ]; then
+            echo "::error::後端 ESLint 有 ${ERRORS} 個 error，必須修掉。"
+            npx eslint .
+            exit 1
+          fi
+          if [ "$WARNINGS" -gt "$LINT_WARNING_BASELINE" ]; then
+            echo "::error::後端 ESLint warning 數 ${WARNINGS} 超過基準線 ${LINT_WARNING_BASELINE}，請修正本次新增的問題。"
+            exit 1
+          fi
+          if [ "$WARNINGS" -lt "$LINT_WARNING_BASELINE" ]; then
+            echo "::notice::ESLint warning 已降到 ${WARNINGS}，請同步調降 LINT_WARNING_BASELINE 以鎖住成果。"
+          fi
+
+      # 帶 --coverage 才會真的套用 jest.config.js 的 coverageThreshold。
+      # 原本 CI 只跑 `npm test`，門檻雖然修好了拼字卻從未在 CI 生效。
+      # 這一步同時涵蓋 src/common/security/security-invariants.spec.ts
+      # （authz 定級覆蓋率、@Body() any、外洩密鑰三項回歸守衛）。
+      - name: Run tests (含 coverage 門檻)
+        run: npm test -- --coverage --passWithNoTests
 
       - name: Build
         run: npm run build
