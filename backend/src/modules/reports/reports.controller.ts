@@ -102,6 +102,8 @@ export class ReportsController {
         @Query('offset') offset?: string,
         @Query('includeDeleted') includeDeleted?: string,
         @Request() req?: { user?: { roleLevel?: number } },
+        // CD-1 新增；刻意放在參數列最後，避免既有位置式呼叫（測試/內部）被打亂
+        @Query('isMassCasualty') isMassCasualty?: string,
     ) {
         // SEC-SD.2 R3: includeDeleted=true 需要 DIRECTOR 以上權限
         const wantDeleted = includeDeleted === 'true';
@@ -116,6 +118,9 @@ export class ReportsController {
             status,
             type,
             severity,
+            // 只有明確傳 true/false 才過濾，未傳＝擴充前行為
+            isMassCasualty:
+                isMassCasualty === undefined ? undefined : isMassCasualty === 'true',
             limit: limit ? parseInt(limit, 10) : undefined,
             offset: offset ? parseInt(offset, 10) : undefined,
         };

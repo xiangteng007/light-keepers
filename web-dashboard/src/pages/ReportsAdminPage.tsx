@@ -1,21 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
+import {
+    DISASTER_TYPE_GROUPS,
+    DISASTER_TYPE_META,
+    MASS_CASUALTY_META,
+} from '../constants/disasterTypes';
 import { getReports, reviewReport } from '../api/services';
 import type { Report, ReportStatus, ReportType, ReportSeverity } from '../api/services';
 import './ReportsAdminPage.css';
 
 // 回報類型設定
-// Bespoke categorical palette (8 disaster types) — no 1:1 semantic token equivalent, left as literal hex
-const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> = {
-    earthquake: { label: '地震', icon: '🌍', color: '#795548' },
-    flood: { label: '淹水', icon: '🌊', color: '#2196F3' },
-    fire: { label: '火災', icon: '🔥', color: '#FF5722' },
-    typhoon: { label: '颱風', icon: '🌀', color: '#00BCD4' },
-    landslide: { label: '土石流', icon: '⛰️', color: '#795548' },
-    traffic: { label: '交通事故', icon: '🚗', color: '#FF9800' },
-    infrastructure: { label: '設施損壞', icon: '🏗️', color: '#F44336' },
-    other: { label: '其他', icon: '📋', color: '#607D8B' },
-};
+// CD-1: 改讀 disasterTypes SSOT（既有 8 類的 label/emoji/色碼在 SSOT 中逐字沿用
+// 原值，本頁視覺輸出與擴充前相同）
+const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> =
+    Object.fromEntries(
+        Object.entries(DISASTER_TYPE_META).map(([type, meta]) => [
+            type,
+            { label: meta.label, icon: meta.emoji, color: meta.color },
+        ]),
+    ) as Record<ReportType, { label: string; icon: string; color: string }>;
 
 // 狀態設定
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -37,6 +40,9 @@ export default function ReportsAdminPage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedStatus, setSelectedStatus] = useState<string>('pending');
+    // CD-1: 災型與大量傷患篩選（空字串＝全部＝擴充前行為）
+    const [selectedType, setSelectedType] = useState<string>('');
+    const [massCasualtyOnly, setMassCasualtyOnly] = useState(false);
     const [selectedReport, setSelectedReport] = useState<Report | null>(null);
     const [reviewNote, setReviewNote] = useState('');
     const [isReviewing, setIsReviewing] = useState(false);
@@ -48,6 +54,8 @@ export default function ReportsAdminPage() {
         try {
             const response = await getReports({
                 status: selectedStatus as ReportStatus || undefined,
+                type: (selectedType as ReportType) || undefined,
+                isMassCasualty: massCasualtyOnly ? true : undefined,
             });
             setReports(response.data.data);
         } catch (err) {
@@ -60,7 +68,7 @@ export default function ReportsAdminPage() {
 
     useEffect(() => {
         fetchReports();
-    }, [selectedStatus]);
+    }, [selectedStatus, selectedType, massCasualtyOnly]);
 
     // 審核回報
     const handleReview = async (status: 'confirmed' | 'rejected') => {
@@ -132,6 +140,35 @@ export default function ReportsAdminPage() {
                         {config.label}
                     </button>
                 ))}
+
+                {/* CD-1: 災型篩選（民防類獨立分組，避免與天災混選） */}
+                <select
+                    className="filter-select"
+                    value={selectedType}
+                    onChange={(e) => setSelectedType(e.target.value)}
+                    aria-label="災害類型篩選"
+                >
+                    <option value="">全部災型</option>
+                    {DISASTER_TYPE_GROUPS.map((group) => (
+                        <optgroup key={group.title} label={group.title}>
+                            {group.options.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                    {option.emoji} {option.label}
+                                </option>
+                            ))}
+                        </optgroup>
+                    ))}
+                </select>
+
+                {/* CD-1: 大量傷患是跨災型旗標，因此是獨立開關而非災型選項 */}
+                <label className="filter-checkbox">
+                    <input
+                        type="checkbox"
+                        checked={massCasualtyOnly}
+                        onChange={(e) => setMassCasualtyOnly(e.target.checked)}
+                    />
+                    {MASS_CASUALTY_META.emoji} 只看{MASS_CASUALTY_META.label}
+                </label>
             </div>
 
             {/* 回報列表 */}
@@ -158,6 +195,15 @@ export default function ReportsAdminPage() {
                                     <span className="report-type">
                                         {typeConfig.icon} {typeConfig.label}
                                     </span>
+                                    {report.isMassCasualty && (
+                                        <span
+                                            className="report-type"
+                                            style={{ color: MASS_CASUALTY_META.color }}
+                                        >
+                                            {MASS_CASUALTY_META.emoji} {MASS_CASUALTY_META.label}
+                                            {report.casualtyEstimate ? `（約 ${report.casualtyEstimate} 人）` : ''}
+                                        </span>
+                                    )}
                                     <Badge
                                         variant={report.status === 'confirmed' ? 'success' :
                                             report.status === 'rejected' ? 'danger' : 'warning'}

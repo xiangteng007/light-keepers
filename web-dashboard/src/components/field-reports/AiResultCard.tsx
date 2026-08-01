@@ -13,6 +13,8 @@ interface AiResultCardProps {
 const SEVERITY_LABELS = ['低', '中', '高', '危急', '嚴重'];
 const SEVERITY_COLORS = ['#4ade80', '#facc15', '#fb923c', '#ef4444', '#dc2626'];
 
+// CD-1: 補上民防災型的標籤。`medical` 不是 ReportType（AI 佇列自有的分類），
+// 因此這裡維持手寫 map 而非直接吃 disasterTypes SSOT，既有標籤一字未改。
 const CATEGORY_LABELS: Record<string, string> = {
     flood: '水災',
     fire: '火災',
@@ -20,6 +22,10 @@ const CATEGORY_LABELS: Record<string, string> = {
     traffic: '交通事故',
     medical: '醫療',
     infrastructure: '基礎設施',
+    air_raid: '空襲／砲擊',
+    explosion: '爆炸／爆裂物',
+    terror_attack: '恐怖攻擊',
+    cbrn: '化生放核',
     other: '其他',
 };
 

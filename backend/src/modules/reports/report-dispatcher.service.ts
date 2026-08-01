@@ -2,6 +2,7 @@ import { Injectable, Logger, Inject, forwardRef } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Report, ReportSeverity, ReportType } from './reports.entity';
+import { DISASTER_TYPE_META, MASS_CASUALTY_META } from './disaster-types';
 import { Task } from '../tasks/entities';
 import { Account } from '../accounts/entities';
 import { LineBotService } from '../line-bot/line-bot.service';
@@ -17,18 +18,14 @@ const SEVERITY_TO_PRIORITY: Record<ReportSeverity, number> = {
 };
 
 /**
- * 災害類型對應的技能標籤
+ * 災害類型對應的技能標籤。
+ *
+ * CD-1 起改由 `disaster-types.ts` SSOT 供給（既有 8 類的值逐字沿用，
+ * 派遣行為與擴充前相同），新增災型不必再回來改這裡。
  */
-const TYPE_TO_SKILLS: Record<ReportType, string[]> = {
-    earthquake: ['搜救', '救援'],
-    flood: ['水域救援', '抽水'],
-    fire: ['消防', '滅火'],
-    typhoon: ['防災', '救援'],
-    landslide: ['搜救', '重機械'],
-    traffic: ['交通管制', '救援'],
-    infrastructure: ['電氣', '工程'],
-    other: [],
-};
+const TYPE_TO_SKILLS: Record<ReportType, string[]> = Object.fromEntries(
+    Object.entries(DISASTER_TYPE_META).map(([type, meta]) => [type, meta.skills]),
+) as Record<ReportType, string[]>;
 
 @Injectable()
 export class ReportDispatcherService {
@@ -154,6 +151,20 @@ export class ReportDispatcherService {
             lines.push(`📷 照片: ${report.photos.length} 張`);
         }
 
+        // CD-1: 民防災型與大量傷患事件附上應變動作提示。
+        // 既有 8 類 civilDefense=false 且 isMassCasualty 預設 false，因此既有
+        // 任務描述的內容與擴充前逐字相同。
+        const meta = DISASTER_TYPE_META[report.type];
+        if (meta?.civilDefense) {
+            lines.push(`\n🛡️ 應變提示（${meta.label}）:`);
+            meta.responseHints.forEach((hint, i) => lines.push(`  ${i + 1}. ${hint}`));
+        }
+        if (report.isMassCasualty) {
+            const count = report.casualtyEstimate ? `（概估 ${report.casualtyEstimate} 人）` : '';
+            lines.push(`\n🚑 ${MASS_CASUALTY_META.label}事件${count}:`);
+            MASS_CASUALTY_META.responseHints.forEach((hint, i) => lines.push(`  ${i + 1}. ${hint}`));
+        }
+
         lines.push(`\n🔗 來源回報 ID: ${report.id}`);
 
         return lines.join('\n');
@@ -184,6 +195,12 @@ export class ReportDispatcherService {
             traffic: '交通事故',
             infrastructure: '基礎設施',
             other: '其他',
+            // CD-1 民防類別（既有 8 個標籤刻意保持原字串，不改成 SSOT label，
+            // 以免變更既有任務描述的文案）
+            air_raid: '空襲／砲擊',
+            explosion: '爆炸／爆裂物',
+            terror_attack: '恐怖攻擊',
+            cbrn: '化生放核',
         };
         return map[type] || type;
     }

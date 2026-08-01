@@ -103,6 +103,76 @@ describe('AiClassificationService', () => {
         });
     });
 
+    // CD-1: 民防災型擴充（設計見 docs/architecture/CIVIL_DEFENSE_TAXONOMY.md）
+    describe('CD-1 民防擴充', () => {
+        it('prompt 列出四個民防類別與 massCasualty 欄位', () => {
+            const prompt = buildClassificationPrompt('防空警報');
+            for (const type of ['air_raid', 'explosion', 'terror_attack', 'cbrn']) {
+                expect(prompt).toContain(type);
+            }
+            expect(prompt).toContain('massCasualty');
+        });
+
+        it('prompt 明寫「瓦斯氣爆歸 fire」這條反直覺界線', () => {
+            const prompt = buildClassificationPrompt('測試');
+            expect(prompt).toContain('瓦斯氣爆');
+        });
+
+        it.each([
+            ['剛剛防空警報響了，遠處有爆炸聲', 'air_raid'],
+            ['路邊有個沒人認領的可疑包裹', 'explosion'],
+            ['夜市有人持刀砍人', 'terror_attack'],
+            ['信封裡有不明粉末', 'cbrn'],
+        ])('關鍵字 fallback：「%s」→ %s', (text, expected) => {
+            const result = (service as any).fallbackClassification(text);
+            expect(result.type).toBe(expected);
+        });
+
+        it('向後相容：既有 8 類的關鍵字命中結果與擴充前完全相同', () => {
+            const legacyFixtures: Array<[string, string]> = [
+                ['淹水了，水很深', 'flood'],
+                ['地震了，建築物倒塌', 'earthquake'],
+                ['房子起火了', 'fire'],
+                // 「爆炸」必須仍然落在 fire，不得被 explosion 奪走
+                ['工廠發生爆炸，現場還在冒煙', 'fire'],
+                // 既有行為：'氣爆'/'炸開' 本來就不在任何關鍵字表裡 → other
+                ['瓦斯氣爆，隔壁整面牆炸開', 'other'],
+                ['颱風把屋頂掀掉了', 'typhoon'],
+                ['山區土石流，道路被沖斷', 'landslide'],
+                ['路口發生車禍', 'traffic'],
+                ['電線桿倒塌壓到路面', 'infrastructure'],
+                ['一般情況，沒什麼特別的', 'other'],
+            ];
+            for (const [text, expected] of legacyFixtures) {
+                expect((service as any).fallbackClassification(text).type).toBe(expected);
+            }
+        });
+
+        it('大量傷患是與災型正交的旗標', () => {
+            const mci = (service as any).fallbackClassification('車禍現場很多人受傷，救護車不夠');
+            expect(mci.type).toBe('traffic');
+            expect(mci.massCasualty).toBe(true);
+
+            const normal = (service as any).fallbackClassification('路口發生車禍');
+            expect(normal.type).toBe('traffic');
+            expect(normal.massCasualty).toBe(false);
+        });
+
+        it('parseAIResponse 接受民防類別並讀取 massCasualty', () => {
+            const result = (service as any).parseAIResponse(
+                '{"type":"cbrn","confidence":0.9,"massCasualty":true,"reasoning":"不明氣體"}',
+            );
+            expect(result.type).toBe('cbrn');
+            expect(result.massCasualty).toBe(true);
+        });
+
+        it('parseAIResponse 對缺少 massCasualty 的舊格式回應向下相容', () => {
+            const result = (service as any).parseAIResponse('{"type":"flood","confidence":0.9}');
+            expect(result.type).toBe('flood');
+            expect(result.massCasualty).toBe(false);
+        });
+    });
+
     describe('parseAIResponse', () => {
         it('should parse JSON response', () => {
             const result = (service as any).parseAIResponse('{"type":"flood","confidence":0.9,"reasoning":"水災相關描述"}');

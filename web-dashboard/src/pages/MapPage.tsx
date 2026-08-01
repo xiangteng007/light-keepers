@@ -14,7 +14,7 @@ import {
 } from './map-constants';
 import {
     getSeverityColor, getSeverityLabel,
-    createMarkerIcon, createNcdrMarkerIcon,
+    createMarkerIcon, createDisasterReportMarkerIcon, createNcdrMarkerIcon,
     createShelterMarkerIcon, createAedMarkerIcon, createWarehouseMarkerIcon,
     containerStyle, mapOptions, initNcdrFilters,
 } from './map-utils';
@@ -444,7 +444,7 @@ export default function MapPage() {
                                     <MarkerF
                                         key={`report-${report.id}`}
                                         position={{ lat: Number(report.latitude), lng: Number(report.longitude) }}
-                                        icon={createMarkerIcon(severityMap[report.severity] || 2)}
+                                        icon={createDisasterReportMarkerIcon(report.type, severityMap[report.severity] || 2)}
                                         onClick={() => {
                                             // 將報告轉換為事件格式顯示
                                             const eventLike = {

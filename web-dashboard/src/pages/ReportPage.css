@@ -181,6 +181,33 @@
 /* =====================================
    災害類型卡片（Wizard 版本）
    ===================================== */
+/* CD-1: 災型分組（天災／民防），民防類獨立成組避免誤選 */
+.disaster-type-group__title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-secondary, #64748b);
+    margin: 0 0 0.75rem;
+    letter-spacing: 0.05em;
+}
+
+/* CD-1: 大量傷患是跨災型旗標，樣式刻意與災型卡片區隔 */
+.mass-casualty-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-default, #cbd5e1);
+    border-radius: 12px;
+    background: var(--surface-default, #fff);
+    color: var(--text-primary, #334155);
+    cursor: pointer;
+    margin-bottom: 0.75rem;
+}
+
+.mass-casualty-toggle:hover {
+    background: var(--bg-secondary, #f1f5f9);
+}
+
 .disaster-type-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);

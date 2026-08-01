@@ -2,6 +2,8 @@ import {
     IsString,
     IsOptional,
     IsArray,
+    IsBoolean,
+    IsInt,
     IsNumber,
     IsIn,
     Length,
@@ -13,15 +15,19 @@ import {
 } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
 import { ReportStatus, ReportType, ReportSeverity, ReportSource } from '../reports.entity';
+import { REPORT_TYPE_VALUES } from '../disaster-types';
+
+/**
+ * 災型合法值來自 disaster-types SSOT（含 D16 民防類別）。
+ * 只放寬不收緊：既有 8 個值仍全部合法，既有呼叫端不受影響。
+ */
+const REPORT_TYPE_IN = REPORT_TYPE_VALUES as readonly string[];
 
 /**
  * DTO for creating a new disaster report
  */
 export class CreateReportDto {
-    @IsIn(
-        ['earthquake', 'flood', 'fire', 'typhoon', 'landslide', 'traffic', 'infrastructure', 'other'],
-        { message: '災情類型必須是有效的類型' }
-    )
+    @IsIn(REPORT_TYPE_IN, { message: '災情類型必須是有效的類型' })
     type: ReportType;
 
     @IsIn(['low', 'medium', 'high', 'critical'], { message: '嚴重程度必須是 low, medium, high 或 critical' })
@@ -81,16 +87,26 @@ export class CreateReportDto {
     @IsOptional()
     @Length(0, 100, { message: 'LINE 顯示名稱長度不可超過 100 字元' })
     reporterLineDisplayName?: string;
+
+    // 大量傷患（MCI）跨災型旗標 — CD-1
+    @IsBoolean({ message: '大量傷患旗標必須是布林值' })
+    @IsOptional()
+    @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value))
+    isMassCasualty?: boolean;
+
+    @IsInt({ message: '概估傷患人數必須是整數' })
+    @IsOptional()
+    @Min(0)
+    @Max(100000, { message: '概估傷患人數超出合理範圍' })
+    @Type(() => Number)
+    casualtyEstimate?: number;
 }
 
 /**
  * DTO for updating an existing report (admin use)
  */
 export class UpdateReportDto {
-    @IsIn(
-        ['earthquake', 'flood', 'fire', 'typhoon', 'landslide', 'traffic', 'infrastructure', 'other'],
-        { message: '災情類型必須是有效的類型' }
-    )
+    @IsIn(REPORT_TYPE_IN, { message: '災情類型必須是有效的類型' })
     @IsOptional()
     type?: ReportType;
 
@@ -124,6 +140,19 @@ export class UpdateReportDto {
     @IsOptional()
     @Length(0, 500, { message: '地址長度不可超過 500 字元' })
     address?: string;
+
+    // 大量傷患（MCI）跨災型旗標 — CD-1
+    @IsBoolean({ message: '大量傷患旗標必須是布林值' })
+    @IsOptional()
+    @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value))
+    isMassCasualty?: boolean;
+
+    @IsInt({ message: '概估傷患人數必須是整數' })
+    @IsOptional()
+    @Min(0)
+    @Max(100000, { message: '概估傷患人數超出合理範圍' })
+    @Type(() => Number)
+    casualtyEstimate?: number;
 }
 
 /**
@@ -151,10 +180,7 @@ export class ReportQueryDto {
     @IsOptional()
     status?: ReportStatus;
 
-    @IsIn(
-        ['earthquake', 'flood', 'fire', 'typhoon', 'landslide', 'traffic', 'infrastructure', 'other'],
-        { message: '災情類型必須是有效的類型' }
-    )
+    @IsIn(REPORT_TYPE_IN, { message: '災情類型必須是有效的類型' })
     @IsOptional()
     type?: ReportType;
 
@@ -169,6 +195,12 @@ export class ReportQueryDto {
     @IsString()
     @IsOptional()
     search?: string;
+
+    /** 只列出大量傷患事件（CD-1；未指定＝不過濾＝擴充前行為） */
+    @IsBoolean({ message: '大量傷患篩選必須是布林值' })
+    @IsOptional()
+    @Transform(({ value }) => (typeof value === 'string' ? value === 'true' : value))
+    isMassCasualty?: boolean;
 
     @Type(() => Number)
     @IsNumber()

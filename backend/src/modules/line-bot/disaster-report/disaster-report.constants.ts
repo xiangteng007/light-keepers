@@ -3,6 +3,14 @@
  * BOT-REPORT-001
  */
 
+import {
+    CIVIL_DEFENSE_KEYWORDS,
+    CIVIL_DEFENSE_REPORT_TYPES,
+    detectCivilDefenseType,
+} from '../../reports/disaster-types';
+
+const CIVIL_DEFENSE_TYPE_SET: ReadonlySet<string> = new Set(CIVIL_DEFENSE_REPORT_TYPES);
+
 /**
  * Session 過期時間（毫秒）
  */
@@ -97,7 +105,10 @@ export const MESSAGES = {
 };
 
 /**
- * 災情類型映射（未來可擴展）
+ * 災情類型映射
+ *
+ * CD-1：新增四個民防類別。既有 8 類的關鍵字**一字未改**，且民防關鍵字取自
+ * `disaster-types.ts` 的「強訊號」詞彙表（與既有關鍵字無交集）。
  */
 export const DISASTER_TYPE_KEYWORDS: Record<string, string[]> = {
     earthquake: ['地震', '震災', '倒塌'],
@@ -107,17 +118,30 @@ export const DISASTER_TYPE_KEYWORDS: Record<string, string[]> = {
     landslide: ['土石流', '山崩', '落石'],
     traffic: ['車禍', '交通', '事故'],
     infrastructure: ['路燈', '電線', '管線', '倒塌'],
+    air_raid: CIVIL_DEFENSE_KEYWORDS.air_raid,
+    explosion: CIVIL_DEFENSE_KEYWORDS.explosion,
+    terror_attack: CIVIL_DEFENSE_KEYWORDS.terror_attack,
+    cbrn: CIVIL_DEFENSE_KEYWORDS.cbrn,
     other: [], // 預設
 };
 
 /**
- * 根據描述文字判斷災情類型
+ * 根據描述文字判斷災情類型。
+ *
+ * 兩階段：先比對民防強訊號，再走既有關鍵字表。因為兩組詞彙無交集，只含既有
+ * 關鍵字的文本結果與擴充前完全相同（例如「爆炸」仍然判 fire）。
  */
 export function detectDisasterType(text: string): string {
     const lowerText = text.toLowerCase();
 
+    const civilDefenseType = detectCivilDefenseType(text);
+    if (civilDefenseType) {
+        return civilDefenseType;
+    }
+
     for (const [type, keywords] of Object.entries(DISASTER_TYPE_KEYWORDS)) {
         if (type === 'other') continue;
+        if (CIVIL_DEFENSE_TYPE_SET.has(type)) continue; // 已在階段 1 比對過
         if (keywords.some(kw => lowerText.includes(kw))) {
             return type;
         }

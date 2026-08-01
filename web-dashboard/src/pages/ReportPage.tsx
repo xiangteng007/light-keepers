@@ -1,6 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, Button } from '../design-system';
+import {
+    DISASTER_TYPE_GROUPS,
+    DISASTER_TYPE_OPTIONS,
+    MASS_CASUALTY_META,
+} from '../constants/disasterTypes';
 import { createReport } from '../api/services';
 import type { ReportType, ReportSeverity } from '../api/services';
 import './ReportPage.css';
@@ -15,29 +20,21 @@ const STEPS: { key: WizardStep; label: string; icon: string }[] = [
     { key: 'confirm', label: '確認送出', icon: '4' },
 ];
 
-// 前端災害類型對應後端 ReportType
-const TYPE_MAPPING: Record<string, ReportType> = {
-    earthquake: 'earthquake',
-    typhoon: 'typhoon',
-    flood: 'flood',
-    fire: 'fire',
-    landslide: 'landslide',
-    traffic: 'traffic',
-    infrastructure: 'infrastructure',
-    other: 'other',
-};
+// 災害類型選項與後端 ReportType 對應
+// CD-1: 兩者都改由 constants/disasterTypes SSOT 產生。前端值與後端代碼本來就
+// 一對一相同，TYPE_MAPPING 因此只是恆等映射，留著是為了不動既有 handleSubmit。
+const TYPE_MAPPING: Record<string, ReportType> = Object.fromEntries(
+    DISASTER_TYPE_OPTIONS.map(option => [option.value, option.value]),
+) as Record<string, ReportType>;
 
-// 災害類型選項
-const DISASTER_TYPES = [
-    { value: 'earthquake', label: '地震', icon: '🌍', description: '地震造成的損害' },
-    { value: 'typhoon', label: '颱風', icon: '🌀', description: '颱風、強風災害' },
-    { value: 'flood', label: '水災', icon: '🌊', description: '淹水、積水情況' },
-    { value: 'fire', label: '火災', icon: '🔥', description: '火災、濃煙' },
-    { value: 'landslide', label: '土石流', icon: '⛰️', description: '山崩、土石滑動' },
-    { value: 'traffic', label: '交通事故', icon: '🚗', description: '車禍、道路阻塞' },
-    { value: 'infrastructure', label: '設施損壞', icon: '🏗️', description: '建築、設施損毀' },
-    { value: 'other', label: '其他', icon: '❓', description: '其他緊急狀況' },
-];
+const DISASTER_TYPES = DISASTER_TYPE_OPTIONS.map(option => ({
+    value: option.value,
+    label: option.label,
+    icon: option.emoji,
+    Icon: option.Icon,
+    description: option.description,
+    civilDefense: option.civilDefense,
+}));
 
 // 嚴重程度選項
 // NOTE: these must stay literal hex (not var(--token, ...)) because they are
@@ -63,6 +60,9 @@ interface FormData {
     contactName: string;
     contactPhone: string;
     photos: string[];
+    // CD-1: 大量傷患跨災型旗標
+    isMassCasualty: boolean;
+    casualtyEstimate: string;
 }
 
 export default function ReportPage() {
@@ -84,6 +84,8 @@ export default function ReportPage() {
         contactName: '',
         contactPhone: '',
         photos: [],
+        isMassCasualty: false,
+        casualtyEstimate: '',
     });
 
     // 自動獲取 GPS 位置
@@ -121,7 +123,7 @@ export default function ReportPage() {
     }, [currentStep]);
 
     // 表單欄位更新
-    const updateField = (field: keyof FormData, value: string | number | null) => {
+    const updateField = (field: keyof FormData, value: string | number | boolean | null) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
@@ -198,6 +200,11 @@ export default function ReportPage() {
                 photos: formData.photos.length > 0 ? formData.photos : undefined,
                 contactName: formData.contactName || undefined,
                 contactPhone: formData.contactPhone || undefined,
+                // CD-1: 未勾選時送 false（後端預設也是 false，行為一致）
+                isMassCasualty: formData.isMassCasualty,
+                casualtyEstimate: formData.casualtyEstimate
+                    ? Number(formData.casualtyEstimate)
+                    : undefined,
             });
 
             setSubmitSuccess(true);
@@ -224,6 +231,8 @@ export default function ReportPage() {
             contactName: '',
             contactPhone: '',
             photos: [],
+            isMassCasualty: false,
+            casualtyEstimate: '',
         });
     };
 
@@ -257,19 +266,52 @@ export default function ReportPage() {
                         <h3 className="wizard-step__title">選擇災害類型</h3>
                         <p className="wizard-step__subtitle">請選擇最符合的災害類型</p>
 
-                        <div className="disaster-type-grid">
-                            {DISASTER_TYPES.map(type => (
-                                <button
-                                    key={type.value}
-                                    type="button"
-                                    className={`disaster-type-card ${formData.type === type.value ? 'active' : ''}`}
-                                    onClick={() => updateField('type', type.value)}
-                                >
-                                    <span className="disaster-type-card__icon">{type.icon}</span>
-                                    <span className="disaster-type-card__label">{type.label}</span>
-                                    <span className="disaster-type-card__desc">{type.description}</span>
-                                </button>
-                            ))}
+                        {/* CD-1: 民防類別獨立分組，避免與天災混在同一片網格中誤選 */}
+                        {DISASTER_TYPE_GROUPS.map(group => (
+                            <div key={group.title} className="disaster-type-group">
+                                <h4 className="disaster-type-group__title">{group.title}</h4>
+                                <div className="disaster-type-grid">
+                                    {group.options.map(type => (
+                                        <button
+                                            key={type.value}
+                                            type="button"
+                                            className={`disaster-type-card ${formData.type === type.value ? 'active' : ''}`}
+                                            onClick={() => updateField('type', type.value)}
+                                        >
+                                            <span className="disaster-type-card__icon">
+                                                <type.Icon size={24} color={type.color} aria-hidden="true" />
+                                            </span>
+                                            <span className="disaster-type-card__label">{type.label}</span>
+                                            <span className="disaster-type-card__desc">{type.description}</span>
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+
+                        {/* CD-1: 大量傷患是跨災型旗標，因此是獨立勾選而非災型選項 */}
+                        <div className="form-section">
+                            <label className="mass-casualty-toggle">
+                                <input
+                                    type="checkbox"
+                                    checked={formData.isMassCasualty}
+                                    onChange={e => updateField('isMassCasualty', e.target.checked)}
+                                />
+                                <MASS_CASUALTY_META.Icon size={18} color={MASS_CASUALTY_META.color} aria-hidden="true" />
+                                <span>
+                                    {MASS_CASUALTY_META.label}事件（{MASS_CASUALTY_META.description}）
+                                </span>
+                            </label>
+                            {formData.isMassCasualty && (
+                                <input
+                                    type="number"
+                                    className="form-input"
+                                    min={0}
+                                    placeholder="概估傷患人數（可留空）"
+                                    value={formData.casualtyEstimate}
+                                    onChange={e => updateField('casualtyEstimate', e.target.value)}
+                                />
+                            )}
                         </div>
 
                         <div className="form-section">
@@ -458,6 +500,15 @@ export default function ReportPage() {
                                     {selectedType?.icon} {selectedType?.label}
                                 </span>
                             </div>
+                            {formData.isMassCasualty && (
+                                <div className="confirm-item">
+                                    <span className="confirm-label">{MASS_CASUALTY_META.label}</span>
+                                    <span className="confirm-value" style={{ color: MASS_CASUALTY_META.color }}>
+                                        {MASS_CASUALTY_META.emoji} 是
+                                        {formData.casualtyEstimate ? `（約 ${formData.casualtyEstimate} 人）` : ''}
+                                    </span>
+                                </div>
+                            )}
                             <div className="confirm-item">
                                 <span className="confirm-label">嚴重程度</span>
                                 <span

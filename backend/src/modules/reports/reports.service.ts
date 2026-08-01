@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Report, ReportStatus, ReportType, ReportSeverity, ReportSource } from './reports.entity';
 import { Task } from '../tasks/entities';
 import { ReportDispatcherService } from './report-dispatcher.service';
+import { getDefaultSeverity } from './disaster-types';
 
 export interface CreateReportDto {
     type: ReportType;
@@ -20,6 +21,9 @@ export interface CreateReportDto {
     source?: ReportSource;
     reporterLineUserId?: string;
     reporterLineDisplayName?: string;
+    // 大量傷患（MCI）跨災型旗標 — CD-1
+    isMassCasualty?: boolean;
+    casualtyEstimate?: number;
 }
 
 export interface ReviewReportDto {
@@ -32,6 +36,8 @@ export interface ReportFilter {
     status?: ReportStatus;
     type?: ReportType;
     severity?: ReportSeverity;
+    /** 只列出大量傷患事件（CD-1）；undefined＝不過濾＝擴充前行為 */
+    isMassCasualty?: boolean;
     limit?: number;
     offset?: number;
 }
@@ -54,8 +60,12 @@ export class ReportsService {
         const report = this.reportsRepository.create({
             ...dto,
             status: 'pending',
-            severity: dto.severity || 'medium',
+            // CD-1: 未指定 severity 時採災型預設值。既有 8 類的預設值都是
+            // 'medium'，因此既有呼叫端的行為與擴充前完全相同；只有民防新災型
+            // （air_raid/cbrn/terror_attack=critical, explosion=high）會拉高。
+            severity: dto.severity || getDefaultSeverity(dto.type),
             source: dto.source || 'web',
+            isMassCasualty: dto.isMassCasualty ?? false,
         });
 
         const saved = await this.reportsRepository.save(report);
@@ -224,6 +234,13 @@ export class ReportsService {
 
         if (filter.severity) {
             query.andWhere('report.severity = :severity', { severity: filter.severity });
+        }
+
+        // CD-1: 大量傷患篩選（undefined 時完全不加條件＝擴充前行為）
+        if (filter.isMassCasualty !== undefined) {
+            query.andWhere('report.isMassCasualty = :isMassCasualty', {
+                isMassCasualty: filter.isMassCasualty,
+            });
         }
 
         query.orderBy('report.createdAt', 'DESC');

@@ -2,7 +2,14 @@ import api from '../client';
 
 // ===== 回報系統 Reports =====
 
-export type ReportType = 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other';
+/**
+ * 災害類型。前 8 個是既有（天災導向）類別，後 4 個是 D16 民防韌性（CD-1）新增。
+ * 標籤／圖標／顏色集中在 `src/constants/disasterTypes.ts`。
+ */
+export type ReportType =
+    | 'earthquake' | 'flood' | 'fire' | 'typhoon' | 'landslide' | 'traffic' | 'infrastructure' | 'other'
+    // D16 民防（CD-1）
+    | 'air_raid' | 'explosion' | 'terror_attack' | 'cbrn';
 export type ReportSeverity = 'low' | 'medium' | 'high' | 'critical';
 export type ReportStatus = 'pending' | 'confirmed' | 'rejected';
 export type ReportSource = 'web' | 'line';
@@ -27,6 +34,9 @@ export interface Report {
     source?: ReportSource;
     reporterLineUserId?: string;
     reporterLineDisplayName?: string;
+    // 大量傷患（MCI）跨災型旗標 — CD-1
+    isMassCasualty?: boolean;
+    casualtyEstimate?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -42,6 +52,9 @@ export interface CreateReportDto {
     photos?: string[];
     contactName?: string;
     contactPhone?: string;
+    // 大量傷患（MCI）跨災型旗標 — CD-1
+    isMassCasualty?: boolean;
+    casualtyEstimate?: number;
 }
 
 export interface ReviewReportDto {
@@ -55,6 +68,8 @@ export const getReports = (params?: {
     status?: ReportStatus;
     type?: ReportType;
     severity?: ReportSeverity;
+    /** 只列出大量傷患事件（CD-1）；未指定＝不過濾 */
+    isMassCasualty?: boolean;
     limit?: number;
     offset?: number
 }) => api.get<{ success: boolean; data: Report[]; count: number }>('/reports', { params });
