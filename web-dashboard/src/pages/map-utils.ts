@@ -84,6 +84,19 @@ export const createWarehouseMarkerIcon = () => ({
     anchor: new google.maps.Point(12, 12),
 });
 
+// 防空避難處所標記圖標 - 盾牌形狀（琥珀色，與避難收容所綠色明確區分）
+// 防空避難處所為短時間空襲/飛彈警報掩蔽用途，與收容所（長期收容）性質不同，
+// 因此使用獨立圖標與顏色，避免使用者混淆。
+export const createAirRaidShelterMarkerIcon = () => ({
+    path: 'M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z',
+    fillColor: '#FF8F00',
+    fillOpacity: 1,
+    strokeColor: '#fff',
+    strokeWeight: 2,
+    scale: 1.3,
+    anchor: new google.maps.Point(12, 20),
+});
+
 // Map container style
 export const containerStyle = {
     width: '100%',

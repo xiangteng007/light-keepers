@@ -3,11 +3,18 @@ import {
     Get,
     Query,
 } from '@nestjs/common';
+import { Throttle } from '@nestjs/throttler';
 import { PublicResourcesService, Shelter, AedLocation } from './public-resources.service';
+import { AirRaidSheltersService } from './air-raid-shelters.service';
+import { AirRaidShelter } from './entities/air-raid-shelter.entity';
+import { Public } from '../shared/guards';
 
 @Controller('public-resources')
 export class PublicResourcesController {
-    constructor(private readonly publicResourcesService: PublicResourcesService) { }
+    constructor(
+        private readonly publicResourcesService: PublicResourcesService,
+        private readonly airRaidSheltersService: AirRaidSheltersService,
+    ) { }
 
     /**
      * 取得所有避難收容所
@@ -101,5 +108,54 @@ export class PublicResourcesController {
         }
 
         return result;
+    }
+
+    /**
+     * 取得所有防空避難設施（防空避難處所）
+     * GET /public-resources/air-raid-shelters
+     *
+     * 資料來源：內政部警政署「防空避難處所」開放資料 (data.gov.tw)，經
+     * backend/src/scripts/import-air-raid-shelters.ts 或月度排程匯入。
+     * 與 /public-resources/shelters（長期收容所）為不同性質的設施，見
+     * AirRaidShelter entity 註解說明。
+     *
+     * Level 0 公開端點：@Public() 允許匿名存取，@Throttle 限制每分鐘 30 次請求。
+     */
+    @Public()
+    @Throttle({ default: { limit: 30, ttl: 60000 } })
+    @Get('air-raid-shelters')
+    async getAirRaidShelters(): Promise<{ data: AirRaidShelter[]; total: number }> {
+        const shelters = await this.airRaidSheltersService.findAll();
+        return { data: shelters, total: shelters.length };
+    }
+
+    /**
+     * 查找附近防空避難設施
+     * GET /public-resources/air-raid-shelters/nearby?lat=25.05&lng=121.55&radius=2
+     *
+     * Level 0 公開端點：@Public() 允許匿名存取，@Throttle 限制每分鐘 30 次請求。
+     */
+    @Public()
+    @Throttle({ default: { limit: 30, ttl: 60000 } })
+    @Get('air-raid-shelters/nearby')
+    async getNearbyAirRaidShelters(
+        @Query('lat') lat: string,
+        @Query('lng') lng: string,
+        @Query('radius') radius?: string,
+    ): Promise<{ data: AirRaidShelter[]; total: number }> {
+        const latitude = parseFloat(lat);
+        const longitude = parseFloat(lng);
+        const radiusKm = parseFloat(radius || '2');
+
+        if (isNaN(latitude) || isNaN(longitude)) {
+            return { data: [], total: 0 };
+        }
+
+        const shelters = await this.airRaidSheltersService.findNearby(
+            latitude,
+            longitude,
+            radiusKm,
+        );
+        return { data: shelters, total: shelters.length };
     }
 }

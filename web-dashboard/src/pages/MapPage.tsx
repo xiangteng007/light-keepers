@@ -1,7 +1,7 @@
 import { useState, useCallback, useRef, useMemo } from 'react';
 import { GoogleMap, useJsApiLoader, MarkerF, InfoWindowF, HeatmapLayerF } from '@react-google-maps/api';
 import { useQuery } from '@tanstack/react-query';
-import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, getWarehousesForMap, getHotspots, type NcdrAlert, type Shelter, type AedLocation, type Report, type Warehouse, type HotspotData } from '../api';
+import { getEvents, getNcdrAlertsForMap, getPublicResourcesForMap, getNearbyAed, getReportsForMap, getWarehousesForMap, getHotspots, getNearbyAirRaidShelters, type NcdrAlert, type Shelter, type AedLocation, type Report, type Warehouse, type HotspotData, type AirRaidShelter } from '../api';
 import type { Event } from '../api';
 import { Badge, Card, Button } from '../design-system';
 
@@ -16,8 +16,15 @@ import {
     getSeverityColor, getSeverityLabel,
     createMarkerIcon, createNcdrMarkerIcon,
     createShelterMarkerIcon, createAedMarkerIcon, createWarehouseMarkerIcon,
+    createAirRaidShelterMarkerIcon,
     containerStyle, mapOptions, initNcdrFilters,
 } from './map-utils';
+
+// TODO(離線地圖包): 防空避難處所圖層的 PMTiles 離線封裝尚未納入本次工作範圍。
+// 待離線地圖包（見 web-dashboard/src/pages/OfflinePrepPage.tsx、
+// web-dashboard/src/pages/PackageLibraryPage.tsx、
+// web-dashboard/src/services/localPMTilesServer.ts）支援自訂圖層資料後，
+// 應將防空避難處所資料一併納入可離線下載的封裝內容。
 
 export default function MapPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
@@ -35,13 +42,15 @@ export default function MapPage() {
     const [ncdrTypeFilters] = useState<Record<number, boolean>>(initNcdrFilters);
     const [selectedNcdrAlert, setSelectedNcdrAlert] = useState<NcdrAlert | null>(null);
 
-    // 公共資源圖層狀態（避難所/AED/倉庫）
+    // 公共資源圖層狀態（避難所/AED/倉庫/防空避難處所）
     const [showShelters, setShowShelters] = useState(false);
     const [showAed, setShowAed] = useState(false);
     const [showWarehouses, setShowWarehouses] = useState(false);
+    const [showAirRaidShelters, setShowAirRaidShelters] = useState(false);
     const [selectedShelter, setSelectedShelter] = useState<Shelter | null>(null);
     const [selectedAed, setSelectedAed] = useState<AedLocation | null>(null);
     const [selectedWarehouse, setSelectedWarehouse] = useState<Warehouse | null>(null);
+    const [selectedAirRaidShelter, setSelectedAirRaidShelter] = useState<AirRaidShelter | null>(null);
 
     // Phase 5.2: 熱點分析圖層
     const [showHotspots, setShowHotspots] = useState(false);
@@ -120,12 +129,24 @@ export default function MapPage() {
         staleTime: 1000 * 60 * 30, // 30 分鐘快取
     });
 
+    // 獲取附近防空避難處所（基於地圖中心查詢，沿用 AED nearby 模式）
+    const { data: nearbyAirRaidSheltersData } = useQuery({
+        queryKey: ['nearbyAirRaidShelters', mapCenter.lat, mapCenter.lng],
+        queryFn: async () => {
+            const res = await getNearbyAirRaidShelters(mapCenter.lat, mapCenter.lng, 5); // 5km 半徑
+            return res.data.data || [];
+        },
+        enabled: showAirRaidShelters,
+        staleTime: 1000 * 60 * 30, // 30 分鐘快取（資料為月度更新，變動不頻繁）
+    });
+
     const events = Array.isArray(eventsData) ? eventsData : [];
     const confirmedReports = Array.isArray(reportsData) ? reportsData : [];
     const ncdrAlerts = Array.isArray(ncdrData) ? ncdrData : [];
     const shelters = Array.isArray(sheltersData) ? sheltersData : [];
     const aedLocations = Array.isArray(nearbyAedData) ? nearbyAedData : [];
     const warehouses = Array.isArray(warehousesData) ? warehousesData : [];
+    const airRaidShelters = Array.isArray(nearbyAirRaidSheltersData) ? nearbyAirRaidSheltersData : [];
 
     // Phase 5.2: 獲取熱點分析數據
     const { data: hotspotsResponse } = useQuery({
@@ -374,6 +395,14 @@ export default function MapPage() {
                             />
                             <span>📦 倉庫</span>
                         </label>
+                        <label className="header-layer-toggle" title="政府公告防空避難處所（空襲/飛彈警報短時掩蔽用，與避難收容所不同）">
+                            <input
+                                type="checkbox"
+                                checked={showAirRaidShelters}
+                                onChange={(e) => setShowAirRaidShelters(e.target.checked)}
+                            />
+                            <span>🛡️ 防空避難處所</span>
+                        </label>
                         <label className="header-layer-toggle" title="顯示災情回報熱點分析">
                             <input
                                 type="checkbox"
@@ -473,6 +502,7 @@ export default function MapPage() {
                                         setInfoWindowEvent(null);
                                         setSelectedShelter(null);
                                         setSelectedAed(null);
+                                        setSelectedAirRaidShelter(null);
                                     }}
                                     title={alert.title}
                                 />
@@ -489,6 +519,7 @@ export default function MapPage() {
                                         setSelectedAed(null);
                                         setSelectedNcdrAlert(null);
                                         setInfoWindowEvent(null);
+                                        setSelectedAirRaidShelter(null);
                                     }}
                                     title={shelter.name}
                                 />
@@ -505,6 +536,7 @@ export default function MapPage() {
                                         setSelectedShelter(null);
                                         setSelectedNcdrAlert(null);
                                         setInfoWindowEvent(null);
+                                        setSelectedAirRaidShelter(null);
                                     }}
                                     title={aed.name}
                                 />
@@ -522,8 +554,27 @@ export default function MapPage() {
                                         setSelectedShelter(null);
                                         setSelectedNcdrAlert(null);
                                         setInfoWindowEvent(null);
+                                        setSelectedAirRaidShelter(null);
                                     }}
                                     title={warehouse.name}
+                                />
+                            ))}
+
+                            {/* 防空避難處所標記（與避難收容所使用獨立圖標/顏色區分） */}
+                            {showAirRaidShelters && airRaidShelters.map((shelter) => (
+                                <MarkerF
+                                    key={shelter.id}
+                                    position={{ lat: shelter.latitude, lng: shelter.longitude }}
+                                    icon={createAirRaidShelterMarkerIcon()}
+                                    onClick={() => {
+                                        setSelectedAirRaidShelter(shelter);
+                                        setSelectedShelter(null);
+                                        setSelectedAed(null);
+                                        setSelectedWarehouse(null);
+                                        setSelectedNcdrAlert(null);
+                                        setInfoWindowEvent(null);
+                                    }}
+                                    title={shelter.name}
                                 />
                             ))}
 
@@ -766,6 +817,58 @@ export default function MapPage() {
                                             <button
                                                 onClick={() => {
                                                     const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedWarehouse.latitude},${selectedWarehouse.longitude}`;
+                                                    window.open(url, '_blank');
+                                                }}
+                                            >
+                                                🧭 導航
+                                            </button>
+                                        </div>
+                                    </div>
+                                </InfoWindowF>
+                            )}
+
+                            {/* 防空避難處所 InfoWindow */}
+                            {selectedAirRaidShelter && (
+                                <InfoWindowF
+                                    position={{
+                                        lat: selectedAirRaidShelter.latitude,
+                                        lng: selectedAirRaidShelter.longitude,
+                                    }}
+                                    onCloseClick={() => setSelectedAirRaidShelter(null)}
+                                    options={{
+                                        pixelOffset: new google.maps.Size(0, -25),
+                                    }}
+                                >
+                                    <div className="gmap-infowindow">
+                                        <div className="gmap-infowindow__header">
+                                            <span
+                                                className="gmap-infowindow__severity"
+                                                style={{ background: '#FF8F00' }}
+                                            >
+                                                🛡️ 防空避難處所
+                                            </span>
+                                        </div>
+                                        <h4 className="gmap-infowindow__title">{selectedAirRaidShelter.name}</h4>
+                                        <p className="gmap-infowindow__desc">
+                                            📍 {selectedAirRaidShelter.address || `${selectedAirRaidShelter.city}${selectedAirRaidShelter.district}`}
+                                        </p>
+                                        <p className="gmap-infowindow__desc">
+                                            👥 容納人數：{selectedAirRaidShelter.capacity || '未知'}
+                                        </p>
+                                        {selectedAirRaidShelter.basementLevels != null && (
+                                            <p className="gmap-infowindow__desc">
+                                                🏚️ 地下 {selectedAirRaidShelter.basementLevels} 層
+                                            </p>
+                                        )}
+                                        {selectedAirRaidShelter.managingOrg && (
+                                            <p className="gmap-infowindow__desc">
+                                                🏢 管理單位：{selectedAirRaidShelter.managingOrg}
+                                            </p>
+                                        )}
+                                        <div className="gmap-infowindow__actions">
+                                            <button
+                                                onClick={() => {
+                                                    const url = `https://www.google.com/maps/dir/?api=1&destination=${selectedAirRaidShelter.latitude},${selectedAirRaidShelter.longitude}`;
                                                     window.open(url, '_blank');
                                                 }}
                                             >

@@ -119,3 +119,34 @@ export const getPublicResourcesForMap = (types?: ('shelters' | 'aed')[]) =>
     api.get<{ shelters?: Shelter[]; aed?: AedLocation[] }>('/public-resources/map', {
         params: types ? { types: types.join(',') } : undefined
     });
+
+// ===== 防空避難處所（Air-Raid Shelter）=====
+// 與 Shelter（長期收容所）不同：防空避難處所供空襲/飛彈警報時短時間掩蔽使用，
+// 資料來源為內政部警政署「防空避難處所」開放資料 (data.gov.tw)，見
+// backend/src/modules/public-resources/entities/air-raid-shelter.entity.ts
+
+export interface AirRaidShelter {
+    id: string;
+    name: string;
+    city: string;
+    district: string;
+    address: string;
+    latitude: number;
+    longitude: number;
+    capacity: number;
+    /** 地下樓層數（例如 B2 則為 2）；資料未提供或非地下設施則為 null */
+    basementLevels: number | null;
+    managingOrg: string | null;
+    contactPhone?: string | null;
+    isGeocoded: boolean;
+}
+
+// 取得所有防空避難處所
+export const getAirRaidShelters = () =>
+    api.get<{ data: AirRaidShelter[]; total: number }>('/public-resources/air-raid-shelters');
+
+// 查找附近防空避難處所
+export const getNearbyAirRaidShelters = (lat: number, lng: number, radiusKm?: number) =>
+    api.get<{ data: AirRaidShelter[]; total: number }>('/public-resources/air-raid-shelters/nearby', {
+        params: { lat, lng, radius: radiusKm }
+    });
