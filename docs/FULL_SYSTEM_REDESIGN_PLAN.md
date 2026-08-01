@@ -232,6 +232,41 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
   ```
   N5105＋16GB 承載評估：NestJS＋PostGIS＋nginx 對協會規模（百人級並發）足夠；AI 推論、PDF 大量產出等重活不落在 NAS。
 
+### 民防韌性（Civil Defense Readiness）— 2026-08-01 依 D16 決策新增
+
+> **背景**：平台現況為純天災導向。Owner 拍板擴充涵蓋**戰爭/恐攻/大型複合災難**。
+> **既有可轉用資產**：ICS 指揮流程（情境無關）、避難所/尋親/檢傷/物資邏輯、離線 outbox（斷網通報不丟）、NAS 本地化（去境外雲依賴）——後兩項恰為戰時韌性核心且已完工。
+
+#### CD-1 災型分類與告警擴充
+- **內容**: 災型 enum 增列 空襲/砲擊/爆炸/恐攻/CBRN（化生放核）；intake 表單、地圖圖標、LLM 分類器 prompt 與對測資料同步擴充；告警源除 NCDR 外評估介接災防告警（PWS 飛彈警報屬廣播接收端，平台側做「收到警報→一鍵啟動戰時模式」的人工觸發）。
+- **風險**: 低-中（enum 加值向後相容；碰 intake schema）。
+- **驗收**: 新災型全流程可通報/派遣/結案；LLM 分類對新類別對測 ≥90%。
+
+#### CD-2 防空避難設施資料介接
+- **內容**: 介接內政部警政署「防空避難處所」開放資料（政府資料開放平台 CSV）→ 新增設施類型於 PublicResources；地圖圖層與離線地圖包（PMTiles）納入；與現有收容所明確區分（防空=短時躲避、收容=長期安置）。
+- **風險**: 低（唯讀公開資料，加 entity 欄位/種子資料）。
+- **驗收**: 地圖可查最近防空避難處所（含離線）；資料定期更新 job。
+
+#### CD-3 大量傷患事件（MCI）流程
+- **內容**: 現有單人檢傷升級為 MCI 級聯——START/JumpSTART 傷票（含離線填寫）、分流站管理、傷患追蹤（掛牌編號→後送→醫院）、醫院容量看板（人工回報起步）。
+- **風險**: 高（新 entity 群＋核心流程，正確性攸關人命）。
+- **驗收**: 演練情境：50 傷患從掛牌到後送全程可追；斷網下傷票可填、恢復後同步。
+
+#### CD-4 通訊降級計畫（Degraded Comms）
+- **內容**: 定義四級降級模式並逐級實作——L0 正常（LINE+FCM）／L1 無雲（NAS 本地全功能，已具）／L2 無網際網路（內網 WiFi＋離線 outbox，已具局部；補「基地台模式」文件與演練）／L3 無電力（紙本 SOP/傷票/通訊錄一鍵匯出 PDF，平時預印）。LoRa/mesh **先做 spike 評估報告**（硬體成本/覆蓋/法規）再決定投資（D17）。SMS fallback 評估（D18，需費用）。
+- **風險**: 中（多為文件/匯出/演練；mesh 只做評估不實作）。
+- **驗收**: 各級降級有書面 SOP＋年度演練腳本；L3 紙本包可一鍵產出。
+
+#### CD-5 跨機關協調與政府體系介接
+- **內容**: 既有 `interoperability-adapters`（EDXL DTO 已在 3.5 定型）擴充 CAP（Common Alerting Protocol）收發；與縣市 EOC/全民防衛動員體系的介接**視 owner 洽談結果**定 scope（D19）；先完成技術面（標準格式收發＋沙盒驗證）。
+- **風險**: 中（外部依賴重，介接窗口非工程可控）。
+- **驗收**: EDXL/CAP 樣本訊息可 round-trip；介接文件備妥供洽談。
+
+#### CD-6 戰時資料韌性
+- **內容**: 異地備份由「建議」升級為**必要**：第二備份目標（Mac mini 或加密雲端冷儲存）自動化；RPO ≤ 24h／RTO ≤ 4h 目標入 RUNBOOK；還原演練頻率季→**月**（戰備期）；NAS 實體安置建議（非臨窗/有 UPS）。
+- **風險**: 低（基於既有備份腳本擴充）。
+- **驗收**: 雙目標備份自動化＋一次跨目標還原演練通過。
+
 ### 跨切面
 
 #### XC-1 安全速修包（新增：深掃直接抓到的可利用點）
@@ -271,6 +306,9 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | **Phase 5**（3–4 週） | 核心功能缺口 | XC-4（audit P0→P1）、BE-3 分頁/N+1（前後端成對 PR）、DA-1 索引 | 🟡–🔴 新 entity/欄位 | audit/05 Gherkin、explain 驗證 |
 | **Phase 6**（1–2 週） | 收尾 | DA-3 Resources 評估報告、API 版本 ADR、剩餘換皮批次、文件終稿 | 🟢（分析/文件） | 報告交付 |
 | **Phase M**（機動，2–3 週，**期限由 Google 租約到期日決定**） | 本地 NAS 搬遷 | INF-1：NAS Docker 棧、DB/檔案搬遷、本地 LLM provider、對外通道（Tunnel/反代）、備份演練 | 🟡-🔴 一次性停機搬資料 | NAS 全棧 e2e 綠燈、備份還原演練 |
+| **Phase C1**（2 週，D16 新增） | 民防：資料與分類 | CD-1 災型擴充、CD-2 防空避難設施、CD-6 韌性升級 | 🟢-🟡 enum/資料為主 | 新災型全流程、避難處所離線可查、雙備份演練 |
+| **Phase C2**（3–4 週） | 民防：MCI＋降級 | CD-3 大量傷患流程、CD-4 通訊降級（含 LoRa spike 報告） | 🔴 新核心流程 | 50 傷患演練情境、四級降級 SOP |
+| **Phase C3**（機動） | 民防：介接 | CD-5 EDXL/CAP＋政府體系介接（依 D19 洽談進度） | 🟡 外部依賴 | 標準訊息 round-trip |
 
 依賴：Phase 1 的 baseline 需 D7 窗口；Phase 3 依賴 Phase 2 的元件層與 Phase 1 的 DTO；Phase 5 依賴 Phase 1 的 schema 治理完成。**Phase M 排程建議**：至少在租約到期前 4 週啟動；理想順序是 P1（schema 治理）→ P4 的 stub 刪除（縮小 Gemini/搬遷面）→ Phase M，但若租約期限緊迫，Phase M 可提前插隊，僅硬性依賴 P1 的 baseline migration（沒有它，NAS 重建 schema 只能整庫 dump/restore，仍可行但失去版控保障）。
 
@@ -334,6 +372,15 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | M.4 | Cloud SQL → NAS PostGIS 搬遷（dump/restore＋停機窗口演練）（INF-1） | OPUS | 🔴 | PM |
 | M.5 | 對外通道（Cloudflare Tunnel/反代＋TLS）＋LINE webhook/FCM 實測（INF-1） | OPUS | 🟡 | PM |
 | M.6 | Cloud Logging/cloudbuild 替換（winston 本地＋GitHub Actions）＋備份還原演練（INF-1） | SONNET / OPUS 驗收 | 🟢 | PM |
+| C1.1 | 災型 enum/表單/圖標/LLM prompt 擴充（CD-1） | OPUS 定分類法 / SONNET 批次接線 | 🟡 | PC1 |
+| C1.2 | 防空避難處所開放資料介接＋地圖圖層＋更新 job（CD-2） | SONNET | 🟢 | PC1 |
+| C1.3 | 雙目標備份自動化＋RPO/RTO 入 RUNBOOK（CD-6） | OPUS | 🟢 | PC1 |
+| C2.1 | MCI 資料模型與傷票流程（START/JumpSTART、離線傷票）（CD-3） | OPUS | 🔴 | PC2 |
+| C2.2 | 分流站/後送追蹤/醫院容量看板 UI（CD-3） | SONNET（依 C2.1 spec） | 🟡 | PC2 |
+| C2.3 | 四級通訊降級 SOP＋L3 紙本包一鍵匯出（CD-4） | OPUS 定 SOP / SONNET 匯出實作 | 🟡 | PC2 |
+| C2.4 | LoRa/mesh spike 評估報告（硬體/覆蓋/法規/成本）（CD-4） | OPUS | 🟢(報告) | PC2 |
+| C3.1 | CAP 協定收發＋EDXL round-trip 沙盒（CD-5） | OPUS | 🟡 | PC3 |
+| C3.2 | 政府介接技術文件包（供洽談）（CD-5） | SONNET | 🟢 | PC3 |
 
 **派工模式**: 每期 OPUS 先出細部 spec（端點清單/元件 API/遷移批次），SONNET 按清單批量執行，OPUS review 所有碰正確性的 PR。SONNET 批次工作以「每批一 PR＋e2e 綠燈」為節奏。
 
@@ -361,6 +408,7 @@ Helmet+CSP、CORS 白名單、全域 ValidationPipe（設定正確，被 `any` �
 | D7 | 正式 DB 操作窗口 | **依建議**：提前兩週排程、附備份確認 | P1 baseline、P5 索引、Phase M 搬遷停機皆循此程序 |
 | D9 | 多租戶 | **降級為單租戶** | DA-2 走 (a) 路線：廢 TenantGuard、ADR-001 標 superseded、tenants 模組降為組織資料管理；省去核心表加 tenantId 的大工程；工作項 4.1 風險由 🔴 降為 🟡 |
 | D10 | 41 個純 stub 模組 | **刪除** | BE-4 走刪除路線（工作項 4.2）：先出 app.module import 依賴圖確認無隱性依賴，分批刪除＋CI 綠燈；同時大幅縮小 Gemini 依賴面，利於 Phase M 的本地 LLM 切換 |
+| D16 | 民防韌性（戰爭/恐攻/大型災難） | **同意新設計（2026-08-01）** | 新增 CD-1~6 主題與 Phase C1–C3（見 §2 民防韌性節）；衍生新決策 D17（LoRa 硬體投資，待 C2.4 spike 報告）、D18（SMS fallback 通道費用）、D19（政府/EOC 介接窗口洽談，owner 主導） |
 | D12 | NAS 硬體規格 | **已提供（2026-08-01）**：ASUSTOR AS5404T（Nimbustor 4 Gen2）、Celeron N5105 4C4T、16GB DDR4、ADM 5.1.1、4-bay HDD（RAID 6）＋4× M.2 NVMe（規劃 RAID 10 供 Docker/DB）、2× 2.5GbE。**同內網另有 RTX 5090 AI 工作站、Mac mini、中華電信固定 IP、TP-Link 網路** | Phase M 架構修正（見 INF-1 補充）：NAS 只跑 Docker 應用棧（backend＋PostGIS＋nginx，N5105/16GB 對協會規模足夠；DB volume 放 NVMe RAID 10）；**LLM 推論不在 NAS 上跑，走 RTX 5090 工作站**（Ollama/LM Studio server mode，backend 以 OpenAI-compatible endpoint 經內網呼叫）；HDD RAID 6 池承接備份（每日 pg_dump＋檔案快照） |
 
 ### 待 Owner 拍板的方向題（尚未決）
