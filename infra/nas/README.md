@@ -240,6 +240,7 @@ docker compose -f docker-compose.nas.yml --env-file .env exec backend npm run mi
 | 3 | `cp -al` 硬連結快照 | `${HDD_BACKUP_ROOT}/uploads/YYYYMMDD-HHMMSS/`（未變動的檔案不佔額外空間） |
 | 4 | 清理 | 刪除 mtime 超過 `BACKUP_RETENTION_DAYS`（預設 **14 天**）的 dump 與快照 |
 | 5 | 心跳 | 更新 `.heartbeat`；超過 26 小時未更新，容器 healthcheck 會轉為 unhealthy |
+| 6 | **第二副本** | 推送到 NAS 以外的目標並回驗（§5.4，CD-6 要求） |
 
 設計上的兩個保護：dump 先寫 `.partial` 再改名（中斷不會留下看似完整的半套檔案）；dump 小於 1KB 直接判定失敗（幾乎必然是權限或連錯 DB）。
 
@@ -247,9 +248,12 @@ docker compose -f docker-compose.nas.yml --env-file .env exec backend npm run mi
 
 ```bash
 docker compose -f docker-compose.nas.yml --env-file .env exec backup /usr/local/bin/backup.sh
+
+# 只跑本地備份，不推第二副本
+docker compose -f docker-compose.nas.yml --env-file .env exec backup /usr/local/bin/backup.sh --no-replicate
 ```
 
-### 5.2 還原演練（建議每季一次）
+### 5.2 還原演練（平時每季一次，戰備期每月）
 
 演練用 `scripts/restore-drill.sh`，它會**另起一個臨時 postgres 容器**做還原，**完全不碰生產資料庫**，因此可在任何時間安全執行。
 
@@ -266,6 +270,11 @@ cd infra/nas/scripts
 ./restore-drill.sh --keep
 docker exec -it lk-restore-drill psql -U <DB_USERNAME> -d <DB_DATABASE>
 docker rm -f lk-restore-drill      # 查完記得拆
+
+# 4. 跨目標演練：從第二副本拉回來還原（CD-6 驗收項，見 §5.4）
+./restore-drill.sh --source=secondary
+./restore-drill.sh --source=secondary --secondary-mode=rclone   # 指定從雲端那份驗
+./restore-drill.sh --source=secondary --dry-run                 # 只拉回驗 sha256，不還原
 ```
 
 演練會檢查並輸出：
@@ -275,7 +284,17 @@ docker rm -f lk-restore-drill      # 查完記得拆
 3. 還原後的表數／row count 與線上逐表比對
    （線上比備份多 = 備份後的新增，正常；**還原比線上多 = 曾發生資料遺失，需追查**）
 4. uploads 備份檔案數與保留快照數
-5. **RTO**：實際還原耗時 —— 請記錄到 `docs/RUNBOOK.md`，這是災難當下唯一可信的時間估計
+5. **RTO**：實際還原耗時 —— 請記錄到 [`docs/RUNBOOK.md`](../../docs/RUNBOOK.md) §7.3 的演練紀錄表，
+   這是災難當下唯一可信的時間估計
+
+`--source=secondary` 額外驗證的是**完全不同的一件事**：不是「備份是好的嗎」，
+而是「**當整台 NAS 不在了，你還救得回來嗎**」。主副本演練通過不代表第二副本通過——
+金鑰被輪換、rclone crypt 密碼記錯、遠端目錄被清空、保留策略誤刪最後一份，
+這些只有真的拉一次才會發現。
+
+> 該模式透過 `docker compose run --rm --no-deps` 借用 `backup` 容器執行拉取：
+> 遠端存取邏輯只有 `replicate.sh` 一份（host 與容器不會漂移），SSH 私鑰與
+> `rclone.conf` 也只掛在容器裡，host 上不需要第二份秘密。生產棧沒開也能演練。
 
 ### 5.3 真的要還原生產資料庫時
 
@@ -303,6 +322,94 @@ chown -R 1000:1000 /volume2/docker/lightkeepers/uploads
 # 5. 起服務並驗證
 docker compose -f docker-compose.nas.yml --env-file .env start backend backup
 ./scripts/verify-stack.sh
+```
+
+### 5.4 第二副本（CD-6 / 工作項 C1.3）
+
+**HDD RAID 6 不是異地備份。** 它跟 NVMe 在同一台機器、同一個地址。
+RAID 擋得住硬碟壞，擋不住失竊、火災、淹水、停電燒毀，更擋不住戰時的物理毀損。
+D16 民防韌性決策把第二副本從「建議」升級為**必要**：同址單一副本 = 沒有備份。
+
+目標值（RPO ≤ 24h／RTO ≤ 4h）、演練頻率與實體安置要求見
+[`docs/RUNBOOK.md`](../../docs/RUNBOOK.md) 第 7 節。
+
+#### 方案 A：rsync over SSH → 內網 Mac mini（主推）
+
+內網 2.5GbE 快、無月費、掉線時人找得到機器。
+
+```bash
+# 1. NAS 上產生專用金鑰（不要用既有的個人金鑰）
+mkdir -p /volume1/docker/secrets && chmod 700 /volume1/docker/secrets
+ssh-keygen -t ed25519 -N '' -C 'lk-nas-backup-replica' \
+    -f /volume1/docker/secrets/lk_replica_ed25519
+chmod 600 /volume1/docker/secrets/lk_replica_ed25519
+
+# 2. Mac mini：系統設定 → 一般 → 共享 → 開啟「遠端登入」，建一個專用帳號
+#    再把公鑰加進該帳號的 ~/.ssh/authorized_keys，並加上限制前綴：
+#      restrict,pty ssh-ed25519 AAAA... lk-nas-backup-replica
+#    這樣即使 NAS 被入侵，這把金鑰也只能傳檔，不能開 shell 或轉發連線。
+
+# 3. Mac mini：建立落點（建議掛外接硬碟）
+mkdir -p /Volumes/LK-Backup/lightkeepers/{db,uploads}
+
+# 4. NAS 的 infra/nas/.env 填入（見 .env.nas.example §7.1）
+#      REPLICA_ENABLED=true
+#      REPLICA_MODE=rsync
+#      REPLICA_SSH_HOST / REPLICA_SSH_USER / REPLICA_REMOTE_ROOT
+#      REPLICA_SSH_KEY_HOST=/volume1/docker/secrets/lk_replica_ed25519
+
+# 5. 重建並先測連線（--dry-run 只驗連線與本機 sha256，不傳輸）
+docker compose -f docker-compose.nas.yml --env-file .env up -d --build backup
+docker compose -f docker-compose.nas.yml --env-file .env exec backup \
+    /usr/local/bin/replicate.sh --dry-run
+
+# 6. 實際推一次
+docker compose -f docker-compose.nas.yml --env-file .env exec backup /usr/local/bin/replicate.sh
+
+# 7. ⚠ 最重要的一步：驗證這份第二副本真的還原得回來
+./scripts/restore-drill.sh --source=secondary
+```
+
+⚠ Mac mini 請放在**不同房間、不同電源迴路**。放在 NAS 旁邊等於白做——
+同一場火、同一次竊盜會一起消失。
+⚠ 該處的資料是**未加密**的；若空間無法上鎖，請改用方案 B 或啟用 FileVault。
+
+#### 方案 B：rclone crypt → S3 相容冷儲存（選配，建議與 A 併用）
+
+真正的異地。走 `rclone crypt`，**資料在離開 NAS 之前就加密完畢**，
+雲端業者拿到的只有密文與被混淆的檔名。
+
+設定骨架見 [`backup/rclone.conf.example`](backup/rclone.conf.example)（含 B2／R2／Wasabi 的
+provider 對照與 bucket 版本控制建議）。複製到 `/volume1/docker/secrets/rclone.conf`、
+`chmod 600`、填完值後在 `.env` 設 `REPLICA_RCLONE_CONF_HOST`、`REPLICA_RCLONE_REMOTE`，
+並把 `REPLICA_MODE` 改成 `rclone` 或 `both`。
+
+⚠⚠ crypt 的 `password` / `password2` 遺失 = 雲端那份**永久解不開**。
+必須離線抄一份（紙本，與 NAS 不同地點）並存進團隊密碼管理器。
+`restore-drill.sh --source=secondary --secondary-mode=rclone` 同時也是在驗證
+「這兩個值還救得回來」。
+
+⚠ 儲存等級不要選需要「解凍」才能讀的（GLACIER／DEEP_ARCHIVE）——
+取回要等數小時到數天，RTO ≤ 4h 直接破表。
+
+#### 完整性與告警
+
+| 時機 | 動作 | 失敗後果 |
+|---|---|---|
+| 推送**前** | 本機用 `.sha256` 驗一次 | 拒絕推送。把壞檔推出去會覆蓋遠端良品，一次弄壞兩份 |
+| 推送**後** | 在遠端重算 sha256 比對（rclone 走 `check --download`） | 判定失敗。傳輸層說成功不代表磁碟上的位元是對的 |
+| uploads | 推送後 `rsync --checksum --dry-run` 逐檔回驗（可用 `REPLICA_VERIFY_UPLOADS=false` 關閉） | 判定失敗 |
+| 任一失敗 | 寫 `${HDD_BACKUP_ROOT}/.replica-failed`（含時間與原因）、**不更新** `.replica-heartbeat` | 心跳超過 49 小時 → 容器 unhealthy |
+
+心跳刻意分成兩條：`.heartbeat`（本地備份）與 `.replica-heartbeat`（第二副本）。
+「沒備份」和「備了但沒送出去」的處置方式完全不同，混在一起就看不出差別。
+49 小時的門檻給一次失敗自動復原的機會——Mac mini 臨時關機一天不該讓整個棧
+看起來壞掉，但連兩天推不出去就是真的有事。
+
+```bash
+# 目前狀態
+docker compose -f docker-compose.nas.yml --env-file .env exec backup /usr/local/bin/healthcheck.sh
+cat /volume1/backup/lightkeepers/.replica-failed 2>/dev/null   # 有這個檔就是有事
 ```
 
 ---
@@ -412,7 +519,7 @@ nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重�
 | LLM provider 接線 | `LLM_BASE_URL` 等 env 已備妥，實際的 OpenAI-compatible provider 尚未實作 | 工作項 M.2 |
 | Cloud Logging 替換 | winston 本地檔＋Sentry | 工作項 M.6 |
 | cloudbuild → GitHub Actions | build image 推到 NAS 可拉的 registry | 工作項 M.6 |
-| 異地備份第二副本 | HDD 池外的一份（Mac mini 或雲端冷儲存），需人為設定 | §2 |
+| ~~異地備份第二副本~~ | 自動化已於 C1.3 完成（`backup/replicate.sh`，見 §5.4）。**仍需人為設定目標並跑一次 `--source=secondary` 演練**才算生效 | ✅ 機制完成／待現場設定 |
 
 ---
 
@@ -426,7 +533,10 @@ nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重�
 | 上傳回 `EACCES` | `chown -R 1000:1000 ${NVME_DATA_ROOT}/uploads` |
 | Tunnel 連上但回 502 | Cloudflare 的 Public Hostname 服務位址須為 `nginx:8080`，不是 `localhost:8080` |
 | LINE webhook 驗證失敗 | Webhook URL 是否已改到新網域；Cloudflare 的 Disable Chunked Encoding 應保持關閉 |
-| 備份容器 unhealthy | `.heartbeat` 超過 26 小時未更新。看 `${HDD_BACKUP_ROOT}/backup.log` |
+| 備份容器 unhealthy | 先跑 `exec backup /usr/local/bin/healthcheck.sh` 看是哪條心跳過期。本地 → 看 `${HDD_BACKUP_ROOT}/backup.log`；第二副本 → 看 `${HDD_BACKUP_ROOT}/.replica-failed` |
+| 第二副本推送失敗：SSH 連不上 | Mac mini 關機／睡眠（系統設定 → 節能 → 關閉自動睡眠）、`authorized_keys` 未加公鑰、防火牆擋 22 |
+| 第二副本推送失敗：遠端 sha256 不符 | 傳輸或遠端儲存有問題。**先不要覆蓋遠端那份**，保留現場再查 |
+| rclone 報 crypt 錯誤 | `password`/`password2` 與當初建立時不一致——用錯密碼不會報「密碼錯」，只會解出亂碼或找不到檔案 |
 | 記憶體吃緊 | `docker stats`。16GB 的分配見 compose 檔開頭；AI 推論若不慎跑在 NAS 上會立刻爆掉——確認 `LLM_BASE_URL` 指向工作站 |
 
 常用指令：

@@ -228,9 +228,13 @@ services:
 
   # ---------------------------------------------------------------------------
   # 備份 job —— 每日 pg_dump + uploads rsync → HDD RAID 6，保留 14 天
+  #                並推送第二副本到 NAS 以外的目標（CD-6 / 工作項 C1.3）
   #
   # 沒有用 host crond：ADM 的排程與容器生命週期分離，容器一停排程就變孤兒。
   # 改用容器內常駐迴圈（entrypoint.sh），與棧同生共死，狀態也看得到。
+  #
+  # 雙目標：HDD 池是「主副本」（快、隨時可還原），Mac mini／雲端冷儲存是
+  # 「第二副本」（離開這台機器，扛得住整台 NAS 消失）。兩者缺一都不算備份完成。
   # ---------------------------------------------------------------------------
   backup:
     build:
@@ -249,19 +253,49 @@ services:
       PGDATABASE: ${DB_DATABASE:?DB_DATABASE is required}
       BACKUP_AT: ${BACKUP_AT:-03:30}
       BACKUP_RETENTION_DAYS: ${BACKUP_RETENTION_DAYS:-14}
+
+      # --- 第二副本（CD-6）：預設關閉，設定完目標後才打開 ---
+      # ⚠ REPLICA_ENABLED=false 時 backup.sh 會在日誌留下 WARN：
+      #   同址單一副本不符合 CD-6，僅供尚未備妥第二目標的過渡期使用。
+      REPLICA_ENABLED: ${REPLICA_ENABLED:-false}
+      REPLICA_MODE: ${REPLICA_MODE:-rsync}
+      # 預設與主副本同為 14 天。第二副本若空間允許建議拉到 30 天以上：
+      # 勒索軟體常有超過兩週的潛伏期，保留期短於潛伏期＝乾淨備份已被輪替掉。
+      # （compose 的變數展開不支援巢狀預設值，故此處寫死 14 而非引用 BACKUP_RETENTION_DAYS）
+      REPLICA_RETENTION_DAYS: ${REPLICA_RETENTION_DAYS:-14}
+      REPLICA_VERIFY_UPLOADS: ${REPLICA_VERIFY_UPLOADS:-true}
+      # 方案 A：rsync over SSH → Mac mini
+      REPLICA_SSH_HOST: ${REPLICA_SSH_HOST:-}
+      REPLICA_SSH_USER: ${REPLICA_SSH_USER:-}
+      REPLICA_SSH_PORT: ${REPLICA_SSH_PORT:-22}
+      REPLICA_REMOTE_ROOT: ${REPLICA_REMOTE_ROOT:-}
+      # 容器內固定路徑；host 端的實際檔案由下方 volumes 的 *_HOST 變數指定
+      REPLICA_SSH_KEY: /secrets/replica_key
+      # 方案 B：rclone crypt → S3 相容冷儲存
+      RCLONE_CONFIG: /secrets/rclone.conf
+      REPLICA_RCLONE_REMOTE: ${REPLICA_RCLONE_REMOTE:-}
+      REPLICA_RCLONE_VERIFY: ${REPLICA_RCLONE_VERIFY:-download}
+      # healthcheck 門檻（秒）：本地 26h、第二副本 49h（兩個週期 + 1h 容差）
+      BACKUP_STALE_SECONDS: ${BACKUP_STALE_SECONDS:-93600}
+      REPLICA_STALE_SECONDS: ${REPLICA_STALE_SECONDS:-176400}
     volumes:
       # 來源：NVMe 上的 uploads（唯讀，備份程序不該有寫權限）
       - ${NVME_DATA_ROOT:?NVME_DATA_ROOT is required}/uploads:/source/uploads:ro
       # 目的：HDD RAID 6 備份池
       - ${HDD_BACKUP_ROOT:?HDD_BACKUP_ROOT is required}:/backup
+      # 第二副本的憑證，唯讀掛入。未啟用時指向 repo 內的佔位／範本檔——
+      # compose 不支援條件式 mount，來源路徑不存在會讓整個服務起不來。
+      - ${REPLICA_SSH_KEY_HOST:-./backup/replica-key.placeholder}:/secrets/replica_key:ro
+      - ${REPLICA_RCLONE_CONF_HOST:-./backup/rclone.conf.example}:/secrets/rclone.conf:ro
     depends_on:
       postgres:
         condition: service_healthy
     healthcheck:
-      # 心跳檔超過 26 小時沒更新即視為不健康（日備 + 2 小時容許誤差）
-      test: ["CMD-SHELL", "test -f /backup/.heartbeat && test $$(( $$(date +%s) - $$(stat -c %Y /backup/.heartbeat) )) -lt 93600"]
+      # 兩條心跳：本地備份 + 第二副本。判定邏輯與失敗原因見 backup/healthcheck.sh
+      # （原本是寫死在這裡的一行 CMD-SHELL，加入第二副本後條件變多，抽成腳本才讀得懂也測得動）
+      test: ["CMD", "/usr/local/bin/healthcheck.sh"]
       interval: 300s
-      timeout: 10s
+      timeout: 30s
       retries: 3
       start_period: 120s
     mem_limit: 512m

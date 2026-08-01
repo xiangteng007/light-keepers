@@ -6,4 +6,5 @@
 *.conf          text eol=lf
 *.yml           text eol=lf
 Dockerfile      text eol=lf
-.env.nas.example text eol=lf
+*.example       text eol=lf
+*.placeholder   text eol=lf
