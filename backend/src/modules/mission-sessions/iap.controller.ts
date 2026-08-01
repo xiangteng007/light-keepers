@@ -9,8 +9,11 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { IAPService } from './iap.service';
 import { IAPDocumentType } from './entities/iap-document.entity';
-import { Objective, RiskAssessment, ResourceAllocation } from './entities/operational-period.entity';
 import { UpsertIapDocumentDto } from './dto/iap-document.dto';
+import {
+    CreateOperationalPeriodDto,
+    UpdateOperationalPeriodDto,
+} from './dto/operational-period.dto';
 
 // 定級理由：IAP（事件行動計畫）＝作戰指揮文件。撰寫作戰週期目標、風險評估與資源配置屬幕僚作業 → L2；
 // 「核准」與「啟動/關閉作戰週期」是指揮權行為，一旦生效即改變全隊行動依據 → 收緊 L3。
@@ -46,14 +49,7 @@ export class IAPController {
     @ApiOperation({ summary: '建立新的作戰週期' })
     async createPeriod(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            name?: string;
-            startTime: string;
-            endTime?: string;
-            objectives?: Objective[];
-            priorities?: string[];
-            commanderGuidance?: string;
-        },
+        @Body() body: CreateOperationalPeriodDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const period = await this.iapService.createPeriod({
@@ -73,15 +69,7 @@ export class IAPController {
     @ApiOperation({ summary: '更新作戰週期' })
     async updatePeriod(
         @Param('periodId') periodId: string,
-        @Body() body: {
-            name?: string;
-            objectives?: Objective[];
-            priorities?: string[];
-            riskAssessment?: RiskAssessment[];
-            resourceAllocation?: ResourceAllocation[];
-            commanderGuidance?: string;
-            endTime?: string;
-        },
+        @Body() body: UpdateOperationalPeriodDto,
     ) {
         const period = await this.iapService.updatePeriod(periodId, {
             ...body,

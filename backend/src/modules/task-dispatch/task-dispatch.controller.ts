@@ -20,6 +20,8 @@ import {
     AcceptTaskDto,
     DeclineTaskDto,
     CompleteTaskDto,
+    TaskCheckInDto,
+    TaskCheckOutDto,
 } from './dto';
 import { TaskStatus, TaskPriority } from './entities/dispatch-task.entity';
 
@@ -176,7 +178,7 @@ export class TaskDispatchController {
     @RequiredLevel(RoleLevel.VOLUNTEER)
     async checkIn(
         @Param('id') id: string,
-        @Body() dto: { latitude: number; longitude: number; note?: string },
+        @Body() dto: TaskCheckInDto,
         @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.checkIn(id, req.user.id, {
@@ -193,7 +195,7 @@ export class TaskDispatchController {
     @RequiredLevel(RoleLevel.VOLUNTEER)
     async checkOut(
         @Param('id') id: string,
-        @Body() dto: { latitude?: number; longitude?: number; notes?: string },
+        @Body() dto: TaskCheckOutDto,
         @Request() req: AuthenticatedRequest,
     ) {
         return this.taskService.checkOut(id, req.user.id, {
