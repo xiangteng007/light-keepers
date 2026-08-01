@@ -220,6 +220,42 @@ const AUTHZ_BASELINE: Record<string, { count: number; reason: string }> = {
     },
 };
 
+/**
+ * 行內型別 `@Body() body: { ... }` 的偵測。
+ *
+ * 為什麼這是安全問題：全域 ValidationPipe 只有在參數型別是「類別」時才會執行。
+ * TypeScript 的行內物件型別編譯後不留下 metatype，Nest 拿不到可驗證的型別，
+ * 於是整個 whitelist / forbidNonWhitelisted / 型別檢查全部靜默跳過——
+ * 端點看起來有驗證，實際上什麼都沒驗。
+ */
+function countInlineBodies(source: string): number {
+    const clean = stripComments(source);
+    // @Body() 或 @Body('key')，接參數名，接 `: {`（可能換行後才是 `{`）
+    const inlineBody = /@Body\(\s*(?:'[^']*'|"[^"]*")?\s*\)\s*[A-Za-z_$][\w$]*\s*[?!]?\s*:\s*\{/g;
+    return (clean.match(inlineBody) ?? []).length;
+}
+
+/**
+ * 已經完成 DTO 化、必須維持 0 的 controller。
+ * 這些是 P0 判定的高風險面：作戰情資、派遣、簽到座標、心理健康特種個資。
+ */
+const INLINE_BODY_PROTECTED = new Set([
+    'modules/mission-sessions/sitrep.controller.ts',
+    'modules/mission-sessions/iap.controller.ts',
+    'modules/mission-sessions/aar.controller.ts',
+    'modules/overlays/map-dispatch.controller.ts',
+    'modules/psychological-support/mood-tracker.controller.ts',
+    'modules/task-dispatch/task-dispatch.controller.ts',
+    'modules/auth/auth.controller.ts',
+    'modules/auth/two-factor.controller.ts',
+]);
+
+/**
+ * 其餘尚未 DTO 化的端點總數（棘輪基準線）。
+ * 2026-08-02 實測值。剩下的建議照「碰個資／碰錢／碰指揮權」分批補，屬 P0 之後。
+ */
+const INLINE_BODY_BASELINE = 111;
+
 describe('安全不變量（P0 回歸守衛）', () => {
     describe('authz 定級覆蓋率', () => {
         it('掛了角色 Guard 的端點都必須宣告 @RequiredLevel / @RequiredRoles / @Public', () => {
@@ -331,6 +367,52 @@ describe('安全不變量（P0 回歸守衛）', () => {
             }
 
             expect(offenders.length === 0 ? '' : `以下 @Body() 參數是 any：\n${offenders.join('\n')}`).toBe('');
+        });
+
+        it('已 DTO 化的 controller 不得回退成行內型別 body', () => {
+            const offenders: string[] = [];
+            for (const file of CONTROLLER_FILES) {
+                const repoPath = toRepoPath(file);
+                if (!INLINE_BODY_PROTECTED.has(repoPath)) continue;
+                const count = countInlineBodies(readFileSync(file, 'utf8'));
+                if (count > 0) {
+                    offenders.push(`  ${repoPath}：出現 ${count} 個行內型別 @Body()`);
+                }
+            }
+            expect(
+                offenders.length === 0
+                    ? ''
+                    : `這些檔案的端點已改用 DTO，不得回退（行內型別會讓 ValidationPipe 空轉）：\n${offenders.join('\n')}`,
+            ).toBe('');
+        });
+
+        it('全專案行內型別 body 的總數只能下降（棘輪）', () => {
+            const total = CONTROLLER_FILES.reduce(
+                (sum, file) => sum + countInlineBodies(readFileSync(file, 'utf8')),
+                0,
+            );
+
+            if (total > INLINE_BODY_BASELINE) {
+                const perFile = CONTROLLER_FILES.map((file) => ({
+                    file: toRepoPath(file),
+                    count: countInlineBodies(readFileSync(file, 'utf8')),
+                }))
+                    .filter((x) => x.count > 0)
+                    .sort((a, b) => b.count - a.count)
+                    .map((x) => `  ${x.file}: ${x.count}`)
+                    .join('\n');
+                throw new Error(
+                    `行內型別 @Body() 從基準線 ${INLINE_BODY_BASELINE} 增加到 ${total}。` +
+                    `新端點請一律用 class DTO（行內型別編譯後沒有 metatype，ValidationPipe 不會執行）。\n${perFile}`,
+                );
+            }
+
+            // 降低時要求同步調降基準線，才不會把已經修好的成果又讓出去
+            expect(
+                total < INLINE_BODY_BASELINE
+                    ? `行內型別 @Body() 已降到 ${total}，請把 INLINE_BODY_BASELINE 調成這個數字以鎖住成果。`
+                    : '',
+            ).toBe('');
         });
     });
 
