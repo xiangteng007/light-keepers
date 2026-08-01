@@ -867,6 +867,18 @@
     --sidebar-width-collapsed: 80px;
 }
 
+/* ── Layout 相容別名（R1：原 AppShellLayout.css :root 宣告移入此處，
+      維持 SidebarSettings/MentalHealthPage/ProtectedRoute 等既有消費者） ── */
+:root {
+    --layout-bg: var(--bg-primary);
+    --layout-surface: var(--surface-default);
+    --layout-border: var(--border-default);
+    --layout-text: var(--text-primary);
+    --layout-text-secondary: var(--text-secondary);
+    --layout-text-muted: var(--text-tertiary);
+    --layout-accent: var(--color-secondary);
+}
+
 /* ═══════════════════════════════════════════════════════════════════════════
    LAYER 7 — 條件式覆寫 (來源 A：design-tokens.css)
    ═══════════════════════════════════════════════════════════════════════════ */
@@ -900,4 +912,78 @@
         --transition-base: 0ms;
         --transition-slow: 0ms;
     }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 8 — 災時戰術模式 (R1 / FE-7 雙模式 IA)
+   ─────────────────────────────────────────────────────────────────────────
+   掛載點：AppShellLayout 根節點的 data-app-mode="emergency"
+   （由 useAppMode.ts 依 EmergencyContext 等級 / 手動覆寫決定）。
+   色盤來源：lightkeepers_tactical_uiux_spec_utf8_bundle（戰術深色最小可行色盤）。
+   注意：此層宣告在元素（非 :root）上，透過「繼承就近覆寫」贏過任何
+   :root / [data-theme] 宣告 —— 不依賴 specificity，light/dark 皆會被蓋過。
+   規格見 docs/architecture/DESIGN_LANGUAGE.md §1.3。
+   ═══════════════════════════════════════════════════════════════════════════ */
+[data-app-mode="emergency"] {
+    /* 背景 / 表面 */
+    --bg-primary: #161E2A;
+    --bg-secondary: #1D2635;
+    --bg-tertiary: #232D3F;
+    --surface-ground: #161E2A;
+    --surface-default: #1D2635;
+    --surface-card: #1D2635;
+    --surface-raised: #232D3F;
+    --surface-overlay: rgba(22, 30, 42, 0.95);
+    --surface-hover: #263143;
+    --surface-pressed: #2C3850;
+    --surface-active: #2C3850;
+
+    /* 文字 */
+    --text-primary: #F3F3F2;
+    --text-heading: #F3F3F2;
+    --text-body: #F3F3F2;
+    --text-secondary: #D0CEC3;
+    --text-tertiary: #AEAEA7;
+    --text-muted: #AEAEA7;
+    --text-disabled: #65696A;
+    --text-inverse: #161E2A;
+    --text-link: #C39B6F;
+    --text-accent: #C39B6F;
+
+    /* 邊框 */
+    --border-default: #2F3641;
+    --border-light: #2A3140;
+    --border-dark: #3A4250;
+    --border-subtle: #2F3641;
+    --border-focus: #C39B6F;
+    --border-accent: #C39B6F;
+
+    /* 強調（戰術金 — 克制使用於關鍵行動/焦點） */
+    --accent-primary: #C39B6F;
+    --accent-hover: #D4AC80;
+    --accent-gold: #C39B6F;
+    --color-secondary: #C39B6F;
+
+    /* 狀態色：深色底提高亮度確保 AA 對比（語意不變，見 DESIGN_LANGUAGE.md §3） */
+    --color-danger: #F87171;
+    --color-danger-bg: rgba(248, 113, 113, 0.15);
+    --color-warning: #FBBF24;
+    --color-warning-bg: rgba(251, 191, 36, 0.15);
+    --color-success: #4ADE80;
+    --color-safe: #34D399;
+    --color-safe-bg: rgba(52, 211, 153, 0.15);
+    --color-info: #60A5FA;
+    --color-info-bg: rgba(96, 165, 250, 0.15);
+    --color-critical: #A78BFA;
+    --color-critical-bg: rgba(167, 139, 250, 0.18);
+
+    /* 陰影（墨色加深） */
+    --shadow-sm: 0 2px 6px rgba(8, 10, 15, 0.45);
+    --shadow-md: 0 8px 20px rgba(8, 10, 15, 0.45);
+    --shadow-lg: 0 18px 46px rgba(8, 10, 15, 0.55);
+
+    /* 動效：災時一律最短，禁止裝飾性動畫 */
+    --transition-normal: 100ms ease;
+    --transition-slow: 100ms ease;
+    --transition-spring: 100ms ease;
 }
