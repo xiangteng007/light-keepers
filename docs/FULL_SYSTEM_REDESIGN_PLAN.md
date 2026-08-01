@@ -23,6 +23,9 @@
 | **Phase M 前置** | ✅ 紙上作業就緒 | M.0 compose env 修復；M.1 NAS 生產棧（`infra/nas/`：五服務 compose＋備份 job＋還原演練腳本＋部署手冊）；M.2 本地 LLM provider（hybrid fallback＋對測工具）；M.3 搬遷腳本（DB/GCS，dry-run 驗證）；✅ M.3b storage 抽象層接管（三 service 全遷、per-feature bucket 綁定、local 簽章 URL 向前相容方案；**已知缺口**：local 模式的 write 直傳 URL 無落點（nginx 405），影響 field-reports 附件直傳，列 README §8 後續）；⏸ 實際搬遷等 D15 租約日＋owner 架 Ollama/Tunnel |
 | 驗證基準 | — | 後端 357 suites / 3,499 tests 全綠；前端 vitest 88/88；tsc 雙側乾淨；coverage 門檻生效（52%/32%，實測 58.5%/37.4%） |
 
+| **Phase C1（民防）** | ✅ **全部完成** | C1.1 災型擴充（air_raid/explosion/terror_attack/cbrn＋MCI 正交旗標；LLM 對測新類別 100%、既有零回歸、整體 96.9%；migration 已寫待 D7 執行）、C1.2 防空避難處所（entity/匯入器/月更 job/公開端點×2/地圖圖層）、C1.3 雙目標備份（Mac mini rsync＋加密雲選配、RPO≤24h/RTO≤4h 入 RUNBOOK、戰備期月演練切換條件） |
+| **Phase R（FABLE 重設計）** | 🔄 | R1（設計語言＋Shell＋IA 收斂）FABLE 執行中 |
+
 **等 Owner 的動作**：①憑證輪換（`docs/security/CREDENTIAL_ROTATION_CHECKLIST.md`）②git 歷史清理確認 ③D7/D15 排窗口 ④D12–D14（NAS 規格/LLM 選型/通道）⑤下次部署將強制全員重新登入（JWT 更換）。
 
 ---
