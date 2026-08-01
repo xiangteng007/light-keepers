@@ -26,6 +26,8 @@
 | **Phase C1（民防）** | ✅ **全部完成** | C1.1 災型擴充（air_raid/explosion/terror_attack/cbrn＋MCI 正交旗標；LLM 對測新類別 100%、既有零回歸、整體 96.9%；migration 已寫待 D7 執行）、C1.2 防空避難處所（entity/匯入器/月更 job/公開端點×2/地圖圖層）、C1.3 雙目標備份（Mac mini rsync＋加密雲選配、RPO≤24h/RTO≤4h 入 RUNBOOK、戰備期月演練切換條件） |
 | **Phase R（FABLE 重設計）** | 🔄 | ✅ R1 完成（DESIGN_LANGUAGE.md、雙模式 Shell、權限單一來源、24 redirect、5 權限修正、14 假 widget 頁改 placeholder、132/132 tests）；✅ R2 完成（R2a 態勢類：COP 牆＋角色分層 Dashboard；R2b 行動類：30 秒通報流＋真離線佇列、MapPage 拆分、應變工作檯；157/157 tests）；✅ R3 完成（R3a 14 頁＋R3b 63 頁＝77 頁依 archetype 重建；順修多個既有壞頁）；✅ R4 完成（78 張三態×雙尺寸截圖基準、axe AA 39/39 零違規——修掉兩個系統性 dark 模式對比根因、硬編色防復發 gate）。**Phase R 全部完成**；📋 待 owner 圈選 docs/audit/PAGE_REMOVAL_PROPOSAL.md（36 孤兒檔處置） |
 
+| **Phase C2 前置** | ✅ C2.1 設計完成 | `docs/architecture/MCI_DESIGN.md`（433 行）：傷票＝victims 原地升級（不建第二套傷患模型）、改判不對稱門檻（升色快通道/降色重評＋L2 確認）、稽核 append-only＋DB 觸發器（法律證據）、離線防撞編號；實作分解 M1–M8（M1 migration 依賴 D7/D15）；**6 個 D-MCI 決策點待 owner**（照片個資/保存期限/EMS 介接/BLACK 定案權限/實體傷票採購/JumpSTART 預設納入） |
+
 **等 Owner 的動作**：①憑證輪換（`docs/security/CREDENTIAL_ROTATION_CHECKLIST.md`）②git 歷史清理確認 ③D7/D15 排窗口 ④D12–D14（NAS 規格/LLM 選型/通道）⑤下次部署將強制全員重新登入（JWT 更換）。
 
 ---
