@@ -15,6 +15,12 @@
     margin: 0;
 }
 
+.settings-page .page-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
 .settings-page__panel {
     max-width: 640px;
     background: var(--surface-default, var(--bg-card));

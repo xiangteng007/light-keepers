@@ -5,7 +5,7 @@
  * 管理所有事件的列表與狀態追蹤 — connected to real API
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, Clock, CheckCircle, Plus, MapPin, Users, RefreshCw, Inbox, Loader2 } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle, Plus, MapPin, Users, RefreshCw, Inbox } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
 import { Badge, Button, Alert } from '../../design-system';
 import type { BadgeProps } from '../../design-system';
@@ -86,7 +86,7 @@ export default function IncidentsPage() {
         >
             <div className="incidents-page">
                 {/* toolbar：統計摘要列（可點擊篩選）＋ 主要動作 */}
-                <div className="panel incidents-toolbar">
+                <div className="incidents-toolbar">
                     <div className="stats-bar" role="group" aria-label="依狀態篩選事件">
                         {Object.entries(STATUS_INFO).map(([key, info]) => {
                             const count = incidents.filter(i => i.status === key).length;

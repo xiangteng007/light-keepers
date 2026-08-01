@@ -148,7 +148,7 @@
 
 .table td {
     padding: var(--space-3) var(--space-4);
-    font-size: var(--font-size-sm);
+    font-size: var(--font-size-base);
     color: var(--text-secondary);
     border-bottom: 1px solid var(--border-light);
 }

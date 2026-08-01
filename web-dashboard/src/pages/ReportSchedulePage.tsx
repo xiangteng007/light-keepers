@@ -27,7 +27,6 @@ import {
     CheckCircle,
     XCircle,
     AlertCircle,
-    X,
 } from 'lucide-react';
 import { Button, Badge, Modal, InputField } from '../design-system';
 import type { BadgeProps } from '../design-system';

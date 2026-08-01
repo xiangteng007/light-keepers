@@ -69,9 +69,9 @@ export default function BiometricPage() {
                     onClick={handleRegister}
                     disabled={isRegistering}
                     loading={isRegistering}
-                    icon={<Fingerprint size={16} aria-hidden="true" />}
+                    icon={isRegistering ? undefined : <Fingerprint size={16} aria-hidden="true" />}
                 >
-                    註冊新裝置
+                    {isRegistering ? '註冊中...' : '註冊新裝置'}
                 </Button>
             </div>
 

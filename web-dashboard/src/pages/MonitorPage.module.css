@@ -65,7 +65,7 @@
 }
 
 .card {
-    border-left: 3px solid var(--border-default);
+    border-left: 4px solid var(--border-default);
     transition: box-shadow var(--duration-fast, 150ms) var(--ease-smooth, ease);
 }
 

@@ -5,6 +5,13 @@
   gap: var(--space-6);
 }
 
+.ncdr-page .page-header__left h1 {
+  margin: 0;
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--text-primary);
+}
+
 /* 绡╅伕鍣?*/
 .ncdr-filter {
   padding: var(--space-5) !important;

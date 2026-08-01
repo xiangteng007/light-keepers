@@ -182,6 +182,7 @@ export default function VolunteersPage() {
             {/* Tab 切換 */}
             <div className="volunteers-tabs" role="tablist" aria-label="志工檢視">
                 <button
+                    type="button"
                     role="tab"
                     aria-selected={activeTab === 'pending'}
                     className={`tab-btn ${activeTab === 'pending' ? 'active' : ''}`}
@@ -190,6 +191,7 @@ export default function VolunteersPage() {
                     待審核 {pendingVolunteers.length > 0 && <Badge variant="warning" size="sm">{pendingVolunteers.length}</Badge>}
                 </button>
                 <button
+                    type="button"
                     role="tab"
                     aria-selected={activeTab === 'list'}
                     className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}

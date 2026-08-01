@@ -1,15 +1,30 @@
 /**
- * IncidentsPage.css
+ * IncidentsPage.css — 事件中心（List archetype，DESIGN_LANGUAGE.md §7.1）
+ * 語義 token only；light/dark/tactical 三態自動生效（原本假設固定深色背景的
+ * rgba(255,255,255,*) 已全部換為 surface/border 語義 token）。
  */
 .incidents-page {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: var(--space-5);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── toolbar：統計摘要列 + 主要動作 ───────────────────────────── */
+.incidents-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
 }
 
 .stats-bar {
     display: flex;
-    gap: 12px;
+    gap: var(--space-3);
     flex-wrap: wrap;
 }
 
@@ -17,77 +32,108 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 16px 24px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    min-height: 44px;
+    padding: var(--space-4) var(--space-6);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: background var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
     min-width: 100px;
 }
 
 .stat-item:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
 }
 
-.stat-item.active {
+.stat-item:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.stat-item.is-active {
     border-color: var(--stat-color);
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--surface-hover);
 }
 
 .stat-count {
-    font-size: 28px;
-    font-weight: 700;
+    font-size: var(--font-size-2xl, 28px);
+    font-weight: var(--font-weight-bold);
     color: var(--stat-color);
 }
 
 .stat-label {
-    font-size: 12px;
-    color: var(--text-tertiary, #5f6368);
-    margin-top: 4px;
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: var(--space-1);
 }
 
 .page-actions {
     display: flex;
-    justify-content: flex-end;
+    align-items: center;
+    gap: var(--space-2);
 }
 
-.btn-primary {
+.btn-icon {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    background: var(--accent-gold, #d4a84b);
-    border: none;
-    border-radius: 10px;
-    color: var(--text-primary, #0b111b);
-    font-weight: 500;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: filter 0.2s;
+    transition: background var(--duration-fast) var(--ease-out);
 }
 
-.btn-primary:hover {
-    filter: brightness(1.1);
+.btn-icon:hover {
+    background: var(--surface-hover);
 }
 
+.btn-icon:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.btn-icon:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.spin {
+    animation: incidents-spin 1s linear infinite;
+}
+
+@keyframes incidents-spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.incidents-page__retry {
+    margin-top: var(--space-2);
+}
+
+/* ── Incident List ─────────────────────────────────────────── */
 .incident-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .incident-card {
     display: flex;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     overflow: hidden;
-    transition: all 0.2s;
+    transition: background var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
 }
 
 .incident-card:hover {
-    background: rgba(255, 255, 255, 0.04);
-    transform: translateX(4px);
+    background: var(--surface-hover);
 }
 
 .priority-bar {
@@ -97,49 +143,61 @@
 
 .incident-content {
     flex: 1;
-    padding: 16px;
+    padding: var(--space-4);
+    min-width: 0;
 }
 
 .incident-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-bottom: 8px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+    flex-wrap: wrap;
 }
 
 .incident-number {
-    font-size: 12px;
-    font-family: monospace;
-    color: var(--text-tertiary, #5f6368);
-}
-
-.status-badge {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-    color: white;
+    font-size: var(--font-size-xs);
+    font-family: var(--font-mono);
+    color: var(--text-tertiary);
 }
 
 .incident-title {
-    margin: 0 0 12px;
-    font-size: 16px;
-    font-weight: 500;
-    color: var(--text-primary, #e8eaed);
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
 }
 
 .incident-meta {
     display: flex;
-    gap: 20px;
-    font-size: 12px;
-    color: var(--text-tertiary, #5f6368);
+    gap: var(--space-5);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    flex-wrap: wrap;
 }
 
 .incident-meta span {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
+}
+
+/* ── Responsive ────────────────────────────────────────────── */
+@media (max-width: 767px) {
+    .incidents-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .page-actions {
+        justify-content: stretch;
+    }
+
+    .page-actions > :last-child {
+        flex: 1;
+    }
+
+    .incident-card:hover {
+        transform: none;
+    }
 }

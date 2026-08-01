@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
 
                 {success ? (
                     <div className="login-form">
-                        <div className="login-success">
+                        <div className="login-success" role="status">
                             ✅ 密碼重設成功！即將跳轉至登入頁面...
                         </div>
                         <Link to="/login" className="login-submit" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
@@ -139,7 +139,7 @@ export default function ResetPasswordPage() {
                         })()}
 
                         {error && (
-                            <div className="login-error">
+                            <div className="login-error" role="alert">
                                 ⚠️ {error}
                             </div>
                         )}

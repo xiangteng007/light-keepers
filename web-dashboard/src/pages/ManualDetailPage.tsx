@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Wifi, Inbox } from 'lucide-react';
-import { Card, Tag, Button, Alert, Badge } from '../design-system';
+import { Card, Tag, Alert, Badge } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 
 // 手冊分類

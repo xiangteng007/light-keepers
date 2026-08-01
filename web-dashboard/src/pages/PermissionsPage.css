@@ -310,8 +310,8 @@
 }
 
 .page-card__visible input[type="checkbox"] {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     accent-color: var(--accent-primary, var(--color-secondary));
 }
 

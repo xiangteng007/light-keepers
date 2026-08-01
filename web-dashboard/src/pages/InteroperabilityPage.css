@@ -15,6 +15,12 @@
     margin: 0;
 }
 
+.interop-page .page-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
 .interop-page__stats {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));

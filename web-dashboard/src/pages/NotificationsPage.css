@@ -18,6 +18,12 @@
     margin: 0;
 }
 
+.notif-page .page-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
 .notif-page__filters {
     display: flex;
     gap: var(--space-2);
@@ -41,7 +47,7 @@
 }
 
 .notif-page__card--unread {
-    border-left: 3px solid var(--accent-primary);
+    border-left: 4px solid var(--accent-primary);
 }
 
 .notif-page__card-header {

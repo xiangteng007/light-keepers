@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Radio, Satellite, Wifi, Send, Plus, Users } from 'lucide-react';
-import { Button, Badge } from '../../../design-system';
-import { StatIndicator } from '../../../design-system/components/Indicators';
+import { Button, Badge, StatIndicator } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
 import './CommunicationsPage.css';
