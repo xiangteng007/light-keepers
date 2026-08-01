@@ -24,7 +24,7 @@
 | 驗證基準 | — | 後端 357 suites / 3,499 tests 全綠；前端 vitest 88/88；tsc 雙側乾淨；coverage 門檻生效（52%/32%，實測 58.5%/37.4%） |
 
 | **Phase C1（民防）** | ✅ **全部完成** | C1.1 災型擴充（air_raid/explosion/terror_attack/cbrn＋MCI 正交旗標；LLM 對測新類別 100%、既有零回歸、整體 96.9%；migration 已寫待 D7 執行）、C1.2 防空避難處所（entity/匯入器/月更 job/公開端點×2/地圖圖層）、C1.3 雙目標備份（Mac mini rsync＋加密雲選配、RPO≤24h/RTO≤4h 入 RUNBOOK、戰備期月演練切換條件） |
-| **Phase R（FABLE 重設計）** | 🔄 | ✅ R1 完成（DESIGN_LANGUAGE.md、雙模式 Shell、權限單一來源、24 redirect、5 權限修正、14 假 widget 頁改 placeholder、132/132 tests）；🔄 R2 旗艦頁重設計執行中；📋 待 owner 圈選 docs/audit/PAGE_REMOVAL_PROPOSAL.md（36 孤兒檔處置） |
+| **Phase R（FABLE 重設計）** | 🔄 | ✅ R1 完成（DESIGN_LANGUAGE.md、雙模式 Shell、權限單一來源、24 redirect、5 權限修正、14 假 widget 頁改 placeholder、132/132 tests）；✅ R2 完成（R2a 態勢類：COP 牆＋角色分層 Dashboard；R2b 行動類：30 秒通報流＋真離線佇列、MapPage 拆分、應變工作檯；157/157 tests）；🔄 R3 全站批次執行中；📋 待 owner 圈選 docs/audit/PAGE_REMOVAL_PROPOSAL.md（36 孤兒檔處置） |
 
 **等 Owner 的動作**：①憑證輪換（`docs/security/CREDENTIAL_ROTATION_CHECKLIST.md`）②git 歷史清理確認 ③D7/D15 排窗口 ④D12–D14（NAS 規格/LLM 選型/通道）⑤下次部署將強制全員重新登入（JWT 更換）。
 
