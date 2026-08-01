@@ -3,6 +3,10 @@ import './ForecastPage.css';
 
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
+import { Alert, Button } from '../design-system';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
+import EmptyState from '../components/shared/EmptyState';
+import { CloudOff } from 'lucide-react';
 
 // 類型定義
 interface WeatherElement {
@@ -90,6 +94,16 @@ const COUNTIES = [
     { code: '10016', name: '澎湖縣' },
     { code: '09020', name: '金門縣' },
     { code: '09007', name: '連江縣' },
+];
+
+// 標籤定義
+const TABS: Array<{ id: string; label: string; emoji: string }> = [
+    { id: 'general', label: '一般天氣', emoji: '🏠' },
+    { id: 'marine', label: '海面天氣', emoji: '🌊' },
+    { id: 'tide', label: '潮汐預報', emoji: '🌙' },
+    { id: 'mountain', label: '登山天氣', emoji: '⛰️' },
+    { id: 'scenic', label: '風景區', emoji: '🏞️' },
+    { id: 'farm', label: '農場旅遊', emoji: '🌾' },
 ];
 
 // 天氣圖標對應
@@ -215,6 +229,16 @@ export default function ForecastPage() {
         }
     };
 
+    // 依當前分頁重試
+    const handleRetry = () => {
+        if (activeTab === 'general') fetchGeneralForecast();
+        else if (activeTab === 'marine') fetchMarineForecast();
+        else if (activeTab === 'tide') fetchTideForecast();
+        else if (activeTab === 'mountain') fetchMountainForecast();
+        else if (activeTab === 'scenic') fetchScenicForecast();
+        else if (activeTab === 'farm') fetchFarmForecast();
+    };
+
     // 元素名稱對照表（CWA 中文名稱 -> 前端使用的 key）
     const ELEMENT_NAME_MAP: Record<string, string> = {
         '天氣現象': 'Wx',
@@ -256,63 +280,55 @@ export default function ForecastPage() {
     return (
         <div className="forecast-page">
             {/* 頁面標題 */}
-            <div className="forecast-header">
-                <h1>🌤️ 氣象預報總覽</h1>
-                <p className="forecast-subtitle">整合中央氣象署公開資料</p>
+            <div className="page-header">
+                <div className="page-header__titles">
+                    <h1>氣象預報總覽</h1>
+                    <p className="page-header__subtitle">整合中央氣象署公開資料</p>
+                </div>
             </div>
 
             {/* 標籤列 */}
-            <div className="forecast-tabs">
-                <button
-                    className={`tab-btn ${activeTab === 'general' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('general')}
-                >
-                    🏠 一般天氣
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'marine' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('marine')}
-                >
-                    🌊 海面天氣
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'tide' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('tide')}
-                >
-                    🌙 潮汐預報
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'mountain' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('mountain')}
-                >
-                    ⛰️ 登山天氣
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'scenic' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('scenic')}
-                >
-                    🏞️ 風景區
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'farm' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('farm')}
-                >
-                    🌾 農場旅遊
-                </button>
+            <div className="forecast-tabs" role="tablist" aria-label="預報類型">
+                {TABS.map((tab) => (
+                    <button
+                        key={tab.id}
+                        role="tab"
+                        aria-selected={activeTab === tab.id}
+                        className={`forecast-tab ${activeTab === tab.id ? 'is-active' : ''}`}
+                        onClick={() => setActiveTab(tab.id)}
+                    >
+                        <span aria-hidden="true">{tab.emoji}</span> {tab.label}
+                    </button>
+                ))}
             </div>
 
             {/* 錯誤訊息 */}
-            {error && <div className="forecast-error">{error}</div>}
+            {error && (
+                <Alert variant="danger" title="載入失敗" className="forecast-alert">
+                    <div className="forecast-alert__body">
+                        <span>{error}</span>
+                        <Button variant="secondary" size="sm" onClick={handleRetry}>
+                            重試
+                        </Button>
+                    </div>
+                </Alert>
+            )}
 
             {/* 載入中 */}
-            {loading && <div className="forecast-loading">載入中...</div>}
+            {loading && (
+                <div className="forecast-skeleton" role="status" aria-label="載入中">
+                    <Skeleton variant="card" height={64} count={3} />
+                </div>
+            )}
 
             {/* 一般天氣預報 */}
-            {activeTab === 'general' && (
+            {!loading && activeTab === 'general' && (
                 <div className="forecast-section">
                     <div className="county-selector">
-                        <label>選擇縣市：</label>
+                        <label htmlFor="forecast-county">選擇縣市：</label>
                         <select
+                            id="forecast-county"
+                            className="forecast-select"
                             value={selectedCounty}
                             onChange={(e) => setSelectedCounty(e.target.value)}
                         >
@@ -321,6 +337,15 @@ export default function ForecastPage() {
                             ))}
                         </select>
                     </div>
+
+                    {generalForecast.length === 0 && !error && (
+                        <EmptyState
+                            icon={CloudOff}
+                            variant="minimal"
+                            title="尚無天氣預報資料"
+                            description="請確認縣市選擇，或稍後再試"
+                        />
+                    )}
 
                     {generalForecast.length > 0 && generalForecast[0] && (
                         <>
@@ -427,7 +452,10 @@ export default function ForecastPage() {
             )}
 
             {/* 海面天氣 */}
-            {activeTab === 'marine' && marineForecast.length > 0 && (
+            {!loading && activeTab === 'marine' && marineForecast.length === 0 && !error && (
+                <EmptyState icon={CloudOff} variant="minimal" title="尚無海面天氣資料" />
+            )}
+            {!loading && activeTab === 'marine' && marineForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌊 海面天氣預報</h2>
                     <div className="marine-grid">
@@ -459,7 +487,10 @@ export default function ForecastPage() {
             )}
 
             {/* 潮汐預報 */}
-            {activeTab === 'tide' && tideForecast.length > 0 && (
+            {!loading && activeTab === 'tide' && tideForecast.length === 0 && !error && (
+                <EmptyState icon={CloudOff} variant="minimal" title="尚無潮汐預報資料" />
+            )}
+            {!loading && activeTab === 'tide' && tideForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌙 潮汐預報（未來一個月）</h2>
                     <div className="tide-grid">
@@ -487,7 +518,10 @@ export default function ForecastPage() {
             )}
 
             {/* 登山天氣 */}
-            {activeTab === 'mountain' && mountainForecast.length > 0 && (
+            {!loading && activeTab === 'mountain' && mountainForecast.length === 0 && !error && (
+                <EmptyState icon={CloudOff} variant="minimal" title="尚無登山天氣資料" />
+            )}
+            {!loading && activeTab === 'mountain' && mountainForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>⛰️ 登山天氣預報（一週）</h2>
                     <div className="recreational-grid">
@@ -510,7 +544,10 @@ export default function ForecastPage() {
             )}
 
             {/* 風景區預報 */}
-            {activeTab === 'scenic' && scenicForecast.length > 0 && (
+            {!loading && activeTab === 'scenic' && scenicForecast.length === 0 && !error && (
+                <EmptyState icon={CloudOff} variant="minimal" title="尚無風景區預報資料" />
+            )}
+            {!loading && activeTab === 'scenic' && scenicForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🏞️ 國家風景區預報（一週）</h2>
                     <div className="recreational-grid">
@@ -533,7 +570,10 @@ export default function ForecastPage() {
             )}
 
             {/* 農場旅遊預報 */}
-            {activeTab === 'farm' && farmForecast.length > 0 && (
+            {!loading && activeTab === 'farm' && farmForecast.length === 0 && !error && (
+                <EmptyState icon={CloudOff} variant="minimal" title="尚無農場旅遊預報資料" />
+            )}
+            {!loading && activeTab === 'farm' && farmForecast.length > 0 && (
                 <div className="forecast-section">
                     <h2>🌾 農場旅遊預報（一週）</h2>
                     <div className="recreational-grid">

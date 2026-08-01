@@ -3,6 +3,8 @@
  * Chatbot assistant powered by Gemini
  */
 import { useState, useRef, useEffect } from 'react';
+import { Bot, User } from 'lucide-react';
+import { Badge, Button, InputField } from '../../design-system';
 import './AIChatPage.css';
 
 interface ChatMessage {
@@ -80,15 +82,15 @@ export default function AIChatPage() {
     return (
         <div className="ai-chat-page">
             <header className="ai-chat-page__header">
-                <h1>🤖 AI 助手</h1>
-                <span className="status-badge">Gemini Pro</span>
+                <h1>AI 助手</h1>
+                <Badge variant="gradient" size="sm">Gemini Pro</Badge>
             </header>
 
-            <div className="ai-chat-page__messages">
+            <div className="ai-chat-page__messages" role="log" aria-live="polite" aria-label="對話紀錄">
                 {messages.map(msg => (
                     <div key={msg.id} className={`message message--${msg.role}`}>
-                        <div className="message__avatar">
-                            {msg.role === 'assistant' ? '🤖' : '👤'}
+                        <div className="message__avatar" aria-hidden="true">
+                            {msg.role === 'assistant' ? <Bot size={18} /> : <User size={18} />}
                         </div>
                         <div className="message__content">
                             <p>{msg.content}</p>
@@ -98,7 +100,9 @@ export default function AIChatPage() {
                             {msg.suggestions && (
                                 <div className="message__suggestions">
                                     {msg.suggestions.map((s, i) => (
-                                        <button key={i} onClick={() => handleSuggestion(s)}>{s}</button>
+                                        <Button key={i} variant="ghost" size="sm" onClick={() => handleSuggestion(s)}>
+                                            {s}
+                                        </Button>
                                     ))}
                                 </div>
                             )}
@@ -107,9 +111,9 @@ export default function AIChatPage() {
                 ))}
                 {isLoading && (
                     <div className="message message--assistant">
-                        <div className="message__avatar">🤖</div>
+                        <div className="message__avatar" aria-hidden="true"><Bot size={18} /></div>
                         <div className="message__content">
-                            <div className="typing-indicator">
+                            <div className="typing-indicator" role="status" aria-label="AI 輸入中">
                                 <span></span><span></span><span></span>
                             </div>
                         </div>
@@ -119,17 +123,19 @@ export default function AIChatPage() {
             </div>
 
             <div className="ai-chat-page__input">
-                <input
-                    type="text"
+                <InputField
                     value={input}
                     onChange={e => setInput(e.target.value)}
                     onKeyPress={e => e.key === 'Enter' && handleSend()}
                     placeholder="輸入問題..."
                     disabled={isLoading}
+                    fullWidth
+                    aria-label="輸入訊息"
+                    className="ai-chat-page__input-field"
                 />
-                <button onClick={handleSend} disabled={isLoading || !input.trim()}>
+                <Button variant="primary" onClick={handleSend} disabled={isLoading || !input.trim()}>
                     發送
-                </button>
+                </Button>
             </div>
         </div>
     );

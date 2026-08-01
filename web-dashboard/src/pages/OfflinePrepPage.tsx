@@ -1,6 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { Map as MapIcon, MapPin, Palette, Package as PackageIcon, Check, X } from 'lucide-react';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
+import { Alert, Badge, Button, ProgressBar } from '../design-system';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
+import EmptyState from '../components/shared/EmptyState';
 import './OfflinePrepPage.css';
 
 interface MapPackage {
@@ -42,34 +46,35 @@ export const OfflinePrepPage: React.FC<OfflinePrepPageProps> = ({
     const [usedSpace, setUsedSpace] = useState(0);
 
     // Fetch available packages
-    useEffect(() => {
-        const fetchPackages = async () => {
-            setIsLoading(true);
-            try {
-                // Fetch all packages
-                const { data: allData } = await api.get('/map-packages');
-                setPackages(allData);
+    const fetchPackages = useCallback(async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+            // Fetch all packages
+            const { data: allData } = await api.get('/map-packages');
+            setPackages(allData);
 
-                // Fetch recommended for session
-                if (sessionId) {
-                    const { data: recData } = await api.get('/map-packages/recommend', {
-                        params: { sessionId },
-                    });
-                    setRecommended(recData);
-                }
-
-                // Calculate total size
-                const total = allData.reduce((sum: number, pkg: MapPackage) => sum + pkg.size, 0);
-                setTotalSpace(total);
-            } catch (err) {
-                setError(getApiErrorMessage(err, '無法載入地圖套件'));
-            } finally {
-                setIsLoading(false);
+            // Fetch recommended for session
+            if (sessionId) {
+                const { data: recData } = await api.get('/map-packages/recommend', {
+                    params: { sessionId },
+                });
+                setRecommended(recData);
             }
-        };
 
-        fetchPackages();
+            // Calculate total size
+            const total = allData.reduce((sum: number, pkg: MapPackage) => sum + pkg.size, 0);
+            setTotalSpace(total);
+        } catch (err) {
+            setError(getApiErrorMessage(err, '無法載入地圖套件'));
+        } finally {
+            setIsLoading(false);
+        }
     }, [sessionId]);
+
+    useEffect(() => {
+        fetchPackages();
+    }, [fetchPackages]);
 
     // Format bytes to human readable
     const formatBytes = (bytes: number): string => {
@@ -141,99 +146,115 @@ export const OfflinePrepPage: React.FC<OfflinePrepPageProps> = ({
         return progress?.status === 'complete';
     });
 
-    if (isLoading) {
-        return (
-            <div className="opp-container">
-                <div className="opp-loading">載入地圖套件中...</div>
-            </div>
-        );
-    }
-
     return (
         <div className="opp-container">
-            <header className="opp-header">
-                <h1 className="opp-title">📦 離線地圖準備</h1>
-                <p className="opp-subtitle">下載任務區域的離線地圖</p>
-            </header>
-
-            {error && (
-                <div className="opp-error">
-                    {error}
-                    <button onClick={() => setError(null)}>✕</button>
-                </div>
-            )}
-
-            {/* Storage info */}
-            <div className="opp-storage">
-                <div className="opp-storage-bar">
-                    <div
-                        className="opp-storage-used"
-                        style={{ width: `${(usedSpace / totalSpace) * 100}%` }}
-                    />
-                </div>
-                <div className="opp-storage-info">
-                    <span>已使用: {formatBytes(usedSpace)}</span>
-                    <span>總計: {formatBytes(totalSpace)}</span>
+            <div className="page-header">
+                <div className="page-header__titles">
+                    <h1>離線地圖準備</h1>
+                    <p className="page-header__subtitle">下載任務區域的離線地圖</p>
                 </div>
             </div>
 
-            {/* Recommended section */}
-            {recommended.length > 0 && (
-                <section className="opp-section">
-                    <div className="opp-section-header">
-                        <h2>建議下載</h2>
-                        <button
-                            className="opp-btn opp-btn--primary"
-                            onClick={downloadAllRecommended}
-                            disabled={allRecommendedDownloaded}
-                        >
-                            {allRecommendedDownloaded ? '✓ 已完成' : '全部下載'}
-                        </button>
+            {error && (
+                <Alert variant="danger" title="載入失敗" className="opp-alert">
+                    <div className="opp-alert__body">
+                        <span>{error}</span>
+                        <Button variant="secondary" size="sm" onClick={fetchPackages}>重試</Button>
                     </div>
-                    <div className="opp-list">
-                        {recommended.map(pkg => (
-                            <PackageCard
-                                key={pkg.id}
-                                package={pkg}
-                                progress={downloads.get(pkg.id)}
-                                onDownload={() => startDownload(pkg)}
-                                onCancel={() => cancelDownload(pkg.id)}
-                                formatBytes={formatBytes}
-                            />
-                        ))}
-                    </div>
-                </section>
+                </Alert>
             )}
 
-            {/* All packages */}
-            <section className="opp-section">
-                <div className="opp-section-header">
-                    <h2>所有套件</h2>
+            {isLoading ? (
+                <div className="opp-skeleton" role="status" aria-label="載入地圖套件中">
+                    <Skeleton variant="card" height={72} count={3} />
                 </div>
-                <div className="opp-list">
-                    {packages.map(pkg => (
-                        <PackageCard
-                            key={pkg.id}
-                            package={pkg}
-                            progress={downloads.get(pkg.id)}
-                            onDownload={() => startDownload(pkg)}
-                            onCancel={() => cancelDownload(pkg.id)}
-                            formatBytes={formatBytes}
+            ) : (
+                <>
+                    {/* Storage info */}
+                    <section className="opp-storage" aria-label="儲存空間使用量">
+                        <ProgressBar
+                            value={usedSpace}
+                            max={totalSpace || 1}
+                            label="已使用空間"
+                            showValue
+                            variant="gradient"
                         />
-                    ))}
-                </div>
-            </section>
+                        <div className="opp-storage-info">
+                            <span>已使用 {formatBytes(usedSpace)}</span>
+                            <span>總計 {formatBytes(totalSpace)}</span>
+                        </div>
+                    </section>
+
+                    {/* Recommended section */}
+                    {recommended.length > 0 && (
+                        <section className="opp-section" aria-label="建議下載">
+                            <div className="opp-section-header">
+                                <h2>建議下載</h2>
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={downloadAllRecommended}
+                                    disabled={allRecommendedDownloaded}
+                                >
+                                    {allRecommendedDownloaded ? '已完成' : '全部下載'}
+                                </Button>
+                            </div>
+                            <div className="opp-list">
+                                {recommended.map(pkg => (
+                                    <PackageCard
+                                        key={pkg.id}
+                                        package={pkg}
+                                        progress={downloads.get(pkg.id)}
+                                        onDownload={() => startDownload(pkg)}
+                                        onCancel={() => cancelDownload(pkg.id)}
+                                        formatBytes={formatBytes}
+                                    />
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {/* All packages */}
+                    <section className="opp-section" aria-label="所有套件">
+                        <div className="opp-section-header">
+                            <h2>所有套件</h2>
+                        </div>
+                        {packages.length === 0 ? (
+                            <EmptyState
+                                icon={MapIcon}
+                                variant="minimal"
+                                title="尚無可用地圖套件"
+                                description="請稍後再試，或聯繫管理員新增地圖套件"
+                            />
+                        ) : (
+                            <div className="opp-list">
+                                {packages.map(pkg => (
+                                    <PackageCard
+                                        key={pkg.id}
+                                        package={pkg}
+                                        progress={downloads.get(pkg.id)}
+                                        onDownload={() => startDownload(pkg)}
+                                        onCancel={() => cancelDownload(pkg.id)}
+                                        formatBytes={formatBytes}
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </section>
+                </>
+            )}
 
             {/* Complete button */}
             {onComplete && (
                 <div className="opp-footer">
-                    <button
-                        className="opp-btn opp-btn--success"
+                    <Button
+                        variant="primary"
                         onClick={onComplete}
                         disabled={!allRecommendedDownloaded && recommended.length > 0}
+                        className="opp-footer__btn"
                     >
                         繼續任務
-                    </button>
+                    </Button>
                 </div>
             )}
         </div>
@@ -256,22 +277,23 @@ const PackageCard: React.FC<PackageCardProps> = ({
     onCancel,
     formatBytes,
 }) => {
-    const getTypeIcon = (type: string) => {
+    const TypeIcon = (type: string) => {
         switch (type) {
-            case 'pmtiles': return '🗺️';
-            case 'mbtiles': return '📍';
-            case 'style': return '🎨';
-            default: return '📦';
+            case 'pmtiles': return MapIcon;
+            case 'mbtiles': return MapPin;
+            case 'style': return Palette;
+            default: return PackageIcon;
         }
     };
+    const Icon = TypeIcon(pkg.type);
 
     const progressPercent = progress
-        ? (progress.bytesDownloaded / progress.totalBytes) * 100
+        ? Math.round((progress.bytesDownloaded / progress.totalBytes) * 100)
         : 0;
 
     return (
-        <div className={`opp-card ${progress?.status === 'complete' ? 'complete' : ''}`}>
-            <div className="opp-card-icon">{getTypeIcon(pkg.type)}</div>
+        <div className={`opp-card ${progress?.status === 'complete' ? 'is-complete' : ''}`}>
+            <div className="opp-card-icon" aria-hidden="true"><Icon size={24} /></div>
             <div className="opp-card-content">
                 <div className="opp-card-name">{pkg.name}</div>
                 <div className="opp-card-meta">
@@ -281,26 +303,25 @@ const PackageCard: React.FC<PackageCardProps> = ({
                 </div>
                 {progress && progress.status !== 'complete' && (
                     <div className="opp-card-progress">
-                        <div
-                            className="opp-card-progress-bar"
-                            style={{ width: `${progressPercent}%` }}
-                        />
+                        <ProgressBar value={progressPercent} showValue={false} size="sm" />
                     </div>
                 )}
             </div>
             <div className="opp-card-actions">
                 {!progress && (
-                    <button className="opp-btn opp-btn--small" onClick={onDownload}>
+                    <Button variant="secondary" size="sm" onClick={onDownload}>
                         下載
-                    </button>
+                    </Button>
                 )}
                 {progress?.status === 'downloading' && (
-                    <button className="opp-btn opp-btn--small opp-btn--danger" onClick={onCancel}>
-                        取消
-                    </button>
+                    <Button variant="secondary" size="sm" onClick={onCancel} aria-label={`取消下載 ${pkg.name}`}>
+                        <X size={14} aria-hidden="true" /> 取消
+                    </Button>
                 )}
                 {progress?.status === 'complete' && (
-                    <span className="opp-card-complete">✓</span>
+                    <Badge variant="success" size="sm" icon={<Check size={12} aria-hidden="true" />}>
+                        已完成
+                    </Badge>
                 )}
             </div>
         </div>
