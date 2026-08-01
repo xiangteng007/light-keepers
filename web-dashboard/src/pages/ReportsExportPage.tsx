@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Card, Button, Badge } from '../design-system';
+import { Users, AlertTriangle, Download, FileText, BarChart3 } from 'lucide-react';
+import { Card, Button, Badge, InputField } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 import {
     getVolunteerHoursReport,
     downloadVolunteerHoursCSV,
@@ -113,90 +115,92 @@ export default function ReportsExportPage() {
 
     return (
         <div className="page reports-export-page">
-            <div className="page-header">
+            <header className="page-header">
                 <div className="page-header__left">
-                    <h2>📊 報表匯出</h2>
+                    <h1>報表匯出</h1>
                     <p className="page-subtitle">下載統計報表與資料分析</p>
                 </div>
-            </div>
+            </header>
 
-            {/* 日期範圍選擇 */}
-            <Card className="date-range-card" padding="md">
-                <h3>📅 資料範圍</h3>
+            {/* 篩選工具列：資料範圍 */}
+            <section className="panel toolbar-panel" aria-labelledby="date-range-heading">
+                <h2 id="date-range-heading" className="panel-title">資料範圍</h2>
                 <div className="date-range-inputs">
-                    <div className="date-input">
-                        <label>開始日期</label>
-                        <input
-                            type="date"
-                            value={dateRange.start}
-                            onChange={e => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                        />
-                    </div>
-                    <div className="date-input">
-                        <label>結束日期</label>
-                        <input
-                            type="date"
-                            value={dateRange.end}
-                            onChange={e => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                        />
-                    </div>
+                    <InputField
+                        type="date"
+                        label="開始日期"
+                        value={dateRange.start}
+                        onChange={e => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                    />
+                    <InputField
+                        type="date"
+                        label="結束日期"
+                        value={dateRange.end}
+                        onChange={e => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                    />
                 </div>
-            </Card>
+            </section>
 
             {/* 報表選項 */}
             <div className="reports-grid">
                 {/* 志工時數報表 */}
                 <Card className="report-option" padding="lg">
-                    <div className="report-option__icon">👥</div>
+                    <div className="report-option__icon" aria-hidden="true"><Users size={32} /></div>
                     <h3>志工時數報表</h3>
                     <p>統計志工服務時數與任務數量</p>
                     <div className="report-option__actions">
                         <Button
                             variant="secondary"
+                            icon={<BarChart3 size={16} aria-hidden="true" />}
                             onClick={loadVolunteerReport}
-                            disabled={isLoading === 'volunteer'}
+                            loading={isLoading === 'volunteer'}
                         >
-                            {isLoading === 'volunteer' ? '載入中...' : '📊 預覽'}
+                            預覽
                         </Button>
                         <Button
+                            icon={<Download size={16} aria-hidden="true" />}
                             onClick={() => downloadVolunteerHoursCSV(dateRange.start, dateRange.end)}
                         >
-                            📥 CSV
+                            CSV
                         </Button>
                         <Button
                             variant="secondary"
+                            icon={<FileText size={16} aria-hidden="true" />}
                             onClick={() => volunteerReport && exportVolunteerPDF(volunteerReport, dateRange)}
                             disabled={!volunteerReport}
                         >
-                            📄 PDF
+                            PDF
                         </Button>
                     </div>
                 </Card>
 
                 {/* 災情統計報表 */}
                 <Card className="report-option" padding="lg">
-                    <div className="report-option__icon">🚨</div>
+                    <div className="report-option__icon" aria-hidden="true"><AlertTriangle size={32} /></div>
                     <h3>災情統計報表</h3>
                     <p>災害類型分布與響應時間分析</p>
                     <div className="report-option__actions">
                         <Button
                             variant="secondary"
+                            icon={<BarChart3 size={16} aria-hidden="true" />}
                             onClick={loadDisasterReport}
-                            disabled={isLoading === 'disaster'}
+                            loading={isLoading === 'disaster'}
                         >
-                            {isLoading === 'disaster' ? '載入中...' : '📊 預覽'}
+                            預覽
                         </Button>
                         <Button
+                            icon={<Download size={16} aria-hidden="true" />}
                             onClick={() => downloadDisasterJSON(dateRange.start, dateRange.end)}
                         >
-                            📥 JSON
+                            JSON
                         </Button>
                         <Button
                             variant="secondary"
+                            icon={<FileText size={16} aria-hidden="true" />}
                             onClick={() => disasterReport && exportDisasterPDF(disasterReport, dateRange)}
                             disabled={!disasterReport}
                         >
-                            📄 PDF
+                            PDF
                         </Button>
                     </div>
                 </Card>
@@ -205,35 +209,45 @@ export default function ReportsExportPage() {
             {/* 預覽區 */}
             {volunteerReport && (
                 <Card className="preview-card" padding="lg">
-                    <h3>👥 志工時數報表預覽</h3>
-                    <Badge>{volunteerReport.length} 筆資料</Badge>
-                    <table className="preview-table">
-                        <thead>
-                            <tr>
-                                <th>志工姓名</th>
-                                <th>總時數</th>
-                                <th>任務數</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {volunteerReport.slice(0, 10).map((row, idx) => (
-                                <tr key={idx}>
-                                    <td>{row.volunteerName}</td>
-                                    <td>{row.totalHours} 小時</td>
-                                    <td>{row.taskCount}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {volunteerReport.length > 10 && (
-                        <p className="preview-note">顯示前 10 筆，共 {volunteerReport.length} 筆</p>
+                    <div className="preview-card__header">
+                        <h3>志工時數報表預覽</h3>
+                        <Badge variant="info">{volunteerReport.length} 筆資料</Badge>
+                    </div>
+                    {volunteerReport.length === 0 ? (
+                        <EmptyState variant="minimal" title="此區間沒有志工時數資料" />
+                    ) : (
+                        <>
+                            <div className="preview-table-wrap">
+                                <table className="preview-table">
+                                    <thead>
+                                        <tr>
+                                            <th>志工姓名</th>
+                                            <th>總時數</th>
+                                            <th>任務數</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {volunteerReport.slice(0, 10).map((row, idx) => (
+                                            <tr key={idx}>
+                                                <td>{row.volunteerName}</td>
+                                                <td className="tabular-num">{row.totalHours} 小時</td>
+                                                <td className="tabular-num">{row.taskCount}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {volunteerReport.length > 10 && (
+                                <p className="preview-note">顯示前 10 筆，共 {volunteerReport.length} 筆</p>
+                            )}
+                        </>
                     )}
                 </Card>
             )}
 
             {disasterReport && (
                 <Card className="preview-card" padding="lg">
-                    <h3>🚨 災情統計報表預覽</h3>
+                    <h3>災情統計報表預覽</h3>
                     <div className="stats-grid">
                         <div className="stat-item">
                             <span className="stat-label">總事件數</span>
@@ -259,7 +273,7 @@ export default function ReportsExportPage() {
                                                 }}
                                             />
                                         </div>
-                                        <span className="bar-value">{count}</span>
+                                        <span className="bar-value tabular-num">{count}</span>
                                     </div>
                                 ))}
                             </div>
