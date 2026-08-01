@@ -1,9 +1,15 @@
 /**
  * ICSSectionDashboard.tsx
- * 
+ *
  * Expert Council Navigation Design v3.0
  * Unified ICS Section Dashboard with role-specific views
  * Per expert_council_navigation_design.md Phase 3
+ *
+ * R3a redesign: List archetype (page-header -> nav/toolbar -> content panels).
+ * Per-section identification uses icon + label only (no per-section hardcoded
+ * hex color) so it never collides with the strict status-color semantics in
+ * DESIGN_LANGUAGE.md §3 (danger/warning/success/info are reserved for state,
+ * not decoration).
  */
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -16,7 +22,9 @@ import {
     AlertTriangle,
     ArrowRight,
 } from 'lucide-react';
-import { useEmergencyContext, useEmergencyStyles } from '../../context/useEmergencyContext';
+import { Badge } from '../../design-system';
+import EmptyState from '../../components/shared/EmptyState';
+import { useEmergencyContext, useEmergencyStyles, EmergencyLevel } from '../../context/useEmergencyContext';
 import './ICSSectionDashboard.css';
 
 // ICS Section configuration
@@ -25,7 +33,6 @@ const ICS_SECTIONS = {
         id: 'command',
         label: '指揮組 Command',
         icon: Command,
-        color: '#EF4444',
         description: '整體事件指揮與決策',
         metrics: [
             { label: '進行中事件', value: 0, key: 'activeIncidents' },
@@ -42,7 +49,6 @@ const ICS_SECTIONS = {
         id: 'operations',
         label: '作戰組 Operations',
         icon: Shield,
-        color: '#F59E0B',
         description: '救援行動與現場作業',
         metrics: [
             { label: '搜救任務', value: 0, key: 'searchTasks' },
@@ -60,7 +66,6 @@ const ICS_SECTIONS = {
         id: 'planning',
         label: '計畫組 Planning',
         icon: ClipboardList,
-        color: '#3B82F6',
         description: '情資蒐集與規劃',
         metrics: [
             { label: '待處理報告', value: 0, key: 'pendingReports' },
@@ -77,7 +82,6 @@ const ICS_SECTIONS = {
         id: 'logistics',
         label: '後勤組 Logistics',
         icon: Package,
-        color: '#10B981',
         description: '物資與裝備管理',
         metrics: [
             { label: '物資項目', value: 0, key: 'inventoryItems' },
@@ -94,7 +98,6 @@ const ICS_SECTIONS = {
         id: 'finance',
         label: '財務組 Finance/Admin',
         icon: DollarSign,
-        color: '#8B5CF6',
         description: '費用追蹤與行政',
         metrics: [
             { label: '待報銷', value: 0, key: 'pendingExpenses' },
@@ -117,7 +120,7 @@ interface ICSSectionDashboardProps {
 export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardProps) {
     const { section: urlSection } = useParams<{ section: string }>();
     const { hasActiveIncident, currentIncident } = useEmergencyContext();
-    const { color: emergencyColor, label: emergencyLabel } = useEmergencyStyles();
+    const { label: emergencyLabel, level: emergencyLevel } = useEmergencyStyles();
 
     // Determine which section to show
     const activeSectionId = (sectionId || urlSection || 'command') as SectionKey;
@@ -135,8 +138,12 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
 
     const SectionIcon = section.icon;
 
+    // Active-incident badge severity follows §3 semantics (not decoration):
+    // Emergency/Critical -> danger, Warning/Advisory -> warning.
+    const incidentBadgeVariant = emergencyLevel >= EmergencyLevel.Emergency ? 'danger' : 'warning';
+
     return (
-        <div className="ics-dashboard" style={{ '--section-color': section.color } as React.CSSProperties}>
+        <div className="ics-dashboard">
             {/* Section Header */}
             <header className="ics-dashboard__header">
                 <div className="ics-dashboard__title">
@@ -146,15 +153,16 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
                         <p>{section.description}</p>
                     </div>
                 </div>
-                
+
                 {hasActiveIncident && currentIncident && (
-                    <div 
-                        className="ics-dashboard__incident-badge"
-                        style={{ background: emergencyColor }}
+                    <Badge
+                        variant={incidentBadgeVariant}
+                        dot
+                        pulse
+                        icon={<AlertTriangle size={14} />}
                     >
-                        <AlertTriangle size={14} />
-                        <span>{emergencyLabel}: {currentIncident.title}</span>
-                    </div>
+                        {emergencyLabel}: {currentIncident.title}
+                    </Badge>
                 )}
             </header>
 
@@ -168,7 +176,6 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
                             key={key}
                             to={`/ics/${key}`}
                             className={`ics-nav-item ${isActive ? 'active' : ''}`}
-                            style={{ '--nav-color': sec.color } as React.CSSProperties}
                         >
                             <NavIcon size={18} />
                             <span>{sec.label.split(' ')[0]}</span>
@@ -208,10 +215,11 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
             <section className="ics-dashboard__activity">
                 <h3>最近活動</h3>
                 <div className="ics-activity-list">
-                    <div className="ics-activity-empty">
-                        <Clock size={24} />
-                        <span>目前無活動記錄</span>
-                    </div>
+                    <EmptyState
+                        variant="minimal"
+                        icon={Clock}
+                        title="目前無活動記錄"
+                    />
                 </div>
             </section>
         </div>

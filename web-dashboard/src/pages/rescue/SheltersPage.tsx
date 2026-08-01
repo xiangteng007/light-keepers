@@ -10,6 +10,12 @@
  * occupancyRate，沒有聯絡人/電話/設施清單/更新時間欄位，故這些欄位在 UI 上省略而非造假資料。
  * 「新增避難所」「報到入住」「詳細資訊」按鈕暫未接動作（後端有對應端點 POST /shelters、
  * POST /shelters/:id/check-in 等，但屬於獨立表單/詳情頁工作，非本次範圍，維持既有按鈕但先不掛動作）。
+ *
+ * R3a：依 docs/architecture/DESIGN_LANGUAGE.md §7.1（列表頁 archetype）重建。
+ * 全部使用語義 token（--bg-* / --surface-* / --text-* / --border-* / --color-*），
+ * light / dark / tactical 三態自動生效，本檔不寫任何主題分支；狀態徽章一律用
+ * design-system Badge（§3 語意對照）；空狀態用 components/shared/EmptyState；
+ * 載入用 skeleton row（§7.1）。
  */
 import { useState, useEffect, useCallback } from 'react';
 import {
@@ -21,12 +27,13 @@ import {
     Plus,
     Search,
     Filter,
-    Loader2,
     RefreshCw,
 } from 'lucide-react';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
-import { Alert } from '../../design-system';
+import { Alert, Badge, Button } from '../../design-system';
+import type { BadgeProps } from '../../design-system';
+import EmptyState from '../../components/shared/EmptyState';
 import './SheltersPage.css';
 
 interface Shelter {
@@ -40,12 +47,15 @@ interface Shelter {
     occupancyRate: number;
 }
 
-const STATUS_MAP: Record<string, { className: string; label: string }> = {
-    OPEN: { className: 'bg-green', label: '運作中' },
-    STANDBY: { className: 'bg-blue', label: '待命' },
-    CLOSED: { className: 'bg-gray', label: '已關閉' },
-    INACTIVE: { className: 'bg-gray', label: '未啟用' },
-    FULL: { className: 'bg-orange', label: '已滿' },
+// 狀態語意對照 DESIGN_LANGUAGE §3：success=安全、warning=需注意、
+// info=中性進行中、default=中性非活躍。FULL（已滿）是「需注意」而非「危急」，
+// 因為滿載本身不等於生命安全危急，故用 warning 而非 danger。
+const STATUS_MAP: Record<string, { variant: NonNullable<BadgeProps['variant']>; label: string }> = {
+    OPEN: { variant: 'success', label: '運作中' },
+    STANDBY: { variant: 'info', label: '待命' },
+    CLOSED: { variant: 'default', label: '已關閉' },
+    INACTIVE: { variant: 'default', label: '未啟用' },
+    FULL: { variant: 'warning', label: '已滿' },
 };
 
 export default function SheltersPage() {
@@ -88,7 +98,7 @@ export default function SheltersPage() {
 
     const getStatusBadge = (status: string) => {
         const style = STATUS_MAP[status] || STATUS_MAP.CLOSED;
-        return <span className={`shelter-status ${style.className}`}>{style.label}</span>;
+        return <Badge variant={style.variant} size="sm">{style.label}</Badge>;
     };
 
     const getOccupancyColor = (current: number, capacity: number) => {
@@ -100,79 +110,95 @@ export default function SheltersPage() {
     };
 
     return (
-        <div className="shelters-page">
-            {/* Header */}
-            <header className="shelters-header">
-                <div className="shelters-title">
-                    <Building size={28} />
-                    <h1>避難所管理</h1>
-                </div>
-                <div style={{ display: 'flex', gap: '8px' }}>
-                    <button
-                        className="shelters-add-btn"
+        <div className="page shelters-page">
+            {/* page-header：h1 ＋ 主要動作（DESIGN_LANGUAGE §7.1） */}
+            <header className="shelters-page__header">
+                <h1 className="shelters-page__title">
+                    <Building size={24} aria-hidden="true" />
+                    避難所管理
+                </h1>
+                <div className="shelters-page__actions">
+                    <Button
+                        variant="secondary"
+                        size="md"
                         onClick={fetchShelters}
                         disabled={loading}
-                        style={{ background: 'transparent' }}
+                        icon={<RefreshCw size={18} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     >
-                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
                         重新整理
-                    </button>
-                    <button className="shelters-add-btn" disabled title="表單建置中">
-                        <Plus size={18} />
+                    </Button>
+                    <Button
+                        variant="primary"
+                        size="md"
+                        disabled
+                        title="表單建置中"
+                        icon={<Plus size={18} aria-hidden="true" />}
+                    >
                         新增避難所
-                    </button>
+                    </Button>
                 </div>
             </header>
 
             {error && (
-                <Alert variant="danger" icon={<AlertTriangle size={16} />}>{error}</Alert>
+                <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>{error}</Alert>
             )}
 
-            {/* Stats Cards */}
+            {/* 統計摘要列（4 個，§7.1） */}
             <div className="shelters-stats">
-                <div className="stat-card">
-                    <Building className="stat-icon" />
-                    <div className="stat-content">
-                        <span className="stat-value">{activeShelters}</span>
-                        <span className="stat-label">運作中</span>
+                <div className="shelters-stat-card">
+                    <span className="shelters-stat-card__icon" aria-hidden="true">
+                        <Building size={22} />
+                    </span>
+                    <div className="shelters-stat-card__content">
+                        <span className="shelters-stat-card__value">{activeShelters}</span>
+                        <span className="shelters-stat-card__label">運作中</span>
                     </div>
                 </div>
-                <div className="stat-card">
-                    <Users className="stat-icon" />
-                    <div className="stat-content">
-                        <span className="stat-value">{totalOccupancy}</span>
-                        <span className="stat-label">收容人數</span>
+                <div className="shelters-stat-card">
+                    <span className="shelters-stat-card__icon" aria-hidden="true">
+                        <Users size={22} />
+                    </span>
+                    <div className="shelters-stat-card__content">
+                        <span className="shelters-stat-card__value">{totalOccupancy}</span>
+                        <span className="shelters-stat-card__label">收容人數</span>
                     </div>
                 </div>
-                <div className="stat-card">
-                    <Bed className="stat-icon" />
-                    <div className="stat-content">
-                        <span className="stat-value">{totalCapacity - totalOccupancy}</span>
-                        <span className="stat-label">剩餘容量</span>
+                <div className="shelters-stat-card">
+                    <span className="shelters-stat-card__icon" aria-hidden="true">
+                        <Bed size={22} />
+                    </span>
+                    <div className="shelters-stat-card__content">
+                        <span className="shelters-stat-card__value">{totalCapacity - totalOccupancy}</span>
+                        <span className="shelters-stat-card__label">剩餘容量</span>
                     </div>
                 </div>
-                <div className="stat-card">
-                    <AlertTriangle className="stat-icon warning" />
-                    <div className="stat-content">
-                        <span className="stat-value">{shelters.filter(s => s.status === 'FULL').length}</span>
-                        <span className="stat-label">已滿警示</span>
+                <div className="shelters-stat-card shelters-stat-card--warning">
+                    <span className="shelters-stat-card__icon" aria-hidden="true">
+                        <AlertTriangle size={22} />
+                    </span>
+                    <div className="shelters-stat-card__content">
+                        <span className="shelters-stat-card__value">
+                            {shelters.filter(s => s.status === 'FULL').length}
+                        </span>
+                        <span className="shelters-stat-card__label">已滿警示</span>
                     </div>
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="shelters-filters">
-                <div className="search-box">
-                    <Search size={18} />
+            {/* panel: toolbar（搜尋＋篩選，§7.1） */}
+            <div className="panel shelters-toolbar">
+                <div className="shelters-search">
+                    <Search size={18} aria-hidden="true" />
                     <input
                         type="text"
                         placeholder="搜尋避難所..."
                         value={searchTerm}
                         onChange={e => setSearchTerm(e.target.value)}
+                        aria-label="搜尋避難所"
                     />
                 </div>
-                <div className="filter-box">
-                    <Filter size={18} />
+                <div className="shelters-filter">
+                    <Filter size={18} aria-hidden="true" />
                     <select
                         value={statusFilter}
                         onChange={e => setStatusFilter(e.target.value)}
@@ -188,53 +214,70 @@ export default function SheltersPage() {
                 </div>
             </div>
 
-            {/* Shelter List */}
-            {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem' }}>
-                    <Loader2 size={24} className="spin" />
-                    <span>載入避難所資料中...</span>
-                </div>
-            ) : filteredShelters.length === 0 ? (
-                <div className="shelters-empty" style={{ textAlign: 'center', padding: '3rem', opacity: 0.6 }}>
-                    {shelters.length === 0 ? '目前尚無避難所資料' : '沒有符合條件的避難所'}
-                </div>
-            ) : (
-                <div className="shelters-list">
-                    {filteredShelters.map(shelter => (
-                        <div key={shelter.id} className="shelter-card">
-                            <div className="shelter-card-header">
-                                <h3>{shelter.name}</h3>
-                                {getStatusBadge(shelter.status)}
-                            </div>
-
-                            <div className="shelter-card-body">
-                                <div className="shelter-info-row">
-                                    <MapPin size={14} />
-                                    <span>{shelter.address}</span>
+            {/* panel: content（避難所卡片列表，§7.1） */}
+            <div className="panel shelters-content">
+                {loading ? (
+                    <div className="shelters-skeleton" role="status" aria-label="載入避難所資料中">
+                        {Array.from({ length: 4 }, (_, i) => (
+                            <div key={i} className="shelters-skeleton__row" />
+                        ))}
+                    </div>
+                ) : filteredShelters.length === 0 ? (
+                    <EmptyState
+                        variant={shelters.length === 0 ? 'default' : 'search'}
+                        title={shelters.length === 0 ? '目前尚無避難所資料' : '沒有符合條件的避難所'}
+                        description={shelters.length === 0
+                            ? '尚未有任何避難所資料建立。'
+                            : '請調整搜尋字詞或篩選條件後再試一次。'}
+                    />
+                ) : (
+                    <div className="shelters-list">
+                        {filteredShelters.map(shelter => (
+                            <div key={shelter.id} className="shelter-card">
+                                <div className="shelter-card__header">
+                                    <h3 className="shelter-card__name">{shelter.name}</h3>
+                                    {getStatusBadge(shelter.status)}
                                 </div>
 
-                                <div className="shelter-occupancy">
-                                    <div className="occupancy-header">
-                                        <span>收容人數</span>
-                                        <span>{shelter.currentOccupancy} / {shelter.capacity}</span>
+                                <div className="shelter-card__body">
+                                    <div className="shelter-card__address">
+                                        <MapPin size={14} aria-hidden="true" />
+                                        <span>{shelter.address}</span>
                                     </div>
-                                    <div className="occupancy-bar">
-                                        <div
-                                            className={`occupancy-fill ${getOccupancyColor(shelter.currentOccupancy, shelter.capacity)}`}
-                                            style={{ width: `${Math.min(shelter.occupancyRate, 100)}%` }}
-                                        />
+
+                                    <div className="shelter-occupancy">
+                                        <div className="shelter-occupancy__header">
+                                            <span>收容人數</span>
+                                            <span className="shelter-occupancy__count">
+                                                {shelter.currentOccupancy} / {shelter.capacity}
+                                            </span>
+                                        </div>
+                                        <div className="shelter-occupancy__bar">
+                                            <div
+                                                className={`shelter-occupancy__fill shelter-occupancy__fill--${getOccupancyColor(shelter.currentOccupancy, shelter.capacity)}`}
+                                                style={{ width: `${Math.min(shelter.occupancyRate, 100)}%` }}
+                                                role="progressbar"
+                                                aria-valuenow={Math.min(shelter.occupancyRate, 100)}
+                                                aria-valuemin={0}
+                                                aria-valuemax={100}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="shelter-card-footer">
-                                <button className="btn-secondary" disabled title="功能建置中">報到入住</button>
-                                <button className="btn-primary" disabled title="功能建置中">詳細資訊</button>
+                                <div className="shelter-card__footer">
+                                    <Button variant="secondary" size="sm" disabled title="功能建置中">
+                                        報到入住
+                                    </Button>
+                                    <Button variant="primary" size="sm" disabled title="功能建置中">
+                                        詳細資訊
+                                    </Button>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

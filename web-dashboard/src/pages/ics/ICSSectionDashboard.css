@@ -1,14 +1,26 @@
 /**
  * ICSSectionDashboard.css
- * 
+ *
  * Expert Council Navigation Design v3.0
  * ICS Section Dashboard styling
+ *
+ * R3a redesign: List archetype (page-header -> nav/toolbar -> content panels).
+ * All colors are semantic tokens from tokens.css — no hardcoded hex/rgba,
+ * no light/dark/tactical branches (the token layer handles that).
+ * Mobile-first: base rules target the smallest viewport, wider layouts
+ * are added via min-width media queries.
  */
 
 .ics-dashboard {
-    padding: 24px;
+    padding: var(--space-3);
     max-width: 1200px;
     margin: 0 auto;
+}
+
+@media (min-width: 769px) {
+    .ics-dashboard {
+        padding: var(--space-6);
+    }
 }
 
 /* Error State */
@@ -17,175 +29,208 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 16px;
-    padding: 64px;
-    color: #9CA3AF;
+    gap: var(--space-4);
+    padding: var(--space-16);
+    color: var(--text-secondary);
     text-align: center;
 }
 
 .ics-dashboard__error a {
-    color: #D4AF37;
+    color: var(--color-secondary);
     text-decoration: none;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
 }
 
 /* Header */
 .ics-dashboard__header {
     display: flex;
+    flex-direction: column;
     align-items: flex-start;
-    justify-content: space-between;
-    gap: 24px;
-    margin-bottom: 24px;
-    padding-bottom: 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-default);
+}
+
+@media (min-width: 769px) {
+    .ics-dashboard__header {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: space-between;
+    }
 }
 
 .ics-dashboard__title {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .ics-dashboard__icon {
-    color: var(--section-color, #D4AF37);
+    color: var(--color-secondary);
     flex-shrink: 0;
 }
 
 .ics-dashboard__title h1 {
-    margin: 0 0 4px;
-    font-size: 24px;
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-xl);
     font-weight: 700;
-    color: #E5E7EB;
+    color: var(--text-primary);
+}
+
+@media (min-width: 769px) {
+    .ics-dashboard__title h1 {
+        font-size: var(--font-size-2xl);
+    }
 }
 
 .ics-dashboard__title p {
     margin: 0;
-    font-size: 14px;
-    color: #9CA3AF;
-}
-
-.ics-dashboard__incident-badge {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-    white-space: nowrap;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 /* Section Navigation */
 .ics-dashboard__nav {
     display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    padding: 4px;
-    background: rgba(255, 255, 255, 0.02);
-    border-radius: 10px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+    padding: var(--space-1);
+    background: var(--bg-secondary);
+    border-radius: var(--radius-md);
     overflow-x: auto;
 }
 
 .ics-nav-item {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 8px;
-    color: #9CA3AF;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    min-height: 44px;
+    border-radius: var(--radius-sm);
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
     white-space: nowrap;
-    transition: all 150ms ease;
+    transition: background-color 150ms ease, color 150ms ease;
 }
 
 .ics-nav-item:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #E5E7EB;
+    background: var(--surface-hover);
+    color: var(--text-primary);
+}
+
+.ics-nav-item:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .ics-nav-item.active {
-    background: color-mix(in srgb, var(--nav-color) 15%, transparent);
-    color: var(--nav-color);
+    background: var(--surface-hover);
+    color: var(--text-primary);
+    border: 1px solid var(--border-focus);
 }
 
 .ics-nav-item svg {
-    color: var(--nav-color);
+    color: inherit;
 }
 
 /* Metrics */
 .ics-dashboard__metrics {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-    margin-bottom: 32px;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    margin-bottom: var(--space-8);
+}
+
+@media (min-width: 769px) {
+    .ics-dashboard__metrics {
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-4);
+    }
 }
 
 .ics-metric-card {
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    padding: var(--space-5);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
     text-align: center;
 }
 
 .ics-metric-value {
-    font-size: 36px;
+    font-size: var(--font-size-4xl);
     font-weight: 700;
-    color: var(--section-color, #D4AF37);
-    margin-bottom: 4px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
 }
 
 .ics-metric-label {
-    font-size: 13px;
-    color: #9CA3AF;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 /* Quick Links */
 .ics-dashboard__links {
-    margin-bottom: 32px;
+    margin-bottom: var(--space-8);
 }
 
 .ics-dashboard__links h3 {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: #9CA3AF;
-    margin: 0 0 12px;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .ics-links-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 12px;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+}
+
+@media (min-width: 480px) {
+    .ics-links-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
 }
 
 .ics-link-card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 16px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
-    color: #E5E7EB;
+    padding: var(--space-4);
+    min-height: 44px;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
     text-decoration: none;
-    font-size: 14px;
+    font-size: var(--font-size-base);
     font-weight: 500;
-    transition: all 150ms ease;
+    transition: background-color 150ms ease, border-color 150ms ease, color 150ms ease;
 }
 
 .ics-link-card:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border-color: #D4AF37;
-    color: #D4AF37;
+    background: var(--surface-hover);
+    border-color: var(--border-focus);
+    color: var(--color-secondary);
+}
+
+.ics-link-card:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .ics-link-card svg {
     opacity: 0.5;
-    transition: all 150ms ease;
+    transition: opacity 150ms ease, transform 150ms ease;
 }
 
 .ics-link-card:hover svg {
@@ -195,47 +240,17 @@
 
 /* Activity */
 .ics-dashboard__activity h3 {
-    font-size: 14px;
+    font-size: var(--font-size-sm);
     font-weight: 600;
-    color: #9CA3AF;
-    margin: 0 0 12px;
+    color: var(--text-secondary);
+    margin: 0 0 var(--space-3);
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
 .ics-activity-list {
     min-height: 120px;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px dashed rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-}
-
-.ics-activity-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    color: #6B7280;
-    text-align: center;
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-    .ics-dashboard {
-        padding: 16px;
-    }
-    
-    .ics-dashboard__header {
-        flex-direction: column;
-    }
-    
-    .ics-dashboard__metrics {
-        grid-template-columns: 1fr;
-    }
-    
-    .ics-nav-item span {
-        display: none;
-    }
+    background: var(--bg-secondary);
+    border: 1px dashed var(--border-default);
+    border-radius: var(--radius-lg);
 }

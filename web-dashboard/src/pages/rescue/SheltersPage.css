@@ -1,14 +1,24 @@
 /**
  * SheltersPage.css
- * 
+ *
  * Expert Council Navigation Design v3.0
  * 避難所管理頁面樣式
+ *
+ * R3a 重建（docs/architecture/DESIGN_LANGUAGE.md）：
+ * - 全部使用語義 token（--bg-* / --surface-* / --text-* / --border-* / --color-* /
+ *   --space-* / --radius-* / --font-size-*），light / dark / tactical 三態自動生效，
+ *   本檔不寫任何主題分支選擇器。
+ * - 間距 4px 節奏；觸控目標 ≥44px；行動優先（先寫 mobile 再放大，@media (min-width: 768px)）。
+ * - 狀態色語意嚴格對照 §3：success=安全、warning=需注意、info=中性、danger=危急。
  */
 
 .shelters-page {
-    padding: 24px;
     max-width: 1400px;
     margin: 0 auto;
+    padding: var(--space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 .spin {
@@ -21,316 +31,312 @@
     }
 }
 
-/* Header */
-.shelters-header {
+@media (prefers-reduced-motion: reduce) {
+    .spin {
+        animation: none;
+    }
+}
+
+/* ===== page-header ===== */
+
+.shelters-page__header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     justify-content: space-between;
-    margin-bottom: 24px;
+    flex-wrap: wrap;
+    gap: var(--space-3);
 }
 
-.shelters-title {
+.shelters-page__title {
     display: flex;
     align-items: center;
-    gap: 12px;
-    color: #E5E7EB;
-}
-
-.shelters-title h1 {
-    font-size: 24px;
-    font-weight: 600;
+    gap: var(--space-2);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
     margin: 0;
 }
 
-.shelters-add-btn {
+.shelters-page__actions {
     display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    background: linear-gradient(135deg, #D4AF37 0%, #C39B2F 100%);
-    color: #0F1218;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 150ms ease;
+    gap: var(--space-2);
+    flex-wrap: wrap;
 }
 
-.shelters-add-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-}
+/* ===== 統計摘要列 ===== */
 
-/* Stats */
 .shelters-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 16px;
-    margin-bottom: 24px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
 }
 
-.stat-card {
+.shelters-stat-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    padding: 20px;
-    background: #13171F;
-    border: 1px solid #1F2937;
-    border-radius: 12px;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
 }
 
-.stat-icon {
-    width: 48px;
-    height: 48px;
-    padding: 12px;
-    background: rgba(212, 175, 55, 0.1);
-    color: #D4AF37;
-    border-radius: 10px;
+.shelters-stat-card__icon {
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-secondary);
+    color: var(--text-secondary);
+    border-radius: var(--radius-md);
 }
 
-.stat-icon.warning {
-    background: rgba(245, 158, 11, 0.1);
-    color: #F59E0B;
+/* 已滿警示卡：語意 warning（§3 —— 滿載為「需注意」，非危急） */
+.shelters-stat-card--warning .shelters-stat-card__icon {
+    background: var(--color-warning-bg);
+    color: var(--color-warning-dark, var(--color-warning));
 }
 
-.stat-content {
+.shelters-stat-card__content {
     display: flex;
     flex-direction: column;
+    min-width: 0;
 }
 
-.stat-value {
-    font-size: 28px;
-    font-weight: 700;
-    color: #E5E7EB;
+.shelters-stat-card__value {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    line-height: var(--line-height-tight);
+    font-variant-numeric: tabular-nums;
 }
 
-.stat-label {
-    font-size: 13px;
-    color: #6B7280;
+.shelters-stat-card__label {
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
 }
 
-/* Filters */
-.shelters-filters {
+/* ===== panel: toolbar ===== */
+
+.panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+.shelters-toolbar {
     display: flex;
-    gap: 16px;
-    margin-bottom: 24px;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-3);
 }
 
-.search-box,
-.filter-box {
+.shelters-search,
+.shelters-filter {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 10px 16px;
-    background: #13171F;
-    border: 1px solid #1F2937;
-    border-radius: 8px;
-    color: #94A3B8;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-tertiary);
 }
 
-.search-box {
+.shelters-search input,
+.shelters-filter select {
     flex: 1;
-}
-
-.search-box input,
-.filter-box select {
-    flex: 1;
+    min-width: 0;
     background: transparent;
     border: none;
-    color: #E5E7EB;
-    font-size: 14px;
+    color: var(--text-primary);
+    font-size: var(--font-size-base);
+    font-family: inherit;
     outline: none;
 }
 
-.filter-box select {
+.shelters-search input::placeholder {
+    color: var(--text-tertiary);
+}
+
+.shelters-filter select {
     cursor: pointer;
 }
 
-/* Shelter List */
+.shelters-search:focus-within,
+.shelters-filter:focus-within {
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+}
+
+/* ===== panel: content ===== */
+
+.shelters-content {
+    padding: var(--space-3);
+}
+
+/* 載入 skeleton（≥3 列，§7.1） */
+
+.shelters-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+.shelters-skeleton__row {
+    height: 88px;
+    border-radius: var(--radius-md);
+    background: var(--surface-hover);
+    animation: shelters-skeleton-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes shelters-skeleton-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .shelters-skeleton__row {
+        animation: none;
+    }
+}
+
+/* ===== 避難所卡片列表 ===== */
+
 .shelters-list {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
 }
 
 .shelter-card {
-    background: #13171F;
-    border: 1px solid #1F2937;
-    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
     overflow: hidden;
-    transition: all 150ms ease;
+    transition: border-color var(--transition-fast, 150ms ease), transform var(--transition-fast, 150ms ease);
 }
 
 .shelter-card:hover {
-    border-color: #374151;
+    border-color: var(--border-focus);
     transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
-.shelter-card-header {
+.shelter-card__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 16px;
-    border-bottom: 1px solid #1F2937;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-light);
 }
 
-.shelter-card-header h3 {
+.shelter-card__name {
     margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    color: #E5E7EB;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
-.shelter-status {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 600;
+.shelter-card__body {
+    padding: var(--space-4);
 }
 
-.shelter-status.bg-green {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10B981;
-}
-
-.shelter-status.bg-blue {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3B82F6;
-}
-
-.shelter-status.bg-orange {
-    background: rgba(245, 158, 11, 0.15);
-    color: #F59E0B;
-}
-
-.shelter-status.bg-gray {
-    background: rgba(107, 114, 128, 0.15);
-    color: #6B7280;
-}
-
-.shelter-card-body {
-    padding: 16px;
-}
-
-.shelter-info-row {
+.shelter-card__address {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #9CA3AF;
-    font-size: 13px;
-    margin-bottom: 8px;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--space-3);
 }
 
 .shelter-occupancy {
-    margin: 16px 0;
+    margin-top: var(--space-3);
 }
 
-.occupancy-header {
+.shelter-occupancy__header {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
-    color: #9CA3AF;
-    margin-bottom: 6px;
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
 }
 
-.occupancy-bar {
+.shelter-occupancy__count {
+    font-variant-numeric: tabular-nums;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+}
+
+.shelter-occupancy__bar {
     height: 6px;
-    background: #1F2937;
-    border-radius: 3px;
+    background: var(--bg-secondary);
+    border-radius: var(--radius-full);
     overflow: hidden;
 }
 
-.occupancy-fill {
+.shelter-occupancy__fill {
     height: 100%;
-    border-radius: 3px;
-    transition: width 300ms ease;
+    border-radius: var(--radius-full);
+    transition: width var(--transition-normal, 300ms ease);
 }
 
-.occupancy-fill.green { background: #10B981; }
-.occupancy-fill.orange { background: #F59E0B; }
-.occupancy-fill.red { background: #EF4444; }
+/* 收容率語意色（§3）：green=安全、orange=需注意、red=危急（逼近滿容量） */
+.shelter-occupancy__fill--green { background: var(--color-success); }
+.shelter-occupancy__fill--orange { background: var(--color-warning); }
+.shelter-occupancy__fill--red { background: var(--color-danger); }
 
-.shelter-facilities {
+.shelter-card__footer {
     display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-4);
+    border-top: 1px solid var(--border-light);
+    margin-top: auto;
 }
 
-.facility-tag {
-    padding: 4px 8px;
-    background: rgba(59, 130, 246, 0.1);
-    color: #93C5FD;
-    font-size: 11px;
-    border-radius: 4px;
-}
-
-.shelter-card-footer {
-    display: flex;
-    gap: 12px;
-    padding: 16px;
-    border-top: 1px solid #1F2937;
-}
-
-.btn-primary,
-.btn-secondary {
+.shelter-card__footer > * {
     flex: 1;
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 150ms ease;
 }
 
-.btn-primary {
-    background: #D4AF37;
-    color: #0F1218;
-}
+/* ═════════ 平板以上（桌面是放大版） ═════════ */
 
-.btn-primary:hover {
-    background: #E5C158;
-}
-
-.btn-secondary {
-    background: transparent;
-    color: #94A3B8;
-    border: 1px solid #374151;
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: #E5E7EB;
-}
-
-/* Responsive */
-@media (max-width: 1024px) {
-    .shelters-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 768px) {
+@media (min-width: 768px) {
     .shelters-page {
-        padding: 16px;
+        padding: var(--space-6);
+        gap: var(--space-6);
     }
-    
-    .shelters-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
+
+    .shelters-page__title {
+        font-size: var(--font-size-2xl);
     }
-    
+
     .shelters-stats {
-        grid-template-columns: 1fr 1fr;
+        grid-template-columns: repeat(4, 1fr);
     }
-    
-    .shelters-filters {
-        flex-direction: column;
+
+    .shelters-toolbar {
+        flex-direction: row;
     }
-    
+
+    .shelters-search {
+        flex: 1;
+    }
+
+    .shelters-filter {
+        flex: 0 0 220px;
+    }
+
     .shelters-list {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    }
+
+    .shelters-skeleton__row {
+        height: 180px;
     }
 }
