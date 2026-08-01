@@ -197,10 +197,152 @@
   color: var(--color-success-dark);
 }
 
-.donations-table .empty-row {
-  text-align: center;
+.donations-table td.empty-cell {
+  padding: 0;
+}
+
+/* ============================================
+   Alert action row
+   ============================================ */
+.alert-with-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+/* ============================================
+   Loading Skeleton
+   ============================================ */
+.donations-skeleton__bar {
+  border-radius: var(--radius-md);
+  background: var(--surface-hover);
+  animation: donations-pulse 1.2s ease-in-out infinite;
+}
+
+.donations-skeleton__bar--row {
+  height: 20px;
+  width: 100%;
+}
+
+.donations-skeleton__bar--value {
+  height: 20px;
+  width: 70%;
+}
+
+.donations-skeleton__bar--label {
+  height: 12px;
+  width: 50%;
+}
+
+.donations-skeleton__bar--card-line {
+  height: 16px;
+  width: 100%;
+  margin-bottom: var(--space-2);
+}
+
+.donations-skeleton__bar--short {
+  width: 60%;
+  margin-bottom: 0;
+}
+
+.donations-skeleton__icon {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-lg);
+  background: var(--surface-hover);
+  animation: donations-pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.donations-skeleton__lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  flex: 1;
+}
+
+@keyframes donations-pulse {
+  0%, 100% { opacity: 0.55; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .donations-skeleton__bar,
+  .donations-skeleton__icon {
+    animation: none;
+  }
+}
+
+/* ============================================
+   Mobile Card List (List archetype §7.1)
+   ============================================ */
+.donations-table-container--desktop {
+  display: block;
+}
+
+.donations-cards--mobile {
+  display: none;
+}
+
+.donations-cards {
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.donation-card {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--surface-default);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-lg);
+}
+
+.donation-card__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.donation-card__row--top {
+  font-weight: 600;
+}
+
+.donation-card__row--meta {
+  font-size: var(--text-xs);
   color: var(--text-tertiary);
-  padding: 2rem;
+}
+
+.donation-card__name {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: var(--text-sm);
+}
+
+.donation-card__amount {
+  font-weight: 700;
+  color: var(--color-success-dark);
+  font-size: var(--text-base);
+}
+
+.donation-card__date,
+.donation-card__meta {
+  color: var(--text-tertiary);
+  font-size: var(--text-xs);
+}
+
+.donation-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-1);
+}
+
+.donation-card__actions .lk-btn {
+  min-height: 44px;
 }
 
 /* Receipt Link */
@@ -396,5 +538,16 @@
 
   .page-header__actions {
     flex-wrap: wrap;
+  }
+}
+
+/* 行動端：表格改為卡片直列（DESIGN_LANGUAGE §7.1） */
+@media (max-width: 767px) {
+  .donations-table-container--desktop {
+    display: none;
+  }
+
+  .donations-cards--mobile {
+    display: flex;
   }
 }

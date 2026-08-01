@@ -31,15 +31,15 @@
 }
 
 .stat--warning .stat-value {
-    color: #FF9800;
+    color: var(--color-warning);
 }
 
 .stat--info .stat-value {
-    color: #2196F3;
+    color: var(--color-info);
 }
 
 .stat--success .stat-value {
-    color: #4CAF50;
+    color: var(--color-success);
 }
 
 .filter-row {

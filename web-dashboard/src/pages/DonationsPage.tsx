@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, Button, Badge, Modal } from '../design-system';
+import { Card, Button, Badge, Modal, Alert } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 import {
     getDonationStats,
     getDonations,
@@ -29,6 +30,51 @@ const PAYMENT_METHODS = [
     { value: 'cash', label: '現金' },
 ];
 
+/* ── 載入 skeleton（≥3 列，DESIGN_LANGUAGE §7.1）────────────── */
+
+function StatsCardsSkeleton() {
+    return (
+        <div className="stats-grid" role="status" aria-label="載入統計資料中">
+            {Array.from({ length: 6 }, (_, i) => (
+                <Card key={i} className="stat-card stat-card--skeleton" padding="md">
+                    <div className="donations-skeleton__icon" />
+                    <div className="donations-skeleton__lines">
+                        <span className="donations-skeleton__bar donations-skeleton__bar--value" />
+                        <span className="donations-skeleton__bar donations-skeleton__bar--label" />
+                    </div>
+                </Card>
+            ))}
+        </div>
+    );
+}
+
+function TableSkeletonRows({ rows = 5, columns }: { rows?: number; columns: number }) {
+    return (
+        <>
+            {Array.from({ length: rows }, (_, i) => (
+                <tr key={i} className="donations-table__skeleton-row" aria-hidden="true">
+                    <td colSpan={columns}>
+                        <div className="donations-skeleton__bar donations-skeleton__bar--row" />
+                    </td>
+                </tr>
+            ))}
+        </>
+    );
+}
+
+function MobileCardSkeleton({ rows = 3 }: { rows?: number }) {
+    return (
+        <div role="status" aria-label="載入中">
+            {Array.from({ length: rows }, (_, i) => (
+                <div key={i} className="donation-card donation-card--skeleton" aria-hidden="true">
+                    <div className="donations-skeleton__bar donations-skeleton__bar--card-line" />
+                    <div className="donations-skeleton__bar donations-skeleton__bar--card-line donations-skeleton__bar--short" />
+                </div>
+            ))}
+        </div>
+    );
+}
+
 export default function DonationsPage() {
     const { user } = useAuth();
     const queryClient = useQueryClient();
@@ -50,19 +96,34 @@ export default function DonationsPage() {
     const [isAnonymous, setIsAnonymous] = useState(false);
 
     // 查詢統計
-    const { data: stats } = useQuery({
+    const {
+        data: stats,
+        isLoading: statsLoading,
+        isError: statsError,
+        refetch: refetchStats,
+    } = useQuery({
         queryKey: ['donationStats'],
         queryFn: () => getDonationStats().then(res => res.data.data),
     });
 
     // 查詢捐款列表
-    const { data: donationsData } = useQuery({
+    const {
+        data: donationsData,
+        isLoading: donationsLoading,
+        isError: donationsIsError,
+        refetch: refetchDonations,
+    } = useQuery({
         queryKey: ['donations'],
         queryFn: () => getDonations({ limit: 20 }).then(res => res.data),
     });
 
     // 查詢捐款人列表
-    const { data: donorsData } = useQuery({
+    const {
+        data: donorsData,
+        isLoading: donorsLoading,
+        isError: donorsIsError,
+        refetch: refetchDonors,
+    } = useQuery({
         queryKey: ['donors'],
         queryFn: () => getDonors({ limit: 20 }).then(res => res.data),
     });
@@ -192,161 +253,297 @@ export default function DonationsPage() {
             </div>
 
             {/* 總覽 */}
-            {activeTab === 'overview' && stats && (
+            {activeTab === 'overview' && (
                 <div className="stats-overview">
-                    <div className="stats-grid">
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">💰</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">{formatCurrency(stats.totalAmount)}</div>
-                                <div className="stat-card__label">累計捐款</div>
+                    {statsLoading ? (
+                        <StatsCardsSkeleton />
+                    ) : statsError ? (
+                        <Alert variant="danger" title="無法載入統計資料">
+                            <div className="alert-with-action">
+                                <span>請檢查網路連線後再試一次。</span>
+                                <Button size="sm" variant="secondary" onClick={() => refetchStats()}>
+                                    重試
+                                </Button>
                             </div>
-                        </Card>
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">📅</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">{formatCurrency(stats.monthAmount)}</div>
-                                <div className="stat-card__label">本月捐款</div>
-                            </div>
-                        </Card>
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">🎯</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">{formatCurrency(stats.todayAmount)}</div>
-                                <div className="stat-card__label">今日捐款</div>
-                            </div>
-                        </Card>
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">👥</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">{stats.donorCount}</div>
-                                <div className="stat-card__label">捐款人數</div>
-                            </div>
-                        </Card>
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">📝</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">{stats.totalDonations}</div>
-                                <div className="stat-card__label">捐款筆數</div>
-                            </div>
-                        </Card>
-                        <Card className="stat-card" padding="md">
-                            <div className="stat-card__icon">📊</div>
-                            <div className="stat-card__content">
-                                <div className="stat-card__value">
-                                    {stats.totalDonations > 0 ? formatCurrency(stats.totalAmount / stats.totalDonations) : '$0'}
+                        </Alert>
+                    ) : stats ? (
+                        <div className="stats-grid">
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">💰</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">{formatCurrency(stats.totalAmount)}</div>
+                                    <div className="stat-card__label">累計捐款</div>
                                 </div>
-                                <div className="stat-card__label">平均捐款</div>
-                            </div>
-                        </Card>
-                    </div>
+                            </Card>
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">📅</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">{formatCurrency(stats.monthAmount)}</div>
+                                    <div className="stat-card__label">本月捐款</div>
+                                </div>
+                            </Card>
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">🎯</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">{formatCurrency(stats.todayAmount)}</div>
+                                    <div className="stat-card__label">今日捐款</div>
+                                </div>
+                            </Card>
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">👥</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">{stats.donorCount}</div>
+                                    <div className="stat-card__label">捐款人數</div>
+                                </div>
+                            </Card>
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">📝</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">{stats.totalDonations}</div>
+                                    <div className="stat-card__label">捐款筆數</div>
+                                </div>
+                            </Card>
+                            <Card className="stat-card" padding="md">
+                                <div className="stat-card__icon">📊</div>
+                                <div className="stat-card__content">
+                                    <div className="stat-card__value">
+                                        {stats.totalDonations > 0 ? formatCurrency(stats.totalAmount / stats.totalDonations) : '$0'}
+                                    </div>
+                                    <div className="stat-card__label">平均捐款</div>
+                                </div>
+                            </Card>
+                        </div>
+                    ) : (
+                        <EmptyState variant="minimal" title="暫無統計資料" description="目前沒有可顯示的捐款統計。" />
+                    )}
                 </div>
             )}
 
             {/* 捐款紀錄 */}
             {activeTab === 'donations' && (
                 <Card title="捐款紀錄" padding="lg">
-                    <div className="donations-table-container">
-                        <table className="donations-table">
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>捐款人</th>
-                                    <th>金額</th>
-                                    <th>方式</th>
-                                    <th>狀態</th>
-                                    <th>收據</th>
-                                    <th>操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {donationsData?.data?.map((donation: Donation) => (
-                                    <tr key={donation.id}>
-                                        <td>{formatDate(donation.createdAt)}</td>
-                                        <td>{donation.donor?.isAnonymous ? '善心人士' : donation.donor?.name}</td>
-                                        <td className="amount">{formatCurrency(donation.amount)}</td>
-                                        <td>
-                                            <Badge variant="info">
-                                                {PAYMENT_METHODS.find(m => m.value === donation.paymentMethod)?.label || donation.paymentMethod}
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            <Badge variant={donation.status === 'paid' ? 'success' : donation.status === 'pending' ? 'warning' : 'danger'}>
-                                                {donation.status === 'paid' ? '已入帳' : donation.status === 'pending' ? '待確認' : donation.status}
-                                            </Badge>
-                                        </td>
-                                        <td>
-                                            {donation.receipt ? (
-                                                <a
-                                                    href={`${API_BASE_URL}/donations/receipts/${donation.receipt.id}/pdf`}
-                                                    target="_blank"
-                                                    rel="noopener noreferrer"
-                                                    className="receipt-download-link"
-                                                >
-                                                    📄 {donation.receipt.receiptNo}
-                                                </a>
-                                            ) : '-'}
-                                        </td>
-                                        <td>
+                    {donationsIsError ? (
+                        <Alert variant="danger" title="載入捐款紀錄失敗">
+                            <div className="alert-with-action">
+                                <span>請稍後再試一次。</span>
+                                <Button size="sm" variant="secondary" onClick={() => refetchDonations()}>
+                                    重試
+                                </Button>
+                            </div>
+                        </Alert>
+                    ) : (
+                        <>
+                            {/* 桌機：表格 */}
+                            <div className="donations-table-container donations-table-container--desktop">
+                                <table className="donations-table">
+                                    <thead>
+                                        <tr>
+                                            <th>日期</th>
+                                            <th>捐款人</th>
+                                            <th>金額</th>
+                                            <th>方式</th>
+                                            <th>狀態</th>
+                                            <th>收據</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {donationsLoading ? (
+                                            <TableSkeletonRows rows={5} columns={7} />
+                                        ) : donationsData?.data && donationsData.data.length > 0 ? (
+                                            donationsData.data.map((donation: Donation) => (
+                                                <tr key={donation.id}>
+                                                    <td>{formatDate(donation.createdAt)}</td>
+                                                    <td>{donation.donor?.isAnonymous ? '善心人士' : donation.donor?.name}</td>
+                                                    <td className="amount">{formatCurrency(donation.amount)}</td>
+                                                    <td>
+                                                        <Badge variant="info">
+                                                            {PAYMENT_METHODS.find(m => m.value === donation.paymentMethod)?.label || donation.paymentMethod}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>
+                                                        <Badge variant={donation.status === 'paid' ? 'success' : donation.status === 'pending' ? 'warning' : 'danger'}>
+                                                            {donation.status === 'paid' ? '已入帳' : donation.status === 'pending' ? '待確認' : donation.status}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>
+                                                        {donation.receipt ? (
+                                                            <a
+                                                                href={`${API_BASE_URL}/donations/receipts/${donation.receipt.id}/pdf`}
+                                                                target="_blank"
+                                                                rel="noopener noreferrer"
+                                                                className="receipt-download-link"
+                                                            >
+                                                                📄 {donation.receipt.receiptNo}
+                                                            </a>
+                                                        ) : '-'}
+                                                    </td>
+                                                    <td>
+                                                        {donation.status === 'pending' && (
+                                                            <Button size="sm" variant="primary" onClick={() => handleConfirmPayment(donation)}>
+                                                                確認入帳
+                                                            </Button>
+                                                        )}
+                                                    </td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={7} className="empty-cell">
+                                                    <EmptyState variant="minimal" title="暫無捐款紀錄" description="尚未有任何捐款紀錄。" />
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* 行動端：卡片直列 */}
+                            <div className="donations-cards donations-cards--mobile">
+                                {donationsLoading ? (
+                                    <MobileCardSkeleton rows={3} />
+                                ) : donationsData?.data && donationsData.data.length > 0 ? (
+                                    donationsData.data.map((donation: Donation) => (
+                                        <div className="donation-card" key={donation.id}>
+                                            <div className="donation-card__row donation-card__row--top">
+                                                <span className="donation-card__name">
+                                                    {donation.donor?.isAnonymous ? '善心人士' : donation.donor?.name}
+                                                </span>
+                                                <Badge variant={donation.status === 'paid' ? 'success' : donation.status === 'pending' ? 'warning' : 'danger'}>
+                                                    {donation.status === 'paid' ? '已入帳' : donation.status === 'pending' ? '待確認' : donation.status}
+                                                </Badge>
+                                            </div>
+                                            <div className="donation-card__row">
+                                                <span className="donation-card__amount">{formatCurrency(donation.amount)}</span>
+                                                <span className="donation-card__date">{formatDate(donation.createdAt)}</span>
+                                            </div>
+                                            <div className="donation-card__row donation-card__row--meta">
+                                                <Badge variant="info">
+                                                    {PAYMENT_METHODS.find(m => m.value === donation.paymentMethod)?.label || donation.paymentMethod}
+                                                </Badge>
+                                                {donation.receipt ? (
+                                                    <a
+                                                        href={`${API_BASE_URL}/donations/receipts/${donation.receipt.id}/pdf`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="receipt-download-link"
+                                                    >
+                                                        📄 {donation.receipt.receiptNo}
+                                                    </a>
+                                                ) : (
+                                                    <span>無收據</span>
+                                                )}
+                                            </div>
                                             {donation.status === 'pending' && (
-                                                <Button size="sm" variant="primary" onClick={() => handleConfirmPayment(donation)}>
-                                                    確認入帳
-                                                </Button>
+                                                <div className="donation-card__actions">
+                                                    <Button size="sm" variant="primary" onClick={() => handleConfirmPayment(donation)}>
+                                                        確認入帳
+                                                    </Button>
+                                                </div>
                                             )}
-                                        </td>
-                                    </tr>
-                                ))}
-                                {(!donationsData?.data || donationsData.data.length === 0) && (
-                                    <tr>
-                                        <td colSpan={7} className="empty-row">暫無捐款紀錄</td>
-                                    </tr>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <EmptyState variant="minimal" title="暫無捐款紀錄" description="尚未有任何捐款紀錄。" />
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </Card>
             )}
 
             {/* 捐款人 */}
             {activeTab === 'donors' && (
                 <Card title="捐款人列表" padding="lg">
-                    <div className="donations-table-container">
-                        <table className="donations-table">
-                            <thead>
-                                <tr>
-                                    <th>姓名</th>
-                                    <th>類型</th>
-                                    <th>Email</th>
-                                    <th>電話</th>
-                                    <th>捐款次數</th>
-                                    <th>累計金額</th>
-                                    <th>加入日期</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {donorsData?.data?.map((donor: Donor) => (
-                                    <tr key={donor.id}>
-                                        <td>{donor.isAnonymous ? '善心人士' : donor.name}</td>
-                                        <td>
-                                            <Badge variant={donor.type === 'corporate' ? 'info' : 'default'}>
-                                                {donor.type === 'corporate' ? '企業' : '個人'}
-                                            </Badge>
-                                        </td>
-                                        <td>{donor.email || '-'}</td>
-                                        <td>{donor.phone || '-'}</td>
-                                        <td>{donor.totalDonationCount}</td>
-                                        <td className="amount">{formatCurrency(donor.totalDonationAmount)}</td>
-                                        <td>{formatDate(donor.createdAt)}</td>
-                                    </tr>
-                                ))}
-                                {(!donorsData?.data || donorsData.data.length === 0) && (
-                                    <tr>
-                                        <td colSpan={7} className="empty-row">暫無捐款人</td>
-                                    </tr>
+                    {donorsIsError ? (
+                        <Alert variant="danger" title="載入捐款人資料失敗">
+                            <div className="alert-with-action">
+                                <span>請稍後再試一次。</span>
+                                <Button size="sm" variant="secondary" onClick={() => refetchDonors()}>
+                                    重試
+                                </Button>
+                            </div>
+                        </Alert>
+                    ) : (
+                        <>
+                            {/* 桌機：表格 */}
+                            <div className="donations-table-container donations-table-container--desktop">
+                                <table className="donations-table">
+                                    <thead>
+                                        <tr>
+                                            <th>姓名</th>
+                                            <th>類型</th>
+                                            <th>Email</th>
+                                            <th>電話</th>
+                                            <th>捐款次數</th>
+                                            <th>累計金額</th>
+                                            <th>加入日期</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {donorsLoading ? (
+                                            <TableSkeletonRows rows={5} columns={7} />
+                                        ) : donorsData?.data && donorsData.data.length > 0 ? (
+                                            donorsData.data.map((donor: Donor) => (
+                                                <tr key={donor.id}>
+                                                    <td>{donor.isAnonymous ? '善心人士' : donor.name}</td>
+                                                    <td>
+                                                        <Badge variant={donor.type === 'corporate' ? 'info' : 'default'}>
+                                                            {donor.type === 'corporate' ? '企業' : '個人'}
+                                                        </Badge>
+                                                    </td>
+                                                    <td>{donor.email || '-'}</td>
+                                                    <td>{donor.phone || '-'}</td>
+                                                    <td>{donor.totalDonationCount}</td>
+                                                    <td className="amount">{formatCurrency(donor.totalDonationAmount)}</td>
+                                                    <td>{formatDate(donor.createdAt)}</td>
+                                                </tr>
+                                            ))
+                                        ) : (
+                                            <tr>
+                                                <td colSpan={7} className="empty-cell">
+                                                    <EmptyState variant="minimal" title="暫無捐款人" description="尚未有任何捐款人紀錄。" />
+                                                </td>
+                                            </tr>
+                                        )}
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            {/* 行動端：卡片直列 */}
+                            <div className="donations-cards donations-cards--mobile">
+                                {donorsLoading ? (
+                                    <MobileCardSkeleton rows={3} />
+                                ) : donorsData?.data && donorsData.data.length > 0 ? (
+                                    donorsData.data.map((donor: Donor) => (
+                                        <div className="donation-card" key={donor.id}>
+                                            <div className="donation-card__row donation-card__row--top">
+                                                <span className="donation-card__name">
+                                                    {donor.isAnonymous ? '善心人士' : donor.name}
+                                                </span>
+                                                <Badge variant={donor.type === 'corporate' ? 'info' : 'default'}>
+                                                    {donor.type === 'corporate' ? '企業' : '個人'}
+                                                </Badge>
+                                            </div>
+                                            <div className="donation-card__row">
+                                                <span className="donation-card__amount">{formatCurrency(donor.totalDonationAmount)}</span>
+                                                <span className="donation-card__meta">{donor.totalDonationCount} 次捐款</span>
+                                            </div>
+                                            <div className="donation-card__row donation-card__row--meta">
+                                                <span>{donor.email || '-'}</span>
+                                                <span>{donor.phone || '-'}</span>
+                                            </div>
+                                            <div className="donation-card__row donation-card__row--meta">
+                                                <span>加入日期：{formatDate(donor.createdAt)}</span>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <EmptyState variant="minimal" title="暫無捐款人" description="尚未有任何捐款人紀錄。" />
                                 )}
-                            </tbody>
-                        </table>
-                    </div>
+                            </div>
+                        </>
+                    )}
                 </Card>
             )}
 

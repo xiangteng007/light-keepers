@@ -1,0 +1,52 @@
+/* ResourcesSkeleton.css — 物資管理子分頁共用載入骨架樣式 */
+.resources-tab-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+}
+
+.resources-tab-skeleton__row {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+}
+
+.resources-tab-skeleton__bar {
+  display: block;
+  height: 16px;
+  width: 60%;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    90deg,
+    var(--bg-hover) 25%,
+    var(--bg-primary) 50%,
+    var(--bg-hover) 75%
+  );
+  background-size: 200% 100%;
+  animation: resourcesTabSkeletonShimmer 1.4s ease-in-out infinite;
+}
+
+.resources-tab-skeleton__bar--sm {
+  width: 35%;
+  height: 12px;
+}
+
+@keyframes resourcesTabSkeletonShimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .resources-tab-skeleton__bar {
+    animation: none;
+  }
+}

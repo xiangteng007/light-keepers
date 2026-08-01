@@ -76,15 +76,15 @@
 }
 
 .result-gain {
-    color: #4CAF50;
+    color: var(--color-success);
 }
 
 .result-loss {
-    color: #F44336;
+    color: var(--color-danger);
 }
 
 .result-ok {
-    color: #4CAF50;
+    color: var(--color-success);
 }
 
 .audit-progress {
@@ -103,7 +103,7 @@
 .modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: var(--surface-overlay);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -148,20 +148,20 @@
 }
 
 .diff-row {
-    background: rgba(255, 152, 0, 0.1);
+    background: var(--color-warning-bg);
 }
 
 .missing-row {
-    background: rgba(244, 67, 54, 0.1);
+    background: var(--color-danger-bg);
 }
 
 .diff-gain {
-    color: #4CAF50;
+    color: var(--color-success);
     font-weight: 600;
 }
 
 .diff-loss {
-    color: #F44336;
+    color: var(--color-danger);
     font-weight: 600;
 }
 
@@ -174,30 +174,7 @@
     border-top: 1px solid var(--border-color);
 }
 
-/* Loading & Empty */
-.loading-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 3rem;
-    color: var(--text-secondary);
-}
-
-.spinner {
-    width: 32px;
-    height: 32px;
-    border: 3px solid var(--border-color);
-    border-top-color: var(--primary);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    to {
-        transform: rotate(360deg);
-    }
-}
-
+/* Empty（載入骨架見 ResourcesSkeleton.css） */
 .empty-state {
     padding: 2rem;
     text-align: center;

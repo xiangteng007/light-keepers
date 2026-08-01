@@ -1,28 +1,33 @@
 /**
  * ICS205CommsPage.tsx
- * 
+ *
  * ICS Form 205 - Incident Radio Communications Plan
  * Per Expert Council Navigation Design §7.1
- * 
+ *
  * Covers:
  * - Radio frequencies and channels
  * - Communication assignments
  * - Special instructions
+ *
+ * R3a redesign: Detail archetype (DESIGN_LANGUAGE.md §7.2) — this is a form
+ * page with no clear list/board/map shape, so it uses the detail skeleton:
+ * page-header (back | h1 | action group ≤3) → segmented panels. Data layer
+ * (plan state, updateField/updateChannel/addChannel/removeChannel,
+ * handleSave incl. its known-TODO alert, handlePrint) is unchanged — this
+ * pass only rebuilds markup/styling to design-system components + tokens.
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
     Radio,
-    Phone,
-    Users,
     Save,
     Printer,
     Share2,
     ChevronLeft,
     Plus,
     Trash2,
-    Calendar,
 } from 'lucide-react';
+import { Button, InputField } from '../../design-system';
 import { createLogger } from '../../utils/logger';
 import './ICS205CommsPage.css';
 
@@ -135,6 +140,7 @@ export default function ICS205CommsPage() {
     };
 
     const handleSave = () => {
+        // TODO: wire to backend once ICS 205 persistence API exists.
         logger.debug('Saving ICS 205:', plan);
         alert('ICS 205 已儲存');
     };
@@ -145,7 +151,7 @@ export default function ICS205CommsPage() {
 
     return (
         <div className="ics205-page">
-            {/* Header */}
+            {/* Page header (Detail archetype §7.2: back | h1 | action group ≤3) */}
             <header className="ics205-header">
                 <div className="ics205-header-left">
                     <Link to="/ics" className="ics205-back">
@@ -153,7 +159,7 @@ export default function ICS205CommsPage() {
                         <span>ICS 儀表板</span>
                     </Link>
                     <div className="ics205-title">
-                        <Radio size={28} />
+                        <Radio size={28} className="ics205-title-icon" />
                         <div>
                             <h1>ICS 205 - 通訊計畫</h1>
                             <p>Incident Radio Communications Plan</p>
@@ -161,18 +167,15 @@ export default function ICS205CommsPage() {
                     </div>
                 </div>
                 <div className="ics205-actions">
-                    <button className="ics205-btn secondary" onClick={handlePrint}>
-                        <Printer size={16} />
+                    <Button variant="secondary" size="sm" icon={<Printer size={16} />} onClick={handlePrint}>
                         列印
-                    </button>
-                    <button className="ics205-btn secondary">
-                        <Share2 size={16} />
+                    </Button>
+                    <Button variant="secondary" size="sm" icon={<Share2 size={16} />}>
                         分享
-                    </button>
-                    <button className="ics205-btn primary" onClick={handleSave}>
-                        <Save size={16} />
+                    </Button>
+                    <Button variant="primary" size="sm" icon={<Save size={16} />} onClick={handleSave}>
                         儲存
-                    </button>
+                    </Button>
                 </div>
             </header>
 
@@ -182,52 +185,45 @@ export default function ICS205CommsPage() {
                 <section className="ics205-section">
                     <h2>1. 基本資訊</h2>
                     <div className="ics205-form-grid">
-                        <div className="ics205-field">
-                            <label htmlFor="incidentName">事件名稱</label>
-                            <input
-                                id="incidentName"
-                                type="text"
-                                value={plan.incidentName}
-                                onChange={e => updateField('incidentName', e.target.value)}
-                                placeholder="例：颱風蘇力救災行動"
-                            />
-                        </div>
-                        <div className="ics205-field">
-                            <label htmlFor="dateTimePrepared">
-                                <Calendar size={14} />
-                                製作日期時間
-                            </label>
-                            <input
-                                id="dateTimePrepared"
-                                type="datetime-local"
-                                value={plan.dateTimePrepared}
-                                onChange={e => updateField('dateTimePrepared', e.target.value)}
-                            />
-                        </div>
-                        <div className="ics205-field">
-                            <label htmlFor="operationalPeriodFrom">作業期間起始</label>
-                            <input
-                                id="operationalPeriodFrom"
-                                type="datetime-local"
-                                value={plan.operationalPeriod.from}
-                                onChange={e => updateField('operationalPeriod', {
-                                    ...plan.operationalPeriod,
-                                    from: e.target.value,
-                                })}
-                            />
-                        </div>
-                        <div className="ics205-field">
-                            <label htmlFor="operationalPeriodTo">作業期間結束</label>
-                            <input
-                                id="operationalPeriodTo"
-                                type="datetime-local"
-                                value={plan.operationalPeriod.to}
-                                onChange={e => updateField('operationalPeriod', {
-                                    ...plan.operationalPeriod,
-                                    to: e.target.value,
-                                })}
-                            />
-                        </div>
+                        <InputField
+                            label="事件名稱"
+                            id="incidentName"
+                            type="text"
+                            value={plan.incidentName}
+                            onChange={e => updateField('incidentName', e.target.value)}
+                            placeholder="例：颱風蘇力救災行動"
+                            fullWidth
+                        />
+                        <InputField
+                            label="製作日期時間"
+                            id="dateTimePrepared"
+                            type="datetime-local"
+                            value={plan.dateTimePrepared}
+                            onChange={e => updateField('dateTimePrepared', e.target.value)}
+                            fullWidth
+                        />
+                        <InputField
+                            label="作業期間起始"
+                            id="operationalPeriodFrom"
+                            type="datetime-local"
+                            value={plan.operationalPeriod.from}
+                            onChange={e => updateField('operationalPeriod', {
+                                ...plan.operationalPeriod,
+                                from: e.target.value,
+                            })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="作業期間結束"
+                            id="operationalPeriodTo"
+                            type="datetime-local"
+                            value={plan.operationalPeriod.to}
+                            onChange={e => updateField('operationalPeriod', {
+                                ...plan.operationalPeriod,
+                                to: e.target.value,
+                            })}
+                            fullWidth
+                        />
                     </div>
                 </section>
 
@@ -235,10 +231,7 @@ export default function ICS205CommsPage() {
                 <section className="ics205-section">
                     <h2>2. 基礎地區通訊資訊</h2>
                     <div className="ics205-field full-width">
-                        <label htmlFor="basicLocalComms">
-                            <Phone size={14} />
-                            區域通訊概況
-                        </label>
+                        <label htmlFor="basicLocalComms">區域通訊概況</label>
                         <textarea
                             id="basicLocalComms"
                             value={plan.basicLocalComms}
@@ -253,12 +246,11 @@ export default function ICS205CommsPage() {
                 <section className="ics205-section">
                     <div className="ics205-section-header">
                         <h2>3. 無線電頻率分配</h2>
-                        <button className="ics205-add-btn" onClick={addChannel}>
-                            <Plus size={16} />
+                        <Button variant="secondary" size="sm" icon={<Plus size={16} />} onClick={addChannel}>
                             新增頻道
-                        </button>
+                        </Button>
                     </div>
-                    
+
                     <div className="ics205-table-container">
                         <table className="ics205-channels-table">
                             <thead>
@@ -307,6 +299,7 @@ export default function ICS205CommsPage() {
                                                 value={channel.frequency}
                                                 onChange={e => updateChannel(channel.id, 'frequency', e.target.value)}
                                                 placeholder="MHz"
+                                                aria-label="頻率"
                                             />
                                         </td>
                                         <td>
@@ -337,14 +330,15 @@ export default function ICS205CommsPage() {
                                             />
                                         </td>
                                         <td>
-                                            <button
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
                                                 className="ics205-delete-btn"
                                                 onClick={() => removeChannel(channel.id)}
                                                 aria-label="刪除頻道"
                                                 title="刪除"
-                                            >
-                                                <Trash2 size={14} />
-                                            </button>
+                                                icon={<Trash2 size={14} />}
+                                            />
                                         </td>
                                     </tr>
                                 ))}
@@ -357,10 +351,7 @@ export default function ICS205CommsPage() {
                 <section className="ics205-section">
                     <h2>4. 特殊指示</h2>
                     <div className="ics205-field full-width">
-                        <label htmlFor="specialInstructions">
-                            <Users size={14} />
-                            通訊規則與限制
-                        </label>
+                        <label htmlFor="specialInstructions">通訊規則與限制</label>
                         <textarea
                             id="specialInstructions"
                             value={plan.specialInstructions}
@@ -374,16 +365,15 @@ export default function ICS205CommsPage() {
                 {/* Prepared By */}
                 <section className="ics205-section">
                     <div className="ics205-form-grid">
-                        <div className="ics205-field">
-                            <label htmlFor="preparedBy">製作人 (Communications Unit Leader)</label>
-                            <input
-                                id="preparedBy"
-                                type="text"
-                                value={plan.preparedBy}
-                                onChange={e => updateField('preparedBy', e.target.value)}
-                                placeholder="姓名 / 職稱"
-                            />
-                        </div>
+                        <InputField
+                            label="製作人 (Communications Unit Leader)"
+                            id="preparedBy"
+                            type="text"
+                            value={plan.preparedBy}
+                            onChange={e => updateField('preparedBy', e.target.value)}
+                            placeholder="姓名 / 職稱"
+                            fullWidth
+                        />
                     </div>
                 </section>
             </div>

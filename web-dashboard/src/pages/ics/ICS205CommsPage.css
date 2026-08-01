@@ -1,135 +1,167 @@
 /**
  * ICS205CommsPage.css
- * 
+ *
  * ICS Form 205 - Communications Plan styling
+ *
+ * R3a redesign: Detail archetype (DESIGN_LANGUAGE.md §7.2).
+ * All colors are semantic tokens from tokens.css — no hardcoded hex/rgba,
+ * no light/dark/tactical branches (the token layer handles that switch).
+ * Mobile-first: base rules target the smallest viewport, wider layouts
+ * are added via min-width media queries. Touch targets >= 44px.
  */
 
 .ics205-page {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    background: #0F172A;
-    color: #E5E7EB;
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 
 /* Header */
 .ics205-header {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 16px 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-4);
+    background: var(--bg-secondary);
+    border-bottom: 1px solid var(--border-default);
+}
+
+@media (min-width: 768px) {
+    .ics205-header {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-4) var(--space-6);
+    }
 }
 
 .ics205-header-left {
     display: flex;
-    align-items: center;
-    gap: 24px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3);
+    width: 100%;
+}
+
+@media (min-width: 768px) {
+    .ics205-header-left {
+        flex-direction: row;
+        align-items: center;
+        gap: var(--space-6);
+        width: auto;
+    }
 }
 
 .ics205-back {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 4px;
-    color: #9CA3AF;
+    gap: var(--space-1);
+    min-height: 44px;
+    color: var(--text-secondary);
     text-decoration: none;
-    font-size: 13px;
+    font-size: var(--font-size-sm);
     transition: color 150ms ease;
 }
 
 .ics205-back:hover {
-    color: #D4AF37;
+    color: var(--color-secondary);
+}
+
+.ics205-back:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+    border-radius: var(--radius-sm);
 }
 
 .ics205-title {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
-.ics205-title svg {
-    color: #3B82F6;
+.ics205-title-icon {
+    color: var(--color-secondary);
+    flex-shrink: 0;
 }
 
 .ics205-title h1 {
     margin: 0;
-    font-size: 20px;
+    font-size: var(--font-size-xl);
     font-weight: 700;
+    color: var(--text-primary);
+}
+
+@media (min-width: 768px) {
+    .ics205-title h1 {
+        font-size: var(--font-size-2xl);
+    }
 }
 
 .ics205-title p {
     margin: 0;
-    font-size: 12px;
-    color: #9CA3AF;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 .ics205-actions {
     display: flex;
-    gap: 8px;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    width: 100%;
 }
 
-.ics205-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 6px;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 150ms ease;
-}
-
-.ics205-btn.primary {
-    background: #D4AF37;
-    color: #0F172A;
-}
-
-.ics205-btn.primary:hover {
-    background: #E8C547;
-}
-
-.ics205-btn.secondary {
-    background: rgba(255, 255, 255, 0.05);
-    color: #E5E7EB;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.ics205-btn.secondary:hover {
-    background: rgba(255, 255, 255, 0.1);
+@media (min-width: 768px) {
+    .ics205-actions {
+        width: auto;
+    }
 }
 
 /* Content */
 .ics205-content {
     flex: 1;
-    padding: 24px;
+    padding: var(--space-3);
     max-width: 1200px;
     margin: 0 auto;
     width: 100%;
 }
 
+@media (min-width: 768px) {
+    .ics205-content {
+        padding: var(--space-6);
+    }
+}
+
 .ics205-section {
-    margin-bottom: 32px;
-    padding: 20px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
+    margin-bottom: var(--space-6);
+    padding: var(--space-4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+}
+
+@media (min-width: 768px) {
+    .ics205-section {
+        padding: var(--space-5);
+    }
 }
 
 .ics205-section h2 {
-    margin: 0 0 16px;
-    font-size: 16px;
+    margin: 0 0 var(--space-4);
+    font-size: var(--font-size-lg);
     font-weight: 600;
-    color: #3B82F6;
+    color: var(--color-secondary);
 }
 
 .ics205-section-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    gap: var(--space-3);
+    margin-bottom: var(--space-4);
 }
 
 .ics205-section-header h2 {
@@ -138,14 +170,20 @@
 
 .ics205-form-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 16px;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+    .ics205-form-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .ics205-field {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-2);
 }
 
 .ics205-field.full-width {
@@ -153,33 +191,32 @@
 }
 
 .ics205-field label {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 12px;
+    font-size: var(--font-size-sm);
     font-weight: 500;
-    color: #9CA3AF;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: var(--text-secondary);
 }
 
-.ics205-field input,
-.ics205-field textarea,
-.ics205-field select {
-    padding: 10px 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 6px;
-    color: #E5E7EB;
-    font-size: 14px;
-    transition: all 150ms ease;
+.ics205-field textarea {
+    padding: var(--space-3);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    min-height: 44px;
+    resize: vertical;
+    transition: border-color 150ms ease, background-color 150ms ease;
 }
 
-.ics205-field input:focus,
 .ics205-field textarea:focus {
     outline: none;
-    border-color: #3B82F6;
-    background: rgba(59, 130, 246, 0.05);
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+}
+
+.ics205-field textarea::placeholder {
+    color: var(--text-muted);
 }
 
 /* Table */
@@ -195,101 +232,73 @@
 
 .ics205-channels-table th {
     text-align: left;
-    padding: 10px 8px;
-    background: rgba(59, 130, 246, 0.1);
-    font-size: 11px;
+    padding: var(--space-3) var(--space-2);
+    background: var(--bg-secondary);
+    font-size: var(--font-size-xs);
     font-weight: 600;
-    color: #9CA3AF;
+    color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid var(--border-default);
 }
 
 .ics205-channels-table td {
-    padding: 6px 4px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding: var(--space-2) var(--space-1);
+    border-bottom: 1px solid var(--border-default);
 }
 
 .ics205-channels-table input,
 .ics205-channels-table select {
     width: 100%;
-    padding: 8px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 4px;
-    color: #E5E7EB;
-    font-size: 13px;
+    min-height: 44px;
+    padding: var(--space-2);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm);
+    transition: border-color 150ms ease;
+}
+
+.ics205-channels-table input::placeholder {
+    color: var(--text-muted);
 }
 
 .ics205-channels-table input:focus,
 .ics205-channels-table select:focus {
     outline: none;
-    border-color: #3B82F6;
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
 }
 
 .ics205-channels-table select {
     cursor: pointer;
 }
 
-.ics205-add-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    padding: 8px 16px;
-    background: rgba(59, 130, 246, 0.1);
-    border: 1px solid rgba(59, 130, 246, 0.3);
-    border-radius: 6px;
-    color: #3B82F6;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 150ms ease;
-}
-
-.ics205-add-btn:hover {
-    background: rgba(59, 130, 246, 0.2);
-}
-
 .ics205-delete-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px;
-    background: transparent;
-    border: none;
-    border-radius: 4px;
-    color: #6B7280;
-    cursor: pointer;
-    transition: all 150ms ease;
-}
-
-.ics205-delete-btn:hover {
-    background: rgba(239, 68, 68, 0.1);
-    color: #EF4444;
+    padding: 0 !important;
+    width: 44px;
+    min-width: 44px;
 }
 
 /* Footer */
 .ics205-footer {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 24px;
-    background: rgba(255, 255, 255, 0.02);
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
-    font-size: 12px;
-    color: #6B7280;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-3) var(--space-4);
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-default);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .ics205-header {
-        flex-direction: column;
-        gap: 16px;
-        align-items: flex-start;
-    }
-    
-    .ics205-form-grid {
-        grid-template-columns: 1fr;
+@media (min-width: 768px) {
+    .ics205-footer {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        padding: var(--space-3) var(--space-6);
     }
 }
 
@@ -299,10 +308,10 @@
         background: white;
         color: black;
     }
-    
+
     .ics205-header,
     .ics205-footer,
-    .ics205-add-btn,
+    .ics205-section-header button,
     .ics205-delete-btn {
         display: none;
     }
