@@ -1,74 +1,58 @@
 /**
  * UnifiedReportingPage.tsx
- * 
+ *
  * 綜合報表頁面 - 跨領域報表生成
+ *
+ * R3b 重建（DESIGN_LANGUAGE.md）：List archetype（stat 摘要列 + 內容清單，dashboard-ish）。
+ * 本頁尚無真實資料來源／後端端點，維持誠實的「建置中」狀態呈現
+ * （§4：空狀態一律用 EmptyState），不再顯示虛構的統計數字。
  */
-import './placeholder-pages.css';
-import { AlertTriangle, FileText, TrendingUp, Printer } from 'lucide-react';
+import { FileText, TrendingUp, Printer, Construction } from 'lucide-react';
+import { Alert, Card } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import './UnifiedReportingPage.css';
+
+const EXPECTED_FEATURES = [
+    { icon: FileText, title: 'SITREP 生成', desc: '自動化情況報告' },
+    { icon: TrendingUp, title: '趨勢分析', desc: '歷史資料對比' },
+    { icon: Printer, title: '報表輸出', desc: 'PDF / Excel 匯出' },
+];
 
 export default function UnifiedReportingPage() {
     return (
-        <div className="placeholder-page">
-            <h1 className="placeholder-page__title">📊 綜合報表</h1>
-            <p className="placeholder-page__subtitle">
-                跨領域整合報表、SITREP、事件摘要
-            </p>
+        <div className="unified-reporting-page">
+            <header className="page-header">
+                <h1>綜合報表</h1>
+                <p className="page-header__subtitle">跨領域整合報表、SITREP、事件摘要</p>
+            </header>
 
-            {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--blue">
-                <AlertTriangle size={20} color="#1E40AF" />
-                <div>
-                    <strong className="placeholder-page__dev-notice-title">🚧 報表功能開發中</strong>
-                    <p className="placeholder-page__dev-notice-text">
-                        綜合報表系統正在開發中，預計包含：SITREP 自動生成、AAR 範本、資料視覺化儀表板等功能。
-                    </p>
-                </div>
-            </div>
+            <Alert variant="info" title="報表功能開發中">
+                綜合報表系統正在開發中，預計包含：SITREP 自動生成、AAR 範本、資料視覺化儀表板等功能。
+                下列統計數字尚未接上真實資料來源，暫不顯示。
+            </Alert>
 
-            <div className="placeholder-page__grid">
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📄</div>
-                    <div className="placeholder-page__card-value">24</div>
-                    <div className="placeholder-page__card-label">本月報表</div>
-                </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📋</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--blue">3</div>
-                    <div className="placeholder-page__card-label">SITREP 進行中</div>
-                </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📈</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--green">8</div>
-                    <div className="placeholder-page__card-label">AAR 已完成</div>
-                </div>
-            </div>
+            <section className="panel" aria-label="報表列表">
+                <EmptyState
+                    icon={Construction}
+                    variant="minimal"
+                    title="報表列表建置中"
+                    description="此功能尚未串接後端資料，目前無法產生或檢視報表。"
+                />
+            </section>
 
             {/* 預期功能區塊 */}
-            <div className="placeholder-page__expected-features">
-                <h3 className="placeholder-page__expected-features-title">
-                    📋 預期功能
-                </h3>
-                <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <FileText size={24} color="#DC2626" />
-                        <div className="placeholder-page__feature-card-title">SITREP 生成</div>
-                        <div className="placeholder-page__card-label">自動化情況報告</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <TrendingUp size={24} color="#3B82F6" />
-                        <div className="placeholder-page__feature-card-title">趨勢分析</div>
-                        <div className="placeholder-page__card-label">歷史資料對比</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Printer size={24} color="#10B981" />
-                        <div className="placeholder-page__feature-card-title">報表輸出</div>
-                        <div className="placeholder-page__card-label">PDF / Excel 匯出</div>
-                    </div>
+            <section className="expected-features">
+                <h2 className="expected-features__title">預期功能</h2>
+                <div className="expected-features__grid">
+                    {EXPECTED_FEATURES.map((feature) => (
+                        <Card key={feature.title} padding="md" className="feature-card">
+                            <feature.icon size={24} aria-hidden="true" />
+                            <div className="feature-card__title">{feature.title}</div>
+                            <div className="feature-card__desc">{feature.desc}</div>
+                        </Card>
+                    ))}
                 </div>
-            </div>
+            </section>
         </div>
     );
 }
-

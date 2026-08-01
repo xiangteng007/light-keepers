@@ -1,16 +1,20 @@
 /**
  * CommunityCenterPage.tsx
- * 
+ *
  * Community Domain - 社區中心頁面
  * 展示社區聯絡點、受災戶追蹤、社區活動 — connected to real API
+ *
+ * R3b 重建（DESIGN_LANGUAGE.md）：List archetype。
+ * page-header（h1 + 次要動作）→ 統計摘要列（StatIndicator）→ content（雙欄清單，桌機 2 欄 / 行動端單欄）。
  */
-import React, { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
     Home, Users, Heart, MapPin, Phone, Calendar,
-    AlertTriangle, CheckCircle, Clock, ChevronRight, Loader2, RefreshCw
+    AlertTriangle, CheckCircle, Clock, ChevronRight, RefreshCw
 } from 'lucide-react';
-import { PageTemplate } from '../../../components/PageTemplate';
-import { Alert } from '../../../design-system';
+import { Alert, Badge, Button, Card, StatIndicator } from '../../../design-system';
+import EmptyState from '../../../components/shared/EmptyState';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
 import './CommunityCenterPage.css';
@@ -35,6 +39,12 @@ interface Activity {
     participants: number;
     createdAt?: string;
 }
+
+const STATUS_CONFIG: Record<string, { label: string; icon: typeof AlertTriangle; variant: 'warning' | 'info' | 'success' }> = {
+    active: { label: '需關注', icon: AlertTriangle, variant: 'warning' },
+    monitoring: { label: '觀察中', icon: Clock, variant: 'info' },
+    normal: { label: '正常', icon: CheckCircle, variant: 'success' },
+};
 
 export default function CommunityCenterPage() {
     const [communities, setCommunities] = useState<Community[]>([]);
@@ -70,8 +80,8 @@ export default function CommunityCenterPage() {
             if (postsRes.status === 'fulfilled') {
                 const postsData = postsRes.value.data?.data || postsRes.value.data || [];
                 const posts = Array.isArray(postsData) ? postsData : (postsData.items || []);
-                if (posts.length > 0 && activities.length === 0) {
-                    setActivities(posts.slice(0, 10).map((p: any) => ({
+                if (posts.length > 0) {
+                    setActivities((prev) => prev.length > 0 ? prev : posts.slice(0, 10).map((p: any) => ({
                         id: p.id,
                         title: p.title || p.content?.slice(0, 30) || '活動',
                         date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('zh-TW') : undefined,
@@ -104,96 +114,81 @@ export default function CommunityCenterPage() {
         households: communities.reduce((sum, c) => sum + (c.households || 0), 0),
     };
 
-    const getStatusIcon = (status: string) => {
-        switch (status) {
-            case 'active': return <AlertTriangle className="status-icon warning" />;
-            case 'monitoring': return <Clock className="status-icon monitoring" />;
-            case 'normal': return <CheckCircle className="status-icon normal" />;
-            default: return null;
-        }
-    };
-
     return (
-        <PageTemplate
-            title="社區中心"
-            subtitle="社區聯絡網絡與受災戶追蹤"
-            icon={Home}
-            domain="Community 社區治理"
-        >
-            <div className="community-center">
-                {/* Refresh */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
-                    <button onClick={fetchData} disabled={loading} style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', background: 'transparent', border: '1px solid var(--border-default, #334155)', borderRadius: '6px', padding: '0.5rem 0.75rem', color: 'var(--text-secondary, #94a3b8)', cursor: 'pointer' }}>
-                        <RefreshCw size={14} className={loading ? 'spin' : ''} /> 重新整理
-                    </button>
+        <div className="community-center">
+            {/* page-header */}
+            <header className="page-header">
+                <div className="page-header__title-group">
+                    <h1>社區中心</h1>
+                    <p className="page-header__subtitle">社區聯絡網絡與受災戶追蹤</p>
                 </div>
+                <Button
+                    variant="secondary"
+                    size="sm"
+                    icon={<RefreshCw size={14} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                    onClick={fetchData}
+                    disabled={loading}
+                    aria-label="重新整理社區資料"
+                >
+                    重新整理
+                </Button>
+            </header>
 
-                {/* Error */}
-                {error && (
-                    <div style={{ marginBottom: '1rem' }}>
-                        <Alert variant="danger" icon={<AlertTriangle size={16} />}>{error}</Alert>
-                    </div>
-                )}
+            {error && (
+                <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>
+                    {error}
+                </Alert>
+            )}
 
-                {/* Summary Stats */}
-                <div className="summary-stats">
-                    <div className="summary-card">
-                        <Home className="summary-icon" />
-                        <div className="summary-content">
-                            <span className="summary-value">{totalStats.communities}</span>
-                            <span className="summary-label">聯繫社區</span>
-                        </div>
+            {/* 統計摘要列 */}
+            <div className="summary-stats">
+                <StatIndicator icon={<Home size={20} aria-hidden="true" />} value={totalStats.communities} label="聯繫社區" />
+                <StatIndicator icon={<AlertTriangle size={20} aria-hidden="true" />} value={totalStats.affected} label="受災戶" variant="warning" />
+                <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={totalStats.sheltered} label="收容中" variant="default" />
+                <StatIndicator icon={<Heart size={20} aria-hidden="true" />} value={totalStats.households.toLocaleString()} label="總戶數" />
+            </div>
+
+            {loading ? (
+                <div className="two-column" aria-busy="true" aria-label="載入中">
+                    <div className="panel">
+                        <Skeleton variant="title" width="40%" />
+                        <Skeleton variant="card" height={72} count={3} className="community-center__skeleton-row" />
                     </div>
-                    <div className="summary-card warning">
-                        <AlertTriangle className="summary-icon" />
-                        <div className="summary-content">
-                            <span className="summary-value">{totalStats.affected}</span>
-                            <span className="summary-label">受災戶</span>
-                        </div>
-                    </div>
-                    <div className="summary-card info">
-                        <Users className="summary-icon" />
-                        <div className="summary-content">
-                            <span className="summary-value">{totalStats.sheltered}</span>
-                            <span className="summary-label">收容中</span>
-                        </div>
-                    </div>
-                    <div className="summary-card">
-                        <Heart className="summary-icon" />
-                        <div className="summary-content">
-                            <span className="summary-value">{totalStats.households.toLocaleString()}</span>
-                            <span className="summary-label">總戶數</span>
-                        </div>
+                    <div className="panel">
+                        <Skeleton variant="title" width="40%" />
+                        <Skeleton variant="card" height={72} count={3} className="community-center__skeleton-row" />
                     </div>
                 </div>
-
-                {/* Loading */}
-                {loading && (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: 'var(--text-secondary, #94a3b8)' }}>
-                        <Loader2 size={24} className="spin" />
-                        <span>載入社區資料中...</span>
-                    </div>
-                )}
-
-                {!loading && (
-                    <div className="two-column">
-                        {/* Community List */}
-                        <div className="community-list">
-                            <h3>社區清單</h3>
-                            {communities.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #64748b)' }}>
-                                    暫無社區資料
-                                </div>
-                            ) : communities.map(community => (
-                                <div
+            ) : (
+                <div className="two-column">
+                    {/* Community List */}
+                    <section className="panel community-list" aria-label="社區清單">
+                        <h2>社區清單</h2>
+                        {communities.length === 0 ? (
+                            <EmptyState
+                                variant="minimal"
+                                title="暫無社區資料"
+                                description="目前沒有已登記的社區聯絡資料。"
+                            />
+                        ) : communities.map(community => {
+                            const status = STATUS_CONFIG[community.status];
+                            const StatusIcon = status?.icon;
+                            return (
+                                <Card
                                     key={community.id}
+                                    padding="sm"
+                                    hoverable
                                     className={`community-item ${selectedCommunity === community.id ? 'selected' : ''}`}
                                     onClick={() => setSelectedCommunity(community.id)}
                                 >
                                     <div className="item-header">
-                                        {getStatusIcon(community.status)}
+                                        {status && (
+                                            <Badge variant={status.variant} size="sm" icon={StatusIcon ? <StatusIcon size={12} aria-hidden="true" /> : undefined}>
+                                                {status.label}
+                                            </Badge>
+                                        )}
                                         <span className="item-name">{community.name}</span>
-                                        <ChevronRight size={16} />
+                                        <ChevronRight size={16} aria-hidden="true" />
                                     </div>
                                     <div className="item-stats">
                                         <span>總戶數: {community.households}</span>
@@ -204,43 +199,45 @@ export default function CommunityCenterPage() {
                                     </div>
                                     {(community.contactPerson || community.phone) && (
                                         <div className="item-contact">
-                                            {community.contactPerson && <span><Users size={12} /> {community.contactPerson}</span>}
-                                            {community.phone && <span><Phone size={12} /> {community.phone}</span>}
+                                            {community.contactPerson && <span><Users size={12} aria-hidden="true" /> {community.contactPerson}</span>}
+                                            {community.phone && <span><Phone size={12} aria-hidden="true" /> {community.phone}</span>}
                                         </div>
                                     )}
-                                </div>
-                            ))}
-                        </div>
+                                </Card>
+                            );
+                        })}
+                    </section>
 
-                        {/* Upcoming Activities */}
-                        <div className="activities-panel">
-                            <h3><Calendar size={18} /> 近期活動</h3>
-                            {activities.length === 0 ? (
-                                <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted, #64748b)' }}>
-                                    暫無活動
+                    {/* Upcoming Activities */}
+                    <section className="panel activities-panel" aria-label="近期活動">
+                        <h2><Calendar size={18} aria-hidden="true" /> 近期活動</h2>
+                        {activities.length === 0 ? (
+                            <EmptyState
+                                variant="minimal"
+                                title="暫無活動"
+                                description="目前沒有排定的社區活動。"
+                            />
+                        ) : activities.map(activity => (
+                            <Card key={activity.id} padding="sm" className="activity-card">
+                                <div className="activity-header">
+                                    <span className="activity-title">{activity.title}</span>
                                 </div>
-                            ) : activities.map(activity => (
-                                <div key={activity.id} className="activity-card">
-                                    <div className="activity-header">
-                                        <span className="activity-title">{activity.title}</span>
-                                    </div>
-                                    <div className="activity-details">
-                                        {(activity.date || activity.time) && (
-                                            <span><Calendar size={12} /> {activity.date} {activity.time || ''}</span>
-                                        )}
-                                        {activity.location && (
-                                            <span><MapPin size={12} /> {activity.location}</span>
-                                        )}
-                                        {activity.participants > 0 && (
-                                            <span><Users size={12} /> 已報名 {activity.participants} 人</span>
-                                        )}
-                                    </div>
+                                <div className="activity-details">
+                                    {(activity.date || activity.time) && (
+                                        <span><Calendar size={12} aria-hidden="true" /> {activity.date} {activity.time || ''}</span>
+                                    )}
+                                    {activity.location && (
+                                        <span><MapPin size={12} aria-hidden="true" /> {activity.location}</span>
+                                    )}
+                                    {activity.participants > 0 && (
+                                        <span><Users size={12} aria-hidden="true" /> 已報名 {activity.participants} 人</span>
+                                    )}
                                 </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </div>
-        </PageTemplate>
+                            </Card>
+                        ))}
+                    </section>
+                </div>
+            )}
+        </div>
     );
 }
