@@ -112,23 +112,26 @@ interface VictimCardProps {
 
 function VictimCard({ victim, onSelect, onTransport, onArrived }: VictimCardProps) {
     const identifier = victim.braceletId || `#${victim.id.slice(-6)}`;
+    // a11y：卡片本身不再用 role="button"/tabIndex 包住整張卡（footer 內有真正的
+    // <Button>，兩層互動元素疊在一起會觸發 axe nested-interactive）。改用明確的
+    // 「查看詳情」按鈕承載鍵盤可達性，卡片 onClick 保留給滑鼠使用者做為額外捷徑。
     return (
         <article
             className={`victim-card victim-card--${victim.triageLevel.toLowerCase()}`}
             onClick={() => onSelect(victim)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-                if (e.key === 'Enter' || e.key === ' ') onSelect(victim);
-            }}
         >
             <div className="victim-card__header">
                 <Badge variant={getLevelBadgeVariant(victim.triageLevel)} size="sm">
                     {victim.triageLevel}
                 </Badge>
-                <span className="victim-card__identifier">
+                <button
+                    type="button"
+                    className="victim-card__identifier victim-card__identifier--btn"
+                    onClick={(e) => { e.stopPropagation(); onSelect(victim); }}
+                    aria-label={`查看傷患 ${identifier} 詳情`}
+                >
                     <TagIcon size={12} aria-hidden="true" /> {identifier}
-                </span>
+                </button>
                 <span className="victim-card__time">{formatTime(victim.createdAt)}</span>
             </div>
 

@@ -113,10 +113,20 @@
   border: 1px solid var(--color-secondary);
   border-radius: var(--radius-md);
   background: transparent;
-  color: var(--color-secondary);
+  /* R4 a11y：--color-secondary 直接當文字色在 light 主題只有 2.8:1，見
+     A11Y_AUDIT_R4.md */
+  color: #C2410C;
   font-size: var(--font-size-sm);
   font-weight: var(--font-weight-semibold);
   cursor: pointer;
+}
+
+/* dark 主題下 --color-secondary（銅色 #B87333）在按鈕底色上只有 4:1，剛好卡在
+   門檻下；用同色相較淺的 --color-secondary-light 補足對比 */
+[data-theme="dark"] .map-layer-panel__preset,
+[data-theme="copper-steel"] .map-layer-panel__preset {
+  color: var(--color-secondary-light);
+  border-color: var(--color-secondary-light);
 }
 
 .map-layer-panel__preset:hover {
@@ -204,8 +214,15 @@
 
 .map-layer-panel__basemap.active {
   border-color: var(--color-secondary);
-  color: var(--color-secondary);
+  /* R4 a11y：--color-secondary 直接當文字色在 light 主題只有 2.8:1、dark 主題
+     只有 4:1，見 A11Y_AUDIT_R4.md */
+  color: #C2410C;
   font-weight: var(--font-weight-semibold);
+}
+
+[data-theme="dark"] .map-layer-panel__basemap.active,
+[data-theme="copper-steel"] .map-layer-panel__basemap.active {
+  color: var(--color-secondary-light);
 }
 
 .map-layer-panel__legend {

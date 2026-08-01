@@ -44,7 +44,9 @@
 
 .cc-updated {
     font-size: var(--font-size-sm);
-    color: var(--text-tertiary);
+    /* R4 a11y：--text-tertiary 在 --bg-primary 底色上只有 4.39:1，剛好卡在 AA
+       4.5:1 門檻下，見 A11Y_AUDIT_R4.md */
+    color: var(--text-secondary);
     font-variant-numeric: tabular-nums;
 }
 

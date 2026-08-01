@@ -2,31 +2,36 @@
  * Sync Status Indicator Styles
  */
 
+/*
+ * R4 a11y 修正：原本用半透明 rgba() 疊在頁面背景上，實際對比隨底色而異
+ * （量到低至 2.3:1，低於 AA 文字門檛 4.5:1）。改用不透明淺色底＋深色字，
+ * 對比與底下頁面背景無關，可保證 ≥4.5:1（見 docs/audit/A11Y_AUDIT_R4.md）。
+ */
 .indicator {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 6px 12px;
-    background: rgba(16, 185, 129, 0.1);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: #DCFCE7;
+    border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 20px;
     font-size: 12px;
-    color: #10B981;
+    color: #166534;
     cursor: default;
     transition: all 0.15s;
     user-select: none;
 }
 
 .indicator.offline {
-    background: rgba(107, 114, 128, 0.1);
-    border-color: rgba(107, 114, 128, 0.2);
-    color: #6B7280;
+    background: #F3F4F6;
+    border-color: rgba(107, 114, 128, 0.3);
+    color: #374151;
 }
 
 .indicator.pending {
-    background: rgba(245, 158, 11, 0.1);
-    border-color: rgba(245, 158, 11, 0.2);
-    color: #F59E0B;
+    background: #FEF3C7;
+    border-color: rgba(245, 158, 11, 0.3);
+    color: #92400E;
     cursor: pointer;
 }
 
@@ -66,7 +71,8 @@
     border-radius: 9px;
     font-size: 10px;
     font-weight: 600;
-    color: #fff;
+    /* R4 a11y：白字在 #F59E0B 上只有 2.15:1；深色字才過 AA */
+    color: #451A03;
 }
 
 @keyframes spin {

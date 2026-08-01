@@ -26,7 +26,10 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    color: rgba(255, 255, 255, 0.6);
+    /* R4 a11y 修正：原本寫死 rgba(255,255,255,*)，假設頭部一律深色底；
+       實際渲染在淺色主題的頭部背景上時對比只有 ~1.06:1（幾乎看不見）。
+       改用語義 token，三態（light/dark/tactical）皆能自動取得足夠對比。 */
+    color: var(--text-secondary);
     text-decoration: none;
     font-size: 13px;
     padding: 4px 8px;
@@ -35,7 +38,7 @@
 }
 
 .link:hover {
-    color: #D4AF37;
+    color: var(--accent-gold, #D4AF37);
     background: rgba(212, 175, 55, 0.1);
 }
 
@@ -50,12 +53,12 @@
 }
 
 .separator {
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-tertiary);
     flex-shrink: 0;
 }
 
 .current {
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-primary);
     font-size: 13px;
     font-weight: 500;
     padding: 4px 8px;

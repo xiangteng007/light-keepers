@@ -249,7 +249,8 @@
 
 .lk-stat__label {
     font-size: var(--font-size-sm);
-    color: var(--text-muted);
+    /* R4 a11y：--text-muted 對比不足，見 A11Y_AUDIT_R4.md */
+    color: var(--text-secondary);
     margin-top: var(--spacing-0-5);
 }
 

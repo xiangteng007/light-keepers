@@ -213,8 +213,8 @@ export default function VolunteersPage() {
                 onClose={() => setSuccessMessage('')}
             />
 
-            {/* 統計卡片 */}
-            <div className="volunteers-stats" role="list">
+            {/* 統計卡片（非清單，是摘要指標群組；role="group" 而非 "list" 避免 aria-required-children 違規） */}
+            <div className="volunteers-stats" role="group" aria-label="志工統計摘要">
                 <StatIndicator label="總志工數" value={stats.total} />
                 <StatIndicator variant="success" label="可用" value={stats.available} />
                 <StatIndicator variant="warning" label="執勤中" value={stats.busy} />

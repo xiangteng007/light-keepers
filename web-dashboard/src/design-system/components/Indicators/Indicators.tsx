@@ -42,6 +42,7 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
                     className={`lk-progress__bar lk-progress__bar--${variant} ${animated ? 'lk-progress__bar--animated' : ''}`}
                     style={{ width: `${percentage}%` }}
                     role="progressbar"
+                    aria-label={label ?? `進度 ${Math.round(percentage)}%`}
                     aria-valuenow={value}
                     aria-valuemin={0}
                     aria-valuemax={max}

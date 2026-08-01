@@ -221,7 +221,7 @@
     background: rgba(16, 185, 129, 0.15);
     border: 1px solid rgba(16, 185, 129, 0.3);
     border-radius: 4px;
-    color: #10B981;
+    color: var(--account-success, #10B981);
     font-size: 0.75rem;
     font-weight: 500;
 }
@@ -234,7 +234,7 @@
     background: rgba(245, 158, 11, 0.15);
     border: 1px solid rgba(245, 158, 11, 0.3);
     border-radius: 4px;
-    color: #F59E0B;
+    color: var(--account-warning, #F59E0B);
     font-size: 0.75rem;
     font-weight: 500;
 }

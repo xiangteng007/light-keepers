@@ -889,7 +889,9 @@ body {
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: var(--text-muted);
+  /* R4 a11y：--text-muted 在 light/dark 主題常見底色上量到 2.53–3.75:1，
+     低於 AA 4.5:1；改用 --text-secondary（同語意層級，對比較足） */
+  color: var(--text-secondary);
 }
 
 .empty-state span {
@@ -1607,7 +1609,8 @@ body {
 
 .volunteer-card__region {
   font-size: 13px;
-  color: var(--text-muted);
+  /* R4 a11y：--text-muted 對比不足，見 A11Y_AUDIT_R4.md */
+  color: var(--text-secondary);
   margin: 2px 0 0 0;
 }
 
@@ -1622,14 +1625,17 @@ body {
   background: var(--bg-hover);
   border-radius: 12px;
   font-size: 12px;
-  color: var(--text-secondary);
+  /* R4 a11y：--text-secondary 在 dark 主題的 --bg-hover 底色上只有 4.03:1，
+     剛好卡在 AA 門檻下，見 A11Y_AUDIT_R4.md */
+  color: var(--text-primary);
 }
 
 .volunteer-card__stats {
   display: flex;
   gap: 16px;
   font-size: 13px;
-  color: var(--text-muted);
+  /* R4 a11y：--text-muted 對比不足，見 A11Y_AUDIT_R4.md */
+  color: var(--text-secondary);
   padding-top: 8px;
   border-top: 1px solid var(--border-color);
 }

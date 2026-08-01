@@ -135,11 +135,15 @@ html.dark h6 {
   color: var(--text-primary) !important;
 }
 
-html.dark p,
-html.dark span,
-html.dark label {
-  color: var(--text-secondary);
-}
+/* R4 a11y 修正：移除了 `html.dark p, html.dark span, html.dark label { color:
+   var(--text-secondary) }` 這條全域覆寫。它是 R1/R2/R3 建立 `[data-theme="dark"]`
+   token 系統之前的舊版「戰術主題」殘留，靠 class 選擇器（2 個 compound
+   selector，優先權比多數元件內的單一 class 規則高）強制把「幾乎所有」
+   span/p/label 文字改成 --text-secondary。結果是元件明明照 DESIGN_LANGUAGE
+   token 選對了顏色（例如 Badge 的深色文字、header 的 level-badge），
+   到了 dark 主題卻被這條規則蓋掉，變成低對比的灰色文字——
+   見 docs/audit/A11Y_AUDIT_R4.md 的 color-contrast 大宗違規來源。
+   元件層級的顏色本來就該遵循自己的語義 token，不需要這種盲目全域覆寫。 */
 
 html.dark .badge {
   background: var(--bg-surface) !important;

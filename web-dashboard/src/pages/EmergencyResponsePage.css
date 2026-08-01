@@ -124,7 +124,8 @@
 .er-stat dt {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-tertiary);
+    /* R4 a11y：--text-tertiary 在 --bg-secondary 底色上只有 3.8:1，見 A11Y_AUDIT_R4.md */
+    color: var(--text-secondary);
 }
 
 .er-stat dd {

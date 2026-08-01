@@ -108,13 +108,14 @@
 .wizard-progress__step.completed .wizard-progress__circle {
     background: var(--color-success);
     border-color: var(--color-success);
-    color: #fff;
+    color: var(--text-inverse);
 }
 
 .wizard-progress__label {
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
-    color: var(--text-tertiary);
+    /* R4 a11y：--text-tertiary 在 --bg-primary 底色上只有 4.39:1，見 A11Y_AUDIT_R4.md */
+    color: var(--text-secondary);
 }
 
 .wizard-progress__step.active .wizard-progress__label {
@@ -449,7 +450,7 @@
     height: 28px;
     border-radius: var(--radius-full);
     background: var(--color-danger);
-    color: #fff;
+    color: var(--text-inverse);
     border: 2px solid var(--surface-default);
     cursor: pointer;
     display: flex;
