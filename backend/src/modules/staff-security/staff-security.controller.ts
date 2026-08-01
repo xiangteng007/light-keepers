@@ -6,7 +6,7 @@
 import { Controller, Get, Post, Patch, Body, Param, Query, UseGuards, Request } from '@nestjs/common';
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
-import { CoreJwtGuard, UnifiedRolesGuard } from '../shared/guards';
+import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { SecurityIncidentService, CreateIncidentDto } from './services/security-incident.service';
 import { StaffCheckInService, CheckInDto, CheckInType } from './services/staff-checkin.service';
 import { EvacuationPlanService } from './services/evacuation-plan.service';
@@ -15,6 +15,13 @@ import { CreateEvacuationPlanDto } from './dto/evacuation-plan.dto';
 @ApiTags('Staff Security')
 @Controller('api/v1/staff-security')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：現場人員自身的安全動作（回報事件、簽到、緊急按鈕、查附近事件與集合點）
+// 必須人人可用 → 類別預設 L1。
+// 提升到 L2 的是「看/改別人」的端點：結案事件狀態、逾時未簽到名單、
+// 指定人員的最後位置與簽到歷史（他人位置屬個資）、建立與發動撤離。
+// ⚠️ 待確認：目前 L2 也擋掉「志工查自己的簽到歷史」；若需開放本人查詢，
+// 應改掛 ResourceOwnerGuard（ADR-003）而非降級，屬 P0 之後的工作。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @ApiBearerAuth()
 export class StaffSecurityController {
     constructor(
@@ -52,6 +59,7 @@ export class StaffSecurityController {
     }
 
     @Patch('incidents/:id/status')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 改他人回報的事件狀態／結案
     @ApiOperation({ summary: 'Update incident status' })
     async updateIncidentStatus(
         @Param('id') id: string,
@@ -86,18 +94,21 @@ export class StaffSecurityController {
     }
 
     @Get('check-in/overdue')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 全員逾時未簽到名單（管理視角）
     @ApiOperation({ summary: 'Get staff with overdue check-ins' })
     async getOverdueCheckIns(@Query('missionId') missionId?: string) {
         return this.checkInService.getOverdueCheckIns(missionId);
     }
 
     @Get('check-in/location/:staffId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 指定人員的最後位置＝個資
     @ApiOperation({ summary: 'Get last known location for staff' })
     async getLastLocation(@Param('staffId') staffId: string) {
         return this.checkInService.getLastKnownLocation(staffId);
     }
 
     @Get('check-in/history/:staffId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 指定人員的行蹤歷史＝個資
     @ApiOperation({ summary: 'Get check-in history for staff' })
     async getCheckInHistory(
         @Param('staffId') staffId: string,
@@ -109,6 +120,7 @@ export class StaffSecurityController {
     // ========== Evacuation Endpoints ==========
 
     @Post('evacuation/plans')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 建立撤離計畫
     @ApiOperation({ summary: 'Create evacuation plan' })
     async createEvacuationPlan(@Body() body: CreateEvacuationPlanDto) {
         return this.evacuationService.createPlan(body.locationId, body.plan);
@@ -121,6 +133,7 @@ export class StaffSecurityController {
     }
 
     @Post('evacuation/initiate/:planId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 發動撤離＝現場指揮動作
     @ApiOperation({ summary: 'Initiate evacuation' })
     async initiateEvacuation(
         @Param('planId') planId: string,

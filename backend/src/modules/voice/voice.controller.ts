@@ -22,6 +22,9 @@ import { VoiceTranscriptionService } from './voice-transcription.service';
 @ApiTags('voice')
 @ApiBearerAuth()
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：語音回報與收聽任務語音記錄是現場作業 → 類別預設 L1；
+// 由語音記錄生成 SITREP 草稿與 sitrep.controller 的產製端點對齊 → L2。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @Controller('voice')
 export class VoiceController {
     constructor(private readonly voiceService: VoiceTranscriptionService) { }
@@ -77,6 +80,7 @@ export class VoiceController {
     }
 
     @Get(':missionSessionId/sitrep')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 與 sitrep.controller 的產製端點同級
     @ApiOperation({ summary: '生成 SITREP 草稿' })
     @ApiParam({ name: 'missionSessionId', description: '任務場次 ID' })
     async generateSITREP(@Param('missionSessionId') missionSessionId: string) {

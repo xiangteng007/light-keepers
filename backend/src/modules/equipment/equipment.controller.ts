@@ -12,11 +12,15 @@ import { Equipment, EquipmentCategory, EquipmentStatus } from './entities';
 @ApiTags('equipment')
 @ApiBearerAuth()
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：設備查詢與現場借還由志工執行 → 類別預設 L1；
+// 建檔／維護／指派任務屬管理動作 → 逐一標 L2（前端 page-policy 的 equipment 頁本來就是 L2）。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @Controller('equipment')
 export class EquipmentController {
     constructor(private readonly equipmentService: EquipmentService) { }
 
     @Post()
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 管理：新增設備主檔
     @ApiOperation({ summary: '新增設備' })
     async create(@Body() data: Partial<Equipment>) {
         return this.equipmentService.create(data);
@@ -113,6 +117,7 @@ export class EquipmentController {
     }
 
     @Post(':id/maintenance/start')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 管理：設備轉入維護（影響可派遣性）
     @ApiOperation({ summary: '開始維護' })
     @ApiParam({ name: 'id' })
     async startMaintenance(@Param('id') id: string, @Body() data: { reason: string }) {
@@ -120,6 +125,7 @@ export class EquipmentController {
     }
 
     @Post(':id/maintenance/end')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 管理：設備解除維護
     @ApiOperation({ summary: '結束維護' })
     @ApiParam({ name: 'id' })
     async endMaintenance(@Param('id') id: string, @Body() data: { notes?: string }) {
@@ -144,6 +150,7 @@ export class EquipmentController {
     }
 
     @Post(':id/assign-task')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 管理：設備指派至任務
     @ApiOperation({ summary: '指派設備至任務' })
     @ApiParam({ name: 'id' })
     async assignToTask(
@@ -154,6 +161,7 @@ export class EquipmentController {
     }
 
     @Post(':id/unassign-task')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 管理：解除設備指派
     @ApiOperation({ summary: '從任務解除指派' })
     @ApiParam({ name: 'id' })
     async unassignFromTask(@Param('id') id: string) {
