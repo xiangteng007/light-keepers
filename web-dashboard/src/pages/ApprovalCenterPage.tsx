@@ -4,7 +4,11 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Modal } from '../design-system';
+import { ClipboardCheck, Lock, Unlock, X, Check } from 'lucide-react';
+import { Modal, Badge, Button, Alert } from '../design-system';
+import type { BadgeProps } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 import './ApprovalCenterPage.css';
@@ -125,12 +129,13 @@ export default function ApprovalCenterPage() {
         }
     };
 
+    // 管制等級 Badge（DESIGN_LANGUAGE.md §3：warning=需注意管控、danger=藥品管制更嚴格）
     const getControlBadge = (level: string) => {
         if (level === 'controlled') {
-            return <span className="control-badge control-badge--controlled">管控</span>;
+            return <Badge variant="warning" size="sm">管控</Badge>;
         }
         if (level === 'medical') {
-            return <span className="control-badge control-badge--medical">藥品</span>;
+            return <Badge variant="danger" size="sm">藥品</Badge>;
         }
         return null;
     };
@@ -142,15 +147,19 @@ export default function ApprovalCenterPage() {
     ];
 
     return (
-        <div className="page approval-page">
-            {/* Header */}
+        <div className="approval-page">
+            {/* page-header：List archetype（DESIGN_LANGUAGE.md §7.1）
+                Board 覆寫為 List：/approvals/pending 僅回傳待覆核單一狀態清單，
+                無 approved/rejected 清單 API，不符合 Board 三欄資料形狀（§7.3），故改用 List。 */}
             <div className="page-header">
-                <h2>📋 覆核中心</h2>
-                <div className="filter-pills">
+                <h1>覆核中心</h1>
+                <div className="filter-pills" role="group" aria-label="管制等級篩選">
                     {filters.map(f => (
                         <button
                             key={f.key}
-                            className={`filter-pill ${filter === f.key ? 'active' : ''}`}
+                            type="button"
+                            aria-pressed={filter === f.key}
+                            className={`filter-pill ${filter === f.key ? 'is-active' : ''}`}
                             data-filter={f.key}
                             onClick={() => setFilter(f.key)}
                         >
@@ -162,23 +171,24 @@ export default function ApprovalCenterPage() {
 
             {/* Error */}
             {error && (
-                <div className="approval-alert approval-alert--danger">
-                    ⚠️ {error}
-                    <button className="alert-dismiss" onClick={() => setError(null)}>×</button>
-                </div>
+                <Alert variant="danger" closable onClose={() => setError(null)}>
+                    {error}
+                </Alert>
             )}
 
-            {/* Loading */}
+            {/* Loading / Empty / Content */}
             {loading ? (
-                <div className="approval-loading">
-                    <div className="approval-spinner" />
+                <div className="approval-grid" aria-busy="true" aria-label="載入覆核清單中">
+                    <Skeleton variant="card" height={220} count={3} />
                 </div>
             ) : approvals.length === 0 ? (
-                <div className="approval-alert approval-alert--info">
-                    🎉 目前沒有待覆核的出庫單
-                </div>
+                <EmptyState
+                    icon={ClipboardCheck}
+                    title="目前沒有待覆核的出庫單"
+                    description="所有出庫申請都已處理完畢"
+                />
             ) : (
-                /* Approval Cards */
+                /* Approval Cards（行動端/桌機皆卡片：欄位多，優於窄表格） */
                 <div className="approval-grid">
                     {approvals.map((approval) => (
                         <div key={approval.id} className="approval-card">
@@ -191,7 +201,7 @@ export default function ApprovalCenterPage() {
                             <div className="approval-card__body">
                                 <div className="approval-card__field">
                                     <div className="approval-card__label">出庫數量</div>
-                                    <div className="approval-card__value approval-card__value--quantity">
+                                    <div className="approval-card__value approval-card__value--quantity tabular-nums">
                                         {approval.quantity}
                                     </div>
                                 </div>
@@ -211,13 +221,15 @@ export default function ApprovalCenterPage() {
                                 </div>
                                 <div className="approval-card__field">
                                     <div className="approval-card__label">申請時間</div>
-                                    <div className="approval-card__value">
+                                    <div className="approval-card__value tabular-nums">
                                         {new Date(approval.createdAt).toLocaleString('zh-TW')}
                                     </div>
                                 </div>
                             </div>
                             <div className="approval-card__footer">
-                                <button
+                                <Button
+                                    variant="secondary"
+                                    size="sm"
                                     className="approval-card__detail-btn"
                                     onClick={() => {
                                         setSelectedApproval(approval);
@@ -226,7 +238,7 @@ export default function ApprovalCenterPage() {
                                     }}
                                 >
                                     查看詳情
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     ))}
@@ -251,7 +263,7 @@ export default function ApprovalCenterPage() {
                             <tbody>
                                 <tr>
                                     <th>出庫數量</th>
-                                    <td><span className="quantity-value">{selectedApproval.quantity}</span></td>
+                                    <td><span className="quantity-value tabular-nums">{selectedApproval.quantity}</span></td>
                                 </tr>
                                 <tr>
                                     <th>領用人姓名</th>
@@ -267,7 +279,7 @@ export default function ApprovalCenterPage() {
                                 </tr>
                                 <tr>
                                     <th>申請時間</th>
-                                    <td>{new Date(selectedApproval.createdAt).toLocaleString('zh-TW')}</td>
+                                    <td className="tabular-nums">{new Date(selectedApproval.createdAt).toLocaleString('zh-TW')}</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -275,14 +287,16 @@ export default function ApprovalCenterPage() {
                         {/* Sensitive Data Section */}
                         <div className="sensitive-section">
                             <div className="sensitive-header">
-                                <h4>🔐 敏感資訊（需權限）</h4>
+                                <h4><Lock size={14} aria-hidden="true" /> 敏感資訊（需權限）</h4>
                                 {!sensitiveData && (
-                                    <button
-                                        className="sensitive-btn"
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        icon={<Unlock size={14} aria-hidden="true" />}
                                         onClick={() => handleViewSensitive(selectedApproval.id)}
                                     >
-                                        🔓 查看敏感資料（寫稽核）
-                                    </button>
+                                        查看敏感資料（寫稽核）
+                                    </Button>
                                 )}
                             </div>
                             {sensitiveData ? (
@@ -311,26 +325,28 @@ export default function ApprovalCenterPage() {
 
                         {/* Actions */}
                         <div className="modal-actions">
-                            <button
-                                className="btn-close-modal"
+                            <Button
+                                variant="secondary"
                                 onClick={() => setShowDetailModal(false)}
                             >
                                 關閉
-                            </button>
-                            <button
-                                className="btn-reject"
+                            </Button>
+                            <Button
+                                variant="danger"
+                                icon={<X size={14} aria-hidden="true" />}
                                 onClick={() => setShowRejectModal(true)}
                                 disabled={actionLoading}
                             >
-                                ❌ 拒絕覆核
-                            </button>
-                            <button
-                                className="btn-approve"
+                                拒絕覆核
+                            </Button>
+                            <Button
+                                variant="primary"
+                                icon={<Check size={14} aria-hidden="true" />}
                                 onClick={() => selectedApproval && handleApprove(selectedApproval.id)}
-                                disabled={actionLoading}
+                                loading={actionLoading}
                             >
-                                {actionLoading ? '處理中...' : '✅ 通過覆核'}
-                            </button>
+                                通過覆核
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -351,19 +367,20 @@ export default function ApprovalCenterPage() {
                         onChange={(e) => setRejectReason(e.target.value)}
                         placeholder="請詳細說明拒絕原因，例如：庫存不足、用途不明確、領用人資訊有誤等"
                     />
-                    <span className="char-count">已輸入 {rejectReason.length} 個字</span>
+                    <span className="char-count tabular-nums">已輸入 {rejectReason.length} 個字</span>
                 </div>
                 <div className="reject-actions">
-                    <button className="btn-close-modal" onClick={() => setShowRejectModal(false)}>
+                    <Button variant="secondary" onClick={() => setShowRejectModal(false)}>
                         取消
-                    </button>
-                    <button
-                        className="btn-reject"
+                    </Button>
+                    <Button
+                        variant="danger"
                         onClick={handleReject}
-                        disabled={actionLoading || rejectReason.length < 5}
+                        disabled={rejectReason.length < 5}
+                        loading={actionLoading}
                     >
-                        {actionLoading ? '處理中...' : '確認拒絕'}
-                    </button>
+                        確認拒絕
+                    </Button>
                 </div>
             </Modal>
         </div>

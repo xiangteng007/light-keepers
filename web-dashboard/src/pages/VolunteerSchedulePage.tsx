@@ -1,8 +1,26 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Card, Button, Badge } from '../design-system';
+import { Users, X, ChevronDown, ChevronRight, Check, Plus, Minus } from 'lucide-react';
+import { Card, Button, Badge, Modal } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 import { getAccounts } from '../api/services';
 import './VolunteerSchedulePage.css';
+
+// 行動端斷點偵測（DESIGN_LANGUAGE.md §6：mobile ≤767px）
+function useIsMobile(breakpoint = 767): boolean {
+    const [isMobile, setIsMobile] = useState(
+        () => typeof window !== 'undefined' && window.innerWidth <= breakpoint
+    );
+    useEffect(() => {
+        if (typeof window === 'undefined') return;
+        const mq = window.matchMedia(`(max-width: ${breakpoint}px)`);
+        const handler = () => setIsMobile(mq.matches);
+        handler();
+        mq.addEventListener('change', handler);
+        return () => mq.removeEventListener('change', handler);
+    }, [breakpoint]);
+    return isMobile;
+}
 
 // ===== 類型定義 =====
 type ViewRange = 'week' | 'biweek' | 'month';
@@ -30,7 +48,8 @@ interface ScheduleVolunteer {
     region: string;
 }
 
-// 預設顏色池
+// 預設顏色池（班別為裝飾性類別色，非狀態色 — 依 DESIGN_LANGUAGE.md §3 不得與狀態色混淆用途，
+// 僅用於視覺區分不同班別，非危急/警戒/安全語意）
 const SHIFT_COLORS = [
     '#10b981', // 綠
     '#f59e0b', // 橙
@@ -115,6 +134,8 @@ export default function VolunteerSchedulePage() {
     const [expandedSlot, setExpandedSlot] = useState<string | null>(null); // 展開的時段
     const [editingShift, setEditingShift] = useState<string | null>(null);
     const [editingTime, setEditingTime] = useState<string | null>(null);
+    const [mobileDayIndex, setMobileDayIndex] = useState(0);
+    const isMobile = useIsMobile();
 
     // 獲取志工列表 (使用 accounts API，因為 volunteers 表可能為空)
     const { data: accountsData, isLoading } = useQuery({
@@ -135,6 +156,14 @@ export default function VolunteerSchedulePage() {
     }, [accountsData]);
 
     const dates = useMemo(() => getDates(viewRange), [viewRange]);
+
+    // 行動端 segmented day-switcher：切換範圍時重設回第一天
+    useEffect(() => {
+        setMobileDayIndex(0);
+    }, [viewRange]);
+
+    // 行動端只顯示單一天（segmented tabs 切換），桌機顯示整個範圍（水平捲動）
+    const displayDates = isMobile ? [dates[mobileDayIndex] ?? dates[0]].filter(Boolean) : dates;
 
     // 初始化排班資料
     useEffect(() => {
@@ -272,19 +301,22 @@ export default function VolunteerSchedulePage() {
     const selectedShift = selectedSlot ? shifts.find(s => s.id === selectedSlot.shiftId) : null;
 
     return (
-        <div className="page volunteer-schedule-page">
+        <div className="volunteer-schedule-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📅 志工排班</h2>
+                    <h1>志工排班</h1>
                     <p className="page-subtitle">班表管理與調度</p>
                 </div>
                 <div className="page-header__right">
                     {/* 日期範圍選擇器 */}
-                    <div className="view-range-selector">
+                    <div className="view-range-selector" role="tablist" aria-label="排班檢視範圍">
                         {(['week', 'biweek', 'month'] as ViewRange[]).map(range => (
                             <button
                                 key={range}
-                                className={`view-range-btn ${viewRange === range ? 'active' : ''}`}
+                                type="button"
+                                role="tab"
+                                aria-selected={viewRange === range}
+                                className={`view-range-btn ${viewRange === range ? 'is-active' : ''}`}
                                 onClick={() => setViewRange(range)}
                             >
                                 {VIEW_RANGE_LABELS[range]}
@@ -294,6 +326,24 @@ export default function VolunteerSchedulePage() {
                 </div>
             </div>
 
+            {/* 行動端 segmented day-switcher：取代整個範圍的水平捲動 */}
+            {isMobile && (
+                <div className="day-switcher" role="tablist" aria-label="選擇日期">
+                    {dates.map((date, idx) => (
+                        <button
+                            key={date}
+                            type="button"
+                            role="tab"
+                            aria-selected={mobileDayIndex === idx}
+                            className={`day-switcher__btn ${mobileDayIndex === idx ? 'is-active' : ''}`}
+                            onClick={() => setMobileDayIndex(idx)}
+                        >
+                            {formatDate(date)}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {/* 排班表格 */}
             <Card padding="lg" className="schedule-card">
                 {/* 班別控制 */}
@@ -301,36 +351,40 @@ export default function VolunteerSchedulePage() {
                     <span className="shift-controls-label">班別設定</span>
                     <div className="shift-controls">
                         <button
+                            type="button"
                             className="shift-control-btn"
                             onClick={removeShift}
                             disabled={shifts.length <= 1}
+                            aria-label="減少班別"
                             title="減少班別"
                         >
-                            −
+                            <Minus size={16} aria-hidden="true" />
                         </button>
-                        <span className="shift-count">{shifts.length} 班</span>
+                        <span className="shift-count tabular-nums">{shifts.length} 班</span>
                         <button
+                            type="button"
                             className="shift-control-btn"
                             onClick={addShift}
                             disabled={shifts.length >= 8}
+                            aria-label="增加班別"
                             title="增加班別"
                         >
-                            +
+                            <Plus size={16} aria-hidden="true" />
                         </button>
                     </div>
                 </div>
 
                 <div className="schedule-grid" style={{
-                    gridTemplateColumns: `140px repeat(${dates.length}, minmax(100px, 1fr))`
+                    gridTemplateColumns: `140px repeat(${displayDates.length}, minmax(100px, 1fr))`
                 }}>
                     {/* 表頭 */}
                     <div className="schedule-header" style={{
-                        gridColumn: `span ${dates.length + 1}`,
+                        gridColumn: `span ${displayDates.length + 1}`,
                         display: 'contents'
                     }}>
                         <div className="schedule-cell schedule-cell--header">班別 / 日期</div>
-                        {dates.map(date => (
-                            <div key={date} className="schedule-cell schedule-cell--header">
+                        {displayDates.map(date => (
+                            <div key={date} className="schedule-cell schedule-cell--header tabular-nums">
                                 {formatDate(date)}
                             </div>
                         ))}
@@ -384,10 +438,12 @@ export default function VolunteerSchedulePage() {
                                             onChange={(e) => updateShiftTime(shift.id, 'endTime', e.target.value)}
                                         />
                                         <button
+                                            type="button"
                                             className="shift-time-done"
                                             onClick={() => setEditingTime(null)}
+                                            aria-label="完成編輯時間"
                                         >
-                                            ✓
+                                            <Check size={12} aria-hidden="true" />
                                         </button>
                                     </div>
                                 ) : (
@@ -401,7 +457,7 @@ export default function VolunteerSchedulePage() {
                                 )}
                             </div>
 
-                            {dates.map(date => {
+                            {displayDates.map(date => {
                                 const slot = getSlotSchedule(date, shift.id);
                                 const slotKey = `${date}-${shift.id}`;
                                 const isExpanded = expandedSlot === slotKey;
@@ -413,60 +469,70 @@ export default function VolunteerSchedulePage() {
                                         className={`schedule-cell schedule-cell--slot ${volunteerCount > 0 ? 'has-volunteer' : 'empty'}`}
                                     >
                                         {volunteerCount === 0 ? (
-                                            <span
+                                            <button
+                                                type="button"
                                                 className="empty-slot"
                                                 onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
                                             >
                                                 + 指派
-                                            </span>
+                                            </button>
                                         ) : volunteerCount === 1 ? (
                                             <div className="slot-content">
-                                                <span
+                                                <button
+                                                    type="button"
                                                     className="volunteer-name"
                                                     onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
                                                 >
                                                     {slot!.volunteers[0].name}
-                                                </span>
+                                                </button>
                                                 <button
+                                                    type="button"
                                                     className="remove-btn"
+                                                    aria-label={`移除 ${slot!.volunteers[0].name}`}
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         removeVolunteerFromSlot(date, shift.id, slot!.volunteers[0].id);
                                                     }}
                                                 >
-                                                    ✕
+                                                    <X size={12} aria-hidden="true" />
                                                 </button>
                                             </div>
                                         ) : (
                                             <div className="slot-multi">
-                                                <div
+                                                <button
+                                                    type="button"
                                                     className="slot-multi__header"
                                                     onClick={() => toggleExpand(slotKey)}
+                                                    aria-expanded={isExpanded}
                                                 >
-                                                    <span className="slot-multi__count">
-                                                        👥 {volunteerCount} 人
+                                                    <Users size={14} aria-hidden="true" />
+                                                    <span className="slot-multi__count tabular-nums">
+                                                        {volunteerCount} 人
                                                     </span>
-                                                    <span className="slot-multi__toggle">
-                                                        {isExpanded ? '▼' : '▶'}
+                                                    <span className="slot-multi__toggle" aria-hidden="true">
+                                                        {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
                                                     </span>
-                                                </div>
+                                                </button>
                                                 {isExpanded && (
                                                     <div className="slot-multi__list">
                                                         {slot!.volunteers.map(v => (
                                                             <div key={v.id} className="slot-multi__item">
                                                                 <span>{v.name}</span>
                                                                 <button
+                                                                    type="button"
                                                                     className="remove-btn-sm"
+                                                                    aria-label={`移除 ${v.name}`}
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         removeVolunteerFromSlot(date, shift.id, v.id);
                                                                     }}
                                                                 >
-                                                                    ✕
+                                                                    <X size={12} aria-hidden="true" />
                                                                 </button>
                                                             </div>
                                                         ))}
                                                         <button
+                                                            type="button"
                                                             className="slot-multi__add"
                                                             onClick={() => setSelectedSlot({ date, shiftId: shift.id })}
                                                         >
@@ -485,60 +551,65 @@ export default function VolunteerSchedulePage() {
             </Card>
 
             {/* 指派志工 Modal */}
-            {selectedSlot && (
-                <div className="modal-overlay" onClick={() => setSelectedSlot(null)}>
-                    <Card className="modal-content" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>指派志工</h3>
-                        <p className="modal-subtitle">
-                            {formatDate(selectedSlot.date)} - {selectedShift?.label}
-                        </p>
-
-                        {isLoading ? (
+            <Modal
+                isOpen={!!selectedSlot}
+                onClose={() => setSelectedSlot(null)}
+                title="指派志工"
+                subtitle={selectedSlot ? `${formatDate(selectedSlot.date)} - ${selectedShift?.label}` : undefined}
+                size="sm"
+                footer={(
+                    <Button variant="secondary" onClick={() => setSelectedSlot(null)}>
+                        取消
+                    </Button>
+                )}
+            >
+                {selectedSlot && (
+                    isLoading ? (
+                        <div className="volunteer-list">
                             <div className="loading-state">載入中...</div>
-                        ) : (
-                            <div className="volunteer-list">
-                                {volunteers.map((volunteer) => (
-                                    <div
-                                        key={volunteer.id}
-                                        className="volunteer-item"
-                                        onClick={() => assignVolunteer(volunteer)}
-                                    >
-                                        <span className="volunteer-avatar">👤</span>
-                                        <div className="volunteer-info">
-                                            <span className="name">{volunteer.name}</span>
-                                            <span className="region">{volunteer.email}</span>
-                                        </div>
-                                        <Badge variant="success" size="sm">
-                                            可用
-                                        </Badge>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-
-                        <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => setSelectedSlot(null)}>
-                                取消
-                            </Button>
                         </div>
-                    </Card>
-                </div>
-            )}
+                    ) : volunteers.length === 0 ? (
+                        <EmptyState variant="minimal" title="尚無志工資料" />
+                    ) : (
+                        <div className="volunteer-list">
+                            {volunteers.map((volunteer) => (
+                                <button
+                                    type="button"
+                                    key={volunteer.id}
+                                    className="volunteer-item"
+                                    onClick={() => assignVolunteer(volunteer)}
+                                >
+                                    <span className="volunteer-avatar" aria-hidden="true">
+                                        <Users size={18} />
+                                    </span>
+                                    <div className="volunteer-info">
+                                        <span className="name">{volunteer.name}</span>
+                                        <span className="region">{volunteer.email}</span>
+                                    </div>
+                                    <Badge variant="success" size="sm">
+                                        可用
+                                    </Badge>
+                                </button>
+                            ))}
+                        </div>
+                    )
+                )}
+            </Modal>
 
             {/* 志工時數統計 */}
             {volunteerHoursStats.length > 0 && (
                 <Card padding="lg" className="hours-stats-card">
-                    <h3>📊 排班時數統計</h3>
+                    <h3>排班時數統計</h3>
                     <p className="stats-subtitle">根據目前排班計算的預估時數</p>
                     <div className="hours-stats-list">
                         {volunteerHoursStats.slice(0, 10).map((stat, index) => (
                             <div key={stat.id} className="hours-stat-item">
-                                <span className="stat-rank">#{index + 1}</span>
+                                <span className="stat-rank tabular-nums">#{index + 1}</span>
                                 <span className="stat-name">{stat.name}</span>
                                 <span className="stat-info">
                                     <Badge variant="info" size="sm">{stat.shifts} 班</Badge>
                                 </span>
-                                <span className="stat-hours">{stat.hours.toFixed(1)} 小時</span>
+                                <span className="stat-hours tabular-nums">{stat.hours.toFixed(1)} 小時</span>
                             </div>
                         ))}
                     </div>
