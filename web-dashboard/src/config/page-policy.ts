@@ -66,15 +66,24 @@ export const PAGE_POLICIES: PagePolicyEntry[] = [
     // ========== 公開頁面 (L0) ==========
     { pageKey: 'command-center', path: '/command-center', label: '戰情儀表板', requiredLevel: 0, group: 'ops', icon: 'LayoutDashboard', order: 0, showInMenu: true },
     { pageKey: 'intake', path: '/intake', label: '通報入口', requiredLevel: 0, group: 'ops', icon: 'FileText', order: 1, showInMenu: true },
-    { pageKey: 'dashboard', path: '/dashboard', label: '儀表版', requiredLevel: 0, group: 'ops', icon: 'Home', order: 0, showInMenu: false },
     { pageKey: 'account', path: '/account', label: '帳戶', requiredLevel: 0, group: 'personal', icon: 'User', showInMenu: false },
     { pageKey: 'profile', path: '/profile', label: '個人資料', requiredLevel: 0, group: 'personal', icon: 'User', showInMenu: true },
-    
+
+    // 緊急快捷（R1: 補齊 policy 覆蓋，撤離資訊為公開 — 修正 sidebar minLevel=L1 的矛盾）
+    { pageKey: 'emergency-sos', path: '/emergency/sos', label: 'SOS 求救', requiredLevel: 0, group: 'ops', icon: 'AlertCircle', showInMenu: false },
+    { pageKey: 'emergency-evacuation', path: '/emergency/evacuation', label: '撤離資訊', requiredLevel: 0, group: 'ops', icon: 'Siren', showInMenu: false },
+    { pageKey: 'emergency-hotline', path: '/emergency/hotline', label: '緊急專線', requiredLevel: 0, group: 'ops', icon: 'Phone', showInMenu: false },
+
     // Geo 公開頁面
     { pageKey: 'unified-map', path: '/geo/map', label: '統一地圖', requiredLevel: 0, group: 'geo', icon: 'Map', order: 0, showInMenu: true },
     { pageKey: 'geo-alerts', path: '/hub/geo-alerts', label: '警報中心', requiredLevel: 0, group: 'geo', icon: 'Bell', order: 1, showInMenu: true },
     { pageKey: 'weather', path: '/hub/weather', label: '氣象預報', requiredLevel: 0, group: 'geo', icon: 'CloudRain', order: 2, showInMenu: true },
+    { pageKey: 'geo-shelters', path: '/geo/shelters', label: '避難所地圖', requiredLevel: 0, group: 'geo', icon: 'MapPin', order: 3, showInMenu: true },
     { pageKey: 'offline', path: '/hub/offline', label: '離線狀態', requiredLevel: 0, group: 'ops', icon: 'HardDrive', order: 6, showInMenu: true },
+
+    // 知識 / 社區公開頁面（R1: mental-health route 為 L0，policy 對齊修正 sidebar 矛盾）
+    { pageKey: 'knowledge-manuals', path: '/knowledge/manuals', label: '作業手冊', requiredLevel: 0, group: 'insights', icon: 'BookOpen', showInMenu: true },
+    { pageKey: 'mental-health', path: '/community/mental-health', label: '心理支持', requiredLevel: 0, group: 'workforce', icon: 'HeartHandshake', showInMenu: true },
 
     // ========== 志工頁面 (L1) ==========
     { pageKey: 'volunteer-setup', path: '/volunteer-setup', label: '志工資料設定', requiredLevel: 1, showInMenu: false },
@@ -90,24 +99,30 @@ export const PAGE_POLICIES: PagePolicyEntry[] = [
     { pageKey: 'shifts', path: '/workforce/shifts', label: '排班日曆', requiredLevel: 1, group: 'workforce', icon: 'Calendar', order: 1, showInMenu: true },
     { pageKey: 'performance', path: '/workforce/performance', label: '績效中心', requiredLevel: 1, group: 'workforce', icon: 'Trophy', order: 2, showInMenu: true },
     
+    // 救援行動 L1（R1: 補齊 policy 覆蓋）
+    { pageKey: 'rescue-triage', path: '/rescue/triage', label: '傷患分類', requiredLevel: 1, group: 'ops', icon: 'Stethoscope', showInMenu: true },
+    { pageKey: 'rescue-reunification', path: '/rescue/reunification', label: '家庭重聚', requiredLevel: 1, group: 'ops', icon: 'Users2', showInMenu: true },
+
     // 社區 L1
     { pageKey: 'community-hub', path: '/community/hub', label: '社區中心', requiredLevel: 1, group: 'personal', icon: 'Home', showInMenu: true },
-    
+
     // 個人頁面 L1
     { pageKey: 'events', path: '/events', label: '活動', requiredLevel: 1, group: 'personal', icon: 'Calendar', showInMenu: true },
-    { pageKey: 'report', path: '/report', label: '通報', requiredLevel: 1, group: 'personal', icon: 'FileText', showInMenu: true },
     { pageKey: 'training', path: '/training', label: '訓練', requiredLevel: 1, group: 'personal', icon: 'BookOpen', showInMenu: true },
     { pageKey: 'resources-public', path: '/resources-public', label: '公開物資', requiredLevel: 1, group: 'personal', showInMenu: true },
     { pageKey: 'community', path: '/community', label: '社區', requiredLevel: 1, group: 'personal', showInMenu: true },
-    { pageKey: 'reunification', path: '/reunification', label: '尋人', requiredLevel: 1, group: 'personal', showInMenu: true },
     { pageKey: 'activities', path: '/activities', label: '活動記錄', requiredLevel: 1, group: 'personal', showInMenu: true },
-    { pageKey: 'leaderboard', path: '/leaderboard', label: '排行榜', requiredLevel: 1, group: 'personal', showInMenu: true },
     { pageKey: 'my-vehicles', path: '/my-vehicles', label: '我的車輛', requiredLevel: 1, group: 'personal', showInMenu: true },
     { pageKey: 'my-insurance', path: '/my-insurance', label: '我的保險', requiredLevel: 1, group: 'personal', showInMenu: true },
     { pageKey: 'ai-chat', path: '/hub/ai-chat', label: 'AI 助手', requiredLevel: 1, group: 'ops', icon: 'Bot', showInMenu: true },
 
     // ========== 幹部頁面 (L2) ==========
     { pageKey: 'ics-forms', path: '/ops/ics-forms', label: 'ICS 表單', requiredLevel: 2, group: 'ops', icon: 'FileStack', order: 4, showInMenu: true },
+    { pageKey: 'ics-dashboard', path: '/ics', label: 'ICS 派遣台', requiredLevel: 2, group: 'ops', icon: 'Target', showInMenu: true },
+    // R1: 搜救任務 route(L1) 與 sidebar(L2) 矛盾 — 收斂為 L2（任務協調屬幹部職能）
+    { pageKey: 'rescue-search', path: '/rescue/search-rescue', label: '搜救任務', requiredLevel: 2, group: 'ops', icon: 'Search', showInMenu: true },
+    { pageKey: 'rescue-medical', path: '/rescue/medical-transport', label: '醫療後送', requiredLevel: 2, group: 'ops', icon: 'Truck', showInMenu: true },
+    { pageKey: 'rescue-comms', path: '/rescue/field-comms', label: '現地通訊', requiredLevel: 2, group: 'ops', icon: 'Radio', showInMenu: true },
     { pageKey: 'equipment', path: '/logistics/equipment', label: '裝備管理', requiredLevel: 2, group: 'logistics', icon: 'QrCode', order: 1, showInMenu: true },
     { pageKey: 'donations', path: '/logistics/donations', label: '捐贈追蹤', requiredLevel: 2, group: 'logistics', icon: 'Heart', order: 2, showInMenu: true },
     { pageKey: 'unified-resources', path: '/logistics/unified-resources', label: '資源整合', requiredLevel: 2, group: 'logistics', icon: 'Combine', order: 3, showInMenu: true },
@@ -123,14 +138,18 @@ export const PAGE_POLICIES: PagePolicyEntry[] = [
     { pageKey: 'governance-audit', path: '/governance/audit', label: '審計日誌', requiredLevel: 3, group: 'admin', icon: 'FileSearch', showInMenu: true },
     { pageKey: 'governance-security', path: '/governance/security', label: '安全設定', requiredLevel: 3, group: 'admin', icon: 'Lock', showInMenu: true },
     { pageKey: 'governance-interoperability', path: '/governance/interoperability', label: '互通性', requiredLevel: 3, group: 'admin', showInMenu: true },
+    { pageKey: 'governance-monitor', path: '/governance/monitor', label: '系統監控', requiredLevel: 3, group: 'admin', icon: 'Activity', showInMenu: true },
 
     // ========== 理事長頁面 (L4) ==========
     { pageKey: 'governance-webhooks', path: '/governance/webhooks', label: 'Webhooks', requiredLevel: 4, group: 'admin', icon: 'Webhook', showInMenu: true },
     { pageKey: 'governance-biometric', path: '/governance/biometric', label: '生物辨識', requiredLevel: 4, group: 'admin', icon: 'Fingerprint', showInMenu: true },
     { pageKey: 'governance-settings', path: '/governance/settings', label: '系統設定', requiredLevel: 4, group: 'admin', icon: 'Settings', showInMenu: true },
 
-    // ========== 系統擁有者頁面 (L5) ==========
-    { pageKey: 'admin-audit-logs', path: '/admin/audit-logs', label: '管理員審計', requiredLevel: 5, group: 'admin', icon: 'FileSearch', showInMenu: true },
+    // ── R1 IA 收斂備註 ──────────────────────────────────────────────
+    // 下列路徑已收斂為 redirect（不再是實頁，故不留 policy 條目）：
+    //   /dashboard → /command-center、/report → /intake、/reunification → /rescue/reunification、
+    //   /leaderboard → /workforce/performance、/admin/audit-logs → /governance/audit
+    // 完整對照見 docs/audit/ROUTE_IA_RECONCILIATION.md 與 routes/*.routes.tsx。
 ];
 
 /**

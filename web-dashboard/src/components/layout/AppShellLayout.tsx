@@ -1,102 +1,89 @@
 /**
- * AppShellLayout.tsx
- * 
- * Implementation of appshell-layout.md with iOS Widget system
- * Level 5 users can edit, drag, resize, and hide widgets
+ * AppShellLayout.tsx — R1 / FE-7 重建
+ *
+ * 雙模式應用殼（DESIGN_LANGUAGE.md）：
+ * - data-app-mode="normal|emergency"：災時模式由 tokens.css LAYER 8 全域換色（高對比戰術深色）
+ * - data-density="simple|dense"：L0–L1 志工極簡殼 / L2+ 管理密度殼
+ * - EmergencyStatusBar 常駐掛載（有警戒級以上事件時自動顯示）
+ * - 導覽：AppSidebar（桌機）/ Drawer（行動端）/ MobileBottomNav（行動端底欄）
+ *   權限一律由 page-policy 解析（useSidebarConfig）
+ * - Widget 儀表板系統保留（dashboard 類頁面使用）
  */
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { useTranslation } from 'react-i18next';
-import { Menu, X, Settings, ChevronsLeft, ChevronsRight, Bell, User, Plus, Minus } from 'lucide-react';
+import { useEmergencyStyles } from '../../context/useEmergencyContext';
+import { Menu, X, Bell, User, Siren } from 'lucide-react';
 import { WidgetGrid } from './WidgetGrid';
 import { WidgetEditControls } from './Widget';
 import { WidgetPicker } from './WidgetPicker';
 import { SidebarSettings } from './SidebarSettings';
 import { useWidgetLayout } from './useWidgetLayout';
-import { useSidebarConfig, ICON_MAP } from './useSidebarConfig';
+import { useSidebarConfig } from './useSidebarConfig';
+import { useAppMode } from './useAppMode';
 import { PermissionLevel } from './widget.types';
 import { WIDGET_CONTENT_MAP } from '../widgets/widgetContentMap';
 import { SyncStatusIndicator } from '../SyncStatusIndicator';
 import { Breadcrumb } from '../Breadcrumb';
 import { LanguageSelector } from '../LanguageSelector';
+import AppSidebar, { SidebarNavContent } from './AppSidebar';
 import MobileBottomNav from './MobileBottomNav';
+import EmergencyStatusBar from './EmergencyStatusBar';
 import { ThemeSwitcher } from '../ui/ThemeSwitcher';
 import './AppShellLayout.css';
 
 interface AppShellLayoutProps {
     children?: React.ReactNode;
-    userLevel?: PermissionLevel;  // Pass from AuthContext
-    pageId?: string;  // Page-specific identifier for independent widget configs
+    userLevel?: PermissionLevel;
+    pageId?: string;
 }
 
 export default function AppShellLayout({
     children,
-    userLevel = PermissionLevel.Anonymous,  // Default to Level 0 (unauthenticated)
+    userLevel = PermissionLevel.Anonymous,
     pageId = 'default',
 }: AppShellLayoutProps) {
-    const { t } = useTranslation();
     const { user: authUser } = useAuth();
+    const navigate = useNavigate();
 
-    // Helper to convert item id to camelCase translation key
-    const getItemLabel = useMemo(() => {
-        const idToKey: Record<string, string> = {
-            'sos': 'sos', 'quick-report': 'quickReport', 'evacuation': 'evacuation', 'hotline': 'hotline',
-            'command-center': 'commandCenter', 'incidents': 'incidents', 'tasks': 'tasks',
-            'ics-forms': 'icsForms', 'notifications': 'notifications', 'ic-dashboard': 'icDashboard',
-            'offline': 'offline', 'unified-map': 'unifiedMap', 'alerts': 'alerts', 'weather': 'weather',
-            'shelter-map': 'shelterMap', 'shelters': 'shelters', 'triage': 'triage',
-            'reunification': 'reunification', 'search-rescue': 'searchRescue',
-            'medical-transport': 'medicalTransport', 'field-comms': 'fieldComms',
-            'inventory': 'inventory', 'equipment': 'equipment', 'donations': 'donations',
-            'unified-resources': 'unifiedResources', 'approvals': 'approvals', 'people': 'people',
-            'shifts': 'shifts', 'mobilization': 'mobilization', 'performance': 'performance',
-            'community-hub': 'communityHub', 'mental-health': 'mentalHealth', 'analytics': 'analytics',
-            'reports': 'reports', 'unified-reporting': 'unifiedReporting',
-            'simulation-engine': 'simulationEngine', 'ai-tasks': 'aiTasks', 'ai-chat': 'aiChat',
-            'training': 'training', 'manuals': 'manuals', 'iam': 'iam', 'audit': 'audit',
-            'security': 'security', 'interoperability': 'interoperability', 'webhooks': 'webhooks',
-            'biometric': 'biometric', 'settings': 'settings',
-        };
-        return (id: string, fallback: string) => {
-            const key = idToKey[id];
-            return key ? t(`sidebar.items.${key}`, fallback) : fallback;
-        };
-    }, [t]);
+    // ── 雙模式判定（自動 + L2+ 手動覆寫） ──
+    const { mode, isEmergencyMode, toggleMode } = useAppMode();
+    const emergencyStyles = useEmergencyStyles();
+
+    // ── UI 狀態 ──
     const [drawerOpen, setDrawerOpen] = useState(false);
-    // Persist sidebar expanded state to localStorage
-    const [sidebarExpanded, setSidebarExpanded] = useState(() => {
-        const saved = localStorage.getItem('sidebarExpanded');
-        return saved === 'true';
-    });
-    // Multi-expand state: track all expanded groups (no accordion)
-    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
-        const saved = localStorage.getItem('expandedGroups');
-        if (saved) {
-            try {
-                return new Set(JSON.parse(saved));
-            } catch {
-                return new Set();
-            }
-        }
-        return new Set();
-    });
     const [isMobile, setIsMobile] = useState(false);
     const [pickerOpen, setPickerOpen] = useState(false);
     const [sidebarSettingsOpen, setSidebarSettingsOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [accountOpen, setAccountOpen] = useState(false);
+    const [sidebarExpanded, setSidebarExpanded] = useState(() => {
+        return localStorage.getItem('sidebarExpanded') === 'true';
+    });
+    const [expandedGroups, setExpandedGroups] = useState<Set<string>>(() => {
+        try {
+            const saved = localStorage.getItem('expandedGroups');
+            return saved ? new Set(JSON.parse(saved)) : new Set(['ops']);
+        } catch {
+            return new Set(['ops']);
+        }
+    });
 
-    // Sidebar navigation config with RBAC
+    // ── 導覽解析（權限唯一來源：page-policy） ──
     const {
-        visibleGroups,
         navItems,
+        allItems,
+        navGroups,
+        groupedItems,
+        quickActions,
+        emergencyItems,
+        volunteerItems,
         updateNavItem,
         reorderNavItems,
         resetConfig,
-        getVisibleItemsByGroup,
-    } = useSidebarConfig(userLevel);
+    } = useSidebarConfig(userLevel, mode);
 
-    // Widget layout system with RBAC
+    // ── Widget 儀表板系統（保留） ──
     const {
         widgets,
         editState,
@@ -120,20 +107,6 @@ export default function AppShellLayout({
         return () => window.removeEventListener('resize', checkMobile);
     }, []);
 
-    // Auto-expand group based on current path - ONLY on initial load
-    // Use ref to track initialization to prevent resetting on navigation
-    const initialExpandDone = React.useRef(false);
-    useEffect(() => {
-        if (initialExpandDone.current) return; // Skip if already initialized
-        const currentPath = window.location.pathname;
-        const activeItem = navItems.find(item => item.path === currentPath);
-        if (activeItem) {
-            setExpandedGroups(prev => new Set([...prev, activeItem.group]));
-            initialExpandDone.current = true;
-        }
-    }, [navItems]);
-
-    // Persist expanded groups to localStorage
     useEffect(() => {
         localStorage.setItem('expandedGroups', JSON.stringify([...expandedGroups]));
     }, [expandedGroups]);
@@ -142,44 +115,81 @@ export default function AppShellLayout({
         if (!isMobile) setDrawerOpen(false);
     }, [isMobile]);
 
-    const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-    const closeDrawer = () => setDrawerOpen(false);
-
     const toggleGroupExpansion = (groupId: string) => {
-        // Toggle: add or remove group from expanded set (multi-expand, no accordion)
         setExpandedGroups(prev => {
             const next = new Set(prev);
-            if (next.has(groupId)) {
-                next.delete(groupId);
-            } else {
-                next.add(groupId);
-            }
+            if (next.has(groupId)) next.delete(groupId);
+            else next.add(groupId);
             return next;
         });
     };
 
-    // Widget content is now provided by WIDGET_CONTENT_MAP
-    const widgetContent = WIDGET_CONTENT_MAP;
+    const toggleSidebarExpanded = () => {
+        const next = !sidebarExpanded;
+        setSidebarExpanded(next);
+        localStorage.setItem('sidebarExpanded', String(next));
+    };
+
+    const closeDrawer = () => setDrawerOpen(false);
+
+    const density = userLevel >= PermissionLevel.Supervisor ? 'dense' : 'simple';
+
+    const navContentProps = {
+        mode,
+        userLevel,
+        groups: navGroups,
+        groupedItems,
+        quickActions,
+        emergencyItems,
+        volunteerItems,
+    };
 
     return (
-        <div className={`appShellLayout ${editState.isEditMode ? 'appShellLayout--edit-mode' : ''}`}>
+        <div
+            className={`appShellLayout ${editState.isEditMode ? 'appShellLayout--edit-mode' : ''}`}
+            data-app-mode={mode}
+            data-density={density}
+        >
+            {/* 災時狀態列（Warning 級以上自動顯示，常駐置頂） */}
+            <EmergencyStatusBar />
+
             {/* [H] Header */}
             <header className="header">
                 <div className="headerLeft">
-                    <button className="burgerBtn" onClick={toggleDrawer}>
+                    <button
+                        type="button"
+                        className="burgerBtn"
+                        onClick={() => setDrawerOpen(!drawerOpen)}
+                        aria-label={drawerOpen ? '關閉選單' : '開啟選單'}
+                    >
                         {drawerOpen ? <X size={24} /> : <Menu size={24} />}
                     </button>
-                    <span className="header__logo">
-                        LIGHTKEEPERS
-                    </span>
-                    {canEdit && (
-                        <span className="header__level-badge">
-                            Level {userLevel}
+                    <span className="header__logo">LIGHTKEEPERS</span>
+                    {isEmergencyMode && (
+                        <span className="header__mode-badge" role="status">
+                            <Siren size={12} aria-hidden />
+                            災時模式{emergencyStyles.isActive ? ` · ${emergencyStyles.label}` : ''}
                         </span>
                     )}
+                    {canEdit && (
+                        <span className="header__level-badge">Level {userLevel}</span>
+                    )}
                 </div>
-                <div className="headerCenter">{/* H-C */}</div>
+                <div className="headerCenter" />
                 <div className="headerRight">
+                    {/* 災時模式手動切換（L2+ 幹部；演練/復盤用） */}
+                    {userLevel >= PermissionLevel.Supervisor && (
+                        <button
+                            type="button"
+                            className={`header__icon-btn header__mode-toggle ${isEmergencyMode ? 'active' : ''}`}
+                            onClick={toggleMode}
+                            title={isEmergencyMode ? '退出災時模式' : '進入災時模式'}
+                            aria-pressed={isEmergencyMode}
+                        >
+                            <Siren size={20} />
+                        </button>
+                    )}
+
                     <WidgetEditControls
                         isEditMode={editState.isEditMode}
                         canEdit={canEdit}
@@ -190,110 +200,68 @@ export default function AppShellLayout({
                         onAddWidget={() => setPickerOpen(true)}
                     />
 
-                    {/* Sync Status Indicator */}
                     <SyncStatusIndicator />
-
-                    {/* Theme Switcher */}
                     <ThemeSwitcher />
-
-                    {/* Language Selector Dropdown */}
                     <LanguageSelector />
 
-                    {/* Notification Icon */}
+                    {/* 通知 */}
                     <div className="header__dropdown-container">
                         <button
-                            onClick={() => setNotificationOpen(!notificationOpen)}
+                            type="button"
+                            onClick={() => {
+                                setNotificationOpen(!notificationOpen);
+                                setAccountOpen(false);
+                            }}
                             className="header__icon-btn"
                             title="通知"
+                            aria-haspopup="true"
+                            aria-expanded={notificationOpen}
                         >
                             <Bell size={20} />
                         </button>
                         {notificationOpen && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                right: 0,
-                                marginTop: '8px',
-                                width: '300px',
-                                background: 'var(--layout-bg, #0b111b)',
-                                border: '1px solid var(--accent-gold, #d4a84b)',
-                                borderRadius: '12px',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
-                                zIndex: 200,
-                                padding: '16px',
-                            }}>
-                                <div style={{ fontWeight: 600, marginBottom: '12px', color: 'var(--text-primary)' }}>通知</div>
-                                <div style={{ color: 'var(--text-muted)', fontSize: '14px' }}>目前沒有新通知</div>
+                            <div className="header__dropdown-panel header__dropdown-panel--notification">
+                                <div className="header__dropdown-header">通知</div>
+                                <div className="header__dropdown-empty">目前沒有新通知</div>
                             </div>
                         )}
                     </div>
 
-                    {/* Account Avatar */}
-                    <div style={{ position: 'relative' }}>
+                    {/* 帳戶 */}
+                    <div className="header__dropdown-container">
                         <button
+                            type="button"
                             onClick={() => {
                                 setAccountOpen(!accountOpen);
                                 setNotificationOpen(false);
                             }}
-                            style={{
-                                background: 'rgba(212, 168, 75, 0.2)',
-                                border: '2px solid var(--accent-gold)',
-                                color: 'var(--accent-gold)',
-                                cursor: 'pointer',
-                                padding: '6px',
-                                borderRadius: '50%',
-                                width: '36px',
-                                height: '36px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                            }}
+                            className="header__avatar-btn"
                             title="帳戶"
+                            aria-haspopup="true"
+                            aria-expanded={accountOpen}
                         >
                             <User size={18} />
                         </button>
                         {accountOpen && (
-                            <div style={{
-                                position: 'absolute',
-                                top: '100%',
-                                right: 0,
-                                marginTop: '8px',
-                                width: '240px',
-                                background: 'var(--layout-bg, #0b111b)',
-                                border: '1px solid var(--accent-gold, #d4a84b)',
-                                borderRadius: '12px',
-                                boxShadow: '0 10px 40px rgba(0,0,0,0.4)',
-                                zIndex: 200,
-                                padding: '16px',
-                            }}>
-                                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '16px' }}>
-                                    <div style={{
-                                        width: '48px', height: '48px', borderRadius: '50%',
-                                        background: 'rgba(212, 168, 75, 0.2)',
-                                        border: '2px solid var(--accent-gold)',
-                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        color: 'var(--accent-gold)',
-                                    }}>
+                            <div className="header__dropdown-panel header__dropdown-panel--account">
+                                <div className="header__account-user">
+                                    <div className="header__account-avatar">
                                         <User size={24} />
                                     </div>
                                     <div>
-                                        <div style={{ fontWeight: 600, color: 'var(--text-primary)' }}>{authUser?.displayName || '使用者'}</div>
-                                        <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Level {userLevel}</div>
+                                        <div className="header__account-name">
+                                            {authUser?.displayName || '使用者'}
+                                        </div>
+                                        <div className="header__account-level">Level {userLevel}</div>
                                     </div>
                                 </div>
-                                <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: '12px' }}>
+                                <div className="header__account-actions">
                                     <button
-                                        onClick={() => window.location.href = '/account'}
-                                        style={{
-                                            width: '100%',
-                                            background: 'rgba(255,255,255,0.05)',
-                                            border: '1px solid rgba(255,255,255,0.1)',
-                                            color: 'var(--text-primary)',
-                                            padding: '10px 12px',
-                                            borderRadius: '8px',
-                                            cursor: 'pointer',
-                                            fontSize: '14px',
-                                            textAlign: 'left',
+                                        type="button"
+                                        className="header__account-link"
+                                        onClick={() => {
+                                            setAccountOpen(false);
+                                            navigate('/account');
                                         }}
                                     >
                                         前往帳戶設定
@@ -306,126 +274,19 @@ export default function AppShellLayout({
             </header>
 
             <div className="mainBody">
-                {/* [S] Sidebar */}
-                <aside className={`sidebar ${sidebarExpanded ? 'expanded' : ''}`}>
-                    <div className="sbTop">
-                        <button
-                            onClick={() => {
-                                const newState = !sidebarExpanded;
-                                setSidebarExpanded(newState);
-                                localStorage.setItem('sidebarExpanded', String(newState));
-                            }}
-                            style={{
-                                background: 'rgba(255,255,255,0.05)',
-                                border: 'none',
-                                borderRadius: '6px',
-                                padding: '6px',
-                                color: 'var(--text-secondary)',
-                                cursor: 'pointer',
-                                width: '40px',
-                                height: '40px',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                flexShrink: 0,
-                            }}
-                        >
-                            {sidebarExpanded ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
-                        </button>
-                    </div>
-                    <nav className="sbScroll">
-                        {visibleGroups.map(group => {
-                            const groupItems = getVisibleItemsByGroup(group.id);
-                            if (groupItems.length === 0) return null;
+                {/* [S] 桌機側欄 */}
+                <AppSidebar
+                    {...navContentProps}
+                    expanded={sidebarExpanded}
+                    expandedGroups={expandedGroups}
+                    onToggleGroup={toggleGroupExpansion}
+                    onToggleExpanded={toggleSidebarExpanded}
+                    onOpenSettings={() => setSidebarSettingsOpen(true)}
+                />
 
-                            const isCollapsed = !expandedGroups.has(group.id);
-
-                            return (
-                                <div key={group.id} style={{ marginBottom: '16px' }}>
-                                    {/* Group Header - Adaptive for both expanded and collapsed sidebar */}
-                                    <div
-                                        onClick={() => toggleGroupExpansion(group.id)}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            justifyContent: sidebarExpanded ? 'space-between' : 'center',
-                                            padding: sidebarExpanded ? '8px 10px' : '8px 0',
-                                            fontSize: '11px',
-                                            fontWeight: 600,
-                                            color: 'var(--text-muted)',
-                                            textTransform: 'uppercase',
-                                            letterSpacing: '0.5px',
-                                            borderBottom: '1px solid rgba(255,255,255,0.05)',
-                                            marginBottom: '4px',
-                                            cursor: 'pointer',
-                                            userSelect: 'none',
-                                            background: (!isCollapsed && !sidebarExpanded) ? 'rgba(255,255,255,0.05)' : 'transparent',
-                                            borderRadius: sidebarExpanded ? '0' : '8px',
-                                        }}
-                                        title={sidebarExpanded ? (isCollapsed ? "展開" : "收合") : group.label}
-                                    >
-                                        {sidebarExpanded ? (
-                                            <>
-                                                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                                                    <span>{group.emoji}</span>
-                                                    <span>{t(`sidebar.groups.${group.id}`, group.label)}</span>
-                                                </div>
-                                                {isCollapsed ? <Plus size={16} /> : <Minus size={16} />}
-                                            </>
-                                        ) : (
-                                            <span style={{ fontSize: '18px' }}>{group.emoji}</span>
-                                        )}
-                                    </div>
-
-                                    {/* Group Items - Strictly follow accordion state even when minimized */}
-                                    {!isCollapsed && (
-                                        <div style={{
-                                            overflow: 'hidden',
-                                            transition: 'height 0.3s ease',
-                                        }}>
-                                            {groupItems.map(item => {
-                                                const IconComponent = ICON_MAP[item.icon];
-                                                return (
-                                                    <NavItem
-                                                        key={item.id}
-                                                        icon={IconComponent ? <IconComponent size={20} /> : null}
-                                                        label={getItemLabel(item.id, item.label)}
-                                                        path={item.path}
-                                                        expanded={sidebarExpanded}
-                                                    />
-                                                );
-                                            })}
-                                        </div>
-                                    )}
-                                </div>
-                            );
-                        })}
-                    </nav>
-                    <div className="sbBottom">
-                        {/* 編輯 Sidebar 導航 - Level 5 Only */}
-                        {userLevel >= PermissionLevel.SystemOwner && (
-                            <div
-                                onClick={() => setSidebarSettingsOpen(true)}
-                                style={{
-                                    display: 'flex', alignItems: 'center', gap: '12px', padding: '10px',
-                                    borderRadius: '8px', cursor: 'pointer',
-                                    background: 'transparent',
-                                    color: 'var(--text-secondary)',
-                                    marginBottom: '4px', justifyContent: sidebarExpanded ? 'flex-start' : 'center',
-                                }}
-                            >
-                                <Settings size={20} />
-                                {sidebarExpanded && <span style={{ fontSize: '14px' }}>設定</span>}
-                            </div>
-                        )}
-                    </div>
-                </aside>
-
-                {/* [M] MainColumn - Widget Grid */}
+                {/* [M] 主工作區 */}
                 <main className="mainCol">
-                    {/* Breadcrumb Navigation */}
                     <Breadcrumb />
-
                     {children || (
                         <WidgetGrid
                             widgets={widgets}
@@ -443,75 +304,42 @@ export default function AppShellLayout({
                             onToggleEditMode={toggleEditMode}
                             onResetLayout={resetLayout}
                             onShowWidget={toggleWidgetVisibility}
-                            widgetContent={widgetContent}
+                            widgetContent={WIDGET_CONTENT_MAP}
                         />
                     )}
                 </main>
-
-                {/* Desktop: Right column removed - now part of widget grid */}
             </div>
 
-            {/* [MB] MobileBottom - Functional Navigation */}
+            {/* [MB] 行動端底欄（雙模式） */}
             <nav className="mobileBottom">
-                <MobileBottomNav />
+                <MobileBottomNav mode={mode} userLevel={userLevel} />
             </nav>
 
             {/* [SC] Scrim */}
             <div className={`scrim ${drawerOpen ? 'visible' : ''}`} onClick={closeDrawer} />
 
-            {/* [D] Drawer */}
-            <aside className={`drawer ${drawerOpen ? 'open' : ''}`}>
-                {/* Drawer Top - User Info */}
+            {/* [D] 行動端 Drawer（全功能導覽） */}
+            <aside className={`drawer ${drawerOpen ? 'open' : ''}`} aria-label="行動端導覽">
                 <div className="drawerTop">
-                    <div className="drawer-user">
-                        <User size={40} className="drawer-user-avatar" />
-                        <div className="drawer-user-info">
-                            <div className="drawer-user-name">{authUser?.displayName || '光守護者'}</div>
-                            <div className="drawer-user-level">Level {userLevel}{userLevel >= PermissionLevel.Supervisor ? ' 管理員' : ''}</div>
+                    <div className="drawer__user">
+                        <User size={36} className="drawer__user-avatar" aria-hidden />
+                        <div>
+                            <div className="drawer__user-name">{authUser?.displayName || '光守護者'}</div>
+                            <div className="drawer__user-level">Level {userLevel}</div>
                         </div>
                     </div>
-                    <button className="drawer-close" onClick={closeDrawer} title="關閉選單">
+                    <button type="button" className="drawer__close" onClick={closeDrawer} aria-label="關閉選單">
                         <X size={24} />
                     </button>
                 </div>
-                
-                {/* Drawer Middle - Navigation */}
-                <nav className="drawerScroll">
-                    {visibleGroups.map(group => (
-                        <div key={group.id} className="drawer-group">
-                            <div className="drawer-group-header">
-                                {group.emoji} {group.label}
-                            </div>
-                            {getVisibleItemsByGroup(group.id).map(item => {
-                                const Icon = ICON_MAP[item.icon] || ICON_MAP.default;
-                                return (
-                                    <a
-                                        key={item.id}
-                                        href={item.path}
-                                        className={`drawer-nav-item ${location.pathname === item.path ? 'active' : ''}`}
-                                        onClick={closeDrawer}
-                                    >
-                                        <Icon size={18} />
-                                        <span>{item.label}</span>
-                                    </a>
-                                );
-                            })}
-                        </div>
-                    ))}
-                </nav>
-                
-                {/* Drawer Bottom - Settings */}
-                <div className="drawerBottom">
-                    <button 
-                        className="drawer-settings-btn"
-                        onClick={() => {
-                            setSidebarSettingsOpen(true);
-                            closeDrawer();
-                        }}
-                    >
-                        <Settings size={18} />
-                        <span>側邊欄設定</span>
-                    </button>
+                <div className="drawerScroll">
+                    <SidebarNavContent
+                        {...navContentProps}
+                        expanded
+                        expandedGroups={expandedGroups}
+                        onToggleGroup={toggleGroupExpansion}
+                        onNavigate={closeDrawer}
+                    />
                 </div>
             </aside>
 
@@ -525,43 +353,15 @@ export default function AppShellLayout({
                 }}
             />
 
-            {/* Sidebar Settings Modal */}
+            {/* 側欄設定（L5；只能調顯示/順序/名稱 —— 權限由 page-policy 管） */}
             <SidebarSettings
                 isOpen={sidebarSettingsOpen}
-                navItems={navItems}
+                navItems={allItems.length ? allItems : navItems}
                 onClose={() => setSidebarSettingsOpen(false)}
                 onUpdateItem={updateNavItem}
                 onReorder={reorderNavItems}
                 onReset={resetConfig}
             />
-        </div>
-    );
-}
-
-// Simple placeholder components
-function NavItem({ icon, label, path, expanded, active }: {
-    icon: React.ReactNode;
-    label: string;
-    path?: string;
-    expanded: boolean;
-    active?: boolean;
-}) {
-    const isActive = path && window.location.pathname === path;
-    return (
-        <div
-            onClick={() => path && (window.location.href = path)}
-            title={!expanded ? label : undefined}
-            style={{
-                display: 'flex', alignItems: 'center', gap: '12px', padding: '10px',
-                borderRadius: '8px', cursor: 'pointer',
-                background: (active || isActive) ? 'rgba(212, 168, 75, 0.15)' : 'transparent',
-                color: (active || isActive) ? 'var(--accent-gold)' : 'var(--text-secondary)',
-                marginBottom: '4px', justifyContent: expanded ? 'flex-start' : 'center',
-                transition: 'all 0.2s ease',
-            }}
-        >
-            {icon}
-            {expanded && <span style={{ fontSize: '14px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{label}</span>}
         </div>
     );
 }
