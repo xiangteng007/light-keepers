@@ -11,6 +11,10 @@ import { DonorReportingService, Grant, FundingType, GrantStatus } from './donor-
 @ApiTags('Donor Reporting')
 @Controller('api/v1/donors')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：補助款/捐贈財務資料。查詢類與既有 donations controller 對齊（L2 幹部）；
+// 建立補助案、登錄支出、登錄成效指標、產生捐助方報告屬財務異動與對外文件 → L3 常務理事。
+// （若協會實務上由幹部登帳、理事僅覆核，此處的 L3 需 owner 確認後調整。）
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 @ApiBearerAuth()
 export class DonorReportingController {
     constructor(private readonly donorService: DonorReportingService) { }
@@ -46,6 +50,7 @@ export class DonorReportingController {
     }
 
     @Post('grants')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 財務：建立補助案
     @ApiOperation({ summary: 'Create a new grant' })
     async createGrant(
         @Body() body: {
@@ -87,6 +92,7 @@ export class DonorReportingController {
     }
 
     @Post('grants/:grantId/expenditures')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 財務：登錄支出
     @ApiOperation({ summary: 'Record expenditure against a grant' })
     async recordExpenditure(
         @Param('grantId') grantId: string,
@@ -117,6 +123,7 @@ export class DonorReportingController {
     }
 
     @Post('grants/:grantId/metrics')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 財務：登錄對捐助方申報的成效指標
     @ApiOperation({ summary: 'Record impact metric' })
     async recordImpactMetric(
         @Param('grantId') grantId: string,
@@ -145,6 +152,7 @@ export class DonorReportingController {
     // ========== Reports ==========
 
     @Post('grants/:grantId/reports')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 財務：產生對外的捐助方報告
     @ApiOperation({ summary: 'Generate donor report' })
     async generateReport(
         @Param('grantId') grantId: string,

@@ -7,7 +7,9 @@ describe('HeartbeatController', () => {
     let controller: HeartbeatController;
     let service: jest.Mocked<Partial<HeartbeatService>>;
 
-    const mockReq = { user: { userId: 'cmd1', email: 'cmd@test.com', roleLevel: 4 } } as any;
+    // 這裡刻意複製 CoreJwtGuard `attachUser()` 實際掛上的欄位（id/sub，沒有 userId）。
+    // 舊版 mock 寫的是 `userId`，等於用假的 request 形狀去證明一段執行期永遠拿 undefined 的程式。
+    const mockReq = { user: { id: 'cmd1', sub: 'cmd1', email: 'cmd@test.com', roleLevel: 4 } } as any;
 
     beforeEach(async () => {
         service = {

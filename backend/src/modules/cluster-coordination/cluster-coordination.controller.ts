@@ -11,6 +11,9 @@ import { ClusterCoordinationService, ClusterType, FourWEntry } from './cluster-c
 @ApiTags('Cluster Coordination')
 @Controller('api/v1/clusters')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：跨機關協調資料。查詢類（叢集總覽/成員/會議/4W）現場人員需要看得到 → L1；
+// 寫入類（代表組織加入叢集、排會議、指派行動項、送 4W 回報）對外具代表性 → 逐一標 L2。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @ApiBearerAuth()
 export class ClusterCoordinationController {
     constructor(private readonly clusterService: ClusterCoordinationService) { }
@@ -30,6 +33,7 @@ export class ClusterCoordinationController {
     }
 
     @Post('join')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：代表組織加入叢集
     @ApiOperation({ summary: 'Join a cluster as organization' })
     async joinCluster(
         @Body() body: {
@@ -58,6 +62,7 @@ export class ClusterCoordinationController {
     }
 
     @Post('meetings')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：排定跨機關會議
     @ApiOperation({ summary: 'Schedule a cluster meeting' })
     async scheduleMeeting(
         @Body() body: {
@@ -80,6 +85,7 @@ export class ClusterCoordinationController {
     }
 
     @Post('meetings/:meetingId/actions')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：指派行動項給他人
     @ApiOperation({ summary: 'Add action item to meeting' })
     async addActionItem(
         @Param('meetingId') meetingId: string,
@@ -106,6 +112,7 @@ export class ClusterCoordinationController {
     // ========== 4W Reporting ==========
 
     @Post('4w')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 寫入：對外提報 4W 成果統計
     @ApiOperation({ summary: 'Submit 4W entry (Who-What-Where-When)' })
     async submitFourW(
         @Body() body: {

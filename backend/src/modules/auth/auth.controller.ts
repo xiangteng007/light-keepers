@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Patch, Delete, Param, UseGuards, Request, Res, BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { Controller, Post, Body, Get, Patch, Delete, Param, Query, UseGuards, Request, Res, BadRequestException, UnauthorizedException } from '@nestjs/common';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { Response } from 'express';
 import { Throttle } from '@nestjs/throttler';
@@ -6,6 +6,22 @@ import { AuthService } from './auth.service';
 import { RefreshTokenService } from './services/refresh-token.service';
 import { AccountManagementService } from './services/account-management.service';
 import { RegisterDto, LoginDto, UpdateProfileDto, ChangePasswordDto, UpdatePreferencesDto } from './dto/auth.dto';
+import {
+    OAuthCallbackDto,
+    OAuthAccessTokenDto,
+    IdTokenDto,
+    LineRegisterDto,
+    GoogleRegisterDto,
+    SendPhoneOtpDto,
+    VerifyPhoneOtpDto,
+    VerifyOtpCodeDto,
+    EmailOnlyDto,
+    VerifyEmailOtpDto,
+    SendVerificationEmailDto,
+    SetPasswordDto,
+    ForgotPasswordDto,
+    ResetPasswordDto,
+} from './dto/auth-flows.dto';
 import { Public } from './decorators/public.decorator';
 
 // Request types for type safety
@@ -143,7 +159,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('line/callback')
     async lineCallback(
-        @Body() body: { code: string; redirectUri: string },
+        @Body() body: OAuthCallbackDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -170,7 +186,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('line/login')
     async loginWithLine(
-        @Body() body: { accessToken: string },
+        @Body() body: OAuthAccessTokenDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -196,7 +212,7 @@ export class AuthController {
     // 限流：5/min per IP —— 建帳號路徑，與 /auth/register 同級
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('line/register')
-    async registerWithLine(@Body() body: { accessToken: string; displayName: string; email?: string; phone?: string }) {
+    async registerWithLine(@Body() body: LineRegisterDto) {
         return this.authService.registerWithLine(body.accessToken, body.displayName, body.email, body.phone);
     }
 
@@ -206,7 +222,7 @@ export class AuthController {
      */
     @Post('line/bind')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-    async bindLine(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
+    async bindLine(@Request() req: { user: { id: string } }, @Body() body: OAuthAccessTokenDto) {
         const lineProfile = await this.authService.verifyLineToken(body.accessToken);
         await this.authService.bindLineAccount(req.user.id, lineProfile.userId, lineProfile.displayName);
         return { success: true, lineDisplayName: lineProfile.displayName };
@@ -220,7 +236,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindLineCallback(
         @Request() req: { user: { id: string } },
-        @Body() body: { code: string; redirectUri: string }
+        @Body() body: OAuthCallbackDto
     ) {
         // 使用 code 換取 access token
         const accessToken = await this.authService.exchangeLineCodeForToken(body.code, body.redirectUri);
@@ -239,7 +255,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('liff/login')
     async loginWithLiffToken(
-        @Body() body: { idToken: string },
+        @Body() body: IdTokenDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -270,7 +286,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('google/callback')
     async googleCallback(
-        @Body() body: { code: string; redirectUri: string },
+        @Body() body: OAuthCallbackDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -297,7 +313,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('google/login')
     async loginWithGoogle(
-        @Body() body: { accessToken: string },
+        @Body() body: OAuthAccessTokenDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -323,7 +339,7 @@ export class AuthController {
     // 限流：5/min per IP —— 建帳號路徑，與 /auth/register 同級
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('google/register')
-    async registerWithGoogle(@Body() body: { accessToken: string; displayName?: string }) {
+    async registerWithGoogle(@Body() body: GoogleRegisterDto) {
         return this.authService.registerWithGoogle(body.accessToken, body.displayName);
     }
 
@@ -333,7 +349,7 @@ export class AuthController {
      */
     @Post('google/bind')
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
-    async bindGoogle(@Request() req: { user: { id: string } }, @Body() body: { accessToken: string }) {
+    async bindGoogle(@Request() req: { user: { id: string } }, @Body() body: OAuthAccessTokenDto) {
         const googleProfile = await this.authService.verifyGoogleToken(body.accessToken);
         await this.authService.bindGoogleAccount(req.user.id, googleProfile.id, googleProfile.email);
         return { success: true, googleEmail: googleProfile.email };
@@ -347,7 +363,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async bindGoogleCallback(
         @Request() req: { user: { id: string } },
-        @Body() body: { code: string; redirectUri: string }
+        @Body() body: OAuthCallbackDto
     ) {
         // 使用 code 換取 access token
         const accessToken = await this.authService.exchangeGoogleCodeForToken(body.code, body.redirectUri);
@@ -371,7 +387,7 @@ export class AuthController {
     @Throttle({ default: { limit: 10, ttl: 60000 } })
     @Post('firebase/login')
     async loginWithFirebaseToken(
-        @Body() body: { idToken: string },
+        @Body() body: IdTokenDto,
         @Request() req: RequestWithCookies,
         @Res({ passthrough: true }) res: Response,
     ) {
@@ -429,7 +445,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async setPassword(
         @Request() req: { user: { id: string } },
-        @Body() body: { newPassword: string }
+        @Body() body: SetPasswordDto
     ) {
         return this.accountManagementService.setPassword(req.user.id, body.newPassword);
     }
@@ -474,7 +490,7 @@ export class AuthController {
     // 限流：5/min per IP —— OTP 發送，防簡訊轟炸與計費濫用
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-otp')
-    async sendPhoneOtp(@Body() body: { phone: string }) {
+    async sendPhoneOtp(@Body() body: SendPhoneOtpDto) {
         return this.authService.sendPhoneOtp(body.phone);
     }
 
@@ -501,7 +517,7 @@ export class AuthController {
     @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
     async verifyLineOtp(
         @Request() req: { user: { lineUserId?: string } },
-        @Body() body: { code: string }
+        @Body() body: VerifyOtpCodeDto
     ) {
         if (!req.user.lineUserId) {
             throw new BadRequestException('請先綁定 LINE 帳號');
@@ -515,7 +531,7 @@ export class AuthController {
     // 限流：5/min per IP —— OTP 驗證，防驗證碼窮舉
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('verify-otp')
-    async verifyPhoneOtp(@Body() body: { phone: string; code: string }) {
+    async verifyPhoneOtp(@Body() body: VerifyPhoneOtpDto) {
         return this.authService.verifyPhoneOtp(body.phone, body.code);
     }
 
@@ -525,7 +541,7 @@ export class AuthController {
     // 限流：5/min per IP —— OTP 發送，防 email 轟炸與寄信配額濫用
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-email-otp')
-    async sendEmailOtp(@Body() body: { email: string }) {
+    async sendEmailOtp(@Body() body: EmailOnlyDto) {
         return this.authService.sendEmailOtp(body.email);
     }
 
@@ -535,7 +551,7 @@ export class AuthController {
     // 限流：5/min per IP —— OTP 驗證，防驗證碼窮舉
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('verify-email-otp')
-    async verifyEmailOtp(@Body() body: { email: string; code: string }) {
+    async verifyEmailOtp(@Body() body: VerifyEmailOtpDto) {
         return this.authService.verifyEmailOtp(body.email, body.code);
     }
 
@@ -546,7 +562,7 @@ export class AuthController {
     // 限流：5/min per IP —— 觸發外部寄信，防濫發
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('send-custom-verification')
-    async sendCustomVerificationEmail(@Body() body: { email: string; displayName?: string }) {
+    async sendCustomVerificationEmail(@Body() body: SendVerificationEmailDto) {
         return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
     }
 
@@ -556,7 +572,7 @@ export class AuthController {
     // 限流：5/min per IP —— 觸發外部寄信，防濫發
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('resend-verification')
-    async resendVerificationEmail(@Body() body: { email: string; displayName?: string }) {
+    async resendVerificationEmail(@Body() body: SendVerificationEmailDto) {
         return this.authService.sendCustomVerificationEmail(body.email, body.displayName);
     }
 
@@ -565,10 +581,15 @@ export class AuthController {
      * 用於 Firebase 驗證連結後的狀態同步
      */
     // 限流：30/min per IP —— 前端輪詢驗證狀態，屬查詢類
+    //
+    // P0 輸入驗證修正：原本是 `@Get` 搭配 `@Body()`。GET 請求在瀏覽器／axios 下不帶 body，
+    // 因此 `email` 恆為 undefined，而 `findOne({ where: { email: undefined } })` 在 TypeORM
+    // 會**忽略該條件**，回傳資料表中任意一筆帳號的驗證狀態。改為 `@Query()` + DTO：
+    // 參數確實可被送達，且 email 必填並經格式驗證。全庫查無呼叫端，無前端相依。
     @Throttle({ default: { limit: 30, ttl: 60000 } })
     @Get('check-email-verification')
-    async checkEmailVerification(@Body() body: { email: string }) {
-        return this.authService.checkEmailVerificationStatus(body.email);
+    async checkEmailVerification(@Query() query: EmailOnlyDto) {
+        return this.authService.checkEmailVerificationStatus(query.email);
     }
 
     // =========================================
@@ -583,7 +604,7 @@ export class AuthController {
     // 限流：5/min per IP —— 覆核：合理。觸發外部寄信＋帳號列舉探測面
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('forgot-password')
-    async forgotPassword(@Body() body: { email?: string; phone?: string }) {
+    async forgotPassword(@Body() body: ForgotPasswordDto) {
         return this.authService.requestPasswordReset(body.email, body.phone);
     }
 
@@ -595,7 +616,7 @@ export class AuthController {
     // 限流：5/min per IP —— 覆核：合理。防重設 token 窮舉
     @Throttle({ default: { limit: 5, ttl: 60000 } })
     @Post('reset-password')
-    async resetPassword(@Body() body: { token: string; newPassword: string }) {
+    async resetPassword(@Body() body: ResetPasswordDto) {
         return this.authService.resetPassword(body.token, body.newPassword);
     }
 

@@ -24,6 +24,10 @@ import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../
 @ApiTags('Data Export')
 @Controller('account/export')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：本 controller 的三個端點都以 `req.user.id` 對自己的資料操作
+// （service 內以 userId 過濾，非本人拿不到別人的匯出檔），因此只需「已登入的正式帳號」。
+// L0（未升級的一般民眾帳號）沒有可匯出的個人資料，故最低定為 L1。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @ApiBearerAuth()
 export class DataExportController {
     constructor(private readonly dataExportService: DataExportService) { }

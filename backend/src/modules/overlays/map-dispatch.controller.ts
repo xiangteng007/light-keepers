@@ -7,9 +7,17 @@ import { Controller, Get, Post, Put, Body, Param, Query, Req, UseGuards } from '
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { MapDispatchService } from './map-dispatch.service';
-import { SectorType, SectorStatus } from './entities/sector.entity';
-import { RallyPointType, RallyPointStatus } from './entities/rally-point.entity';
-import { RouteType, RouteStatus, Waypoint } from './entities/planned-route.entity';
+import {
+    AssignTeamDto,
+    CreateRallyPointDto,
+    CreateRouteDto,
+    CreateSectorDto,
+    DispatchFromBboxDto,
+    DispatchToSectorDto,
+    UpdateRallyPointStatusDto,
+    UpdateRouteStatusDto,
+    UpdateSectorStatusDto,
+} from './dto/map-dispatch.dto';
 
 // Authenticated request interface for type safety
 interface AuthenticatedRequest {
@@ -42,14 +50,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '建立責任區' })
     async createSector(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            sectorCode: string;
-            name: string;
-            sectorType: SectorType;
-            geometry: { type: 'Polygon'; coordinates: number[][][] };
-            severity?: number;
-            props?: Record<string, unknown>;
-        },
+        @Body() body: CreateSectorDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.createSector({
@@ -64,7 +65,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '指派小隊到責任區' })
     async assignTeamToSector(
         @Param('sectorId') sectorId: string,
-        @Body() body: { teamId: string; teamName: string },
+        @Body() body: AssignTeamDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.assignTeamToSector(sectorId, {
@@ -78,7 +79,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '更新責任區狀態' })
     async updateSectorStatus(
         @Param('sectorId') sectorId: string,
-        @Body() body: { status: SectorStatus },
+        @Body() body: UpdateSectorStatusDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const sector = await this.service.updateSectorStatus(
@@ -103,17 +104,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '建立集結點' })
     async createRallyPoint(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            name: string;
-            pointType: RallyPointType;
-            geometry: { type: 'Point'; coordinates: [number, number] };
-            address?: string;
-            capacity?: number;
-            contactName?: string;
-            contactPhone?: string;
-            radioChannel?: string;
-            props?: Record<string, unknown>;
-        },
+        @Body() body: CreateRallyPointDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const point = await this.service.createRallyPoint({
@@ -128,7 +119,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '更新集結點狀態' })
     async updateRallyPointStatus(
         @Param('pointId') pointId: string,
-        @Body() body: { status: RallyPointStatus },
+        @Body() body: UpdateRallyPointStatusDto,
     ) {
         const point = await this.service.updateRallyPointStatus(pointId, body.status);
         return { success: true, data: point };
@@ -148,15 +139,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '建立規劃路徑' })
     async createRoute(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            name: string;
-            routeType: RouteType;
-            geometry: { type: 'LineString'; coordinates: number[][] };
-            waypoints?: Waypoint[];
-            estimatedTime?: number;
-            estimatedDistance?: number;
-            props?: Record<string, unknown>;
-        },
+        @Body() body: CreateRouteDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const route = await this.service.createRoute({
@@ -171,7 +154,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '更新路徑狀態' })
     async updateRouteStatus(
         @Param('routeId') routeId: string,
-        @Body() body: { status: RouteStatus },
+        @Body() body: UpdateRouteStatusDto,
     ) {
         const route = await this.service.updateRouteStatus(routeId, body.status);
         return { success: true, data: route };
@@ -183,14 +166,7 @@ export class MapDispatchController {
     @ApiOperation({ summary: '框選派遣' })
     async dispatchFromBbox(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            bbox: { minLng: number; minLat: number; maxLng: number; maxLat: number };
-            teamId: string;
-            teamName: string;
-            taskTitle: string;
-            taskDescription?: string;
-            priority?: number;
-        },
+        @Body() body: DispatchFromBboxDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const task = await this.service.dispatchFromBbox({
@@ -206,7 +182,7 @@ export class MapDispatchController {
     async dispatchToSector(
         @Param('sessionId') sessionId: string,
         @Param('sectorId') sectorId: string,
-        @Body() body: { taskTitle: string; taskDescription: string },
+        @Body() body: DispatchToSectorDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const task = await this.service.dispatchToSector(

@@ -24,6 +24,10 @@ import { CreateScheduledReportDto } from './dto/scheduled-report.dto';
 @ApiTags('Report Scheduler')
 @Controller('reports/scheduler')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：與同模組的 reports/advanced 對齊，類別預設 L2（幹部）。
+// 排程本身會「自動把報表寄給 recipients 名單」＝可持續外送資料的組態，
+// 因此新增／修改／刪除排程提高到 L3；啟用/停用/立即執行維持 L2。
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 @ApiBearerAuth()
 export class ReportSchedulerController {
     constructor(private readonly schedulerService: ReportSchedulerService) { }
@@ -54,6 +58,7 @@ export class ReportSchedulerController {
     }
 
     @Post()
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 組態：新增自動外寄的報表排程
     @ApiOperation({ summary: 'Create a new scheduled report' })
     createScheduledReport(@Body() body: CreateScheduledReportDto) {
         const report: ScheduledReport = {
@@ -78,6 +83,7 @@ export class ReportSchedulerController {
     }
 
     @Put(':id')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 組態：變更排程（含收件人名單）
     @ApiOperation({ summary: 'Update a scheduled report' })
     updateScheduledReport(
         @Param('id') id: string,
@@ -97,6 +103,7 @@ export class ReportSchedulerController {
     }
 
     @Delete(':id')
+    @RequiredLevel(ROLE_LEVELS.DIRECTOR) // 組態：刪除排程
     @ApiOperation({ summary: 'Delete a scheduled report' })
     deleteScheduledReport(@Param('id') id: string) {
         const deleted = this.schedulerService.deleteScheduledReport(id);

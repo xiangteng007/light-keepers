@@ -18,25 +18,64 @@ import {
 } from '@nestjs/common';
 import { Request } from 'express';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { IsNotEmpty, IsString, Matches, MaxLength } from 'class-validator';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { TwoFactorService } from './services/two-factor.service';
 
-class VerifyTokenDto {
+/**
+ * P0 輸入驗證修正：以下 DTO 原本是「沒有任何 class-validator 裝飾器的空類別」。
+ *
+ * 全域 ValidationPipe 設定為 `whitelist: true` + `forbidNonWhitelisted: true`，
+ * 而 class-validator 的 whitelist 是以「有無驗證裝飾器」判斷欄位是否合法：
+ * 沒有裝飾器的類別 → 送進來的每個欄位都被視為非白名單欄位 → 一律回 400。
+ * 也就是說 `/auth/2fa/verify`、`/validate`、`DELETE /auth/2fa` 三個端點
+ * **在正式環境是壞的**（任何請求都被驗證層擋掉）。補上裝飾器同時修好驗證與可用性。
+ */
+
+/** TOTP 為 6 位數字（speakeasy 預設） */
+const TOTP_PATTERN = /^\d{6}$/;
+const TOTP_MESSAGE = '驗證碼必須是 6 位數字';
+
+/** 備用碼格式：`XXXX-XXXX`（`generateBackupCodes()` 產生的大寫十六進位） */
+const BACKUP_CODE_PATTERN = /^[0-9A-Fa-f]{4}-?[0-9A-Fa-f]{4}$/;
+const BACKUP_CODE_MESSAGE = '備用碼格式不正確';
+
+export class VerifyTokenDto {
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(128)
     secret: string;
+
+    @IsString()
+    @Matches(TOTP_PATTERN, { message: TOTP_MESSAGE })
     token: string;
 }
 
-class VerifyLoginDto {
+export class VerifyLoginDto {
+    @IsString()
+    @Matches(TOTP_PATTERN, { message: TOTP_MESSAGE })
     token: string;
 }
 
-class DisableDto {
+export class DisableDto {
+    @IsString()
+    @IsNotEmpty()
+    @MaxLength(128)
     password: string;
+}
+
+export class VerifyBackupCodeDto {
+    @IsString()
+    @Matches(BACKUP_CODE_PATTERN, { message: BACKUP_CODE_MESSAGE })
+    code: string;
 }
 
 @ApiTags('Two-Factor Authentication')
 @Controller('auth/2fa')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：全部端點都只操作「呼叫者自己」的 2FA 設定（service 以 req.user.id 取值），
+// 不會跨帳號讀寫，故最低等級即可；定為 L1 以排除未升級的 L0 帳號。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @ApiBearerAuth()
 export class TwoFactorController {
     constructor(private readonly twoFactorService: TwoFactorService) { }
@@ -124,8 +163,8 @@ export class TwoFactorController {
     @Post('verify-backup')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Verify using a backup code' })
-    @ApiBody({ schema: { type: 'object', properties: { code: { type: 'string' } } } })
-    async verifyBackupCode(@Req() req: Request, @Body() body: { code: string }) {
+    @ApiBody({ type: VerifyBackupCodeDto })
+    async verifyBackupCode(@Req() req: Request, @Body() body: VerifyBackupCodeDto) {
         const userId = (req as any).user?.id;
         const isValid = await this.twoFactorService.verifyBackupCode(userId, body.code);
         return {

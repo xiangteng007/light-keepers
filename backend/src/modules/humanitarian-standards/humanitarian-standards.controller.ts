@@ -22,6 +22,9 @@ import {
 @ApiTags('Humanitarian Standards')
 @Controller('api/v1/humanitarian-standards')
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：HXL/IATI/3W/Sphere 匯出的是可對外揭露的營運與受助資料整包，
+// 類別預設 L2（幹部）；純標準參照表（HXL tag 清單、Sphere 指標定義）無業務資料 → L1。
+@RequiredLevel(ROLE_LEVELS.OFFICER)
 @ApiBearerAuth()
 export class HumanitarianStandardsController {
     constructor(
@@ -34,6 +37,7 @@ export class HumanitarianStandardsController {
     // ========== HXL Endpoints ==========
 
     @Get('hxl/tags')
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER) // 純標準參照表，無業務資料
     @ApiOperation({ summary: 'Get available HXL tags' })
     getHxlTags() {
         return this.hxlExport.getHxlTags();
@@ -102,6 +106,7 @@ export class HumanitarianStandardsController {
     // ========== Sphere Standards Endpoints ==========
 
     @Get('sphere/standards')
+    @RequiredLevel(ROLE_LEVELS.VOLUNTEER) // 純標準參照表，無業務資料
     @ApiOperation({ summary: 'Get Sphere standards reference' })
     getSphereStandards() {
         return this.sphereStandards.getStandardsReference();

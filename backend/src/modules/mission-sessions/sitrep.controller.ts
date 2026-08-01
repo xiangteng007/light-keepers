@@ -9,8 +9,8 @@ import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { SITREPService } from './sitrep.service';
 import { DecisionType } from './entities/decision-log.entity';
-import { KeyEvent, ResourceStatus } from './entities/sitrep.entity';
 import { LogDecisionDto } from './dto/decision-log.dto';
+import { CreateSitrepDto, GenerateSitrepDto, UpdateSitrepDto } from './dto/sitrep.dto';
 
 // 定級理由：SITREP 含傷亡數字（casualties）與資源缺口，未經核准即外流會造成錯誤情資與家屬恐慌 → class 基準 L2。
 // 「核准 SITREP」＝對外發布定稿情勢報告，屬指揮官發言權 → 收緊 L3。
@@ -37,12 +37,7 @@ export class SITREPController {
     @ApiOperation({ summary: '建立 SITREP' })
     async createSITREP(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            operationalPeriodId?: string;
-            periodStart: string;
-            periodEnd: string;
-            summary?: string;
-        },
+        @Body() body: CreateSitrepDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const sitrep = await this.sitrepService.createSITREP({
@@ -60,10 +55,7 @@ export class SITREPController {
     @ApiOperation({ summary: 'AI 自動生成 SITREP 草稿' })
     async generateSITREP(
         @Param('sessionId') sessionId: string,
-        @Body() body: {
-            periodStart: string;
-            periodEnd: string;
-        },
+        @Body() body: GenerateSitrepDto,
         @Req() req: AuthenticatedRequest,
     ) {
         const sitrep = await this.sitrepService.generateSITREPDraft(
@@ -79,14 +71,7 @@ export class SITREPController {
     @ApiOperation({ summary: '更新 SITREP' })
     async updateSITREP(
         @Param('sitrepId') sitrepId: string,
-        @Body() body: {
-            summary?: string;
-            keyEvents?: KeyEvent[];
-            resourceStatus?: ResourceStatus[];
-            casualties?: Record<string, number>;
-            nextActions?: string[];
-            requests?: { type: string; description: string; priority: number }[];
-        },
+        @Body() body: UpdateSitrepDto,
     ) {
         const sitrep = await this.sitrepService.updateSITREP(sitrepId, body);
         return { success: true, data: sitrep };

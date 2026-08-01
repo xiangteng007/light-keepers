@@ -8,7 +8,7 @@ import { AuthenticatedRequest } from '../../common/types/request.types';
 import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { CoreJwtGuard, UnifiedRolesGuard, RequiredLevel, ROLE_LEVELS } from '../shared/guards';
 import { AARService } from './aar.service';
-import { DecisionReview, LessonLearned } from './entities/aar.entity';
+import { UpdateAarDto } from './dto/aar.dto';
 
 // 定級理由：AAR（事後復盤）內含決策檢討與失誤紀錄，會指名個別幹部的判斷對錯，屬課責性文件 → class 基準 L2。
 // 「定稿」是把復盤結論固化為組織正式紀錄（含對人的評價），屬管理階層決定 → 收緊 L3。
@@ -69,14 +69,7 @@ export class AARController {
     @ApiOperation({ summary: '更新 AAR' })
     async updateAAR(
         @Param('aarId') aarId: string,
-        @Body() body: {
-            executiveSummary?: string;
-            decisionsReview?: DecisionReview[];
-            lessonsLearned?: LessonLearned[];
-            recommendations?: string[];
-            successes?: string[];
-            challenges?: string[];
-        },
+        @Body() body: UpdateAarDto,
     ) {
         const aar = await this.aarService.updateAAR(aarId, body);
         return { success: true, data: aar };

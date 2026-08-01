@@ -29,6 +29,9 @@ class CalculateRouteDto {
 @ApiTags('routing')
 @ApiBearerAuth()
 @UseGuards(CoreJwtGuard, UnifiedRolesGuard)
+// P0 授權定級：現場人員需要回報路阻、查阻斷點、算路徑 → 類別預設 L1；
+// 「移除阻斷點」是把封路狀態清掉、直接影響其他人的路徑規劃 → L2。
+@RequiredLevel(ROLE_LEVELS.VOLUNTEER)
 @Controller('routing')
 export class RoutingController {
     constructor(private readonly routingService: RoutingService) { }
@@ -52,6 +55,7 @@ export class RoutingController {
     }
 
     @Delete('blocks/:missionSessionId/:blockId')
+    @RequiredLevel(ROLE_LEVELS.OFFICER) // 解除封路狀態，影響全體路徑規劃
     @ApiOperation({ summary: '移除阻斷點' })
     async removeRoadBlock(
         @Param('missionSessionId') missionSessionId: string,

@@ -10,6 +10,7 @@ import { SensitiveDataInterceptor } from '../../common/interceptors/sensitive-da
 import { AuthenticatedRequest } from '../../common/types/request.types';
 import { MoodTrackerService } from './mood-tracker.service';
 import { PFAChatbotService } from './pfa-chatbot.service';
+import { ChatDto, LogMoodDto, NewChatSessionDto, PostBlessingDto } from './dto/mood-tracker.dto';
 
 // 定級理由：心理健康屬特種個資，分級以「本人 vs 他人」為軸而非以讀寫為軸。
 // 本人記錄/查閱心情、與 HopeBot 對話、祈福牆互動＝自助療癒功能，第一線志工必須可用 → L1
@@ -31,6 +32,22 @@ export class MoodTrackerController {
         private readonly chatbotService: PFAChatbotService,
     ) { }
 
+    /**
+     * 取得呼叫者身分，取不到就拒絕。
+     *
+     * 原本寫成 `req.user?.sub ?? body.userId`——一旦 JWT 沒有 sub，
+     * 就會退回使用呼叫端自己送的 userId，等於把剛補好的 IDOR 缺口留了一條後路。
+     * DTO 化之後 `body.userId` 是選填，型別也不再允許這種退路，索性一次修掉：
+     * 本 controller 全部端點都在 guard 之後，拿不到身分就是不該繼續。
+     */
+    private requireUserId(req: AuthenticatedRequest): string {
+        const userId = req.user?.sub ?? req.user?.id;
+        if (!userId) {
+            throw new ForbiddenException('無法辨識使用者身分');
+        }
+        return userId;
+    }
+
     /** 本人放行；讀他人需 L3+（心理健康屬特種個資） */
     private assertCanAccessUser(req: AuthenticatedRequest, targetUserId: string): void {
         const requesterId = req.user?.sub ?? req.user?.id;
@@ -47,16 +64,10 @@ export class MoodTrackerController {
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async logMood(
         @Req() req: AuthenticatedRequest,
-        @Body() body: {
-            userId: string;
-            score: number;
-            tags?: string[];
-            note?: string;
-            taskId?: string;
-        }
+        @Body() body: LogMoodDto
     ) {
         // IDOR 防護：不信任 body.userId，一律以 JWT 身分寫入
-        const log = await this.moodService.logMood({ ...body, userId: req.user?.sub ?? body.userId });
+        const log = await this.moodService.logMood({ ...body, userId: this.requireUserId(req) });
         return {
             success: true,
             data: log,
@@ -139,15 +150,10 @@ export class MoodTrackerController {
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async postBlessing(
         @Req() req: AuthenticatedRequest,
-        @Body() body: {
-            userId?: string;
-            displayName: string;
-            message: string;
-            iconType?: string;
-        }
+        @Body() body: PostBlessingDto
     ) {
         // IDOR 防護：祝福以 JWT 身分發送（displayName 仍可自訂暱稱）
-        const blessing = await this.moodService.postBlessing({ ...body, userId: req.user?.sub ?? body.userId });
+        const blessing = await this.moodService.postBlessing({ ...body, userId: this.requireUserId(req) });
         return {
             success: true,
             data: blessing,
@@ -173,15 +179,11 @@ export class MoodTrackerController {
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
     async chat(
         @Req() req: AuthenticatedRequest,
-        @Body() body: {
-            userId: string;
-            sessionId: string;
-            message: string;
-        }
+        @Body() body: ChatDto
     ) {
         // IDOR 防護：對話身分以 JWT 為準
         const result = await this.chatbotService.chat(
-            req.user?.sub ?? body.userId,
+            this.requireUserId(req),
             body.sessionId,
             body.message
         );
@@ -210,7 +212,7 @@ export class MoodTrackerController {
     @Post('chat/new-session')
     @ApiOperation({ summary: '開始新對話' })
     @RequiredLevel(ROLE_LEVELS.VOLUNTEER)
-    async startNewSession(@Body() body: { sessionId: string }) {
+    async startNewSession(@Body() body: NewChatSessionDto) {
         const greeting = this.chatbotService.startNewSession(body.sessionId);
         return {
             success: true,
