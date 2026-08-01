@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Badge, Modal, InputField } from '../design-system';
+import { Card, Button, Badge, Modal, InputField, StatIndicator } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
 import { getScrapedCourses, triggerScrape } from '../api/services';
 import type { ScrapedCourse } from '../api/services';
 import { useAuth } from '../context/AuthContext';
@@ -152,18 +153,19 @@ export default function TrainingPage() {
 
     return (
         <div className="page training-page">
-            <div className="page-header">
+            <header className="page-header">
                 <div className="page-header__left">
-                    <h2>📚 培訓中心</h2>
+                    <h1>培訓中心</h1>
                     <p className="page-subtitle">線上課程與外部培訓資源</p>
                 </div>
                 <div className="page-header__right">
                     {canManageCourses && (
                         <Button
                             variant="primary"
+                            icon={<Plus size={18} aria-hidden="true" />}
                             onClick={() => setShowAddCourseModal(true)}
                         >
-                            <Plus size={18} /> 新增課程
+                            新增課程
                         </Button>
                     )}
                     <Button
@@ -171,36 +173,34 @@ export default function TrainingPage() {
                         onClick={handleRefreshCourses}
                         disabled={isLoading}
                     >
-                        {isLoading ? '🔄 更新中...' : '🔄 更新課程'}
+                        {isLoading ? '更新中...' : '更新課程'}
                     </Button>
                 </div>
-            </div>
+            </header>
 
             {/* 統計卡片 */}
             <div className="training-stats">
-                <Card className="stat-card" padding="md">
-                    <div className="stat-card__value">{stats.internal}</div>
-                    <div className="stat-card__label">內部課程</div>
-                </Card>
-                <Card className="stat-card stat-card--info" padding="md">
-                    <div className="stat-card__value">{stats.external}</div>
-                    <div className="stat-card__label">外部課程</div>
-                </Card>
+                <StatIndicator value={stats.internal} label="內部課程" />
+                <StatIndicator value={stats.external} label="外部課程" variant="default" />
             </div>
 
-            {/* Tab 切換 */}
-            <div className="training-tabs">
+            {/* Tab 切換（toolbar） */}
+            <div className="training-tabs" role="tablist" aria-label="課程來源">
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'external'}
                     className={`training-tab ${activeTab === 'external' ? 'active' : ''}`}
                     onClick={() => setActiveTab('external')}
                 >
-                    🌐 外部課程查詢
+                    外部課程查詢
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'internal'}
                     className={`training-tab ${activeTab === 'internal' ? 'active' : ''}`}
                     onClick={() => setActiveTab('internal')}
                 >
-                    📖 內部線上課程
+                    內部線上課程
                 </button>
             </div>
 
@@ -227,20 +227,15 @@ export default function TrainingPage() {
                     {/* 外部課程列表 */}
                     <div className="scraped-courses-grid">
                         {isLoadingCourses ? (
-                            <div className="empty-state">
-                                <span className="empty-icon">⏳</span>
-                                <p>載入外部課程中...</p>
+                            <div className="scraped-courses-grid__loading" aria-busy="true" aria-label="載入中">
+                                <Card padding="md" className="scraped-course-card scraped-course-card--skeleton"><span className="sr-only">載入中</span></Card>
+                                <Card padding="md" className="scraped-course-card scraped-course-card--skeleton"><span className="sr-only">載入中</span></Card>
+                                <Card padding="md" className="scraped-course-card scraped-course-card--skeleton"><span className="sr-only">載入中</span></Card>
                             </div>
                         ) : error ? (
-                            <div className="empty-state">
-                                <span className="empty-icon">⚠️</span>
-                                <p>{error}</p>
-                            </div>
+                            <EmptyState variant="error" title="載入外部課程失敗" description={error} />
                         ) : filteredScrapedCourses.length === 0 ? (
-                            <div className="empty-state">
-                                <span className="empty-icon">🔍</span>
-                                <p>尚無此分類的課程</p>
-                            </div>
+                            <EmptyState variant="search" title="尚無此分類的課程" description="請試試其他分類篩選。" />
                         ) : (
                             filteredScrapedCourses.map(course => {
                                 const cat = SCRAPED_CATEGORY_CONFIG[course.category as keyof typeof SCRAPED_CATEGORY_CONFIG] || SCRAPED_CATEGORY_CONFIG.other;
@@ -249,7 +244,7 @@ export default function TrainingPage() {
                                         <div className="scraped-course-header">
                                             <span
                                                 className="scraped-badge"
-                                                style={{ background: cat.color, color: 'white', padding: '0.25rem 0.75rem', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 500 }}
+                                                style={{ background: cat.color }}
                                             >
                                                 {cat.icon} {cat.label}
                                             </span>
@@ -265,7 +260,7 @@ export default function TrainingPage() {
                                                 size="sm"
                                                 onClick={() => window.open(course.originalUrl, '_blank')}
                                             >
-                                                🔗 查看詳情
+                                                查看詳情
                                             </Button>
                                         </div>
                                     </Card>
@@ -286,20 +281,12 @@ export default function TrainingPage() {
             {activeTab === 'internal' && (
                 <div className="internal-courses-section">
                     {internalCourses.length === 0 ? (
-                        <div className="empty-state empty-state--large">
-                            <span className="empty-icon">📚</span>
-                            <h3>內部課程籌備中</h3>
-                            <p>我們正在努力準備內部培訓課程，敬請期待！</p>
-                            {canManageCourses && (
-                                <Button
-                                    variant="primary"
-                                    onClick={() => setShowAddCourseModal(true)}
-                                    style={{ marginTop: '1rem' }}
-                                >
-                                    <Plus size={18} /> 新增第一堂課程
-                                </Button>
-                            )}
-                        </div>
+                        <EmptyState
+                            variant="default"
+                            title="內部課程籌備中"
+                            description="我們正在努力準備內部培訓課程，敬請期待！"
+                            action={canManageCourses ? { label: '新增第一堂課程', onClick: () => setShowAddCourseModal(true) } : undefined}
+                        />
                     ) : (
                         <div className="courses-grid">
                             {internalCourses.map(course => {

@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card, Badge } from '../design-system';
+import { Camera, RefreshCw } from 'lucide-react';
+import { Alert, Badge, Button, Card } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './ResourcesPublicPage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
@@ -167,58 +170,64 @@ export default function ResourcesPublicPage() {
     return (
         <div className="page resources-public-page">
             {/* 頁面標題 */}
-            <div className="page-header">
+            <header className="page-header">
                 <div className="page-header__left">
-                    <h2>📦 物資查詢</h2>
+                    <h1>物資查詢</h1>
                     <p className="page-subtitle">查看庫存與儲位資訊</p>
                 </div>
                 <div className="page-header__right">
-                    <button className="scan-btn" onClick={handleScan} aria-label="掃碼查詢">
-                        📷 掃碼
-                    </button>
+                    <Button variant="secondary" icon={<Camera size={16} aria-hidden="true" />} onClick={handleScan} aria-label="掃碼查詢">
+                        掃碼
+                    </Button>
                 </div>
-            </div>
+            </header>
 
             {/* 搜尋列 */}
             <div className="search-bar">
                 <input
                     type="text"
                     className="search-input"
-                    placeholder="🔍 搜尋品項名稱..."
+                    placeholder="搜尋品項名稱..."
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
+                    aria-label="搜尋品項名稱"
                 />
             </div>
 
-            {/* 篩選 Chips */}
-            <div className="filter-chips">
+            {/* 篩選 Chips（toolbar） */}
+            <div className="filter-chips" role="toolbar" aria-label="物資篩選">
                 <button
                     className={`filter-chip ${activeFilter === 'all' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('all')}
+                    aria-pressed={activeFilter === 'all'}
                 >
                     全部
                 </button>
                 <button
                     className={`filter-chip filter-chip--warning ${activeFilter === 'low' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('low')}
+                    aria-pressed={activeFilter === 'low'}
                 >
                     ⚠️ 低庫存
                 </button>
                 <button
                     className={`filter-chip filter-chip--danger ${activeFilter === 'expiring' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('expiring')}
+                    aria-pressed={activeFilter === 'expiring'}
                 >
                     ⏰ 即期品
                 </button>
                 <button
                     className={`filter-chip ${activeFilter === 'equipment' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('equipment')}
+                    aria-pressed={activeFilter === 'equipment'}
                 >
                     🔧 器材
                 </button>
                 <button
                     className={`filter-chip ${activeFilter === 'consumable' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('consumable')}
+                    aria-pressed={activeFilter === 'consumable'}
                 >
                     📦 耗材
                 </button>
@@ -226,23 +235,22 @@ export default function ResourcesPublicPage() {
 
             {/* 載入/錯誤狀態 */}
             {isLoading ? (
-                <div className="loading-state">
-                    <div className="spinner"></div>
-                    <p>載入物資資料中...</p>
+                <div aria-busy="true" aria-label="載入物資資料中">
+                    <Skeleton variant="card" height={110} count={3} className="resources-list__skeleton-row" />
                 </div>
             ) : error ? (
-                <div className="error-state">
-                    <p>⚠️ {error}</p>
-                    <button onClick={fetchData}>重試</button>
-                </div>
+                <Alert variant="danger" title="載入失敗">
+                    {error}
+                    <div className="error-state__actions">
+                        <Button size="sm" variant="secondary" onClick={fetchData}>重試</Button>
+                    </div>
+                </Alert>
             ) : (
                 <>
                     {/* 物資列表 */}
                     <div className="resources-list">
                         {filteredResources.length === 0 ? (
-                            <div className="empty-state">
-                                <p>📦 無符合條件的物資</p>
-                            </div>
+                            <EmptyState variant="search" title="無符合條件的物資" description="請調整搜尋或篩選條件。" />
                         ) : (
                             filteredResources.map(resource => {
                                 const category = CATEGORY_CONFIG[resource.category] || CATEGORY_CONFIG.other;
@@ -347,9 +355,15 @@ export default function ResourcesPublicPage() {
                 <span className="last-updated">
                     最後更新：{lastUpdated ? formatLastUpdated(lastUpdated) : '-'}
                 </span>
-                <button className="refresh-btn" onClick={fetchData} disabled={isLoading}>
-                    🔄 重新整理
-                </button>
+                <Button
+                    size="sm"
+                    variant="secondary"
+                    icon={<RefreshCw size={14} className={isLoading ? 'spin' : ''} aria-hidden="true" />}
+                    onClick={fetchData}
+                    disabled={isLoading}
+                >
+                    重新整理
+                </Button>
             </div>
         </div>
     );
