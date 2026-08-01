@@ -1,0 +1,194 @@
+/**
+ * OrgChartPage.css — custom/Detail 基底（樹狀視覺化，R3b）
+ *
+ * 注意：此頁面先前完全依賴 Tailwind utility className（本專案未啟用
+ * PostCSS/Tailwind build，這些 className 不會產生任何 CSS），因此原本
+ * 是無樣式的。本檔改用語義 token 重建，light/dark/tactical 三態自動生效。
+ */
+
+.org-chart-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .org-chart-page {
+        padding: var(--space-6);
+        gap: var(--space-6);
+    }
+}
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.page-header__titles h1 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-header__subtitle {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.org-chart-page__actions {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.org-chart-page__alert-body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    flex-wrap: wrap;
+}
+
+.org-chart-page__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.org-chart-page__hint {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    justify-content: center;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* 畫布 */
+.org-chart-canvas {
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6) var(--space-4);
+    overflow-x: auto;
+}
+
+.org-chart-canvas__inner {
+    display: flex;
+    justify-content: center;
+    min-width: max-content;
+}
+
+/* 節點 */
+.org-node {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.org-node__card {
+    display: block;
+    width: 100%;
+    min-width: 176px;
+    padding: var(--space-4);
+    background: var(--surface-hover);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    text-align: center;
+    cursor: default;
+    font: inherit;
+    color: inherit;
+    transition: border-color var(--duration-fast) var(--ease-smooth), box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+button.org-node__card {
+    cursor: pointer;
+    min-height: 44px;
+}
+
+button.org-node__card:hover {
+    border-color: var(--border-dark);
+    box-shadow: var(--shadow-sm);
+}
+
+button.org-node__card:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.org-node__card--root {
+    border-color: var(--color-brand-accent);
+    background: color-mix(in srgb, var(--color-brand-accent) 10%, var(--surface-card));
+}
+
+.org-node__avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--color-brand-accent);
+    color: var(--text-inverse);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-lg);
+}
+
+.org-node__name {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.org-node__title {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-accent);
+}
+
+.org-node__dept {
+    margin: 0;
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.org-node__toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+}
+
+.org-node__children {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: var(--space-4);
+}
+
+.org-node__children-row {
+    display: flex;
+    gap: var(--space-8);
+}
+
+.org-node__child {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.org-node__connector {
+    width: 1px;
+    height: var(--space-4);
+    background: var(--border-default);
+}

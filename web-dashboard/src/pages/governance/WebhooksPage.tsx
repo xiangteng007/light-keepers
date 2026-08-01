@@ -9,10 +9,12 @@
  * lastSuccessAt/lastFailureAt 呈現，整體成功/失敗數改用 /webhooks/stats 的彙總值。
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, RefreshCw, AlertTriangle } from 'lucide-react';
+import { RefreshCw, AlertTriangle, Plus, Webhook as WebhookIcon } from 'lucide-react';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
-import { Alert } from '../../design-system';
+import { Alert, Badge, Button, InputField, Tag, StatIndicator, Modal } from '../../design-system';
+import { SkeletonList } from '../../components/ui/Skeleton/Skeleton';
+import EmptyState from '../../components/shared/EmptyState';
 import './WebhooksPage.css';
 
 interface WebhookSubscription {
@@ -135,77 +137,72 @@ export default function WebhooksPage() {
 
     return (
         <div className="webhooks-page">
-            <header className="webhooks-page__header">
-                <div>
-                    <h1>🔗 Webhook 管理</h1>
+            <div className="page-header">
+                <div className="page-header__text">
+                    <h1><WebhookIcon size={24} aria-hidden="true" /> Webhook 管理</h1>
                     <p>管理外部系統事件訂閱</p>
                 </div>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                    <button
+                <div className="page-header__actions">
+                    <Button
+                        variant="secondary"
                         onClick={fetchData}
                         disabled={loading}
-                        className="action-btn"
-                        style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                        icon={<RefreshCw size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     >
-                        <RefreshCw size={14} className={loading ? 'spin' : ''} /> 重新整理
-                    </button>
-                    <button className="create-btn" onClick={() => setShowCreate(true)}>
-                        + 新增訂閱
-                    </button>
+                        重新整理
+                    </Button>
+                    <Button variant="primary" onClick={() => setShowCreate(true)} icon={<Plus size={16} aria-hidden="true" />}>
+                        新增訂閱
+                    </Button>
                 </div>
-            </header>
+            </div>
 
             {error && (
-                <Alert variant="danger" icon={<AlertTriangle size={16} />}>{error}</Alert>
+                <Alert variant="danger" icon={<AlertTriangle size={16} />} title="載入失敗">
+                    <div className="webhooks-page__error-body">
+                        <span>{error}</span>
+                        <Button size="sm" variant="secondary" onClick={fetchData}>重試</Button>
+                    </div>
+                </Alert>
             )}
 
             {deliveryStats && (
-                <div className="webhooks-page__list" style={{ flexDirection: 'row', gap: '12px' }}>
-                    <div className="webhook-card" style={{ flex: 1, justifyContent: 'center' }}>
-                        <div className="stat">
-                            <span className="value success">{deliveryStats.success}</span>
-                            <span className="label">派送成功</span>
-                        </div>
-                    </div>
-                    <div className="webhook-card" style={{ flex: 1, justifyContent: 'center' }}>
-                        <div className="stat">
-                            <span className="value failure">{deliveryStats.failed}</span>
-                            <span className="label">派送失敗</span>
-                        </div>
-                    </div>
-                    <div className="webhook-card" style={{ flex: 1, justifyContent: 'center' }}>
-                        <div className="stat">
-                            <span className="value">{deliveryStats.pending}</span>
-                            <span className="label">派送中</span>
-                        </div>
-                    </div>
+                <div className="webhooks-page__stats">
+                    <StatIndicator value={deliveryStats.success} label="派送成功" variant="success" />
+                    <StatIndicator value={deliveryStats.failed} label="派送失敗" variant="danger" />
+                    <StatIndicator value={deliveryStats.pending} label="派送中" />
                 </div>
             )}
 
             {loading ? (
-                <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: '0.5rem', color: 'rgba(255,255,255,0.6)' }}>
-                    <Loader2 size={24} className="spin" />
-                    <span>載入 Webhook 訂閱中...</span>
+                <div className="webhooks-page__list">
+                    <SkeletonList count={3} showAvatar={false} />
                 </div>
             ) : subscriptions.length === 0 ? (
-                <div className="empty-state">尚無 Webhook 訂閱</div>
+                <EmptyState
+                    title="尚無 Webhook 訂閱"
+                    description="新增訂閱以接收系統事件通知到外部服務。"
+                    action={{ label: '新增訂閱', onClick: () => setShowCreate(true) }}
+                />
             ) : (
                 <div className="webhooks-page__list">
                     {subscriptions.map(sub => (
                         <div key={sub.id} className={`webhook-card ${!sub.active ? 'inactive' : ''}`}>
                             <div className="webhook-card__status">
-                                <span className={`status-dot ${sub.active ? 'active' : 'inactive'}`} />
+                                <Badge variant={sub.active ? 'success' : 'default'} size="sm">
+                                    {sub.active ? '啟用中' : '已停用'}
+                                </Badge>
                             </div>
                             <div className="webhook-card__info">
                                 <h3>{sub.name}</h3>
                                 <p className="webhook-url">{sub.url}</p>
                                 <div className="webhook-events">
                                     {sub.events.map((e, i) => (
-                                        <span key={i} className="event-tag">{e}</span>
+                                        <Tag key={i} size="sm">{e}</Tag>
                                     ))}
                                 </div>
                                 {sub.lastError && (
-                                    <p style={{ fontSize: '11px', color: '#EF4444', margin: '6px 0 0' }}>
+                                    <p className="webhook-last-error">
                                         最近錯誤：{sub.lastError}
                                     </p>
                                 )}
@@ -217,74 +214,75 @@ export default function WebhooksPage() {
                                 </div>
                             </div>
                             <div className="webhook-card__actions">
-                                <button
-                                    className="action-btn test"
+                                <Button
+                                    size="sm"
+                                    variant="secondary"
                                     onClick={() => handleTest(sub.id)}
                                     disabled={testingId === sub.id}
+                                    loading={testingId === sub.id}
                                 >
-                                    {testingId === sub.id ? '測試中...' : '測試'}
-                                </button>
-                                <button className="action-btn edit" onClick={() => handleToggleActive(sub)}>
+                                    測試
+                                </Button>
+                                <Button size="sm" variant="secondary" onClick={() => handleToggleActive(sub)}>
                                     {sub.active ? '停用' : '啟用'}
-                                </button>
+                                </Button>
                             </div>
                         </div>
                     ))}
                 </div>
             )}
 
-            {showCreate && (
-                <div className="modal-overlay" onClick={() => setShowCreate(false)}>
-                    <div className="modal" onClick={e => e.stopPropagation()}>
-                        <h2>新增 Webhook 訂閱</h2>
-                        <form onSubmit={handleCreate}>
-                            <label>
-                                名稱
-                                <input
-                                    type="text"
-                                    placeholder="ERP 整合"
-                                    value={formName}
-                                    onChange={e => setFormName(e.target.value)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                Webhook URL
-                                <input
-                                    type="url"
-                                    placeholder="https://..."
-                                    value={formUrl}
-                                    onChange={e => setFormUrl(e.target.value)}
-                                    required
-                                />
-                            </label>
-                            <label>
-                                事件類型
-                                <select
-                                    multiple
-                                    value={formEvents}
-                                    onChange={e => setFormEvents(Array.from(e.target.selectedOptions, o => o.value))}
-                                    required
-                                >
-                                    {eventTypes.length === 0 ? (
-                                        <option value="*">* (全部)</option>
-                                    ) : (
-                                        eventTypes.map(et => (
-                                            <option key={et.type} value={et.type}>{et.description}（{et.type}）</option>
-                                        ))
-                                    )}
-                                </select>
-                            </label>
-                            <div className="modal-actions">
-                                <button type="button" onClick={() => setShowCreate(false)}>取消</button>
-                                <button type="submit" className="primary" disabled={creating}>
-                                    {creating ? '建立中...' : '建立'}
-                                </button>
-                            </div>
-                        </form>
+            <Modal
+                isOpen={showCreate}
+                onClose={() => setShowCreate(false)}
+                title="新增 Webhook 訂閱"
+                size="sm"
+            >
+                <form onSubmit={handleCreate} className="webhook-form">
+                    <InputField
+                        label="名稱"
+                        placeholder="ERP 整合"
+                        value={formName}
+                        onChange={e => setFormName(e.target.value)}
+                        required
+                        fullWidth
+                    />
+                    <InputField
+                        label="Webhook URL"
+                        type="url"
+                        placeholder="https://..."
+                        value={formUrl}
+                        onChange={e => setFormUrl(e.target.value)}
+                        required
+                        fullWidth
+                    />
+                    <label className="webhook-form__label" htmlFor="webhook-events-select">
+                        事件類型
+                        <select
+                            id="webhook-events-select"
+                            multiple
+                            value={formEvents}
+                            onChange={e => setFormEvents(Array.from(e.target.selectedOptions, o => o.value))}
+                            required
+                            className="webhook-form__select"
+                        >
+                            {eventTypes.length === 0 ? (
+                                <option value="*">* (全部)</option>
+                            ) : (
+                                eventTypes.map(et => (
+                                    <option key={et.type} value={et.type}>{et.description}（{et.type}）</option>
+                                ))
+                            )}
+                        </select>
+                    </label>
+                    <div className="webhook-form__actions">
+                        <Button type="button" variant="secondary" onClick={() => setShowCreate(false)}>取消</Button>
+                        <Button type="submit" variant="primary" disabled={creating} loading={creating}>
+                            建立
+                        </Button>
                     </div>
-                </div>
-            )}
+                </form>
+            </Modal>
         </div>
     );
 }

@@ -1,0 +1,238 @@
+/**
+ * ReportsPage.css — R3b 列表頁骨架（DESIGN_LANGUAGE.md §7.1）
+ * 全部使用語義 token；light/dark/tactical 三態自動生效。
+ */
+
+.reports-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .reports-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .reports-page {
+        padding: var(--space-6);
+    }
+}
+
+/* ── page-header ── */
+
+.reports-page__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.reports-page__header h1 {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.reports-page__subtitle {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+}
+
+/* ── 統計摘要列 ── */
+
+.reports-page__stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .reports-page__stats {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.reports-page__stat {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+}
+
+.reports-page__stat-label {
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.reports-page__stat-value {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── panel: content ── */
+
+.reports-page__panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+.reports-page__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding: var(--space-4);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 桌機表格 ── */
+
+.reports-table {
+    width: 100%;
+    border-collapse: collapse;
+    display: none;
+}
+
+@media (min-width: 768px) {
+    .reports-table {
+        display: table;
+    }
+
+    .reports-cards {
+        display: none;
+    }
+}
+
+.reports-table thead tr {
+    border-bottom: 1px solid var(--border-default);
+}
+
+.reports-table th {
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-xs, 12px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.reports-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-light);
+    color: var(--text-primary);
+    font-size: var(--font-size-base, 14px);
+    vertical-align: middle;
+}
+
+.reports-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.reports-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.reports-table__name {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-primary);
+}
+
+.reports-table__download {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    background: transparent;
+    border: none;
+    color: var(--color-info);
+    font-size: var(--font-size-sm, 14px);
+    font-weight: var(--font-weight-medium, 500);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+}
+
+.reports-table__download:hover {
+    background: var(--surface-hover);
+}
+
+.reports-table__download:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.reports-table__dash {
+    color: var(--text-tertiary);
+}
+
+/* ── 行動端卡片直列 ── */
+
+.reports-cards {
+    display: flex;
+    flex-direction: column;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.reports-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--border-light);
+    min-height: 56px;
+}
+
+.reports-card:last-child {
+    border-bottom: none;
+}
+
+.reports-card__main {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    min-width: 0;
+}
+
+.reports-card__name {
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.reports-card__meta {
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.reports-card__side {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    flex-shrink: 0;
+}

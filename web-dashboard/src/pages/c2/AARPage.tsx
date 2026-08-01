@@ -5,8 +5,11 @@
  * 任務後檢討與經驗學習 — connected to real API
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { FileCheck, Calendar, Users, Lightbulb, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
+import { FileCheck, Calendar, Users, Lightbulb, ChevronRight, RefreshCw } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import { Button, Badge, Tag, Alert } from '../../design-system';
+import EmptyState from '../../components/shared/EmptyState';
+import { SkeletonList } from '../../components/ui/Skeleton/Skeleton';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
 import './AARPage.css';
@@ -66,102 +69,114 @@ export default function AARPage() {
             domain="C2 指揮控制"
         >
             <div className="aar-page">
-                {/* AAR List */}
-                <div className="aar-list">
-                    <div className="list-header">
-                        <h3>檢討報告列表</h3>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button className="btn-new" onClick={fetchAARs} disabled={loading} title="重新整理" style={{ padding: '0.25rem 0.5rem' }}>
-                                <RefreshCw size={14} className={loading ? 'spin' : ''} />
-                            </button>
-                            <button className="btn-new">+ 新增 AAR</button>
+                {/* AAR 列表（List archetype：本頁無單一 AAR 詳情端點/資料，
+                    覆核判定改用列表骨架而非 Detail —— 見批次報告說明） */}
+                <section className="panel aar-panel-list" aria-labelledby="aar-list-heading">
+                    <div className="aar-toolbar">
+                        <h2 id="aar-list-heading" className="aar-panel-title">檢討報告列表</h2>
+                        <div className="aar-toolbar-actions">
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                icon={<RefreshCw size={14} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                                onClick={fetchAARs}
+                                disabled={loading}
+                                aria-label="重新整理檢討報告列表"
+                            >
+                                重新整理
+                            </Button>
+                            <Button variant="primary" size="sm">+ 新增 AAR</Button>
                         </div>
                     </div>
 
-                    {/* Error */}
-                    {error && (
-                        <div style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', padding: '0.75rem 1rem', borderRadius: '8px', marginBottom: '1rem' }}>
-                            ⚠️ {error}
-                        </div>
+                    {error && !loading && (
+                        <Alert variant="danger" title="載入失敗" className="aar-alert">
+                            <p className="aar-alert__message">{error}</p>
+                            <Button variant="secondary" size="sm" onClick={fetchAARs}>重試</Button>
+                        </Alert>
                     )}
 
-                    {/* Loading */}
-                    {loading && (
-                        <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem', gap: '0.5rem', color: '#94a3b8' }}>
-                            <Loader2 size={20} className="spin" />
-                            <span>載入中...</span>
-                        </div>
+                    {loading ? (
+                        <SkeletonList count={4} />
+                    ) : error ? null : aars.length === 0 ? (
+                        <EmptyState
+                            variant="default"
+                            title="暫無 AAR 報告"
+                            description="尚未建立任何任務後檢討報告。"
+                            action={{ label: '重新整理', onClick: fetchAARs }}
+                        />
+                    ) : (
+                        <ul className="aar-list" role="list">
+                            {aars.map(aar => {
+                                const isSelected = selectedAAR === aar.id;
+                                const dateLabel = aar.date || (aar.createdAt ? new Date(aar.createdAt).toLocaleDateString('zh-TW') : '-');
+                                return (
+                                    <li key={aar.id}>
+                                        <button
+                                            type="button"
+                                            className={`aar-item ${isSelected ? 'aar-item--selected' : ''}`}
+                                            onClick={() => setSelectedAAR(aar.id)}
+                                            aria-pressed={isSelected}
+                                        >
+                                            <div className="aar-item__main">
+                                                <span className="aar-item__title">{aar.title || aar.name || `AAR-${aar.id.slice(0, 8)}`}</span>
+                                                <Tag size="sm" color="default">{aar.incidentNumber || aar.sessionId || '-'}</Tag>
+                                            </div>
+                                            <div className="aar-item__meta">
+                                                <span><Calendar size={12} aria-hidden="true" /> <time dateTime={aar.createdAt}>{dateLabel}</time></span>
+                                                <span><Users size={12} aria-hidden="true" /> {aar.participants || 0} 人</span>
+                                            </div>
+                                            <div className="aar-item__stats">
+                                                <Badge variant="warning" size="sm" icon={<Lightbulb size={12} aria-hidden="true" />}>
+                                                    {aar.lessonsLearned || 0} 經驗
+                                                </Badge>
+                                                <Badge variant="info" size="sm" icon={<FileCheck size={12} aria-hidden="true" />}>
+                                                    {aar.actionItems || 0} 行動項目
+                                                </Badge>
+                                            </div>
+                                            <ChevronRight size={16} className="aar-item__chevron" aria-hidden="true" />
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                        </ul>
                     )}
+                </section>
 
-                    {/* List */}
-                    {!loading && aars.length === 0 && (
-                        <div style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
-                            暫無 AAR 報告
-                        </div>
-                    )}
-                    {!loading && aars.map(aar => (
-                        <div
-                            key={aar.id}
-                            className={`aar-item ${selectedAAR === aar.id ? 'selected' : ''}`}
-                            onClick={() => setSelectedAAR(aar.id)}
-                        >
-                            <div className="aar-main">
-                                <h4>{aar.title || aar.name || `AAR-${aar.id.slice(0, 8)}`}</h4>
-                                <span className="incident-ref">{aar.incidentNumber || aar.sessionId || '-'}</span>
-                            </div>
-                            <div className="aar-meta">
-                                <span><Calendar size={12} /> {aar.date || (aar.createdAt ? new Date(aar.createdAt).toLocaleDateString('zh-TW') : '-')}</span>
-                                <span><Users size={12} /> {aar.participants || 0} 人</span>
-                            </div>
-                            <div className="aar-stats">
-                                <span className="stat lessons">
-                                    <Lightbulb size={14} />
-                                    {aar.lessonsLearned || 0} 經驗
-                                </span>
-                                <span className="stat actions">
-                                    <FileCheck size={14} />
-                                    {aar.actionItems || 0} 行動項目
-                                </span>
-                            </div>
-                            <ChevronRight size={16} className="chevron" />
-                        </div>
-                    ))}
-                </div>
-
-                {/* AAR Framework Guide */}
-                <div className="aar-guide">
-                    <h3>AAR 四大問題框架</h3>
-                    <div className="framework-cards">
-                        <div className="framework-card">
-                            <div className="card-icon planned">1</div>
-                            <div className="card-content">
-                                <h4>我們原本計劃做什麼？</h4>
+                {/* AAR 四大問題框架（歷程可審計性參考：時間戳＋操作者＋對象由上方列表項目呈現） */}
+                <section className="panel aar-panel-guide" aria-labelledby="aar-guide-heading">
+                    <h2 id="aar-guide-heading" className="aar-panel-title">AAR 四大問題框架</h2>
+                    <ol className="aar-framework">
+                        <li className="aar-framework__item">
+                            <span className="aar-framework__num" data-tone="planned" aria-hidden="true">1</span>
+                            <div>
+                                <h3>我們原本計劃做什麼？</h3>
                                 <p>回顧任務目標、預期成果、行動計劃</p>
                             </div>
-                        </div>
-                        <div className="framework-card">
-                            <div className="card-icon actual">2</div>
-                            <div className="card-content">
-                                <h4>實際發生了什麼事？</h4>
+                        </li>
+                        <li className="aar-framework__item">
+                            <span className="aar-framework__num" data-tone="actual" aria-hidden="true">2</span>
+                            <div>
+                                <h3>實際發生了什麼事？</h3>
                                 <p>客觀描述事件經過，不做評價</p>
                             </div>
-                        </div>
-                        <div className="framework-card">
-                            <div className="card-icon why">3</div>
-                            <div className="card-content">
-                                <h4>為什麼會這樣？</h4>
+                        </li>
+                        <li className="aar-framework__item">
+                            <span className="aar-framework__num" data-tone="why" aria-hidden="true">3</span>
+                            <div>
+                                <h3>為什麼會這樣？</h3>
                                 <p>分析成功與失敗的根本原因</p>
                             </div>
-                        </div>
-                        <div className="framework-card">
-                            <div className="card-icon improve">4</div>
-                            <div className="card-content">
-                                <h4>下次如何改進？</h4>
+                        </li>
+                        <li className="aar-framework__item">
+                            <span className="aar-framework__num" data-tone="improve" aria-hidden="true">4</span>
+                            <div>
+                                <h3>下次如何改進？</h3>
                                 <p>制定具體可執行的改進行動</p>
                             </div>
-                        </div>
-                    </div>
-                </div>
+                        </li>
+                    </ol>
+                </section>
             </div>
         </PageTemplate>
     );

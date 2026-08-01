@@ -1,148 +1,159 @@
 /**
- * 活動報名頁面樣式
+ * ActivitiesPage.css — 活動報名（List archetype，DESIGN_LANGUAGE.md §7.1）
+ * 語義 token only；light/dark/tactical 三態自動生效。
  */
 
 .activities-page {
-    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
     max-width: 900px;
     margin: 0 auto;
 }
 
-/* Header */
-.activities-header {
-    margin-bottom: 24px;
+/* ── page-header ───────────────────────────────────────────── */
+.activities-page .page-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
 }
 
-.activities-header__title h1 {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 4px;
-    color: var(--text-color, #1f2937);
+.activities-page .page-header h1 {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    margin: 0 0 var(--space-1);
+    color: var(--text-primary);
 }
 
-.activities-header__title p {
-    color: var(--text-muted, #6b7280);
+.page-header__subtitle {
+    color: var(--text-secondary);
     margin: 0;
+    font-size: var(--font-size-sm);
 }
 
-/* Tabs */
+/* ── panel（共用容器）───────────────────────────────────────── */
+.activities-page .panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+}
+
+/* ── toolbar：頁籤 + 篩選 ───────────────────────────────────── */
+.activities-toolbar {
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
 .activities-tabs {
     display: flex;
-    gap: 8px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-    padding-bottom: 12px;
+    gap: var(--space-2);
+    border-bottom: 1px solid var(--border-default);
+    padding-bottom: var(--space-3);
 }
 
-.tab-btn {
-    padding: 10px 20px;
+.activities-tabs__btn {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
     border: none;
     background: transparent;
-    border-radius: 8px;
-    font-size: 0.95rem;
-    font-weight: 500;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
     cursor: pointer;
-    color: var(--text-muted, #6b7280);
-    transition: all 0.2s;
+    color: var(--text-secondary);
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
-.tab-btn:hover {
-    background: var(--hover-bg, #f3f4f6);
+.activities-tabs__btn:hover {
+    background: var(--surface-hover);
 }
 
-.tab-btn.active {
-    background: #3b82f6;
-    color: white;
+.activities-tabs__btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
-/* Filter */
+.activities-tabs__btn.is-active {
+    background: var(--color-primary);
+    color: var(--text-inverse);
+}
+
 .activities-filter {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 12px 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 12px;
-    margin-bottom: 20px;
+    gap: var(--space-2);
     overflow-x: auto;
-    border: 1px solid var(--border-color, #e5e7eb);
 }
 
-.activities-filter svg {
-    color: var(--text-muted, #6b7280);
-    flex-shrink: 0;
-}
-
-.filter-btn {
-    padding: 8px 14px;
-    border: none;
-    background: transparent;
-    border-radius: 8px;
-    font-size: 0.875rem;
-    color: var(--text-muted, #6b7280);
+.filter-chip {
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    background: var(--surface-default);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.2s;
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
-.filter-btn:hover {
-    background: var(--hover-bg, #f3f4f6);
+.filter-chip:hover {
+    background: var(--surface-hover);
 }
 
-.filter-btn.active {
-    background: #3b82f6;
-    color: white;
+.filter-chip:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
-/* Activities List */
+.filter-chip.is-active {
+    background: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--text-inverse);
+}
+
+/* ── content：活動 / 報名列表 ───────────────────────────────── */
 .activities-list {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
+    padding: var(--space-4);
 }
 
-.loading,
-.empty {
-    text-align: center;
-    padding: 48px;
-    color: var(--text-muted, #6b7280);
+.activities-list__skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
 }
 
-.empty svg {
-    margin-bottom: 16px;
-    opacity: 0.5;
-}
-
-.empty button {
-    margin-top: 16px;
-    padding: 10px 20px;
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-/* Activity Card */
 .activity-card {
     display: flex;
     align-items: center;
-    gap: 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid var(--border-color, #e5e7eb);
+    gap: var(--space-4);
+    background: var(--surface-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    border: 1px solid var(--border-default);
     cursor: pointer;
-    transition: all 0.2s;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
+    min-height: 44px;
 }
 
 .activity-card:hover {
-    border-color: #3b82f6;
-    box-shadow: 0 4px 16px rgba(59, 130, 246, 0.1);
+    border-color: var(--color-info);
+    box-shadow: var(--shadow-sm);
 }
 
-.activity-card.cancelled {
+.activity-card:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.activity-card.is-cancelled {
     opacity: 0.6;
 }
 
@@ -150,422 +161,252 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12px 16px;
-    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-    border-radius: 12px;
-    color: white;
-    min-width: 60px;
+    justify-content: center;
+    padding: var(--space-2) var(--space-3);
+    background: var(--color-info);
+    border-radius: var(--radius-md);
+    color: var(--text-inverse);
+    min-width: 56px;
+    flex-shrink: 0;
 }
 
-.activity-card__date .month {
-    font-size: 0.7rem;
+.activity-card__month {
+    font-size: var(--font-size-xs);
     text-transform: uppercase;
     opacity: 0.9;
 }
 
-.activity-card__date .day {
-    font-size: 1.5rem;
-    font-weight: 700;
+.activity-card__day {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-bold);
+    font-variant-numeric: tabular-nums;
 }
 
 .activity-card__content {
     flex: 1;
+    min-width: 0;
 }
 
 .activity-card__header {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+    flex-wrap: wrap;
 }
 
-.activity-card__header .category {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-}
-
-.cat-training {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-.cat-volunteer {
-    background: #ddd6fe;
-    color: #7c3aed;
-}
-
-.cat-community {
-    background: #d1fae5;
-    color: #059669;
-}
-
-.cat-drill {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-.cat-other {
-    background: #f3f4f6;
-    color: #6b7280;
-}
-
-.activity-card__header .status {
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    color: white;
+.activity-card__category {
+    padding: 2px var(--space-2);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    background: var(--surface-hover);
+    color: var(--text-secondary);
 }
 
 .activity-card__title {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin: 0 0 8px;
-    color: var(--text-color, #1f2937);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--space-2);
+    color: var(--text-primary);
 }
 
 .activity-card__info {
     display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    color: var(--text-muted, #6b7280);
-    font-size: 0.8rem;
+    gap: var(--space-3);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
 }
 
 .activity-card__info span {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: var(--space-1);
+}
+
+.activity-card__badges {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
 }
 
 .activity-card__registered {
     display: inline-flex;
     align-items: center;
-    gap: 4px;
-    margin-top: 8px;
-    padding: 4px 10px;
-    background: #d1fae5;
-    color: #059669;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: 500;
+    gap: var(--space-1);
+    margin-top: var(--space-2);
+    padding: 2px var(--space-2);
+    background: var(--color-success-bg, var(--color-safe-bg));
+    color: var(--color-success);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
 }
 
 .activity-card__arrow {
-    color: var(--text-muted, #9ca3af);
+    color: var(--text-tertiary);
+    flex-shrink: 0;
 }
 
-/* Registration Card */
-.my-registrations {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.registration-card {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    background: var(--card-bg, #ffffff);
-    border-radius: 16px;
-    padding: 16px;
-    border: 1px solid var(--border-color, #e5e7eb);
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.registration-card:hover {
-    border-color: #3b82f6;
-}
-
-.registration-card__status svg {
+.activity-card__reg-status svg {
     width: 32px;
     height: 32px;
 }
 
-.registration-card__status .confirmed {
-    color: #22c55e;
+.activity-card__reg-status .is-confirmed {
+    color: var(--color-success);
 }
 
-.registration-card__status .pending {
-    color: #f59e0b;
+.activity-card__reg-status .is-pending {
+    color: var(--color-warning);
 }
 
-.registration-card__status .attended {
-    color: #3b82f6;
+.activity-card__reg-status .is-attended {
+    color: var(--color-info);
 }
 
-.registration-card__content {
-    flex: 1;
-}
-
-.registration-card__content h3 {
-    margin: 0 0 6px;
-    font-size: 1.05rem;
-}
-
-.registration-card__info {
-    display: flex;
-    gap: 16px;
-    font-size: 0.8rem;
-    color: var(--text-muted, #6b7280);
-}
-
-.registration-card__info span {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.registration-status {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 12px;
-    font-size: 0.7rem;
-    font-weight: 500;
-    margin-top: 6px;
-}
-
-.registration-status.confirmed {
-    background: #d1fae5;
-    color: #059669;
-}
-
-.registration-status.pending {
-    background: #fef3c7;
-    color: #d97706;
-}
-
-/* Modal */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
-}
-
-.modal-content {
-    background: var(--card-bg, #ffffff);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 600px;
-    max-height: 90vh;
-    overflow-y: auto;
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 24px;
-    border-bottom: 1px solid var(--border-color, #e5e7eb);
-}
-
-.modal-header h2 {
-    margin: 0;
-    font-size: 1.25rem;
-}
-
-.modal-close {
-    background: transparent;
-    border: none;
-    padding: 8px;
-    cursor: pointer;
-    color: var(--text-muted, #6b7280);
-    border-radius: 8px;
-}
-
-.modal-close:hover {
-    background: var(--hover-bg, #f3f4f6);
-}
-
-/* Activity Detail Modal */
+/* ── Activity Detail Modal 內容 ─────────────────────────────── */
 .activity-detail__content {
-    padding: 20px 24px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
 }
 
 .activity-detail__image {
     width: 100%;
     height: 200px;
     object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 16px;
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
 }
 
 .activity-detail__meta {
     display: grid;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .meta-item {
     display: flex;
     align-items: flex-start;
-    gap: 12px;
+    gap: var(--space-3);
 }
 
 .meta-item svg {
-    color: #3b82f6;
+    color: var(--color-info);
     flex-shrink: 0;
     margin-top: 2px;
 }
 
-.meta-item .label {
+.meta-item__label {
     display: block;
-    font-size: 0.75rem;
-    color: var(--text-muted, #6b7280);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
 }
 
-.meta-item .value {
-    font-weight: 500;
+.meta-item__value {
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
 }
 
-.activity-detail__description,
-.activity-detail__contact {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-color, #e5e7eb);
+.activity-detail__section {
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-default);
 }
 
-.activity-detail__description h4,
-.activity-detail__contact h4 {
-    font-size: 0.95rem;
-    margin: 0 0 8px;
+.activity-detail__section h4 {
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    margin: 0 0 var(--space-2);
+    color: var(--text-primary);
 }
 
-.activity-detail__description p,
-.activity-detail__contact p {
-    color: var(--text-color, #374151);
-    line-height: 1.6;
-    margin: 4px 0;
+.activity-detail__section p {
+    color: var(--text-secondary);
+    line-height: var(--line-height-normal);
+    margin: var(--space-1) 0;
 }
 
-.activity-detail__contact p {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.9rem;
+.activity-detail__section p svg {
+    margin-right: var(--space-2);
 }
 
-/* Actions */
+/* ── Actions ────────────────────────────────────────────────── */
 .activity-detail__actions {
-    padding: 20px 24px;
-    border-top: 1px solid var(--border-color, #e5e7eb);
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-default);
 }
 
 .registered-actions {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: var(--space-3);
     align-items: center;
 }
 
 .registered-badge {
     display: flex;
     align-items: center;
-    gap: 8px;
-    color: #22c55e;
-    font-weight: 500;
-}
-
-.btn-cancel {
-    padding: 10px 20px;
-    background: transparent;
-    border: 1px solid #ef4444;
-    color: #ef4444;
-    border-radius: 10px;
-    cursor: pointer;
+    gap: var(--space-2);
+    color: var(--color-success);
+    font-weight: var(--font-weight-medium);
 }
 
 .btn-register {
     width: 100%;
-    padding: 14px;
-    font-size: 1rem;
 }
 
-.btn-primary {
-    background: #3b82f6;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 500;
-}
-
-.btn-primary:disabled {
-    background: #9ca3af;
-    cursor: not-allowed;
-}
-
-.btn-secondary {
-    padding: 10px 20px;
-    background: transparent;
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    cursor: pointer;
-}
-
-/* Register Form */
+/* ── Register Form ──────────────────────────────────────────── */
 .register-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: var(--space-4);
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: var(--space-2);
 }
 
 .form-group label {
-    font-size: 0.875rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
 }
 
-.form-group input,
 .form-group textarea {
-    padding: 12px;
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    font-size: 0.95rem;
-    background: var(--input-bg, #ffffff);
+    padding: var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-family: inherit;
+    resize: vertical;
 }
 
-.form-group input:focus,
-.form-group textarea:focus {
+.form-group textarea:focus-visible {
     outline: none;
-    border-color: #3b82f6;
+    box-shadow: var(--focus-ring);
+    border-color: var(--border-focus);
 }
 
 .form-actions {
     display: flex;
     justify-content: flex-end;
-    gap: 10px;
-    margin-top: 8px;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
 }
 
-/* Dark mode */
-[data-theme="dark"] .activity-card,
-[data-theme="dark"] .registration-card,
-[data-theme="dark"] .activities-filter,
-[data-theme="dark"] .modal-content {
-    background: var(--card-bg, #1f2937);
-    border-color: var(--border-color, #374151);
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .activities-page {
-        padding: 16px;
-    }
-
+/* ── Responsive ─────────────────────────────────────────────── */
+@media (max-width: 767px) {
     .activity-card {
         flex-direction: column;
         align-items: flex-start;
@@ -573,19 +414,20 @@
 
     .activity-card__date {
         flex-direction: row;
-        gap: 8px;
-        padding: 8px 16px;
-    }
-
-    .activity-card__date .day {
-        font-size: 1.2rem;
+        gap: var(--space-2);
+        padding: var(--space-2) var(--space-4);
+        min-width: 0;
     }
 
     .activity-card__arrow {
         display: none;
     }
 
-    .modal-content {
-        max-height: 85vh;
+    .form-actions {
+        flex-direction: column-reverse;
+    }
+
+    .form-actions > * {
+        width: 100%;
     }
 }

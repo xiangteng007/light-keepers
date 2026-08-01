@@ -1,0 +1,184 @@
+/**
+ * PointsReportPage.css — List archetype（token 化，R3b）
+ */
+
+.points-report-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .points-report-page {
+        padding: var(--space-6);
+        gap: var(--space-6);
+    }
+}
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.page-header__titles h1 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-header__subtitle {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+/* Tabs */
+.points-report-tabs {
+    display: flex;
+    gap: var(--space-4);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.points-report-tab {
+    min-height: 44px;
+    padding: 0 var(--space-1) var(--space-3);
+    border: none;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    cursor: pointer;
+}
+
+.points-report-tab:hover {
+    color: var(--text-primary);
+}
+
+.points-report-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.points-report-tab.is-active {
+    color: var(--text-accent);
+    border-bottom-color: var(--text-accent);
+}
+
+.points-report-skeleton {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+}
+
+/* Table */
+.points-report-table-wrapper {
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    overflow-x: auto;
+}
+
+.points-report-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.points-report-table thead tr {
+    border-bottom: 1px solid var(--border-default);
+}
+
+.points-report-table th {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-wide);
+    white-space: nowrap;
+}
+
+.points-report-table tbody tr {
+    border-bottom: 1px solid var(--border-light);
+    min-height: 44px;
+}
+
+.points-report-table tbody tr:last-child {
+    border-bottom: none;
+}
+
+.points-report-table tbody tr:hover {
+    background: var(--surface-hover);
+}
+
+.points-report-table td {
+    padding: var(--space-3) var(--space-4);
+    font-size: var(--font-size-sm);
+}
+
+.points-report-table__name {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-medium);
+    white-space: nowrap;
+}
+
+.points-report-table__num {
+    color: var(--text-secondary);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+}
+
+.points-report-table__points {
+    color: var(--text-accent);
+    font-weight: var(--font-weight-semibold);
+}
+
+.points-report-table__reason {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    color: var(--text-secondary);
+}
+
+.points-report-table__type-badge {
+    flex-shrink: 0;
+}
+
+/* 排名徽章色（裝飾色，非狀態色，與 LeaderboardPage 一致） */
+.points-rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    font-weight: var(--font-weight-bold);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
+}
+
+.points-rank--gold {
+    background: var(--color-gold-400);
+    color: var(--color-brown-900);
+}
+
+.points-rank--silver {
+    background: var(--border-dark);
+    color: var(--text-inverse);
+}
+
+.points-rank--bronze {
+    background: var(--color-brown-500);
+    color: var(--text-inverse);
+}
+
+.points-rank--default {
+    background: var(--surface-pressed);
+    color: var(--text-secondary);
+}

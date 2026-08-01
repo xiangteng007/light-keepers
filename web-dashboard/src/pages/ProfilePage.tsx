@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList } from 'lucide-react';
+import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList, CheckCircle2, XCircle } from 'lucide-react';
 import { createVolunteer } from '../api/services';
-import { Badge, Button } from '../design-system';
+import { Alert, Badge, Button, Modal } from '../design-system';
 import './ProfilePage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
@@ -296,16 +296,19 @@ export default function ProfilePage() {
 
     return (
         <div className="profile-page">
-            <div className="profile-header">
-                <h1><Settings size={28} /> 個人設定</h1>
+            <header className="profile-header">
+                <h1><Settings size={28} aria-hidden="true" /> 個人設定</h1>
                 <p>管理您的帳號資訊和偏好設定</p>
-            </div>
+            </header>
 
             {message && (
-                <div className={`profile-message profile-message--${message.type}`}>
+                <Alert
+                    variant={message.type === 'success' ? 'success' : 'danger'}
+                    closable
+                    onClose={() => setMessage(null)}
+                >
                     {message.text}
-                    <button onClick={() => setMessage(null)}>×</button>
-                </div>
+                </Alert>
             )}
 
             <div className="profile-content">
@@ -392,16 +395,16 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="profile-form-group">
-                                    <label><Shield size={16} /> 身份</label>
+                                    <label><Shield size={16} aria-hidden="true" /> 身份</label>
                                     <div className="profile-value">
-                                        <span className="profile-badge">{user?.roleDisplayName || '登記志工'}</span>
+                                        <Badge variant="info" size="sm">{user?.roleDisplayName || '登記志工'}</Badge>
                                     </div>
                                 </div>
                             </div>
 
                             <div className="profile-section-divider" />
 
-                            <h3><LinkIcon size={18} /> 綁定帳號</h3>
+                            <h3><LinkIcon size={18} aria-hidden="true" /> 綁定帳號</h3>
                             <div className="profile-linked-accounts">
                                 <div className="linked-account">
                                     <div className="linked-account-info">
@@ -544,15 +547,17 @@ export default function ProfilePage() {
                                 </div>
                             ) : !canRegisterVolunteer ? (
                                 <div className="binding-required">
-                                    <div className="binding-alert">
-                                        <span className="alert-icon">⚠️</span>
-                                        <h4>需要完成帳號綁定</h4>
-                                        <p>登記志工前，請先完成以下帳號綁定：</p>
-                                    </div>
+                                    <Alert variant="warning" title="需要完成帳號綁定">
+                                        登記志工前，請先完成以下帳號綁定：
+                                    </Alert>
                                     <div className="binding-checklist">
                                         <div className={`binding-item ${hasLineBinding ? 'done' : ''}`}>
-                                            <span className="binding-icon">{hasLineBinding ? '✅' : '❌'}</span>
-                                            <span>LINE 帳號綁定</span>
+                                            {hasLineBinding ? (
+                                                <CheckCircle2 size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
+                                            ) : (
+                                                <XCircle size={18} className="binding-icon" aria-hidden="true" />
+                                            )}
+                                            <span>LINE 帳號綁定{hasLineBinding ? '（已完成）' : '（未完成）'}</span>
                                             {!hasLineBinding && (
                                                 <Button size="sm" variant="primary" onClick={handleLineBind}>
                                                     綁定
@@ -560,8 +565,12 @@ export default function ProfilePage() {
                                             )}
                                         </div>
                                         <div className={`binding-item ${hasGoogleBinding ? 'done' : ''}`}>
-                                            <span className="binding-icon">{hasGoogleBinding ? '✅' : '❌'}</span>
-                                            <span>Google 帳號綁定</span>
+                                            {hasGoogleBinding ? (
+                                                <CheckCircle2 size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
+                                            ) : (
+                                                <XCircle size={18} className="binding-icon" aria-hidden="true" />
+                                            )}
+                                            <span>Google 帳號綁定{hasGoogleBinding ? '（已完成）' : '（未完成）'}</span>
                                             {!hasGoogleBinding && (
                                                 <Button size="sm" variant="primary" onClick={handleGoogleBind}>
                                                     綁定
@@ -710,54 +719,59 @@ export default function ProfilePage() {
 
             {/* Password Modal (Set or Change) */}
             {showPasswordModal && (
-                <div className="modal-overlay" onClick={() => setShowPasswordModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-                        <h3><Lock size={20} /> {hasPassword ? '變更密碼' : '設定密碼'}</h3>
-                        <div className="password-form">
-                            {hasPassword && (
-                                <div className="form-group">
-                                    <label>目前密碼</label>
-                                    <input
-                                        type="password"
-                                        value={passwordData.currentPassword}
-                                        onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
-                                        placeholder="請輸入目前密碼"
-                                    />
-                                </div>
-                            )}
+                <Modal
+                    isOpen={showPasswordModal}
+                    onClose={() => setShowPasswordModal(false)}
+                    title={hasPassword ? '變更密碼' : '設定密碼'}
+                    size="sm"
+                >
+                    <div className="password-form">
+                        {hasPassword && (
                             <div className="form-group">
-                                <label>{hasPassword ? '新密碼' : '密碼'}</label>
+                                <label htmlFor="pw-current">目前密碼</label>
                                 <input
+                                    id="pw-current"
                                     type="password"
-                                    value={passwordData.newPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
-                                    placeholder="請輸入密碼（至少 6 字元）"
+                                    value={passwordData.currentPassword}
+                                    onChange={(e) => setPasswordData({ ...passwordData, currentPassword: e.target.value })}
+                                    placeholder="請輸入目前密碼"
                                 />
                             </div>
-                            <div className="form-group">
-                                <label>確認密碼</label>
-                                <input
-                                    type="password"
-                                    value={passwordData.confirmPassword}
-                                    onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
-                                    placeholder="請再次輸入密碼"
-                                />
-                            </div>
+                        )}
+                        <div className="form-group">
+                            <label htmlFor="pw-new">{hasPassword ? '新密碼' : '密碼'}</label>
+                            <input
+                                id="pw-new"
+                                type="password"
+                                value={passwordData.newPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                                placeholder="請輸入密碼（至少 6 字元）"
+                            />
                         </div>
-                        <div className="modal-actions">
-                            <Button variant="secondary" onClick={() => setShowPasswordModal(false)}>
-                                取消
-                            </Button>
-                            <Button
-                                variant="primary"
-                                onClick={hasPassword ? handleChangePassword : handleSetPassword}
-                                disabled={isChangingPassword}
-                            >
-                                {isChangingPassword ? '處理中...' : '確認'}
-                            </Button>
+                        <div className="form-group">
+                            <label htmlFor="pw-confirm">確認密碼</label>
+                            <input
+                                id="pw-confirm"
+                                type="password"
+                                value={passwordData.confirmPassword}
+                                onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                                placeholder="請再次輸入密碼"
+                            />
                         </div>
                     </div>
-                </div>
+                    <div className="modal-actions">
+                        <Button variant="secondary" onClick={() => setShowPasswordModal(false)}>
+                            取消
+                        </Button>
+                        <Button
+                            variant="primary"
+                            onClick={hasPassword ? handleChangePassword : handleSetPassword}
+                            disabled={isChangingPassword}
+                        >
+                            {isChangingPassword ? '處理中...' : '確認'}
+                        </Button>
+                    </div>
+                </Modal>
             )}
         </div>
     );

@@ -21,9 +21,11 @@ import {
     HardDrive,
     CheckCircle,
     RefreshCw,
-    X,
     FileJson,
 } from 'lucide-react';
+import { Button, Badge, Modal, InputField, StatIndicator } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { SkeletonList } from '../components/ui/Skeleton/Skeleton';
 import './BackupPage.css';
 
 export default function BackupPage() {
@@ -137,89 +139,71 @@ export default function BackupPage() {
     return (
         <div className="backup-page">
             {/* 頁面標題 */}
-            <header className="backup-header">
-                <div className="backup-header__title">
-                    <h1>💾 資料備份</h1>
+            <header className="page-header">
+                <div className="page-header__left">
+                    <h1>資料備份</h1>
                     <p>管理系統資料的備份與還原</p>
                 </div>
-                <div className="backup-header__actions">
-                    <button
-                        className="btn-refresh"
+                <div className="page-header__actions">
+                    <Button
+                        variant="ghost"
+                        size="md"
+                        icon={<RefreshCw size={18} className={loading ? 'spin' : ''} aria-hidden="true" />}
                         onClick={loadBackups}
                         disabled={loading}
-                    >
-                        <RefreshCw size={18} className={loading ? 'spin' : ''} />
-                    </button>
-                    <button
-                        className="btn-create"
+                        aria-label="重新整理備份列表"
+                    />
+                    <Button
+                        variant="primary"
+                        icon={<Plus size={18} aria-hidden="true" />}
                         onClick={() => setShowCreateModal(true)}
                         disabled={creating}
                     >
-                        <Plus size={18} />
                         建立備份
-                    </button>
+                    </Button>
                 </div>
             </header>
 
-            {/* 統計卡片 */}
+            {/* 統計摘要 */}
             <div className="backup-stats">
-                <div className="stat-card">
-                    <Database size={24} />
-                    <div>
-                        <span className="stat-value">{backups.length}</span>
-                        <span className="stat-label">備份數量</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <HardDrive size={24} />
-                    <div>
-                        <span className="stat-value">
-                            {formatSize(backups.reduce((sum, b) => sum + (b.size || 0), 0))}
-                        </span>
-                        <span className="stat-label">總使用空間</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <Clock size={24} />
-                    <div>
-                        <span className="stat-value">
-                            {backups.length > 0
-                                ? formatDate(backups[0].createdAt).split(' ')[0]
-                                : '-'
-                            }
-                        </span>
-                        <span className="stat-label">最近備份</span>
-                    </div>
-                </div>
+                <StatIndicator icon={<Database size={20} aria-hidden="true" />} value={backups.length} label="備份數量" />
+                <StatIndicator
+                    icon={<HardDrive size={20} aria-hidden="true" />}
+                    value={formatSize(backups.reduce((sum, b) => sum + (b.size || 0), 0))}
+                    label="總使用空間"
+                />
+                <StatIndicator
+                    icon={<Clock size={20} aria-hidden="true" />}
+                    value={backups.length > 0 ? formatDate(backups[0].createdAt).split(' ')[0] : '-'}
+                    label="最近備份"
+                />
             </div>
 
             {/* 備份列表 */}
-            <div className="backup-list">
-                <h2>備份記錄</h2>
+            <section className="panel backup-list" aria-labelledby="backup-list-heading">
+                <h2 id="backup-list-heading" className="panel-title">備份記錄</h2>
                 {loading ? (
-                    <div className="loading">
-                        <RefreshCw size={24} className="spin" />
-                        載入中...
-                    </div>
+                    <SkeletonList count={4} />
                 ) : backups.length === 0 ? (
-                    <div className="empty">
-                        <Database size={48} />
-                        <p>尚無備份記錄</p>
-                        <button onClick={() => setShowCreateModal(true)}>建立第一個備份</button>
-                    </div>
+                    <EmptyState
+                        icon={Database}
+                        title="尚無備份記錄"
+                        description="建立第一個備份以保護系統資料。"
+                        action={{ label: '建立第一個備份', onClick: () => setShowCreateModal(true) }}
+                    />
                 ) : (
-                    <div className="backup-table">
-                        <div className="backup-table__header">
-                            <span>備份</span>
-                            <span>模組</span>
-                            <span>大小</span>
-                            <span>時間</span>
-                            <span>操作</span>
+                    <div className="backup-table" role="table">
+                        <div className="backup-table__header" role="row">
+                            <span role="columnheader">備份</span>
+                            <span role="columnheader">模組</span>
+                            <span role="columnheader">大小</span>
+                            <span role="columnheader">時間</span>
+                            <span role="columnheader">操作</span>
                         </div>
                         {backups.map(backup => (
-                            <div key={backup.id} className="backup-row">
+                            <div key={backup.id} className="backup-row" role="row">
                                 <div className="backup-row__info">
-                                    <FileJson size={20} />
+                                    <FileJson size={20} aria-hidden="true" />
                                     <div>
                                         <span className="backup-name">
                                             {backup.description || `備份 ${backup.id.slice(0, 8)}`}
@@ -230,66 +214,72 @@ export default function BackupPage() {
 
                                 <div className="backup-row__modules">
                                     {backup.modules?.map(mod => (
-                                        <span key={mod} className="module-badge">{mod}</span>
+                                        <Badge key={mod} variant="info" size="sm">{mod}</Badge>
                                     ))}
                                 </div>
 
-                                <span className="backup-row__size">{formatSize(backup.size)}</span>
+                                <span className="backup-row__size tabular-num">{formatSize(backup.size)}</span>
 
-                                <span className="backup-row__time">{formatDate(backup.createdAt)}</span>
+                                <time className="backup-row__time tabular-num" dateTime={backup.createdAt}>
+                                    {formatDate(backup.createdAt)}
+                                </time>
 
                                 <div className="backup-row__actions">
                                     <button
                                         className="action-btn"
                                         onClick={() => handleDownload(backup)}
+                                        aria-label={`下載備份 ${backup.description || backup.id}`}
                                         title="下載"
                                     >
-                                        <Download size={16} />
+                                        <Download size={16} aria-hidden="true" />
                                     </button>
                                     <button
-                                        className="action-btn restore"
+                                        className="action-btn action-btn--restore"
                                         onClick={() => handleRestore(backup)}
                                         disabled={restoring === backup.id}
+                                        aria-label={`還原備份 ${backup.description || backup.id}`}
                                         title="還原"
                                     >
                                         {restoring === backup.id ? (
-                                            <RefreshCw size={16} className="spin" />
+                                            <RefreshCw size={16} className="spin" aria-hidden="true" />
                                         ) : (
-                                            <Upload size={16} />
+                                            <Upload size={16} aria-hidden="true" />
                                         )}
                                     </button>
                                     <button
-                                        className="action-btn delete"
+                                        className="action-btn action-btn--delete"
                                         onClick={() => handleDelete(backup)}
+                                        aria-label={`刪除備份 ${backup.description || backup.id}`}
                                         title="刪除"
                                     >
-                                        <Trash2 size={16} />
+                                        <Trash2 size={16} aria-hidden="true" />
                                     </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-            </div>
+            </section>
 
             {/* 建立備份 Modal */}
-            {showCreateModal && (
-                <CreateBackupModal
-                    onClose={() => setShowCreateModal(false)}
-                    onConfirm={handleCreateBackup}
-                    creating={creating}
-                />
-            )}
+            <CreateBackupModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onConfirm={handleCreateBackup}
+                creating={creating}
+            />
         </div>
     );
 }
 
 // ===== 建立備份 Modal =====
 function CreateBackupModal({
+    isOpen,
     onClose,
     onConfirm,
     creating,
 }: {
+    isOpen: boolean;
     onClose: () => void;
     onConfirm: (modules: string[], description: string) => void;
     creating: boolean;
@@ -326,70 +316,65 @@ function CreateBackupModal({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content create-backup-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <h2>建立備份</h2>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>選擇要備份的模組</label>
-                        <div className="module-grid">
-                            {MODULE_OPTIONS.map(mod => (
+        <Modal
+            isOpen={isOpen}
+            onClose={onClose}
+            title="建立備份"
+            className="create-backup-modal"
+            footer={(
+                <div className="modal-actions">
+                    <Button type="button" variant="secondary" onClick={onClose}>
+                        取消
+                    </Button>
+                    <Button
+                        type="submit"
+                        form="create-backup-form"
+                        variant="primary"
+                        icon={creating ? <RefreshCw size={16} className="spin" aria-hidden="true" /> : <Database size={16} aria-hidden="true" />}
+                        disabled={creating || selectedModules.length === 0}
+                        loading={creating}
+                    >
+                        {creating ? '備份中...' : '建立備份'}
+                    </Button>
+                </div>
+            )}
+        >
+            <form id="create-backup-form" onSubmit={handleSubmit}>
+                <div className="form-group">
+                    <span className="form-group__label" id="backup-module-label">選擇要備份的模組</span>
+                    <div className="module-grid" role="group" aria-labelledby="backup-module-label">
+                        {MODULE_OPTIONS.map(mod => {
+                            const selected = selectedModules.includes(mod.value);
+                            return (
                                 <button
                                     key={mod.value}
                                     type="button"
-                                    className={`module-option ${selectedModules.includes(mod.value) ? 'selected' : ''}`}
+                                    className={`module-option ${selected ? 'module-option--selected' : ''}`}
                                     onClick={() => toggleModule(mod.value)}
+                                    aria-pressed={selected}
                                 >
-                                    <span className="module-icon">{mod.icon}</span>
+                                    <span className="module-icon" aria-hidden="true">{mod.icon}</span>
                                     <span className="module-label">{mod.label}</span>
-                                    {selectedModules.includes(mod.value) && (
-                                        <CheckCircle size={16} className="check-icon" />
+                                    {selected && (
+                                        <CheckCircle size={16} className="check-icon" aria-hidden="true" />
                                     )}
                                 </button>
-                            ))}
-                        </div>
+                            );
+                        })}
                     </div>
+                </div>
 
-                    <div className="form-group">
-                        <label>備份說明（選填）</label>
-                        <input
-                            type="text"
-                            value={description}
-                            onChange={e => setDescription(e.target.value)}
-                            placeholder="例：系統升級前備份"
-                        />
-                    </div>
-
-                    <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={onClose}>
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={creating || selectedModules.length === 0}
-                        >
-                            {creating ? (
-                                <>
-                                    <RefreshCw size={16} className="spin" />
-                                    備份中...
-                                </>
-                            ) : (
-                                <>
-                                    <Database size={16} />
-                                    建立備份
-                                </>
-                            )}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className="form-group">
+                    <InputField
+                        label="備份說明（選填）"
+                        type="text"
+                        value={description}
+                        onChange={e => setDescription(e.target.value)}
+                        placeholder="例：系統升級前備份"
+                        fullWidth
+                    />
+                </div>
+            </form>
+        </Modal>
     );
 }

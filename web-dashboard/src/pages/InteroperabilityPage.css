@@ -1,0 +1,77 @@
+/**
+ * InteroperabilityPage.css — List archetype，token 化
+ */
+
+.interop-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+}
+
+.interop-page__title {
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.interop-page .page-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.interop-page__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
+}
+
+.interop-page__panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.interop-page__panel-title {
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.interop-page__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-4);
+}
+
+.interop-page__feature-card {
+    text-align: center;
+}
+
+.interop-page__feature-icon {
+    color: var(--text-secondary);
+    margin-bottom: var(--space-2);
+}
+
+.interop-page__feature-title {
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+    margin-bottom: var(--space-1);
+}
+
+.interop-page__feature-desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+@media (max-width: 767px) {
+    .interop-page__title {
+        font-size: 20px;
+    }
+
+    .interop-page__stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}

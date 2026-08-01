@@ -1,79 +1,105 @@
+/**
+ * InsuranceManagementPage.css — 我的保險（List archetype，DESIGN_LANGUAGE.md §7.1）
+ * 語義 token only；light/dark/tactical 三態自動生效。
+ */
+
 .insurance-management-page {
-    padding: var(--spacing-lg);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
 }
 
 .insurance-management-page .page-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: var(--spacing-lg);
+    align-items: flex-start;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+}
+
+.header-left h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    margin-top: var(--space-1);
+    font-size: var(--font-size-sm);
 }
 
 /* Coverage Summary */
 .coverage-summary {
-    margin-bottom: var(--spacing-lg);
-    background: linear-gradient(135deg, #e0f2fe, #f0f9ff);
+    background: var(--color-info-bg);
+    border: 1px solid var(--border-default);
 }
 
 .summary-content {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .summary-icon {
-    font-size: 2rem;
+    color: var(--color-info);
+    flex-shrink: 0;
 }
 
 .summary-text {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
+    color: var(--text-primary);
 }
 
 /* Insurances List */
 .insurances-list {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 /* Insurance Card */
 .insurance-card {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .insurance-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-bottom: var(--spacing-sm);
-    border-bottom: 1px solid var(--color-border);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-default);
+    flex-wrap: wrap;
+    gap: var(--space-2);
 }
 
 .insurance-company {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .company-name {
-    font-size: 1.125rem;
-    font-weight: 600;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
 }
 
 .insurance-info {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .info-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-sm) var(--spacing-lg);
+    gap: var(--space-2) var(--space-6);
 }
 
 @media (max-width: 600px) {
@@ -89,50 +115,56 @@
 }
 
 .info-label {
-    font-size: 0.75rem;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
 }
 
 .info-value {
-    font-weight: 500;
+    font-weight: var(--font-weight-medium);
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
 }
 
 .coverage-tasks {
     display: flex;
     align-items: center;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
     flex-wrap: wrap;
 }
 
 .tasks-label {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 .task-tags {
     display: flex;
-    gap: var(--spacing-xs);
+    gap: var(--space-1);
     flex-wrap: wrap;
 }
 
 .insurance-actions {
     display: flex;
-    gap: var(--spacing-sm);
-    padding-top: var(--spacing-sm);
-    border-top: 1px solid var(--color-border);
+    gap: var(--space-2);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-default);
+}
+
+.insurance-actions > * {
+    min-height: 44px;
 }
 
 /* Form Styles */
 .insurance-form {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: var(--spacing-md);
+    gap: var(--space-4);
 }
 
 @media (max-width: 600px) {
@@ -144,54 +176,63 @@
 .form-section {
     display: flex;
     flex-direction: column;
-    gap: var(--spacing-xs);
+    gap: var(--space-2);
 }
 
 .form-label {
-    font-weight: 500;
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
+    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
-.form-input,
 .form-select,
 .form-textarea {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-border);
+    padding: var(--space-3) var(--space-4);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
-    font-size: 1rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    font-family: inherit;
+    min-height: 44px;
+    transition: border-color var(--duration-fast) var(--ease-out), box-shadow var(--duration-fast) var(--ease-out);
 }
 
-.form-input:focus,
-.form-select:focus,
-.form-textarea:focus {
+.form-textarea {
+    resize: vertical;
+    min-height: unset;
+}
+
+.form-select:focus-visible,
+.form-textarea:focus-visible {
     outline: none;
-    border-color: var(--color-primary);
-    box-shadow: 0 0 0 3px rgba(var(--color-primary-rgb), 0.15);
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
 }
 
 .form-hint {
-    font-size: 0.75rem;
-    color: var(--color-text-muted);
-    margin-top: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
+    margin-top: var(--space-1);
 }
 
 /* Task Options */
 .task-options {
     display: flex;
     flex-wrap: wrap;
-    gap: var(--spacing-sm);
+    gap: var(--space-2);
 }
 
 .task-btn {
-    padding: var(--spacing-sm) var(--spacing-md);
-    border: 1px solid var(--color-border);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-full);
     background: transparent;
     cursor: pointer;
-    font-size: 0.875rem;
-    transition: all 0.2s;
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
+    transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
 }
 
 .task-btn:hover {
@@ -199,39 +240,33 @@
     color: var(--color-primary);
 }
 
-.task-btn.selected {
+.task-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.task-btn.is-selected {
     background: var(--color-primary);
     border-color: var(--color-primary);
-    color: white;
+    color: var(--text-inverse);
 }
 
 /* Modal Actions */
 .modal-actions {
     display: flex;
     justify-content: flex-end;
-    gap: var(--spacing-sm);
-    padding-top: var(--spacing-md);
-    border-top: 1px solid var(--color-border);
-    margin-top: var(--spacing-md);
+    gap: var(--space-3);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--border-default);
+    margin-top: var(--space-2);
 }
 
-/* Empty & Loading States */
-.loading-state,
-.empty-state {
-    text-align: center;
-    padding: var(--spacing-xl) !important;
-}
+@media (max-width: 767px) {
+    .modal-actions {
+        flex-direction: column-reverse;
+    }
 
-.empty-icon {
-    font-size: 4rem;
-    margin-bottom: var(--spacing-md);
-}
-
-.empty-state h3 {
-    margin-bottom: var(--spacing-sm);
-}
-
-.empty-state p {
-    color: var(--color-text-secondary);
-    margin-bottom: var(--spacing-lg);
+    .modal-actions > * {
+        width: 100%;
+    }
 }

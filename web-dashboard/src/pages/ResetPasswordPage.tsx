@@ -69,7 +69,7 @@ export default function ResetPasswordPage() {
 
                 {success ? (
                     <div className="login-form">
-                        <div className="login-success">
+                        <div className="login-success" role="status">
                             ✅ 密碼重設成功！即將跳轉至登入頁面...
                         </div>
                         <Link to="/login" className="login-submit" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
@@ -106,51 +106,40 @@ export default function ResetPasswordPage() {
                             />
                         </div>
 
-                        {/* 密碼強度指示 */}
-                        {password && (
-                            <div style={{ marginBottom: '20px' }}>
-                                <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
-                                    密碼強度：
-                                    <span style={{
-                                        color: password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)
-                                            ? '#4CAF50'
-                                            : password.length >= 6
-                                                ? '#FF9800'
-                                                : '#f44336'
-                                    }}>
-                                        {password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)
-                                            ? ' 強'
-                                            : password.length >= 6
-                                                ? ' 中'
-                                                : ' 弱'}
-                                    </span>
-                                </div>
-                                <div style={{
-                                    height: '4px',
-                                    borderRadius: '2px',
-                                    background: 'var(--border-color)',
-                                    overflow: 'hidden'
-                                }}>
+                        {/* 密碼強度指示（狀態色語意：強=success／中=warning／弱=danger，且不僅靠顏色——文字標籤同步呈現） */}
+                        {password && (() => {
+                            const isStrong = password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password);
+                            const isMedium = password.length >= 6;
+                            const strengthColor = isStrong ? 'var(--color-success)' : isMedium ? 'var(--color-warning)' : 'var(--color-danger)';
+                            const strengthLabel = isStrong ? '強' : isMedium ? '中' : '弱';
+                            const strengthWidth = isStrong ? '100%' : isMedium ? '66%' : '33%';
+                            return (
+                                <div style={{ marginBottom: '20px' }} role="status">
+                                    <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '6px' }}>
+                                        密碼強度：
+                                        <span style={{ color: strengthColor, fontWeight: 600 }}>
+                                            {' '}{strengthLabel}
+                                        </span>
+                                    </div>
                                     <div style={{
-                                        height: '100%',
-                                        width: password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)
-                                            ? '100%'
-                                            : password.length >= 6
-                                                ? '66%'
-                                                : '33%',
-                                        background: password.length >= 8 && /[A-Z]/.test(password) && /[0-9]/.test(password)
-                                            ? '#4CAF50'
-                                            : password.length >= 6
-                                                ? '#FF9800'
-                                                : '#f44336',
-                                        transition: 'all 0.3s ease'
-                                    }} />
+                                        height: '4px',
+                                        borderRadius: '2px',
+                                        background: 'var(--border-color)',
+                                        overflow: 'hidden'
+                                    }}>
+                                        <div style={{
+                                            height: '100%',
+                                            width: strengthWidth,
+                                            background: strengthColor,
+                                            transition: 'all 0.3s ease'
+                                        }} />
+                                    </div>
                                 </div>
-                            </div>
-                        )}
+                            );
+                        })()}
 
                         {error && (
-                            <div className="login-error">
+                            <div className="login-error" role="alert">
                                 ⚠️ {error}
                             </div>
                         )}

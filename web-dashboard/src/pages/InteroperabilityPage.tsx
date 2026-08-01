@@ -1,74 +1,53 @@
 /**
  * InteroperabilityPage.tsx
- * 
+ *
  * 機構互通頁面 - 跨組織資料交換
  */
-import './placeholder-pages.css';
-import { AlertTriangle, Link, Database, RefreshCw } from 'lucide-react';
+import { Link, Database, RefreshCw } from 'lucide-react';
+import { Alert, Card, StatIndicator } from '../design-system';
+import './InteroperabilityPage.css';
+
+const FEATURES = [
+    { icon: Link, title: 'API 管理', description: '外部系統連接設定' },
+    { icon: Database, title: 'EDXL 訊息', description: '標準化災害訊息交換' },
+    { icon: RefreshCw, title: '資料同步', description: '即時同步狀態監控' },
+];
 
 export default function InteroperabilityPage() {
     return (
-        <div className="placeholder-page">
-            <h1 className="placeholder-page__title">🔄 機構互通</h1>
-            <p className="placeholder-page__subtitle">
-                OCHA EDXL、EMAP 標準、跨機關資料交換
-            </p>
-
-            {/* 開發中提示 */}
-            <div className="placeholder-page__dev-notice placeholder-page__dev-notice--green">
-                <AlertTriangle size={20} color="#047857" />
-                <div>
-                    <strong className="placeholder-page__dev-notice-title">🚧 互通功能開發中</strong>
-                    <p className="placeholder-page__dev-notice-text">
-                        機構互通系統正在開發中，預計包含：EDXL 訊息發送、EMAP 標準對接、API 管理介面等功能。
-                    </p>
+        <div className="interop-page">
+            <div className="page-header">
+                <div className="page-header__left">
+                    <h1 className="interop-page__title">機構互通</h1>
+                    <p className="page-subtitle">OCHA EDXL、EMAP 標準、跨機關資料交換</p>
                 </div>
             </div>
 
-            <div className="placeholder-page__grid">
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">🌐</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--green">4</div>
-                    <div className="placeholder-page__card-label">已連接機構</div>
-                </div>
+            <Alert variant="info" title="互通功能開發中">
+                機構互通系統正在開發中，預計包含：EDXL 訊息發送、EMAP 標準對接、API 管理介面等功能。
+            </Alert>
 
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">📤</div>
-                    <div className="placeholder-page__card-value">156</div>
-                    <div className="placeholder-page__card-label">今日訊息</div>
-                </div>
-
-                <div className="placeholder-page__card">
-                    <div className="placeholder-page__card-icon">✅</div>
-                    <div className="placeholder-page__card-value placeholder-page__card-value--blue">99.2%</div>
-                    <div className="placeholder-page__card-label">同步成功率</div>
-                </div>
+            <div className="interop-page__stats">
+                <StatIndicator label="已連接機構" value={4} variant="success" />
+                <StatIndicator label="今日訊息" value={156} variant="default" />
+                <StatIndicator label="同步成功率" value="99.2%" variant="default" />
             </div>
 
-            {/* 預期功能區塊 */}
-            <div className="placeholder-page__expected-features">
-                <h3 className="placeholder-page__expected-features-title">
-                    📋 預期功能
-                </h3>
-                <div className="placeholder-page__grid">
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Link size={24} color="#3B82F6" />
-                        <div className="placeholder-page__feature-card-title">API 管理</div>
-                        <div className="placeholder-page__card-label">外部系統連接設定</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <Database size={24} color="#8B5CF6" />
-                        <div className="placeholder-page__feature-card-title">EDXL 訊息</div>
-                        <div className="placeholder-page__card-label">標準化災害訊息交換</div>
-                    </div>
-                    <div className="placeholder-page__card placeholder-page__feature-card">
-                        <RefreshCw size={24} color="#10B981" />
-                        <div className="placeholder-page__feature-card-title">資料同步</div>
-                        <div className="placeholder-page__card-label">即時同步狀態監控</div>
-                    </div>
+            <section className="panel interop-page__panel" aria-labelledby="interop-features-heading">
+                <h2 id="interop-features-heading" className="interop-page__panel-title">預期功能</h2>
+                <div className="interop-page__grid">
+                    {FEATURES.map((feature) => {
+                        const Icon = feature.icon;
+                        return (
+                            <Card key={feature.title} className="interop-page__feature-card">
+                                <Icon size={24} aria-hidden="true" className="interop-page__feature-icon" />
+                                <div className="interop-page__feature-title">{feature.title}</div>
+                                <div className="interop-page__feature-desc">{feature.description}</div>
+                            </Card>
+                        );
+                    })}
                 </div>
-            </div>
+            </section>
         </div>
     );
 }
-

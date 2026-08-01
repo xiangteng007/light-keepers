@@ -1,0 +1,65 @@
+/**
+ * SimulationPage.css — custom / Detail-base archetype（DESIGN_LANGUAGE.md §7.2 基底）
+ * 獨立 CSS 檔（不再共用 placeholder-pages.css，避免影響同檔其他頁面）。
+ */
+
+.simulation-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.simulation-page .page-header h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.simulation-page .page-header__subtitle {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm);
+}
+
+.simulation-types__grid,
+.expected-features__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+}
+
+.simulation-card,
+.feature-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.simulation-card__title,
+.feature-card__title {
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}
+
+.simulation-card__desc,
+.feature-card__desc {
+    font-size: var(--font-size-sm);
+    color: var(--text-tertiary);
+}
+
+.expected-features {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.expected-features__title {
+    margin: 0;
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
+}

@@ -1,231 +1,238 @@
-/* 📚 培訓中心頁面樣式
- * 註：#667eea 系列（indigo 強調色）為本頁專屬品牌互動色（分頁/焦點/核取方塊強調），
- * 語義上不對應既有 success/warning/danger/info，故保留字面值；漸層背景同理。
+/* 📚 培訓中心頁面樣式 — List archetype（DESIGN_LANGUAGE.md §7.1）
+ * 全部改用語義 token；互動強調色統一改用 --color-info（原本頁專屬 #667eea 已移除）。
  */
 
 .training-page {
-    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.training-page .page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.training-page .page-header__left h1 {
+    margin: 0 0 var(--space-1);
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.training-page .page-header__right {
+    display: flex;
+    gap: var(--space-2);
+}
+
+.page-subtitle {
+    margin: 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 /* Tab 切換 */
 .training-tabs {
     display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1.5rem;
-    background: var(--bg-secondary, #f1f5f9);
-    padding: 0.25rem;
-    border-radius: var(--radius-lg, 12px);
+    gap: var(--space-2);
+    background: var(--surface-hover);
+    padding: var(--space-1);
+    border-radius: var(--radius-lg);
 }
 
 .training-tab {
     flex: 1;
-    padding: 0.75rem 1rem;
+    min-height: 44px;
+    padding: var(--space-3) var(--space-4);
     border: none;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     background: transparent;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: var(--text-secondary, #64748b);
+    font-weight: var(--font-weight-semibold);
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all var(--duration-normal) var(--ease-smooth);
 }
 
 .training-tab:hover {
-    color: var(--text-primary, #334155);
+    color: var(--text-primary);
+}
+
+.training-tab:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .training-tab.active {
-    background: white;
-    color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    background: var(--surface-default);
+    color: var(--color-info);
+    box-shadow: var(--shadow-sm);
 }
 
 /* 統計卡片 */
 .training-stats {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-}
-
-.stat-card {
-    text-align: center;
-}
-
-.stat-card__value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary, #1e293b);
-}
-
-.stat-card__label {
-    font-size: 0.85rem;
-    color: var(--text-secondary, #64748b);
-}
-
-.stat-card--success .stat-card__value {
-    color: var(--color-success, #10b981);
-}
-
-.stat-card--warning .stat-card__value {
-    color: var(--color-warning, #f59e0b);
-}
-
-.stat-card--info .stat-card__value {
-    color: var(--color-info, #3b82f6);
-}
-
-.stat-card--danger .stat-card__value {
-    color: var(--color-danger, #ef4444);
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: var(--space-4);
 }
 
 /* 🌐 爬取課程分類 */
 .scraped-categories {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
     flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-    padding: 0.5rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); /* 裝飾漸層，保留字面值 */
-    border-radius: 14px;
+    padding: var(--space-2);
+    background: var(--surface-hover);
+    border-radius: var(--radius-xl);
 }
 
 .scraped-category-btn {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    padding: 0.625rem 1rem;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: var(--space-2) var(--space-4);
     border: 2px solid transparent;
-    border-radius: 25px;
-    background: white;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary, #475569);
+    border-radius: var(--radius-full);
+    background: var(--surface-default);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all var(--duration-normal) var(--ease-smooth);
 }
 
 .scraped-category-btn:hover {
-    border-color: var(--cat-color, #667eea);
-    background: rgba(102, 126, 234, 0.05);
+    border-color: var(--cat-color, var(--color-info));
+}
+
+.scraped-category-btn:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
 }
 
 .scraped-category-btn.active {
-    background: var(--cat-color, #667eea);
-    color: white;
-    border-color: var(--cat-color, #667eea);
+    background: var(--cat-color, var(--color-info));
+    color: var(--text-inverse);
+    border-color: var(--cat-color, var(--color-info));
 }
 
 .scraped-category-icon {
-    font-size: 1.1rem;
+    font-size: var(--font-size-lg);
 }
 
 /* 爬取課程 Grid */
 .scraped-courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-4);
+}
+
+.scraped-courses-grid__loading {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: var(--space-4);
+}
+
+.scraped-course-card--skeleton {
+    height: 160px;
+    background: var(--surface-hover);
+    animation: training-skeleton-pulse 1.2s var(--ease-in-out) infinite;
+}
+
+@keyframes training-skeleton-pulse {
+    0%, 100% { opacity: 0.55; }
+    50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .scraped-course-card--skeleton { animation: none; }
 }
 
 /* 爬取課程卡片 */
 .scraped-course-card {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
-    border: 1px solid var(--border-color, #e2e8f0);
-    transition: all 0.3s;
+    gap: var(--space-3);
+    border: 1px solid var(--border-default);
+    transition: all var(--duration-normal) var(--ease-smooth);
 }
 
 .scraped-course-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1);
-    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
+    box-shadow: var(--shadow-lg);
+    border-color: var(--color-info);
 }
 
 .scraped-course-header {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
+}
+
+.scraped-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-inverse);
 }
 
 .scraped-course-title {
-    font-size: 1.05rem;
-    font-weight: 600;
-    color: var(--text-primary, #1e293b);
+    font-size: var(--font-size-lg);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
     margin: 0;
-    line-height: 1.4;
+    line-height: var(--line-height-normal);
 }
 
 .scraped-course-meta {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    font-size: 0.85rem;
-    color: var(--text-secondary, #64748b);
+    gap: var(--space-3);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 .scraped-course-meta span {
     display: flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: var(--space-1);
 }
 
 .scraped-course-actions {
     margin-top: auto;
-    padding-top: 0.5rem;
-    border-top: 1px solid var(--border-light, #f1f5f9);
+    padding-top: var(--space-2);
+    border-top: 1px solid var(--border-light);
 }
 
-/* 資料來源說明（indigo 資訊框為品牌裝飾色，保留字面值） */
+/* 資料來源說明 */
 .data-source-info {
-    background: linear-gradient(135deg, #eef2ff 0%, #e0e7ff 100%);
-    padding: 1rem 1.25rem;
-    border-radius: var(--radius-lg, 12px);
-    border-left: 4px solid #667eea;
+    background: var(--color-info-bg);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
+    border-left: 4px solid var(--color-info);
 }
 
 .data-source-info p {
     margin: 0;
-    font-size: 0.85rem;
-    color: #4338ca;
+    font-size: var(--font-size-sm);
+    color: var(--color-info-dark, var(--color-info));
 }
 
 .data-source-info p:first-child {
-    font-weight: 600;
-    margin-bottom: 0.25rem;
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--space-1);
 }
 
-/* 空狀態 */
+/* 空狀態容器（跨整個 grid） */
 .empty-state {
     grid-column: 1 / -1;
-    text-align: center;
-    padding: 3rem;
-    color: var(--text-tertiary, #94a3b8);
-}
-
-.empty-icon {
-    font-size: 3rem;
-    display: block;
-    margin-bottom: 0.5rem;
-}
-
-/* 大型空狀態 */
-.empty-state--large {
-    padding: 4rem 2rem;
-    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); /* 裝飾漸層，保留字面值 */
-    border-radius: var(--radius-xl, 16px);
-    border: 2px dashed var(--border-color, #e2e8f0);
-}
-
-.empty-state--large h3 {
-    margin: 0.5rem 0;
-    font-size: 1.25rem;
-    color: var(--text-primary, #334155);
-}
-
-.empty-state--large p {
-    margin: 0;
-    font-size: 0.95rem;
 }
 
 /* 內部課程區塊 */
@@ -237,57 +244,59 @@
 .add-course-form {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 0.375rem;
+    gap: var(--space-2);
 }
 
 .form-group label {
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: var(--text-secondary, #374151);
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
 }
 
 .form-group select,
 .form-group input[type="number"] {
-    padding: 0.625rem 0.875rem;
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: var(--radius-md, 8px);
-    font-size: 0.9rem;
-    background: white;
-    transition: border-color 0.2s;
+    min-height: 44px;
+    padding: var(--space-2) var(--space-3);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-base);
+    background: var(--surface-default);
+    color: var(--text-primary);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .form-group select:focus,
 .form-group input[type="number"]:focus {
     outline: none;
-    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: var(--color-info);
+    box-shadow: var(--focus-ring);
 }
 
 .checkbox-label {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: var(--space-2);
     cursor: pointer;
     height: 100%;
-    padding-top: 1.5rem;
+    padding-top: var(--space-6);
 }
 
 .checkbox-label input[type="checkbox"] {
-    width: 1rem;
-    height: 1rem;
-    accent-color: #667eea;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--color-info);
 }
 
 @media (max-width: 480px) {
@@ -296,47 +305,18 @@
     }
 }
 
-/* 內部課程分類 */
-.training-categories {
-    display: flex;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    margin-bottom: 1.5rem;
-}
-
-.category-btn {
-    padding: 0.5rem 1rem;
-    border: 1px solid var(--border-color, #e2e8f0);
-    border-radius: 20px;
-    background: white;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.category-btn:hover {
-    border-color: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
-    background: var(--surface-hover, #f8fafc);
-}
-
-.category-btn.active {
-    background: #667eea; /* 本頁專屬品牌互動色，保留字面值 */
-    color: white;
-    border-color: #667eea;
-}
-
 /* 課程 Grid */
 .courses-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    gap: var(--space-4);
 }
 
 /* 課程卡片 */
 .course-card {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .course-card__header {
@@ -348,45 +328,33 @@
 .course-card__icon {
     width: 40px;
     height: 40px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 1.25rem;
-    color: white;
+    font-size: var(--font-size-xl);
+    color: var(--text-inverse);
 }
 
 .course-card__title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary, #1e293b);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    color: var(--text-primary);
     margin: 0;
 }
 
 .course-card__desc {
-    font-size: 0.85rem;
-    color: var(--text-secondary, #64748b);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
     margin: 0;
     flex: 1;
 }
 
 .course-card__meta {
     display: flex;
-    gap: 1rem;
-    font-size: 0.8rem;
-}
-
-.progress-bar {
-    height: 6px;
-    background: var(--bg-tertiary, #e2e8f0);
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.progress-bar__fill {
-    height: 100%;
-    border-radius: 3px;
-    transition: width 0.3s;
+    gap: var(--space-4);
+    font-size: var(--font-size-sm);
+    font-variant-numeric: tabular-nums;
 }
 
 .course-card__actions {
@@ -395,54 +363,12 @@
     align-items: center;
 }
 
-.progress-text {
-    font-size: 0.8rem;
-    color: var(--text-secondary, #64748b);
-}
-
-/* Modal */
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--surface-overlay, rgba(0, 0, 0, 0.5));
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 1rem;
-}
-
-.modal-content {
-    max-width: 500px;
-    width: 100%;
-    max-height: 80vh;
-    overflow-y: auto;
-}
-
-.modal-content--lg {
-    max-width: 600px;
-}
-
-.modal-desc {
-    color: var(--text-secondary, #64748b);
-}
-
+/* Modal 表單間距 */
 .modal-actions {
     display: flex;
-    gap: 0.75rem;
+    gap: var(--space-3);
     justify-content: flex-end;
-    margin-top: 1.5rem;
-}
-
-.course-content {
-    background: var(--surface-raised, #f8fafc);
-    padding: 1rem;
-    border-radius: var(--radius-md, 8px);
-    margin-top: 1rem;
-}
-
-.course-content h4 {
-    margin: 0 0 0.5rem 0;
+    margin-top: var(--space-5);
 }
 
 /* RWD */

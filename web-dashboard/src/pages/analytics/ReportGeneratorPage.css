@@ -1,57 +1,75 @@
 /**
  * ReportGeneratorPage.css
- * Analytics Domain Styles
+ * Analytics Domain Styles — R3b 詳情頁骨架（設定精靈，DESIGN_LANGUAGE.md §7.2）
+ * 全部語義 token；light/dark/tactical 三態自動生效。
  */
 
 .report-generator {
     display: flex;
     flex-direction: column;
-    gap: 28px;
+    gap: var(--space-6);
 }
 
-.report-generator section {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 14px;
-    padding: 20px;
+.rg-panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
 }
 
-.report-generator h3 {
+.rg-panel__title {
     display: flex;
     align-items: center;
-    gap: 10px;
-    margin: 0 0 18px;
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-secondary, #9aa0a6);
+    gap: var(--space-2);
+    margin: 0 0 var(--space-4);
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
 }
 
-/* Templates Grid */
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── Templates Grid ── */
+
 .templates-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+}
+
+@media (min-width: 640px) {
+    .templates-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .template-card {
     display: flex;
-    gap: 14px;
-    padding: 18px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    align-items: flex-start;
+    gap: var(--space-3);
+    padding: var(--space-4);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     cursor: pointer;
-    transition: all 0.2s;
+    text-align: left;
+    min-height: 44px;
 }
 
 .template-card:hover {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.12);
+    background: var(--surface-hover);
 }
 
-.template-card.selected {
-    border-color: var(--accent-gold, #d4a84b);
-    background: rgba(212, 168, 75, 0.08);
+.template-card:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.template-card--selected {
+    border-color: var(--accent-primary, var(--color-secondary));
+    background: var(--surface-hover);
 }
 
 .template-icon {
@@ -60,205 +78,159 @@
     justify-content: center;
     width: 48px;
     height: 48px;
-    background: rgba(212, 168, 75, 0.1);
-    border-radius: 12px;
-    color: var(--accent-gold, #d4a84b);
     flex-shrink: 0;
+    background: var(--color-info-bg);
+    border-radius: var(--radius-md);
+    color: var(--color-info);
 }
 
-.template-card.selected .template-icon {
-    background: var(--accent-gold);
-    color: #0b111b;
+.template-card--selected .template-icon {
+    background: var(--accent-primary, var(--color-secondary));
+    color: var(--text-inverse);
 }
 
-.template-info h4 {
-    margin: 0 0 4px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text-primary, #e8eaed);
+.template-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
 }
 
-.template-info p {
-    margin: 0;
-    font-size: 12px;
-    color: var(--text-muted, #5f6368);
+.template-info__name {
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-primary);
 }
 
-/* Config Form */
+.template-info__desc {
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+/* ── Config Form ── */
+
 .config-form {
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: var(--space-4);
+}
+
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-4);
+}
+
+@media (min-width: 640px) {
+    .form-row {
+        grid-template-columns: 1fr 1fr;
+    }
 }
 
 .form-group {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: var(--space-2);
 }
 
-.form-group label {
+.form-group__label {
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-size: 13px;
-    color: var(--text-secondary, #9aa0a6);
+    gap: var(--space-1);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
 }
 
-.form-group input,
-.form-group select {
-    padding: 12px 14px;
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    color: var(--text-primary, #e8eaed);
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
+.rg-select {
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    font-size: var(--font-size-base, 14px);
 }
 
-.form-group input:focus,
-.form-group select:focus {
-    border-color: var(--accent-gold, #d4a84b);
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 16px;
+.rg-select:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
 }
 
 .form-actions {
     display: flex;
-    gap: 12px;
-    margin-top: 8px;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
 }
 
-.btn-generate,
-.btn-schedule {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 20px;
-    border-radius: 10px;
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-}
+/* ── Reports List ── */
 
-.btn-generate {
-    background: var(--accent-gold, #d4a84b);
-    border: none;
-    color: #0b111b;
-}
-
-.btn-generate:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.btn-generate:not(:disabled):hover {
-    filter: brightness(1.1);
-}
-
-.btn-schedule {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-primary, #e8eaed);
-}
-
-.btn-schedule:hover {
-    background: rgba(255, 255, 255, 0.08);
-}
-
-/* Reports List */
 .reports-list {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: var(--space-2);
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .report-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px;
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 10px;
+    gap: var(--space-3);
+    padding: var(--space-3);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-md);
 }
 
 .report-icon {
-    color: var(--text-muted, #5f6368);
+    color: var(--text-tertiary);
+    flex-shrink: 0;
 }
 
 .report-info {
     flex: 1;
+    min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 2px;
 }
 
 .report-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text-primary, #e8eaed);
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .report-meta {
-    font-size: 12px;
-    color: var(--text-muted, #5f6368);
-}
-
-.report-status {
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 500;
-}
-
-.report-status.completed {
-    background: rgba(16, 185, 129, 0.15);
-    color: #10b981;
-}
-
-.report-status.pending {
-    background: rgba(59, 130, 246, 0.15);
-    color: #3b82f6;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
 }
 
 .btn-download {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 36px;
-    height: 36px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
+    width: 44px;
+    height: 44px;
+    flex-shrink: 0;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     color: var(--text-secondary);
     cursor: pointer;
-    transition: all 0.2s;
 }
 
 .btn-download:hover {
-    background: rgba(212, 168, 75, 0.1);
-    border-color: var(--accent-gold);
-    color: var(--accent-gold);
+    background: var(--surface-hover);
+    color: var(--accent-primary, var(--color-secondary));
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .templates-grid {
-        grid-template-columns: 1fr;
-    }
-
-    .form-row {
-        grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-        flex-direction: column;
-    }
+.btn-download:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
 }

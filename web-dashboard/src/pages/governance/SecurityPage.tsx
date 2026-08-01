@@ -8,7 +8,9 @@
  * 對應後端模組。
  */
 import { useState } from 'react';
-import { Alert } from '../../design-system';
+import { ShieldAlert, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { Alert, Badge, Button, StatIndicator } from '../../design-system';
+import EmptyState from '../../components/shared/EmptyState';
 import './SecurityPage.css';
 
 interface AnomalyAlert {
@@ -28,6 +30,23 @@ const mockAlerts: AnomalyAlert[] = [
     { id: '4', type: 'HIGH_FREQUENCY', severity: 'medium', description: '異常高頻率請求：250 次/分鐘', timestamp: new Date(Date.now() - 1800000), accountId: 'api-service', resolved: false },
 ];
 
+// 嚴重度 → Badge variant 對照。critical/high 都映射到 danger（Badge 元件無獨立 critical
+// variant，§3 的「大規模危機」token 保留給 EmergencyStatusBar），medium 用 warning，
+// low 用 info——語意仍嚴格對應，不是裝飾用色。
+const SEVERITY_BADGE_VARIANT: Record<AnomalyAlert['severity'], 'danger' | 'warning' | 'info'> = {
+    critical: 'danger',
+    high: 'danger',
+    medium: 'warning',
+    low: 'info',
+};
+
+const SEVERITY_LABEL: Record<AnomalyAlert['severity'], string> = {
+    critical: '嚴重',
+    high: '高',
+    medium: '中',
+    low: '低',
+};
+
 export default function SecurityPage() {
     const [alerts, setAlerts] = useState(mockAlerts);
     const [filter, setFilter] = useState<'all' | 'unresolved'>('unresolved');
@@ -38,69 +57,72 @@ export default function SecurityPage() {
 
     const filteredAlerts = alerts.filter(a => filter === 'all' || !a.resolved);
 
-    const getSeverityColor = (severity: string) => {
-        switch (severity) {
-            case 'critical': return '#9333EA';
-            case 'high': return '#EF4444';
-            case 'medium': return '#F59E0B';
-            default: return '#3B82F6';
-        }
-    };
-
     return (
         <div className="security-page">
-            <header className="security-page__header">
-                <div>
-                    <h1>🛡️ 安全中心</h1>
+            <div className="page-header">
+                <div className="page-header__text">
+                    <h1><ShieldAlert size={24} aria-hidden="true" /> 安全中心</h1>
                     <p>異常行為偵測與安全監控</p>
                 </div>
                 <div className="security-page__stats">
-                    <div className="stat-card">
-                        <span className="stat-value">{alerts.filter(a => !a.resolved).length}</span>
-                        <span className="stat-label">待處理</span>
-                    </div>
-                    <div className="stat-card">
-                        <span className="stat-value">{alerts.filter(a => a.severity === 'critical').length}</span>
-                        <span className="stat-label">嚴重</span>
-                    </div>
+                    <StatIndicator
+                        value={alerts.filter(a => !a.resolved).length}
+                        label="待處理"
+                        variant="warning"
+                    />
+                    <StatIndicator
+                        value={alerts.filter(a => a.severity === 'critical').length}
+                        label="嚴重"
+                        variant="danger"
+                    />
                 </div>
-            </header>
+            </div>
 
             <Alert variant="warning" title="示範資料">
                 此頁目前顯示示範資料，功能建置中。後端尚未提供登入異常偵測 API。
             </Alert>
 
-            <div className="security-page__controls">
-                <button
-                    className={filter === 'unresolved' ? 'active' : ''}
+            <div className="security-page__controls" role="group" aria-label="篩選警報">
+                <Button
+                    size="sm"
+                    variant={filter === 'unresolved' ? 'primary' : 'secondary'}
                     onClick={() => setFilter('unresolved')}
+                    aria-pressed={filter === 'unresolved'}
                 >
                     待處理
-                </button>
-                <button
-                    className={filter === 'all' ? 'active' : ''}
+                </Button>
+                <Button
+                    size="sm"
+                    variant={filter === 'all' ? 'primary' : 'secondary'}
                     onClick={() => setFilter('all')}
+                    aria-pressed={filter === 'all'}
                 >
                     全部
-                </button>
+                </Button>
             </div>
 
             <div className="security-page__alerts">
                 {filteredAlerts.length === 0 ? (
-                    <div className="empty-state">
-                        <span>✅</span>
-                        <p>目前沒有待處理的安全警報</p>
-                    </div>
+                    <EmptyState
+                        icon={CheckCircle2}
+                        title="目前沒有待處理的安全警報"
+                        description="所有已知的登入異常都已處理完畢。"
+                    />
                 ) : (
                     filteredAlerts.map(alert => (
                         <div key={alert.id} className={`alert-card ${alert.resolved ? 'resolved' : ''}`}>
-                            <div
-                                className="alert-card__severity"
-                                style={{ backgroundColor: getSeverityColor(alert.severity) }}
-                            />
                             <div className="alert-card__content">
                                 <div className="alert-card__header">
-                                    <span className="alert-type">{alert.type}</span>
+                                    <div className="alert-card__header-left">
+                                        <Badge
+                                            variant={SEVERITY_BADGE_VARIANT[alert.severity]}
+                                            size="sm"
+                                            icon={<AlertTriangle size={11} aria-hidden="true" />}
+                                        >
+                                            {SEVERITY_LABEL[alert.severity]}
+                                        </Badge>
+                                        <span className="alert-type">{alert.type}</span>
+                                    </div>
                                     <span className="alert-time">
                                         {alert.timestamp.toLocaleString('zh-TW')}
                                     </span>
@@ -109,12 +131,14 @@ export default function SecurityPage() {
                                 <span className="alert-account">帳號: {alert.accountId}</span>
                             </div>
                             {!alert.resolved && (
-                                <button
-                                    className="resolve-btn"
-                                    onClick={() => resolveAlert(alert.id)}
-                                >
-                                    解決
-                                </button>
+                                <Button size="sm" variant="secondary" onClick={() => resolveAlert(alert.id)}>
+                                    標記已解決
+                                </Button>
+                            )}
+                            {alert.resolved && (
+                                <Badge variant="success" size="sm" icon={<CheckCircle2 size={11} aria-hidden="true" />}>
+                                    已解決
+                                </Badge>
                             )}
                         </div>
                     ))

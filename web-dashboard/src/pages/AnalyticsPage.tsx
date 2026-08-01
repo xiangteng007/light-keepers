@@ -14,7 +14,8 @@ import {
     Filler,
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
-import { Card, Button } from '../design-system';
+import { Card, Button, Badge, StatIndicator } from '../design-system';
+import { Package, Users, AlertTriangle, Megaphone, ClipboardList, CheckCircle2, Inbox } from 'lucide-react';
 import {
     getResourceStats,
     getReportStats,
@@ -289,22 +290,22 @@ export default function AnalyticsPage() {
     };
 
     // 交易類型標籤
-    const getTransactionLabel = (type: string) => {
-        const labels: Record<string, { text: string; class: string }> = {
-            in: { text: '入庫', class: 'badge-success' },
-            out: { text: '出庫', class: 'badge-danger' },
-            transfer: { text: '調撥', class: 'badge-info' },
-            donation: { text: '捐贈', class: 'badge-primary' },
-            adjustment: { text: '調整', class: 'badge-warning' },
+    const getTransactionLabel = (type: string): { text: string; variant: 'success' | 'danger' | 'info' | 'warning' | 'default' } => {
+        const labels: Record<string, { text: string; variant: 'success' | 'danger' | 'info' | 'warning' | 'default' }> = {
+            in: { text: '入庫', variant: 'success' },
+            out: { text: '出庫', variant: 'danger' },
+            transfer: { text: '調撥', variant: 'info' },
+            donation: { text: '捐贈', variant: 'info' },
+            adjustment: { text: '調整', variant: 'warning' },
         };
-        return labels[type] || { text: type, class: 'badge-secondary' };
+        return labels[type] || { text: type, variant: 'default' };
     };
 
     return (
         <div className="page analytics-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>📊 數據分析儀表板</h2>
+                    <h1>數據分析儀表板</h1>
                     <p className="page-subtitle">系統整體運作狀態總覽</p>
                 </div>
                 <div className="date-range-selector">
@@ -332,86 +333,70 @@ export default function AnalyticsPage() {
                 </div>
             </div>
 
-            {/* 6 個 KPI 摘要卡片 */}
+            {/* 統計摘要列（StatIndicator，§7.1） */}
             <div className="kpi-grid">
-                <Card className="kpi-card kpi-card--resources" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">📦</span>
-                        <span className="kpi-card__title">物資管理</span>
-                    </div>
-                    <div className="kpi-card__value">{totalResources}</div>
-                    <div className="kpi-card__subtitle">物資種類</div>
-                    <div className="kpi-card__detail">
-                        {lowStockCount > 0 ? (
-                            <span className="kpi-detail--warning">⚠️ {lowStockCount} 項低庫存</span>
-                        ) : (
-                            <span className="kpi-detail--success">✓ 庫存充足</span>
-                        )}
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<Package size={20} aria-hidden="true" />}
+                        value={totalResources}
+                        label="物資管理・物資種類"
+                        variant={lowStockCount > 0 ? 'warning' : 'success'}
+                    />
+                    <Badge variant={lowStockCount > 0 ? 'warning' : 'success'} size="sm">
+                        {lowStockCount > 0 ? `${lowStockCount} 項低庫存` : '庫存充足'}
+                    </Badge>
                 </Card>
 
-                <Card className="kpi-card kpi-card--volunteers" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">👥</span>
-                        <span className="kpi-card__title">志工團隊</span>
-                    </div>
-                    <div className="kpi-card__value">{totalVolunteers}</div>
-                    <div className="kpi-card__subtitle">志工人數</div>
-                    <div className="kpi-card__detail">
-                        <span className="kpi-detail--info">🟢 {busyVolunteers} 人執勤中</span>
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<Users size={20} aria-hidden="true" />}
+                        value={totalVolunteers}
+                        label="志工團隊・志工人數"
+                        variant="default"
+                    />
+                    <Badge variant="info" size="sm">{busyVolunteers} 人執勤中</Badge>
                 </Card>
 
-                <Card className="kpi-card kpi-card--alerts" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">🚨</span>
-                        <span className="kpi-card__title">NCDR 警報</span>
-                    </div>
-                    <div className="kpi-card__value">{totalAlerts}</div>
-                    <div className="kpi-card__subtitle">即時警報</div>
-                    <div className="kpi-card__detail">
-                        <span className="kpi-detail--neutral">過去 {dateRange} 天</span>
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<AlertTriangle size={20} aria-hidden="true" />}
+                        value={totalAlerts}
+                        label="NCDR 警報・即時警報"
+                        variant="default"
+                    />
+                    <Badge variant="default" size="sm">過去 {dateRange} 天</Badge>
                 </Card>
 
-                <Card className="kpi-card kpi-card--reports" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">📢</span>
-                        <span className="kpi-card__title">災情回報</span>
-                    </div>
-                    <div className="kpi-card__value">{totalReports}</div>
-                    <div className="kpi-card__subtitle">回報總數</div>
-                    <div className="kpi-card__detail">
-                        {pendingReports > 0 ? (
-                            <span className="kpi-detail--warning">⏳ {pendingReports} 件待處理</span>
-                        ) : (
-                            <span className="kpi-detail--success">✓ 全部處理完成</span>
-                        )}
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<Megaphone size={20} aria-hidden="true" />}
+                        value={totalReports}
+                        label="災情回報・回報總數"
+                        variant={pendingReports > 0 ? 'warning' : 'success'}
+                    />
+                    <Badge variant={pendingReports > 0 ? 'warning' : 'success'} size="sm">
+                        {pendingReports > 0 ? `${pendingReports} 件待處理` : '全部處理完成'}
+                    </Badge>
                 </Card>
 
-                <Card className="kpi-card kpi-card--events" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">📋</span>
-                        <span className="kpi-card__title">事件管理</span>
-                    </div>
-                    <div className="kpi-card__value">{activeEvents}</div>
-                    <div className="kpi-card__subtitle">進行中事件</div>
-                    <div className="kpi-card__detail">
-                        <span className="kpi-detail--neutral">需持續關注</span>
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<ClipboardList size={20} aria-hidden="true" />}
+                        value={activeEvents}
+                        label="事件管理・進行中事件"
+                        variant="default"
+                    />
+                    <Badge variant="default" size="sm">需持續關注</Badge>
                 </Card>
 
-                <Card className="kpi-card kpi-card--tasks" padding="md">
-                    <div className="kpi-card__header">
-                        <span className="kpi-card__icon">✅</span>
-                        <span className="kpi-card__title">任務進度</span>
-                    </div>
-                    <div className="kpi-card__value">{taskCompletionRate}%</div>
-                    <div className="kpi-card__subtitle">完成率</div>
-                    <div className="kpi-card__detail">
-                        <span className="kpi-detail--info">{taskCompleted}/{taskTotal} 已完成</span>
-                    </div>
+                <Card className="kpi-card" padding="md">
+                    <StatIndicator
+                        icon={<CheckCircle2 size={20} aria-hidden="true" />}
+                        value={`${taskCompletionRate}%`}
+                        label="任務進度・完成率"
+                        variant="default"
+                    />
+                    <Badge variant="info" size="sm">{taskCompleted}/{taskTotal} 已完成</Badge>
                 </Card>
             </div>
 
@@ -435,7 +420,7 @@ export default function AnalyticsPage() {
                             <Doughnut data={resourceCategoryData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <span>📭</span>
+                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
                                 <p>尚無物資資料</p>
                             </div>
                         )}
@@ -448,7 +433,7 @@ export default function AnalyticsPage() {
                             <Pie data={ncdrCategoryData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <span>📭</span>
+                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
                                 <p>目前無警報資料</p>
                             </div>
                         )}
@@ -473,7 +458,7 @@ export default function AnalyticsPage() {
                             <Doughnut data={reportStatusData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <span>📭</span>
+                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
                                 <p>尚無回報資料</p>
                             </div>
                         )}
@@ -491,7 +476,7 @@ export default function AnalyticsPage() {
                                     const label = getTransactionLabel(tx.type);
                                     return (
                                         <div key={tx.id} className="activity-item">
-                                            <span className={`activity-badge ${label.class}`}>{label.text}</span>
+                                            <Badge variant={label.variant} size="sm">{label.text}</Badge>
                                             <span className="activity-text">{tx.operatorName}</span>
                                             <span className="activity-meta">
                                                 {tx.quantity > 0 ? '+' : ''}{tx.quantity} · {formatTime(tx.createdAt)}
@@ -510,9 +495,12 @@ export default function AnalyticsPage() {
                             {alertsData && alertsData.length > 0 ? (
                                 alertsData.slice(0, 5).map((alert: { id: string; title: string; severity?: string; createdAt?: string }) => (
                                     <div key={alert.id} className="activity-item">
-                                        <span className={`activity-badge badge-${alert.severity || 'info'}`}>
+                                        <Badge
+                                            variant={alert.severity === 'critical' ? 'danger' : alert.severity === 'warning' ? 'warning' : 'info'}
+                                            size="sm"
+                                        >
                                             {alert.severity === 'critical' ? '緊急' : alert.severity === 'warning' ? '警告' : '資訊'}
-                                        </span>
+                                        </Badge>
                                         <span className="activity-text" title={alert.title}>
                                             {alert.title.length > 20 ? alert.title.substring(0, 20) + '...' : alert.title}
                                         </span>
@@ -532,9 +520,12 @@ export default function AnalyticsPage() {
                             {recentReports && recentReports.length > 0 ? (
                                 recentReports.slice(0, 5).map((report: { id: string; title: string; status: string; createdAt: string }) => (
                                     <div key={report.id} className="activity-item">
-                                        <span className={`activity-badge badge-${report.status === 'pending' ? 'warning' : report.status === 'confirmed' ? 'success' : 'danger'}`}>
+                                        <Badge
+                                            variant={report.status === 'pending' ? 'warning' : report.status === 'confirmed' ? 'success' : 'danger'}
+                                            size="sm"
+                                        >
                                             {report.status === 'pending' ? '待處理' : report.status === 'confirmed' ? '已確認' : '已駁回'}
-                                        </span>
+                                        </Badge>
                                         <span className="activity-text" title={report.title}>
                                             {report.title.length > 20 ? report.title.substring(0, 20) + '...' : report.title}
                                         </span>

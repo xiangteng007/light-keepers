@@ -126,22 +126,25 @@ export default function LabelManagementPage() {
             </div>
 
             {/* Tab 切換 */}
-            <div className="btn-group mb-3">
+            <div className="btn-group mb-3" role="group" aria-label="貼紙管理功能切換">
                 <Button
                     variant={activeTab === 'templates' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('templates')}
+                    aria-pressed={activeTab === 'templates'}
                 >
                     📄 模板管理
                 </Button>
                 <Button
                     variant={activeTab === 'generate' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('generate')}
+                    aria-pressed={activeTab === 'generate'}
                 >
                     🔐 手動產碼
                 </Button>
                 <Button
                     variant={activeTab === 'history' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('history')}
+                    aria-pressed={activeTab === 'history'}
                 >
                     📊 列印歷史
                 </Button>
@@ -289,7 +292,7 @@ export default function LabelManagementPage() {
                 </Modal.Header>
                 <Modal.Body>
                     <Form>
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-3" controlId="label-template-name">
                             <Form.Label>模板名稱 *</Form.Label>
                             <Form.Control
                                 type="text"
@@ -299,7 +302,7 @@ export default function LabelManagementPage() {
                             />
                         </Form.Group>
 
-                        <Form.Group className="mb-3">
+                        <Form.Group className="mb-3" controlId="label-template-desc">
                             <Form.Label>描述</Form.Label>
                             <Form.Control
                                 as="textarea"
@@ -312,7 +315,7 @@ export default function LabelManagementPage() {
 
                         <div className="row">
                             <div className="col-6">
-                                <Form.Group className="mb-3">
+                                <Form.Group className="mb-3" controlId="label-template-width">
                                     <Form.Label>寬度 (mm)</Form.Label>
                                     <Form.Control
                                         type="number"
@@ -322,7 +325,7 @@ export default function LabelManagementPage() {
                                 </Form.Group>
                             </div>
                             <div className="col-6">
-                                <Form.Group className="mb-3">
+                                <Form.Group className="mb-3" controlId="label-template-height">
                                     <Form.Label>高度 (mm)</Form.Label>
                                     <Form.Control
                                         type="number"
@@ -334,11 +337,12 @@ export default function LabelManagementPage() {
                         </div>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>適用目標類型</Form.Label>
-                            <div>
+                            <Form.Label id="label-template-target-types-label">適用目標類型</Form.Label>
+                            <div role="group" aria-labelledby="label-template-target-types-label">
                                 {['lot', 'asset'].map((type) => (
                                     <Form.Check
                                         key={type}
+                                        id={`label-template-target-type-${type}`}
                                         inline
                                         type="checkbox"
                                         label={type}
@@ -356,11 +360,12 @@ export default function LabelManagementPage() {
                         </Form.Group>
 
                         <Form.Group className="mb-3">
-                            <Form.Label>適用管控等級</Form.Label>
-                            <div>
+                            <Form.Label id="label-template-control-levels-label">適用管控等級</Form.Label>
+                            <div role="group" aria-labelledby="label-template-control-levels-label">
                                 {['controlled', 'medical', 'asset'].map((level) => (
                                     <Form.Check
                                         key={level}
+                                        id={`label-template-control-level-${level}`}
                                         inline
                                         type="checkbox"
                                         label={level}

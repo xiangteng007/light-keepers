@@ -1,10 +1,11 @@
 /**
  * Account Page - Main Styles (CSS Module)
- * 
- * Design System: Tactical Deep Blue-Gray
- * - Background: #0B1220
- * - Card: #111B2E
- * - Accent: #D4AF37 (Gold)
+ *
+ * Design System: Tactical Deep Blue-Gray (K2 Copper Steel dark theme).
+ * R3 token pass: all colors resolve through tokens.css (--bg-primary,
+ * --surface-default, --color-secondary "gold" accent, --color-success/
+ * warning/danger) — no hardcoded hex/rgb remain. Alpha variants use
+ * color-mix() against the same tokens instead of frozen rgba() snapshots.
  */
 
 /* ============ CSS Variables ============ */
@@ -19,7 +20,7 @@
     
     /* Accent colors */
     --account-accent-gold: var(--color-secondary);
-    --account-accent-gold-dim: rgba(184, 115, 51, 0.15);
+    --account-accent-gold-dim: color-mix(in srgb, var(--color-secondary) 15%, transparent);
     
     /* Semantic colors */
     --account-success: var(--color-success);
@@ -162,7 +163,7 @@
 
 .tabButtonActive {
     background: var(--account-accent-gold-dim);
-    border-color: rgba(212, 175, 55, 0.3);
+    border-color: color-mix(in srgb, var(--account-accent-gold) 30%, transparent);
     color: var(--account-accent-gold);
 }
 
@@ -214,7 +215,7 @@
     background: var(--account-accent-gold);
     border: none;
     border-radius: var(--account-radius-sm);
-    color: #0B1220;
+    color: var(--bg-primary);
     font-size: 0.9rem;
     font-weight: 600;
     cursor: pointer;
@@ -222,7 +223,7 @@
 }
 
 .btnPrimary:hover {
-    background: #E5C158;
+    background: color-mix(in srgb, var(--account-accent-gold) 85%, white 15%);
     transform: translateY(-1px);
 }
 
@@ -238,7 +239,7 @@
     justify-content: center;
     gap: var(--account-spacing-xs);
     padding: var(--account-spacing-sm) var(--account-spacing-md);
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--account-text-primary) 5%, transparent);
     border: 1px solid var(--account-card-border);
     border-radius: var(--account-radius-sm);
     color: var(--account-text-primary);
@@ -249,8 +250,8 @@
 }
 
 .btnSecondary:hover {
-    background: rgba(255, 255, 255, 0.1);
-    border-color: rgba(255, 255, 255, 0.15);
+    background: color-mix(in srgb, var(--account-text-primary) 10%, transparent);
+    border-color: color-mix(in srgb, var(--account-text-primary) 15%, transparent);
 }
 
 .btnGhost {
@@ -270,7 +271,7 @@
 }
 
 .btnGhost:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: color-mix(in srgb, var(--account-text-primary) 5%, transparent);
     color: var(--account-text-primary);
 }
 
@@ -280,8 +281,8 @@
     justify-content: center;
     gap: var(--account-spacing-xs);
     padding: var(--account-spacing-sm) var(--account-spacing-md);
-    background: rgba(239, 68, 68, 0.1);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: color-mix(in srgb, var(--account-danger) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--account-danger) 30%, transparent);
     border-radius: var(--account-radius-sm);
     color: var(--account-danger);
     font-size: 0.9rem;
@@ -291,7 +292,7 @@
 }
 
 .btnDanger:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: color-mix(in srgb, var(--account-danger) 20%, transparent);
 }
 
 /* ============ Status Badges ============ */
@@ -309,31 +310,31 @@
 
 .badgeGold {
     background: var(--account-accent-gold-dim);
-    border: 1px solid rgba(212, 175, 55, 0.4);
+    border: 1px solid color-mix(in srgb, var(--account-accent-gold) 40%, transparent);
     color: var(--account-accent-gold);
 }
 
 .badgeSuccess {
-    background: rgba(16, 185, 129, 0.15);
-    border: 1px solid rgba(16, 185, 129, 0.3);
+    background: color-mix(in srgb, var(--account-success) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--account-success) 30%, transparent);
     color: var(--account-success);
 }
 
 .badgeWarning {
-    background: rgba(245, 158, 11, 0.15);
-    border: 1px solid rgba(245, 158, 11, 0.3);
+    background: color-mix(in srgb, var(--account-warning) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--account-warning) 30%, transparent);
     color: var(--account-warning);
 }
 
 .badgeDanger {
-    background: rgba(239, 68, 68, 0.15);
-    border: 1px solid rgba(239, 68, 68, 0.3);
+    background: color-mix(in srgb, var(--account-danger) 15%, transparent);
+    border: 1px solid color-mix(in srgb, var(--account-danger) 30%, transparent);
     color: var(--account-danger);
 }
 
 .badgeMuted {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: color-mix(in srgb, var(--account-text-primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--account-text-primary) 20%, transparent);
     color: var(--account-text-secondary);
 }
 
@@ -353,7 +354,7 @@
 .formInput {
     width: 100%;
     padding: var(--account-spacing-sm) var(--account-spacing-md);
-    background: rgba(0, 0, 0, 0.2);
+    background: color-mix(in srgb, var(--bg-inverse) 20%, transparent);
     border: 1px solid var(--account-card-border);
     border-radius: var(--account-radius-sm);
     color: var(--account-text-primary);
@@ -405,7 +406,7 @@
 .toggleSlider {
     position: absolute;
     inset: 0;
-    background: rgba(255, 255, 255, 0.2);
+    background: color-mix(in srgb, var(--account-text-primary) 20%, transparent);
     border-radius: 26px;
     transition: 0.3s;
 }
@@ -417,7 +418,7 @@
     width: 20px;
     left: 3px;
     bottom: 3px;
-    background: white;
+    background: var(--text-inverse);
     border-radius: 50%;
     transition: 0.3s;
 }

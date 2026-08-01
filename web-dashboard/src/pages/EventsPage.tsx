@@ -1,8 +1,11 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { LayoutGrid, List as ListIcon } from 'lucide-react';
 import { getReports, createTask, getAccounts, deleteReport, getTasks, getReportStats } from '../api/services';
 import type { Report, ReportType, ReportSeverity, ReportSource, Task } from '../api/services';
-import { Modal, Button, Card } from '../design-system';
+import { Alert, Badge, Modal, Button, Card, StatIndicator } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import { DISASTER_TYPE_META, MASS_CASUALTY_META } from '../constants/disasterTypes';
 import { useAuth } from '../context/AuthContext';
 import './EventsPage.css';
@@ -53,6 +56,23 @@ function formatDateTime(dateStr: string): string {
 }
 
 type ViewMode = 'card' | 'table';
+
+type TaskStatus = { pending: number; inProgress: number; completed: number } | null;
+
+// 任務派發狀態徽章（§3：狀態一律用 Badge，文字＋色同時傳達）
+function TaskStatusBadge({ taskStatus }: { taskStatus: TaskStatus }) {
+    if (!taskStatus) {
+        return <Badge variant="default" size="sm">未派發</Badge>;
+    }
+    const total = taskStatus.pending + taskStatus.inProgress + taskStatus.completed;
+    if (taskStatus.completed === total) {
+        return <Badge variant="success" size="sm">已完成</Badge>;
+    }
+    if (taskStatus.inProgress > 0) {
+        return <Badge variant="warning" size="sm" pulse>處理中</Badge>;
+    }
+    return <Badge variant="info" size="sm">已派發</Badge>;
+}
 
 export default function EventsPage() {
     const queryClient = useQueryClient();
@@ -226,10 +246,12 @@ export default function EventsPage() {
     if (isLoading) {
         return (
             <div className="page events-page">
-                <div className="page-header">
-                    <h2>災害回報</h2>
+                <header className="page-header">
+                    <h1>災害回報</h1>
+                </header>
+                <div aria-busy="true" aria-label="載入中">
+                    <Skeleton variant="card" height={160} count={3} className="events-page__skeleton-row" />
                 </div>
-                <div className="loading-state">載入中...</div>
             </div>
         );
     }
@@ -237,10 +259,12 @@ export default function EventsPage() {
     if (error) {
         return (
             <div className="page events-page">
-                <div className="page-header">
-                    <h2>災害回報</h2>
-                </div>
-                <div className="error-state">載入失敗，請重試</div>
+                <header className="page-header">
+                    <h1>災害回報</h1>
+                </header>
+                <Alert variant="danger" title="載入失敗">
+                    無法載入災害回報資料，請重試。
+                </Alert>
             </div>
         );
     }
@@ -248,57 +272,34 @@ export default function EventsPage() {
     return (
         <div className="page events-page">
             {/* 頁面標題區 */}
-            <div className="page-header">
+            <header className="page-header">
                 <div className="page-header__left">
-                    <h2>🚨 災害回報</h2>
-                    <span className="header-badge">{filteredReports.length} 件</span>
+                    <h1>災害回報</h1>
+                    <Badge variant="default">{filteredReports.length} 件</Badge>
                 </div>
                 <div className="page-header__right">
                     <Button variant="primary" onClick={() => window.location.href = '/report'}>
-                        📝 新增回報
+                        新增回報
                     </Button>
                 </div>
-            </div>
+            </header>
 
             {/* 統計儀表板 */}
             <div className="events-stats">
-                <div className="stat-card stat-card--total">
-                    <div className="stat-card__icon">📊</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{statsData?.confirmed || filteredReports.length}</div>
-                        <div className="stat-card__label">已確認回報</div>
-                    </div>
-                </div>
-                <div className="stat-card stat-card--line">
-                    <div className="stat-card__icon">💬</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{sourceStats.line}</div>
-                        <div className="stat-card__label">LINE 回報</div>
-                    </div>
-                </div>
-                <div className="stat-card stat-card--web">
-                    <div className="stat-card__icon">🌐</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{sourceStats.web}</div>
-                        <div className="stat-card__label">網頁回報</div>
-                    </div>
-                </div>
-                <div className="stat-card stat-card--pending">
-                    <div className="stat-card__icon">⏳</div>
-                    <div className="stat-card__content">
-                        <div className="stat-card__value">{statsData?.pending || 0}</div>
-                        <div className="stat-card__label">待審核</div>
-                    </div>
-                </div>
+                <StatIndicator value={statsData?.confirmed || filteredReports.length} label="已確認回報" />
+                <StatIndicator value={sourceStats.line} label="LINE 回報" />
+                <StatIndicator value={sourceStats.web} label="網頁回報" />
+                <StatIndicator value={statsData?.pending || 0} label="待審核" variant="warning" />
             </div>
 
-            {/* 篩選器 */}
-            <div className="filter-bar">
+            {/* 篩選器（toolbar） */}
+            <div className="filter-bar" role="toolbar" aria-label="事件篩選">
                 <div className="filter-bar__left">
                     <select
                         className="filter-select"
                         value={typeFilter}
                         onChange={(e) => setTypeFilter(e.target.value)}
+                        aria-label="篩選事件類別"
                     >
                         <option value="">所有類別</option>
                         {Object.entries(TYPE_CONFIG).map(([key, config]) => (
@@ -309,6 +310,7 @@ export default function EventsPage() {
                         className="filter-select"
                         value={sourceFilter}
                         onChange={(e) => setSourceFilter(e.target.value)}
+                        aria-label="篩選事件來源"
                     >
                         <option value="">所有來源</option>
                         <option value="line">💬 LINE</option>
@@ -320,6 +322,7 @@ export default function EventsPage() {
                         placeholder="搜尋事件..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
+                        aria-label="搜尋事件"
                     />
                 </div>
                 <div className="filter-bar__right">
@@ -327,26 +330,31 @@ export default function EventsPage() {
                         <button
                             className={`view-toggle__btn ${viewMode === 'card' ? 'active' : ''}`}
                             onClick={() => setViewMode('card')}
+                            aria-pressed={viewMode === 'card'}
+                            aria-label="卡片視圖"
                             title="卡片視圖"
                         >
-                            ▦
+                            <LayoutGrid size={16} aria-hidden="true" />
                         </button>
                         <button
                             className={`view-toggle__btn ${viewMode === 'table' ? 'active' : ''}`}
                             onClick={() => setViewMode('table')}
+                            aria-pressed={viewMode === 'table'}
+                            aria-label="表格視圖"
                             title="表格視圖"
                         >
-                            ☰
+                            <ListIcon size={16} aria-hidden="true" />
                         </button>
                     </div>
                 </div>
             </div>
 
             {filteredReports.length === 0 ? (
-                <div className="empty-state">
-                    <span>📋</span>
-                    <p>目前沒有已確認的災害回報</p>
-                </div>
+                <EmptyState
+                    variant="default"
+                    title="目前沒有已確認的災害回報"
+                    description="符合篩選條件的回報將顯示於此。"
+                />
             ) : viewMode === 'card' ? (
                 /* 卡片視圖 */
                 <div className="events-grid">
@@ -402,25 +410,19 @@ export default function EventsPage() {
 
                                 {/* 任務狀態 */}
                                 <div className="event-card__status">
-                                    {!taskStatus ? (
-                                        <span className="status status-pending">⚪ 未派發</span>
-                                    ) : taskStatus.completed === taskStatus.pending + taskStatus.inProgress + taskStatus.completed ? (
-                                        <span className="status status-completed">✅ 已完成</span>
-                                    ) : taskStatus.inProgress > 0 ? (
-                                        <span className="status status-active">🟡 處理中</span>
-                                    ) : (
-                                        <span className="status status-pending">🔵 已派發</span>
-                                    )}
+                                    <TaskStatusBadge taskStatus={taskStatus} />
                                 </div>
 
                                 {/* 操作按鈕 */}
                                 <div className="event-card__actions">
-                                    <button className="btn-small" onClick={() => openDetailModal(report)}>
+                                    <Button size="sm" variant="secondary" onClick={() => openDetailModal(report)}>
                                         查看
-                                    </button>
+                                    </Button>
                                     {user && (
-                                        <button
-                                            className="btn-small btn-success-outline"
+                                        <Button
+                                            size="sm"
+                                            variant="secondary"
+                                            className="btn-success-outline"
                                             onClick={() => {
                                                 if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
                                                     handleClaimTask(report);
@@ -428,12 +430,12 @@ export default function EventsPage() {
                                             }}
                                         >
                                             領取
-                                        </button>
+                                        </Button>
                                     )}
                                     {canAssignTask && (
-                                        <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
+                                        <Button size="sm" variant="secondary" className="btn-primary-outline" onClick={() => openTaskModal(report)}>
                                             分派
-                                        </button>
+                                        </Button>
                                     )}
                                 </div>
                             </Card>
@@ -487,24 +489,18 @@ export default function EventsPage() {
                                             </span>
                                         </td>
                                         <td>
-                                            {!taskStatus ? (
-                                                <span className="status status-pending">⚪ 未派發</span>
-                                            ) : taskStatus.completed === taskStatus.pending + taskStatus.inProgress + taskStatus.completed ? (
-                                                <span className="status status-completed">✅ 已完成</span>
-                                            ) : taskStatus.inProgress > 0 ? (
-                                                <span className="status status-active">🟡 處理中</span>
-                                            ) : (
-                                                <span className="status status-pending">🔵 已派發</span>
-                                            )}
+                                            <TaskStatusBadge taskStatus={taskStatus} />
                                         </td>
                                         <td>{formatTimeAgo(report.createdAt)}</td>
                                         <td className="actions-cell">
-                                            <button className="btn-small" onClick={() => openDetailModal(report)}>
+                                            <Button size="sm" variant="secondary" onClick={() => openDetailModal(report)}>
                                                 查看
-                                            </button>
+                                            </Button>
                                             {user && (
-                                                <button
-                                                    className="btn-small btn-success-outline"
+                                                <Button
+                                                    size="sm"
+                                                    variant="secondary"
+                                                    className="btn-success-outline"
                                                     onClick={() => {
                                                         if (confirm(`確定要領取「${report.title}」任務嗎？`)) {
                                                             handleClaimTask(report);
@@ -512,16 +508,17 @@ export default function EventsPage() {
                                                     }}
                                                 >
                                                     領取
-                                                </button>
+                                                </Button>
                                             )}
                                             {canAssignTask && (
-                                                <button className="btn-small btn-primary-outline" onClick={() => openTaskModal(report)}>
+                                                <Button size="sm" variant="secondary" className="btn-primary-outline" onClick={() => openTaskModal(report)}>
                                                     分派
-                                                </button>
+                                                </Button>
                                             )}
                                             {canDeleteEvent && (
-                                                <button
-                                                    className="btn-small btn-danger-outline"
+                                                <Button
+                                                    size="sm"
+                                                    variant="danger"
                                                     onClick={() => {
                                                         if (confirm(`確定要刪除「${report.title}」嗎？`)) {
                                                             deleteReportMutation.mutate(report.id);
@@ -529,7 +526,7 @@ export default function EventsPage() {
                                                     }}
                                                 >
                                                     刪除
-                                                </button>
+                                                </Button>
                                             )}
                                         </td>
                                     </tr>

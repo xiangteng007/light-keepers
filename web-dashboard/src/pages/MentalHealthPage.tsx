@@ -92,55 +92,65 @@ export default function MentalHealthPage() {
 
     return (
         <div className="mental-health-page">
-            {/* Header */}
-            <div className="mh-header">
-                <h1>🌱 心理健康中心</h1>
+            {/* page-header（Detail archetype，語氣沉靜：不使用危急色） */}
+            <header className="page-header">
+                <h1>心理健康中心</h1>
                 <p>照顧好自己，才能更好地幫助他人</p>
+            </header>
+
+            {/* Hotline Banner — 真實服務，維持可見但不使用危急紅（見頁面特別註記） */}
+            <div className="mh-hotline" role="note">
+                <span className="mh-hotline__label">需要幫助嗎？</span>
+                <a href="tel:1925" className="mh-hotline__number">1925 安心專線</a>
+                <span className="mh-hotline__meta">24 小時免費專人服務</span>
             </div>
 
-            {/* Hotline Banner */}
-            <div className="mh-hotline">
-                <span>🆘 需要幫助嗎？</span>
-                <a href="tel:1925">1925 安心專線</a>
-                <span>24小時免費專人服務</span>
-            </div>
-
-            <Alert variant="warning" title="示範資料">
+            <Alert variant="info" title="示範資料">
                 此頁目前顯示示範資料，功能建置中。心情記錄、祈福牆、AI 聊聊回覆皆為前端本地模擬，
                 尚未儲存到後端。1925 安心專線為真實服務，可放心撥打。
             </Alert>
 
-            {/* Tabs */}
-            <div className="mh-tabs">
+            {/* Tabs（分段導覽，非狀態徽章） */}
+            <div className="mh-tabs" role="tablist" aria-label="心理健康中心功能區">
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'mood'}
                     className={`mh-tab ${activeTab === 'mood' ? 'active' : ''}`}
                     onClick={() => setActiveTab('mood')}
                 >
-                    😊 心情記錄
+                    心情記錄
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'phq9'}
                     className={`mh-tab ${activeTab === 'phq9' ? 'active' : ''}`}
                     onClick={() => setActiveTab('phq9')}
                 >
-                    📋 憂鬱評估
+                    憂鬱評估
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'gad7'}
                     className={`mh-tab ${activeTab === 'gad7' ? 'active' : ''}`}
                     onClick={() => setActiveTab('gad7')}
                 >
-                    📋 焦慮評估
+                    焦慮評估
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'blessing'}
                     className={`mh-tab ${activeTab === 'blessing' ? 'active' : ''}`}
                     onClick={() => setActiveTab('blessing')}
                 >
-                    🕯️ 祈福牆
+                    祈福牆
                 </button>
                 <button
+                    role="tab"
+                    aria-selected={activeTab === 'chat'}
                     className={`mh-tab ${activeTab === 'chat' ? 'active' : ''}`}
                     onClick={() => setActiveTab('chat')}
                 >
-                    💬 聊聊
+                    聊聊
                 </button>
             </div>
 

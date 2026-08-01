@@ -27,9 +27,19 @@ import {
     CheckCircle,
     XCircle,
     AlertCircle,
-    X,
 } from 'lucide-react';
+import { Button, Badge, Modal, InputField } from '../design-system';
+import type { BadgeProps } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './ReportSchedulePage.css';
+
+// 執行狀態 Badge 對照（DESIGN_LANGUAGE.md §3）
+const EXECUTION_STATUS: Record<string, { label: string; variant: BadgeProps['variant'] }> = {
+    completed: { label: '成功', variant: 'success' },
+    failed: { label: '失敗', variant: 'danger' },
+    running: { label: '執行中', variant: 'warning' },
+};
 
 // 報表類型選項
 const REPORT_TYPES = [
@@ -150,39 +160,42 @@ export default function ReportSchedulePage() {
 
     return (
         <div className="report-schedule-page">
-            {/* 頁面標題 */}
+            {/* page-header（DESIGN_LANGUAGE.md §7.1） */}
             <header className="schedule-header">
                 <div className="schedule-header__title">
-                    <h1>📋 報表排程</h1>
+                    <h1>報表排程</h1>
                     <p>自動化報表生成與發送</p>
                 </div>
-                <button
-                    className="schedule-header__create-btn"
+                <Button
+                    variant="primary"
+                    icon={<Plus size={18} aria-hidden="true" />}
                     onClick={() => setShowCreateModal(true)}
                 >
-                    <Plus size={18} />
                     新增排程
-                </button>
+                </Button>
             </header>
 
             {/* 排程列表 */}
-            <div className="schedules-grid">
-                {loading ? (
-                    <div className="loading">載入中...</div>
-                ) : schedules.length === 0 ? (
-                    <div className="empty">
-                        <Calendar size={48} />
-                        <p>尚無報表排程</p>
-                        <button onClick={() => setShowCreateModal(true)}>建立第一個排程</button>
-                    </div>
-                ) : (
-                    schedules.map(schedule => (
+            {loading ? (
+                <div className="schedules-grid" aria-busy="true" aria-label="載入排程中">
+                    <Skeleton variant="card" height={220} count={3} />
+                </div>
+            ) : schedules.length === 0 ? (
+                <EmptyState
+                    icon={Calendar}
+                    title="尚無報表排程"
+                    description="建立排程以自動化生成與發送報表"
+                    action={{ label: '建立第一個排程', onClick: () => setShowCreateModal(true) }}
+                />
+            ) : (
+                <div className="schedules-grid">
+                    {schedules.map(schedule => (
                         <article
                             key={schedule.id}
-                            className={`schedule-card ${schedule.isActive ? 'active' : 'inactive'}`}
+                            className={`schedule-card ${schedule.isActive ? 'is-active' : 'is-inactive'}`}
                         >
                             <div className="schedule-card__header">
-                                <span className="schedule-card__icon">
+                                <span className="schedule-card__icon" aria-hidden="true">
                                     {getReportTypeInfo(schedule.reportType).icon}
                                 </span>
                                 <div className="schedule-card__title">
@@ -192,21 +205,30 @@ export default function ReportSchedulePage() {
                                     </span>
                                 </div>
                                 <button
-                                    className={`toggle-btn ${schedule.isActive ? 'on' : 'off'}`}
+                                    type="button"
+                                    className={`toggle-btn ${schedule.isActive ? 'is-on' : 'is-off'}`}
                                     onClick={() => handleToggle(schedule)}
+                                    aria-pressed={schedule.isActive}
+                                    aria-label={schedule.isActive ? `停用「${schedule.name}」排程` : `啟用「${schedule.name}」排程`}
                                     title={schedule.isActive ? '點擊停用' : '點擊啟用'}
                                 >
-                                    {schedule.isActive ? <Play size={16} /> : <Pause size={16} />}
+                                    {schedule.isActive ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
                                 </button>
+                            </div>
+
+                            <div className="schedule-card__status">
+                                <Badge variant={schedule.isActive ? 'success' : 'default'} size="sm">
+                                    {schedule.isActive ? '啟用中' : '已停用'}
+                                </Badge>
                             </div>
 
                             <div className="schedule-card__info">
                                 <div className="info-item">
-                                    <Clock size={14} />
-                                    <span>{formatFrequency(schedule)}</span>
+                                    <Clock size={14} aria-hidden="true" />
+                                    <span className="tabular-nums">{formatFrequency(schedule)}</span>
                                 </div>
                                 <div className="info-item">
-                                    {React.createElement(DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.icon || Mail, { size: 14 })}
+                                    {React.createElement(DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.icon || Mail, { size: 14, 'aria-hidden': true })}
                                     <span>{DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.label || schedule.deliveryMethod}</span>
                                 </div>
                             </div>
@@ -217,13 +239,15 @@ export default function ReportSchedulePage() {
 
                             <div className="schedule-card__actions">
                                 <button
+                                    type="button"
                                     className="action-btn execute"
                                     onClick={() => handleExecute(schedule)}
                                     title="立即執行"
                                 >
-                                    <Play size={14} /> 執行
+                                    <Play size={14} aria-hidden="true" /> 執行
                                 </button>
                                 <button
+                                    type="button"
                                     className="action-btn history"
                                     onClick={() => {
                                         setSelectedSchedule(schedule);
@@ -231,20 +255,22 @@ export default function ReportSchedulePage() {
                                     }}
                                     title="查看記錄"
                                 >
-                                    <FileText size={14} /> 記錄
+                                    <FileText size={14} aria-hidden="true" /> 記錄
                                 </button>
                                 <button
+                                    type="button"
                                     className="action-btn delete"
                                     onClick={() => handleDelete(schedule)}
+                                    aria-label={`刪除「${schedule.name}」排程`}
                                     title="刪除"
                                 >
-                                    <Trash2 size={14} />
+                                    <Trash2 size={14} aria-hidden="true" />
                                 </button>
                             </div>
                         </article>
-                    ))
-                )}
-            </div>
+                    ))}
+                </div>
+            )}
 
             {/* 新增排程 Modal */}
             {showCreateModal && (
@@ -318,124 +344,112 @@ function CreateScheduleModal({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content create-schedule-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <h2>新增報表排程</h2>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
+        <Modal isOpen onClose={onClose} title="新增報表排程" size="md">
+            <form className="create-schedule-form" onSubmit={handleSubmit}>
+                <InputField
+                    label="排程名稱 *"
+                    value={name}
+                    onChange={e => setName(e.target.value)}
+                    placeholder="例：每週志工時數統計"
+                    required
+                    fullWidth
+                />
 
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>排程名稱 *</label>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={e => setName(e.target.value)}
-                            placeholder="例：每週志工時數統計"
-                            required
-                        />
-                    </div>
+                <div className="form-group">
+                    <label htmlFor="report-type">報表類型</label>
+                    <select id="report-type" value={reportType} onChange={e => setReportType(e.target.value)}>
+                        {REPORT_TYPES.map(type => (
+                            <option key={type.value} value={type.value}>
+                                {type.icon} {type.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
 
+                <div className="form-row">
                     <div className="form-group">
-                        <label>報表類型</label>
-                        <select value={reportType} onChange={e => setReportType(e.target.value)}>
-                            {REPORT_TYPES.map(type => (
-                                <option key={type.value} value={type.value}>
-                                    {type.icon} {type.label}
-                                </option>
+                        <label htmlFor="report-frequency">執行頻率</label>
+                        <select id="report-frequency" value={frequency} onChange={e => setFrequency(e.target.value)}>
+                            {FREQUENCY_OPTIONS.map(f => (
+                                <option key={f.value} value={f.value}>{f.label}</option>
                             ))}
                         </select>
                     </div>
 
-                    <div className="form-row">
+                    {frequency === 'weekly' && (
                         <div className="form-group">
-                            <label>執行頻率</label>
-                            <select value={frequency} onChange={e => setFrequency(e.target.value)}>
-                                {FREQUENCY_OPTIONS.map(f => (
-                                    <option key={f.value} value={f.value}>{f.label}</option>
+                            <label htmlFor="report-day-of-week">週幾</label>
+                            <select id="report-day-of-week" value={dayOfWeek} onChange={e => setDayOfWeek(Number(e.target.value))}>
+                                {['日', '一', '二', '三', '四', '五', '六'].map((day, idx) => (
+                                    <option key={idx} value={idx}>週{day}</option>
                                 ))}
                             </select>
                         </div>
+                    )}
 
-                        {frequency === 'weekly' && (
-                            <div className="form-group">
-                                <label>週幾</label>
-                                <select value={dayOfWeek} onChange={e => setDayOfWeek(Number(e.target.value))}>
-                                    {['日', '一', '二', '三', '四', '五', '六'].map((day, idx) => (
-                                        <option key={idx} value={idx}>週{day}</option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
-                        {frequency === 'monthly' && (
-                            <div className="form-group">
-                                <label>日期</label>
-                                <select value={dayOfMonth} onChange={e => setDayOfMonth(Number(e.target.value))}>
-                                    {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
-                                        <option key={day} value={day}>{day} 日</option>
-                                    ))}
-                                </select>
-                            </div>
-                        )}
-
+                    {frequency === 'monthly' && (
                         <div className="form-group">
-                            <label>執行時間</label>
-                            <input
-                                type="time"
-                                value={executeAt}
-                                onChange={e => setExecuteAt(e.target.value)}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-group">
-                        <label>遞送方式</label>
-                        <div className="delivery-options">
-                            {DELIVERY_METHODS.map(method => (
-                                <button
-                                    key={method.value}
-                                    type="button"
-                                    className={`delivery-option ${deliveryMethod === method.value ? 'selected' : ''}`}
-                                    onClick={() => setDeliveryMethod(method.value)}
-                                >
-                                    <method.icon size={18} />
-                                    {method.label}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {deliveryMethod === 'email' && (
-                        <div className="form-group">
-                            <label>收件人（多個用逗號分隔）</label>
-                            <input
-                                type="text"
-                                value={recipients}
-                                onChange={e => setRecipients(e.target.value)}
-                                placeholder="email1@example.com, email2@example.com"
-                            />
+                            <label htmlFor="report-day-of-month">日期</label>
+                            <select id="report-day-of-month" value={dayOfMonth} onChange={e => setDayOfMonth(Number(e.target.value))}>
+                                {Array.from({ length: 28 }, (_, i) => i + 1).map(day => (
+                                    <option key={day} value={day}>{day} 日</option>
+                                ))}
+                            </select>
                         </div>
                     )}
 
-                    <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={onClose}>
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={submitting || !name.trim()}
-                        >
-                            {submitting ? '建立中...' : '建立排程'}
-                        </button>
+                    <InputField
+                        label="執行時間"
+                        type="time"
+                        value={executeAt}
+                        onChange={e => setExecuteAt(e.target.value)}
+                        fullWidth
+                    />
+                </div>
+
+                <div className="form-group">
+                    <span id="delivery-method-label">遞送方式</span>
+                    <div className="delivery-options" role="group" aria-labelledby="delivery-method-label">
+                        {DELIVERY_METHODS.map(method => (
+                            <button
+                                key={method.value}
+                                type="button"
+                                aria-pressed={deliveryMethod === method.value}
+                                className={`delivery-option ${deliveryMethod === method.value ? 'is-selected' : ''}`}
+                                onClick={() => setDeliveryMethod(method.value)}
+                            >
+                                <method.icon size={18} aria-hidden="true" />
+                                {method.label}
+                            </button>
+                        ))}
                     </div>
-                </form>
-            </div>
-        </div>
+                </div>
+
+                {deliveryMethod === 'email' && (
+                    <InputField
+                        label="收件人（多個用逗號分隔）"
+                        value={recipients}
+                        onChange={e => setRecipients(e.target.value)}
+                        placeholder="email1@example.com, email2@example.com"
+                        fullWidth
+                    />
+                )}
+
+                <div className="modal-actions">
+                    <Button type="button" variant="secondary" onClick={onClose}>
+                        取消
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={!name.trim()}
+                        loading={submitting}
+                    >
+                        建立排程
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 }
 
@@ -450,55 +464,44 @@ function ExecutionHistoryModal({
     onClose: () => void;
 }) {
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content execution-history-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <h2>{schedule.name} - 執行記錄</h2>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
-
-                <div className="executions-list">
-                    {executions.length === 0 ? (
-                        <div className="empty">
-                            <FileText size={32} />
-                            <p>尚無執行記錄</p>
-                        </div>
-                    ) : (
-                        executions.map(exec => (
-                            <div key={exec.id} className={`execution-item ${exec.status}`}>
-                                <div className="execution-item__status">
-                                    {exec.status === 'completed' && <CheckCircle className="success" />}
-                                    {exec.status === 'failed' && <XCircle className="error" />}
-                                    {exec.status === 'running' && <AlertCircle className="running" />}
+        <Modal isOpen onClose={onClose} title={`${schedule.name} - 執行記錄`} size="md">
+            <div className="executions-list">
+                {executions.length === 0 ? (
+                    <EmptyState icon={FileText} title="尚無執行記錄" variant="minimal" />
+                ) : (
+                    executions.map(exec => {
+                        const statusInfo = EXECUTION_STATUS[exec.status];
+                        return (
+                            <div key={exec.id} className={`execution-item execution-item--${exec.status}`}>
+                                <div className="execution-item__status" aria-hidden="true">
+                                    {exec.status === 'completed' && <CheckCircle className="is-success" />}
+                                    {exec.status === 'failed' && <XCircle className="is-error" />}
+                                    {exec.status === 'running' && <AlertCircle className="is-running" />}
                                 </div>
                                 <div className="execution-item__info">
-                                    <span className="time">
+                                    <span className="time tabular-nums">
                                         {new Date(exec.createdAt).toLocaleString('zh-TW')}
                                     </span>
-                                    <span className={`status-badge ${exec.status}`}>
-                                        {exec.status === 'completed' && '成功'}
-                                        {exec.status === 'failed' && '失敗'}
-                                        {exec.status === 'running' && '執行中'}
-                                    </span>
+                                    {statusInfo && (
+                                        <Badge variant={statusInfo.variant} size="sm">{statusInfo.label}</Badge>
+                                    )}
                                     {exec.durationMs && (
-                                        <span className="duration">耗時 {(exec.durationMs / 1000).toFixed(1)}s</span>
+                                        <span className="duration tabular-nums">耗時 {(exec.durationMs / 1000).toFixed(1)}s</span>
                                     )}
                                 </div>
                                 {exec.outputPath && (
-                                    <a href={exec.outputPath} className="download-btn" target="_blank" rel="noopener">
-                                        <Download size={14} />
+                                    <a href={exec.outputPath} className="download-btn" target="_blank" rel="noopener" aria-label="下載報表">
+                                        <Download size={14} aria-hidden="true" />
                                     </a>
                                 )}
                                 {exec.errorMessage && (
                                     <p className="error-message">{exec.errorMessage}</p>
                                 )}
                             </div>
-                        ))
-                    )}
-                </div>
+                        );
+                    })
+                )}
             </div>
-        </div>
+        </Modal>
     );
 }

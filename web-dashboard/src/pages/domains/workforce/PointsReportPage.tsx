@@ -1,7 +1,17 @@
 import { useState, useEffect } from 'react';
+import { Download } from 'lucide-react';
+import { Badge, Button } from '../../../design-system';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import EmptyState from '../../../components/shared/EmptyState';
+import './PointsReportPage.css';
 
 interface PointsRecord { id: string; volunteerId: string; volunteerName: string; points: number; reason: string; date: string; type: 'earned' | 'redeemed'; }
 interface VolunteerPoints { volunteerId: string; name: string; totalPoints: number; thisMonth: number; rank: number; }
+
+const TABS: Array<{ id: 'leaderboard' | 'history'; label: string }> = [
+    { id: 'leaderboard', label: '排行榜' },
+    { id: 'history', label: '歷史紀錄' },
+];
 
 export default function PointsReportPage() {
     const [leaderboard, setLeaderboard] = useState<VolunteerPoints[]>([]);
@@ -23,51 +33,112 @@ export default function PointsReportPage() {
         setLoading(false);
     }, []);
 
-    if (loading) return <div className="flex items-center justify-center min-h-screen"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div></div>;
+    const getRankModifier = (rank: number) => {
+        switch (rank) {
+            case 1: return 'points-rank--gold';
+            case 2: return 'points-rank--silver';
+            case 3: return 'points-rank--bronze';
+            default: return 'points-rank--default';
+        }
+    };
 
     return (
-        <div className="p-6 space-y-6">
-            <div className="flex justify-between items-center">
-                <div><h1 className="text-2xl font-bold text-white">Points Report</h1><p className="text-gray-400">Volunteer recognition tracking</p></div>
-                <button className="px-4 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">Export Report</button>
+        <div className="points-report-page">
+            <div className="page-header">
+                <div className="page-header__titles">
+                    <h1>積分報表</h1>
+                    <p className="page-header__subtitle">志工積分認可追蹤</p>
+                </div>
+                <Button variant="primary" size="sm" icon={<Download size={16} aria-hidden="true" />}>
+                    匯出報表
+                </Button>
             </div>
-            <div className="flex gap-4 border-b border-slate-700">
-                <button onClick={() => setActiveTab('leaderboard')} className={`pb-3 px-1 font-medium ${activeTab === 'leaderboard' ? 'text-amber-400 border-b-2 border-amber-400' : 'text-gray-400 hover:text-white'}`}>Leaderboard</button>
-                <button onClick={() => setActiveTab('history')} className={`pb-3 px-1 font-medium ${activeTab === 'history' ? 'text-amber-400 border-b-2 border-amber-400' : 'text-gray-400 hover:text-white'}`}>History</button>
+
+            <div className="points-report-tabs" role="tablist" aria-label="報表檢視">
+                {TABS.map((tab) => (
+                    <button
+                        key={tab.id}
+                        role="tab"
+                        aria-selected={activeTab === tab.id}
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`points-report-tab ${activeTab === tab.id ? 'is-active' : ''}`}
+                    >
+                        {tab.label}
+                    </button>
+                ))}
             </div>
-            {activeTab === 'leaderboard' && (
-                <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
-                    <table className="w-full">
-                        <thead><tr className="border-b border-slate-700"><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Rank</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Volunteer</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">This Month</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Total</th></tr></thead>
-                        <tbody className="divide-y divide-slate-700">
-                            {leaderboard.map((v) => (
-                                <tr key={v.volunteerId} className="hover:bg-slate-700/50">
-                                    <td className="px-6 py-4"><span className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${v.rank === 1 ? 'bg-yellow-500 text-black' : v.rank === 2 ? 'bg-gray-400 text-black' : 'bg-amber-700 text-white'}`}>{v.rank}</span></td>
-                                    <td className="px-6 py-4 text-white font-medium">{v.name}</td>
-                                    <td className="px-6 py-4 text-green-400">+{v.thisMonth}</td>
-                                    <td className="px-6 py-4 text-amber-400 font-bold">{v.totalPoints.toLocaleString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+
+            {loading && (
+                <div className="points-report-skeleton" role="status" aria-label="載入積分報表中">
+                    <Skeleton variant="card" height={48} count={4} />
                 </div>
             )}
-            {activeTab === 'history' && (
-                <div className="bg-slate-800/50 rounded-lg border border-slate-700 overflow-hidden">
-                    <table className="w-full">
-                        <thead><tr className="border-b border-slate-700"><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Date</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Volunteer</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Reason</th><th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase">Points</th></tr></thead>
-                        <tbody className="divide-y divide-slate-700">
-                            {records.map((r) => (
-                                <tr key={r.id} className="hover:bg-slate-700/50">
-                                    <td className="px-6 py-4 text-gray-300">{r.date}</td>
-                                    <td className="px-6 py-4 text-white">{r.volunteerName}</td>
-                                    <td className="px-6 py-4 text-gray-300">{r.reason}</td>
-                                    <td className={`px-6 py-4 font-medium ${r.type === 'earned' ? 'text-green-400' : 'text-red-400'}`}>{r.type === 'earned' ? '+' : ''}{r.points}</td>
+
+            {!loading && activeTab === 'leaderboard' && (
+                leaderboard.length === 0 ? (
+                    <EmptyState variant="minimal" title="暫無排行資料" />
+                ) : (
+                    <div className="points-report-table-wrapper">
+                        <table className="points-report-table">
+                            <thead>
+                                <tr>
+                                    <th>名次</th>
+                                    <th>志工</th>
+                                    <th>本月</th>
+                                    <th>總積分</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                            </thead>
+                            <tbody>
+                                {leaderboard.map((v) => (
+                                    <tr key={v.volunteerId}>
+                                        <td>
+                                            <span className={`points-rank ${getRankModifier(v.rank)}`}>{v.rank}</span>
+                                        </td>
+                                        <td className="points-report-table__name">{v.name}</td>
+                                        <td className="points-report-table__num">+{v.thisMonth}</td>
+                                        <td className="points-report-table__num points-report-table__points">{v.totalPoints.toLocaleString()}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )
+            )}
+
+            {!loading && activeTab === 'history' && (
+                records.length === 0 ? (
+                    <EmptyState variant="minimal" title="暫無歷史紀錄" />
+                ) : (
+                    <div className="points-report-table-wrapper">
+                        <table className="points-report-table">
+                            <thead>
+                                <tr>
+                                    <th>日期</th>
+                                    <th>志工</th>
+                                    <th>原因</th>
+                                    <th>積分</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {records.map((r) => (
+                                    <tr key={r.id}>
+                                        <td className="points-report-table__num">{r.date}</td>
+                                        <td className="points-report-table__name">{r.volunteerName}</td>
+                                        <td className="points-report-table__reason">
+                                            {r.reason}
+                                            <Badge variant={r.type === 'earned' ? 'success' : 'default'} size="sm" className="points-report-table__type-badge">
+                                                {r.type === 'earned' ? '獲得' : '兌換'}
+                                            </Badge>
+                                        </td>
+                                        <td className="points-report-table__num points-report-table__points">
+                                            {r.type === 'earned' ? '+' : ''}{r.points}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                )
             )}
         </div>
     );

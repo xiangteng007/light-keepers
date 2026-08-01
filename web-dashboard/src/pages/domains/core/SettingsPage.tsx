@@ -1,80 +1,124 @@
 import { useState } from 'react';
+import { Button, InputField } from '../../../design-system';
+import './SettingsPage.css';
 
-interface SettingSection { id: string; title: string; description: string; }
+interface SettingSection {
+    id: 'profile' | 'notifications' | 'security' | 'display';
+    title: string;
+    description: string;
+}
 
 const sections: SettingSection[] = [
-    { id: 'profile', title: 'Profile Settings', description: 'Manage your personal information' },
-    { id: 'notifications', title: 'Notifications', description: 'Configure alert preferences' },
-    { id: 'security', title: 'Security', description: 'Password and authentication settings' },
-    { id: 'display', title: 'Display', description: 'Theme and layout preferences' },
+    { id: 'profile', title: '個人資料', description: '管理您的基本資訊' },
+    { id: 'notifications', title: '通知設定', description: '設定提醒偏好' },
+    { id: 'security', title: '安全性', description: '密碼與登入設定' },
+    { id: 'display', title: '顯示', description: '主題與版面偏好' },
 ];
 
+const NOTIFICATION_LABEL: Record<string, string> = {
+    email: '電子郵件通知',
+    push: '推播通知',
+    sms: '簡訊通知',
+};
+
 export default function SettingsPage() {
-    const [activeSection, setActiveSection] = useState('profile');
+    const [activeSection, setActiveSection] = useState<SettingSection['id']>('profile');
     const [theme, setTheme] = useState('dark');
     const [notifications, setNotifications] = useState({ email: true, push: true, sms: false });
 
     return (
-        <div className="p-6 space-y-6">
-            <div><h1 className="text-2xl font-bold text-white">Settings</h1><p className="text-gray-400">Manage your preferences</p></div>
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                <div className="lg:col-span-1 bg-slate-800/50 rounded-lg border border-slate-700 p-4">
-                    <nav className="space-y-1">
-                        {sections.map((section) => (
-                            <button key={section.id} onClick={() => setActiveSection(section.id)} className={`w-full text-left px-4 py-3 rounded-lg transition-colors ${activeSection === section.id ? 'bg-amber-500 text-black' : 'text-gray-300 hover:bg-slate-700'}`}>
-                                <p className="font-medium">{section.title}</p>
-                                <p className={`text-sm ${activeSection === section.id ? 'text-black/70' : 'text-gray-400'}`}>{section.description}</p>
-                            </button>
-                        ))}
-                    </nav>
-                </div>
-                <div className="lg:col-span-3 bg-slate-800/50 rounded-lg border border-slate-700 p-6">
+        <div className="settings-page">
+            <header className="settings-page__header">
+                <h1>設定</h1>
+                <p className="settings-page__subtitle">管理您的偏好設定</p>
+            </header>
+
+            <div className="settings-page__body">
+                <nav className="settings-nav" aria-label="設定類別">
+                    {sections.map((section) => (
+                        <button
+                            key={section.id}
+                            type="button"
+                            className={`settings-nav__item ${activeSection === section.id ? 'settings-nav__item--active' : ''}`}
+                            aria-current={activeSection === section.id ? 'page' : undefined}
+                            onClick={() => setActiveSection(section.id)}
+                        >
+                            <span className="settings-nav__title">{section.title}</span>
+                            <span className="settings-nav__desc">{section.description}</span>
+                        </button>
+                    ))}
+                </nav>
+
+                <section className="settings-content" aria-live="polite">
                     {activeSection === 'profile' && (
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-bold text-white">Profile Settings</h2>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div><label className="block text-gray-400 text-sm mb-1">Display Name</label><input type="text" defaultValue="Admin User" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
-                                <div><label className="block text-gray-400 text-sm mb-1">Email</label><input type="email" defaultValue="admin@lightkeepers.org" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
-                                <div><label className="block text-gray-400 text-sm mb-1">Phone</label><input type="tel" defaultValue="+886 912 345 678" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
-                                <div><label className="block text-gray-400 text-sm mb-1">Region</label><input type="text" defaultValue="North District" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
+                        <div className="settings-section">
+                            <h2>個人資料</h2>
+                            <div className="settings-grid">
+                                <InputField label="顯示名稱" defaultValue="Admin User" fullWidth />
+                                <InputField label="電子郵件" type="email" defaultValue="admin@lightkeepers.org" fullWidth />
+                                <InputField label="電話" type="tel" defaultValue="+886 912 345 678" fullWidth />
+                                <InputField label="區域" defaultValue="North District" fullWidth />
                             </div>
-                            <button className="px-6 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">Save Changes</button>
+                            <Button>儲存變更</Button>
                         </div>
                     )}
+
                     {activeSection === 'notifications' && (
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-bold text-white">Notification Preferences</h2>
-                            <div className="space-y-4">
-                                {Object.entries(notifications).map(([key, value]) => (
-                                    <label key={key} className="flex items-center justify-between p-4 bg-slate-700/50 rounded-lg cursor-pointer">
-                                        <span className="text-white capitalize">{key} Notifications</span>
-                                        <input type="checkbox" checked={value} onChange={() => setNotifications({ ...notifications, [key]: !value })} className="w-5 h-5 accent-amber-500" />
+                        <div className="settings-section">
+                            <h2>通知偏好</h2>
+                            <div className="settings-toggle-list">
+                                {(Object.entries(notifications) as [keyof typeof notifications, boolean][]).map(([key, value]) => (
+                                    <label key={key} className="settings-toggle">
+                                        <span>{NOTIFICATION_LABEL[key]}</span>
+                                        <input
+                                            type="checkbox"
+                                            checked={value}
+                                            onChange={() => setNotifications({ ...notifications, [key]: !value })}
+                                            aria-label={NOTIFICATION_LABEL[key]}
+                                        />
                                     </label>
                                 ))}
                             </div>
                         </div>
                     )}
+
                     {activeSection === 'security' && (
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-bold text-white">Security Settings</h2>
-                            <div className="space-y-4">
-                                <div><label className="block text-gray-400 text-sm mb-1">Current Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
-                                <div><label className="block text-gray-400 text-sm mb-1">New Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
-                                <div><label className="block text-gray-400 text-sm mb-1">Confirm Password</label><input type="password" className="w-full px-4 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white" /></div>
+                        <div className="settings-section">
+                            <h2>安全性設定</h2>
+                            <div className="settings-grid settings-grid--single">
+                                <InputField label="目前密碼" type="password" fullWidth />
+                                <InputField label="新密碼" type="password" fullWidth />
+                                <InputField label="確認新密碼" type="password" fullWidth />
                             </div>
-                            <button className="px-6 py-2 bg-amber-500 text-black font-medium rounded-lg hover:bg-amber-400">Update Password</button>
+                            <Button>更新密碼</Button>
                         </div>
                     )}
+
                     {activeSection === 'display' && (
-                        <div className="space-y-6">
-                            <h2 className="text-xl font-bold text-white">Display Settings</h2>
-                            <div><p className="text-gray-400 mb-3">Theme</p><div className="flex gap-3">
-                                <button onClick={() => setTheme('dark')} className={`px-4 py-2 rounded-lg ${theme === 'dark' ? 'bg-amber-500 text-black' : 'bg-slate-700 text-gray-300'}`}>Dark</button>
-                                <button onClick={() => setTheme('light')} className={`px-4 py-2 rounded-lg ${theme === 'light' ? 'bg-amber-500 text-black' : 'bg-slate-700 text-gray-300'}`}>Light</button>
-                            </div></div>
+                        <div className="settings-section">
+                            <h2>顯示設定</h2>
+                            <div className="settings-theme">
+                                <span className="settings-theme__label">主題</span>
+                                <div className="settings-theme__options" role="group" aria-label="主題選擇">
+                                    <Button
+                                        variant={theme === 'dark' ? 'primary' : 'secondary'}
+                                        aria-pressed={theme === 'dark'}
+                                        onClick={() => setTheme('dark')}
+                                    >
+                                        深色
+                                    </Button>
+                                    <Button
+                                        variant={theme === 'light' ? 'primary' : 'secondary'}
+                                        aria-pressed={theme === 'light'}
+                                        onClick={() => setTheme('light')}
+                                    >
+                                        淺色
+                                    </Button>
+                                </div>
+                            </div>
                         </div>
                     )}
-                </div>
+                </section>
             </div>
         </div>
     );

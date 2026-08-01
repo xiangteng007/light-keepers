@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { RefreshCw, Users, UserCheck, UserX, Clock } from 'lucide-react';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
-import { Alert } from '../../../design-system';
+import { Alert, Badge, Button, Card, StatIndicator } from '../../../design-system';
+import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
+import EmptyState from '../../../components/shared/EmptyState';
 import './AttendancePage.css';
 
 interface AttendanceRecord {
@@ -58,12 +61,12 @@ export default function AttendancePage() {
         fetchRecords();
     }, [fetchRecords]);
 
-    const getStatusBadge = (status: string) => {
-        const config: Record<string, { modifier: string; label: string }> = {
-            present: { modifier: 'attendance-badge--present', label: '出席' },
-            absent: { modifier: 'attendance-badge--absent', label: '缺席' },
-            late: { modifier: 'attendance-badge--late', label: '遲到' },
-            'early-leave': { modifier: 'attendance-badge--early-leave', label: '早退' },
+    const getStatusBadge = (status: string): { variant: 'success' | 'danger' | 'warning'; label: string } => {
+        const config: Record<string, { variant: 'success' | 'danger' | 'warning'; label: string }> = {
+            present: { variant: 'success', label: '出席' },
+            absent: { variant: 'danger', label: '缺席' },
+            late: { variant: 'warning', label: '遲到' },
+            'early-leave': { variant: 'warning', label: '早退' },
         };
         return config[status] || config.present;
     };
@@ -77,55 +80,127 @@ export default function AttendancePage() {
 
     return (
         <div className="attendance-page">
-            <div className="attendance-header">
-                <div><h1 className="attendance-title">出勤追蹤</h1><p className="attendance-subtitle">志工簽到管理</p></div>
+            <div className="page-header">
+                <div className="page-header__titles">
+                    <h1>出勤追蹤</h1>
+                    <p className="page-header__subtitle">志工簽到管理</p>
+                </div>
                 <div className="attendance-controls">
-                    <input type="date" value={selectedDate} onChange={(e) => setSelectedDate(e.target.value)} className="attendance-date-input" aria-label="選擇日期" />
-                    <button onClick={fetchRecords} disabled={loading} className="attendance-refresh-btn">
+                    <input
+                        type="date"
+                        value={selectedDate}
+                        onChange={(e) => setSelectedDate(e.target.value)}
+                        className="attendance-date-input"
+                        aria-label="選擇日期"
+                    />
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        onClick={fetchRecords}
+                        disabled={loading}
+                        icon={<RefreshCw size={16} aria-hidden="true" />}
+                    >
                         {loading ? '載入中...' : '重新整理'}
-                    </button>
+                    </Button>
                 </div>
             </div>
 
             {/* Error */}
-            {error && <Alert variant="danger">{error}</Alert>}
+            {error && (
+                <Alert variant="danger" title="載入失敗" className="attendance-alert">
+                    <div className="attendance-alert__body">
+                        <span>{error}</span>
+                        <Button variant="secondary" size="sm" onClick={fetchRecords}>重試</Button>
+                    </div>
+                </Alert>
+            )}
 
+            {/* 統計摘要列 */}
             <div className="attendance-stats-grid">
-                <div className="attendance-stat-card"><p className="attendance-stat-label">總計</p><p className="attendance-stat-value">{stats.total}</p></div>
-                <div className="attendance-stat-card"><p className="attendance-stat-label">出席</p><p className="attendance-stat-value attendance-stat-value--success">{stats.present}</p></div>
-                <div className="attendance-stat-card"><p className="attendance-stat-label">缺席</p><p className="attendance-stat-value attendance-stat-value--danger">{stats.absent}</p></div>
-                <div className="attendance-stat-card"><p className="attendance-stat-label">遲到</p><p className="attendance-stat-value attendance-stat-value--warning">{stats.late}</p></div>
+                <Card padding="md" className="attendance-stat-card">
+                    <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={stats.total} label="總計" variant="default" />
+                </Card>
+                <Card padding="md" className="attendance-stat-card">
+                    <StatIndicator icon={<UserCheck size={20} aria-hidden="true" />} value={stats.present} label="出席" variant="success" />
+                </Card>
+                <Card padding="md" className="attendance-stat-card">
+                    <StatIndicator icon={<UserX size={20} aria-hidden="true" />} value={stats.absent} label="缺席" variant="danger" />
+                </Card>
+                <Card padding="md" className="attendance-stat-card">
+                    <StatIndicator icon={<Clock size={20} aria-hidden="true" />} value={stats.late} label="遲到" variant="warning" />
+                </Card>
             </div>
 
             {/* Loading */}
             {loading && (
-                <div className="attendance-loading">
-                    載入中...
+                <div className="attendance-skeleton" role="status" aria-label="載入出勤記錄中">
+                    <Skeleton variant="card" height={56} count={4} />
                 </div>
             )}
 
-            {!loading && (
-                <div className="attendance-table-wrapper">
-                    <table className="attendance-table">
-                        <thead><tr className="attendance-table__head-row"><th className="attendance-table__th">志工</th><th className="attendance-table__th">簽到</th><th className="attendance-table__th">簽退</th><th className="attendance-table__th">時數</th><th className="attendance-table__th">狀態</th></tr></thead>
-                        <tbody className="attendance-table__body">
-                            {records.length === 0 ? (
-                                <tr><td colSpan={5} className="attendance-empty-cell">暫無出勤記錄</td></tr>
-                            ) : records.map((record) => {
-                                const badge = getStatusBadge(record.status);
-                                return (
-                                    <tr key={record.id} className="attendance-table__row">
-                                        <td><div className="attendance-name-cell"><div className="attendance-avatar">{record.volunteerName.charAt(0)}</div><span className="attendance-name-text">{record.volunteerName}</span></div></td>
-                                        <td className="attendance-cell-muted">{record.checkIn || '-'}</td>
-                                        <td className="attendance-cell-muted">{record.checkOut || '-'}</td>
-                                        <td className="attendance-cell-muted">{record.hoursWorked}h</td>
-                                        <td><span className={`attendance-badge ${badge.modifier}`}>{badge.label}</span></td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+            {!loading && records.length === 0 && (
+                <EmptyState variant="minimal" title="暫無出勤記錄" description="請選擇其他日期，或稍後再試" />
+            )}
+
+            {!loading && records.length > 0 && (
+                <>
+                    {/* 桌機：表格 */}
+                    <div className="attendance-table-wrapper">
+                        <table className="attendance-table">
+                            <thead>
+                                <tr className="attendance-table__head-row">
+                                    <th className="attendance-table__th">志工</th>
+                                    <th className="attendance-table__th">簽到</th>
+                                    <th className="attendance-table__th">簽退</th>
+                                    <th className="attendance-table__th">時數</th>
+                                    <th className="attendance-table__th">狀態</th>
+                                </tr>
+                            </thead>
+                            <tbody className="attendance-table__body">
+                                {records.map((record) => {
+                                    const badge = getStatusBadge(record.status);
+                                    return (
+                                        <tr key={record.id} className="attendance-table__row">
+                                            <td>
+                                                <div className="attendance-name-cell">
+                                                    <div className="attendance-avatar" aria-hidden="true">{record.volunteerName.charAt(0)}</div>
+                                                    <span className="attendance-name-text">{record.volunteerName}</span>
+                                                </div>
+                                            </td>
+                                            <td className="attendance-cell-muted attendance-cell-tabular">{record.checkIn || '-'}</td>
+                                            <td className="attendance-cell-muted attendance-cell-tabular">{record.checkOut || '-'}</td>
+                                            <td className="attendance-cell-muted attendance-cell-tabular">{record.hoursWorked}h</td>
+                                            <td><Badge variant={badge.variant} size="sm">{badge.label}</Badge></td>
+                                        </tr>
+                                    );
+                                })}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {/* 行動端：Card 直列 */}
+                    <div className="attendance-card-list">
+                        {records.map((record) => {
+                            const badge = getStatusBadge(record.status);
+                            return (
+                                <Card key={record.id} padding="md" className="attendance-record-card">
+                                    <div className="attendance-record-card__row">
+                                        <div className="attendance-name-cell">
+                                            <div className="attendance-avatar" aria-hidden="true">{record.volunteerName.charAt(0)}</div>
+                                            <span className="attendance-name-text">{record.volunteerName}</span>
+                                        </div>
+                                        <Badge variant={badge.variant} size="sm">{badge.label}</Badge>
+                                    </div>
+                                    <div className="attendance-record-card__meta">
+                                        <span>簽到 {record.checkIn || '-'}</span>
+                                        <span>簽退 {record.checkOut || '-'}</span>
+                                        <span>{record.hoursWorked}h</span>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                    </div>
+                </>
             )}
         </div>
     );

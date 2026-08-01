@@ -34,8 +34,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 40px;
-    height: 40px;
+    width: var(--manual-touch-target);
+    height: var(--manual-touch-target);
 
     background: transparent;
     border: none;
@@ -71,8 +71,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: var(--manual-touch-target);
+    height: var(--manual-touch-target);
 
     background: rgba(255, 255, 255, 0.1);
     border: none;

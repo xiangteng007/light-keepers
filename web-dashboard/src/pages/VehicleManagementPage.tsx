@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { Car } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { vehiclesApi } from '../api/vms';
 import type { VolunteerVehicle, VehicleType, VehiclePurpose } from '../api/vms';
-import { Card, Button, Badge, Alert, Modal } from '../design-system';
+import { Card, Button, Badge, Tag, Alert, Modal, InputField } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './VehicleManagementPage.css';
 
 // 車輛類型選項
@@ -186,7 +189,7 @@ export default function VehicleManagementPage() {
         <div className="page vehicle-management-page">
             <div className="page-header">
                 <div className="header-left">
-                    <h2>🚗 我的車輛</h2>
+                    <h1>我的車輛</h1>
                     <p className="page-subtitle">管理您的救援車輛資訊</p>
                 </div>
                 <Button onClick={handleAdd}>+ 新增車輛</Button>
@@ -199,14 +202,16 @@ export default function VehicleManagementPage() {
             )}
 
             {isLoading ? (
-                <div className="loading-state">載入中...</div>
+                <div className="vehicles-grid" aria-busy="true" aria-label="載入車輛資料中">
+                    <Skeleton variant="card" height={220} count={3} />
+                </div>
             ) : vehicles.length === 0 ? (
-                <Card padding="lg" className="empty-state">
-                    <div className="empty-icon">🚗</div>
-                    <h3>尚未登記車輛</h3>
-                    <p>登記您的車輛以便任務派遣時使用</p>
-                    <Button onClick={handleAdd}>新增第一輛車</Button>
-                </Card>
+                <EmptyState
+                    icon={Car}
+                    title="尚未登記車輛"
+                    description="登記您的車輛以便任務派遣時使用"
+                    action={{ label: '新增第一輛車', onClick: handleAdd }}
+                />
             ) : (
                 <div className="vehicles-grid">
                     {vehicles.map(vehicle => {
@@ -236,9 +241,9 @@ export default function VehicleManagementPage() {
                                             <span className="info-label">用途</span>
                                             <div className="purpose-tags">
                                                 {vehicle.purposes.map(p => (
-                                                    <Badge key={p} size="sm">
+                                                    <Tag key={p} size="sm">
                                                         {VEHICLE_PURPOSES.find(vp => vp.code === p)?.name}
-                                                    </Badge>
+                                                    </Tag>
                                                 ))}
                                             </div>
                                         </div>
@@ -278,19 +283,17 @@ export default function VehicleManagementPage() {
             >
                 <div className="vehicle-form">
                     <div className="form-row">
+                        <InputField
+                            label="車牌號碼 *"
+                            placeholder="ABC-1234"
+                            value={form.licensePlate}
+                            onChange={e => setForm({ ...form, licensePlate: e.target.value.toUpperCase() })}
+                            fullWidth
+                        />
                         <div className="form-section">
-                            <label className="form-label">車牌號碼 *</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="ABC-1234"
-                                value={form.licensePlate}
-                                onChange={e => setForm({ ...form, licensePlate: e.target.value.toUpperCase() })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">車輛類型 *</label>
+                            <label className="form-label" htmlFor="vehicle-type">車輛類型 *</label>
                             <select
+                                id="vehicle-type"
                                 className="form-select"
                                 value={form.vehicleType}
                                 onChange={e => setForm({ ...form, vehicleType: e.target.value as VehicleType })}
@@ -305,59 +308,49 @@ export default function VehicleManagementPage() {
                     </div>
 
                     <div className="form-row">
-                        <div className="form-section">
-                            <label className="form-label">廠牌</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="Toyota"
-                                value={form.brand}
-                                onChange={e => setForm({ ...form, brand: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">型號</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="RAV4"
-                                value={form.model}
-                                onChange={e => setForm({ ...form, model: e.target.value })}
-                            />
-                        </div>
+                        <InputField
+                            label="廠牌"
+                            placeholder="Toyota"
+                            value={form.brand}
+                            onChange={e => setForm({ ...form, brand: e.target.value })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="型號"
+                            placeholder="RAV4"
+                            value={form.model}
+                            onChange={e => setForm({ ...form, model: e.target.value })}
+                            fullWidth
+                        />
                     </div>
 
                     <div className="form-row">
-                        <div className="form-section">
-                            <label className="form-label">排氣量 (cc)</label>
-                            <input
-                                type="number"
-                                className="form-input"
-                                placeholder="2000"
-                                value={form.engineCc}
-                                onChange={e => setForm({ ...form, engineCc: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">顏色</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="白色"
-                                value={form.color}
-                                onChange={e => setForm({ ...form, color: e.target.value })}
-                            />
-                        </div>
+                        <InputField
+                            label="排氣量 (cc)"
+                            type="number"
+                            placeholder="2000"
+                            value={form.engineCc}
+                            onChange={e => setForm({ ...form, engineCc: e.target.value })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="顏色"
+                            placeholder="白色"
+                            value={form.color}
+                            onChange={e => setForm({ ...form, color: e.target.value })}
+                            fullWidth
+                        />
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label">車輛用途</label>
-                        <div className="purpose-options">
+                        <span className="form-label" id="purpose-group-label">車輛用途</span>
+                        <div className="purpose-options" role="group" aria-labelledby="purpose-group-label">
                             {VEHICLE_PURPOSES.map(purpose => (
                                 <button
                                     key={purpose.code}
                                     type="button"
-                                    className={`purpose-btn ${form.purposes.includes(purpose.code) ? 'selected' : ''}`}
+                                    aria-pressed={form.purposes.includes(purpose.code)}
+                                    className={`purpose-btn ${form.purposes.includes(purpose.code) ? 'is-selected' : ''}`}
                                     onClick={() => togglePurpose(purpose.code)}
                                 >
                                     {purpose.name}
@@ -368,8 +361,9 @@ export default function VehicleManagementPage() {
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label">特殊改裝說明</label>
+                        <label className="form-label" htmlFor="vehicle-modifications">特殊改裝說明</label>
                         <textarea
+                            id="vehicle-modifications"
                             className="form-textarea"
                             placeholder="例如：加裝絞盤、車頂架、無線電等"
                             value={form.modifications}
@@ -383,41 +377,34 @@ export default function VehicleManagementPage() {
                     </div>
 
                     <div className="form-row">
-                        <div className="form-section">
-                            <label className="form-label">保險公司</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="新光產險"
-                                value={form.insuranceCompany}
-                                onChange={e => setForm({ ...form, insuranceCompany: e.target.value })}
-                            />
-                        </div>
-                        <div className="form-section">
-                            <label className="form-label">保單編號</label>
-                            <input
-                                type="text"
-                                className="form-input"
-                                placeholder="保單編號"
-                                value={form.insurancePolicyNo}
-                                onChange={e => setForm({ ...form, insurancePolicyNo: e.target.value })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="form-section">
-                        <label className="form-label">保險到期日</label>
-                        <input
-                            type="date"
-                            className="form-input"
-                            value={form.insuranceExpiresAt}
-                            onChange={e => setForm({ ...form, insuranceExpiresAt: e.target.value })}
+                        <InputField
+                            label="保險公司"
+                            placeholder="新光產險"
+                            value={form.insuranceCompany}
+                            onChange={e => setForm({ ...form, insuranceCompany: e.target.value })}
+                            fullWidth
+                        />
+                        <InputField
+                            label="保單編號"
+                            placeholder="保單編號"
+                            value={form.insurancePolicyNo}
+                            onChange={e => setForm({ ...form, insurancePolicyNo: e.target.value })}
+                            fullWidth
                         />
                     </div>
 
+                    <InputField
+                        label="保險到期日"
+                        type="date"
+                        value={form.insuranceExpiresAt}
+                        onChange={e => setForm({ ...form, insuranceExpiresAt: e.target.value })}
+                        fullWidth
+                    />
+
                     <div className="form-section">
-                        <label className="form-label">備註</label>
+                        <label className="form-label" htmlFor="vehicle-notes">備註</label>
                         <textarea
+                            id="vehicle-notes"
                             className="form-textarea"
                             placeholder="其他備註事項"
                             value={form.notes}
@@ -430,8 +417,8 @@ export default function VehicleManagementPage() {
                         <Button variant="secondary" onClick={() => setShowModal(false)}>
                             取消
                         </Button>
-                        <Button onClick={handleSubmit} disabled={isSubmitting}>
-                            {isSubmitting ? '儲存中...' : '儲存'}
+                        <Button onClick={handleSubmit} loading={isSubmitting}>
+                            儲存
                         </Button>
                     </div>
                 </div>

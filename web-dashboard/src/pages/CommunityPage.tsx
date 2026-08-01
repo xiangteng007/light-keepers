@@ -1,6 +1,9 @@
 /**
  * 社群牆頁面
  * Community Wall Page
+ *
+ * R3b 重建（DESIGN_LANGUAGE.md）：List archetype。
+ * page-header（h1 + 主要動作）→ 統計摘要列 → toolbar（分類篩選）→ content（貼文清單）。
  */
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -22,21 +25,22 @@ import {
     Send,
     Plus,
     Pin,
-    Filter,
     TrendingUp,
     Users,
-    X,
 } from 'lucide-react';
+import { Badge, Button, Card, InputField, Modal, StatIndicator } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './CommunityPage.css';
 
 // 分類標籤
-const CATEGORY_OPTIONS: { value: PostCategory; label: string; emoji: string }[] = [
-    { value: 'general', label: '一般討論', emoji: '💬' },
-    { value: 'help', label: '求助', emoji: '🆘' },
-    { value: 'share', label: '分享', emoji: '📢' },
-    { value: 'event', label: '活動', emoji: '📅' },
-    { value: 'emergency', label: '緊急', emoji: '🚨' },
-    { value: 'volunteer', label: '志工', emoji: '🙋' },
+const CATEGORY_OPTIONS: { value: PostCategory; label: string; emoji: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }[] = [
+    { value: 'general', label: '一般討論', emoji: '💬', variant: 'default' },
+    { value: 'help', label: '求助', emoji: '🆘', variant: 'warning' },
+    { value: 'share', label: '分享', emoji: '📢', variant: 'success' },
+    { value: 'event', label: '活動', emoji: '📅', variant: 'info' },
+    { value: 'emergency', label: '緊急', emoji: '🚨', variant: 'danger' },
+    { value: 'volunteer', label: '志工', emoji: '🙋', variant: 'default' },
 ];
 
 export default function CommunityPage() {
@@ -84,6 +88,7 @@ export default function CommunityPage() {
     useEffect(() => {
         loadPosts();
         loadStats();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCategory]);
 
     // 按讚
@@ -127,53 +132,31 @@ export default function CommunityPage() {
     return (
         <div className="community-page">
             {/* 頁面標題 */}
-            <header className="community-header">
-                <div className="community-header__title">
-                    <h1>💬 社群牆</h1>
+            <header className="page-header">
+                <div className="page-header__title-group">
+                    <h1>社群牆</h1>
                     <p>與志工夥伴交流、分享經驗</p>
                 </div>
-                <button
-                    className="community-header__create-btn"
-                    onClick={() => setShowCreateModal(true)}
-                >
-                    <Plus size={18} />
+                <Button variant="primary" icon={<Plus size={18} aria-hidden="true" />} onClick={() => setShowCreateModal(true)}>
                     發表貼文
-                </button>
+                </Button>
             </header>
 
             {/* 統計卡片 */}
             {stats && (
                 <div className="community-stats">
-                    <div className="stat-card">
-                        <MessageSquare size={20} />
-                        <div className="stat-card__content">
-                            <span className="stat-card__value">{stats.totalPosts}</span>
-                            <span className="stat-card__label">總貼文</span>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <TrendingUp size={20} />
-                        <div className="stat-card__content">
-                            <span className="stat-card__value">{stats.todayPosts}</span>
-                            <span className="stat-card__label">今日新增</span>
-                        </div>
-                    </div>
-                    <div className="stat-card">
-                        <Users size={20} />
-                        <div className="stat-card__content">
-                            <span className="stat-card__value">{stats.topContributors?.length || 0}</span>
-                            <span className="stat-card__label">活躍貢獻者</span>
-                        </div>
-                    </div>
+                    <StatIndicator icon={<MessageSquare size={20} aria-hidden="true" />} value={stats.totalPosts} label="總貼文" />
+                    <StatIndicator icon={<TrendingUp size={20} aria-hidden="true" />} value={stats.todayPosts} label="今日新增" />
+                    <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={stats.topContributors?.length || 0} label="活躍貢獻者" />
                 </div>
             )}
 
-            {/* 分類篩選 */}
-            <div className="community-filter">
-                <Filter size={16} />
+            {/* 分類篩選（toolbar） */}
+            <div className="community-filter" role="toolbar" aria-label="貼文分類篩選">
                 <button
                     className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
                     onClick={() => setSelectedCategory('all')}
+                    aria-pressed={selectedCategory === 'all'}
                 >
                     全部
                 </button>
@@ -182,6 +165,7 @@ export default function CommunityPage() {
                         key={cat.value}
                         className={`filter-btn ${selectedCategory === cat.value ? 'active' : ''}`}
                         onClick={() => setSelectedCategory(cat.value)}
+                        aria-pressed={selectedCategory === cat.value}
                     >
                         {cat.emoji} {cat.label}
                     </button>
@@ -191,36 +175,41 @@ export default function CommunityPage() {
             {/* 貼文列表 */}
             <div className="posts-list">
                 {loading ? (
-                    <div className="posts-loading">載入中...</div>
-                ) : posts.length === 0 ? (
-                    <div className="posts-empty">
-                        <MessageSquare size={48} />
-                        <p>目前沒有貼文</p>
-                        <button onClick={() => setShowCreateModal(true)}>發表第一篇貼文</button>
+                    <div aria-busy="true" aria-label="載入中" className="posts-loading">
+                        <Skeleton variant="card" height={140} count={3} className="posts-loading__row" />
                     </div>
+                ) : posts.length === 0 ? (
+                    <EmptyState
+                        variant="default"
+                        title="目前沒有貼文"
+                        description="成為第一個分享想法的人吧！"
+                        action={{ label: '發表第一篇貼文', onClick: () => setShowCreateModal(true) }}
+                    />
                 ) : (
                     posts.map(post => (
-                        <article
+                        <Card
                             key={post.id}
+                            padding="md"
+                            hoverable
                             className={`post-card ${post.isPinned ? 'pinned' : ''}`}
                             onClick={() => setSelectedPost(post)}
                         >
                             {post.isPinned && (
                                 <div className="post-card__pin">
-                                    <Pin size={12} /> 置頂
+                                    <Pin size={12} aria-hidden="true" /> 置頂
                                 </div>
                             )}
                             <div className="post-card__header">
-                                <div className="post-card__avatar">
+                                <div className="post-card__avatar" aria-hidden="true">
                                     {post.authorName.charAt(0)}
                                 </div>
                                 <div className="post-card__meta">
                                     <span className="post-card__author">{post.authorName}</span>
                                     <span className="post-card__time">{formatTime(post.createdAt)}</span>
                                 </div>
-                                <span className={`post-card__category cat-${post.category}`}>
+                                <Badge variant={getCategoryInfo(post.category).variant} size="sm">
                                     {getCategoryInfo(post.category).emoji} {getCategoryInfo(post.category).label}
-                                </span>
+                                </Badge>
                             </div>
 
                             {post.title && (
@@ -249,22 +238,23 @@ export default function CommunityPage() {
 
                             <div className="post-card__actions" onClick={e => e.stopPropagation()}>
                                 <button
-                                    className="action-btn"
+                                    className="action-btn action-btn--like"
                                     onClick={() => handleLike(post.id)}
+                                    aria-label={`按讚，目前 ${post.likeCount} 個讚`}
                                 >
-                                    <Heart size={16} />
+                                    <Heart size={16} aria-hidden="true" />
                                     {post.likeCount}
                                 </button>
-                                <button className="action-btn">
-                                    <MessageSquare size={16} />
+                                <button className="action-btn" aria-label={`留言，共 ${post.commentCount} 則`}>
+                                    <MessageSquare size={16} aria-hidden="true" />
                                     {post.commentCount}
                                 </button>
-                                <span className="action-btn view-count">
-                                    <Eye size={16} />
+                                <span className="action-btn view-count" aria-label={`瀏覽 ${post.viewCount} 次`}>
+                                    <Eye size={16} aria-hidden="true" />
                                     {post.viewCount}
                                 </span>
                             </div>
-                        </article>
+                        </Card>
                     ))
                 )}
             </div>
@@ -332,69 +322,60 @@ function CreatePostModal({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content create-post-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <h2>發表貼文</h2>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
-
-                <form onSubmit={handleSubmit}>
-                    <div className="form-group">
-                        <label>分類</label>
-                        <div className="category-selector">
-                            {CATEGORY_OPTIONS.map(cat => (
-                                <button
-                                    key={cat.value}
-                                    type="button"
-                                    className={`category-option ${category === cat.value ? 'selected' : ''}`}
-                                    onClick={() => setCategory(cat.value)}
-                                >
-                                    {cat.emoji} {cat.label}
-                                </button>
-                            ))}
-                        </div>
+        <Modal isOpen onClose={onClose} title="發表貼文" size="md">
+            <form onSubmit={handleSubmit} className="create-post-form">
+                <div className="form-group">
+                    <label>分類</label>
+                    <div className="category-selector">
+                        {CATEGORY_OPTIONS.map(cat => (
+                            <button
+                                key={cat.value}
+                                type="button"
+                                className={`category-option ${category === cat.value ? 'selected' : ''}`}
+                                onClick={() => setCategory(cat.value)}
+                                aria-pressed={category === cat.value}
+                            >
+                                {cat.emoji} {cat.label}
+                            </button>
+                        ))}
                     </div>
+                </div>
 
-                    <div className="form-group">
-                        <label>標題（選填）</label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={e => setTitle(e.target.value)}
-                            placeholder="輸入標題..."
-                            maxLength={200}
-                        />
-                    </div>
+                <InputField
+                    label="標題（選填）"
+                    value={title}
+                    onChange={e => setTitle(e.target.value)}
+                    placeholder="輸入標題..."
+                    maxLength={200}
+                    fullWidth
+                />
 
-                    <div className="form-group">
-                        <label>內容 *</label>
-                        <textarea
-                            value={content}
-                            onChange={e => setContent(e.target.value)}
-                            placeholder="分享你的想法..."
-                            rows={6}
-                            required
-                        />
-                    </div>
+                <div className="form-group">
+                    <label htmlFor="post-content">內容 *</label>
+                    <textarea
+                        id="post-content"
+                        value={content}
+                        onChange={e => setContent(e.target.value)}
+                        placeholder="分享你的想法..."
+                        rows={6}
+                        required
+                    />
+                </div>
 
-                    <div className="modal-actions">
-                        <button type="button" className="btn-secondary" onClick={onClose}>
-                            取消
-                        </button>
-                        <button
-                            type="submit"
-                            className="btn-primary"
-                            disabled={submitting || !content.trim()}
-                        >
-                            {submitting ? '發表中...' : '發表'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
+                <div className="modal-actions">
+                    <Button type="button" variant="secondary" onClick={onClose}>
+                        取消
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="primary"
+                        disabled={submitting || !content.trim()}
+                    >
+                        {submitting ? '發表中...' : '發表'}
+                    </Button>
+                </div>
+            </form>
+        </Modal>
     );
 }
 
@@ -421,6 +402,7 @@ function PostDetailModal({
 
     useEffect(() => {
         loadComments();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post.id]);
 
     const loadComments = async () => {
@@ -456,27 +438,20 @@ function PostDetailModal({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content post-detail-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <div className="post-detail__author">
-                        <div className="avatar">{post.authorName.charAt(0)}</div>
-                        <div>
-                            <span className="name">{post.authorName}</span>
-                            <span className="time">{new Date(post.createdAt).toLocaleString('zh-TW')}</span>
-                        </div>
+        <Modal isOpen onClose={onClose} title={post.title || '貼文詳情'} size="lg">
+            <div className="post-detail">
+                <div className="post-detail__author">
+                    <div className="avatar" aria-hidden="true">{post.authorName.charAt(0)}</div>
+                    <div>
+                        <span className="name">{post.authorName}</span>
+                        <span className="time">{new Date(post.createdAt).toLocaleString('zh-TW')}</span>
                     </div>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
+                </div>
 
                 <div className="post-detail__content">
-                    <span className={`post-card__category cat-${post.category}`}>
+                    <Badge variant={getCategoryInfo(post.category).variant} size="sm">
                         {getCategoryInfo(post.category).emoji} {getCategoryInfo(post.category).label}
-                    </span>
-
-                    {post.title && <h2>{post.title}</h2>}
+                    </Badge>
 
                     <p>{post.content}</p>
 
@@ -489,14 +464,14 @@ function PostDetailModal({
                     )}
 
                     <div className="post-detail__stats">
-                        <button onClick={() => onLike(post.id)}>
-                            <Heart size={18} /> {post.likeCount} 讚
+                        <button onClick={() => onLike(post.id)} aria-label={`按讚，目前 ${post.likeCount} 個讚`}>
+                            <Heart size={18} aria-hidden="true" /> {post.likeCount} 讚
                         </button>
                         <span>
-                            <MessageSquare size={18} /> {post.commentCount} 則留言
+                            <MessageSquare size={18} aria-hidden="true" /> {post.commentCount} 則留言
                         </span>
                         <span>
-                            <Eye size={18} /> {post.viewCount} 次瀏覽
+                            <Eye size={18} aria-hidden="true" /> {post.viewCount} 次瀏覽
                         </span>
                     </div>
                 </div>
@@ -505,14 +480,14 @@ function PostDetailModal({
                     <h3>留言 ({comments.length})</h3>
 
                     {loadingComments ? (
-                        <p className="loading">載入留言中...</p>
+                        <Skeleton variant="text" count={2} />
                     ) : comments.length === 0 ? (
                         <p className="empty">還沒有留言，來發表第一則吧！</p>
                     ) : (
                         <div className="comments-list">
                             {comments.map(comment => (
                                 <div key={comment.id} className="comment-item">
-                                    <div className="comment-avatar">
+                                    <div className="comment-avatar" aria-hidden="true">
                                         {comment.authorName.charAt(0)}
                                     </div>
                                     <div className="comment-content">
@@ -534,17 +509,19 @@ function PostDetailModal({
                                 value={newComment}
                                 onChange={e => setNewComment(e.target.value)}
                                 placeholder="寫下你的留言..."
+                                aria-label="留言內容"
                             />
                             <button
                                 type="submit"
                                 disabled={submitting || !newComment.trim()}
+                                aria-label="送出留言"
                             >
-                                <Send size={18} />
+                                <Send size={18} aria-hidden="true" />
                             </button>
                         </form>
                     )}
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 }

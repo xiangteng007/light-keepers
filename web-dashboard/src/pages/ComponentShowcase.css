@@ -4,7 +4,7 @@
 
 .showcase {
     min-height: 100vh;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, var(--manual-bg-gray) 0%, var(--manual-border) 100%);
     font-family: var(--manual-font-family);
 }
 
@@ -70,8 +70,8 @@
 
 /* Code Block */
 .showcase-code {
-    background: #f8f9fa;
-    border: 1px solid #e2e8f0;
+    background: var(--manual-bg-gray);
+    border: 1px solid var(--manual-border);
     border-radius: 8px;
     padding: 16px;
     overflow-x: auto;
@@ -82,7 +82,7 @@
     font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.5;
-    color: #333;
+    color: var(--manual-text-primary);
 }
 
 /* States Grid */
@@ -93,7 +93,7 @@
 }
 
 .state-card {
-    background: #f8f9fa;
+    background: var(--manual-bg-gray);
     border-left: 4px solid var(--manual-accent);
     padding: 20px;
     border-radius: 8px;

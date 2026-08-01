@@ -1,15 +1,16 @@
 /**
  * ReportGeneratorPage.tsx
- * 
+ *
  * Analytics Domain - 報表產生器頁面
  * 提供報表生成、匯出、排程功能
  */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
     FileText, Download, Calendar, Clock, BarChart2,
     PieChart, TrendingUp, Filter, Play, Settings
 } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import { Button, Badge, InputField } from '../../design-system';
 import './ReportGeneratorPage.css';
 
 const REPORT_TEMPLATES = [
@@ -20,9 +21,9 @@ const REPORT_TEMPLATES = [
 ];
 
 const RECENT_REPORTS = [
-    { id: '1', name: '2026年1月週報', template: '事件摘要報告', generatedAt: '2026/01/10 14:30', status: 'completed' },
-    { id: '2', name: '資源月報 - 12月', template: '資源消耗報告', generatedAt: '2026/01/01 09:00', status: 'completed' },
-    { id: '3', name: '績效季報 Q4', template: '人員績效報告', generatedAt: '2026/01/05 16:45', status: 'pending' },
+    { id: '1', name: '2026年1月週報', template: '事件摘要報告', generatedAt: '2026/01/10 14:30', status: 'completed' as const },
+    { id: '2', name: '資源月報 - 12月', template: '資源消耗報告', generatedAt: '2026/01/01 09:00', status: 'completed' as const },
+    { id: '3', name: '績效季報 Q4', template: '人員績效報告', generatedAt: '2026/01/05 16:45', status: 'pending' as const },
 ];
 
 export default function ReportGeneratorPage() {
@@ -38,97 +39,104 @@ export default function ReportGeneratorPage() {
         >
             <div className="report-generator">
                 {/* Report Templates */}
-                <section className="templates-section">
-                    <h3>報表模板</h3>
-                    <div className="templates-grid">
+                <section className="rg-panel">
+                    <h2 className="rg-panel__title">報表模板</h2>
+                    <div className="templates-grid" role="group" aria-label="選擇報表模板">
                         {REPORT_TEMPLATES.map(template => {
                             const Icon = template.icon;
+                            const selected = selectedTemplate === template.id;
                             return (
-                                <div
+                                <button
                                     key={template.id}
-                                    className={`template-card ${selectedTemplate === template.id ? 'selected' : ''}`}
+                                    type="button"
+                                    className={`template-card ${selected ? 'template-card--selected' : ''}`}
+                                    aria-pressed={selected}
                                     onClick={() => setSelectedTemplate(template.id)}
                                 >
-                                    <div className="template-icon">
+                                    <span className="template-icon" aria-hidden="true">
                                         <Icon size={24} />
-                                    </div>
-                                    <div className="template-info">
-                                        <h4>{template.name}</h4>
-                                        <p>{template.description}</p>
-                                    </div>
-                                </div>
+                                    </span>
+                                    <span className="template-info">
+                                        <span className="template-info__name">{template.name}</span>
+                                        <span className="template-info__desc">{template.description}</span>
+                                    </span>
+                                </button>
                             );
                         })}
                     </div>
                 </section>
 
                 {/* Configuration Panel */}
-                <section className="config-section">
-                    <h3><Settings size={18} /> 報表設定</h3>
+                <section className="rg-panel">
+                    <h2 className="rg-panel__title">
+                        <Settings size={18} aria-hidden="true" /> 報表設定
+                    </h2>
                     <div className="config-form">
-                        <div className="form-group">
-                            <label>報表名稱</label>
-                            <input type="text" placeholder="輸入報表名稱..." />
-                        </div>
+                        <InputField label="報表名稱" placeholder="輸入報表名稱…" fullWidth />
                         <div className="form-row">
-                            <div className="form-group">
-                                <label><Calendar size={14} /> 開始日期</label>
-                                <input
-                                    type="date"
-                                    value={dateRange.start}
-                                    onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label><Calendar size={14} /> 結束日期</label>
-                                <input
-                                    type="date"
-                                    value={dateRange.end}
-                                    onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-                                />
-                            </div>
+                            <InputField
+                                label="開始日期"
+                                type="date"
+                                prefix={<Calendar size={14} aria-hidden="true" />}
+                                value={dateRange.start}
+                                onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
+                                fullWidth
+                            />
+                            <InputField
+                                label="結束日期"
+                                type="date"
+                                prefix={<Calendar size={14} aria-hidden="true" />}
+                                value={dateRange.end}
+                                onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
+                                fullWidth
+                            />
                         </div>
                         <div className="form-group">
-                            <label><Filter size={14} /> 資料篩選</label>
-                            <select>
+                            <label className="form-group__label" htmlFor="rg-filter">
+                                <Filter size={14} aria-hidden="true" /> 資料篩選
+                            </label>
+                            <select id="rg-filter" className="rg-select">
                                 <option>全部資料</option>
                                 <option>僅重大事件</option>
                                 <option>僅本區域</option>
                             </select>
                         </div>
                         <div className="form-actions">
-                            <button className="btn-generate" disabled={!selectedTemplate}>
-                                <Play size={16} />
+                            <Button
+                                icon={<Play size={16} aria-hidden="true" />}
+                                disabled={!selectedTemplate}
+                            >
                                 產生報表
-                            </button>
-                            <button className="btn-schedule">
-                                <Clock size={16} />
+                            </Button>
+                            <Button variant="secondary" icon={<Clock size={16} aria-hidden="true" />}>
                                 設定排程
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 </section>
 
                 {/* Recent Reports */}
-                <section className="recent-section">
-                    <h3>近期報表</h3>
-                    <div className="reports-list">
+                <section className="rg-panel">
+                    <h2 className="rg-panel__title">近期報表</h2>
+                    <ul className="reports-list" role="list">
                         {RECENT_REPORTS.map(report => (
-                            <div key={report.id} className="report-item">
-                                <FileText size={18} className="report-icon" />
+                            <li key={report.id} className="report-item">
+                                <FileText size={18} className="report-icon" aria-hidden="true" />
                                 <div className="report-info">
                                     <span className="report-name">{report.name}</span>
-                                    <span className="report-meta">{report.template} · {report.generatedAt}</span>
+                                    <span className="report-meta tabular-nums">{report.template} · {report.generatedAt}</span>
                                 </div>
-                                <span className={`report-status ${report.status}`}>
-                                    {report.status === 'completed' ? '已完成' : '處理中'}
-                                </span>
-                                <button className="btn-download">
-                                    <Download size={16} />
+                                {report.status === 'completed' ? (
+                                    <Badge variant="success" dot>已完成</Badge>
+                                ) : (
+                                    <Badge variant="warning" dot pulse>處理中</Badge>
+                                )}
+                                <button type="button" className="btn-download" aria-label={`下載 ${report.name}`}>
+                                    <Download size={16} aria-hidden="true" />
                                 </button>
-                            </div>
+                            </li>
                         ))}
-                    </div>
+                    </ul>
                 </section>
             </div>
         </PageTemplate>

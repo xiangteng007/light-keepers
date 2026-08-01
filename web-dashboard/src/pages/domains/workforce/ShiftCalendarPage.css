@@ -1,0 +1,349 @@
+/**
+ * ShiftCalendarPage.css — R3b 看板頁骨架（值班行事曆，DESIGN_LANGUAGE.md §7.3）
+ * 桌機：月曆格線（每格＝一天，圓點＝當天班次類型）。
+ * 行動端：以「本週分頁式日期切換」取代水平多欄捲動看板（§7.3 / §6）。
+ * 全部語義 token；light/dark/tactical 三態自動生效。
+ */
+
+.shift-page {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .shift-page {
+        padding: var(--space-4);
+    }
+}
+
+@media (min-width: 1024px) {
+    .shift-page {
+        padding: var(--space-6);
+    }
+}
+
+.shift-page__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+}
+
+.shift-page__header h1 {
+    font-size: var(--font-size-2xl, 24px);
+    font-weight: var(--font-weight-bold, 700);
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.shift-page__subtitle {
+    margin: var(--space-1) 0 0;
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 14px);
+}
+
+.tabular-nums {
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 版面：桌機雙欄，行動端單欄 ── */
+
+.shift-page__body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+@media (min-width: 1024px) {
+    .shift-page__body {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        align-items: start;
+        gap: var(--space-6);
+    }
+}
+
+.shift-panel {
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+}
+
+.shift-panel__title {
+    margin: 0 0 var(--space-3);
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+/* ── 月曆導覽 ── */
+
+.shift-calendar__nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--space-4);
+}
+
+.shift-calendar__nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    cursor: pointer;
+}
+
+.shift-calendar__nav-btn:hover {
+    background: var(--surface-hover);
+}
+
+.shift-calendar__nav-btn:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.shift-calendar__title {
+    margin: 0;
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+/* ── 月曆格線（桌機/平板顯示，行動端隱藏改用週分頁） ── */
+
+.shift-calendar__grid--month {
+    display: none;
+}
+
+@media (min-width: 640px) {
+    .shift-calendar__grid--month {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 2px;
+    }
+}
+
+.shift-calendar__weekday {
+    text-align: center;
+    padding: var(--space-2) 0;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.shift-calendar__cell {
+    aspect-ratio: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 4px;
+    padding: var(--space-1);
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    cursor: pointer;
+    font-size: var(--font-size-sm, 14px);
+}
+
+.shift-calendar__cell--empty {
+    cursor: default;
+}
+
+.shift-calendar__cell:not(.shift-calendar__cell--empty):hover {
+    background: var(--surface-hover);
+}
+
+.shift-calendar__cell:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.shift-calendar__cell--selected {
+    background: var(--accent-primary, var(--color-secondary));
+    color: var(--text-inverse);
+}
+
+.shift-calendar__day-num {
+    font-weight: var(--font-weight-medium, 500);
+}
+
+.shift-calendar__dots {
+    display: flex;
+    gap: 3px;
+}
+
+.shift-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    flex-shrink: 0;
+}
+
+.shift-dot--regular {
+    background: var(--color-success);
+}
+
+.shift-dot--emergency {
+    background: var(--color-danger);
+}
+
+.shift-dot--training {
+    background: var(--color-info);
+}
+
+/* ── 行動端：本週分頁式日期切換 ── */
+
+.shift-calendar__week-tabs {
+    display: flex;
+    gap: var(--space-2);
+    overflow-x: auto;
+}
+
+@media (min-width: 640px) {
+    .shift-calendar__week-tabs {
+        display: none;
+    }
+}
+
+.shift-week-tab {
+    flex: 1 0 auto;
+    min-width: 44px;
+    min-height: 56px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: var(--space-2);
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.shift-week-tab:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}
+
+.shift-week-tab--active {
+    background: var(--accent-primary, var(--color-secondary));
+    color: var(--text-inverse);
+    border-color: var(--accent-primary, var(--color-secondary));
+}
+
+.shift-week-tab__dow {
+    font-size: var(--font-size-xs, 12px);
+    opacity: 0.8;
+}
+
+.shift-week-tab__date {
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-semibold, 600);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── 圖例 ── */
+
+.shift-calendar__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    margin-top: var(--space-4);
+}
+
+.shift-calendar__legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+/* ── 選定日期詳情 ── */
+
+.shift-detail-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.shift-detail-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.shift-detail-card__head h3 {
+    margin: 0;
+    font-size: var(--font-size-base, 14px);
+    font-weight: var(--font-weight-semibold, 600);
+    color: var(--text-primary);
+}
+
+.shift-detail-card__time {
+    margin: 0 0 4px;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-primary);
+}
+
+.shift-detail-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin: 0;
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.shift-detail-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: var(--space-3);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--border-light);
+}
+
+.shift-detail-card__capacity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--font-size-sm, 14px);
+    color: var(--text-secondary);
+}
+
+.shift-detail-card__edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: 44px;
+    padding: 0 var(--space-2);
+    background: transparent;
+    border: none;
+    color: var(--accent-primary, var(--color-secondary));
+    font-size: var(--font-size-sm, 14px);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+}
+
+.shift-detail-card__edit:hover {
+    background: var(--surface-hover);
+}
+
+.shift-detail-card__edit:focus-visible {
+    outline: 2px solid var(--border-focus);
+    outline-offset: 2px;
+}

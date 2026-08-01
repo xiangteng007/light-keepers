@@ -1,5 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Card, Button, Badge } from '../design-system';
+import { AlertTriangle } from 'lucide-react';
+import { Alert, Card, Button, Badge, Modal } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import {
     DISASTER_TYPE_GROUPS,
     DISASTER_TYPE_META,
@@ -100,12 +103,12 @@ export default function ReportsAdminPage() {
 
     return (
         <div className="page reports-admin-page">
-            <div className="page-header">
+            <header className="page-header">
                 <div className="page-header__left">
-                    <h2>📋 回報審核管理</h2>
+                    <h1>回報審核管理</h1>
                     <p className="page-subtitle">管理員審核回報</p>
                 </div>
-            </div>
+            </header>
 
             {/* 統計卡片 */}
             <div className="reports-stats">
@@ -123,11 +126,12 @@ export default function ReportsAdminPage() {
                 </Card>
             </div>
 
-            {/* 篩選 */}
-            <div className="reports-filters">
+            {/* 篩選（toolbar） */}
+            <div className="reports-filters" role="toolbar" aria-label="回報篩選">
                 <button
                     className={`filter-btn ${selectedStatus === '' ? 'active' : ''}`}
                     onClick={() => setSelectedStatus('')}
+                    aria-pressed={selectedStatus === ''}
                 >
                     全部
                 </button>
@@ -136,6 +140,7 @@ export default function ReportsAdminPage() {
                         key={key}
                         className={`filter-btn ${selectedStatus === key ? 'active' : ''}`}
                         onClick={() => setSelectedStatus(key)}
+                        aria-pressed={selectedStatus === key}
                     >
                         {config.label}
                     </button>
@@ -174,11 +179,13 @@ export default function ReportsAdminPage() {
             {/* 回報列表 */}
             <div className="reports-list">
                 {isLoading ? (
-                    <div className="loading-state">⏳ 載入中...</div>
+                    <div aria-busy="true" aria-label="載入中">
+                        <Skeleton variant="card" height={120} count={3} className="reports-list__skeleton-row" />
+                    </div>
                 ) : error ? (
-                    <div className="error-state">⚠️ {error}</div>
+                    <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>{error}</Alert>
                 ) : reports.length === 0 ? (
-                    <div className="empty-state">📭 目前沒有回報</div>
+                    <EmptyState variant="default" title="目前沒有回報" description="尚無符合篩選條件的回報。" />
                 ) : (
                     reports.map(report => {
                         const typeConfig = TYPE_CONFIG[report.type] || TYPE_CONFIG.other;
@@ -229,10 +236,7 @@ export default function ReportsAdminPage() {
 
             {/* 審核 Modal */}
             {selectedReport && (
-                <div className="modal-overlay" onClick={() => setSelectedReport(null)}>
-                    <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>📋 審核回報</h3>
-
+                <Modal isOpen onClose={() => setSelectedReport(null)} title="審核回報" size="lg">
                         <div className="report-detail">
                             <div className="report-detail__row">
                                 <span className="label">類型</span>
@@ -293,8 +297,7 @@ export default function ReportsAdminPage() {
                                 {isReviewing ? '處理中...' : '✅ 確認'}
                             </Button>
                         </div>
-                    </Card>
-                </div>
+                </Modal>
             )}
         </div>
     );

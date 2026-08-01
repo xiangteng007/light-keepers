@@ -9,18 +9,31 @@ import { useState, useEffect } from 'react';
  * This page does NOT import `LoginPage.css` (that file is actually consumed by
  * BindLinePage / ForgotPasswordPage / ResetPasswordPage — a pre-existing naming
  * collision, left untouched here to avoid scope creep). All visual styling below
- * lives in the inline `styles` object plus an injected <style> keyframes block,
- * not in a page .css file, so the checklist's `git grep "#[0-9a-fA-F]{3,8}" <page>.css`
- * step matches nothing.
- * The look is an intentionally bespoke, fully dark "industrial cyberpunk" auth
- * experience (amber/cyan HUD on navy gradient) that does not participate in the
- * light/dark `data-theme` toggle by design — converting its ~30 inline hex/rgba
- * literals to app-semantic tokens would risk breaking this deliberate one-off
- * brand identity for no visual-parity benefit, so it is left as a documented
- * exception rather than force-fitted. Only the one value that is an exact,
- * coincidental match for an existing semantic token (`--color-success`) was
- * swapped below; everything else (amber accents, HUD cyan, navy gradients) is
- * kept as bespoke brand color.
+ * lives in the inline `styles` object plus an injected <style> keyframes block.
+ *
+ * R3b token pass (FULL_SYSTEM_REDESIGN_PLAN R3 — "Login exception"): layout,
+ * structure and the bespoke "industrial cyberpunk" identity (amber/cyan HUD on
+ * navy gradient) are UNCHANGED. Every hex/rgba literal below has been swapped
+ * for the closest matching token in `tokens.css`:
+ *   - Amber (#FBBF24 / #F59E0B) → `--color-warning-light` / `--color-warning`
+ *     (Layer 3, exact hex match, theme-stable — not affected by `.dark`).
+ *   - Red (#EF4444 / #DC2626) → `--color-danger` / `--color-danger-dark`
+ *     (Layer 3, exact hex match, theme-stable).
+ *   - Success dot → `--color-success` (Layer 3, exact match, was already a var()).
+ *   - Navy background / near-black panels / cyan HUD numerals / white-ish HUD
+ *     text have no exact Layer-3 equivalent (they are inherently dark-only
+ *     values), so the outer container carries a *locally scoped* `dark` class
+ *     (`.login-container.dark`) that pins token resolution to the dark palette
+ *     (`--bg-primary`, `--bg-secondary`, `--text-primary`, `--info-color`, …)
+ *     regardless of the app-wide `data-theme` the user has chosen — this keeps
+ *     the page's always-dark HUD identity intact while still resolving through
+ *     `tokens.css` instead of hardcoded hex. Alpha variants use `color-mix()`
+ *     against these tokens (already an established pattern elsewhere: see
+ *     ResourcesPage.css / ApprovalCenterPage.css).
+ *   - The Google "G" logo SVG path colors and LINE's brand green (#00C300) are
+ *     THIRD-PARTY BRAND MARKS (Sign-in-with-Google / LINE brand guidelines
+ *     require their exact official colors) — these are intentionally left as
+ *     literal hex, not app design tokens, same as any other vendor logo.
  */
 
 // Keyframe animations as style element
@@ -38,10 +51,10 @@ const keyframes = `
 
 @keyframes pulse-glow {
   0%, 100% {
-    box-shadow: 0 0 20px rgba(255, 191, 36, 0.4);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--color-warning-light) 40%, transparent);
   }
   50% {
-    box-shadow: 0 0 60px rgba(255, 191, 36, 0.8);
+    box-shadow: 0 0 60px color-mix(in srgb, var(--color-warning-light) 80%, transparent);
   }
 }
 
@@ -177,7 +190,7 @@ const LoginPage: React.FC = () => {
             minHeight: '100vh',
             width: '100%',
             display: 'flex',
-            background: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #0f0f1a 100%)',
+            background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
             fontFamily: "'JetBrains Mono', monospace",
             position: 'relative' as const,
             overflow: 'hidden',
@@ -187,8 +200,8 @@ const LoginPage: React.FC = () => {
             position: 'absolute' as const,
             inset: 0,
             backgroundImage: `
-                linear-gradient(rgba(255, 191, 36, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 191, 36, 0.03) 1px, transparent 1px)
+                linear-gradient(color-mix(in srgb, var(--color-warning-light) 3%, transparent) 1px, transparent 1px),
+                linear-gradient(90deg, color-mix(in srgb, var(--color-warning-light) 3%, transparent) 1px, transparent 1px)
             `,
             backgroundSize: '40px 40px',
             pointerEvents: 'none' as const,
@@ -200,7 +213,7 @@ const LoginPage: React.FC = () => {
             left: '50%',
             width: '200%',
             height: '200%',
-            background: 'conic-gradient(from 0deg, transparent 0deg, rgba(255, 191, 36, 0.15) 30deg, transparent 60deg)',
+            background: 'conic-gradient(from 0deg, transparent 0deg, color-mix(in srgb, var(--color-warning-light) 15%, transparent) 30deg, transparent 60deg)',
             animation: 'beacon-sweep 8s ease-in-out infinite',
             transformOrigin: 'center center',
             pointerEvents: 'none' as const,
@@ -214,7 +227,7 @@ const LoginPage: React.FC = () => {
             alignItems: 'center',
             padding: '40px',
             position: 'relative' as const,
-            borderRight: '1px solid rgba(255, 191, 36, 0.1)',
+            borderRight: '1px solid color-mix(in srgb, var(--color-warning-light) 10%, transparent)',
         },
         // Digital Clock Container
         digitalClockContainer: {
@@ -229,9 +242,9 @@ const LoginPage: React.FC = () => {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '72px',
             fontWeight: 800,
-            color: '#FBBF24',
+            color: 'var(--color-warning-light)',
             letterSpacing: '0.05em',
-            textShadow: '0 0 30px rgba(255, 191, 36, 0.6), 0 0 60px rgba(255, 191, 36, 0.3)',
+            textShadow: '0 0 30px color-mix(in srgb, var(--color-warning-light) 60%, transparent), 0 0 60px color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
             display: 'flex',
             alignItems: 'center',
             marginBottom: '8px',
@@ -244,7 +257,7 @@ const LoginPage: React.FC = () => {
         dateDisplay: {
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '18px',
-            color: 'rgba(255, 191, 36, 0.8)',
+            color: 'color-mix(in srgb, var(--color-warning-light) 80%, transparent)',
             letterSpacing: '0.3em',
             marginBottom: '4px',
         },
@@ -252,7 +265,7 @@ const LoginPage: React.FC = () => {
         dayDisplay: {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.4)',
+            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
             letterSpacing: '0.5em',
             marginBottom: '24px',
         },
@@ -267,21 +280,21 @@ const LoginPage: React.FC = () => {
             flexDirection: 'column' as const,
             alignItems: 'center',
             padding: '12px 16px',
-            background: 'rgba(0, 0, 0, 0.3)',
-            border: '1px solid rgba(255, 191, 36, 0.2)',
+            background: 'color-mix(in srgb, var(--bg-primary) 30%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
             borderRadius: '4px',
         },
         metricValue: {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '24px',
             fontWeight: 700,
-            color: '#00D4FF',
-            textShadow: '0 0 10px rgba(0, 212, 255, 0.5)',
+            color: 'var(--info-color)',
+            textShadow: '0 0 10px color-mix(in srgb, var(--info-color) 50%, transparent)',
         },
         metricLabel: {
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '9px',
-            color: 'rgba(255, 255, 255, 0.4)',
+            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
             letterSpacing: '0.15em',
             marginTop: '4px',
         },
@@ -297,8 +310,8 @@ const LoginPage: React.FC = () => {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '36px',
             fontWeight: 700,
-            color: '#FBBF24',
-            textShadow: '0 0 20px rgba(255, 191, 36, 0.5)',
+            color: 'var(--color-warning-light)',
+            textShadow: '0 0 20px color-mix(in srgb, var(--color-warning-light) 50%, transparent)',
             display: 'flex',
             alignItems: 'center',
             marginBottom: '4px',
@@ -306,7 +319,7 @@ const LoginPage: React.FC = () => {
         mobileDateDisplay: {
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: '12px',
-            color: 'rgba(255, 191, 36, 0.6)',
+            color: 'color-mix(in srgb, var(--color-warning-light) 60%, transparent)',
             letterSpacing: '0.2em',
         },
         brandTitle: {
@@ -314,14 +327,14 @@ const LoginPage: React.FC = () => {
             fontSize: '48px',
             fontWeight: 800,
             letterSpacing: '0.3em',
-            color: '#FBBF24',
-            textShadow: '0 0 40px rgba(255, 191, 36, 0.5)',
+            color: 'var(--color-warning-light)',
+            textShadow: '0 0 40px color-mix(in srgb, var(--color-warning-light) 50%, transparent)',
             marginBottom: '16px',
             textAlign: 'center' as const,
         },
         brandSubtitle: {
             fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'color-mix(in srgb, var(--text-primary) 50%, transparent)',
             letterSpacing: '0.5em',
             textTransform: 'uppercase' as const,
         },
@@ -331,8 +344,8 @@ const LoginPage: React.FC = () => {
             alignItems: 'center',
             gap: '12px',
             padding: '12px 24px',
-            background: 'rgba(0, 0, 0, 0.4)',
-            border: '1px solid rgba(255, 191, 36, 0.3)',
+            background: 'color-mix(in srgb, var(--bg-primary) 40%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
             borderRadius: '4px',
             marginTop: '40px',
         },
@@ -340,12 +353,12 @@ const LoginPage: React.FC = () => {
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: 'var(--color-success, #22C55E)',
+            background: 'var(--color-success)',
             animation: 'pulse-glow 2s ease-in-out infinite',
         },
         statusText: {
             fontSize: '11px',
-            color: 'var(--color-success, #22C55E)',
+            color: 'var(--color-success)',
             letterSpacing: '0.2em',
         },
         // Right form panel (main content, always visible)
@@ -363,9 +376,9 @@ const LoginPage: React.FC = () => {
         formCard: {
             width: '100%',
             maxWidth: '420px',
-            background: 'rgba(10, 10, 15, 0.9)',
+            background: 'color-mix(in srgb, var(--bg-primary) 90%, transparent)',
             backdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 191, 36, 0.2)',
+            border: '1px solid color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
             borderRadius: '8px',
             padding: '48px',
             position: 'relative' as const,
@@ -377,7 +390,7 @@ const LoginPage: React.FC = () => {
             left: 0,
             width: '100%',
             height: '2px',
-            background: 'linear-gradient(90deg, transparent, rgba(255, 191, 36, 0.5), transparent)',
+            background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warning-light) 50%, transparent), transparent)',
             animation: 'scan-line 3s linear infinite',
             pointerEvents: 'none' as const,
         },
@@ -386,7 +399,7 @@ const LoginPage: React.FC = () => {
             position: 'absolute' as const,
             width: '20px',
             height: '20px',
-            border: '2px solid #FBBF24',
+            border: '2px solid var(--color-warning-light)',
         },
         cornerTL: { top: '12px', left: '12px', borderRight: 'none', borderBottom: 'none' },
         cornerTR: { top: '12px', right: '12px', borderLeft: 'none', borderBottom: 'none' },
@@ -396,13 +409,13 @@ const LoginPage: React.FC = () => {
             fontFamily: "'Orbitron', sans-serif",
             fontSize: '20px',
             fontWeight: 700,
-            color: '#FBBF24',
+            color: 'var(--color-warning-light)',
             letterSpacing: '0.15em',
             marginBottom: '8px',
         },
         formSubtitle: {
             fontSize: '12px',
-            color: 'rgba(255, 255, 255, 0.4)',
+            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
             marginBottom: '32px',
         },
         // Input group
@@ -412,7 +425,7 @@ const LoginPage: React.FC = () => {
         label: {
             display: 'block',
             fontSize: '10px',
-            color: 'rgba(255, 255, 255, 0.5)',
+            color: 'color-mix(in srgb, var(--text-primary) 50%, transparent)',
             letterSpacing: '0.2em',
             textTransform: 'uppercase' as const,
             marginBottom: '8px',
@@ -423,20 +436,21 @@ const LoginPage: React.FC = () => {
         input: {
             width: '100%',
             padding: '16px 20px',
-            background: 'rgba(255, 255, 255, 0.03)',
-            border: '1px solid rgba(255, 255, 255, 0.1)',
+            background: 'color-mix(in srgb, var(--text-primary) 3%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--text-primary) 10%, transparent)',
             borderRadius: '4px',
-            color: '#fff',
+            color: 'var(--text-primary)',
             fontSize: '14px',
             fontFamily: "'JetBrains Mono', monospace",
             outline: 'none',
             transition: 'all 0.3s ease',
             boxSizing: 'border-box' as const,
+            minHeight: '44px',
         },
         inputFocused: {
-            borderColor: '#FBBF24',
-            boxShadow: '0 0 20px rgba(255, 191, 36, 0.2)',
-            background: 'rgba(255, 191, 36, 0.05)',
+            borderColor: 'var(--color-warning-light)',
+            boxShadow: '0 0 20px color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
+            background: 'color-mix(in srgb, var(--color-warning-light) 5%, transparent)',
         },
         // Error message
         errorBox: {
@@ -444,24 +458,25 @@ const LoginPage: React.FC = () => {
             alignItems: 'center',
             gap: '12px',
             padding: '14px 18px',
-            background: 'rgba(220, 38, 38, 0.1)',
-            border: '1px solid rgba(220, 38, 38, 0.4)',
+            background: 'color-mix(in srgb, var(--color-danger-dark) 10%, transparent)',
+            border: '1px solid color-mix(in srgb, var(--color-danger-dark) 40%, transparent)',
             borderRadius: '4px',
             marginBottom: '24px',
         },
         errorText: {
             fontSize: '12px',
-            color: '#EF4444',
+            color: 'var(--color-danger)',
             letterSpacing: '0.05em',
         },
         // Submit button
         submitBtn: {
             width: '100%',
+            minHeight: '44px',
             padding: '18px 32px',
-            background: 'linear-gradient(135deg, #FBBF24 0%, #F59E0B 100%)',
+            background: 'linear-gradient(135deg, var(--color-warning-light) 0%, var(--color-warning) 100%)',
             border: 'none',
             borderRadius: '4px',
-            color: '#0a0a0f',
+            color: 'var(--bg-primary)',
             fontSize: '14px',
             fontFamily: "'Orbitron', sans-serif",
             fontWeight: 700,
@@ -475,18 +490,18 @@ const LoginPage: React.FC = () => {
         },
         submitBtnHover: {
             transform: 'translateY(-2px)',
-            boxShadow: '0 10px 40px rgba(251, 191, 36, 0.4)',
+            boxShadow: '0 10px 40px color-mix(in srgb, var(--color-warning-light) 40%, transparent)',
         },
         // Version footer
         versionFooter: {
             textAlign: 'center' as const,
             marginTop: '32px',
             paddingTop: '24px',
-            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            borderTop: '1px solid color-mix(in srgb, var(--text-primary) 5%, transparent)',
         },
         versionText: {
             fontSize: '10px',
-            color: 'rgba(255, 255, 255, 0.3)',
+            color: 'color-mix(in srgb, var(--text-primary) 30%, transparent)',
             letterSpacing: '0.1em',
         },
         // Mobile styles (will be applied via media query check)
@@ -496,10 +511,10 @@ const LoginPage: React.FC = () => {
     };
 
     return (
-        <div className="login-container" data-testid="login-page" style={styles.container}>
-            {/* Background effects */}
-            <div style={styles.gridOverlay} />
-            <div style={styles.beaconSweep} />
+        <div className="login-container dark" data-testid="login-page" style={styles.container}>
+            {/* Background effects (decorative only) */}
+            <div style={styles.gridOverlay} aria-hidden="true" />
+            <div style={styles.beaconSweep} aria-hidden="true" />
 
             {/* Brand Panel - Only visible on desktop (>=1024px) */}
             {isDesktop && (
@@ -543,7 +558,7 @@ const LoginPage: React.FC = () => {
                     <p style={styles.brandSubtitle}>曦望燈塔資訊管理平台</p>
 
                     <div style={styles.statusBadge}>
-                        <div style={styles.statusDot}/>
+                        <div style={styles.statusDot} aria-hidden="true" />
                         <span style={styles.statusText}>SYSTEM STATUS: OPERATIONAL</span>
                     </div>
                 </div>
@@ -568,14 +583,14 @@ const LoginPage: React.FC = () => {
                 )}
 
             <div className="login-card" style={styles.formCard}>
-                    {/* Scan line effect */}
-                    <div style={styles.scanLine}/>
-                    
-                    {/* Corner decorators */}
-                    <div style={{...styles.corner, ...styles.cornerTL}}/>
-                    <div style={{...styles.corner, ...styles.cornerTR}}/>
-                    <div style={{...styles.corner, ...styles.cornerBL}}/>
-                    <div style={{...styles.corner, ...styles.cornerBR}}/>
+                    {/* Scan line effect (decorative only) */}
+                    <div style={styles.scanLine} aria-hidden="true" />
+
+                    {/* Corner decorators (decorative only) */}
+                    <div style={{...styles.corner, ...styles.cornerTL}} aria-hidden="true" />
+                    <div style={{...styles.corner, ...styles.cornerTR}} aria-hidden="true" />
+                    <div style={{...styles.corner, ...styles.cornerBL}} aria-hidden="true" />
+                    <div style={{...styles.corner, ...styles.cornerBR}} aria-hidden="true" />
 
                     {/* Mobile/Tablet title - shown when brand panel is hidden */}
                     {!isDesktop && (
@@ -605,11 +620,12 @@ const LoginPage: React.FC = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '12px',
+                                minHeight: '44px',
                                 padding: '18px 24px',
-                                background: 'rgba(255, 255, 255, 0.05)',
-                                border: '1px solid rgba(251, 191, 36, 0.3)',
+                                background: 'color-mix(in srgb, var(--text-primary) 5%, transparent)',
+                                border: '1px solid color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
                                 borderRadius: '4px',
-                                color: '#E8E8E8',
+                                color: 'var(--text-primary)',
                                 fontFamily: "'Orbitron', sans-serif",
                                 fontSize: '14px',
                                 fontWeight: 600,
@@ -618,19 +634,20 @@ const LoginPage: React.FC = () => {
                                 transition: 'all 0.3s ease',
                             }}
                             onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
-                                e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.6)';
+                                e.currentTarget.style.background = 'color-mix(in srgb, var(--text-primary) 10%, transparent)';
+                                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--color-warning-light) 60%, transparent)';
                                 e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 8px 30px rgba(251, 191, 36, 0.2)';
+                                e.currentTarget.style.boxShadow = '0 8px 30px color-mix(in srgb, var(--color-warning-light) 20%, transparent)';
                             }}
                             onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
-                                e.currentTarget.style.borderColor = 'rgba(251, 191, 36, 0.3)';
+                                e.currentTarget.style.background = 'color-mix(in srgb, var(--text-primary) 5%, transparent)';
+                                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--color-warning-light) 30%, transparent)';
                                 e.currentTarget.style.transform = 'translateY(0)';
                                 e.currentTarget.style.boxShadow = 'none';
                             }}
                         >
-                            <svg viewBox="0 0 24 24" width="20" height="20">
+                            {/* Google 官方品牌標誌配色 — 依 Google 品牌規範保留原色，不套用 app token */}
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
                                 <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
                                 <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
@@ -639,7 +656,7 @@ const LoginPage: React.FC = () => {
                             使用 GOOGLE 帳號登入
                         </button>
 
-                        {/* LINE Login Button */}
+                        {/* LINE Login Button — LINE 官方品牌綠 (#00C300) 依品牌規範保留原色，不套用 app token */}
                         <button
                             type="button"
                             onClick={handleLineLogin}
@@ -648,6 +665,7 @@ const LoginPage: React.FC = () => {
                                 alignItems: 'center',
                                 justifyContent: 'center',
                                 gap: '12px',
+                                minHeight: '44px',
                                 padding: '18px 24px',
                                 background: 'rgba(0, 195, 0, 0.1)',
                                 border: '1px solid rgba(0, 195, 0, 0.4)',
@@ -673,7 +691,7 @@ const LoginPage: React.FC = () => {
                                 e.currentTarget.style.boxShadow = 'none';
                             }}
                         >
-                            <svg viewBox="0 0 24 24" width="20" height="20">
+                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
                                 <path fill="#00C300" d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.105.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
                             </svg>
                             使用 LINE 帳號登入

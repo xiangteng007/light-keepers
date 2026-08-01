@@ -7,6 +7,13 @@
   margin: 0 auto;
 }
 
+.manuals-page .page-header__left h1 {
+  font-size: var(--font-size-2xl, 24px);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--text-primary);
+  margin: 0;
+}
+
 .page-subtitle {
   color: var(--text-muted);
   font-size: 14px;
@@ -17,11 +24,21 @@
 .manuals-search {
   position: relative;
   margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+}
+
+.manuals-search__icon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-muted);
+  pointer-events: none;
 }
 
 .manuals-search__input {
   width: 100%;
-  padding: 14px 48px 14px 20px;
+  min-height: 44px;
+  padding: 14px 48px 14px 46px;
   border: 1px solid var(--border-color);
   border-radius: 12px;
   background: var(--bg-card);
@@ -30,25 +47,36 @@
   transition: all 0.2s ease;
 }
 
-.manuals-search__input:focus {
+.manuals-search__input:focus-visible {
   outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(184, 151, 111, 0.15);
+  border-color: var(--border-focus, var(--accent-primary));
+  box-shadow: var(--focus-ring);
 }
 
 .manuals-search__clear {
   position: absolute;
-  right: 16px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: var(--bg-secondary);
   border: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
   cursor: pointer;
   color: var(--text-muted);
-  font-size: 12px;
+}
+
+.manuals-search__clear:hover {
+  background: var(--bg-hover);
+}
+
+.manuals-search__clear:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
 }
 
 /* Category Grid */
@@ -113,6 +141,10 @@
 
 .manuals-back-btn,
 .manual-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 44px;
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   padding: 8px 16px;
@@ -126,6 +158,16 @@
 .manuals-back-btn:hover,
 .manual-back-btn:hover {
   background: var(--bg-hover);
+}
+
+.manuals-back-btn:focus-visible,
+.manual-back-btn:focus-visible {
+  outline: 2px solid var(--border-focus);
+  outline-offset: 2px;
+}
+
+.manuals-list-title__icon {
+  font-size: 24px;
 }
 
 .manuals-list-title {
@@ -265,24 +307,7 @@
 }
 
 .manual-warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  background: rgba(232, 90, 90, 0.1);
-  border: 1px solid rgba(232, 90, 90, 0.3);
-  border-radius: 12px;
-  padding: 16px;
   margin-bottom: 24px;
-}
-
-.manual-warning__icon {
-  font-size: 24px;
-}
-
-.manual-warning p {
-  color: var(--danger);
-  font-weight: 500;
-  line-height: 1.5;
 }
 
 .manual-detail-content {
@@ -346,7 +371,7 @@
 
 /* Tips */
 .manual-tips {
-  background: rgba(196, 167, 125, 0.1);
+  background: var(--color-info-bg);
   border-radius: 12px;
   padding: 20px;
 }
@@ -369,17 +394,9 @@
   line-height: 1.8;
 }
 
-/* Offline Badge */
+/* Offline Badge (design-system Badge — 僅補間距) */
 .manual-offline-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(107, 142, 92, 0.15);
-  color: var(--success);
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 16px;
-  border-radius: 20px;
+  margin-top: 16px;
 }
 
 /* Sections (鎿村睍鍗€濉? */
@@ -423,7 +440,7 @@
 }
 
 .pocket-card-box {
-  background: linear-gradient(135deg, #1a1f2e, #232a3d);
+  background: var(--bg-inverse);
   border: 2px solid var(--accent-primary);
   border-radius: 16px;
   padding: 20px 24px;
@@ -431,11 +448,11 @@
 }
 
 .pocket-card-line {
-  color: #e0e0e0;
+  color: var(--text-inverse);
   font-size: 13px;
   line-height: 1.8;
   padding: 6px 0;
-  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  border-bottom: 1px dashed color-mix(in srgb, var(--text-inverse) 15%, transparent);
 }
 
 .pocket-card-line:last-child {
@@ -483,13 +500,15 @@
 }
 
 .checklist-card li {
-  padding: 6px 0;
+  padding: 2px 0;
 }
 
 .checklist-card label {
   display: flex;
   align-items: flex-start;
   gap: 10px;
+  min-height: 44px;
+  padding: 8px 0;
   cursor: pointer;
   font-size: 13px;
   color: var(--text-secondary);
@@ -564,7 +583,7 @@
 }
 
 .faq-item[open] summary {
-  background: rgba(184, 151, 111, 0.1);
+  background: var(--surface-hover, var(--bg-hover));
   border-bottom: 1px solid var(--border-color);
 }
 
@@ -574,7 +593,7 @@
   color: var(--text-secondary);
   line-height: 1.7;
   margin: 0;
-  background: rgba(0, 0, 0, 0.02);
+  background: var(--bg-secondary);
 }
 
 /* Not Found */

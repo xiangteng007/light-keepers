@@ -1,94 +1,57 @@
 .analytics-page {
-    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-6);
+    padding: var(--space-3);
+}
+
+@media (min-width: 768px) {
+    .analytics-page {
+        padding: var(--space-6);
+    }
+}
+
+.page-header__left h1 {
+    margin: 0;
+    font-size: var(--font-size-2xl);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+.page-subtitle {
+    margin: var(--space-1) 0 0;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
 }
 
 /* 日期範圍選擇器 */
 .date-range-selector {
     display: flex;
-    gap: 0.5rem;
+    gap: var(--space-2);
 }
 
-/* KPI 卡片網格 - 6 欄 */
+/* KPI 卡片網格 - StatIndicator 摘要列 */
 .kpi-grid {
     display: grid;
     grid-template-columns: repeat(6, 1fr);
-    gap: 1rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-4);
 }
 
 .kpi-card {
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    transition: transform var(--duration-fast) var(--ease-smooth), box-shadow var(--duration-fast) var(--ease-smooth);
 }
 
 .kpi-card:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-}
-
-.kpi-card__header {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.75rem;
-}
-
-.kpi-card__icon {
-    font-size: 1.25rem;
-}
-
-.kpi-card__title {
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--text-secondary, #64748b);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.kpi-card__value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--text-primary, #1e293b);
-    line-height: 1.1;
-}
-
-.kpi-card__subtitle {
-    font-size: 0.875rem;
-    color: var(--text-secondary, #64748b);
-    margin-top: 0.25rem;
-}
-
-.kpi-card__detail {
-    margin-top: 0.75rem;
-    padding-top: 0.75rem;
-    border-top: 1px solid var(--border-default, #e2e8f0);
-    font-size: 0.8rem;
-}
-
-.kpi-detail--success {
-    color: var(--color-success-dark, #16a34a);
-}
-
-.kpi-detail--warning {
-    color: var(--color-warning-dark, #d97706);
-}
-
-.kpi-detail--danger {
-    color: var(--color-danger-dark, #dc2626);
-}
-
-.kpi-detail--info {
-    color: var(--color-info-dark, #0891b2);
-}
-
-.kpi-detail--neutral {
-    color: var(--text-secondary, #64748b);
+    box-shadow: var(--shadow-md);
 }
 
 /* 圖表卡片 */
 .chart-card {
-    margin-bottom: 1.5rem;
+    margin-bottom: 0;
 }
 
 .chart-container {
@@ -103,8 +66,7 @@
 .charts-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1.5rem;
-    margin-bottom: 1.5rem;
+    gap: var(--space-6);
 }
 
 /* 無資料佔位 */
@@ -114,28 +76,21 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: var(--text-secondary, #64748b);
-}
-
-.no-data-placeholder span {
-    font-size: 3rem;
-    margin-bottom: 0.5rem;
+    gap: var(--space-2);
+    color: var(--text-tertiary);
 }
 
 .no-data-placeholder p {
-    font-size: 1rem;
-    font-weight: 500;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-medium);
+    margin: 0;
 }
 
 /* 即時活動區塊 */
-.activity-section {
-    margin-top: 1.5rem;
-}
-
 .activity-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 1.5rem;
+    gap: var(--space-6);
 }
 
 .activity-card {
@@ -145,89 +100,45 @@
 .activity-list {
     display: flex;
     flex-direction: column;
-    gap: 0.75rem;
+    gap: var(--space-3);
 }
 
 .activity-item {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--bg-secondary, #f8fafc);
-    border-radius: var(--radius-md, 8px);
-    transition: background 0.2s;
+    gap: var(--space-3);
+    min-height: 44px;
+    padding: var(--space-3);
+    background: var(--surface-hover);
+    border-radius: var(--radius-md);
+    transition: background var(--duration-fast) var(--ease-smooth);
 }
 
 .activity-item:hover {
-    background: var(--surface-hover, #f1f5f9);
-}
-
-.activity-badge {
-    font-size: 0.7rem;
-    font-weight: 600;
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--radius-xs, 4px);
-    white-space: nowrap;
-}
-
-.badge-success {
-    /* --color-success-bg has no equivalent in tokens.css (unlike warning/danger/info);
-       use color-mix to derive a matching tint from --color-success, same pattern as
-       ResourcesPage.css .log-type--in */
-    background: color-mix(in srgb, var(--color-success, #16a34a) 12%, transparent);
-    color: var(--color-success-dark, #16a34a);
-}
-
-.badge-danger {
-    background: var(--color-danger-bg, #fee2e2);
-    color: var(--color-danger-dark, #dc2626);
-}
-
-.badge-warning {
-    background: var(--color-warning-bg, #fef3c7);
-    color: var(--color-warning-dark, #d97706);
-}
-
-.badge-info {
-    background: var(--color-info-bg, #e0f2fe);
-    color: var(--color-info-dark, #0284c7);
-}
-
-.badge-primary {
-    background: var(--color-info-bg, #dbeafe);
-    color: var(--color-info-dark, #2563eb);
-}
-
-.badge-secondary {
-    background: var(--border-default, #e2e8f0);
-    color: var(--text-secondary, #475569);
-}
-
-.badge-critical {
-    background: var(--color-danger-bg, #fee2e2);
-    color: var(--color-danger-dark, #dc2626);
+    background: var(--surface-pressed);
 }
 
 .activity-text {
     flex: 1;
-    font-size: 0.875rem;
-    color: var(--text-primary, #334155);
+    font-size: var(--font-size-sm);
+    color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
 .activity-meta {
-    font-size: 0.75rem;
-    color: var(--text-tertiary, #94a3b8);
+    font-size: var(--font-size-xs);
+    color: var(--text-tertiary);
     white-space: nowrap;
+    font-variant-numeric: tabular-nums;
 }
 
 .activity-empty {
     text-align: center;
-    padding: 2rem;
-    color: var(--text-tertiary, #94a3b8);
-    font-size: 0.875rem;
+    padding: var(--space-6);
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm);
 }
 
 /* 響應式設計 */
@@ -253,7 +164,7 @@
     }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .kpi-grid {
         grid-template-columns: 1fr;
     }
@@ -269,19 +180,11 @@
     .date-range-selector {
         flex-wrap: wrap;
     }
-
-    .kpi-card__value {
-        font-size: 1.5rem;
-    }
 }
 
 @media (max-width: 480px) {
     .analytics-page {
-        padding: 1rem;
-    }
-
-    .kpi-card__icon {
-        font-size: 1rem;
+        padding: var(--space-3);
     }
 
     .activity-item {
@@ -290,6 +193,6 @@
 
     .activity-meta {
         width: 100%;
-        margin-top: 0.25rem;
+        margin-top: var(--space-1);
     }
 }

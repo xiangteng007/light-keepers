@@ -1,6 +1,8 @@
 /**
  * 活動報名頁面
  * Activity Registration Page
+ *
+ * Archetype: List（DESIGN_LANGUAGE.md §7.1）— header + toolbar(tabs/篩選) + content(Card 列表)
  */
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
@@ -22,11 +24,13 @@ import {
     CheckCircle,
     AlertCircle,
     ChevronRight,
-    Filter,
-    X,
     Phone,
     Mail,
 } from 'lucide-react';
+import { Badge, Button, Modal, InputField } from '../design-system';
+import type { BadgeProps } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './ActivitiesPage.css';
 
 // 分類選項
@@ -38,13 +42,18 @@ const CATEGORY_OPTIONS: { value: ActivityCategory; label: string; emoji: string 
     { value: 'other', label: '其他', emoji: '📋' },
 ];
 
-// 狀態標籤
-const STATUS_MAP: Record<ActivityStatus, { label: string; color: string }> = {
-    draft: { label: '草稿', color: '#9ca3af' },
-    open: { label: '報名中', color: '#22c55e' },
-    closed: { label: '已截止', color: '#f59e0b' },
-    cancelled: { label: '已取消', color: '#ef4444' },
-    completed: { label: '已結束', color: '#6b7280' },
+// 狀態標籤（對照 DESIGN_LANGUAGE.md §3：success=可報名、warning=待處理/已截止、danger=已取消、default=中性）
+const STATUS_MAP: Record<ActivityStatus, { label: string; variant: BadgeProps['variant'] }> = {
+    draft: { label: '草稿', variant: 'default' },
+    open: { label: '報名中', variant: 'success' },
+    closed: { label: '已截止', variant: 'warning' },
+    cancelled: { label: '已取消', variant: 'danger' },
+    completed: { label: '已結束', variant: 'info' },
+};
+
+const REG_STATUS_MAP: Record<string, { label: string; variant: BadgeProps['variant'] }> = {
+    confirmed: { label: '報名確認', variant: 'success' },
+    pending: { label: '待確認', variant: 'warning' },
 };
 
 export default function ActivitiesPage() {
@@ -90,6 +99,7 @@ export default function ActivitiesPage() {
         if (user) {
             loadMyRegistrations();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [selectedCategory, user]);
 
     // 格式化日期
@@ -120,39 +130,46 @@ export default function ActivitiesPage() {
         return CATEGORY_OPTIONS.find(c => c.value === category) || { label: category, emoji: '📋' };
     };
 
+    const myActiveRegistrations = myRegistrations.filter(r => r.status !== 'cancelled');
+
     return (
         <div className="activities-page">
-            {/* 頁面標題 */}
-            <header className="activities-header">
-                <div className="activities-header__title">
-                    <h1>📅 活動報名</h1>
-                    <p>查看並報名志工活動</p>
+            {/* page-header */}
+            <header className="page-header">
+                <div>
+                    <h1>活動報名</h1>
+                    <p className="page-header__subtitle">查看並報名志工活動</p>
                 </div>
             </header>
 
-            {/* Tab 切換 */}
-            <div className="activities-tabs">
-                <button
-                    className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('all')}
-                >
-                    所有活動
-                </button>
-                <button
-                    className={`tab-btn ${activeTab === 'my' ? 'active' : ''}`}
-                    onClick={() => setActiveTab('my')}
-                >
-                    我的報名 ({myRegistrations.filter(r => r.status !== 'cancelled').length})
-                </button>
-            </div>
+            {/* toolbar：頁籤 + 分類篩選 chips */}
+            <div className="panel activities-toolbar">
+                <div className="activities-tabs" role="tablist" aria-label="活動檢視">
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeTab === 'all'}
+                        className={`activities-tabs__btn ${activeTab === 'all' ? 'is-active' : ''}`}
+                        onClick={() => setActiveTab('all')}
+                    >
+                        所有活動
+                    </button>
+                    <button
+                        type="button"
+                        role="tab"
+                        aria-selected={activeTab === 'my'}
+                        className={`activities-tabs__btn ${activeTab === 'my' ? 'is-active' : ''}`}
+                        onClick={() => setActiveTab('my')}
+                    >
+                        我的報名 ({myActiveRegistrations.length})
+                    </button>
+                </div>
 
-            {activeTab === 'all' && (
-                <>
-                    {/* 分類篩選 */}
-                    <div className="activities-filter">
-                        <Filter size={16} />
+                {activeTab === 'all' && (
+                    <div className="activities-filter" role="group" aria-label="分類篩選">
                         <button
-                            className={`filter-btn ${selectedCategory === 'all' ? 'active' : ''}`}
+                            type="button"
+                            className={`filter-chip ${selectedCategory === 'all' ? 'is-active' : ''}`}
                             onClick={() => setSelectedCategory('all')}
                         >
                             全部
@@ -160,108 +177,118 @@ export default function ActivitiesPage() {
                         {CATEGORY_OPTIONS.map(cat => (
                             <button
                                 key={cat.value}
-                                className={`filter-btn ${selectedCategory === cat.value ? 'active' : ''}`}
+                                type="button"
+                                className={`filter-chip ${selectedCategory === cat.value ? 'is-active' : ''}`}
                                 onClick={() => setSelectedCategory(cat.value)}
                             >
                                 {cat.emoji} {cat.label}
                             </button>
                         ))}
                     </div>
+                )}
+            </div>
 
-                    {/* 活動列表 */}
-                    <div className="activities-list">
-                        {loading ? (
-                            <div className="loading">載入中...</div>
-                        ) : activities.length === 0 ? (
-                            <div className="empty">
-                                <Calendar size={48} />
-                                <p>目前沒有活動</p>
-                            </div>
-                        ) : (
-                            activities.map(activity => (
-                                <article
-                                    key={activity.id}
-                                    className={`activity-card ${activity.status}`}
-                                    onClick={() => setSelectedActivity(activity)}
-                                >
-                                    <div className="activity-card__date">
-                                        <span className="month">{formatDate(activity.startAt).split(' ')[0]}</span>
-                                        <span className="day">{new Date(activity.startAt).getDate()}</span>
+            {/* content */}
+            {activeTab === 'all' && (
+                <div className="panel activities-list">
+                    {loading ? (
+                        <div className="activities-list__skeleton">
+                            <Skeleton variant="card" count={3} height={96} />
+                        </div>
+                    ) : activities.length === 0 ? (
+                        <EmptyState
+                            icon={Calendar}
+                            title="目前沒有活動"
+                            description="符合篩選條件的活動目前沒有資料"
+                        />
+                    ) : (
+                        activities.map(activity => (
+                            <article
+                                key={activity.id}
+                                className={`activity-card ${activity.status === 'cancelled' ? 'is-cancelled' : ''}`}
+                                onClick={() => setSelectedActivity(activity)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter') setSelectedActivity(activity); }}
+                            >
+                                <div className="activity-card__date">
+                                    <span className="activity-card__month">{formatDate(activity.startAt).split(' ')[0]}</span>
+                                    <span className="activity-card__day">{new Date(activity.startAt).getDate()}</span>
+                                </div>
+
+                                <div className="activity-card__content">
+                                    <div className="activity-card__header">
+                                        <span className="activity-card__category">
+                                            {getCategoryInfo(activity.category).emoji} {getCategoryInfo(activity.category).label}
+                                        </span>
+                                        <Badge variant={STATUS_MAP[activity.status].variant} size="sm">
+                                            {STATUS_MAP[activity.status].label}
+                                        </Badge>
                                     </div>
 
-                                    <div className="activity-card__content">
-                                        <div className="activity-card__header">
-                                            <span className={`category cat-${activity.category}`}>
-                                                {getCategoryInfo(activity.category).emoji} {getCategoryInfo(activity.category).label}
-                                            </span>
-                                            <span
-                                                className="status"
-                                                style={{ background: STATUS_MAP[activity.status].color }}
-                                            >
-                                                {STATUS_MAP[activity.status].label}
-                                            </span>
-                                        </div>
+                                    <h3 className="activity-card__title">{activity.title}</h3>
 
-                                        <h3 className="activity-card__title">{activity.title}</h3>
-
-                                        <div className="activity-card__info">
-                                            <span><Clock size={14} /> {formatTime(activity.startAt)} - {formatTime(activity.endAt)}</span>
-                                            {activity.location && <span><MapPin size={14} /> {activity.location}</span>}
-                                            <span><Users size={14} /> {activity.currentParticipants}/{activity.maxParticipants} 人</span>
-                                        </div>
-
-                                        {isRegistered(activity.id) && (
-                                            <div className="activity-card__registered">
-                                                <CheckCircle size={14} /> 已報名
-                                            </div>
-                                        )}
+                                    <div className="activity-card__info">
+                                        <span><Clock size={14} aria-hidden="true" /> {formatTime(activity.startAt)} - {formatTime(activity.endAt)}</span>
+                                        {activity.location && <span><MapPin size={14} aria-hidden="true" /> {activity.location}</span>}
+                                        <span className="tabular-nums"><Users size={14} aria-hidden="true" /> {activity.currentParticipants}/{activity.maxParticipants} 人</span>
                                     </div>
 
-                                    <ChevronRight size={20} className="activity-card__arrow" />
-                                </article>
-                            ))
-                        )}
-                    </div>
-                </>
+                                    {isRegistered(activity.id) && (
+                                        <div className="activity-card__registered">
+                                            <CheckCircle size={14} aria-hidden="true" /> 已報名
+                                        </div>
+                                    )}
+                                </div>
+
+                                <ChevronRight size={20} className="activity-card__arrow" aria-hidden="true" />
+                            </article>
+                        ))
+                    )}
+                </div>
             )}
 
             {activeTab === 'my' && (
-                <div className="my-registrations">
-                    {myRegistrations.filter(r => r.status !== 'cancelled').length === 0 ? (
-                        <div className="empty">
-                            <Calendar size={48} />
-                            <p>你還沒有報名任何活動</p>
-                            <button onClick={() => setActiveTab('all')}>瀏覽活動</button>
-                        </div>
+                <div className="panel activities-list">
+                    {myActiveRegistrations.length === 0 ? (
+                        <EmptyState
+                            icon={Calendar}
+                            title="你還沒有報名任何活動"
+                            action={{ label: '瀏覽活動', onClick: () => setActiveTab('all') }}
+                        />
                     ) : (
-                        myRegistrations
-                            .filter(r => r.status !== 'cancelled')
-                            .map(reg => (
-                                <article
-                                    key={reg.id}
-                                    className="registration-card"
-                                    onClick={() => reg.activity && setSelectedActivity(reg.activity)}
-                                >
-                                    <div className="registration-card__status">
-                                        {reg.status === 'confirmed' && <CheckCircle className="confirmed" />}
-                                        {reg.status === 'pending' && <AlertCircle className="pending" />}
-                                        {reg.attended && <CheckCircle className="attended" />}
-                                    </div>
+                        myActiveRegistrations.map(reg => (
+                            <article
+                                key={reg.id}
+                                className="activity-card"
+                                onClick={() => reg.activity && setSelectedActivity(reg.activity)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter' && reg.activity) setSelectedActivity(reg.activity); }}
+                            >
+                                <div className="activity-card__reg-status" aria-hidden="true">
+                                    {reg.status === 'confirmed' && <CheckCircle className="is-confirmed" />}
+                                    {reg.status === 'pending' && <AlertCircle className="is-pending" />}
+                                    {reg.attended && <CheckCircle className="is-attended" />}
+                                </div>
 
-                                    <div className="registration-card__content">
-                                        <h3>{reg.activity?.title || '活動'}</h3>
-                                        <div className="registration-card__info">
-                                            <span><Calendar size={14} /> {reg.activity?.startAt ? formatDate(reg.activity.startAt) : ''}</span>
-                                            {reg.activity?.location && <span><MapPin size={14} /> {reg.activity.location}</span>}
-                                        </div>
-                                        <span className={`registration-status ${reg.status}`}>
-                                            {reg.status === 'confirmed' && '報名確認'}
-                                            {reg.status === 'pending' && '待確認'}
-                                            {reg.attended && '已出席'}
-                                        </span>
+                                <div className="activity-card__content">
+                                    <h3 className="activity-card__title">{reg.activity?.title || '活動'}</h3>
+                                    <div className="activity-card__info">
+                                        <span><Calendar size={14} aria-hidden="true" /> {reg.activity?.startAt ? formatDate(reg.activity.startAt) : ''}</span>
+                                        {reg.activity?.location && <span><MapPin size={14} aria-hidden="true" /> {reg.activity.location}</span>}
                                     </div>
-                                </article>
-                            ))
+                                    <div className="activity-card__badges">
+                                        {reg.status in REG_STATUS_MAP && (
+                                            <Badge variant={REG_STATUS_MAP[reg.status].variant} size="sm">
+                                                {REG_STATUS_MAP[reg.status].label}
+                                            </Badge>
+                                        )}
+                                        {reg.attended && <Badge variant="info" size="sm">已出席</Badge>}
+                                    </div>
+                                </div>
+                            </article>
+                        ))
                     )}
                 </div>
             )}
@@ -335,7 +362,6 @@ function ActivityDetailModal({
         if (!user || !confirm('確定要取消報名嗎？')) return;
 
         try {
-            // 找到報名 ID
             await cancelRegistration(activity.id, user.id);
             alert('已取消報名');
             onRegister();
@@ -347,114 +373,106 @@ function ActivityDetailModal({
     };
 
     return (
-        <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content activity-detail-modal" onClick={e => e.stopPropagation()}>
-                <header className="modal-header">
-                    <h2>{activity.title}</h2>
-                    <button className="modal-close" onClick={onClose}>
-                        <X size={20} />
-                    </button>
-                </header>
+        <Modal isOpen onClose={onClose} title={activity.title} size="md">
+            <div className="activity-detail__content">
+                {activity.coverImage && (
+                    <img src={activity.coverImage} alt={activity.title} className="activity-detail__image" />
+                )}
 
-                <div className="activity-detail__content">
-                    {activity.coverImage && (
-                        <img src={activity.coverImage} alt={activity.title} className="activity-detail__image" />
-                    )}
-
-                    <div className="activity-detail__meta">
-                        <div className="meta-item">
-                            <Calendar size={18} />
-                            <div>
-                                <span className="label">日期時間</span>
-                                <span className="value">
-                                    {new Date(activity.startAt).toLocaleDateString('zh-TW')}
-                                    {' '}
-                                    {new Date(activity.startAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
-                                    {' - '}
-                                    {new Date(activity.endAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
-                                </span>
-                            </div>
+                <div className="activity-detail__meta">
+                    <div className="meta-item">
+                        <Calendar size={18} aria-hidden="true" />
+                        <div>
+                            <span className="meta-item__label">日期時間</span>
+                            <span className="meta-item__value tabular-nums">
+                                {new Date(activity.startAt).toLocaleDateString('zh-TW')}
+                                {' '}
+                                {new Date(activity.startAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
+                                {' - '}
+                                {new Date(activity.endAt).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
+                            </span>
                         </div>
-
-                        {activity.location && (
-                            <div className="meta-item">
-                                <MapPin size={18} />
-                                <div>
-                                    <span className="label">地點</span>
-                                    <span className="value">{activity.location}</span>
-                                </div>
-                            </div>
-                        )}
-
-                        <div className="meta-item">
-                            <Users size={18} />
-                            <div>
-                                <span className="label">報名人數</span>
-                                <span className="value">{activity.currentParticipants} / {activity.maxParticipants} 人</span>
-                            </div>
-                        </div>
-
-                        {activity.registrationDeadline && (
-                            <div className="meta-item">
-                                <Clock size={18} />
-                                <div>
-                                    <span className="label">報名截止</span>
-                                    <span className="value">{new Date(activity.registrationDeadline).toLocaleDateString('zh-TW')}</span>
-                                </div>
-                            </div>
-                        )}
                     </div>
 
-                    {activity.description && (
-                        <div className="activity-detail__description">
-                            <h4>活動說明</h4>
-                            <p>{activity.description}</p>
+                    {activity.location && (
+                        <div className="meta-item">
+                            <MapPin size={18} aria-hidden="true" />
+                            <div>
+                                <span className="meta-item__label">地點</span>
+                                <span className="meta-item__value">{activity.location}</span>
+                            </div>
                         </div>
                     )}
 
-                    {(activity.contactPhone || activity.contactEmail) && (
-                        <div className="activity-detail__contact">
-                            <h4>聯絡資訊</h4>
-                            {activity.organizerName && <p>{activity.organizerName}</p>}
-                            {activity.contactPhone && <p><Phone size={14} /> {activity.contactPhone}</p>}
-                            {activity.contactEmail && <p><Mail size={14} /> {activity.contactEmail}</p>}
+                    <div className="meta-item">
+                        <Users size={18} aria-hidden="true" />
+                        <div>
+                            <span className="meta-item__label">報名人數</span>
+                            <span className="meta-item__value tabular-nums">{activity.currentParticipants} / {activity.maxParticipants} 人</span>
+                        </div>
+                    </div>
+
+                    {activity.registrationDeadline && (
+                        <div className="meta-item">
+                            <Clock size={18} aria-hidden="true" />
+                            <div>
+                                <span className="meta-item__label">報名截止</span>
+                                <span className="meta-item__value tabular-nums">{new Date(activity.registrationDeadline).toLocaleDateString('zh-TW')}</span>
+                            </div>
                         </div>
                     )}
                 </div>
+
+                {activity.description && (
+                    <div className="activity-detail__section">
+                        <h4>活動說明</h4>
+                        <p>{activity.description}</p>
+                    </div>
+                )}
+
+                {(activity.contactPhone || activity.contactEmail) && (
+                    <div className="activity-detail__section">
+                        <h4>聯絡資訊</h4>
+                        {activity.organizerName && <p>{activity.organizerName}</p>}
+                        {activity.contactPhone && <p><Phone size={14} aria-hidden="true" /> {activity.contactPhone}</p>}
+                        {activity.contactEmail && <p><Mail size={14} aria-hidden="true" /> {activity.contactEmail}</p>}
+                    </div>
+                )}
 
                 <div className="activity-detail__actions">
                     {isRegistered ? (
                         <div className="registered-actions">
                             <div className="registered-badge">
-                                <CheckCircle size={18} /> 你已報名此活動
+                                <CheckCircle size={18} aria-hidden="true" /> 你已報名此活動
                             </div>
-                            <button className="btn-cancel" onClick={handleCancel}>
+                            <Button variant="danger" size="md" onClick={handleCancel}>
                                 取消報名
-                            </button>
+                            </Button>
                         </div>
                     ) : showRegisterForm ? (
                         <form className="register-form" onSubmit={handleRegister}>
+                            <InputField
+                                label="聯絡電話"
+                                type="tel"
+                                value={phone}
+                                onChange={e => setPhone(e.target.value)}
+                                placeholder="09xx-xxx-xxx"
+                                prefix={<Phone size={14} aria-hidden="true" />}
+                                fullWidth
+                            />
+                            <InputField
+                                label="電子郵件"
+                                type="email"
+                                value={email}
+                                onChange={e => setEmail(e.target.value)}
+                                placeholder="your@email.com"
+                                prefix={<Mail size={14} aria-hidden="true" />}
+                                fullWidth
+                            />
                             <div className="form-group">
-                                <label><Phone size={14} /> 聯絡電話</label>
-                                <input
-                                    type="tel"
-                                    value={phone}
-                                    onChange={e => setPhone(e.target.value)}
-                                    placeholder="09xx-xxx-xxx"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label><Mail size={14} /> 電子郵件</label>
-                                <input
-                                    type="email"
-                                    value={email}
-                                    onChange={e => setEmail(e.target.value)}
-                                    placeholder="your@email.com"
-                                />
-                            </div>
-                            <div className="form-group">
-                                <label>備註（選填）</label>
+                                <label htmlFor="activity-remarks">備註（選填）</label>
                                 <textarea
+                                    id="activity-remarks"
                                     value={remarks}
                                     onChange={e => setRemarks(e.target.value)}
                                     placeholder="有任何需要告知主辦單位的事項嗎？"
@@ -462,17 +480,19 @@ function ActivityDetailModal({
                                 />
                             </div>
                             <div className="form-actions">
-                                <button type="button" className="btn-secondary" onClick={() => setShowRegisterForm(false)}>
+                                <Button type="button" variant="secondary" onClick={() => setShowRegisterForm(false)}>
                                     返回
-                                </button>
-                                <button type="submit" className="btn-primary" disabled={submitting}>
-                                    {submitting ? '報名中...' : '確認報名'}
-                                </button>
+                                </Button>
+                                <Button type="submit" variant="primary" loading={submitting}>
+                                    確認報名
+                                </Button>
                             </div>
                         </form>
                     ) : (
-                        <button
-                            className="btn-primary btn-register"
+                        <Button
+                            variant="primary"
+                            size="lg"
+                            className="btn-register"
                             disabled={!canRegister}
                             onClick={() => setShowRegisterForm(true)}
                         >
@@ -480,10 +500,10 @@ function ActivityDetailModal({
                                 ? (activity.status !== 'open' ? '報名已關閉' : '已額滿')
                                 : '立即報名'
                             }
-                        </button>
+                        </Button>
                     )}
                 </div>
             </div>
-        </div>
+        </Modal>
     );
 }

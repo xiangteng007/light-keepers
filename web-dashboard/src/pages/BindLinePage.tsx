@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { Loader2, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { bindLineAccount } from '../api/services';
+import { Button } from '../design-system';
 import './LoginPage.css';
 
 /**
@@ -90,89 +92,74 @@ export default function BindLinePage() {
     return (
         <div className="login-page">
             <div className="login-container">
-                <div className="login-card">
-                    {/* Logo */}
-                    <div className="login-header">
-                        <div className="logo-container">
-                            <div className="logo-icon">🔗</div>
-                        </div>
-                        <h1 className="login-title">LINE 帳號綁定</h1>
+                <div className="login-header">
+                    <div className="login-logo">
+                        <span className="login-logo-icon" aria-hidden="true">🔗</span>
+                        <h1>LINE 帳號綁定</h1>
                         <p className="login-subtitle">將 LINE 與您的志工帳號連結</p>
                     </div>
+                </div>
 
-                    {/* 狀態顯示 */}
-                    <div style={{ textAlign: 'center', padding: '2rem' }}>
-                        {status === 'loading' && (
-                            <div>
-                                <div className="loading-spinner" style={{ margin: '0 auto 1rem' }}></div>
-                                <p>處理中...</p>
-                            </div>
-                        )}
+                {/* 狀態顯示 */}
+                <div className="login-form" style={{ textAlign: 'center' }} role="status" aria-live="polite">
+                    {status === 'loading' && (
+                        <div>
+                            <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
+                            <p>處理中...</p>
+                        </div>
+                    )}
 
-                        {status === 'needLogin' && (
-                            <div>
-                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>🔐</div>
-                                <h2 style={{ marginBottom: '1rem', color: 'var(--color-text-primary)' }}>
-                                    請先登入
-                                </h2>
-                                <p style={{ marginBottom: '2rem', color: 'var(--color-text-secondary)' }}>
-                                    請登入您的志工帳號以完成 LINE 綁定
-                                </p>
-                                <button
-                                    onClick={handleLogin}
-                                    className="login-button"
-                                    style={{ width: '100%' }}
-                                >
-                                    前往登入
-                                </button>
-                            </div>
-                        )}
+                    {status === 'needLogin' && (
+                        <div>
+                            <ShieldCheck size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-info)' }} />
+                            <h2 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                                請先登入
+                            </h2>
+                            <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+                                請登入您的志工帳號以完成 LINE 綁定
+                            </p>
+                            <Button variant="primary" onClick={handleLogin} style={{ width: '100%' }}>
+                                前往登入
+                            </Button>
+                        </div>
+                    )}
 
-                        {status === 'binding' && (
-                            <div>
-                                <div className="loading-spinner" style={{ margin: '0 auto 1rem' }}></div>
-                                <p>正在綁定帳號...</p>
-                            </div>
-                        )}
+                    {status === 'binding' && (
+                        <div>
+                            <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
+                            <p>正在綁定帳號...</p>
+                        </div>
+                    )}
 
-                        {status === 'success' && (
-                            <div>
-                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>✅</div>
-                                <h2 style={{ marginBottom: '1rem', color: 'var(--color-success)' }}>
-                                    綁定成功！
-                                </h2>
-                                <p style={{ marginBottom: '2rem', color: 'var(--color-text-secondary)' }}>
-                                    {message}
-                                </p>
-                                <button
-                                    onClick={handleGoHome}
-                                    className="login-button"
-                                    style={{ width: '100%' }}
-                                >
-                                    前往儀表板
-                                </button>
-                            </div>
-                        )}
+                    {status === 'success' && (
+                        <div>
+                            <CheckCircle2 size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-success)' }} />
+                            <h2 style={{ marginBottom: '1rem', color: 'var(--color-success)' }}>
+                                綁定成功！
+                            </h2>
+                            <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+                                {message}
+                            </p>
+                            <Button variant="primary" onClick={handleGoHome} style={{ width: '100%' }}>
+                                前往儀表板
+                            </Button>
+                        </div>
+                    )}
 
-                        {status === 'error' && (
-                            <div>
-                                <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>❌</div>
-                                <h2 style={{ marginBottom: '1rem', color: 'var(--color-danger)' }}>
-                                    綁定失敗
-                                </h2>
-                                <p style={{ marginBottom: '2rem', color: 'var(--color-text-secondary)' }}>
-                                    {message}
-                                </p>
-                                <button
-                                    onClick={handleGoHome}
-                                    className="login-button secondary"
-                                    style={{ width: '100%' }}
-                                >
-                                    返回首頁
-                                </button>
-                            </div>
-                        )}
-                    </div>
+                    {status === 'error' && (
+                        <div>
+                            <XCircle size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-danger)' }} />
+                            <h2 style={{ marginBottom: '1rem', color: 'var(--color-danger)' }}>
+                                綁定失敗
+                            </h2>
+                            <p style={{ marginBottom: '2rem', color: 'var(--text-secondary)' }}>
+                                {message}
+                            </p>
+                            <Button variant="secondary" onClick={handleGoHome} style={{ width: '100%' }}>
+                                返回首頁
+                            </Button>
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

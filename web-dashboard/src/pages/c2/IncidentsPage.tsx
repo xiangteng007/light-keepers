@@ -5,8 +5,12 @@
  * 管理所有事件的列表與狀態追蹤 — connected to real API
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { AlertTriangle, Clock, CheckCircle, XCircle, Plus, MapPin, Users, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, Clock, CheckCircle, Plus, MapPin, Users, RefreshCw, Inbox } from 'lucide-react';
 import { PageTemplate } from '../../components/PageTemplate';
+import { Badge, Button, Alert } from '../../design-system';
+import type { BadgeProps } from '../../design-system';
+import EmptyState from '../../components/shared/EmptyState';
+import { Skeleton } from '../../components/ui/Skeleton/Skeleton';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
 import './IncidentsPage.css';
@@ -26,17 +30,15 @@ interface Incident {
     assignedTeams?: number;
 }
 
-// Status colors: mapped to semantic status tokens where the hue matches exactly
-// (var(--token, original-hex) keeps the fallback identical, so no visual change).
-// `reported` (#6b7280) is a neutral/inactive gray with no matching semantic status
-// token — left as a bespoke literal.
-const STATUS_INFO: Record<string, { label: string; color: string; icon: React.ElementType }> = {
-    reported: { label: '已通報', color: '#6b7280', icon: Clock },
-    confirmed: { label: '已確認', color: 'var(--color-info, #3b82f6)', icon: AlertTriangle },
-    active: { label: '進行中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle },
-    in_progress: { label: '處理中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle },
-    resolved: { label: '已解決', color: 'var(--color-success, #22c55e)', icon: CheckCircle },
-    closed: { label: '已結案', color: 'var(--color-success-dark, #10b981)', icon: CheckCircle },
+// 狀態資訊：color 供統計磚塊強調色使用（維持既有配色映射）；
+// badgeVariant 對照 DESIGN_LANGUAGE.md §3 供 Badge 元件使用（狀態徽章一律用 Badge）。
+const STATUS_INFO: Record<string, { label: string; color: string; icon: React.ElementType; badgeVariant: BadgeProps['variant'] }> = {
+    reported: { label: '已通報', color: '#6b7280', icon: Clock, badgeVariant: 'default' },
+    confirmed: { label: '已確認', color: 'var(--color-info, #3b82f6)', icon: AlertTriangle, badgeVariant: 'info' },
+    active: { label: '進行中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle, badgeVariant: 'warning' },
+    in_progress: { label: '處理中', color: 'var(--color-warning, #f59e0b)', icon: AlertTriangle, badgeVariant: 'warning' },
+    resolved: { label: '已解決', color: 'var(--color-success, #22c55e)', icon: CheckCircle, badgeVariant: 'success' },
+    closed: { label: '已結案', color: 'var(--color-success-dark, #10b981)', icon: CheckCircle, badgeVariant: 'success' },
 };
 
 // Priority gradient: end points map to danger/warning/success semantics; the two
@@ -83,47 +85,59 @@ export default function IncidentsPage() {
             domain="C2 指揮控制"
         >
             <div className="incidents-page">
-                {/* Stats Bar */}
-                <div className="stats-bar">
-                    {Object.entries(STATUS_INFO).map(([key, info]) => {
-                        const count = incidents.filter(i => i.status === key).length;
-                        if (count === 0 && key !== statusFilter) return null;
-                        return (
-                            <div
-                                key={key}
-                                className={`stat-item ${statusFilter === key ? 'active' : ''}`}
-                                onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
-                                style={{ '--stat-color': info.color } as React.CSSProperties}
-                            >
-                                <span className="stat-count">{count}</span>
-                                <span className="stat-label">{info.label}</span>
-                            </div>
-                        );
-                    })}
-                </div>
+                {/* toolbar：統計摘要列（可點擊篩選）＋ 主要動作 */}
+                <div className="incidents-toolbar">
+                    <div className="stats-bar" role="group" aria-label="依狀態篩選事件">
+                        {Object.entries(STATUS_INFO).map(([key, info]) => {
+                            const count = incidents.filter(i => i.status === key).length;
+                            if (count === 0 && key !== statusFilter) return null;
+                            return (
+                                <button
+                                    key={key}
+                                    type="button"
+                                    className={`stat-item ${statusFilter === key ? 'is-active' : ''}`}
+                                    onClick={() => setStatusFilter(statusFilter === key ? 'all' : key)}
+                                    aria-pressed={statusFilter === key}
+                                    style={{ '--stat-color': info.color } as React.CSSProperties}
+                                >
+                                    <span className="stat-count tabular-nums">{count}</span>
+                                    <span className="stat-label">{info.label}</span>
+                                </button>
+                            );
+                        })}
+                    </div>
 
-                {/* Actions */}
-                <div className="page-actions">
-                    <button className="btn-icon" onClick={fetchIncidents} disabled={loading} title="重新整理">
-                        <RefreshCw size={16} className={loading ? 'spin' : ''} />
-                    </button>
-                    <button className="btn-primary">
-                        <Plus size={16} /> 新增事件
-                    </button>
+                    <div className="page-actions">
+                        <button
+                            type="button"
+                            className="btn-icon"
+                            onClick={fetchIncidents}
+                            disabled={loading}
+                            aria-label="重新整理事件列表"
+                            title="重新整理"
+                        >
+                            <RefreshCw size={16} className={loading ? 'spin' : ''} aria-hidden="true" />
+                        </button>
+                        <Button variant="primary" icon={<Plus size={16} aria-hidden="true" />}>
+                            新增事件
+                        </Button>
+                    </div>
                 </div>
 
                 {/* Error */}
                 {error && (
-                    <div className="error-banner" style={{ background: 'rgba(239,68,68,0.1)' /* color-danger tint, no rgba token variant available */, color: 'var(--color-danger, #ef4444)', padding: '0.75rem 1rem', borderRadius: 'var(--radius-md, 8px)', marginBottom: 'var(--space-4, 1rem)' }}>
-                        <AlertTriangle size={16} /> {error}
-                    </div>
+                    <Alert variant="danger" title="載入失敗">
+                        {error}
+                        <div className="incidents-page__retry">
+                            <Button variant="secondary" size="sm" onClick={fetchIncidents}>重試</Button>
+                        </div>
+                    </Alert>
                 )}
 
                 {/* Loading */}
                 {loading && (
-                    <div style={{ display: 'flex', justifyContent: 'center', padding: '3rem', gap: 'var(--space-2, 0.5rem)', color: 'var(--text-tertiary, #94a3b8)' }}>
-                        <Loader2 size={24} className="spin" />
-                        <span>載入事件中...</span>
+                    <div className="incident-list" aria-busy="true" aria-label="載入事件中">
+                        <Skeleton variant="card" height={88} count={4} />
                     </div>
                 )}
 
@@ -131,28 +145,28 @@ export default function IncidentsPage() {
                 {!loading && (
                     <div className="incident-list">
                         {filtered.length === 0 ? (
-                            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-tertiary, #64748b)' }}>
-                                {error ? '載入失敗' : '暫無事件'}
-                            </div>
+                            <EmptyState
+                                icon={error ? AlertTriangle : Inbox}
+                                title={error ? '載入失敗' : '暫無事件'}
+                                variant={error ? 'error' : 'default'}
+                            />
                         ) : filtered.map(incident => {
                             const statusInfo = STATUS_INFO[incident.status] || STATUS_INFO.reported;
-                            const StatusIcon = statusInfo.icon;
                             return (
                                 <div key={incident.id} className="incident-card">
                                     <div className="priority-bar" style={{ background: PRIORITY_COLORS[incident.priority] || PRIORITY_COLORS[3] }} />
                                     <div className="incident-content">
                                         <div className="incident-header">
-                                            <span className="incident-number">{incident.number || `EVT-${incident.id.slice(0, 8)}`}</span>
-                                            <span className="status-badge" style={{ background: statusInfo.color }}>
-                                                <StatusIcon size={12} />
+                                            <span className="incident-number tabular-nums">{incident.number || `EVT-${incident.id.slice(0, 8)}`}</span>
+                                            <Badge variant={statusInfo.badgeVariant} size="sm" icon={<statusInfo.icon size={12} aria-hidden="true" />}>
                                                 {statusInfo.label}
-                                            </span>
+                                            </Badge>
                                         </div>
                                         <h4 className="incident-title">{incident.title || incident.name}</h4>
                                         <div className="incident-meta">
-                                            {incident.location && <span><MapPin size={12} /> {incident.location}</span>}
-                                            <span><Clock size={12} /> {incident.reportedAt || (incident.createdAt ? new Date(incident.createdAt).toLocaleString('zh-TW') : '-')}</span>
-                                            {incident.assignedTeams != null && <span><Users size={12} /> {incident.assignedTeams} 小隊</span>}
+                                            {incident.location && <span><MapPin size={12} aria-hidden="true" /> {incident.location}</span>}
+                                            <span className="tabular-nums"><Clock size={12} aria-hidden="true" /> {incident.reportedAt || (incident.createdAt ? new Date(incident.createdAt).toLocaleString('zh-TW') : '-')}</span>
+                                            {incident.assignedTeams != null && <span className="tabular-nums"><Users size={12} aria-hidden="true" /> {incident.assignedTeams} 小隊</span>}
                                         </div>
                                     </div>
                                 </div>

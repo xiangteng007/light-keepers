@@ -119,23 +119,23 @@ export default function SensitiveAuditPage() {
                 <Card.Body>
                     <Form>
                         <div className="row g-3">
-                            <div className="col-md-3">
+                            <Form.Group className="col-md-3" controlId="sensitive-audit-date-from">
                                 <Form.Label>起始日期</Form.Label>
                                 <Form.Control
                                     type="date"
                                     value={dateFrom}
                                     onChange={(e) => setDateFrom(e.target.value)}
                                 />
-                            </div>
-                            <div className="col-md-3">
+                            </Form.Group>
+                            <Form.Group className="col-md-3" controlId="sensitive-audit-date-to">
                                 <Form.Label>結束日期</Form.Label>
                                 <Form.Control
                                     type="date"
                                     value={dateTo}
                                     onChange={(e) => setDateTo(e.target.value)}
                                 />
-                            </div>
-                            <div className="col-md-3">
+                            </Form.Group>
+                            <Form.Group className="col-md-3" controlId="sensitive-audit-actor-uid">
                                 <Form.Label>操作者 UID</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -143,9 +143,9 @@ export default function SensitiveAuditPage() {
                                     onChange={(e) => setActorUid(e.target.value)}
                                     placeholder="選填"
                                 />
-                            </div>
+                            </Form.Group>
                             {activeTab === 'read' && (
-                                <div className="col-md-3">
+                                <Form.Group className="col-md-3" controlId="sensitive-audit-target-type">
                                     <Form.Label>目標類型</Form.Label>
                                     <Form.Select
                                         value={targetType}
@@ -156,7 +156,7 @@ export default function SensitiveAuditPage() {
                                         <option value="asset">資產</option>
                                         <option value="resource">物資</option>
                                     </Form.Select>
-                                </div>
+                                </Form.Group>
                             )}
                         </div>
                         <div className="mt-3">
@@ -181,16 +181,18 @@ export default function SensitiveAuditPage() {
             </Card>
 
             {/* Tab 切換 */}
-            <div className="btn-group mb-3">
+            <div className="btn-group mb-3" role="group" aria-label="稽核日誌類型切換">
                 <Button
                     variant={activeTab === 'read' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('read')}
+                    aria-pressed={activeTab === 'read'}
                 >
                     敏感資料讀取
                 </Button>
                 <Button
                     variant={activeTab === 'print' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('print')}
+                    aria-pressed={activeTab === 'print'}
                 >
                     貼紙列印
                 </Button>
