@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { Card, Badge, Button } from '../design-system';
+import { ShieldAlert } from 'lucide-react';
+import { Card, Badge, Button, ToastContainer } from '../design-system';
+import EmptyState from '../components/shared/EmptyState';
+import { SkeletonCard } from '../components/ui/Skeleton/Skeleton';
 import {
     getNcdrAlerts,
     getNcdrAlertStats,
@@ -103,13 +106,12 @@ const saveStoredTypes = (types: number[]) => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(types));
 };
 
-// 嚴重程度顏色 (muted variants mapped to the matching semantic status token;
-// fallback hex kept identical so the deliberately desaturated tone is preserved)
-const getSeverityColor = (severity: string) => {
+// 嚴重程度 → design-system Badge variant（§3 狀態色語意：危急=danger、警戒=warning、其餘=info）
+const getSeverityBadgeVariant = (severity: string): 'danger' | 'warning' | 'info' => {
     switch (severity) {
-        case 'critical': return 'var(--color-danger, #B85C5C)';
-        case 'warning': return 'var(--color-warning, #C9A256)';
-        default: return 'var(--color-info, #5C7B8E)';
+        case 'critical': return 'danger';
+        case 'warning': return 'warning';
+        default: return 'info';
     }
 };
 
@@ -224,12 +226,11 @@ export default function NcdrAlertsPage() {
         });
     };
 
-
     return (
         <div className="page ncdr-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>🚨 災害示警</h2>
+                    <h1>災害示警</h1>
                     <Badge variant="warning">{alerts.length} 則警報</Badge>
                 </div>
                 <div className="page-header__actions">
@@ -238,7 +239,7 @@ export default function NcdrAlertsPage() {
                         size="sm"
                         onClick={() => setShowFilter(!showFilter)}
                     >
-                        🔧 篩選類別 ({selectedTypes.length})
+                        篩選類別 ({selectedTypes.length})
                     </Button>
                     <Button
                         variant="primary"
@@ -246,7 +247,7 @@ export default function NcdrAlertsPage() {
                         loading={syncMutation.isPending}
                         onClick={() => syncMutation.mutate()}
                     >
-                        🔄 同步
+                        同步
                     </Button>
                 </div>
             </div>
@@ -257,15 +258,15 @@ export default function NcdrAlertsPage() {
                     <div className="ncdr-filter__header">
                         <h4>選擇示警類別</h4>
                         <div className="ncdr-filter__actions">
-                            <button onClick={selectCore}>僅核心</button>
-                            <button onClick={selectAll}>全選</button>
-                            <button onClick={selectNone}>全不選</button>
+                            <Button variant="ghost" size="sm" onClick={selectCore}>僅核心</Button>
+                            <Button variant="ghost" size="sm" onClick={selectAll}>全選</Button>
+                            <Button variant="ghost" size="sm" onClick={selectNone}>全不選</Button>
                         </div>
                     </div>
 
                     <div className="ncdr-filter__groups">
                         <div className="ncdr-filter__group">
-                            <h5>🏛️ 中央部會</h5>
+                            <h5>中央部會</h5>
                             <div className="ncdr-filter__items">
                                 {centralTypes.map(type => (
                                     <label key={type.id} className="ncdr-filter__item">
@@ -283,7 +284,7 @@ export default function NcdrAlertsPage() {
                         </div>
 
                         <div className="ncdr-filter__group">
-                            <h5>🏢 事業單位</h5>
+                            <h5>事業單位</h5>
                             <div className="ncdr-filter__items">
                                 {enterpriseTypes.map(type => (
                                     <label key={type.id} className="ncdr-filter__item">
@@ -299,7 +300,7 @@ export default function NcdrAlertsPage() {
                         </div>
 
                         <div className="ncdr-filter__group">
-                            <h5>🏘️ 地方政府</h5>
+                            <h5>地方政府</h5>
                             <div className="ncdr-filter__items">
                                 {localTypes.map(type => (
                                     <label key={type.id} className="ncdr-filter__item">
@@ -316,101 +317,85 @@ export default function NcdrAlertsPage() {
                     </div>
 
                     <div className="ncdr-filter__footer">
-                        <p>⚡ 核心類別 (預設載入): 颱風、地震、海嘯、淹水、土石流、降雨、雷雨、低溫、高溫、強風、濃霧、火災</p>
+                        <p>核心類別 (預設載入): 颱風、地震、海嘯、淹水、土石流、降雨、雷雨、低溫、高溫、強風、濃霧、火災</p>
                         {statsData?.lastSyncTime && (
-                            <p>📅 上次同步: {formatTime(statsData.lastSyncTime)}</p>
+                            <p>上次同步: {formatTime(statsData.lastSyncTime)}</p>
                         )}
                     </div>
                 </Card>
             )}
 
             {/* 警報列表 */}
-            <div className="ncdr-alerts-grid">
-                {isLoading && <div className="loading">載入中...</div>}
-
-                {!isLoading && alerts.length === 0 && (
-                    <Card className="ncdr-empty">
-                        <div className="empty-state">
-                            <span>✅</span>
-                            <h3>目前無災害警報</h3>
-                            <p>已選擇 {selectedTypes.length} 個類別進行監控</p>
-                        </div>
-                    </Card>
-                )}
-
-                {alerts.map((alert: NcdrAlert) => (
-                    <Card key={alert.id} className="ncdr-alert-card" hoverable>
-                        <div className="ncdr-alert__header">
-                            <Badge
-                                variant={alert.severity === 'critical' ? 'danger' : alert.severity === 'warning' ? 'warning' : 'info'}
-                            >
-                                {alert.alertTypeName}
-                            </Badge>
-                            <span
-                                className="ncdr-alert__severity"
-                                style={{ color: getSeverityColor(alert.severity) }}
-                            >
-                                {getSeverityLabel(alert.severity)}
-                            </span>
-                        </div>
-                        <h4 className="ncdr-alert__title">{alert.title}</h4>
-                        {alert.description && (
-                            <p className="ncdr-alert__desc">{alert.description}</p>
-                        )}
-                        <div className="ncdr-alert__meta">
-                            <span>📢 {alert.sourceUnit}</span>
-                            <span>🕐 {formatTime(alert.publishedAt)}</span>
-                        </div>
-                        {alert.sourceLink && (
-                            <a
-                                href={alert.sourceLink}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="ncdr-alert__link"
-                            >
-                                查看詳情 →
-                            </a>
-                        )}
-                        {/* 管理員推播按鈕 */}
-                        {isAdmin && lineBotStats?.botEnabled && (
-                            /* NOTE: var(--color-border) has no fallback and no matching definition in
-                               tokens.css, so this border-top currently renders as invalid/no-op.
-                               Fixed below to use the canonical --border-default token with a fallback. */
-                            <div className="ncdr-alert__actions" style={{ marginTop: '0.75rem', paddingTop: '0.75rem', borderTop: '1px solid var(--border-default, #E2E8F0)' }}>
-                                <Button
-                                    variant="secondary"
-                                    size="sm"
-                                    onClick={() => handleBroadcast(alert)}
-                                    loading={broadcastMutation.isPending}
-                                >
-                                    📱 LINE 推播 ({lineBotStats.boundUserCount} 人)
-                                </Button>
+            {isLoading ? (
+                <div className="ncdr-alerts-grid" aria-busy="true" aria-label="警報載入中">
+                    <SkeletonCard descriptionLines={2} showImage={false} />
+                    <SkeletonCard descriptionLines={2} showImage={false} />
+                    <SkeletonCard descriptionLines={2} showImage={false} />
+                </div>
+            ) : alerts.length === 0 ? (
+                <EmptyState
+                    icon={ShieldAlert}
+                    variant="default"
+                    title="目前無災害警報"
+                    description={`已選擇 ${selectedTypes.length} 個類別進行監控`}
+                />
+            ) : (
+                <div className="ncdr-alerts-grid">
+                    {alerts.map((alert: NcdrAlert) => (
+                        <Card key={alert.id} className="ncdr-alert-card" hoverable>
+                            <div className="ncdr-alert__header">
+                                <Badge variant={getSeverityBadgeVariant(alert.severity)} dot>
+                                    {getSeverityLabel(alert.severity)}
+                                </Badge>
+                                <span className="ncdr-alert__type">{alert.alertTypeName}</span>
                             </div>
-                        )}
-                    </Card>
-                ))}
-            </div>
-
-            {/* 推播結果提示 */}
-            {broadcastResult && (
-                <div
-                    style={{
-                        position: 'fixed',
-                        bottom: '2rem',
-                        right: '2rem',
-                        padding: '1rem 1.5rem',
-                        borderRadius: '0.5rem',
-                        backgroundColor: broadcastResult.success ? 'var(--color-success, #22C55E)' : 'var(--color-danger, #EF4444)',
-                        color: 'white',
-                        boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-                        zIndex: 1000,
-                    }}
-                    onClick={() => setBroadcastResult(null)}
-                >
-                    {broadcastResult.success ? '✅' : '❌'} {broadcastResult.message}
+                            <h4 className="ncdr-alert__title">{alert.title}</h4>
+                            {alert.description && (
+                                <p className="ncdr-alert__desc">{alert.description}</p>
+                            )}
+                            <div className="ncdr-alert__meta">
+                                <span>{alert.sourceUnit}</span>
+                                <span className="ncdr-alert__time">{formatTime(alert.publishedAt)}</span>
+                            </div>
+                            {alert.sourceLink && (
+                                <a
+                                    href={alert.sourceLink}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="ncdr-alert__link"
+                                >
+                                    查看詳情 →
+                                </a>
+                            )}
+                            {/* 管理員推播按鈕 */}
+                            {isAdmin && lineBotStats?.botEnabled && (
+                                <div className="ncdr-alert__actions">
+                                    <Button
+                                        variant="secondary"
+                                        size="sm"
+                                        onClick={() => handleBroadcast(alert)}
+                                        loading={broadcastMutation.isPending}
+                                    >
+                                        LINE 推播 ({lineBotStats.boundUserCount} 人)
+                                    </Button>
+                                </div>
+                            )}
+                        </Card>
+                    ))}
                 </div>
             )}
+
+            {/* 推播結果提示 */}
+            <ToastContainer
+                position="bottom-right"
+                toasts={broadcastResult ? [{
+                    id: 'ncdr-broadcast-result',
+                    variant: broadcastResult.success ? 'success' : 'danger',
+                    message: broadcastResult.message,
+                    onClose: () => setBroadcastResult(null),
+                }] : []}
+                onClose={() => setBroadcastResult(null)}
+            />
         </div>
     );
 }
-

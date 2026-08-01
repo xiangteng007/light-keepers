@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { Alert, Badge, Button, Card } from '../design-system';
 import styles from './MonitorPage.module.css';
 
 interface HealthStatus {
@@ -77,14 +78,20 @@ export default function MonitorPage() {
     const allOk = services.every(s => s.status === 'ok');
     const anyLoading = services.some(s => s.status === 'loading');
 
+    const overallVariant: 'info' | 'success' | 'danger' = anyLoading ? 'info' : allOk ? 'success' : 'danger';
+    const overallText = anyLoading ? '檢查中...' : allOk ? '所有服務正常運作' : '部分服務異常';
+
+    const statusBadgeVariant = (status: ServiceCheck['status']): 'success' | 'danger' | 'default' =>
+        status === 'ok' ? 'success' : status === 'error' ? 'danger' : 'default';
+    const statusLabel = (status: ServiceCheck['status']) =>
+        status === 'ok' ? '正常' : status === 'error' ? '異常' : '檢查中';
+
     return (
         <div className={styles.container}>
-            <header className={styles.header}>
-                <div>
-                    <h1 className={styles.title}>⚡ 系統監控</h1>
-                    <p className={styles.subtitle}>
-                        Light Keepers 服務狀態即時監控
-                    </p>
+            <div className="page-header">
+                <div className="page-header__left">
+                    <h1 className={styles.title}>系統監控</h1>
+                    <p className={styles.subtitle}>Light Keepers 服務狀態即時監控</p>
                 </div>
                 <div className={styles.controls}>
                     <label className={styles.toggle}>
@@ -95,43 +102,36 @@ export default function MonitorPage() {
                         />
                         自動刷新 (30s)
                     </label>
-                    <button className={styles.refreshBtn} onClick={runHealthChecks}>
-                        🔄 立即刷新
-                    </button>
+                    <Button variant="secondary" size="sm" onClick={runHealthChecks}>
+                        立即刷新
+                    </Button>
                 </div>
-            </header>
+            </div>
 
             {/* Overall Status */}
-            <div className={`${styles.overallStatus} ${anyLoading ? styles.loading : allOk ? styles.ok : styles.error}`}>
-                <span className={styles.statusIcon}>
-                    {anyLoading ? '⏳' : allOk ? '✅' : '🚨'}
-                </span>
-                <span className={styles.statusText}>
-                    {anyLoading ? '檢查中...' : allOk ? '所有服務正常運作' : '部分服務異常'}
-                </span>
+            <Alert variant={overallVariant} className={styles.overallStatus}>
+                <span className={styles.statusText}>{overallText}</span>
                 <span className={styles.lastUpdate}>
                     最後更新: {lastRefresh.toLocaleTimeString('zh-TW')}
                 </span>
-            </div>
+            </Alert>
 
             {/* Service Cards */}
             <div className={styles.grid}>
                 {services.map(service => (
-                    <div
-                        key={service.name}
-                        className={`${styles.card} ${styles[service.status]}`}
-                    >
+                    <Card key={service.name} className={`${styles.card} ${styles[service.status]}`}>
                         <div className={styles.cardHeader}>
-                            <span className={styles.cardDot} />
                             <h3 className={styles.cardTitle}>{service.name}</h3>
+                            <Badge
+                                variant={statusBadgeVariant(service.status)}
+                                dot
+                                pulse={service.status === 'loading'}
+                                size="sm"
+                            >
+                                {statusLabel(service.status)}
+                            </Badge>
                         </div>
                         <div className={styles.cardBody}>
-                            <div className={styles.metric}>
-                                <span className={styles.metricLabel}>狀態</span>
-                                <span className={styles.metricValue}>
-                                    {service.status === 'loading' ? '⏳' : service.status === 'ok' ? '✅ 正常' : '❌ 異常'}
-                                </span>
-                            </div>
                             {service.latency !== undefined && (
                                 <div className={styles.metric}>
                                     <span className={styles.metricLabel}>延遲</span>
@@ -151,16 +151,16 @@ export default function MonitorPage() {
                                 </div>
                             )}
                         </div>
-                    </div>
+                    </Card>
                 ))}
             </div>
 
             {/* User Info */}
             {authUser && (
-                <div className={styles.userInfo}>
+                <Card className={styles.userInfo}>
                     <h3>當前使用者</h3>
                     <p>{authUser.displayName || authUser.email} — Level {authUser.roleLevel ?? 0}</p>
-                </div>
+                </Card>
             )}
         </div>
     );
