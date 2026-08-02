@@ -1,4 +1,16 @@
-# 頁面檔案處置提案（待 owner 圈選）
+# 頁面檔案處置提案（✅ owner 已圈選）
+
+> **圈選結果（2026-08-02，owner）**：**「刪除孤兒」——全數刪除。**
+>
+> - §1（假資料版 6 檔）／§2（功能重疊 5 檔）／§6（Shell 舊元件 3 檔）：刪除（與提案建議一致）。
+> - §3（接上 or 刪除 6 檔）／§4（`pages/admin/*` 整包 7 檔）／§5（功能定位 12 檔）：**依 owner 指示一律刪除**。
+> - ⚠ **兩檔例外標記，執行前請 owner 最後看一眼**（提案原建議「接上而非刪除」）：
+>   1. `src/pages/AttendancePage.tsx` — 個人 GPS/QR 簽到，R1 設計語言把「簽到」列為關鍵動作
+>   2. `src/pages/TwoFactorSetupPage.tsx`／`src/pages/security/TwoFactorSetupPage.tsx` — 2FA 設定 UI（後端 2FA 端點已存在）；兩版全刪＝前端永遠無法啟用 2FA
+>   若不另行指示，執行時**照圈選一併刪除**。
+> - §7（維持現狀項）不在本次刪除範圍，照原計畫由 R2/R3 與 design-system 收斂處理。
+> - 執行方式：另開工作項（SONNET 批次；先 `tsc`＋全測試綠、依賴圖確認零引用後分批刪，同步清 `LazyPages.tsx` 殘餘 export 與對應 spec）。
+
 
 - **工作項**：R1 / FE-7（IA 收斂落地）
 - **產出日期**：2026-08-01
