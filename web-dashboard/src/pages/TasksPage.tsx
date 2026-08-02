@@ -3,25 +3,43 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { ChevronDown, ChevronRight, X, CalendarClock, ArrowRight } from 'lucide-react';
 import { getTaskKanban, createTask, updateTask, deleteTask } from '../api';
 import type { Task } from '../api';
-import { Button, Card, Tag, Badge, Modal, InputField } from '../design-system';
+import { Button, Modal, InputField } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './TasksPage.css';
 
 /**
- * TasksPage — 任務看板
+ * TasksPage — 任務佇列（R5 B3c：c1 佇列語言）
  * Archetype: Board（DESIGN_LANGUAGE.md §7.3 的範例頁）
- * 欄＝狀態（待處理/進行中/已完成），欄頭計數 Badge；卡片＝任務（優先度＋標題＋截止時間＋快速狀態按鈕）。
- * 行動端：頂部 segmented tabs 切換欄，不做水平多欄捲動；狀態變更用卡片上的快速按鈕（單手可及）。
+ * 欄＝狀態（待指派/進行中/完成），chip＋形狀雙編碼（□/■/✓，MIL-STD-2525 色盲安全）；
+ * 隊伍代號 .u-stencil、時間戳 .u-mono 右對齊、行動 CTA＝橄欖實心（紅色不出場）。
+ * 行動端：頂部 segmented tabs 切換欄，不做水平多欄捲動；狀態變更用列上的快速按鈕（單手可及）。
  */
 
 type ColumnStatus = 'pending' | 'in_progress' | 'completed';
 
-const COLUMNS: { status: ColumnStatus; title: string; badgeVariant: 'warning' | 'info' | 'success' }[] = [
-    { status: 'pending', title: '待處理', badgeVariant: 'warning' },
-    { status: 'in_progress', title: '進行中', badgeVariant: 'info' },
-    { status: 'completed', title: '已完成', badgeVariant: 'success' },
+const COLUMNS: {
+    status: ColumnStatus;
+    title: string;
+    /** 拉丁小標（stencil）——與中文標題並置，chip 內做形狀雙編碼 */
+    code: string;
+    /** 形狀編碼：□ 待指派（描邊）/ ■ 進行中（實心）/ ✓ 完成 */
+    glyph: string;
+    chipClass: string;
+}[] = [
+    { status: 'pending', title: '待指派', code: 'PENDING', glyph: '□', chipClass: 'status-chip--pending' },
+    { status: 'in_progress', title: '進行中', code: 'ACTIVE', glyph: '■', chipClass: 'status-chip--active' },
+    { status: 'completed', title: '完成', code: 'DONE', glyph: '✓', chipClass: 'status-chip--done' },
 ];
+
+/** 排印鐵律：stencil 寬字距只准用於拉丁/數字；中文代號退回一般字距 */
+const isLatinCode = (value: string) => /^[\x20-\x7E]+$/.test(value);
+
+const formatClock = (iso: string) => {
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return '--:--';
+    return d.toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit' });
+};
 
 export default function TasksPage() {
     const queryClient = useQueryClient();
@@ -90,15 +108,18 @@ export default function TasksPage() {
 
     return (
         <div className="tasks-page">
-            <div className="page-header">
-                <div className="page-header__left">
+            <header className="tasks-page__top">
+                <div className="tasks-page__brand">
                     <h1>任務管理</h1>
-                    <Badge variant="default">共 {totalTasks} 個任務</Badge>
+                    <span className="tasks-page__kicker u-stencil">OPS QUEUE</span>
                 </div>
-                <Button variant="primary" onClick={() => setShowAddModal(true)}>
-                    + 新增任務
-                </Button>
-            </div>
+                <span className="tasks-page__total">
+                    共 <b className="u-mono">{totalTasks}</b> 個任務
+                </span>
+                <button type="button" className="tasks-cta" onClick={() => setShowAddModal(true)}>
+                    ＋ 新增任務
+                </button>
+            </header>
 
             {/* 行動端 segmented tabs：切換欄，不做水平多欄捲動 */}
             <div className="tasks-page__mobile-tabs" role="tablist" aria-label="任務狀態">
@@ -111,8 +132,9 @@ export default function TasksPage() {
                         className={`tasks-page__mobile-tab ${activeColumn === col.status ? 'is-active' : ''}`}
                         onClick={() => setActiveColumn(col.status)}
                     >
+                        <span className="tasks-page__mobile-tab-glyph" aria-hidden="true">{col.glyph}</span>
                         {col.title}
-                        <span className="tasks-page__mobile-tab-count tabular-nums">{columnTasks[col.status].length}</span>
+                        <span className="tasks-page__mobile-tab-count u-mono">{columnTasks[col.status].length}</span>
                     </button>
                 ))}
             </div>
@@ -121,7 +143,9 @@ export default function TasksPage() {
                 <div className="task-board" aria-busy="true" aria-label="載入任務看板中">
                     {COLUMNS.map(col => (
                         <div key={col.status} className="task-column">
-                            <Skeleton variant="card" height={72} count={3} />
+                            <div className="task-column__list">
+                                <Skeleton variant="card" height={72} count={3} />
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -130,17 +154,23 @@ export default function TasksPage() {
                     {COLUMNS.map(col => (
                         <TaskColumn
                             key={col.status}
-                            title={col.title}
-                            status={col.status}
+                            column={col}
                             tasks={columnTasks[col.status]}
                             onStatusChange={handleStatusChange}
                             onDelete={handleDeleteTask}
-                            badgeVariant={col.badgeVariant}
                             className={activeColumn === col.status ? 'is-active-mobile' : ''}
                         />
                     ))}
                 </div>
             )}
+
+            {/* 圖例：狀態雙編碼（形狀＋顏色，不靠透明度） */}
+            <footer className="tasks-page__legend">
+                <span>
+                    圖例 <i aria-hidden="true">□</i> 待指派 · <i aria-hidden="true" className="is-solid">■</i> 進行中 · <i aria-hidden="true">✓</i> 完成
+                </span>
+                <span className="tasks-page__legend-code u-stencil">TASK BOARD · B3C</span>
+            </footer>
 
             {/* 新增任務 Modal */}
             <Modal
@@ -202,16 +232,15 @@ export default function TasksPage() {
 }
 
 interface TaskColumnProps {
-    title: string;
-    status: ColumnStatus;
+    column: (typeof COLUMNS)[number];
     tasks: Task[];
     onStatusChange: (id: string, status: string) => void;
     onDelete: (id: string) => void;
-    badgeVariant: 'warning' | 'info' | 'success';
     className?: string;
 }
 
-function TaskColumn({ title, status, tasks, onStatusChange, onDelete, badgeVariant, className = '' }: TaskColumnProps) {
+function TaskColumn({ column, tasks, onStatusChange, onDelete, className = '' }: TaskColumnProps) {
+    const { status, title } = column;
     const [expandedIds, setExpandedIds] = useState<Set<string>>(new Set());
 
     const toggleExpand = (id: string) => {
@@ -229,10 +258,11 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, badgeVaria
     const nextStatus = status === 'pending' ? 'in_progress' : status === 'in_progress' ? 'completed' : null;
     const nextStatusLabel = nextStatus === 'in_progress' ? '開始處理' : '標記完成';
 
-    const getPriorityTagColor = (priority: number): 'danger' | 'warning' | 'success' | 'default' => {
-        if (priority >= 4) return 'danger';
-        if (priority === 3) return 'warning';
-        return 'default';
+    // 紅色憲法：優先度不是生命安全語義，不用紅——高＝橄欖實心、中＝橄欖描邊、低＝灰描邊
+    const getPriorityChip = (priority: number): { cls: string; glyph: string } => {
+        if (priority >= 4) return { cls: 'prio-chip--high', glyph: '■' };
+        if (priority === 3) return { cls: 'prio-chip--mid', glyph: '□' };
+        return { cls: 'prio-chip--low', glyph: '□' };
     };
 
     const handleDelete = (e: React.MouseEvent, taskId: string, taskTitle: string) => {
@@ -248,24 +278,28 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, badgeVaria
     };
 
     return (
-        <div className={`task-column ${className}`} role="tabpanel" aria-label={title}>
-            <div className="task-column__header">
-                <span>{title}</span>
-                <Badge variant={badgeVariant} size="sm">{tasks.length}</Badge>
-            </div>
+        <section className={`task-column ${className}`} role="tabpanel" aria-label={title}>
+            <header className="task-column__header">
+                <span className={`status-chip ${column.chipClass} u-stencil`} aria-hidden="true">
+                    {column.glyph} {column.code}
+                </span>
+                <h2>{title}</h2>
+                <span className="task-column__count u-mono" aria-label={`${title} ${tasks.length} 項`}>{tasks.length}</span>
+            </header>
             <div className="task-column__list">
                 {tasks.length === 0 && (
                     <EmptyState variant="minimal" title="無任務" />
                 )}
                 {tasks.map((task) => {
                     const isExpanded = expandedIds.has(task.id);
+                    const prio = getPriorityChip(task.priority);
+                    const clockIso = status === 'completed' && task.completedAt ? task.completedAt : task.createdAt;
                     return (
-                        <Card
+                        <article
                             key={task.id}
                             className={`task-card ${status === 'completed' ? 'task-card--completed' : ''} ${isExpanded ? 'task-card--expanded' : ''}`}
-                            padding="sm"
                         >
-                            {/* 標題列：優先度＋標題＋快速狀態按鈕（行動端單手可及）＋展開切換 */}
+                            {/* 標題列：優先度 chip＋標題＋隊伍代號＋時間戳＋快速狀態按鈕（行動端單手可及）＋展開切換 */}
                             <div className="task-card__header">
                                 <button
                                     type="button"
@@ -274,31 +308,44 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, badgeVaria
                                     aria-expanded={isExpanded}
                                 >
                                     {isExpanded ? <ChevronDown size={16} aria-hidden="true" /> : <ChevronRight size={16} aria-hidden="true" />}
-                                    <Tag color={getPriorityTagColor(task.priority)} size="sm">
-                                        P{task.priority}
-                                    </Tag>
+                                    <span className={`prio-chip ${prio.cls} u-stencil`}>
+                                        {prio.glyph} P{task.priority}
+                                    </span>
                                     <span className="task-card__title">{task.title}</span>
                                 </button>
-                                <div className="task-card__actions">
-                                    {nextStatus && (
+                                <div className="task-card__meta">
+                                    {task.assignedTo && (
+                                        <span
+                                            className={`task-card__team ${isLatinCode(task.assignedTo) ? 'u-stencil' : ''}`}
+                                            title={`指派：${task.assignedTo}`}
+                                        >
+                                            {task.assignedTo}
+                                        </span>
+                                    )}
+                                    <time className="task-card__time u-mono" dateTime={clockIso}>
+                                        {formatClock(clockIso)}
+                                    </time>
+                                    <div className="task-card__actions">
+                                        {nextStatus && (
+                                            <button
+                                                type="button"
+                                                className="task-card__quick-status"
+                                                onClick={(e) => handleQuickStatus(e, task.id)}
+                                                aria-label={`${task.title}：${nextStatusLabel}`}
+                                                title={nextStatusLabel}
+                                            >
+                                                <ArrowRight size={16} aria-hidden="true" />
+                                            </button>
+                                        )}
                                         <button
                                             type="button"
-                                            className="task-card__quick-status"
-                                            onClick={(e) => handleQuickStatus(e, task.id)}
-                                            aria-label={`${task.title}：${nextStatusLabel}`}
-                                            title={nextStatusLabel}
+                                            className="task-card__delete"
+                                            onClick={(e) => handleDelete(e, task.id, task.title)}
+                                            aria-label={`刪除任務：${task.title}`}
                                         >
-                                            <ArrowRight size={16} aria-hidden="true" />
+                                            <X size={16} aria-hidden="true" />
                                         </button>
-                                    )}
-                                    <button
-                                        type="button"
-                                        className="task-card__delete"
-                                        onClick={(e) => handleDelete(e, task.id, task.title)}
-                                        aria-label={`刪除任務：${task.title}`}
-                                    >
-                                        <X size={16} aria-hidden="true" />
-                                    </button>
+                                    </div>
                                 </div>
                             </div>
 
@@ -311,24 +358,24 @@ function TaskColumn({ title, status, tasks, onStatusChange, onDelete, badgeVaria
                                     {task.dueAt && (
                                         <div className="task-card__due">
                                             <CalendarClock size={14} aria-hidden="true" />
-                                            <span className="tabular-nums">截止：{new Date(task.dueAt).toLocaleDateString('zh-TW')}</span>
+                                            <span className="u-mono">截止：{new Date(task.dueAt).toLocaleDateString('zh-TW')}</span>
                                         </div>
                                     )}
                                     {nextStatus && (
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
+                                        <button
+                                            type="button"
+                                            className="task-card__advance"
                                             onClick={() => onStatusChange(task.id, nextStatus)}
                                         >
-                                            {nextStatusLabel}
-                                        </Button>
+                                            {nextStatusLabel} <span className="u-mono" aria-hidden="true">→</span>
+                                        </button>
                                     )}
                                 </div>
                             )}
-                        </Card>
+                        </article>
                     );
                 })}
             </div>
-        </div>
+        </section>
     );
 }

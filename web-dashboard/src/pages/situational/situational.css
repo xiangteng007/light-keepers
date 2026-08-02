@@ -265,8 +265,12 @@
 [data-app-mode="emergency"] .sit-skeleton__row { animation: none; }
 
 /* ═══ R5/T1 戰術化：KPI＝任務牆讀數（3 秒法則） ═══ */
+/* R5/T2（c1 構圖）：position 供 mono 編號／hot 斜紋定位；
+   overflow 讓斜紋貼齊上緣；2px＝B3c「重要分隔」規線 */
 .sit-kpi {
-    border: 1px solid var(--border-default);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid var(--border-default);
     border-left-width: 3px;
     border-radius: var(--radius-md);
     box-shadow: none;

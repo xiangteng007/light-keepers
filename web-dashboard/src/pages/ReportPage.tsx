@@ -1,7 +1,16 @@
 /**
- * ReportPage（/intake 通報）— R2b 旗艦頁重設計
+ * ReportPage（/intake 通報）— R5 B3c 野戰手冊化（c4 構圖）
  *
- * 設計依據：docs/architecture/DESIGN_LANGUAGE.md
+ * 視覺依據：public/design-mockups/r5-b3c-deep.html <section class="c4">
+ * （owner 核准的「手機 30 秒通報」目標構圖）＋ DESIGN_LANGUAGE.md v2：
+ * - 三段進度規線（當前段橄欖實心、已完成卡其實心＋✓ 形狀雙編碼）
+ * - 「發生了什麼？」大標＋橄欖短規線＋ STEP 拉丁 stencil 小標
+ * - 災型大格：卡其 2px 描邊、選中橄欖實心底深字＋右上折角（不依賴透明度）
+ * - 拇指區底欄：已選摘要（SELECTED ＋ mono 格號）＋ 58px 大按鈕「下一步」
+ * - 數字/編號一律 mono＋tabular-nums；中文字距 0；本步驟無生命危險語義，
+ *   紅色全程未動用（表單錯誤改琥珀，v2 §D 紅色憲法）
+ *
+ * 功能依據（R2b，全數保留）：docs/architecture/DESIGN_LANGUAGE.md
  * - 「30 秒完成通報」：4 步精簡為 3 步（災型 → 現場 → 送出）。
  *   必填只剩「災型 + 定位」；標題/描述可留空（送出時以災型 SSOT 自動補
  *   「○○災情通報」——高壓可用性 > 完整資料，§0 原則 1）。
@@ -25,6 +34,7 @@ import {
 import { Card, Button, Badge } from '../design-system';
 import {
     DISASTER_TYPE_GROUPS,
+    DISASTER_TYPE_OPTIONS,
     MASS_CASUALTY_META,
     getDisasterTypeMeta,
 } from '../constants/disasterTypes';
@@ -37,11 +47,44 @@ import './ReportPage.css';
 
 type WizardStep = 'type' | 'scene' | 'confirm';
 
-const STEPS: { key: WizardStep; label: string }[] = [
-    { key: 'type', label: '災型' },
-    { key: 'scene', label: '現場' },
-    { key: 'confirm', label: '送出' },
+const STEPS: {
+    key: WizardStep;
+    /** 進度規線下的中文段名（中文字距 0） */
+    label: string;
+    /** STEP 拉丁 stencil 小標（c4：STEP 01 · INCIDENT TYPE） */
+    caption: string;
+    /** 各步大標（c4「發生了什麼？」語言） */
+    title: string;
+    /** 大標下的一行提示 */
+    hint: string;
+}[] = [
+    {
+        key: 'type',
+        label: '災型',
+        caption: 'INCIDENT TYPE',
+        title: '發生了什麼？',
+        hint: '點選最符合的災型，三十秒內完成通報。',
+    },
+    {
+        key: 'scene',
+        label: '現場',
+        caption: 'ON SCENE',
+        title: '現場狀況',
+        hint: '定位自動取得；拍照與語音優先，文字可留空。',
+    },
+    {
+        key: 'confirm',
+        label: '送出',
+        caption: 'CONFIRM',
+        title: '確認送出',
+        hint: '核對重點後送出；離線也會安全暫存，不會遺失。',
+    },
 ];
+
+/** c4 構圖的災型格號：依 SSOT 選單順序跨分組連號（01 起），一律 mono 呈現 */
+function disasterOrdinal(value: string): string {
+    return String(DISASTER_TYPE_OPTIONS.findIndex(o => o.value === value) + 1).padStart(2, '0');
+}
 
 // 嚴重程度：語意對照 DESIGN_LANGUAGE §3（low=安全綠、medium=警戒橙、
 // high=危急紅、critical=大規模危機紫），顏色由 CSS 語義 token 提供，
@@ -359,12 +402,25 @@ export default function ReportPage() {
     }
 
     // ===== 各步驟內容 =====
+    // c4 問句頭：STEP stencil 小標 → 大標 → 橄欖短規線 → 一行提示
+    const stepMeta = STEPS[currentStepIndex] ?? STEPS[0];
+    const askHeader = (
+        <header className="wizard-ask">
+            <span className="wizard-ask__kicker u-stencil">
+                STEP {String(currentStepIndex + 1).padStart(2, '0')} · {stepMeta.caption}
+            </span>
+            <h3 className="wizard-ask__title">{stepMeta.title}</h3>
+            <span className="wizard-ask__rule" aria-hidden="true" />
+            <p className="wizard-ask__hint">{stepMeta.hint}</p>
+        </header>
+    );
+
     const renderStepContent = () => {
         switch (currentStep) {
             case 'type':
                 return (
                     <div className="wizard-step">
-                        <h3 className="wizard-step__title">發生了什麼？</h3>
+                        {askHeader}
 
                         {/* C1.1: 民防類別獨立分組，避免與天災混在同一片網格中誤選 */}
                         {DISASTER_TYPE_GROUPS.map(group => (
@@ -379,8 +435,13 @@ export default function ReportPage() {
                                             aria-pressed={formData.type === type.value}
                                             onClick={() => updateField('type', type.value)}
                                         >
-                                            <span className="disaster-type-card__icon">
-                                                <type.Icon size={26} color={type.color} aria-hidden="true" />
+                                            <span className="disaster-type-card__meta">
+                                                <span className="disaster-type-card__index u-mono" aria-hidden="true">
+                                                    {disasterOrdinal(type.value)}
+                                                </span>
+                                                <span className="disaster-type-card__icon">
+                                                    <type.Icon size={22} color={type.color} aria-hidden="true" />
+                                                </span>
                                             </span>
                                             <span className="disaster-type-card__label">{type.label}</span>
                                             <span className="disaster-type-card__desc">{type.description}</span>
@@ -441,7 +502,7 @@ export default function ReportPage() {
             case 'scene':
                 return (
                     <div className="wizard-step">
-                        <h3 className="wizard-step__title">現場狀況</h3>
+                        {askHeader}
 
                         {/* 定位（自動取得，可重新定位） */}
                         <div className={`location-status-card ${formData.latitude !== null ? 'located' : ''}`}>
@@ -560,7 +621,7 @@ export default function ReportPage() {
                 const severity = SEVERITY_LEVELS.find(s => s.value === formData.severity);
                 return (
                     <div className="wizard-step">
-                        <h3 className="wizard-step__title">確認送出</h3>
+                        {askHeader}
 
                         <div className="confirm-summary">
                             <div className="confirm-item">
@@ -653,7 +714,10 @@ export default function ReportPage() {
     return (
         <div className="page report-page">
             <header className="report-page__header">
-                <h2>災情通報</h2>
+                <div className="report-page__heading">
+                    <h2>災情通報</h2>
+                    <span className="report-page__kicker u-stencil">RAPID REPORT</span>
+                </div>
                 {/* 離線可用性明示（DESIGN_LANGUAGE §7.4 / 3.4 outbox） */}
                 {!isOnline && (
                     <span className="report-offline-badge" role="status">
@@ -661,9 +725,13 @@ export default function ReportPage() {
                         離線模式 · 通報將暫存後自動送出
                     </span>
                 )}
+                {/* c4 步驟章：1/3（進度語意由下方 <ol> 提供，此處僅視覺章） */}
+                <span className="report-step-chip u-mono" aria-hidden="true">
+                    {currentStepIndex + 1}/{STEPS.length}
+                </span>
             </header>
 
-            {/* 進度指示（3 步） */}
+            {/* 三段進度規線（c4）：當前段橄欖實心；已完成卡其實心＋✓；未到描邊 */}
             <ol className="wizard-progress" aria-label={`通報進度：第 ${currentStepIndex + 1} 步，共 ${STEPS.length} 步`}>
                 {STEPS.map((step, index) => (
                     <li
@@ -671,10 +739,16 @@ export default function ReportPage() {
                         className={`wizard-progress__step ${index < currentStepIndex ? 'completed' : index === currentStepIndex ? 'active' : ''}`}
                         aria-current={index === currentStepIndex ? 'step' : undefined}
                     >
-                        <span className="wizard-progress__circle" aria-hidden="true">
-                            {index < currentStepIndex ? '✓' : index + 1}
+                        <span className="wizard-progress__bar" aria-hidden="true" />
+                        <span className="wizard-progress__label">
+                            <span className="wizard-progress__index u-mono" aria-hidden="true">
+                                {String(index + 1).padStart(2, '0')}
+                            </span>
+                            {step.label}
+                            {index < currentStepIndex && (
+                                <span className="wizard-progress__check" aria-hidden="true">✓</span>
+                            )}
                         </span>
-                        <span className="wizard-progress__label">{step.label}</span>
                     </li>
                 ))}
             </ol>
@@ -687,28 +761,43 @@ export default function ReportPage() {
                 {renderStepContent()}
             </Card>
 
-            {/* 主要動作固定下半屏（行動端單手原則） */}
+            {/* 拇指區底欄（c4）：已選摘要與大按鈕同列供最後核對；主要動作固定下半屏 */}
             <div className="wizard-navigation">
-                {currentStepIndex > 0 && (
-                    <Button variant="secondary" size="lg" onClick={prevStep}>
-                        <ChevronLeft size={18} aria-hidden="true" /> 上一步
-                    </Button>
+                {currentStep === 'type' && selectedMeta && formData.type && (
+                    <p className="wizard-picked">
+                        <span className="wizard-picked__tag u-stencil">SELECTED</span>
+                        <b>{selectedMeta.label}</b>
+                        <span className="u-mono">{disasterOrdinal(formData.type)}</span>
+                        <span className="wizard-picked__hint">· 下一步將標定位置</span>
+                    </p>
                 )}
-                {currentStepIndex < STEPS.length - 1 ? (
-                    <Button size="lg" className="wizard-navigation__primary" onClick={nextStep}>
-                        下一步 <ChevronRight size={18} aria-hidden="true" />
-                    </Button>
-                ) : (
-                    <Button
-                        size="lg"
-                        className="wizard-navigation__primary"
-                        onClick={handleSubmit}
-                        disabled={isSubmitting}
-                    >
-                        <Send size={18} aria-hidden="true" />
-                        {isSubmitting ? '送出中…' : isOnline ? '送出通報' : '離線暫存送出'}
-                    </Button>
-                )}
+                <div className="wizard-navigation__buttons">
+                    {currentStepIndex > 0 && (
+                        <Button
+                            variant="secondary"
+                            size="lg"
+                            className="wizard-navigation__prev"
+                            onClick={prevStep}
+                        >
+                            <ChevronLeft size={18} aria-hidden="true" /> 上一步
+                        </Button>
+                    )}
+                    {currentStepIndex < STEPS.length - 1 ? (
+                        <Button size="lg" className="wizard-navigation__primary" onClick={nextStep}>
+                            下一步 <ChevronRight size={18} aria-hidden="true" />
+                        </Button>
+                    ) : (
+                        <Button
+                            size="lg"
+                            className="wizard-navigation__primary"
+                            onClick={handleSubmit}
+                            disabled={isSubmitting}
+                        >
+                            <Send size={18} aria-hidden="true" />
+                            {isSubmitting ? '送出中…' : isOnline ? '送出通報' : '離線暫存送出'}
+                        </Button>
+                    )}
+                </div>
             </div>
         </div>
     );

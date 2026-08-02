@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B 系家族 — 6 個子方向</title>
+<style>
+ * { margin:0; padding:0; box-sizing:border-box; }
+ body { background:#000; font-family:'Noto Sans TC',-apple-system,sans-serif; }
+ .head { padding:26px 24px 6px; color:#fff; }
+ .head h1 { font-size:19px; letter-spacing:.04em; }
+ .head p { color:#999; font-size:13px; margin-top:6px; line-height:1.7; }
+ .wrap { margin:18px 12px 44px; border:1px solid #333; border-radius:8px; overflow:hidden; }
+ .tag { display:flex; align-items:baseline; gap:12px; padding:10px 16px; background:#111; border-bottom:1px solid #333; }
+ .tag b { color:#fff; font-size:15px; }
+ .tag span { color:#888; font-size:12px; }
+ .foot { padding:0 24px 60px; color:#777; font-size:12.5px; line-height:1.8; }
+ .foot b { color:#ddd; }
+</style>
+</head>
+<body>
+<div class="head">
+ <h1>B・國防科技 — 家族展開（6 子方向）</h1>
+ <p>色相軸：B1 橘／B2 青／B3 橄欖／B4 琥珀 ・ 密度軸：B5 密集／B6 簡報。同一畫面同一資料，只變語言。<br>回覆例：「B2」「B1 但用 B5 的密度」「B4 的琥珀＋B1 的排版」。</p>
+</div>
+<div class="wrap"><div class="tag"><b>B1 · 信號橘 精修</b><span>Anduril Lattice——原 B 的完成度版本</span></div>
+<section class="bv1">
+<style>
+.bv1{--bg:#14171C;--pn:#191D22;--ln:#262B31;--acc:#FF6A2B;--t1:#E8EBEF;--t2:#98A1AC;--t3:#5D6674;--mono:'JetBrains Mono',Consolas,monospace;display:block;max-width:100%;box-sizing:border-box;background:var(--bg);color:var(--t1);font:400 14px/1.5 'Inter','Segoe UI','Noto Sans TC','Microsoft JhengHei',system-ui,sans-serif;letter-spacing:-.01em;padding:22px clamp(16px,3vw,30px) 26px}
+.bv1 *{box-sizing:border-box;margin:0;padding:0}
+.bv1 .mono{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+.bv1 .top{display:flex;align-items:center;gap:18px;padding-bottom:15px;border-bottom:1px solid var(--ln);margin-bottom:18px}
+.bv1 .brand{display:flex;align-items:center;gap:9px;font-size:15px;font-weight:650;letter-spacing:-.005em;white-space:nowrap}
+.bv1 .dia{color:var(--acc);font-size:10px;transform:translateY(-1px)}
+.bv1 .mission{margin-left:auto;display:flex;align-items:baseline;gap:7px;font-size:12.5px;color:var(--t2);white-space:nowrap}
+.bv1 .mid{font-size:12px;color:var(--t1)}
+.bv1 .sep{color:var(--t3)}
+.bv1 .clock{font-size:12px;color:var(--t1)}
+.bv1 .cta{appearance:none;border:0;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600;letter-spacing:.02em;color:#14171C;background:var(--acc);padding:9px 18px;border-radius:5px;transition:filter .15s;white-space:nowrap}
+.bv1 .cta:hover{filter:brightness(1.08)}
+.bv1 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin-bottom:12px}
+.bv1 .stat{position:relative;background:var(--pn);border:1px solid var(--ln);border-radius:6px;padding:14px 16px 13px}
+.bv1 .stat::before{content:"";position:absolute;left:-1px;top:10px;bottom:10px;width:3px;border-radius:2px;background:#333A43}
+.bv1 .stat.hot::before{background:var(--acc)}
+.bv1 .stat.hot{border-color:rgba(255,106,43,.32);background:linear-gradient(180deg,rgba(255,106,43,.055),rgba(255,106,43,0) 60%) var(--pn)}
+.bv1 .lbl{font-size:10.5px;font-weight:600;letter-spacing:.09em;color:var(--t3);margin-bottom:9px}
+.bv1 .hot .lbl{color:var(--t2)}
+.bv1 .num{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:27px;font-weight:600;line-height:1;letter-spacing:-.02em}
+.bv1 .hot .num{color:var(--acc)}
+.bv1 .den{font-size:15px;font-weight:500;color:var(--t3)}
+.bv1 .sub{margin-top:8px;font-size:11.5px;color:var(--t2)}
+.bv1 .sub .mono{font-size:11px;color:var(--t1)}
+.bv1 .queues{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:12px}
+.bv1 .q{background:var(--pn);border:1px solid var(--ln);border-radius:6px;overflow:hidden}
+.bv1 .qh{display:flex;align-items:center;gap:9px;padding:11px 14px;border-bottom:1px solid var(--ln);font-size:12px;font-weight:600;letter-spacing:.05em}
+.bv1 .cnt{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:10.5px;font-weight:500;line-height:1.3;color:var(--t2);background:#20252B;border:1px solid var(--ln);border-radius:4px;padding:2px 7px}
+.bv1 .q ul{list-style:none}
+.bv1 .q li{display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #20242A;transition:background .12s}
+.bv1 .q li:last-child{border-bottom:0}
+.bv1 .q li:hover{background:#1C2127}
+.bv1 .q li.urgent{box-shadow:inset 2px 0 0 var(--acc)}
+.bv1 .chip{flex:none;min-width:46px;text-align:center;font-size:9.5px;font-weight:600;line-height:1;letter-spacing:.1em;text-transform:uppercase;padding:4.5px 6px;border-radius:4px;border:1px solid var(--ln);color:var(--t2);background:#1E2329}
+.bv1 .chip.high{color:var(--acc);border-color:rgba(255,106,43,.5);background:rgba(255,106,43,.09);font-family:var(--mono)}
+.bv1 .chip.med{color:#C3CBD6;border-color:#39414B;font-family:var(--mono)}
+.bv1 .chip.low{color:#6A7482;font-family:var(--mono)}
+.bv1 .chip.go{color:#DFE4EA;border-color:#3A424C}
+.bv1 .chip.run{color:#A6AFBB}
+.bv1 .chip.done{color:#5D6674;background:transparent}
+.bv1 .qt{flex:1;min-width:0;font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bv1 .qt .mono{font-size:12px}
+.bv1 .loc{margin-left:8px;font-size:12px;font-weight:400;color:var(--t3)}
+.bv1 .arr{margin:0 6px;color:var(--t3);font-weight:400}
+.bv1 .ts{flex:none;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:11px;color:var(--t3)}
+</style>
+<header class="top">
+  <div class="brand"><span class="dia">◆</span>LightKeepers</div>
+  <div class="mission">任務 <span class="mono mid">BRAVO-172</span><span class="sep">·</span>進行中 <span class="mono clock">04:22:18</span></div>
+  <button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+  <article class="stat">
+    <div class="lbl">通報總數</div>
+    <div class="num">24</div>
+    <div class="sub">近 1 小時 <span class="mono">+6</span></div>
+  </article>
+  <article class="stat hot">
+    <div class="lbl">待處理</div>
+    <div class="num">7</div>
+    <div class="sub">最舊 <span class="mono">12</span> 分鐘</div>
+  </article>
+  <article class="stat">
+    <div class="lbl">派遣隊伍</div>
+    <div class="num">12<span class="den">/15</span></div>
+    <div class="sub"><span class="mono">3</span> 隊待命</div>
+  </article>
+  <article class="stat">
+    <div class="lbl">傷患追蹤</div>
+    <div class="num">0</div>
+    <div class="sub">無 MCI 事件</div>
+  </article>
+</div>
+<div class="queues">
+  <section class="q">
+    <header class="qh">回報佇列<span class="cnt">7</span></header>
+    <ul>
+      <li class="urgent"><span class="chip high">HIGH</span><span class="qt">建物倒塌<span class="loc">林森北路85巷</span></span><span class="ts">23:39</span></li>
+      <li><span class="chip med">MED</span><span class="qt">道路淹水<span class="loc">承德路四段</span></span><span class="ts">23:35</span></li>
+      <li><span class="chip low">LOW</span><span class="qt">路樹倒伏<span class="loc">民族東路</span></span><span class="ts">23:28</span></li>
+    </ul>
+  </section>
+  <section class="q">
+    <header class="qh">任務佇列<span class="cnt">12</span></header>
+    <ul>
+      <li><span class="chip go">派遣</span><span class="qt"><span class="mono">TEAM-04</span><span class="arr">→</span>建物倒塌現場</span><span class="ts">4 分前</span></li>
+      <li><span class="chip run">執行</span><span class="qt"><span class="mono">TEAM-07</span> 抽水作業</span><span class="ts">18 分前</span></li>
+      <li><span class="chip done">完成</span><span class="qt"><span class="mono">TEAM-02</span> 物資配送</span><span class="ts">32 分前</span></li>
+    </ul>
+  </section>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B2 · 冷鋼青</b><span>Palantir Gotham——更冷、更情報機構</span></div>
+<section class="bv2">
+<style>
+  .bv2{display:block;max-width:100%;box-sizing:border-box;background:#10151B;color:#C7D1D9;padding:22px 24px 26px;
+    border:1px solid #223039;border-top:2px solid #4FB3C9;border-radius:3px;
+    font-family:"Segoe UI","Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;font-size:14px;line-height:1.55;-webkit-font-smoothing:antialiased}
+  .bv2 *{box-sizing:border-box;margin:0;padding:0}
+  .bv2 .mo{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums}
+  /* ── 頂列 ── */
+  .bv2 .top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid #223039}
+  .bv2 .brand{display:flex;align-items:center;gap:10px}
+  .bv2 .mark{width:11px;height:11px;border:1px solid #4FB3C9;position:relative;flex:none}
+  .bv2 .mark::after{content:"";position:absolute;inset:3px;background:#4FB3C9}
+  .bv2 .name{font-size:16px;font-weight:600;letter-spacing:.14em;color:#E6EDF2}
+  .bv2 .org{font-size:10px;letter-spacing:.26em;color:#43535E;transform:translateY(1px)}
+  .bv2 .mission{display:flex;align-items:center;gap:9px;margin-left:auto;font-size:12.5px;color:#8296A3;letter-spacing:.05em}
+  .bv2 .live{width:6px;height:6px;border-radius:50%;background:#4FB3C9;box-shadow:0 0 7px rgba(79,179,201,.9);animation:bv2-pulse 2.2s infinite;flex:none}
+  @keyframes bv2-pulse{50%{opacity:.3}}
+  .bv2 .mission b{color:#C7D1D9;font-weight:600;letter-spacing:.09em}
+  .bv2 .timer{color:#7FD4E6;font-size:13px}
+  .bv2 .cta{font:inherit;font-size:13px;font-weight:600;letter-spacing:.14em;color:#0F1519;background:#4FB3C9;
+    border:1px solid #4FB3C9;border-radius:3px;padding:8px 20px;cursor:pointer;transition:background .15s}
+  .bv2 .cta:hover{background:#6CC5D8}
+  /* ── 統計列 ── */
+  .bv2 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:16px 0}
+  .bv2 .card{background:#151B22;border:1px solid #223039;border-radius:3px;padding:13px 16px 12px}
+  .bv2 .card .k{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.2em;color:#8296A3}
+  .bv2 .card .k i{font-style:normal;color:#3A4854;font-size:10px;letter-spacing:.1em}
+  .bv2 .card .v{font-size:30px;line-height:1.15;color:#E6EDF2;margin-top:7px;letter-spacing:-.01em}
+  .bv2 .card .v small{font-size:15px;color:#5E7280;letter-spacing:0}
+  .bv2 .gauge{height:2px;background:#223039;margin:9px 0 8px}
+  .bv2 .gauge i{display:block;height:100%;background:#4FB3C9;box-shadow:0 0 6px rgba(79,179,201,.55)}
+  .bv2 .card .s{font-size:12px;color:#8296A3;letter-spacing:.03em}
+  .bv2 .card .s .mo{color:#A9BBC6}
+  .bv2 .hot{border-color:#3E92A6;background:#16212B;box-shadow:inset 2px 0 0 #4FB3C9}
+  .bv2 .hot .v{color:#8FDCEB}
+  .bv2 .mute .v{color:#7C8E9B}
+  /* ── 雙佇列 ── */
+  .bv2 .queues{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:12px}
+  .bv2 .panel{background:#151B22;border:1px solid #223039;border-radius:3px;overflow:hidden}
+  .bv2 .ph{display:flex;align-items:baseline;gap:8px;padding:11px 14px;border-bottom:1px solid #223039}
+  .bv2 .ph h3{font-size:12.5px;font-weight:600;letter-spacing:.18em;color:#C7D1D9}
+  .bv2 .ph .cnt{font-size:12px;color:#4FB3C9}
+  .bv2 .ph .en{margin-left:auto;font-size:10px;letter-spacing:.24em;color:#43535E}
+  .bv2 .panel ul{list-style:none}
+  .bv2 .panel li{display:flex;align-items:center;gap:11px;padding:10px 14px;border-top:1px solid #1B242D;cursor:default;transition:background .12s}
+  .bv2 .panel li:first-child{border-top:0}
+  .bv2 .panel li:hover{background:#1A222B}
+  .bv2 .lv{font-size:10px;font-weight:700;letter-spacing:.12em;padding:2px 0;width:46px;text-align:center;border-radius:2px;border:1px solid;flex:none}
+  .bv2 .hi{color:#E2756A;border-color:#5A3038;background:rgba(226,117,106,.08)}
+  .bv2 .md{color:#D9A05B;border-color:#4E4028;background:rgba(217,160,91,.08)}
+  .bv2 .lo{color:#8296A3;border-color:#2A3843;background:rgba(130,150,163,.06)}
+  .bv2 .st-go{color:#7FD4E6;border-color:#2E4E58;background:rgba(79,179,201,.09)}
+  .bv2 .st-run{color:#D9A05B;border-color:#4E4028;background:rgba(217,160,91,.08)}
+  .bv2 .st-ok{color:#6FA98A;border-color:#2C4136;background:rgba(111,169,138,.08)}
+  .bv2 .t{flex:1;min-width:0;font-size:13px;color:#C7D1D9;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .bv2 .t .mo{color:#A9BBC6;font-size:12.5px}
+  .bv2 .t em{font-style:normal;color:#5E7280}
+  .bv2 .ts{font-size:12px;color:#5E7280;flex:none}
+</style>
+<header class="top">
+  <div class="brand"><span class="mark"></span><span class="name">LightKeepers</span><span class="org">COMMAND</span></div>
+  <div class="mission"><span class="live"></span><span>任務 <b>BRAVO-172</b> · 進行中 <span class="mo timer">04:22:18</span></span></div>
+  <button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+  <article class="card">
+    <div class="k">通報總數<i class="mo">01</i></div>
+    <div class="v mo">24</div>
+    <div class="gauge"><i style="width:25%"></i></div>
+    <div class="s">近 1 小時 <span class="mo">+6</span></div>
+  </article>
+  <article class="card hot">
+    <div class="k">待處理<i class="mo">02</i></div>
+    <div class="v mo">7</div>
+    <div class="gauge"><i style="width:29%"></i></div>
+    <div class="s">最舊 <span class="mo">12</span> 分鐘</div>
+  </article>
+  <article class="card">
+    <div class="k">派遣隊伍<i class="mo">03</i></div>
+    <div class="v mo">12<small>/15</small></div>
+    <div class="gauge"><i style="width:80%"></i></div>
+    <div class="s"><span class="mo">3</span> 隊待命</div>
+  </article>
+  <article class="card mute">
+    <div class="k">傷患追蹤<i class="mo">04</i></div>
+    <div class="v mo">0</div>
+    <div class="gauge"><i style="width:0"></i></div>
+    <div class="s">無 MCI 事件</div>
+  </article>
+</div>
+<div class="queues">
+  <section class="panel">
+    <div class="ph"><h3>回報佇列</h3><span class="cnt mo">(7)</span><span class="en">TRIAGE FEED</span></div>
+    <ul>
+      <li><span class="lv hi">HIGH</span><span class="t">建物倒塌<em>·</em>林森北路85巷</span><span class="ts mo">T-23:39</span></li>
+      <li><span class="lv md">MED</span><span class="t">道路淹水<em>·</em>承德路四段</span><span class="ts mo">T-23:35</span></li>
+      <li><span class="lv lo">LOW</span><span class="t">路樹倒伏<em>·</em>民族東路</span><span class="ts mo">T-23:28</span></li>
+    </ul>
+  </section>
+  <section class="panel">
+    <div class="ph"><h3>任務佇列</h3><span class="cnt mo">(12)</span><span class="en">TASK FEED</span></div>
+    <ul>
+      <li><span class="lv st-go">派遣</span><span class="t"><span class="mo">TEAM-04</span><em>→</em>建物倒塌現場</span><span class="ts mo">4分前</span></li>
+      <li><span class="lv st-run">執行</span><span class="t"><span class="mo">TEAM-07</span> 抽水作業</span><span class="ts mo">18分前</span></li>
+      <li><span class="lv st-ok">完成</span><span class="t"><span class="mo">TEAM-02</span> 物資配送</span><span class="ts mo">32分前</span></li>
+    </ul>
+  </section>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B3 · 橄欖野戰</b><span>軍規野戰系統——粗獷、stencil、直角</span></div>
+<section class="bv3">
+<style>
+.bv3{--bg:#16170F;--pn:#1C1E14;--ln:#2E3122;--ol:#9BA85C;--kh:#C4B582;--ink:#E6E5D8;--dim:#9A9C85;--mut:#67694F;
+position:relative;max-width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);
+font:14px/1.6 "Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;padding:26px 26px 30px;}
+.bv3 *,.bv3 *::before,.bv3 *::after{box-sizing:border-box;margin:0;padding:0;}
+.bv3::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;opacity:.5;
+background:repeating-linear-gradient(135deg,var(--ol) 0 12px,transparent 12px 24px);}
+.bv3 .mono{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;}
+.bv3 .top{display:flex;align-items:center;flex-wrap:wrap;gap:14px 18px;padding-bottom:16px;border-bottom:1px solid var(--ln);}
+.bv3 .brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.bv3 .logo{width:12px;height:12px;background:var(--ol);border-radius:2px;box-shadow:0 0 0 3px rgba(155,168,92,.16);}
+.bv3 .mission{display:flex;align-items:center;gap:9px;margin-right:auto;padding-left:16px;border-left:1px solid var(--ln);
+font-size:12px;color:var(--dim);letter-spacing:.06em;}
+.bv3 .mission .mono{color:var(--kh);}
+.bv3 .live{width:7px;height:7px;background:var(--ol);border-radius:1px;flex:none;}
+.bv3 .cta{cursor:pointer;border:1px solid var(--ol);background:var(--ol);color:#111207;border-radius:2px;
+font:700 12.5px/1 "Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.22em;padding:11px 15px 11px 20px;
+clip-path:polygon(9px 0,100% 0,100% 100%,0 100%,0 9px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.28);}
+.bv3 .cta:hover{background:var(--kh);border-color:var(--kh);}
+.bv3 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0 14px;}
+.bv3 .card{background:var(--pn);border:1px solid var(--ln);border-radius:2px;padding:14px 16px 13px;}
+.bv3 .lab{display:flex;align-items:baseline;gap:8px;font-size:10.5px;font-weight:600;letter-spacing:.12em;
+text-transform:uppercase;color:var(--dim);}
+.bv3 .idx{color:var(--ol);font-size:10px;}
+.bv3 .val{font-size:30px;font-weight:600;line-height:1.2;margin:7px 0 3px;letter-spacing:.01em;}
+.bv3 .val small{font-size:15px;font-weight:500;color:var(--mut);letter-spacing:.05em;}
+.bv3 .sub{font-size:11.5px;color:var(--mut);letter-spacing:.04em;}
+.bv3 .sub .mono{color:var(--dim);}
+.bv3 .sub .up{color:var(--ol);font-weight:700;}
+.bv3 .hot{border-color:#565A3B;box-shadow:inset 3px 0 0 var(--ol);
+background-image:repeating-linear-gradient(-45deg,rgba(155,168,92,.055) 0 8px,transparent 8px 16px);}
+.bv3 .hot .lab{color:var(--kh);}
+.bv3 .hot .val{color:var(--kh);}
+.bv3 .queues{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;}
+.bv3 .panel{background:var(--pn);border:1px solid var(--ln);border-radius:2px;overflow:hidden;}
+.bv3 .ph{display:flex;align-items:center;gap:9px;padding:11px 16px 10px;border-bottom:1px solid var(--ln);
+background:linear-gradient(rgba(155,168,92,.05),rgba(155,168,92,0));}
+.bv3 .ph h3{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.bv3 .sq{width:8px;height:8px;border-radius:1px;flex:none;}
+.bv3 .sqa{background:var(--ol);}
+.bv3 .sqb{background:var(--kh);}
+.bv3 .count{margin-left:auto;font-size:11px;color:var(--dim);background:var(--bg);border:1px solid var(--ln);border-radius:2px;padding:2px 8px;}
+.bv3 .panel ul{list-style:none;}
+.bv3 .panel li{display:flex;align-items:center;gap:10px;padding:11px 16px;}
+.bv3 .panel li+li{border-top:1px dashed var(--ln);}
+.bv3 .txt{flex:1;min-width:0;font-size:13px;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bv3 .txt .mono{color:var(--kh);font-size:12.5px;}
+.bv3 .ts{flex:none;font-size:11.5px;color:var(--mut);letter-spacing:.03em;}
+.bv3 .chip{flex:none;min-width:46px;text-align:center;font-size:10px;font-weight:700;line-height:1;
+letter-spacing:.1em;text-transform:uppercase;border:1px solid;border-radius:2px;padding:4px 7px;}
+.bv3 .c-high{background:var(--ol);border-color:var(--ol);color:#12130B;}
+.bv3 .c-med{border-color:var(--kh);color:var(--kh);}
+.bv3 .c-low{border-color:#4A4D36;color:var(--dim);}
+.bv3 .c-go{background:var(--kh);border-color:var(--kh);color:#12130B;}
+.bv3 .c-run{border-color:var(--ol);color:var(--ol);}
+.bv3 .c-done{border-color:#3B3E2C;color:var(--mut);}
+.bv3 .done .txt,.bv3 .done .txt .mono,.bv3 .done .ts{color:var(--mut);}
+</style>
+<header class="top">
+<div class="brand"><span class="logo"></span>LightKeepers</div>
+<div class="mission"><span class="live"></span><span>任務 <span class="mono">BRAVO-172</span> · 進行中 <span class="mono">04:22:18</span></span></div>
+<button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+<article class="card">
+<div class="lab"><span class="idx mono">01</span>通報總數</div>
+<div class="val mono">24</div>
+<div class="sub">近 <span class="mono">1</span> 小時 <span class="mono up">+6</span></div>
+</article>
+<article class="card hot">
+<div class="lab"><span class="idx mono">02</span>待處理</div>
+<div class="val mono">7</div>
+<div class="sub">最舊 <span class="mono">12</span> 分鐘</div>
+</article>
+<article class="card">
+<div class="lab"><span class="idx mono">03</span>派遣隊伍</div>
+<div class="val mono">12<small>/15</small></div>
+<div class="sub"><span class="mono">3</span> 隊待命</div>
+</article>
+<article class="card">
+<div class="lab"><span class="idx mono">04</span>傷患追蹤</div>
+<div class="val mono">0</div>
+<div class="sub">無 MCI 事件</div>
+</article>
+</div>
+<div class="queues">
+<article class="panel">
+<header class="ph"><span class="sq sqa"></span><h3>回報佇列</h3><span class="count mono">7</span></header>
+<ul>
+<li><span class="chip c-high mono">HIGH</span><span class="txt">建物倒塌 · 林森北路<span class="mono">85</span>巷</span><span class="ts mono">23:39</span></li>
+<li><span class="chip c-med mono">MED</span><span class="txt">道路淹水 · 承德路四段</span><span class="ts mono">23:35</span></li>
+<li><span class="chip c-low mono">LOW</span><span class="txt">路樹倒伏 · 民族東路</span><span class="ts mono">23:28</span></li>
+</ul>
+</article>
+<article class="panel">
+<header class="ph"><span class="sq sqb"></span><h3>任務佇列</h3><span class="count mono">12</span></header>
+<ul>
+<li><span class="chip c-go">派遣</span><span class="txt"><span class="mono">TEAM-04</span> → 建物倒塌現場</span><span class="ts"><span class="mono">4</span> 分前</span></li>
+<li><span class="chip c-run">執行</span><span class="txt"><span class="mono">TEAM-07</span> 抽水作業</span><span class="ts"><span class="mono">18</span> 分前</span></li>
+<li class="done"><span class="chip c-done">完成</span><span class="txt"><span class="mono">TEAM-02</span> 物資配送</span><span class="ts"><span class="mono">32</span> 分前</span></li>
+</ul>
+</article>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B4 · 琥珀航電</b><span>航空 EFIS 夜間儀表——單色琥珀、形狀編碼</span></div>
+<section class="bv4">
+<style>
+.bv4{--bg:#0C0E10;--pn:#111417;--ln:#1F2429;--amb:#E8A33D;--ambB:#F3C275;--ambD:rgba(232,163,61,.55);--ambF:rgba(232,163,61,.30);--red:#FF5C49;--mono:'JetBrains Mono',Consolas,monospace;background:var(--bg);color:var(--ambD);font-family:var(--mono);font-size:13px;line-height:1.5;max-width:100%;padding:22px;box-sizing:border-box}
+.bv4 *{box-sizing:border-box;margin:0;padding:0;border-radius:0}
+.bv4 .num{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums}
+.bv4 .bv4-top{display:flex;align-items:center;gap:22px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid var(--ln);box-shadow:0 4px 0 -3px var(--ln)}
+.bv4 .bv4-sq{width:9px;height:9px;background:var(--amb);display:inline-block;margin-right:10px;vertical-align:1px}
+.bv4 .bv4-brand{color:var(--ambB);font-size:14px;letter-spacing:.28em;font-weight:600}
+.bv4 .bv4-mi{font-size:12px;letter-spacing:.08em;color:var(--ambD)}
+.bv4 .bv4-mi .num{color:var(--amb)}
+.bv4 .bv4-dot{color:var(--amb);animation:bv4-pulse 2.4s ease-in-out infinite}
+@keyframes bv4-pulse{0%,100%{opacity:1}50%{opacity:.25}}
+.bv4 .bv4-spc{flex:1}
+.bv4 .bv4-utc{font-size:11px;letter-spacing:.18em;color:var(--ambF)}
+.bv4 .bv4-utc .num{color:var(--amb);font-size:13px;letter-spacing:.1em}
+.bv4 .bv4-cta{font-family:var(--mono);font-size:12px;letter-spacing:.3em;text-indent:.3em;color:var(--amb);background:transparent;border:1px solid var(--amb);padding:9px 18px;cursor:pointer;transition:background .15s,color .15s}
+.bv4 .bv4-cta:hover{background:var(--amb);color:var(--bg)}
+.bv4 .bv4-stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0}
+.bv4 .bv4-card{background:var(--pn);border:1px solid var(--ln);padding:16px 18px 14px;position:relative}
+.bv4 .bv4-cl{font-size:10px;letter-spacing:.32em;color:var(--ambF);margin-bottom:10px}
+.bv4 .bv4-cn{font-size:34px;font-weight:200;line-height:1;color:var(--amb);letter-spacing:.02em}
+.bv4 .bv4-cn small{font-size:18px;font-weight:200;color:var(--ambF)}
+.bv4 .bv4-cs{font-size:11px;letter-spacing:.06em;color:var(--ambF);margin-top:10px}
+.bv4 .bv4-cs .num{color:var(--ambD)}
+.bv4 .bv4-warn{border-color:var(--amb);background:rgba(232,163,61,.05)}
+.bv4 .bv4-warn .bv4-cl{color:var(--amb)}
+.bv4 .bv4-warn .bv4-cn{color:var(--ambB)}
+.bv4 .bv4-warn::after{content:"CAUTION";position:absolute;top:14px;right:14px;font-size:9px;letter-spacing:.26em;color:var(--amb);border:1px solid var(--amb);padding:2px 5px 2px 7px}
+.bv4 .bv4-qs{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+.bv4 .bv4-q{background:var(--pn);border:1px solid var(--ln)}
+.bv4 .bv4-ph{display:flex;align-items:baseline;gap:12px;padding:13px 18px;border-bottom:1px solid var(--ln)}
+.bv4 .bv4-pt{color:var(--ambB);font-size:12px;letter-spacing:.24em}
+.bv4 .bv4-pe{font-size:9px;letter-spacing:.22em;color:var(--ambF)}
+.bv4 .bv4-ct{margin-left:auto;color:var(--amb);font-size:12px;border:1px solid var(--ln);padding:1px 8px}
+.bv4 .bv4-q ul{list-style:none}
+.bv4 .bv4-row{display:flex;align-items:baseline;gap:12px;padding:12px 18px;border-top:1px solid var(--ln);font-size:12.5px}
+.bv4 .bv4-row:first-child{border-top:0}
+.bv4 .bv4-sym{width:14px;text-align:center;font-size:11px}
+.bv4 .bv4-sev{font-size:10px;letter-spacing:.2em;width:44px}
+.bv4 .bv4-hi{color:var(--red)}
+.bv4 .bv4-md{color:var(--amb)}
+.bv4 .bv4-lo{color:var(--ambF)}
+.bv4 .bv4-txt{color:var(--ambD);letter-spacing:.04em;flex:1;min-width:0}
+.bv4 .bv4-row .bv4-t{margin-left:auto;color:var(--amb);font-size:12px;letter-spacing:.08em;white-space:nowrap}
+.bv4 .bv4-st{font-size:10px;letter-spacing:.2em;text-indent:.2em;border:1px solid currentColor;padding:2px 6px;white-space:nowrap}
+.bv4 .bv4-s1{color:var(--ambB)}
+.bv4 .bv4-s2{color:var(--amb)}
+.bv4 .bv4-s3{color:var(--ambF)}
+.bv4 .bv4-ft{margin-top:16px;padding-top:12px;border-top:1px solid var(--ln);font-size:9px;letter-spacing:.3em;color:var(--ambF);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+</style>
+<header class="bv4-top">
+  <div class="bv4-brand"><span class="bv4-sq"></span>LightKeepers</div>
+  <div class="bv4-mi">任務 <span class="num">BRAVO-172</span> · <span class="bv4-dot">●</span> 進行中 <span class="num">04:22:18</span></div>
+  <div class="bv4-spc"></div>
+  <div class="bv4-utc">UTC <span class="num">15:39:07</span> Z</div>
+  <button class="bv4-cta" type="button">快速通報</button>
+</header>
+<div class="bv4-stats">
+  <div class="bv4-card">
+    <div class="bv4-cl">通報總數</div>
+    <div class="bv4-cn num">24</div>
+    <div class="bv4-cs">近 1 小時 <span class="num">+6</span></div>
+  </div>
+  <div class="bv4-card bv4-warn">
+    <div class="bv4-cl">待處理</div>
+    <div class="bv4-cn num">7</div>
+    <div class="bv4-cs">最舊 <span class="num">12</span> 分鐘</div>
+  </div>
+  <div class="bv4-card">
+    <div class="bv4-cl">派遣隊伍</div>
+    <div class="bv4-cn num">12<small>/15</small></div>
+    <div class="bv4-cs"><span class="num">3</span> 隊待命</div>
+  </div>
+  <div class="bv4-card">
+    <div class="bv4-cl">傷患追蹤</div>
+    <div class="bv4-cn num">0</div>
+    <div class="bv4-cs">無 MCI 事件</div>
+  </div>
+</div>
+<div class="bv4-qs">
+  <div class="bv4-q">
+    <header class="bv4-ph"><span class="bv4-pt">回報佇列</span><span class="bv4-pe">RPT·IN</span><span class="bv4-ct num">7</span></header>
+    <ul>
+      <li class="bv4-row"><span class="bv4-sym bv4-hi">▲</span><span class="bv4-sev bv4-hi">HIGH</span><span class="bv4-txt">建物倒塌 · 林森北路85巷</span><span class="bv4-t num">23:39</span></li>
+      <li class="bv4-row"><span class="bv4-sym bv4-md">▶</span><span class="bv4-sev bv4-md">MED</span><span class="bv4-txt">道路淹水 · 承德路四段</span><span class="bv4-t num">23:35</span></li>
+      <li class="bv4-row"><span class="bv4-sym bv4-lo">●</span><span class="bv4-sev bv4-lo">LOW</span><span class="bv4-txt">路樹倒伏 · 民族東路</span><span class="bv4-t num">23:28</span></li>
+    </ul>
+  </div>
+  <div class="bv4-q">
+    <header class="bv4-ph"><span class="bv4-pt">任務佇列</span><span class="bv4-pe">TSK·OPS</span><span class="bv4-ct num">12</span></header>
+    <ul>
+      <li class="bv4-row"><span class="bv4-st bv4-s1">派遣</span><span class="bv4-txt num">TEAM-04 → 建物倒塌現場</span><span class="bv4-t num">4分前</span></li>
+      <li class="bv4-row"><span class="bv4-st bv4-s2">執行</span><span class="bv4-txt num">TEAM-07 抽水作業</span><span class="bv4-t num">18分前</span></li>
+      <li class="bv4-row"><span class="bv4-st bv4-s3">完成</span><span class="bv4-txt num">TEAM-02 物資配送</span><span class="bv4-t num">32分前</span></li>
+    </ul>
+  </div>
+</div>
+<footer class="bv4-ft"><span>NVG·COMPAT</span><span>EFIS NIGHT MODE · MONO-AMBER</span></footer>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B5 · 指揮密集</b><span>同 B1 色盤 × Bloomberg 終端機密度——作戰室大屏</span></div>
+<section class="bv5">
+<style>
+.bv5{--bg:#101216;--pn:#16181d;--ln:#262b32;--ln2:#1e2127;--tx:#c7ccd4;--dm:#7d8591;--ft:#59606b;--og:#ff7a1c;--og2:#e0904e;max-width:100%;box-sizing:border-box;background:var(--bg);color:var(--tx);border:1px solid var(--ln);padding:12px 14px 10px;font:11px/1.35 "Segoe UI","Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.bv5 *{box-sizing:border-box;margin:0;padding:0}
+.bv5 .num{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums}
+.bv5-top{display:flex;flex-wrap:wrap;align-items:center;gap:10px 14px;padding-bottom:10px;border-bottom:1px solid var(--ln)}
+.bv5-brand{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:#eef1f5}
+.bv5-brand::before{content:"";width:9px;height:9px;background:var(--og);clip-path:polygon(0 0,100% 0,100% 62%,62% 100%,0 100%)}
+.bv5-brand small{font-size:9px;font-weight:600;letter-spacing:.3em;color:var(--ft);margin-top:2px}
+.bv5-mission{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--dm)}
+.bv5-mission b{color:#eef1f5;font-weight:600;letter-spacing:.06em}
+.bv5-dot{width:6px;height:6px;background:var(--og);border-radius:50%;animation:bv5-blink 1.6s steps(2) infinite}
+@keyframes bv5-blink{50%{opacity:.25}}
+.bv5-cta{flex:none;border:0;cursor:pointer;background:var(--og);color:#15100a;font:700 11px/1 "Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.28em;padding:8px 14px 8px 17px;clip-path:polygon(0 0,100% 0,100% calc(100% - 7px),calc(100% - 7px) 100%,0 100%)}
+.bv5-cta:hover{background:#ff8d3d}
+.bv5-band{display:flex;flex-wrap:wrap;background:var(--pn);border:1px solid var(--ln);margin:10px 0}
+.bv5-rd{flex:1 1 0;min-width:92px;padding:6px 12px 7px;border-left:1px solid var(--ln2)}
+.bv5-rd:first-child{border-left:0}
+.bv5-rd b{display:block;font-size:9px;font-weight:600;letter-spacing:.18em;color:var(--dm)}
+.bv5-rd em{display:block;font:600 16px/1.2 'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;font-style:normal;color:#eef1f5;margin-top:1px}
+.bv5-rd i{display:block;font:9px/1.3 'JetBrains Mono',Consolas,monospace;font-style:normal;color:var(--ft);margin-top:1px}
+.bv5 .hot{background:#1d1610;box-shadow:inset 0 2px 0 var(--og)}
+.bv5 .hot b{color:var(--og2)}
+.bv5 .hot em{color:var(--og)}
+.bv5 .hot i{color:var(--og2)}
+.bv5-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(248px,1fr));gap:8px}
+.bv5-col{background:var(--pn);border:1px solid var(--ln);display:flex;flex-direction:column}
+.bv5-h{display:flex;align-items:center;gap:6px;padding:6px 10px;border-bottom:1px solid var(--ln);font-size:10px;font-weight:700;letter-spacing:.2em;color:#e8ebf0}
+.bv5-h .num{color:var(--og);font-size:10px;font-weight:600;letter-spacing:0}
+.bv5-h i{margin-left:auto;font:600 9px/1 'JetBrains Mono',Consolas,monospace;font-style:normal;letter-spacing:.1em;color:var(--ft)}
+.bv5-row{display:flex;align-items:center;gap:8px;padding:4px 10px;border-bottom:1px solid var(--ln2)}
+.bv5-list .bv5-row:nth-child(even){background:#14161a}
+.bv5-row p{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:11px}
+.bv5-row time{flex:none;font:10px/1 'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--ft)}
+.bv5-tag{flex:none;min-width:34px;text-align:center;font:600 9px/1 'JetBrains Mono',Consolas,monospace;letter-spacing:.08em;padding:2px 4px;border:1px solid transparent}
+.bv5 .t-hi{background:var(--og);border-color:var(--og);color:#15100a}
+.bv5 .t-md{border-color:#7d4517;color:var(--og2)}
+.bv5 .t-lo{border-color:#373d45;color:var(--dm)}
+.bv5 .t-go{background:var(--og);border-color:var(--og);color:#15100a}
+.bv5 .t-run{border-color:#7d4517;color:var(--og2)}
+.bv5 .t-ok{border-color:#2c3138;color:var(--ft)}
+.bv5-more{padding:4px 10px;font:9px/1.3 'JetBrains Mono',Consolas,monospace;letter-spacing:.1em;color:var(--ft);cursor:default}
+.bv5-more:hover{color:var(--og2)}
+.bv5-evs{padding:2px 0}
+.bv5-ev{position:relative;display:flex;gap:8px;padding:5px 10px 5px 24px}
+.bv5-ev::before{content:"";position:absolute;left:10px;top:10px;width:5px;height:5px;background:#3a4048}
+.bv5-ev::after{content:"";position:absolute;left:12px;top:17px;bottom:-7px;width:1px;background:var(--ln2)}
+.bv5-ev:last-child::after{display:none}
+.bv5-ev time{flex:none;width:36px;font:10px/1.5 'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;color:var(--ft)}
+.bv5-ev p{font-size:11px;color:var(--tx)}
+.bv5-ev p b{color:var(--og);font-weight:600}
+.bv5 .now::before{background:var(--og)}
+.bv5 .now time{color:var(--og)}
+.bv5-ft{display:flex;flex-wrap:wrap;gap:4px 14px;justify-content:space-between;margin-top:10px;padding-top:7px;border-top:1px solid var(--ln);font:9px/1.4 'JetBrains Mono',Consolas,monospace;letter-spacing:.12em;color:var(--ft)}
+</style>
+<header class="bv5-top">
+  <div class="bv5-brand">LightKeepers<small>OPS·指揮中心</small></div>
+  <div class="bv5-mission"><span class="bv5-dot"></span>任務 <b class="num">BRAVO-172</b> · 進行中 <b class="num">04:22:18</b></div>
+  <button class="bv5-cta" type="button">快速通報</button>
+</header>
+<div class="bv5-band">
+  <div class="bv5-rd"><b>通報總數</b><em>24</em><i>近1時 +6</i></div>
+  <div class="bv5-rd hot"><b>待處理</b><em>7</em><i>最舊 12分</i></div>
+  <div class="bv5-rd"><b>派遣隊伍</b><em>12/15</em><i>待命 3</i></div>
+  <div class="bv5-rd"><b>傷患追蹤</b><em>0</em><i>無 MCI 事件</i></div>
+  <div class="bv5-rd"><b>避難所</b><em>62%</em><i>容量水位</i></div>
+  <div class="bv5-rd"><b>物資</b><em>3</em><i>低量品項</i></div>
+  <div class="bv5-rd"><b>SOS</b><em>1</em><i>未回應</i></div>
+  <div class="bv5-rd"><b>OUTBOX</b><em>0</em><i>待送訊息</i></div>
+</div>
+<div class="bv5-grid">
+  <div class="bv5-col">
+    <div class="bv5-h">回報佇列<span class="num">(7)</span><i>依優先序</i></div>
+    <div class="bv5-list">
+      <div class="bv5-row"><span class="bv5-tag t-hi">HIGH</span><p>建物倒塌·林森北路85巷</p><time class="num">23:39</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-md">MED</span><p>道路淹水·承德路四段</p><time class="num">23:35</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-lo">LOW</span><p>路樹倒伏·民族東路</p><time class="num">23:28</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-hi">HIGH</span><p>瓦斯洩漏·南京東路二段</p><time class="num">23:22</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-md">MED</span><p>電線垂落·龍江路口</p><time class="num">23:17</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-lo">LOW</span><p>招牌鬆脫·錦州街</p><time class="num">23:11</time></div>
+    </div>
+    <div class="bv5-more">▸ 其餘 1 筆</div>
+  </div>
+  <div class="bv5-col">
+    <div class="bv5-h">任務佇列<span class="num">(12)</span><i>依時間</i></div>
+    <div class="bv5-list">
+      <div class="bv5-row"><span class="bv5-tag t-go">派遣</span><p><span class="num">TEAM-04</span>→建物倒塌現場</p><time class="num">4分前</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-go">派遣</span><p><span class="num">TEAM-11</span>→道路淹水點</p><time class="num">9分前</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-run">執行</span><p><span class="num">TEAM-07</span> 抽水作業</p><time class="num">18分前</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-run">執行</span><p><span class="num">TEAM-05</span> 交通管制</p><time class="num">26分前</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-ok">完成</span><p><span class="num">TEAM-02</span> 物資配送</p><time class="num">32分前</time></div>
+      <div class="bv5-row"><span class="bv5-tag t-ok">完成</span><p><span class="num">TEAM-09</span> 傷患後送</p><time class="num">47分前</time></div>
+    </div>
+    <div class="bv5-more">▸ 其餘 6 筆</div>
+  </div>
+  <div class="bv5-col">
+    <div class="bv5-h">事件流<span class="num">(5)</span><i>LIVE</i></div>
+    <div class="bv5-evs">
+      <div class="bv5-ev now"><time class="num">23:39</time><p>新通報 <span class="num">#0524</span> 建物倒塌 · 判定 <b>HIGH</b></p></div>
+      <div class="bv5-ev"><time class="num">23:35</time><p><span class="num">TEAM-04</span> 抵達林森北路<span class="num">85</span>巷現場</p></div>
+      <div class="bv5-ev"><time class="num">23:31</time><p>指揮官核定加派 <span class="num">2</span> 隊支援</p></div>
+      <div class="bv5-ev"><time class="num">23:28</time><p>避難所「中山國小」收容 <span class="num">+14</span></p></div>
+      <div class="bv5-ev"><time class="num">23:24</time><p><span class="num">TEAM-07</span> 回報抽水進度 <span class="num">60%</span></p></div>
+    </div>
+  </div>
+</div>
+<footer class="bv5-ft"><span>LIGHTKEEPERS OPS v2.4 · 板橋前進指揮所</span><span class="num">FEED LIVE · 更新 23:41:07 · 延遲 0.8s</span></footer>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B6 · 簡報高階</b><span>同 B1 色盤 × 留白從容——理事會/捐款人視角</span></div>
+<section class="bv6">
+<style>
+  .bv6{--bg:#14171C;--pn:#181C21;--ln:#242A31;--ink:#E9EDF2;--mut:#8B95A3;--dim:#5C6672;
+    --org:#FFA24C;--red:#FF7468;--amb:#EFC25E;--cyn:#6FB9E6;--grn:#7CC9A0;
+    --mono:'JetBrains Mono',Consolas,monospace;
+    display:block;max-width:100%;background:var(--bg);color:var(--ink);
+    padding:clamp(36px,5vw,64px) clamp(22px,4.5vw,56px);
+    font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",system-ui,sans-serif;
+    font-size:14px;line-height:1.55;letter-spacing:.01em}
+  .bv6 *{box-sizing:border-box;margin:0;padding:0}
+  .bv6 .num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+  .bv6-top{display:flex;align-items:center;justify-content:space-between;gap:18px 28px;flex-wrap:wrap;margin-bottom:48px}
+  .bv6-brandwrap{display:flex;align-items:baseline;min-width:0}
+  .bv6-brand{font-size:17px;font-weight:600;letter-spacing:.06em;white-space:nowrap}
+  .bv6-brand::before{content:"";display:inline-block;width:8px;height:8px;border-radius:2px;
+    background:var(--org);margin-right:12px;transform:translateY(-1px);box-shadow:0 0 12px rgba(255,162,76,.55)}
+  .bv6-mission{font-size:12px;color:var(--dim);letter-spacing:.08em;white-space:nowrap;
+    margin-left:18px;padding-left:18px;border-left:1px solid var(--ln)}
+  .bv6-mission .num{color:var(--mut)}
+  .bv6-cta{font:inherit;font-size:13px;font-weight:600;letter-spacing:.22em;text-indent:.22em;cursor:pointer;
+    color:#14171C;background:linear-gradient(180deg,#FFB168,#F5913C);border:0;border-radius:8px;
+    padding:12px 28px;box-shadow:0 8px 24px rgba(0,0,0,.35),0 4px 14px rgba(245,145,60,.28)}
+  .bv6-stats{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;margin-bottom:26px}
+  .bv6-stat{background:var(--pn);border:1px solid var(--ln);border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);padding:30px 30px 26px;display:flex;flex-direction:column;gap:18px}
+  .bv6-lab{font-size:11px;letter-spacing:.26em;color:var(--mut)}
+  .bv6-valrow{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+  .bv6-val{font-size:44px;font-weight:200;line-height:1;letter-spacing:-.01em}
+  .bv6-den{font-size:20px;color:var(--dim);font-weight:300;margin-left:2px}
+  .bv6-sub{font-size:12px;color:var(--dim);letter-spacing:.04em}
+  .bv6-sub .num{color:var(--mut)}
+  .bv6-hot{border-color:rgba(255,162,76,.38);
+    background:linear-gradient(180deg,#1C1E22,var(--pn));
+    box-shadow:0 8px 24px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,162,76,.28)}
+  .bv6-hot .bv6-val{color:var(--org)}
+  .bv6-delta{font-size:11px;color:rgba(255,162,76,.85);letter-spacing:.08em}
+  .bv6-queues{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:22px}
+  .bv6-panel{background:var(--pn);border:1px solid var(--ln);border-radius:10px;
+    box-shadow:0 8px 24px rgba(0,0,0,.35);padding:26px 30px 22px}
+  .bv6-phead{display:flex;align-items:center;justify-content:space-between;gap:12px;
+    padding-bottom:18px;border-bottom:1px solid var(--ln)}
+  .bv6-phead h3{font-size:12px;font-weight:600;letter-spacing:.26em;color:var(--mut)}
+  .bv6-count{font-size:12px;color:var(--ink);background:#1F242B;border:1px solid var(--ln);
+    border-radius:6px;padding:2px 10px}
+  .bv6-rows{list-style:none}
+  .bv6-row{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px;padding:20px 0}
+  .bv6-row + .bv6-row{border-top:1px solid var(--ln)}
+  .bv6-what{font-size:14px;letter-spacing:.02em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .bv6-what i{font-style:normal;color:var(--dim);margin:0 6px}
+  .bv6-row time{font-size:13px;color:var(--mut);white-space:nowrap}
+  .bv6-tag{font-family:var(--mono);font-size:10px;letter-spacing:.14em;line-height:1;
+    padding:5px 9px;border-radius:5px;border:1px solid;white-space:nowrap}
+  .bv6-high{color:var(--red);border-color:rgba(255,116,104,.4);background:rgba(255,116,104,.08)}
+  .bv6-med{color:var(--amb);border-color:rgba(239,194,94,.38);background:rgba(239,194,94,.07)}
+  .bv6-low{color:var(--mut);border-color:rgba(139,149,163,.32);background:rgba(139,149,163,.07)}
+  .bv6-go{color:var(--org);border-color:rgba(255,162,76,.4);background:rgba(255,162,76,.08)}
+  .bv6-run{color:var(--cyn);border-color:rgba(111,185,230,.38);background:rgba(111,185,230,.07)}
+  .bv6-done{color:var(--grn);border-color:rgba(124,201,160,.36);background:rgba(124,201,160,.07)}
+  .bv6-more{display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    font-size:12px;color:var(--dim);letter-spacing:.03em;padding-top:16px;border-top:1px solid var(--ln)}
+  .bv6-more .num{color:var(--mut)}
+  .bv6-more .bv6-tag{opacity:.75}
+</style>
+<header class="bv6-top">
+  <div class="bv6-brandwrap">
+    <span class="bv6-brand">LightKeepers</span>
+    <span class="bv6-mission">任務 BRAVO-172 · 進行中 <span class="num">04:22:18</span></span>
+  </div>
+  <button class="bv6-cta" type="button">快速通報</button>
+</header>
+<ul class="bv6-stats">
+  <li class="bv6-stat">
+    <span class="bv6-lab">通報總數</span>
+    <span class="bv6-valrow"><span class="bv6-val num">24</span></span>
+    <span class="bv6-sub">近 1 小時 <span class="num">+6</span></span>
+  </li>
+  <li class="bv6-stat bv6-hot">
+    <span class="bv6-lab">待處理</span>
+    <span class="bv6-valrow"><span class="bv6-val num">7</span><span class="bv6-delta">較上小時 <span class="num">+2</span></span></span>
+    <span class="bv6-sub">最舊 <span class="num">12</span> 分鐘</span>
+  </li>
+  <li class="bv6-stat">
+    <span class="bv6-lab">派遣隊伍</span>
+    <span class="bv6-valrow"><span class="bv6-val num">12<span class="bv6-den">/15</span></span></span>
+    <span class="bv6-sub"><span class="num">3</span> 隊待命</span>
+  </li>
+  <li class="bv6-stat">
+    <span class="bv6-lab">傷患追蹤</span>
+    <span class="bv6-valrow"><span class="bv6-val num">0</span></span>
+    <span class="bv6-sub">無 MCI 事件</span>
+  </li>
+</ul>
+<div class="bv6-queues">
+  <article class="bv6-panel">
+    <header class="bv6-phead"><h3>回報佇列</h3><span class="bv6-count num">7</span></header>
+    <ul class="bv6-rows">
+      <li class="bv6-row">
+        <span class="bv6-tag bv6-high">HIGH</span>
+        <span class="bv6-what">建物倒塌<i>·</i>林森北路85巷</span>
+        <time class="num">23:39</time>
+      </li>
+      <li class="bv6-row">
+        <span class="bv6-tag bv6-med">MED</span>
+        <span class="bv6-what">道路淹水<i>·</i>承德路四段</span>
+        <time class="num">23:35</time>
+      </li>
+    </ul>
+    <footer class="bv6-more">
+      <span class="bv6-tag bv6-low">LOW</span>
+      <span>路樹倒伏·民族東路 <span class="num">23:28</span>，另 <span class="num">4</span> 項低風險通報</span>
+    </footer>
+  </article>
+  <article class="bv6-panel">
+    <header class="bv6-phead"><h3>任務佇列</h3><span class="bv6-count num">12</span></header>
+    <ul class="bv6-rows">
+      <li class="bv6-row">
+        <span class="bv6-tag bv6-go">派遣</span>
+        <span class="bv6-what"><span class="num">TEAM-04</span> → 建物倒塌現場</span>
+        <time class="num">4 分前</time>
+      </li>
+      <li class="bv6-row">
+        <span class="bv6-tag bv6-run">執行</span>
+        <span class="bv6-what"><span class="num">TEAM-07</span> 抽水作業</span>
+        <time class="num">18 分前</time>
+      </li>
+    </ul>
+    <footer class="bv6-more">
+      <span class="bv6-tag bv6-done">完成</span>
+      <span><span class="num">TEAM-02</span> 物資配送 <span class="num">32</span> 分前，另 <span class="num">9</span> 項任務進行中</span>
+    </footer>
+  </article>
+</div>
+</section>
+</div>
+<div class="foot"><b>選定後：</b>我把該語言落成 token＋Shell＋五個旗艦頁（第二次閘門），您點頭才動全站。密度可按裝置分層（外勤手機低密度、指揮桌機中密度、TV 牆高密度），不必二選一。</div>
+</body></html>

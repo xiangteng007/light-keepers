@@ -1,7 +1,9 @@
 /**
- * TasksPage.css — 任務看板（Board archetype，DESIGN_LANGUAGE.md §7.3 canonical 範例）
- * 語義 token only；light/dark/tactical 三態自動生效。
- * 桌機：欄水平排列；行動端：頂部 segmented tabs 切一欄，不做水平多欄捲動。
+ * TasksPage.css — 任務佇列（R5 B3c：c1 佇列語言，Board archetype）
+ * 語義 token only（no-hardcoded-hex）；平時/災時由 tokens.css Layer 8/9 自動切換。
+ * DNA：面板 2px 規線＋radius ≤3px；狀態 chip 形狀雙編碼 □/■/✓；
+ * 時間戳/計數 .u-mono、拉丁小標 .u-stencil；橄欖＝唯一可行動高亮；紅色不出場。
+ * 桌機：三欄水平排列；行動端：頂部 segmented tabs 切一欄，不做水平多欄捲動。
  */
 
 .tasks-page {
@@ -10,37 +12,93 @@
     gap: var(--space-4);
 }
 
-.tasks-page .page-header {
+/* ── 頂列（c1-top：面板化頁頭＋橄欖 CTA）───────────────────── */
+.tasks-page__top {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: var(--space-4);
     flex-wrap: wrap;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-5);
 }
 
-.tasks-page .page-header__left {
+.tasks-page__brand {
     display: flex;
-    align-items: center;
+    align-items: baseline;
     gap: var(--space-3);
+    min-width: 0;
 }
 
-.tasks-page .page-header h1 {
+.tasks-page__brand h1 {
     margin: 0;
-    font-size: var(--font-size-2xl);
+    font-size: var(--font-size-xl);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    color: var(--text-primary);
+}
+
+.tasks-page__kicker {
+    font-size: 10px;
+    color: var(--color-secondary);
+}
+
+.tasks-page__total {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+}
+
+.tasks-page__total b {
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
 }
 
-/* ── 行動端 segmented tabs（欄切換）───────────────────────────── */
+/* 橄欖 CTA（c1-cta：實心、直角、不動效） */
+.tasks-cta {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    padding: 0 var(--space-5);
+    background: var(--accent-gold);
+    color: var(--text-inverse);
+    border: 2px solid var(--accent-gold);
+    border-radius: var(--radius-xs);
+    font-family: inherit;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-zh);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.tasks-cta:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.tasks-cta:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+/* ── 行動端 segmented tabs（欄切換，chip＋形狀雙編碼）───────── */
 .tasks-page__mobile-tabs {
     display: none;
 }
 
 @media (max-width: 767px) {
+    .tasks-page__top {
+        padding: var(--space-3) var(--space-4);
+    }
+
     .tasks-page__mobile-tabs {
         display: flex;
         gap: var(--space-1);
-        background: var(--surface-hover);
+        background: var(--bg-secondary);
+        border: 2px solid var(--border-default);
         border-radius: var(--radius-md);
         padding: var(--space-1);
     }
@@ -52,13 +110,19 @@
         align-items: center;
         justify-content: center;
         gap: var(--space-2);
-        border: none;
+        border: 2px solid transparent;
         background: transparent;
-        border-radius: var(--radius-sm);
+        border-radius: var(--radius-xs);
+        font-family: inherit;
         font-size: var(--font-size-sm);
         font-weight: var(--font-weight-medium);
+        letter-spacing: var(--tracking-zh);
         color: var(--text-secondary);
         cursor: pointer;
+    }
+
+    .tasks-page__mobile-tab-glyph {
+        color: var(--text-tertiary);
     }
 
     .tasks-page__mobile-tab:focus-visible {
@@ -67,18 +131,27 @@
     }
 
     .tasks-page__mobile-tab.is-active {
-        background: var(--surface-default);
+        border-color: var(--accent-gold);
+        background: var(--surface-hover);
         color: var(--text-primary);
-        box-shadow: var(--shadow-sm);
+        font-weight: var(--font-weight-bold);
+    }
+
+    .tasks-page__mobile-tab.is-active .tasks-page__mobile-tab-glyph {
+        color: var(--accent-gold);
     }
 
     .tasks-page__mobile-tab-count {
         font-size: var(--font-size-xs);
         color: var(--text-tertiary);
     }
+
+    .tasks-page__mobile-tab.is-active .tasks-page__mobile-tab-count {
+        color: var(--text-primary);
+    }
 }
 
-/* ── Board：欄水平排列（桌機），行動端只顯示 active 欄 ───────────── */
+/* ── Board：欄水平排列（桌機），行動端只顯示 active 欄 ───────── */
 .task-board {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -100,47 +173,110 @@
     }
 }
 
+/* ── 佇列面板（c1-panel：2px 規線、直角、無浮起陰影）─────────── */
 .task-column {
     display: flex;
     flex-direction: column;
-    gap: var(--space-3);
-    background: var(--surface-hover);
-    border-radius: var(--radius-lg);
-    padding: var(--space-3);
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
     min-height: 120px;
 }
 
+/* 欄頭（c1-ph：下壓 2px 橄欖規線＝重要分隔） */
 .task-column__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: var(--space-2) var(--space-2);
-    font-size: var(--font-size-base);
-    font-weight: var(--font-weight-semibold);
-    color: var(--text-primary);
+    gap: var(--space-2);
+    padding: var(--space-3);
+    border-bottom: 2px solid var(--accent-gold);
 }
 
+.task-column__header h2 {
+    margin: 0;
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-bold);
+    line-height: var(--line-height-tight);
+    letter-spacing: var(--tracking-zh);
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-column__count {
+    margin-left: auto;
+    min-width: 32px;
+    text-align: center;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    padding: 1px 8px;
+}
+
+/* ── 狀態 chip（c1-sev：形狀＋顏色雙編碼，色盲安全）──────────── */
+.status-chip {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    line-height: 1.2;
+    padding: 4px 8px;
+    border: 2px solid;
+    border-radius: var(--radius-xs);
+    white-space: nowrap;
+}
+
+/* 待指派＝描邊卡其 □ */
+.status-chip--pending {
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
+    background: transparent;
+}
+
+/* 進行中＝實心橄欖 ■ */
+.status-chip--active {
+    border-color: var(--accent-gold);
+    background: var(--accent-gold);
+    color: var(--text-inverse);
+}
+
+/* 完成＝描邊灰 ✓ */
+.status-chip--done {
+    border-color: var(--text-tertiary);
+    color: var(--text-tertiary);
+    background: transparent;
+}
+
+/* ── 佇列列表：規線分列，不用卡片陰影 ───────────────────────── */
 .task-column__list {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    padding: var(--space-1) 0 var(--space-2);
 }
 
-/* ── Task Card ──────────────────────────────────────────────── */
+/* ── Task row（c1-row）────────────────────────────────────── */
 .task-card {
-    background: var(--surface-default);
-    transition: box-shadow var(--duration-fast) var(--ease-out);
+    padding: var(--space-1) var(--space-3);
+    border-bottom: 1px solid var(--border-default);
 }
 
-.task-card--completed {
-    opacity: 0.75;
+.task-card:last-child {
+    border-bottom: 0;
+}
+
+.task-card:hover {
+    background: var(--surface-hover);
 }
 
 .task-card__header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: var(--space-2);
+    flex-wrap: wrap;
 }
 
 .task-card__toggle {
@@ -148,7 +284,7 @@
     align-items: center;
     gap: var(--space-2);
     min-height: 44px;
-    flex: 1;
+    flex: 1 1 200px;
     min-width: 0;
     border: none;
     background: transparent;
@@ -160,16 +296,91 @@
 
 .task-card__toggle:focus-visible {
     outline: none;
+    border-radius: var(--radius-xs);
     box-shadow: var(--focus-ring);
 }
 
 .task-card__title {
-    font-size: var(--font-size-sm);
-    font-weight: var(--font-weight-medium);
+    font-size: var(--font-size-base);
+    font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-zh);
     color: var(--text-primary);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+}
+
+/* 完成列：降張力（c1-row.done）——雙編碼靠 ✓ 與字重，不靠透明度 */
+.task-card--completed .task-card__title {
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-normal);
+}
+
+.task-card--completed .task-card__team,
+.task-card--completed .task-card__time {
+    color: var(--text-tertiary);
+}
+
+/* ── 優先度 chip：紅色憲法——高＝橄欖實心，不用紅 ─────────────── */
+.prio-chip {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    font-size: 10px;
+    line-height: 1.2;
+    padding: 3px 6px;
+    border: 2px solid;
+    border-radius: var(--radius-xs);
+    white-space: nowrap;
+}
+
+.prio-chip--high {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: var(--text-inverse);
+}
+
+.prio-chip--mid {
+    background: transparent;
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+}
+
+.prio-chip--low {
+    background: transparent;
+    border-color: var(--text-tertiary);
+    color: var(--text-tertiary);
+}
+
+/* ── 右側 meta：隊伍代號（c1-tm stencil 章）＋時間戳 mono 右對齊 ── */
+.task-card__meta {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-left: auto;
+    flex: none;
+}
+
+.task-card__team {
+    font-size: 10px;
+    color: var(--color-secondary);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    padding: 2px 7px;
+    max-width: 14ch;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.task-card__time {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    text-align: right;
+    min-width: 5ch;
 }
 
 .task-card__actions {
@@ -181,6 +392,7 @@
 
 .task-card__quick-status,
 .task-card__delete {
+    position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -188,20 +400,15 @@
     height: 32px;
     min-width: 32px;
     min-height: 32px;
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-sm);
-    background: var(--surface-default);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    background: transparent;
     color: var(--text-secondary);
     cursor: pointer;
     transition: background var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
 }
 
-/* 觸控熱區補足 44x44（視覺尺寸維持 32px 避免卡片過度膨脹） */
-.task-card__quick-status,
-.task-card__delete {
-    position: relative;
-}
-
+/* 觸控熱區補足 44x44（視覺尺寸維持 32px 避免列高膨脹） */
 .task-card__quick-status::after,
 .task-card__delete::after {
     content: '';
@@ -209,14 +416,16 @@
     inset: -6px;
 }
 
+/* 快速推進＝行動語義→橄欖 */
 .task-card__quick-status:hover {
-    border-color: var(--color-info);
-    color: var(--color-info);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
 }
 
+/* 刪除＝一般破壞性（非生命安全）→琥珀，紅色不出場 */
 .task-card__delete:hover {
-    border-color: var(--color-danger);
-    color: var(--color-danger);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
 }
 
 .task-card__quick-status:focus-visible,
@@ -225,10 +434,11 @@
     box-shadow: var(--focus-ring);
 }
 
+/* ── 展開內容 ──────────────────────────────────────────────── */
 .task-card__content {
-    margin-top: var(--space-2);
-    padding-top: var(--space-2);
-    border-top: 1px solid var(--border-light);
+    margin: 0 0 var(--space-2) var(--space-2);
+    padding: var(--space-2) 0 var(--space-1) var(--space-3);
+    border-left: 2px solid var(--border-default);
     display: flex;
     flex-direction: column;
     gap: var(--space-2);
@@ -249,8 +459,71 @@
     color: var(--text-tertiary);
 }
 
-.tabular-nums {
-    font-variant-numeric: tabular-nums;
+/* 展開內的推進按鈕：橄欖 CTA（小號） */
+.task-card__advance {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 40px;
+    padding: 0 var(--space-4);
+    background: var(--accent-gold);
+    color: var(--text-inverse);
+    border: 2px solid var(--accent-gold);
+    border-radius: var(--radius-xs);
+    font-family: inherit;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    letter-spacing: var(--tracking-zh);
+    line-height: 1;
+    cursor: pointer;
+}
+
+.task-card__advance:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+}
+
+.task-card__advance:focus-visible {
+    outline: 2px solid var(--text-primary);
+    outline-offset: 2px;
+}
+
+@media (max-width: 767px) {
+    .task-card__advance {
+        align-self: stretch;
+        justify-content: center;
+        min-height: 44px;
+    }
+}
+
+/* ── 圖例列（c1-foot）──────────────────────────────────────── */
+.tasks-page__legend {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    background: var(--bg-secondary);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    padding: var(--space-2) var(--space-4);
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+.tasks-page__legend i {
+    font-style: normal;
+    color: var(--color-secondary);
+}
+
+.tasks-page__legend i.is-solid {
+    color: var(--accent-gold);
+}
+
+.tasks-page__legend-code {
+    margin-left: auto;
+    font-size: 10px;
+    color: var(--text-tertiary);
 }
 
 /* ── Modal 表單 ─────────────────────────────────────────────── */
@@ -276,7 +549,7 @@
 .tasks-page__form select {
     padding: var(--space-3) var(--space-4);
     border: 1px solid var(--border-default);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-sm);
     font-size: var(--font-size-base);
     background: var(--surface-default);
     color: var(--text-primary);

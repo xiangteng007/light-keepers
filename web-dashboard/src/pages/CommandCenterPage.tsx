@@ -1,25 +1,23 @@
 /**
- * CommandCenterPage.tsx — 戰情總覽（COP 態勢牆）R2a / FE-7 重設計
+ * CommandCenterPage.tsx — 戰情總覽（COP 態勢牆）R5/T2 B3c 戰術化
  *
- * 資訊架構：指揮官／幹部在災時 10 秒內要依序回答——
- *   1. 現在的災級／警報狀態？   → shell 的 EmergencyStatusBar ＋「活動警報」面板
- *   2. 通報量多少？未處理幾件？ → KPI「通報總數」（帶 7 日趨勢）／「未處理通報」
- *   3. 派遣量能撐得住嗎？       → KPI「派遣中任務」（含逾期）
- *   4. 有無大量傷患（MCI）？    → KPI「大量傷患事件」（含預估傷患數）
- *   5. 最新發生什麼事？         → 「最新通報」時間流
- *   6. 熱點在哪？               → 「災情熱點」縮覽（連往統一地圖）
- *   7. 資源／人力水位？         → 「資源水位」／「人力概況」
+ * 構圖依 owner 核准的 c1 稿（public/design-mockups/r5-b3c-deep.html）：
+ *   ① 頂部任務條：徽記＋LIGHTKEEPERS＋任務代號/狀態＋ELAPSED mono 大時鐘
+ *      ＋橄欖 CTA「快速通報」。任務來源＝EmergencyContext 的進行中事件
+ *      （最高災級者）；無事件時以「今日」值守代替代號、以本次上線持續
+ *      時間當 ELAPSED——全部真實資料，不寫死假任務。
+ *   ② 統計卡加 mono 編號 01–04；「待處理」有件時上緣掛卡其斜紋（hot）。
+ *   ③ 佇列列以 ■/□/✓ 形狀＋chip 雙編碼（MIL-STD-2525 精神：形狀先於顏色，
+ *      色盲安全）；紅色依 v2 §D 憲法不進一般佇列。
+ *   ④ 底部系統狀態列：模式／圖例／同步狀態／OUTBOX／版本／最後同步——
+ *      同步與 outbox 接既有離線層（useSyncStatus），版本取 Vite build MODE。
  *
- * 版面取捨（widget 牆 → 定製版面）：態勢牆的資訊優先序是產品決策，
- * 不應依賴 L5 手動編排 widget；原 PAGE_WIDGET_CONFIGS['command-center']
- * 的 DEFAULT_WIDGETS 牆改為固定 IA 的 12 欄格線版面。widget 系統保留給
- * 其他 dashboard 類頁面（PageWrapper 有 children 時自動走 legacy 模式）。
- *
- * 資料：一律 src/api/services ＋ react-query（30 秒輪詢）；後端缺資料的
- * 區塊以 EmptyState 明示，不擺假資料。三態（light/dark/tactical）由語義
- * token 自動生效；災時模式僅以 CSS 提高密度。
+ * 資料接線與 R2a 相同：一律 src/api/services ＋ react-query（30 秒輪詢）；
+ * 後端缺資料的區塊以 EmptyState 明示，不擺假資料。災時模式
+ * （data-app-mode="emergency"）僅由 CSS 收緊密度（字級 -1、間距 -25%）。
  */
-import { useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { FileText, AlertTriangle, Truck, HeartPulse, MapPin } from 'lucide-react';
@@ -35,24 +33,32 @@ import {
     getReportTrend,
 } from '../api/services';
 import type { NcdrAlert, Report, ReportSeverity, ReportStatus } from '../api/services';
-import { Badge, Button, ProgressBar } from '../design-system';
+import { Button, ProgressBar } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import PageWrapper from '../components/layout/PageWrapper';
+import { useAppMode } from '../components/layout/useAppMode';
+import { useEmergencyContext } from '../context/useEmergencyContext';
+import { useSyncStatus } from '../hooks/useSyncStatus';
 import { getDisasterTypeMeta } from '../constants/disasterTypes';
 import { KpiCard, Panel, SkeletonRows, Sparkline, formatTimeAgo } from './situational/SituationalPrimitives';
 import './CommandCenterPage.css';
 
 const REFRESH_MS = 30_000;
 
-/** 通報嚴重度 → Badge 語意對照（DESIGN_LANGUAGE §3） */
-const SEVERITY_BADGE: Record<
-    ReportSeverity,
-    { label: string; variant: 'default' | 'warning' | 'danger'; dot?: boolean; pulse?: boolean }
-> = {
-    low: { label: '輕微', variant: 'default' },
-    medium: { label: '中等', variant: 'warning' },
-    high: { label: '嚴重', variant: 'danger' },
-    critical: { label: '緊急', variant: 'danger', dot: true, pulse: true },
+type ChipTone = 'hi' | 'md' | 'lo';
+interface ChipSpec {
+    label: string;
+    /** ■＝實心（高張力）、□＝描邊（中低張力）；✓ 另供完成態 */
+    shape: '■' | '□';
+    tone: ChipTone;
+}
+
+/** 通報嚴重度 → ■/□ 形狀＋chip 雙編碼（c1 稿 TRIAGE FEED 樣式） */
+const SEVERITY_CHIP: Record<ReportSeverity, ChipSpec> = {
+    low: { label: '輕微', shape: '□', tone: 'lo' },
+    medium: { label: '中等', shape: '□', tone: 'md' },
+    high: { label: '嚴重', shape: '■', tone: 'hi' },
+    critical: { label: '緊急', shape: '■', tone: 'hi' },
 };
 
 const STATUS_LABEL: Record<ReportStatus, string> = {
@@ -61,16 +67,72 @@ const STATUS_LABEL: Record<ReportStatus, string> = {
     rejected: '已退回',
 };
 
-/** NCDR 警報等級 → Badge 語意對照 */
-const ALERT_BADGE: Record<NcdrAlert['severity'], { label: string; variant: 'danger' | 'warning' | 'info' }> = {
-    critical: { label: '危急', variant: 'danger' },
-    warning: { label: '警戒', variant: 'warning' },
-    info: { label: '資訊', variant: 'info' },
+/** NCDR 警報等級 → ■/□ chip 對照 */
+const ALERT_CHIP: Record<NcdrAlert['severity'], ChipSpec> = {
+    critical: { label: '危急', shape: '■', tone: 'hi' },
+    warning: { label: '警戒', shape: '□', tone: 'md' },
+    info: { label: '資訊', shape: '□', tone: 'lo' },
 };
+
+/** 佇列列狀態 chip：■ 實心／□ 描邊雙編碼（形狀先於顏色） */
+function Chip({ shape, tone, children }: { shape: ChipSpec['shape']; tone: ChipTone; children: ReactNode }) {
+    return (
+        <span className={`cc-chip cc-chip--${tone}`}>
+            <i className="cc-chip__shape" aria-hidden="true">{shape}</i>
+            {children}
+        </span>
+    );
+}
+
+/** 任務條徽記（c1 稿 seal；描邊 currentColor，顏色由 CSS token 決定） */
+function MissionSeal() {
+    return (
+        <span className="cc-mission__seal" aria-hidden="true">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" focusable="false">
+                <path d="M12 2.1 13.7 4.5H10.3Z" fill="currentColor" />
+                <rect x="10.1" y="4.9" width="3.8" height="2.8" fill="currentColor" />
+                <path d="M9.9 8.6h4.2L15.4 20H8.6Z" stroke="currentColor" strokeWidth="1.5" />
+                <path d="M9 12.9h6M8.4 16.4h7.2" stroke="currentColor" strokeWidth="1.2" />
+                <path d="M8.8 6.3 5.1 4.9M15.2 6.3l3.7-1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+                <path d="M6.4 20.9h11.2" stroke="currentColor" strokeWidth="1.8" />
+            </svg>
+        </span>
+    );
+}
+
+/** 毫秒 → HH:MM:SS（超過 24 小時累計進時位；tabular-nums 不跳動） */
+function formatElapsed(ms: number): string {
+    const totalSec = Math.max(0, Math.floor(ms / 1000));
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${pad(Math.floor(totalSec / 3600))}:${pad(Math.floor((totalSec % 3600) / 60))}:${pad(totalSec % 60)}`;
+}
 
 export default function CommandCenterPage() {
     const navigate = useNavigate();
     const queryClient = useQueryClient();
+    const { isEmergencyMode } = useAppMode();
+    const { activeIncidents, currentIncident } = useEmergencyContext();
+    const { isOnline, isSyncing, pendingChanges, lastSyncAt } = useSyncStatus();
+
+    // ── 任務條：EmergencyContext 事件＝任務；無事件＝「今日」值守 ──
+    const mission = useMemo(() => {
+        if (currentIncident) return currentIncident;
+        if (activeIncidents.length === 0) return null;
+        return activeIncidents.reduce((top, i) => (i.level > top.level ? i : top), activeIncidents[0]);
+    }, [currentIncident, activeIncidents]);
+
+    // ELAPSED：有任務＝事件開始至今；平時＝本次上線（本頁掛載）至今
+    const sessionStartRef = useRef(Date.now());
+    const [nowTs, setNowTs] = useState(() => Date.now());
+    useEffect(() => {
+        const timer = window.setInterval(() => setNowTs(Date.now()), 1000);
+        return () => window.clearInterval(timer);
+    }, []);
+    const elapsedFrom = mission ? new Date(mission.startTime).getTime() : sessionStartRef.current;
+    const elapsedLabel = formatElapsed(nowTs - elapsedFrom);
+    const missionCode = mission
+        ? mission.title
+        : new Date(nowTs).toLocaleDateString('zh-TW', { year: 'numeric', month: '2-digit', day: '2-digit' });
 
     // ── 資料（api/services ＋ react-query；COP 牆 30 秒輪詢） ──
     const reportStatsQ = useQuery({
@@ -148,20 +210,29 @@ export default function CommandCenterPage() {
 
     const refreshAll = () => queryClient.invalidateQueries({ queryKey: ['cc'] });
 
+    // ── ④ 系統狀態列讀數（接既有離線層；不造資料） ──
+    const syncText = !isOnline ? '離線模式' : isSyncing ? '同步中' : pendingChanges > 0 ? '待同步' : '系統正常';
+    const syncCode = !isOnline ? 'OFFLINE' : isSyncing ? 'SYNCING' : pendingChanges > 0 ? 'PENDING' : 'SYS NOMINAL';
+    const lastSyncLabel = lastSyncAt
+        ? new Date(lastSyncAt).toLocaleTimeString('zh-TW', { hour12: false })
+        : '從未同步';
+    const buildChannel = String(import.meta.env.MODE ?? 'dev').toUpperCase();
+
     const renderReportRow = (report: Report) => {
         const meta = getDisasterTypeMeta(report.type);
-        const sev = SEVERITY_BADGE[report.severity] ?? SEVERITY_BADGE.low;
+        const sev = SEVERITY_CHIP[report.severity] ?? SEVERITY_CHIP.low;
+        const done = report.status === 'confirmed';
         return (
-            <li key={report.id} className="sit-row">
-                <span className="sit-row__emoji" aria-hidden="true">{meta.emoji}</span>
+            <li key={report.id} className={`sit-row${done ? ' cc-row--done' : ''}`}>
+                <Chip shape={sev.shape} tone={sev.tone}>{sev.label}</Chip>
                 <div className="sit-row__main">
                     <div className="sit-row__title">{report.title}</div>
                     <div className="sit-row__meta">
-                        {meta.label} · {STATUS_LABEL[report.status] ?? report.status}
+                        {meta.label} · {done && <i className="cc-done-mark" aria-hidden="true">✓ </i>}
+                        {STATUS_LABEL[report.status] ?? report.status}
                         {report.isMassCasualty && ' · 大量傷患'}
                     </div>
                 </div>
-                <Badge variant={sev.variant} size="sm" dot={sev.dot} pulse={sev.pulse}>{sev.label}</Badge>
                 <time className="sit-row__time" dateTime={report.createdAt}>{formatTimeAgo(report.createdAt)}</time>
             </li>
         );
@@ -170,23 +241,51 @@ export default function CommandCenterPage() {
     return (
         <PageWrapper pageId="command-center">
             <div className="cc-page">
-                {/* ── 頁首（archetype §7：h1 ＋ 主要動作在右）── */}
-                <header className="cc-header">
-                    <div>
-                        <h1 className="cc-title">戰情總覽</h1>
-                        <p className="cc-subtitle">全域態勢一覽 · 每 30 秒自動更新</p>
+                {/* ── ① 任務條（c1-top：徽記＋番號＋任務＋ELAPSED＋CTA）── */}
+                <header className="cc-mission">
+                    <div className="cc-mission__id">
+                        <MissionSeal />
+                        <div className="cc-mission__brand">
+                            <b className="u-stencil cc-mission__wordmark">LIGHTKEEPERS</b>
+                            <h1 className="cc-title">戰情總覽</h1>
+                        </div>
                     </div>
-                    <div className="cc-header__actions">
+                    <div className="cc-mission__meters">
+                        <div className="cc-mission__op">
+                            <span className="cc-mission__lbl">
+                                {mission ? '任務' : '今日'}
+                                <b className="u-stencil">{mission ? 'MISSION' : 'TODAY'}</b>
+                            </span>
+                            <div className="cc-mission__row">
+                                <b className={`cc-mission__code${mission ? '' : ' u-mono'}`}>{missionCode}</b>
+                                <span className={`cc-mission__state${mission ? ' cc-mission__state--live' : ''}`}>
+                                    <i aria-hidden="true">{mission ? '■' : '□'}</i>
+                                    {mission ? '進行中' : '值守'}
+                                </span>
+                            </div>
+                        </div>
+                        <span className="cc-mission__vr" aria-hidden="true" />
+                        <div className="cc-mission__clock">
+                            <span className="cc-mission__lbl">
+                                {mission ? '已持續' : '上線'}
+                                <b className="u-stencil">ELAPSED</b>
+                            </span>
+                            <strong className="u-mono cc-mission__elapsed">{elapsedLabel}</strong>
+                        </div>
+                    </div>
+                    <div className="cc-mission__actions">
                         {lastUpdated && (
-                            <span className="cc-updated" aria-live="polite">更新於 {lastUpdated}</span>
+                            <span className="cc-updated u-mono" aria-live="polite">更新於 {lastUpdated}</span>
                         )}
                         <Button variant="secondary" size="sm" onClick={refreshAll}>重新整理</Button>
-                        <Button variant="primary" size="sm" onClick={() => navigate('/intake')}>快速通報</Button>
+                        <Button variant="primary" size="sm" className="cc-cta" onClick={() => navigate('/intake')}>
+                            ＋ 快速通報
+                        </Button>
                     </div>
                 </header>
 
                 <div className="cc-grid">
-                    {/* ── KPI 列：通報 / 未處理 / 派遣 / 傷患 ── */}
+                    {/* ── ② KPI 列：mono 編號 01–04；待處理有件時掛 hot 斜紋 ── */}
                     <div className="cc-span-3">
                         <KpiCard
                             label="通報總數"
@@ -197,10 +296,11 @@ export default function CommandCenterPage() {
                             to="/events"
                             loading={reportStatsQ.isLoading}
                         >
+                            <span className="cc-kpi-idx" aria-hidden="true">01</span>
                             {trendPoints.length > 1 && <Sparkline points={trendPoints} />}
                         </KpiCard>
                     </div>
-                    <div className="cc-span-3">
+                    <div className={`cc-span-3${rs && rs.pending > 0 ? ' cc-kpi-hot' : ''}`}>
                         <KpiCard
                             label="未處理通報"
                             value={rs?.pending ?? null}
@@ -209,7 +309,9 @@ export default function CommandCenterPage() {
                             sub={rs ? (rs.pending > 0 ? '待審核佇列累積中' : '審核佇列已清空') : undefined}
                             to="/events"
                             loading={reportStatsQ.isLoading}
-                        />
+                        >
+                            <span className="cc-kpi-idx" aria-hidden="true">02</span>
+                        </KpiCard>
                     </div>
                     <div className="cc-span-3">
                         <KpiCard
@@ -220,7 +322,9 @@ export default function CommandCenterPage() {
                             sub={ts ? `逾期 ${ts.overdue} 件 · 待指派 ${ts.pending} 件` : undefined}
                             to="/tasks"
                             loading={taskStatsQ.isLoading}
-                        />
+                        >
+                            <span className="cc-kpi-idx" aria-hidden="true">03</span>
+                        </KpiCard>
                     </div>
                     <div className="cc-span-3">
                         <KpiCard
@@ -231,7 +335,9 @@ export default function CommandCenterPage() {
                             sub={mciReports.length > 0 ? `預估傷患 ${casualtyTotal} 人` : '目前無 MCI 事件'}
                             to="/rescue/triage"
                             loading={mciQ.isLoading}
-                        />
+                        >
+                            <span className="cc-kpi-idx" aria-hidden="true">04</span>
+                        </KpiCard>
                     </div>
 
                     {/* ── 活動警報（NCDR）── */}
@@ -259,12 +365,10 @@ export default function CommandCenterPage() {
                         ) : (
                             <ul className="sit-list">
                                 {alerts.map(alert => {
-                                    const badge = ALERT_BADGE[alert.severity] ?? ALERT_BADGE.info;
+                                    const chip = ALERT_CHIP[alert.severity] ?? ALERT_CHIP.info;
                                     return (
                                         <li key={alert.id} className="sit-row">
-                                            <Badge variant={badge.variant} size="sm" dot pulse={alert.severity === 'critical'}>
-                                                {badge.label}
-                                            </Badge>
+                                            <Chip shape={chip.shape} tone={chip.tone}>{chip.label}</Chip>
                                             <div className="sit-row__main">
                                                 <div className="sit-row__title">{alert.title}</div>
                                                 <div className="sit-row__meta">
@@ -324,7 +428,7 @@ export default function CommandCenterPage() {
                         ) : (
                             <ul className="sit-list">
                                 {hotspots.map((h, i) => {
-                                    const sev = SEVERITY_BADGE[h.severity] ?? SEVERITY_BADGE.low;
+                                    const sev = SEVERITY_CHIP[h.severity] ?? SEVERITY_CHIP.low;
                                     return (
                                         <li key={h.gridId} className="sit-row">
                                             <span className="sit-row__emoji" aria-hidden="true"><MapPin size={18} /></span>
@@ -334,7 +438,7 @@ export default function CommandCenterPage() {
                                                     <div className="sit-row__meta">{h.recentReports[0].title}</div>
                                                 )}
                                             </div>
-                                            <Badge variant={sev.variant} size="sm">{sev.label}</Badge>
+                                            <Chip shape={sev.shape} tone={sev.tone}>{sev.label}</Chip>
                                         </li>
                                     );
                                 })}
@@ -380,9 +484,12 @@ export default function CommandCenterPage() {
                                                         剩餘 {item.quantity}{item.unit ? ` ${item.unit}` : ''}
                                                     </div>
                                                 </div>
-                                                <Badge variant={item.status === 'depleted' ? 'danger' : 'warning'} size="sm">
+                                                <Chip
+                                                    shape={item.status === 'depleted' ? '■' : '□'}
+                                                    tone={item.status === 'depleted' ? 'hi' : 'md'}
+                                                >
                                                     {item.status === 'depleted' ? '告罄' : '低庫存'}
-                                                </Badge>
+                                                </Chip>
                                             </li>
                                         ))}
                                     </ul>
@@ -432,6 +539,33 @@ export default function CommandCenterPage() {
                         )}
                     </Panel>
                 </div>
+
+                {/* ── ④ 系統狀態列（c1-foot：模式／圖例／同步／OUTBOX／版本）── */}
+                <footer className="cc-sysbar" aria-label="系統狀態">
+                    <span className="cc-sysbar__seg">
+                        <i className="cc-sysbar__glyph" aria-hidden="true">{isEmergencyMode ? '■' : '□'}</i>
+                        {isEmergencyMode ? '災時模式' : '平時模式'}
+                        <b className="u-stencil cc-sysbar__code">{isEmergencyMode ? 'TACTICAL' : 'STANDBY'}</b>
+                    </span>
+                    <span className="cc-sysbar__seg cc-sysbar__legend">
+                        圖例 <i aria-hidden="true">■</i> 高 · <i aria-hidden="true">□</i> 中 · <i aria-hidden="true">✓</i> 完成
+                    </span>
+                    <span className="cc-sysbar__seg">
+                        {syncText}
+                        <b className="u-stencil cc-sysbar__code">{syncCode}</b>
+                    </span>
+                    <span className="cc-sysbar__seg">
+                        <b className="u-stencil cc-sysbar__code">OUTBOX</b>
+                        <b className="u-mono cc-sysbar__num">{pendingChanges}</b>
+                    </span>
+                    <span className="cc-sysbar__seg">
+                        版本
+                        <b className="u-stencil cc-sysbar__code">{buildChannel}</b>
+                    </span>
+                    <span className="cc-sysbar__seg cc-sysbar__seg--end">
+                        最後同步 <time className="u-mono">{lastSyncLabel}</time>
+                    </span>
+                </footer>
             </div>
         </PageWrapper>
     );

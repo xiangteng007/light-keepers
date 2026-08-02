@@ -1,5 +1,5 @@
 /**
- * R2b — MapPage（/geo/map）渲染測試
+ * R2b — MapPage（/geo/map）渲染測試（R5：地圖改掛 MapLibreTacticalMap）
  *
  * 重點驗證：
  * 1. 圖層控制收斂為分組面板（態勢／避難與資源／底圖）＋災時圖層組合。
@@ -12,29 +12,15 @@ import { MemoryRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import MapPage from '../../pages/MapPage';
 
-// ===== Google Maps globals（map-utils 的 icon factory 需要） =====
-(globalThis as Record<string, unknown>).google = {
-    maps: {
-        Point: class { constructor(public x: number, public y: number) { } },
-        Size: class { constructor(public width: number, public height: number) { } },
-        LatLng: class { constructor(public lat: number, public lng: number) { } },
-        SymbolPath: { CIRCLE: 0 },
-    },
-};
-
-// ===== Mock @react-google-maps/api =====
-vi.mock('@react-google-maps/api', () => ({
-    useJsApiLoader: () => ({ isLoaded: true, loadError: undefined }),
-    GoogleMap: ({ children }: { children?: React.ReactNode }) => (
-        <div data-testid="google-map">{children}</div>
+// ===== Mock MapLibre 戰術地圖（jsdom 無 WebGL；驗證薄 adapter 輸出的標記） =====
+vi.mock('../../components/maps/MapLibreTacticalMap', () => ({
+    default: ({ markers = [] }: { markers?: Array<{ id: string; label?: string }> }) => (
+        <div data-testid="maplibre-map">
+            {markers.map((m) => (
+                <span key={m.id} data-testid="map-marker">{m.label}</span>
+            ))}
+        </div>
     ),
-    MarkerF: ({ title }: { title?: string }) => (
-        <span data-testid="map-marker">{title}</span>
-    ),
-    InfoWindowF: ({ children }: { children?: React.ReactNode }) => (
-        <div data-testid="info-window">{children}</div>
-    ),
-    HeatmapLayerF: () => <div data-testid="heatmap" />,
 }));
 
 // ===== Mock API =====

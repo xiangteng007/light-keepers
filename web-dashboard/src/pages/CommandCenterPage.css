@@ -1,53 +1,179 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   CommandCenterPage.css — 戰情總覽（COP 態勢牆）R2a / FE-7
-   - 12 欄格線（DESIGN_LANGUAGE §2.3）；mobile-first（§6）
-   - 顏色一律語義 token；災時模式只提高密度，不另寫顏色（§1.3）
+   CommandCenterPage.css — 戰情總覽 R5/T2 B3c 戰術化（c1 構圖）
+   - 目標構圖：public/design-mockups/r5-b3c-deep.html <section class="c1">
+   - 顏色一律語義 token（no-hardcoded-hex gate）；災時模式僅收緊密度
+     （字級 -1、間距 -25%），顏色由 tokens.css LAYER 8 全域換色
+   - 排印鐵律（tokens LAYER 10）：中文字距 0；拉丁小標走 .u-stencil；
+     數字/時間戳走 .u-mono＋tabular-nums
    ═══════════════════════════════════════════════════════════════════════ */
 
 .cc-page {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-3);
     max-width: 1600px;
     margin: 0 auto;
 }
 
-/* ── 頁首 ── */
-.cc-header {
+/* ── ① 任務條（c1-top：徽記＋番號＋任務代號＋ELAPSED＋橄欖 CTA）── */
+.cc-mission {
     display: flex;
     flex-wrap: wrap;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: var(--space-3);
+    align-items: center;
+    gap: var(--space-3) var(--space-4);
+    padding: var(--space-3) var(--space-4);
+    background: var(--surface-card);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
 }
 
-.cc-title {
-    margin: 0;
-    font-size: var(--font-size-2xl);
-    font-weight: var(--font-weight-bold);
+.cc-mission__id {
+    flex: 1 1 240px;
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    min-width: 0;
+}
+
+.cc-mission__seal {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 46px;
+    height: 46px;
+    border: 2px solid var(--accent-gold);
+    border-radius: var(--radius-sm);
+    background: var(--bg-primary);
+    color: var(--accent-gold);
+}
+
+.cc-mission__brand { min-width: 0; }
+
+.cc-mission__wordmark {
+    display: block;
+    font-size: var(--font-size-base);
     color: var(--text-primary);
     line-height: var(--line-height-tight);
 }
 
-.cc-subtitle {
-    margin: var(--space-1) 0 0;
+/* h1 保留頁面語意，視覺上是任務條的機關銜（c1-brand small） */
+.cc-title {
+    margin: 0;
     font-size: var(--font-size-sm);
-    color: var(--text-secondary);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-muted);
+    line-height: 1.35;
 }
 
-.cc-header__actions {
+.cc-mission__meters {
+    flex: 1 1 280px;
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
+    align-items: stretch;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+.cc-mission__op { min-width: 0; }
+
+.cc-mission__lbl {
+    display: block;
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-secondary);
+    line-height: 1.35;
+}
+
+.cc-mission__lbl .u-stencil {
+    font-size: 10px;
+    margin-left: var(--space-1);
+    color: inherit;
+}
+
+.cc-mission__row {
+    display: flex;
+    align-items: baseline;
     gap: var(--space-2);
+    min-width: 0;
+}
+
+.cc-mission__code {
+    display: inline-block;
+    max-width: 260px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size-md);
+    font-weight: var(--font-weight-bold);
+    color: var(--color-secondary);
+    line-height: var(--line-height-tight);
+}
+
+.cc-mission__state {
+    flex: none;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-bold);
+    color: var(--text-muted);
+}
+
+.cc-mission__state i { font-style: normal; }
+
+.cc-mission__state--live { color: var(--accent-gold); }
+
+.cc-mission__vr {
+    flex: none;
+    width: 2px;
+    align-self: stretch;
+    background: var(--border-default);
+}
+
+.cc-mission__clock { flex: none; }
+
+.cc-mission__elapsed {
+    display: block;
+    font-size: 26px;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.15;
+    color: var(--text-primary);
+}
+
+.cc-mission__actions {
+    flex: 1 1 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+/* 橄欖 CTA：外勤拇指目標 ≥44px */
+.cc-mission__actions .cc-cta {
+    min-height: 44px;
+    font-weight: var(--font-weight-bold);
 }
 
 .cc-updated {
     font-size: var(--font-size-sm);
-    /* R4 a11y：--text-tertiary 在 --bg-primary 底色上只有 4.39:1，剛好卡在 AA
-       4.5:1 門檻下，見 A11Y_AUDIT_R4.md */
+    /* R4 a11y：--text-tertiary 在 --bg-primary 底色上不足 AA 4.5:1，
+       見 A11Y_AUDIT_R4.md */
     color: var(--text-secondary);
-    font-variant-numeric: tabular-nums;
+    margin-right: var(--space-2);
+}
+
+@media (max-width: 767px) {
+    /* 360 外勤檔：動作列全寬、觸控 ≥44px */
+    .cc-mission__actions .lk-btn {
+        flex: 1 1 auto;
+        min-height: 44px;
+    }
+}
+
+@media (min-width: 1024px) {
+    /* 指揮所檔：單列排開（c1 構圖） */
+    .cc-mission__id { flex: 0 1 auto; }
+    .cc-mission__meters { flex: 0 0 auto; margin-left: auto; }
+    .cc-mission__actions { flex: 0 0 auto; }
 }
 
 /* ── 12 欄格線（mobile-first：手機 2 欄 → 平板 4 欄 → 桌機 12 欄）── */
@@ -88,7 +214,192 @@
     .cc-span-12 { grid-column: span 12; }
 }
 
-/* ── 災時模式：密度提高（§1 資訊密度一律「行動優先」）── */
-[data-app-mode="emergency"] .cc-page { gap: var(--space-3); }
-[data-app-mode="emergency"] .cc-grid { gap: var(--space-3); }
-[data-app-mode="emergency"] .cc-subtitle { display: none; }
+/* ── ② KPI 卡：mono 編號 01–04＋hot 卡其斜紋（c1-card / c1-card.hot）── */
+/* c1 卡片右上角是 mono 編號，不放圖示（B3c 印刷平面性） */
+.cc-page .sit-kpi__icon { display: none; }
+
+.cc-kpi-idx {
+    position: absolute;
+    top: var(--space-2);
+    right: var(--space-3);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    font-weight: var(--font-weight-bold);
+    color: var(--text-muted);
+}
+
+/* 待處理 >0：整框轉卡其＋上緣斜紋（c1-card.hot） */
+.cc-kpi-hot .sit-kpi { border-color: var(--color-secondary); }
+
+.cc-kpi-hot .sit-kpi::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: repeating-linear-gradient(
+        -45deg,
+        var(--color-secondary) 0 4px,
+        transparent 4px 9px
+    );
+    pointer-events: none;
+}
+
+.cc-kpi-hot .cc-kpi-idx { color: var(--color-secondary); }
+
+/* ── 面板（c1-panel：2px 規線、橄欖底線標頭、mono 計數章）── */
+.cc-page .sit-panel {
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+}
+
+.cc-page .sit-panel__header {
+    border-bottom: 2px solid var(--accent-gold);
+}
+
+.cc-page .sit-panel__count {
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ── ③ 佇列列：hairline 分隔＋■/□/✓ chip（c1-list / c1-row / c1-sev）── */
+.cc-page .sit-list { gap: 0; }
+
+.cc-page .sit-row {
+    background: transparent;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border-default);
+    padding: var(--space-2) var(--space-1);
+}
+
+.cc-page .sit-row:last-child { border-bottom: 0; }
+
+.cc-page .sit-row:hover { background: var(--surface-hover); }
+
+.cc-page .sit-row__time {
+    font-family: var(--font-mono);
+}
+
+/* 完成（已確認）列：降張力＋✓ 記號 */
+.cc-page .cc-row--done .sit-row__title {
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-normal);
+}
+
+.cc-done-mark {
+    font-style: normal;
+    font-weight: var(--font-weight-bold);
+    color: var(--accent-gold);
+}
+
+/* 狀態 chip：形狀（■實心/□描邊）先於顏色＝色盲安全雙編碼 */
+.cc-chip {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    min-width: 64px;
+    padding: 4px var(--space-2);
+    border: 2px solid var(--text-muted);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.2;
+    letter-spacing: var(--tracking-zh); /* 中文字距鐵律＝0 */
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.cc-chip__shape { font-style: normal; }
+
+.cc-chip--hi {
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: var(--text-inverse);
+}
+
+.cc-chip--md {
+    background: transparent;
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+}
+
+.cc-chip--lo {
+    background: transparent;
+    border-color: var(--text-muted);
+    color: var(--text-muted);
+}
+
+/* ── ④ 系統狀態列（c1-foot）── */
+.cc-sysbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    row-gap: var(--space-1);
+    padding: var(--space-2) var(--space-3);
+    background: var(--surface-card);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-md);
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    line-height: var(--line-height-snug);
+}
+
+.cc-sysbar__seg {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    padding: 0 var(--space-3);
+    border-left: 2px solid var(--border-default);
+}
+
+.cc-sysbar__seg:first-child {
+    border-left: 0;
+    padding-left: 0;
+}
+
+.cc-sysbar__seg--end {
+    margin-left: auto;
+    border-left: 0;
+}
+
+.cc-sysbar__glyph,
+.cc-sysbar__legend i {
+    font-style: normal;
+    color: var(--accent-gold);
+}
+
+.cc-sysbar__code {
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.cc-sysbar__num {
+    font-weight: var(--font-weight-bold);
+    color: var(--text-primary);
+}
+
+/* ── 災時模式：密度收緊（字級 -1、間距 -25%；顏色由 LAYER 8 換）── */
+[data-app-mode="emergency"] .cc-page {
+    /* 字級 -1：LAYER 10 基準 15/13 → 14/12（註記 12px 為鐵律下限，不再降） */
+    --font-size-base: 14px;
+    --font-size-sm: 12px;
+    /* 間距 -25%：4/8/12/16 → 3/6/9/12 */
+    --space-1: 3px;
+    --space-2: 6px;
+    --space-3: 9px;
+    --space-4: 12px;
+}
+
+[data-app-mode="emergency"] .cc-mission__elapsed { font-size: 24px; }
+[data-app-mode="emergency"] .cc-mission__code { font-size: var(--font-size-base); }
+[data-app-mode="emergency"] .cc-page .sit-kpi__value {
+    font-size: calc(var(--font-size-3xl, 28px) - 1px);
+}

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>R5 風格方向選擇 — 同一畫面 × 三種語言</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#000; font-family:'Noto Sans TC',-apple-system,sans-serif; }
+  .picker-head { padding:28px 24px 8px; color:#fff; }
+  .picker-head h1 { font-size:20px; letter-spacing:.05em; }
+  .picker-head p { color:#999; font-size:13px; margin-top:6px; line-height:1.6; }
+  .variant { margin:20px 12px 48px; border:1px solid #333; border-radius:8px; overflow:hidden; }
+  .variant-tag { display:flex; align-items:center; gap:12px; padding:10px 16px; background:#111; border-bottom:1px solid #333; }
+  .variant-tag b { color:#fff; font-size:15px; }
+  .variant-tag span { color:#888; font-size:12px; }
+  .mono { font-family:'JetBrains Mono','Consolas',monospace; font-variant-numeric:tabular-nums; }
+
+  /* ============ A. 任務控制（NASA/SpaceX Mission Control） ============ */
+  .vA { background:#07090C; color:#E8ECEF; }
+  .vA .topbar { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; border-bottom:1px solid #1C2630; }
+  .vA .brand { font-size:12px; letter-spacing:.35em; color:#7ED0E0; }
+  .vA .clock { font-size:13px; color:#E8ECEF; letter-spacing:.1em; }
+  .vA .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:#1C2630; border-bottom:1px solid #1C2630; }
+  .vA .stat { background:#07090C; padding:14px 16px; }
+  .vA .stat .lbl { font-size:10px; letter-spacing:.2em; color:#5E7079; text-transform:uppercase; }
+  .vA .stat .val { font-size:32px; font-weight:300; color:#E8ECEF; margin-top:4px; }
+  .vA .stat .val em { font-style:normal; font-size:12px; color:#7ED0E0; margin-left:6px; }
+  .vA .stat.alert .val { color:#7ED0E0; }
+  .vA .body { display:grid; grid-template-columns:1.6fr 1fr; gap:1px; background:#1C2630; }
+  .vA .panel { background:#07090C; padding:12px 16px; min-height:180px; }
+  .vA .panel h3 { font-size:10px; letter-spacing:.25em; color:#5E7079; margin-bottom:10px; text-transform:uppercase; }
+  .vA .row { display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px solid #10161C; font-size:12.5px; }
+  .vA .row .t { color:#B9C4CA; }
+  .vA .row .v { color:#7ED0E0; }
+  .vA .line { height:3px; background:linear-gradient(90deg,#7ED0E0 62%,#16323A 62%); margin-top:8px; }
+
+  /* ============ B. 國防科技（Palantir / Anduril） ============ */
+  .vB { background:#111417; color:#F2F3F4; }
+  .vB .topbar { display:flex; justify-content:space-between; align-items:center; padding:12px 18px; background:#16191D; border-bottom:1px solid #24282D; }
+  .vB .brand { font-weight:700; font-size:14px; letter-spacing:.02em; }
+  .vB .brand i { color:#FF6A2B; font-style:normal; }
+  .vB .mission { font-size:12px; color:#9AA0A6; }
+  .vB .mission b { color:#F2F3F4; }
+  .vB .cta { background:#FF6A2B; color:#111417; font-weight:700; font-size:12.5px; padding:8px 16px; border-radius:4px; }
+  .vB .stats { display:flex; gap:12px; padding:14px 18px; }
+  .vB .stat { flex:1; background:#16191D; border:1px solid #24282D; border-radius:6px; padding:12px 14px; position:relative; }
+  .vB .stat::before { content:''; position:absolute; left:0; top:10px; bottom:10px; width:3px; border-radius:2px; background:#3D4753; }
+  .vB .stat.hot::before { background:#FF6A2B; }
+  .vB .stat .lbl { font-size:11px; color:#9AA0A6; }
+  .vB .stat .val { font-size:26px; font-weight:600; margin-top:2px; }
+  .vB .stat .sub { font-size:10.5px; color:#6B7280; margin-top:2px; }
+  .vB .queues { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:0 18px 18px; }
+  .vB .q { background:#16191D; border:1px solid #24282D; border-radius:6px; }
+  .vB .q h3 { font-size:12px; padding:10px 14px; border-bottom:1px solid #24282D; color:#C9CDD1; display:flex; justify-content:space-between; }
+  .vB .q h3 span { color:#6B7280; }
+  .vB .item { display:flex; align-items:center; gap:10px; padding:9px 14px; border-bottom:1px solid #1C2024; font-size:12.5px; }
+  .vB .chip { font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:3px; letter-spacing:.05em; }
+  .vB .chip.high { background:rgba(255,106,43,.15); color:#FF8A55; }
+  .vB .chip.med { background:rgba(240,180,41,.12); color:#E8B84B; }
+  .vB .chip.low { background:rgba(120,190,120,.12); color:#8CC98C; }
+  .vB .item .t { flex:1; color:#D7DADD; }
+  .vB .item .ts { color:#6B7280; font-size:11px; }
+
+  /* ============ C. 戰術金精修（密度對齊作戰台） ============ */
+  .vC { background:#161E2A; color:#F3F3F2;
+        background-image:linear-gradient(rgba(243,243,242,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(243,243,242,.02) 1px,transparent 1px);
+        background-size:28px 28px; }
+  .vC .topbar { display:flex; justify-content:space-between; align-items:center; padding:9px 16px; background:#1D2635; border-bottom:1px solid #2F3641; }
+  .vC .brand { font-size:13px; font-weight:700; letter-spacing:.18em; color:#C39B6F; }
+  .vC .mid { font-size:11.5px; color:#AEAEA7; }
+  .vC .mid b { color:#F3F3F2; letter-spacing:.06em; }
+  .vC .btn { background:#C39B6F; color:#161E2A; font-weight:700; font-size:12px; padding:7px 14px; border-radius:4px; }
+  .vC .grid { display:grid; grid-template-columns:220px 1fr; gap:10px; padding:12px 16px; }
+  .vC .side { display:flex; flex-direction:column; gap:8px; }
+  .vC .kv { background:#1D2635; border:1px solid #2F3641; border-radius:6px; padding:10px 12px; }
+  .vC .kv .lbl { font-size:10px; color:#AEAEA7; letter-spacing:.1em; }
+  .vC .kv .val { font-size:22px; margin-top:2px; color:#F3F3F2; display:flex; justify-content:space-between; align-items:baseline; }
+  .vC .kv .val small { font-size:10px; color:#C39B6F; }
+  .vC .main { background:#1D2635; border:1px solid #2F3641; border-radius:6px; }
+  .vC .main h3 { font-size:11px; letter-spacing:.15em; color:#D0CEC3; padding:9px 12px; border-bottom:1px solid #2F3641; display:flex; justify-content:space-between; }
+  .vC .feed-row { display:flex; gap:10px; padding:8px 12px; border-bottom:1px solid #232D3B; font-size:12px; align-items:center; }
+  .vC .feed-row .ts { color:#AEAEA7; font-size:11px; min-width:44px; }
+  .vC .feed-row .sev { width:8px; height:8px; border-radius:2px; }
+  .vC .sev.r { background:#C25B5F; } .vC .sev.a { background:#D9A05B; } .vC .sev.g { background:#57A773; }
+  .vC .feed-row .t { flex:1; color:#E9E8E4; }
+  .vC .feed-row .who { color:#C39B6F; font-size:11px; }
+
+  .footer-note { padding:0 24px 60px; color:#777; font-size:12.5px; line-height:1.8; }
+  .footer-note b { color:#ddd; }
+</style>
+</head>
+<body>
+  <div class="picker-head">
+    <h1>R5 外觀方向 — 同一個「指揮中心」× 三種語言</h1>
+    <p>假資料靜態稿，只比「氣質」。回覆 A / B / C，或「B 但換 XX 色」，或都不是＋貼您的參考圖。</p>
+  </div>
+
+  <!-- ============ A ============ -->
+  <div class="variant">
+    <div class="variant-tag"><b>A · 任務控制</b><span>NASA/SpaceX 遙測牆——極深底、細線、青色數據、大量留黑、無圓角、冷靜到近乎沉默</span></div>
+    <div class="vA">
+      <div class="topbar mono"><span class="brand">LIGHT KEEPERS · MISSION OPS</span><span class="clock">2026-08-02 · 23:41:07 UTC+8</span></div>
+      <div class="stats mono">
+        <div class="stat"><div class="lbl">Active Reports</div><div class="val">24<em>▲ 6</em></div><div class="line"></div></div>
+        <div class="stat alert"><div class="lbl">Pending Triage</div><div class="val">7</div><div class="line"></div></div>
+        <div class="stat"><div class="lbl">Teams Deployed</div><div class="val">12<em>/ 15</em></div><div class="line"></div></div>
+        <div class="stat"><div class="lbl">Shelter Load</div><div class="val">62<em>%</em></div><div class="line"></div></div>
+      </div>
+      <div class="body">
+        <div class="panel">
+          <h3>Event Stream</h3>
+          <div class="row mono"><span class="t">23:39 建物倒塌 · 中山區林森北路</span><span class="v">TEAM-04 派遣</span></div>
+          <div class="row mono"><span class="t">23:35 淹水回報 · 士林區承德路</span><span class="v">已確認</span></div>
+          <div class="row mono"><span class="t">23:31 避難所開設 · 大同區公所</span><span class="v">容量 120</span></div>
+          <div class="row mono"><span class="t">23:24 SOS · 北投區溫泉路</span><span class="v" style="color:#E06C75">應答中</span></div>
+        </div>
+        <div class="panel">
+          <h3>Resources</h3>
+          <div class="row mono"><span class="t">飲用水</span><span class="v">1,240 L</span></div>
+          <div class="row mono"><span class="t">即食餐</span><span class="v">386 份</span></div>
+          <div class="row mono"><span class="t">醫療包</span><span class="v" style="color:#E5C07B">42 · LOW</span></div>
+          <div class="row mono"><span class="t">發電機</span><span class="v">6 台</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ B ============ -->
+  <div class="variant">
+    <div class="variant-tag"><b>B · 國防科技</b><span>Palantir/Anduril——石墨灰、信號橘單一強調、精緻字距、企業級克制、留白呼吸</span></div>
+    <div class="vB">
+      <div class="topbar"><span class="brand">◆ Light<i>Keepers</i></span><span class="mission">任務 <b>BRAVO-172</b> · 進行中 04:22:18</span><span class="cta">快速通報</span></div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">通報總數</div><div class="val mono">24</div><div class="sub">近 1 小時 +6</div></div>
+        <div class="stat hot"><div class="lbl">待處理</div><div class="val mono">7</div><div class="sub">最舊 12 分鐘</div></div>
+        <div class="stat"><div class="lbl">派遣隊伍</div><div class="val mono">12/15</div><div class="sub">3 隊待命</div></div>
+        <div class="stat"><div class="lbl">傷患追蹤</div><div class="val mono">0</div><div class="sub">無 MCI 事件</div></div>
+      </div>
+      <div class="queues">
+        <div class="q">
+          <h3>回報佇列 <span>7</span></h3>
+          <div class="item"><span class="chip high">HIGH</span><span class="t">建物倒塌 · 林森北路 85 巷</span><span class="ts mono">23:39</span></div>
+          <div class="item"><span class="chip med">MED</span><span class="t">道路淹水 · 承德路四段</span><span class="ts mono">23:35</span></div>
+          <div class="item"><span class="chip low">LOW</span><span class="t">路樹倒伏 · 民族東路</span><span class="ts mono">23:28</span></div>
+        </div>
+        <div class="q">
+          <h3>任務佇列 <span>12</span></h3>
+          <div class="item"><span class="chip high">派遣</span><span class="t">TEAM-04 → 建物倒塌現場</span><span class="ts mono">4 分前</span></div>
+          <div class="item"><span class="chip med">執行</span><span class="t">TEAM-07 抽水作業</span><span class="ts mono">18 分前</span></div>
+          <div class="item"><span class="chip low">完成</span><span class="t">TEAM-02 物資配送</span><span class="ts mono">32 分前</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ C ============ -->
+  <div class="variant">
+    <div class="variant-tag"><b>C · 戰術金精修</b><span>現行方向的完成體——海軍藍＋戰術金，但密度、格線、左欄讀數對齊真正的作戰台</span></div>
+    <div class="vC">
+      <div class="topbar"><span class="brand">LIGHTKEEPERS</span><span class="mid mono">MISSION <b>#MEB-172</b> · ELAPSED 04:22:18 · OUTBOX 0</span><span class="btn">快速通報</span></div>
+      <div class="grid">
+        <div class="side mono">
+          <div class="kv"><div class="lbl">通報 REPORTS</div><div class="val">24 <small>▲6/hr</small></div></div>
+          <div class="kv"><div class="lbl">待分流 TRIAGE</div><div class="val" style="color:#D9A05B">7 <small>MAX 12m</small></div></div>
+          <div class="kv"><div class="lbl">隊伍 TEAMS</div><div class="val">12<span style="color:#65696A">/15</span></div></div>
+          <div class="kv"><div class="lbl">避難所 SHELTER</div><div class="val">62% <small>3 開設</small></div></div>
+        </div>
+        <div class="main">
+          <h3>EVENT FEED <span class="mono" style="color:#AEAEA7">LIVE · 23:41:07</span></h3>
+          <div class="feed-row mono"><span class="ts">23:39</span><span class="sev r"></span><span class="t">建物倒塌 · 中山區林森北路 85 巷</span><span class="who">OP-CHEN 派遣 TEAM-04</span></div>
+          <div class="feed-row mono"><span class="ts">23:35</span><span class="sev a"></span><span class="t">道路淹水 40cm · 士林區承德路四段</span><span class="who">已確認</span></div>
+          <div class="feed-row mono"><span class="ts">23:31</span><span class="sev g"></span><span class="t">避難所開設 · 大同區公所（容量 120）</span><span class="who">SYS</span></div>
+          <div class="feed-row mono"><span class="ts">23:24</span><span class="sev r"></span><span class="t">SOS · 北投區溫泉路（應答中）</span><span class="who">OP-LIN ACK</span></div>
+          <div class="feed-row mono"><span class="ts">23:18</span><span class="sev a"></span><span class="t">醫療包庫存低於安全線（42）</span><span class="who">AUTO</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-note">
+    <b>怎麼選：</b>回 A / B / C 其一，可加註（例「B，橘換成青」「C 但更黑」）；三個都不是 → 貼一張您心中的參考圖（遊戲、電影、某軟體截圖都行），我照那個做。<br>
+    選定後我把該語言落成 token＋Shell＋旗艦頁，再給您過第二次閘門，才動全站。
+  </div>
+</body>
+</html>

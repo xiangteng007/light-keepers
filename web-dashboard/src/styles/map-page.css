@@ -1,10 +1,13 @@
 /* ============================================
-   Map Page Styles — R2b 重設計（DESIGN_LANGUAGE §7.4 地圖 archetype）
-   - 全語義 token：light / dark / tactical 三態自動生效
-   - 桌機：地圖滿版 + 右側 360px 詳情側欄
-   - 行動端：地圖上、側欄轉為下方 bottom sheet 區塊
-   - 例外註記：Google Maps InfoWindow 氣泡永遠是白底（Google 控制），
-     .gmap-infowindow 內文字因此固定深色，不隨主題切換。
+   Map Page — R5 戰術圖台（c5 三欄作戰台）
+   目標構圖：public/design-mockups/r5-b3c-deep.html <section class="c5">
+   - 全語義 token（tokens.css Layer 8/9/10）；災時 data-app-mode 自動切換，
+     本檔不寫任何模式分支色
+   - 桌機（>=1024）三欄：左 232px 圖層/讀數｜中央地圖｜右 320px 事件卡堆
+   - 768–1023 車載雙窗格：左欄橫置頂列（面板預設收合）＋地圖＋事件卡
+   - <=767 外勤單欄堆疊：觸控 >=44px
+   - 排印鐵律：中文字距 0；拉丁/數字小標走 .u-stencil；讀數 .u-mono
+   - 紅色憲法：紅左閂只跟 danger 徽章（危機/緊急）雙編碼出現
 ============================================ */
 
 .map-page {
@@ -12,54 +15,101 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  gap: var(--space-3);
+  min-height: 0;
 }
 
-.map-page__header {
+/* ===== 頂列（c5-hd） ===== */
+
+.map-page__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-default);
+  border: 2px solid var(--border-default);
+}
+
+.map-page__topbar-group {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  min-width: 0;
 }
 
-.map-page__header h2 {
-  font-size: var(--font-size-xl);
-  font-weight: var(--font-weight-bold);
-  color: var(--text-primary);
-  margin: 0;
+.map-page__sig {
+  color: var(--accent-gold);
+  font-size: 13px;
+  line-height: 1;
 }
+
+.map-page__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-zh, 0);
+  white-space: nowrap;
+}
+
+/* 拉丁小標：字型/字距由全域 .u-stencil 提供，這裡只給色彩與級數 */
+.map-page__stencil {
+  font-size: 11px;
+  color: var(--color-secondary);
+  text-transform: uppercase;
+}
+
+.map-page__clock {
+  font-size: 13px;
+  color: var(--color-secondary);
+  white-space: nowrap;
+}
+
+/* ===== 三欄框架（c5-body） ===== */
 
 .map-layout {
-  display: grid;
-  grid-template-columns: 1fr 360px;
-  gap: var(--space-4);
   flex: 1;
   min-height: 0;
   width: 100%;
+  display: grid;
+  grid-template-columns: 232px minmax(0, 1fr) 320px;
+  grid-template-rows: minmax(0, 1fr);
+  border: 2px solid var(--border-default);
+  border-top: none;
+  background: var(--bg-primary);
 }
 
-.map-container {
-  position: relative;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  border: 1px solid var(--border-default);
+/* ===== 左欄：圖層開關＋讀數 ===== */
+
+.map-col-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
   background: var(--surface-default);
-  min-height: 500px;
-  width: 100%;
+  border-right: 2px solid var(--border-default);
+  overflow-y: auto;
 }
 
-/* ===== 圖層控制面板（左上浮動、可收合、分組） ===== */
+.map-col-left__foot {
+  margin-top: auto;
+  border-top: 2px solid var(--border-default);
+  padding: var(--space-2) var(--space-3);
+}
 
-.map-layer-panel {
-  position: absolute;
-  top: var(--space-3);
-  left: var(--space-3);
-  z-index: 1000;
-  max-width: 240px;
-  background: var(--surface-default);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
+.map-col-left__foot .map-page__stencil {
+  color: var(--text-tertiary);
+}
+
+/* MapLayerPanel 靜置欄內（原浮動面板 → c5 左欄區段） */
+.map-col-left .map-layer-panel {
+  position: static;
+  z-index: auto;
+  max-width: none;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
 }
 
 .map-layer-panel__header {
@@ -71,9 +121,12 @@
   padding: var(--space-2) var(--space-3);
   background: transparent;
   border: none;
+  border-bottom: 2px solid var(--accent-gold);
   color: var(--text-primary);
-  font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: var(--tracking-zh, 0);
   cursor: pointer;
 }
 
@@ -91,18 +144,17 @@
   transform: rotate(180deg);
 }
 
-.map-layer-panel__body {
-  padding: var(--space-2) var(--space-3) var(--space-3);
-  border-top: 1px solid var(--border-light);
+.map-col-left .map-layer-panel__body {
+  padding: var(--space-3);
+  border-top: none;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  /* §7.4：控制元件不得遮擋地圖中心 60% —— 面板高度封頂並自行捲動 */
-  max-height: min(60vh, 480px);
-  overflow-y: auto;
+  max-height: none;
+  overflow: visible;
 }
 
-/* 災時圖層組合：一鍵套用（關鍵行動 → accent，克制使用） */
+/* 災時圖層組合：關鍵行動 → 橄欖描邊鈕（c5-btn 範式） */
 .map-layer-panel__preset {
   display: flex;
   align-items: center;
@@ -110,27 +162,20 @@
   gap: var(--space-1);
   min-height: 44px;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-secondary);
-  border-radius: var(--radius-md);
-  background: transparent;
-  /* R4 a11y：--color-secondary 直接當文字色在 light 主題只有 2.8:1，見
-     A11Y_AUDIT_R4.md */
-  color: #C2410C;
+  border: 2px solid var(--accent-gold);
+  border-radius: 2px;
+  background: none;
+  color: var(--accent-gold);
+  font-family: inherit;
   font-size: var(--font-size-sm);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-bold, 700);
+  letter-spacing: var(--tracking-zh, 0);
   cursor: pointer;
 }
 
-/* dark 主題下 --color-secondary（銅色 #B87333）在按鈕底色上只有 4:1，剛好卡在
-   門檻下；用同色相較淺的 --color-secondary-light 補足對比 */
-[data-theme="dark"] .map-layer-panel__preset,
-[data-theme="copper-steel"] .map-layer-panel__preset {
-  color: var(--color-secondary-light);
-  border-color: var(--color-secondary-light);
-}
-
 .map-layer-panel__preset:hover {
-  background: var(--surface-hover);
+  background: var(--accent-gold);
+  color: var(--bg-primary);
 }
 
 .map-layer-panel__preset:focus-visible {
@@ -144,13 +189,16 @@
   gap: var(--space-1);
 }
 
+/* 區段小標（c5-st）：中文字距 0、橄欖 2px 底規線 */
 .map-layer-panel__group-title {
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
-  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--text-primary);
+  text-transform: none;
+  letter-spacing: var(--tracking-zh, 0);
+  border-bottom: 2px solid var(--accent-gold);
+  padding-bottom: 4px;
+  margin: 0 0 var(--space-1);
 }
 
 .map-layer-panel__toggle-row {
@@ -158,11 +206,11 @@
   align-items: center;
   gap: var(--space-2);
   min-height: 36px;
-  font-size: var(--font-size-sm);
+  font-size: 14px;
   color: var(--text-primary);
   cursor: pointer;
   padding: 0 var(--space-1);
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
 }
 
 .map-layer-panel__toggle-row:hover {
@@ -170,10 +218,10 @@
 }
 
 .map-layer-panel__toggle-row input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   flex-shrink: 0;
-  accent-color: var(--color-secondary);
+  accent-color: var(--accent-gold);
 }
 
 .map-layer-panel__toggle-row:focus-within {
@@ -182,7 +230,7 @@
 
 .map-layer-panel__hint {
   font-style: normal;
-  color: var(--color-warning-dark, var(--color-warning));
+  color: var(--color-warning);
   font-size: var(--font-size-xs);
 }
 
@@ -195,11 +243,13 @@
 .map-layer-panel__basemap {
   min-height: 36px;
   padding: var(--space-1) var(--space-2);
-  border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  background: var(--surface-default);
-  color: var(--text-primary);
+  border: 2px solid var(--border-default);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: inherit;
   font-size: var(--font-size-xs);
+  letter-spacing: var(--tracking-zh, 0);
   cursor: pointer;
 }
 
@@ -212,17 +262,11 @@
   box-shadow: var(--focus-ring);
 }
 
+/* 作用態雙編碼：橄欖描邊＋粗體（不整塊填色） */
 .map-layer-panel__basemap.active {
-  border-color: var(--color-secondary);
-  /* R4 a11y：--color-secondary 直接當文字色在 light 主題只有 2.8:1、dark 主題
-     只有 4:1，見 A11Y_AUDIT_R4.md */
-  color: #C2410C;
-  font-weight: var(--font-weight-semibold);
-}
-
-[data-theme="dark"] .map-layer-panel__basemap.active,
-[data-theme="copper-steel"] .map-layer-panel__basemap.active {
-  color: var(--color-secondary-light);
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+  font-weight: var(--font-weight-bold, 700);
 }
 
 .map-layer-panel__legend {
@@ -242,22 +286,236 @@
 .map-layer-panel__legend-dot {
   width: 10px;
   height: 10px;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-full, 50%);
 }
 
-/* ===== 側欄（桌機右欄 / 行動端 bottom sheet 區塊） ===== */
+/* 讀數區（c5 任務樹的數字讀數對應） */
+.map-readout {
+  padding: var(--space-3);
+  border-top: 2px solid var(--border-default);
+}
+
+.map-readout__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-2);
+  border-bottom: 2px solid var(--accent-gold);
+  padding-bottom: 4px;
+  margin-bottom: var(--space-2);
+}
+
+.map-readout__head h3 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: var(--font-weight-bold, 700);
+  color: var(--text-primary);
+  letter-spacing: var(--tracking-zh, 0);
+}
+
+.map-readout__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.map-readout__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  line-height: 1.9;
+}
+
+.map-readout__row dt {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.map-readout__row dd {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-secondary);
+}
+
+/* ===== 中央：地圖區 ===== */
+
+.map-stage {
+  position: relative;
+  min-width: 0;
+  min-height: 0;
+  background: var(--bg-primary);
+}
+
+/* MapLibreTacticalMap 根節點帶 inline min-height:400px（共用元件不改），
+   本頁以格線行高為準 → 需 !important 蓋掉 inline 值 */
+.map-stage .maplibre-tactical-map {
+  min-height: 0 !important;
+}
+
+/* 地圖控制鈕：垂直靠左上（c5-ctl），戰術面板化 */
+.map-stage .maplibregl-ctrl-top-right {
+  top: var(--space-2);
+  left: var(--space-2);
+  right: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.map-stage .maplibregl-ctrl-group {
+  background: var(--surface-default);
+  border: 2px solid var(--border-default);
+  border-radius: 2px;
+  box-shadow: none;
+}
+
+.map-stage .maplibregl-ctrl-group button {
+  width: 32px;
+  height: 32px;
+}
+
+.map-stage .maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border-default);
+}
+
+/* maplibre 內建圖示為深色點陣 → 深底反白 */
+.map-stage .maplibregl-ctrl button .maplibregl-ctrl-icon {
+  filter: invert(0.85);
+}
+
+.map-stage .maplibregl-ctrl-scale {
+  background: transparent;
+  color: var(--text-tertiary);
+  border: 2px solid var(--text-tertiary);
+  border-top: none;
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  font-size: 10px;
+}
+
+/* OSM 授權標示保留可讀（授權要求，不得隱藏） */
+.map-stage .maplibregl-ctrl-attrib {
+  background: var(--surface-overlay);
+  font-size: 10px;
+}
+
+.map-stage .maplibregl-ctrl-attrib a {
+  color: var(--text-tertiary);
+}
+
+/* ===== 定位目前位置按鈕（左下、44px 觸控目標） ===== */
+
+.map-locate-btn {
+  position: absolute;
+  bottom: 56px;
+  left: var(--space-2);
+  z-index: 10;
+  width: 44px;
+  height: 44px;
+  background: var(--surface-default);
+  color: var(--accent-gold);
+  border: 2px solid var(--border-default);
+  border-radius: 2px;
+  cursor: pointer;
+  box-shadow: none;
+  transition: background var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-locate-btn:hover:not(:disabled) {
+  background: var(--accent-gold);
+  border-color: var(--accent-gold);
+  color: var(--bg-primary);
+}
+
+.map-locate-btn:focus-visible {
+  outline: none;
+  box-shadow: var(--focus-ring);
+}
+
+.map-locate-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.map-locate-btn--loading svg {
+  animation: spin-locate 1s linear infinite;
+}
+
+@keyframes spin-locate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ===== 右欄：事件卡堆（c5-right） ===== */
 
 .map-sidebar {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  overflow-y: auto;
+  gap: var(--space-2);
   min-height: 0;
+  overflow-y: auto;
+  background: var(--bg-primary);
+  border-left: 2px solid var(--border-default);
+  padding: var(--space-3);
 }
 
-/* 行動卡（選取物件時置頂） */
+/* 卡片戰術化：2px 規線、近直角、無浮起陰影（工藝五律 2） */
+.map-sidebar .lk-card {
+  background: var(--surface-default);
+  border: 2px solid var(--border-default);
+  border-radius: 3px;
+  box-shadow: none;
+}
+
+/* 清單 Tabs（底規線＋橄欖作用態；共用 .sidebar-tab 樣式的本頁覆寫） */
+.map-sidebar .sidebar-tabs {
+  display: flex;
+  gap: var(--space-1);
+  margin-bottom: var(--space-2);
+  border-bottom: 2px solid var(--border-default);
+}
+
+.map-sidebar .sidebar-tab {
+  flex: 1;
+  min-height: 40px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold, 600);
+  letter-spacing: var(--tracking-zh, 0);
+  cursor: pointer;
+}
+
+.map-sidebar .sidebar-tab--active {
+  color: var(--accent-gold);
+  border-bottom-color: var(--accent-gold);
+}
+
+.map-sidebar .sidebar-tab:focus-visible {
+  outline: 2px solid var(--accent-gold);
+  outline-offset: -2px;
+}
+
+.map-sidebar .sidebar-tab__count {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* 行動卡（選取物件時置頂）：預設橄欖左閂＝作用態 */
 .map-action-card {
-  border-left: 3px solid var(--color-secondary);
+  border-left: 3px solid var(--accent-gold);
+}
+
+/* 紅左閂：只給生命安全（紅色憲法）。以 danger 徽章（危機/緊急/SOS 類）雙編碼判定 */
+.map-action-card:has(.lk-badge--danger) {
+  border-left: 4px solid var(--color-danger);
 }
 
 .map-action-card__content {
@@ -274,7 +532,7 @@
   align-items: center;
   justify-content: center;
   border: none;
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
   background: transparent;
   color: var(--text-tertiary);
   cursor: pointer;
@@ -305,8 +563,8 @@
 
 .map-action-card__title {
   margin: 0 0 var(--space-2);
-  font-size: var(--font-size-base);
-  font-weight: var(--font-weight-semibold);
+  font-size: 15px;
+  font-weight: var(--font-weight-bold, 700);
   color: var(--text-primary);
   line-height: var(--line-height-tight);
 }
@@ -335,7 +593,7 @@
 
 .map-action-card__info dt {
   color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium, 500);
   flex-shrink: 0;
 }
 
@@ -351,9 +609,11 @@
   display: flex;
   gap: var(--space-2);
   flex-wrap: wrap;
+  padding-top: var(--space-2);
+  border-top: 2px solid var(--border-default);
 }
 
-/* ===== 事件清單 ===== */
+/* ===== 事件清單（卡堆） ===== */
 
 .map-event-list {
   display: flex;
@@ -370,13 +630,15 @@
   text-align: left;
   font-family: inherit;
   font-size: inherit;
+  letter-spacing: var(--tracking-zh, 0);
   min-height: 56px;
-  padding: var(--space-3);
-  background: var(--bg-secondary);
-  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-default);
+  border: 2px solid var(--border-default);
+  border-radius: 3px;
+  color: var(--text-primary);
   cursor: pointer;
   transition: background var(--transition-fast), border-color var(--transition-fast);
-  border: 2px solid transparent;
 }
 
 .map-event-item:hover {
@@ -388,9 +650,16 @@
   box-shadow: var(--focus-ring);
 }
 
+/* 選中態雙編碼：橄欖描邊＋inset 細閂（金色紀律：不整塊填色） */
 .map-event-item--selected {
-  border-color: var(--color-secondary);
-  background: var(--surface-hover);
+  border-color: var(--accent-gold);
+  box-shadow: inset 2px 0 0 var(--accent-gold);
+}
+
+/* 紅左閂：只跟 danger 徽章（危機/緊急）出現——紅色憲法 */
+.map-event-item:has(.lk-badge--danger) {
+  border-left: 4px solid var(--color-danger);
+  padding-left: calc(var(--space-3) - 2px);
 }
 
 .map-event-item__header {
@@ -405,7 +674,7 @@
 }
 
 .map-event-item__title {
-  font-weight: var(--font-weight-medium);
+  font-weight: var(--font-weight-medium, 500);
   font-size: var(--font-size-sm);
   margin-bottom: var(--space-1);
   color: var(--text-primary);
@@ -416,18 +685,20 @@
   justify-content: space-between;
   font-size: var(--font-size-xs);
   color: var(--text-tertiary);
+  font-family: var(--font-mono);
   font-variant-numeric: tabular-nums;
 }
 
-/* GPS 座標顯示 */
+/* GPS 座標讀數 */
 .gps-coords {
   font-family: var(--font-mono);
   font-size: var(--font-size-xs);
   font-variant-numeric: tabular-nums;
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   padding: var(--space-1) var(--space-2);
-  border-radius: var(--radius-sm);
-  color: var(--text-primary);
+  border: 1px solid var(--border-default);
+  border-radius: 2px;
+  color: var(--color-secondary);
 }
 
 .copy-btn {
@@ -449,7 +720,7 @@
 .copy-btn:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
 }
 
 /* ===== 篩選器 ===== */
@@ -459,7 +730,7 @@
   gap: var(--space-2);
   margin-bottom: var(--space-3);
   padding-bottom: var(--space-3);
-  border-bottom: 1px solid var(--border-default);
+  border-bottom: 2px solid var(--border-default);
 }
 
 .map-filter {
@@ -469,21 +740,23 @@
   gap: var(--space-1);
 }
 
+/* 中文標籤：字距 0、不大寫（排印鐵律 1） */
 .map-filter label {
   font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold, 600);
   color: var(--text-tertiary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-wide);
+  text-transform: none;
+  letter-spacing: var(--tracking-zh, 0);
 }
 
 .map-filter select {
-  background: var(--bg-secondary);
+  background: var(--bg-primary);
   border: 1px solid var(--border-default);
   color: var(--text-primary);
   padding: var(--space-2) var(--space-3);
   min-height: 40px;
-  border-radius: var(--radius-sm);
+  border-radius: 2px;
+  font-family: inherit;
   font-size: var(--font-size-sm);
   cursor: pointer;
   transition: border-color var(--transition-fast);
@@ -496,59 +769,23 @@
 }
 
 .map-filter select:hover {
-  border-color: var(--color-secondary);
+  border-color: var(--accent-gold);
 }
 
-/* ===== 定位目前位置按鈕（44px 觸控目標） ===== */
+/* ============================================
+   共用遺留樣式（MissionCommandPage 經 components/map/MapContainer 使用；
+   本頁已不掛載，勿刪——與上方 .map-stage 無關）
+============================================ */
 
-.map-locate-btn {
-  position: absolute;
-  bottom: 195px;
-  right: 10px;
-  z-index: 1000;
-  width: 44px;
-  height: 44px;
-  background: var(--surface-default);
-  color: var(--text-secondary);
+.map-container {
+  position: relative;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
   border: 1px solid var(--border-default);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  box-shadow: var(--shadow-sm);
-  transition: background var(--transition-fast);
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  background: var(--surface-default);
+  min-height: 500px;
+  width: 100%;
 }
-
-.map-locate-btn:hover:not(:disabled) {
-  background: var(--surface-hover);
-  color: var(--text-primary);
-}
-
-.map-locate-btn:focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-}
-
-.map-locate-btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-.map-locate-btn--loading {
-  color: var(--color-info);
-}
-
-.map-locate-btn--loading svg {
-  animation: spin-locate 1s linear infinite;
-}
-
-@keyframes spin-locate {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-/* ===== 載入 / 錯誤狀態 ===== */
 
 .map-loading {
   display: flex;
@@ -566,7 +803,7 @@
   height: 48px;
   border: 3px solid var(--border-default);
   border-top-color: var(--color-secondary);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-full, 50%);
   animation: spin 1s linear infinite;
 }
 
@@ -574,198 +811,88 @@
   to { transform: rotate(360deg); }
 }
 
-.map-error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 400px;
-  background: var(--bg-secondary);
-  border-radius: var(--radius-lg);
-  color: var(--text-secondary);
-  text-align: center;
-  padding: var(--space-10);
-}
-
-.map-error h3 {
-  margin-bottom: var(--space-2);
-  color: var(--color-danger);
-}
-
-/* ===== Google Maps InfoWindow（氣泡永遠白底 → 固定深色文字，見檔頭註記） ===== */
-
-.gmap-infowindow {
-  min-width: 220px;
-  max-width: 300px;
-  padding: 4px;
-}
-
-.gmap-infowindow__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 8px;
-}
-
-.gmap-infowindow__severity {
-  display: inline-block;
-  padding: 3px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  color: white;
-  text-transform: uppercase;
-}
-
-.gmap-infowindow__category {
-  font-size: 12px;
-  color: #666;
-  background: #f1f1f1;
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.gmap-infowindow__title {
-  font-size: 15px;
-  font-weight: 600;
-  color: #333;
-  margin: 0 0 8px;
-  line-height: 1.3;
-}
-
-.gmap-infowindow__desc {
-  font-size: 13px;
-  color: #666;
-  margin: 0 0 8px;
-  line-height: 1.5;
-  max-height: 60px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.gmap-infowindow__address {
-  font-size: 12px;
-  color: #888;
-  margin: 0 0 12px;
-}
-
-.gmap-infowindow__actions {
-  display: flex;
-  gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid #eee;
-}
-
-.gmap-infowindow__actions button {
-  flex: 1;
-  min-height: 36px;
-  padding: 8px 12px;
-  background: #52525B;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: opacity 0.2s ease;
-}
-
-.gmap-infowindow__actions button:hover {
-  opacity: 0.85;
-}
-
-/* Override Google Maps default InfoWindow styles */
-.gm-style-iw-c {
-  padding: 12px !important;
-  border-radius: 12px !important;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
-}
-
-.gm-style-iw-d {
-  overflow: hidden !important;
-}
-
-.gm-style-iw-t::after {
-  background: white !important;
-  box-shadow: none !important;
-}
-
-.gm-ui-hover-effect {
-  top: 2px !important;
-  right: 2px !important;
-}
-
-/* 隱藏傾斜/旋轉控制與鍵盤快速鍵控制 */
-.gm-style gmp-internal-camera-control,
-.gm-style gmp-internal-camera-control.gmnoprint,
-button[aria-label="Keyboard shortcuts"],
-button[aria-label="鍵盤快速鍵"],
-button[aria-label="Map camera controls"],
-button[aria-label="地圖相機控制"],
-.gm-tilt {
-  display: none !important;
-}
-
-/* ===== Leaflet 相容樣式（TacticalMap 等其他地圖頁共用） ===== */
-
-.leaflet-container {
-  font-family: var(--font-family-primary);
-}
-
-.leaflet-popup-content-wrapper {
-  background: var(--surface-default);
-  color: var(--text-primary);
-  border-radius: var(--radius-md);
-  box-shadow: var(--shadow-lg);
-}
-
-.leaflet-popup-tip {
-  background: var(--surface-default);
-}
-
-.map-popup h4 {
-  margin: 0 0 8px;
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.map-popup__category {
-  color: var(--text-tertiary);
-  font-size: 12px;
-  margin: 4px 0;
-}
-
-.map-popup__severity {
-  font-weight: 600;
-  font-size: 12px;
-  margin: 4px 0;
-}
-
-/* ===== 響應式（行動端：地圖上、側欄成 bottom sheet 區塊） ===== */
+/* ============================================
+   響應式
+   - 768–1023 車載：左欄轉頂列（面板預設收合），地圖＋事件卡雙窗格
+   - <=767 外勤：單欄堆疊（地圖 → 事件卡），觸控 >=44px
+============================================ */
 
 @media (max-width: 1023px) {
   .map-layout {
-    grid-template-columns: 1fr;
-    grid-template-rows: minmax(320px, 55vh) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-rows: auto minmax(0, 1fr);
   }
 
-  .map-container {
+  .map-col-left {
+    grid-column: 1 / -1;
+    border-right: none;
+    border-bottom: 2px solid var(--border-default);
+    overflow: visible;
+  }
+
+  /* 頂列只留圖層面板（預設收合，JS 端已處理）；讀數讓位給地圖 */
+  .map-readout,
+  .map-col-left__foot {
+    display: none;
+  }
+
+  .map-col-left .map-layer-panel__body {
+    max-height: 45vh;
+    overflow-y: auto;
+  }
+
+  .map-layer-panel__toggle-row {
+    min-height: 44px;
+  }
+
+  .map-stage {
     min-height: 320px;
   }
+}
 
-  /* 側欄轉為地圖下方的 sheet：圓角上緣、自帶捲動 */
-  .map-sidebar {
-    border-top-left-radius: var(--radius-lg);
-    border-top-right-radius: var(--radius-lg);
-    min-height: 0;
+@media (max-width: 767px) {
+  .map-page {
+    height: auto;
+    min-height: calc(100vh - 64px);
   }
 
-  /* 行動端面板預設收合（JS 端已處理），展開時降低最大高度 */
-  .map-layer-panel__body {
-    max-height: 45vh;
+  .map-layout {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto minmax(280px, 45vh) minmax(0, 1fr);
+  }
+
+  .map-sidebar {
+    border-left: none;
+    border-top: 2px solid var(--border-default);
   }
 
   .map-event-list {
     max-height: none;
+  }
+
+  .map-event-item {
+    min-height: 64px;
+  }
+
+  .map-locate-btn {
+    bottom: var(--space-3);
+  }
+
+  .map-page__topbar {
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 479px) {
+  /* 360 檔：拉丁小標讓位，保留識別與時鐘 */
+  .map-page__topbar .map-page__stencil {
+    display: none;
+  }
+}
+
+@media (min-width: 1440px) {
+  .map-layout {
+    grid-template-columns: 260px minmax(0, 1fr) 360px;
   }
 }

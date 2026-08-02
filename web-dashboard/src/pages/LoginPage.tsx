@@ -1,153 +1,50 @@
 import { useState, useEffect } from 'react';
+import '../styles/pages/login-page.css';
 
 /**
  * Light Keepers Login Page
- * Design: Industrial Cyberpunk Command Center
- * Key Feature: Digital Clock Display + OAuth Buttons
+ * Design: R5 B3c 野戰手冊（field-manual tactical）
  *
- * FE-2 (2.5) skin-migration note (see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md §4):
- * This page does NOT import `LoginPage.css` (that file is actually consumed by
- * BindLinePage / ForgotPasswordPage / ResetPasswordPage — a pre-existing naming
- * collision, left untouched here to avoid scope creep). All visual styling below
- * lives in the inline `styles` object plus an injected <style> keyframes block.
+ * R5 restyle（FRONTEND_TACTICAL_REBUILD_PROMPT / DESIGN_LANGUAGE v2）:
+ * 舊「industrial cyberpunk」海軍藍/金 HUD（R3b 的 inline styles ＋注入式
+ * keyframes）整組退役，改為 B3c 野戰手冊語言：#16170F 底＋32px 細格線、
+ * 橄欖 seal 徽記與掃描角框、LIGHTKEEPERS stencil 標、mono 時鐘讀數。
+ * 樣式全部移入 `src/styles/pages/login-page.css`（原為孤兒檔，R5 起由本頁
+ * 專用；.lk-login* 前綴命名空間）。tokens.css Layer 9 已讓所有 data-theme
+ * 一律解析為 B3c 色盤，故 R3b 的 `.login-container.dark` pin 手法不再需要。
  *
- * R3b token pass (FULL_SYSTEM_REDESIGN_PLAN R3 — "Login exception"): layout,
- * structure and the bespoke "industrial cyberpunk" identity (amber/cyan HUD on
- * navy gradient) are UNCHANGED. Every hex/rgba literal below has been swapped
- * for the closest matching token in `tokens.css`:
- *   - Amber (#FBBF24 / #F59E0B) → `--color-warning-light` / `--color-warning`
- *     (Layer 3, exact hex match, theme-stable — not affected by `.dark`).
- *   - Red (#EF4444 / #DC2626) → `--color-danger` / `--color-danger-dark`
- *     (Layer 3, exact hex match, theme-stable).
- *   - Success dot → `--color-success` (Layer 3, exact match, was already a var()).
- *   - Navy background / near-black panels / cyan HUD numerals / white-ish HUD
- *     text have no exact Layer-3 equivalent (they are inherently dark-only
- *     values), so the outer container carries a *locally scoped* `dark` class
- *     (`.login-container.dark`) that pins token resolution to the dark palette
- *     (`--bg-primary`, `--bg-secondary`, `--text-primary`, `--info-color`, …)
- *     regardless of the app-wide `data-theme` the user has chosen — this keeps
- *     the page's always-dark HUD identity intact while still resolving through
- *     `tokens.css` instead of hardcoded hex. Alpha variants use `color-mix()`
- *     against these tokens (already an established pattern elsewhere: see
- *     ResourcesPage.css / ApprovalCenterPage.css).
- *   - The Google "G" logo SVG path colors and LINE's brand green (#00C300) are
- *     THIRD-PARTY BRAND MARKS (Sign-in-with-Google / LINE brand guidelines
- *     require their exact official colors) — these are intentionally left as
- *     literal hex, not app design tokens, same as any other vendor logo.
+ * 命名衝突備忘（沿襲 FE-2 (2.5) 註記）：`pages/LoginPage.css` 實際由
+ * BindLinePage / ForgotPasswordPage / ResetPasswordPage 消費，本頁不碰。
+ *
+ * 品牌例外（不套 app token）：
+ * - Google "G" 標誌四色＝Sign-in-with-Google 品牌規範要求的官方原色。
+ * - LINE 品牌綠 #06C755（LINE Login button guidelines 現行版）＝官方原色；
+ *   CSS 側一律以 var(--brand-line-green, #06C755) fallback 形式書寫。
+ *
+ * OAuth 流程（handleGoogleLogin / handleLineLogin）與時鐘/resize 接線
+ * 與 R3b 完全相同，僅重排 UI 包裝。
  */
 
-// Keyframe animations as style element
-const keyframes = `
-@keyframes beacon-sweep {
-  0%, 100% {
-    transform: rotate(-45deg);
-    opacity: 0.6;
-  }
-  50% {
-    transform: rotate(45deg);
-    opacity: 1;
-  }
-}
+const WEEKDAYS_FULL = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+const WEEKDAYS_SHORT = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px color-mix(in srgb, var(--color-warning-light) 40%, transparent);
-  }
-  50% {
-    box-shadow: 0 0 60px color-mix(in srgb, var(--color-warning-light) 80%, transparent);
-  }
-}
+const pad2 = (n: number) => n.toString().padStart(2, '0');
 
-@keyframes clock-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.95; }
-}
-
-@keyframes colon-blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.3; }
-}
-
-@keyframes data-scroll {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-50%); }
-}
-
-@keyframes scan-line {
-  0%, 100% {
-    top: 0%;
-  }
-  50% {
-    top: calc(100% - 2px);
-  }
-}
-
-@keyframes fade-in-up {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
-
-/* Responsive breakpoints */
-@media (max-width: 480px) {
-  .login-container {
-    padding: 16px !important;
-  }
-  .login-card {
-    padding: 24px 20px !important;
-    margin: 16px !important;
-    max-width: calc(100% - 32px) !important;
-  }
-  .login-title {
-    font-size: 24px !important;
-    letter-spacing: 0.1em !important;
-  }
-  .login-subtitle {
-    font-size: 12px !important;
-  }
-  .form-title {
-    font-size: 16px !important;
-  }
-  .input-field {
-    padding: 14px 16px !important;
-    font-size: 14px !important;
-  }
-  .submit-btn {
-    padding: 16px 24px !important;
-    font-size: 12px !important;
-  }
-  .corner-decorator {
-    width: 12px !important;
-    height: 12px !important;
-  }
-}
-
-@media (min-width: 481px) and (max-width: 1024px) {
-  .login-container {
-    padding: 24px !important;
-  }
-  .login-card {
-    padding: 36px 32px !important;
-    max-width: 480px !important;
-  }
-  .login-title {
-    font-size: 32px !important;
-  }
-}
-`;
-
+/** 橄欖燈塔章（構圖出自 design-mockups/r5-b3c-deep.html c1-seal；顏色走 currentColor） */
+const SealMark: React.FC = () => (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <path d="M12 2.1 13.7 4.5H10.3Z" fill="currentColor" />
+        <rect x="10.1" y="4.9" width="3.8" height="2.8" fill="currentColor" />
+        <path d="M9.9 8.6h4.2L15.4 20H8.6Z" stroke="currentColor" strokeWidth="1.5" />
+        <path d="M9 12.9h6M8.4 16.4h7.2" stroke="currentColor" strokeWidth="1.2" />
+        <path d="M8.8 6.3 5.1 4.9M15.2 6.3l3.7-1.4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
+        <path d="M6.4 20.9h11.2" stroke="currentColor" strokeWidth="1.8" />
+    </svg>
+);
 
 const LoginPage: React.FC = () => {
     const [windowWidth, setWindowWidth] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
     const [currentTime, setCurrentTime] = useState(new Date());
-
 
     // Update clock every second
     useEffect(() => {
@@ -165,14 +62,6 @@ const LoginPage: React.FC = () => {
     // Responsive breakpoint - brand panel only on desktop
     const isDesktop = windowWidth >= 1024;
 
-    useEffect(() => {
-        // Add keyframes to document
-        const styleEl = document.createElement('style');
-        styleEl.innerHTML = keyframes;
-        document.head.appendChild(styleEl);
-        return () => { document.head.removeChild(styleEl); };
-    }, []);
-
     // OAuth Login Handlers
     const handleGoogleLogin = () => {
         const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
@@ -184,526 +73,133 @@ const LoginPage: React.FC = () => {
         window.location.href = `${API_BASE_URL}/api/v1/auth/line`;
     };
 
-    // Styles object for inline CSS
-    const styles = {
-        container: {
-            minHeight: '100vh',
-            width: '100%',
-            display: 'flex',
-            background: 'linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, var(--bg-primary) 100%)',
-            fontFamily: "'JetBrains Mono', monospace",
-            position: 'relative' as const,
-            overflow: 'hidden',
-        },
-        // Animated background grid
-        gridOverlay: {
-            position: 'absolute' as const,
-            inset: 0,
-            backgroundImage: `
-                linear-gradient(color-mix(in srgb, var(--color-warning-light) 3%, transparent) 1px, transparent 1px),
-                linear-gradient(90deg, color-mix(in srgb, var(--color-warning-light) 3%, transparent) 1px, transparent 1px)
-            `,
-            backgroundSize: '40px 40px',
-            pointerEvents: 'none' as const,
-        },
-        // Beacon light sweep effect
-        beaconSweep: {
-            position: 'absolute' as const,
-            top: '-50%',
-            left: '50%',
-            width: '200%',
-            height: '200%',
-            background: 'conic-gradient(from 0deg, transparent 0deg, color-mix(in srgb, var(--color-warning-light) 15%, transparent) 30deg, transparent 60deg)',
-            animation: 'beacon-sweep 8s ease-in-out infinite',
-            transformOrigin: 'center center',
-            pointerEvents: 'none' as const,
-        },
-        // Left brand panel (only visible on desktop ≥1024px)
-        brandPanel: {
-            flex: '0 0 45%',
-            display: 'flex',
-            flexDirection: 'column' as const,
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: '40px',
-            position: 'relative' as const,
-            borderRight: '1px solid color-mix(in srgb, var(--color-warning-light) 10%, transparent)',
-        },
-        // Digital Clock Container
-        digitalClockContainer: {
-            display: 'flex',
-            flexDirection: 'column' as const,
-            alignItems: 'center',
-            marginBottom: '40px',
-            animation: 'clock-flicker 4s ease-in-out infinite',
-        },
-        // Main Time Display
-        timeDisplay: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '72px',
-            fontWeight: 800,
-            color: 'var(--color-warning-light)',
-            letterSpacing: '0.05em',
-            textShadow: '0 0 30px color-mix(in srgb, var(--color-warning-light) 60%, transparent), 0 0 60px color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
-            display: 'flex',
-            alignItems: 'center',
-            marginBottom: '8px',
-        },
-        timeColon: {
-            animation: 'colon-blink 1s steps(1) infinite',
-            margin: '0 4px',
-        },
-        // Date Display
-        dateDisplay: {
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '18px',
-            color: 'color-mix(in srgb, var(--color-warning-light) 80%, transparent)',
-            letterSpacing: '0.3em',
-            marginBottom: '4px',
-        },
-        // Day of Week
-        dayDisplay: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '14px',
-            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
-            letterSpacing: '0.5em',
-            marginBottom: '24px',
-        },
-        // System Metrics Row
-        metricsRow: {
-            display: 'flex',
-            gap: '24px',
-            marginTop: '16px',
-        },
-        metricBox: {
-            display: 'flex',
-            flexDirection: 'column' as const,
-            alignItems: 'center',
-            padding: '12px 16px',
-            background: 'color-mix(in srgb, var(--bg-primary) 30%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
-            borderRadius: '4px',
-        },
-        metricValue: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '24px',
-            fontWeight: 700,
-            color: 'var(--info-color)',
-            textShadow: '0 0 10px color-mix(in srgb, var(--info-color) 50%, transparent)',
-        },
-        metricLabel: {
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '9px',
-            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
-            letterSpacing: '0.15em',
-            marginTop: '4px',
-        },
-        // Mobile Clock Styles (compact version)
-        mobileClockContainer: {
-            display: 'flex',
-            flexDirection: 'column' as const,
-            alignItems: 'center',
-            paddingTop: '40px',
-            paddingBottom: '20px',
-        },
-        mobileTimeDisplay: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '36px',
-            fontWeight: 700,
-            color: 'var(--color-warning-light)',
-            textShadow: '0 0 20px color-mix(in srgb, var(--color-warning-light) 50%, transparent)',
-            display: 'flex',
-            alignItems: 'center',
-            marginBottom: '4px',
-        },
-        mobileDateDisplay: {
-            fontFamily: "'JetBrains Mono', monospace",
-            fontSize: '12px',
-            color: 'color-mix(in srgb, var(--color-warning-light) 60%, transparent)',
-            letterSpacing: '0.2em',
-        },
-        brandTitle: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '48px',
-            fontWeight: 800,
-            letterSpacing: '0.3em',
-            color: 'var(--color-warning-light)',
-            textShadow: '0 0 40px color-mix(in srgb, var(--color-warning-light) 50%, transparent)',
-            marginBottom: '16px',
-            textAlign: 'center' as const,
-        },
-        brandSubtitle: {
-            fontSize: '14px',
-            color: 'color-mix(in srgb, var(--text-primary) 50%, transparent)',
-            letterSpacing: '0.5em',
-            textTransform: 'uppercase' as const,
-        },
-        // Status indicator
-        statusBadge: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '12px 24px',
-            background: 'color-mix(in srgb, var(--bg-primary) 40%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
-            borderRadius: '4px',
-            marginTop: '40px',
-        },
-        statusDot: {
-            width: '8px',
-            height: '8px',
-            borderRadius: '50%',
-            background: 'var(--color-success)',
-            animation: 'pulse-glow 2s ease-in-out infinite',
-        },
-        statusText: {
-            fontSize: '11px',
-            color: 'var(--color-success)',
-            letterSpacing: '0.2em',
-        },
-        // Right form panel (main content, always visible)
-        formPanel: {
-            flex: '1 1 55%',
-            display: 'flex',
-            flexDirection: 'column' as const,
-            justifyContent: isDesktop ? 'center' : 'flex-start',
-            alignItems: 'center',
-            padding: isDesktop ? '40px 24px' : '0 24px 40px 24px',
-            position: 'relative' as const,
-            minHeight: '100vh',
-        },
-        // Form card
-        formCard: {
-            width: '100%',
-            maxWidth: '420px',
-            background: 'color-mix(in srgb, var(--bg-primary) 90%, transparent)',
-            backdropFilter: 'blur(20px)',
-            border: '1px solid color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
-            borderRadius: '8px',
-            padding: '48px',
-            position: 'relative' as const,
-            animation: 'fade-in-up 0.8s ease-out',
-        },
-        // Scan line effect on card
-        scanLine: {
-            position: 'absolute' as const,
-            left: 0,
-            width: '100%',
-            height: '2px',
-            background: 'linear-gradient(90deg, transparent, color-mix(in srgb, var(--color-warning-light) 50%, transparent), transparent)',
-            animation: 'scan-line 3s linear infinite',
-            pointerEvents: 'none' as const,
-        },
-        // Corner decorators
-        corner: {
-            position: 'absolute' as const,
-            width: '20px',
-            height: '20px',
-            border: '2px solid var(--color-warning-light)',
-        },
-        cornerTL: { top: '12px', left: '12px', borderRight: 'none', borderBottom: 'none' },
-        cornerTR: { top: '12px', right: '12px', borderLeft: 'none', borderBottom: 'none' },
-        cornerBL: { bottom: '12px', left: '12px', borderRight: 'none', borderTop: 'none' },
-        cornerBR: { bottom: '12px', right: '12px', borderLeft: 'none', borderTop: 'none' },
-        formTitle: {
-            fontFamily: "'Orbitron', sans-serif",
-            fontSize: '20px',
-            fontWeight: 700,
-            color: 'var(--color-warning-light)',
-            letterSpacing: '0.15em',
-            marginBottom: '8px',
-        },
-        formSubtitle: {
-            fontSize: '12px',
-            color: 'color-mix(in srgb, var(--text-primary) 40%, transparent)',
-            marginBottom: '32px',
-        },
-        // Input group
-        inputGroup: {
-            marginBottom: '24px',
-        },
-        label: {
-            display: 'block',
-            fontSize: '10px',
-            color: 'color-mix(in srgb, var(--text-primary) 50%, transparent)',
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase' as const,
-            marginBottom: '8px',
-        },
-        inputWrapper: {
-            position: 'relative' as const,
-        },
-        input: {
-            width: '100%',
-            padding: '16px 20px',
-            background: 'color-mix(in srgb, var(--text-primary) 3%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--text-primary) 10%, transparent)',
-            borderRadius: '4px',
-            color: 'var(--text-primary)',
-            fontSize: '14px',
-            fontFamily: "'JetBrains Mono', monospace",
-            outline: 'none',
-            transition: 'all 0.3s ease',
-            boxSizing: 'border-box' as const,
-            minHeight: '44px',
-        },
-        inputFocused: {
-            borderColor: 'var(--color-warning-light)',
-            boxShadow: '0 0 20px color-mix(in srgb, var(--color-warning-light) 20%, transparent)',
-            background: 'color-mix(in srgb, var(--color-warning-light) 5%, transparent)',
-        },
-        // Error message
-        errorBox: {
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            padding: '14px 18px',
-            background: 'color-mix(in srgb, var(--color-danger-dark) 10%, transparent)',
-            border: '1px solid color-mix(in srgb, var(--color-danger-dark) 40%, transparent)',
-            borderRadius: '4px',
-            marginBottom: '24px',
-        },
-        errorText: {
-            fontSize: '12px',
-            color: 'var(--color-danger)',
-            letterSpacing: '0.05em',
-        },
-        // Submit button
-        submitBtn: {
-            width: '100%',
-            minHeight: '44px',
-            padding: '18px 32px',
-            background: 'linear-gradient(135deg, var(--color-warning-light) 0%, var(--color-warning) 100%)',
-            border: 'none',
-            borderRadius: '4px',
-            color: 'var(--bg-primary)',
-            fontSize: '14px',
-            fontFamily: "'Orbitron', sans-serif",
-            fontWeight: 700,
-            letterSpacing: '0.2em',
-            textTransform: 'uppercase' as const,
-            cursor: 'pointer',
-            transition: 'all 0.3s ease',
-            position: 'relative' as const,
-            overflow: 'hidden',
-            marginTop: '8px',
-        },
-        submitBtnHover: {
-            transform: 'translateY(-2px)',
-            boxShadow: '0 10px 40px color-mix(in srgb, var(--color-warning-light) 40%, transparent)',
-        },
-        // Version footer
-        versionFooter: {
-            textAlign: 'center' as const,
-            marginTop: '32px',
-            paddingTop: '24px',
-            borderTop: '1px solid color-mix(in srgb, var(--text-primary) 5%, transparent)',
-        },
-        versionText: {
-            fontSize: '10px',
-            color: 'color-mix(in srgb, var(--text-primary) 30%, transparent)',
-            letterSpacing: '0.1em',
-        },
-        // Mobile styles (will be applied via media query check)
-        mobileBrandPanel: {
-            display: 'none',
-        },
-    };
+    const hh = pad2(currentTime.getHours());
+    const mm = pad2(currentTime.getMinutes());
+    const ss = pad2(currentTime.getSeconds());
+    const dateStr = `${currentTime.getFullYear()}.${pad2(currentTime.getMonth() + 1)}.${pad2(currentTime.getDate())}`;
+    const day = currentTime.getDay();
 
     return (
-        <div className="login-container dark" data-testid="login-page" style={styles.container}>
-            {/* Background effects (decorative only) */}
-            <div style={styles.gridOverlay} aria-hidden="true" />
-            <div style={styles.beaconSweep} aria-hidden="true" />
+        <div className="lk-login" data-testid="login-page">
+            {/* 32px 細格線底紋（裝飾） */}
+            <div className="lk-login__gridlines" aria-hidden="true" />
 
-            {/* Brand Panel - Only visible on desktop (>=1024px) */}
+            {/* 左欄識別區 — 桌機 ≥1024 */}
             {isDesktop && (
-                <div style={styles.brandPanel}>
-                    {/* Digital Clock Display */}
-                    <div style={styles.digitalClockContainer}>
-                        {/* Main Time */}
-                        <div style={styles.timeDisplay}>
-                            <span>{currentTime.getHours().toString().padStart(2, '0')}</span>
-                            <span style={styles.timeColon}>:</span>
-                            <span>{currentTime.getMinutes().toString().padStart(2, '0')}</span>
-                            <span style={styles.timeColon}>:</span>
-                            <span>{currentTime.getSeconds().toString().padStart(2, '0')}</span>
+                <aside className="lk-login__brand" aria-label="系統識別與時鐘">
+                    <span className="lk-login__seal"><SealMark /></span>
+                    <h1 className="lk-login__wordmark u-stencil">LIGHTKEEPERS</h1>
+                    <p className="lk-login__tagline">曦望燈塔資訊管理平台</p>
+
+                    <div className="lk-login__clock">
+                        <span className="lk-login__clock-label">
+                            現在時刻<b className="u-stencil">LOCAL TIME</b>
+                        </span>
+                        <strong className="lk-login__clock-readout u-mono">
+                            {hh}<i>:</i>{mm}<i>:</i>{ss}
+                        </strong>
+                        <span className="lk-login__clock-date u-mono">{dateStr}</span>
+                        <span className="lk-login__clock-day u-stencil">{WEEKDAYS_FULL[day]}</span>
+                    </div>
+
+                    <div className="lk-login__metrics">
+                        <div className="lk-login__metric">
+                            <span className="lk-login__metric-idx u-mono" aria-hidden="true">01</span>
+                            <strong className="lk-login__metric-value u-mono">99.9</strong>
+                            <span className="lk-login__metric-label u-stencil">UPTIME %</span>
                         </div>
-                        {/* Date */}
-                        <div style={styles.dateDisplay}>
-                            {currentTime.getFullYear()}.{(currentTime.getMonth() + 1).toString().padStart(2, '0')}.{currentTime.getDate().toString().padStart(2, '0')}
+                        <div className="lk-login__metric">
+                            <span className="lk-login__metric-idx u-mono" aria-hidden="true">02</span>
+                            <strong className="lk-login__metric-value u-mono">247</strong>
+                            <span className="lk-login__metric-label u-stencil">ACTIVE</span>
                         </div>
-                        {/* Day of Week */}
-                        <div style={styles.dayDisplay}>
-                            {['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'][currentTime.getDay()]}
-                        </div>
-                        {/* System Metrics */}
-                        <div style={styles.metricsRow}>
-                            <div style={styles.metricBox}>
-                                <span style={styles.metricValue}>99.9</span>
-                                <span style={styles.metricLabel}>UPTIME %</span>
-                            </div>
-                            <div style={styles.metricBox}>
-                                <span style={styles.metricValue}>247</span>
-                                <span style={styles.metricLabel}>ACTIVE</span>
-                            </div>
-                            <div style={styles.metricBox}>
-                                <span style={styles.metricValue}>0</span>
-                                <span style={styles.metricLabel}>ALERTS</span>
-                            </div>
+                        <div className="lk-login__metric">
+                            <span className="lk-login__metric-idx u-mono" aria-hidden="true">03</span>
+                            <strong className="lk-login__metric-value u-mono">0</strong>
+                            <span className="lk-login__metric-label u-stencil">ALERTS</span>
                         </div>
                     </div>
 
-                    <h1 style={styles.brandTitle}>LIGHT KEEPERS</h1>
-                    <p style={styles.brandSubtitle}>曦望燈塔資訊管理平台</p>
-
-                    <div style={styles.statusBadge}>
-                        <div style={styles.statusDot} aria-hidden="true" />
-                        <span style={styles.statusText}>SYSTEM STATUS: OPERATIONAL</span>
-                    </div>
-                </div>
+                    <p className="lk-login__sysline">
+                        <i className="lk-login__sq" aria-hidden="true" />
+                        系統正常<b className="u-stencil">SYS NOMINAL</b>
+                    </p>
+                </aside>
             )}
 
-            {/* Form Panel */}
-            <div style={styles.formPanel}>
-                {/* Mobile Clock - shown when brand panel is hidden */}
-                {!isDesktop && (
-                    <div style={styles.mobileClockContainer}>
-                        <div style={styles.mobileTimeDisplay}>
-                            <span>{currentTime.getHours().toString().padStart(2, '0')}</span>
-                            <span style={styles.timeColon}>:</span>
-                            <span>{currentTime.getMinutes().toString().padStart(2, '0')}</span>
-                            <span style={styles.timeColon}>:</span>
-                            <span>{currentTime.getSeconds().toString().padStart(2, '0')}</span>
-                        </div>
-                        <div style={styles.mobileDateDisplay}>
-                            {currentTime.getFullYear()}.{(currentTime.getMonth() + 1).toString().padStart(2, '0')}.{currentTime.getDate().toString().padStart(2, '0')} {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'][currentTime.getDay()]}
-                        </div>
+            {/* 登入卡 */}
+            <main className="lk-login__main">
+                <section className="lk-login__card" aria-label="登入">
+                    {/* 掃描角框（裝飾） */}
+                    <i className="lk-login__corner lk-login__corner--tl" aria-hidden="true" />
+                    <i className="lk-login__corner lk-login__corner--tr" aria-hidden="true" />
+                    <i className="lk-login__corner lk-login__corner--bl" aria-hidden="true" />
+                    <i className="lk-login__corner lk-login__corner--br" aria-hidden="true" />
+
+                    {/* 頂條：stamp 徽記＋mono 時鐘 */}
+                    <header className="lk-login__topbar">
+                        <span className="lk-login__stamp u-stencil"><i aria-hidden="true" />LIGHTKEEPERS</span>
+                        <span className="lk-login__topclock u-mono">{hh}:{mm}:{ss}</span>
+                    </header>
+
+                    {/* 教範式頁眉 */}
+                    <div className="lk-login__subrow">
+                        <h2 className="lk-login__subrow-zh">系統登入</h2>
+                        <span className="lk-login__subrow-la u-stencil">OPERATOR LOGIN</span>
+                        <span className="lk-login__subrow-tm u-mono">{dateStr} {WEEKDAYS_SHORT[day]}</span>
                     </div>
-                )}
 
-            <div className="login-card" style={styles.formCard}>
-                    {/* Scan line effect (decorative only) */}
-                    <div style={styles.scanLine} aria-hidden="true" />
-
-                    {/* Corner decorators (decorative only) */}
-                    <div style={{...styles.corner, ...styles.cornerTL}} aria-hidden="true" />
-                    <div style={{...styles.corner, ...styles.cornerTR}} aria-hidden="true" />
-                    <div style={{...styles.corner, ...styles.cornerBL}} aria-hidden="true" />
-                    <div style={{...styles.corner, ...styles.cornerBR}} aria-hidden="true" />
-
-                    {/* Mobile/Tablet title - shown when brand panel is hidden */}
+                    {/* 行動端識別區（桌機由左欄承擔） */}
                     {!isDesktop && (
-                        <>
-                            <h1 className="login-title" style={{...styles.brandTitle, fontSize: '28px', marginBottom: '4px'}}>LIGHT KEEPERS</h1>
-                            <p className="login-subtitle" style={{...styles.brandSubtitle, marginBottom: '32px'}}>曦望燈塔資訊管理平台</p>
-                        </>
+                        <div className="lk-login__id">
+                            <span className="lk-login__seal"><SealMark /></span>
+                            <h1 className="lk-login__wordmark u-stencil">LIGHTKEEPERS</h1>
+                            <p className="lk-login__tagline">曦望燈塔資訊管理平台</p>
+                        </div>
                     )}
 
-                    <h2 className="form-title" style={styles.formTitle}>OPERATOR LOGIN</h2>
-                    <p style={styles.formSubtitle}>登入以存取系統 // Connect via social account</p>
+                    <div className="lk-login__body">
+                        <p className="lk-login__lede">選擇帳號通道登入，存取災害應變系統。</p>
 
-                    {/* Social Login Buttons Row */}
-                    <div style={{
-                        display: 'flex',
-                        flexDirection: 'column' as const,
-                        gap: '16px',
-                        width: '100%',
-                        marginTop: '24px',
-                    }}>
-                        {/* Google Login Button */}
-                        <button
-                            type="button"
-                            onClick={handleGoogleLogin}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '12px',
-                                minHeight: '44px',
-                                padding: '18px 24px',
-                                background: 'color-mix(in srgb, var(--text-primary) 5%, transparent)',
-                                border: '1px solid color-mix(in srgb, var(--color-warning-light) 30%, transparent)',
-                                borderRadius: '4px',
-                                color: 'var(--text-primary)',
-                                fontFamily: "'Orbitron', sans-serif",
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                letterSpacing: '2px',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'color-mix(in srgb, var(--text-primary) 10%, transparent)';
-                                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--color-warning-light) 60%, transparent)';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 8px 30px color-mix(in srgb, var(--color-warning-light) 20%, transparent)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'color-mix(in srgb, var(--text-primary) 5%, transparent)';
-                                e.currentTarget.style.borderColor = 'color-mix(in srgb, var(--color-warning-light) 30%, transparent)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            {/* Google 官方品牌標誌配色 — 依 Google 品牌規範保留原色，不套用 app token */}
-                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                                <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                            </svg>
-                            使用 GOOGLE 帳號登入
-                        </button>
+                        <div className="lk-login__actions">
+                            {/* Google 登入 — "G" 標誌四色為 Google 官方品牌規範原色，不套 app token */}
+                            <button type="button" className="lk-login__oauth" onClick={handleGoogleLogin}>
+                                <span className="lk-login__oauth-no u-mono" aria-hidden="true">01</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                                </svg>
+                                <span className="lk-login__oauth-text">
+                                    <b>使用 Google 帳號登入</b>
+                                    <small className="u-stencil">GOOGLE OAUTH</small>
+                                </span>
+                                <span className="lk-login__oauth-arrow" aria-hidden="true">→</span>
+                            </button>
 
-                        {/* LINE Login Button — LINE 官方品牌綠 (#00C300) 依品牌規範保留原色，不套用 app token */}
-                        <button
-                            type="button"
-                            onClick={handleLineLogin}
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                gap: '12px',
-                                minHeight: '44px',
-                                padding: '18px 24px',
-                                background: 'rgba(0, 195, 0, 0.1)',
-                                border: '1px solid rgba(0, 195, 0, 0.4)',
-                                borderRadius: '4px',
-                                color: '#00C300',
-                                fontFamily: "'Orbitron', sans-serif",
-                                fontSize: '14px',
-                                fontWeight: 600,
-                                letterSpacing: '2px',
-                                cursor: 'pointer',
-                                transition: 'all 0.3s ease',
-                            }}
-                            onMouseEnter={(e) => {
-                                e.currentTarget.style.background = 'rgba(0, 195, 0, 0.2)';
-                                e.currentTarget.style.borderColor = 'rgba(0, 195, 0, 0.7)';
-                                e.currentTarget.style.transform = 'translateY(-2px)';
-                                e.currentTarget.style.boxShadow = '0 8px 30px rgba(0, 195, 0, 0.2)';
-                            }}
-                            onMouseLeave={(e) => {
-                                e.currentTarget.style.background = 'rgba(0, 195, 0, 0.1)';
-                                e.currentTarget.style.borderColor = 'rgba(0, 195, 0, 0.4)';
-                                e.currentTarget.style.transform = 'translateY(0)';
-                                e.currentTarget.style.boxShadow = 'none';
-                            }}
-                        >
-                            <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">
-                                <path fill="#00C300" d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.105.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
-                            </svg>
-                            使用 LINE 帳號登入
-                        </button>
+                            {/* LINE 登入 — LINE 官方品牌綠 #06C755 依品牌規範保留原色，不套 app token */}
+                            <button type="button" className="lk-login__oauth lk-login__oauth--line" onClick={handleLineLogin}>
+                                <span className="lk-login__oauth-no u-mono" aria-hidden="true">02</span>
+                                <svg viewBox="0 0 24 24" aria-hidden="true">
+                                    <path fill="#06C755" d="M19.365 9.863c.349 0 .63.285.63.631 0 .345-.281.63-.63.63H17.61v1.125h1.755c.349 0 .63.283.63.63 0 .344-.281.629-.63.629h-2.386c-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63h2.386c.346 0 .627.285.627.63 0 .349-.281.63-.63.63H17.61v1.125h1.755zm-3.855 3.016c0 .27-.174.51-.432.596-.064.021-.133.031-.199.031-.211 0-.391-.09-.51-.25l-2.443-3.317v2.94c0 .344-.279.629-.631.629-.346 0-.626-.285-.626-.629V8.108c0-.27.173-.51.43-.595.06-.023.136-.033.194-.033.195 0 .375.105.495.254l2.462 3.33V8.108c0-.345.282-.63.63-.63.345 0 .63.285.63.63v4.771zm-5.741 0c0 .344-.282.629-.631.629-.345 0-.627-.285-.627-.629V8.108c0-.345.282-.63.63-.63.346 0 .628.285.628.63v4.771zm-2.466.629H4.917c-.345 0-.63-.285-.63-.629V8.108c0-.345.285-.63.63-.63.348 0 .63.285.63.63v4.141h1.756c.348 0 .629.283.629.63 0 .344-.282.629-.629.629M24 10.314C24 4.943 18.615.572 12 .572S0 4.943 0 10.314c0 4.811 4.27 8.842 10.035 9.608.391.082.923.258 1.058.59.12.301.079.766.038 1.08l-.164 1.02c-.045.301-.24 1.186 1.049.645 1.291-.539 6.916-4.078 9.436-6.975C23.176 14.393 24 12.458 24 10.314"/>
+                                </svg>
+                                <span className="lk-login__oauth-text">
+                                    <b>使用 LINE 帳號登入</b>
+                                    <small className="u-stencil">LINE LOGIN</small>
+                                </span>
+                                <span className="lk-login__oauth-arrow" aria-hidden="true">→</span>
+                            </button>
+                        </div>
                     </div>
 
-
-                    <div style={styles.versionFooter}>
-                        <span style={styles.versionText}>VERSION 2.2.0 // 光守護者系統</span>
-                    </div>
-                </div>
-            </div>
+                    {/* 底列 */}
+                    <footer className="lk-login__foot">
+                        <span>光守護者系統</span>
+                        <span><b className="u-mono">v2.2.0</b></span>
+                    </footer>
+                </section>
+            </main>
         </div>
     );
 };

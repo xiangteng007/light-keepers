@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>B3 字體辨識度修正 — 3 版對比</title>
+<style>
+ * { margin:0; padding:0; box-sizing:border-box; }
+ body { background:#000; font-family:'Noto Sans TC',-apple-system,sans-serif; }
+ .head { padding:26px 24px 6px; color:#fff; }
+ .head h1 { font-size:19px; letter-spacing:.04em; }
+ .head p { color:#999; font-size:13px; margin-top:6px; line-height:1.7; }
+ .wrap { margin:18px 12px 44px; border:1px solid #333; border-radius:8px; overflow:hidden; }
+ .wrap.old { opacity:.92; border-color:#5a2e2e; }
+ .tag { display:flex; align-items:baseline; gap:12px; padding:10px 16px; background:#111; border-bottom:1px solid #333; }
+ .tag b { color:#fff; font-size:15px; }
+ .tag span { color:#888; font-size:12px; }
+ .old .tag b { color:#c97b7b; }
+ .foot { padding:0 24px 60px; color:#777; font-size:12.5px; line-height:1.8; }
+</style>
+</head>
+<body>
+<div class="head">
+ <h1>B3 橄欖野戰 — 字體辨識度修正（3 版）</h1>
+ <p>三版鐵律：中文字距一律 0（stencil 只給拉丁小標）、內文不帶橄欖色調（≥7:1）、低優先列不靠透明度隱形。<br>回覆例：「B3b」「B3a 但數字用 B3b 的大小」。</p>
+</div>
+<div class="wrap old"><div class="tag"><b>B3 原版（對照組）</b><span>您指出辨識度不足的那一版——留著對照</span></div>
+<section class="bv3">
+<style>
+.bv3{--bg:#16170F;--pn:#1C1E14;--ln:#2E3122;--ol:#9BA85C;--kh:#C4B582;--ink:#E6E5D8;--dim:#9A9C85;--mut:#67694F;
+position:relative;max-width:100%;box-sizing:border-box;background:var(--bg);color:var(--ink);
+font:14px/1.6 "Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;padding:26px 26px 30px;}
+.bv3 *,.bv3 *::before,.bv3 *::after{box-sizing:border-box;margin:0;padding:0;}
+.bv3::before{content:"";position:absolute;inset:0 0 auto 0;height:3px;opacity:.5;
+background:repeating-linear-gradient(135deg,var(--ol) 0 12px,transparent 12px 24px);}
+.bv3 .mono{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;}
+.bv3 .top{display:flex;align-items:center;flex-wrap:wrap;gap:14px 18px;padding-bottom:16px;border-bottom:1px solid var(--ln);}
+.bv3 .brand{display:flex;align-items:center;gap:10px;font-size:15px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.bv3 .logo{width:12px;height:12px;background:var(--ol);border-radius:2px;box-shadow:0 0 0 3px rgba(155,168,92,.16);}
+.bv3 .mission{display:flex;align-items:center;gap:9px;margin-right:auto;padding-left:16px;border-left:1px solid var(--ln);
+font-size:12px;color:var(--dim);letter-spacing:.06em;}
+.bv3 .mission .mono{color:var(--kh);}
+.bv3 .live{width:7px;height:7px;background:var(--ol);border-radius:1px;flex:none;}
+.bv3 .cta{cursor:pointer;border:1px solid var(--ol);background:var(--ol);color:#111207;border-radius:2px;
+font:700 12.5px/1 "Noto Sans TC","Microsoft JhengHei",sans-serif;letter-spacing:.22em;padding:11px 15px 11px 20px;
+clip-path:polygon(9px 0,100% 0,100% 100%,0 100%,0 9px);box-shadow:inset 0 -2px 0 rgba(0,0,0,.28);}
+.bv3 .cta:hover{background:var(--kh);border-color:var(--kh);}
+.bv3 .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:18px 0 14px;}
+.bv3 .card{background:var(--pn);border:1px solid var(--ln);border-radius:2px;padding:14px 16px 13px;}
+.bv3 .lab{display:flex;align-items:baseline;gap:8px;font-size:10.5px;font-weight:600;letter-spacing:.12em;
+text-transform:uppercase;color:var(--dim);}
+.bv3 .idx{color:var(--ol);font-size:10px;}
+.bv3 .val{font-size:30px;font-weight:600;line-height:1.2;margin:7px 0 3px;letter-spacing:.01em;}
+.bv3 .val small{font-size:15px;font-weight:500;color:var(--mut);letter-spacing:.05em;}
+.bv3 .sub{font-size:11.5px;color:var(--mut);letter-spacing:.04em;}
+.bv3 .sub .mono{color:var(--dim);}
+.bv3 .sub .up{color:var(--ol);font-weight:700;}
+.bv3 .hot{border-color:#565A3B;box-shadow:inset 3px 0 0 var(--ol);
+background-image:repeating-linear-gradient(-45deg,rgba(155,168,92,.055) 0 8px,transparent 8px 16px);}
+.bv3 .hot .lab{color:var(--kh);}
+.bv3 .hot .val{color:var(--kh);}
+.bv3 .queues{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px;}
+.bv3 .panel{background:var(--pn);border:1px solid var(--ln);border-radius:2px;overflow:hidden;}
+.bv3 .ph{display:flex;align-items:center;gap:9px;padding:11px 16px 10px;border-bottom:1px solid var(--ln);
+background:linear-gradient(rgba(155,168,92,.05),rgba(155,168,92,0));}
+.bv3 .ph h3{font-size:11.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;}
+.bv3 .sq{width:8px;height:8px;border-radius:1px;flex:none;}
+.bv3 .sqa{background:var(--ol);}
+.bv3 .sqb{background:var(--kh);}
+.bv3 .count{margin-left:auto;font-size:11px;color:var(--dim);background:var(--bg);border:1px solid var(--ln);border-radius:2px;padding:2px 8px;}
+.bv3 .panel ul{list-style:none;}
+.bv3 .panel li{display:flex;align-items:center;gap:10px;padding:11px 16px;}
+.bv3 .panel li+li{border-top:1px dashed var(--ln);}
+.bv3 .txt{flex:1;min-width:0;font-size:13px;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bv3 .txt .mono{color:var(--kh);font-size:12.5px;}
+.bv3 .ts{flex:none;font-size:11.5px;color:var(--mut);letter-spacing:.03em;}
+.bv3 .chip{flex:none;min-width:46px;text-align:center;font-size:10px;font-weight:700;line-height:1;
+letter-spacing:.1em;text-transform:uppercase;border:1px solid;border-radius:2px;padding:4px 7px;}
+.bv3 .c-high{background:var(--ol);border-color:var(--ol);color:#12130B;}
+.bv3 .c-med{border-color:var(--kh);color:var(--kh);}
+.bv3 .c-low{border-color:#4A4D36;color:var(--dim);}
+.bv3 .c-go{background:var(--kh);border-color:var(--kh);color:#12130B;}
+.bv3 .c-run{border-color:var(--ol);color:var(--ol);}
+.bv3 .c-done{border-color:#3B3E2C;color:var(--mut);}
+.bv3 .done .txt,.bv3 .done .txt .mono,.bv3 .done .ts{color:var(--mut);}
+</style>
+<header class="top">
+<div class="brand"><span class="logo"></span>LightKeepers</div>
+<div class="mission"><span class="live"></span><span>任務 <span class="mono">BRAVO-172</span> · 進行中 <span class="mono">04:22:18</span></span></div>
+<button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+<article class="card">
+<div class="lab"><span class="idx mono">01</span>通報總數</div>
+<div class="val mono">24</div>
+<div class="sub">近 <span class="mono">1</span> 小時 <span class="mono up">+6</span></div>
+</article>
+<article class="card hot">
+<div class="lab"><span class="idx mono">02</span>待處理</div>
+<div class="val mono">7</div>
+<div class="sub">最舊 <span class="mono">12</span> 分鐘</div>
+</article>
+<article class="card">
+<div class="lab"><span class="idx mono">03</span>派遣隊伍</div>
+<div class="val mono">12<small>/15</small></div>
+<div class="sub"><span class="mono">3</span> 隊待命</div>
+</article>
+<article class="card">
+<div class="lab"><span class="idx mono">04</span>傷患追蹤</div>
+<div class="val mono">0</div>
+<div class="sub">無 MCI 事件</div>
+</article>
+</div>
+<div class="queues">
+<article class="panel">
+<header class="ph"><span class="sq sqa"></span><h3>回報佇列</h3><span class="count mono">7</span></header>
+<ul>
+<li><span class="chip c-high mono">HIGH</span><span class="txt">建物倒塌 · 林森北路<span class="mono">85</span>巷</span><span class="ts mono">23:39</span></li>
+<li><span class="chip c-med mono">MED</span><span class="txt">道路淹水 · 承德路四段</span><span class="ts mono">23:35</span></li>
+<li><span class="chip c-low mono">LOW</span><span class="txt">路樹倒伏 · 民族東路</span><span class="ts mono">23:28</span></li>
+</ul>
+</article>
+<article class="panel">
+<header class="ph"><span class="sq sqb"></span><h3>任務佇列</h3><span class="count mono">12</span></header>
+<ul>
+<li><span class="chip c-go">派遣</span><span class="txt"><span class="mono">TEAM-04</span> → 建物倒塌現場</span><span class="ts"><span class="mono">4</span> 分前</span></li>
+<li><span class="chip c-run">執行</span><span class="txt"><span class="mono">TEAM-07</span> 抽水作業</span><span class="ts"><span class="mono">18</span> 分前</span></li>
+<li class="done"><span class="chip c-done">完成</span><span class="txt"><span class="mono">TEAM-02</span> 物資配送</span><span class="ts"><span class="mono">32</span> 分前</span></li>
+</ul>
+</article>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B3a · 中性亮字</b><span>最小修正：底色橄欖不動，只換文字系統（正文暖白，橄欖降級為符號色）</span></div>
+<section class="b3a">
+<style>
+.b3a{background:#16170F;color:#EAE8DC;font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif;font-size:15px;line-height:1.6;padding:22px;max-width:1080px;margin:0 auto;}
+.b3a,.b3a *{box-sizing:border-box;margin:0;letter-spacing:0;}
+.b3a .mono{font-family:'JetBrains Mono',Consolas,monospace;font-variant-numeric:tabular-nums;}
+.b3a .trk{letter-spacing:.14em;} /* 只給拉丁/數字小標；中文永遠 0 */
+/* ── 頂列 ─────────────────────────── */
+.b3a .top{display:flex;align-items:center;gap:18px;flex-wrap:wrap;padding-bottom:16px;border-bottom:1px solid #2E3122;margin-bottom:16px;}
+.b3a .brand{display:flex;align-items:center;gap:9px;}
+.b3a .bsq{width:12px;height:12px;background:#9BA85C;border-radius:1px;}
+.b3a .bname{font-size:17px;font-weight:800;color:#EAE8DC;}
+.b3a .mission{display:flex;align-items:center;gap:8px;color:#B4B3A6;font-size:15px;}
+.b3a .mid{color:#EAE8DC;font-weight:700;}
+.b3a .live{width:7px;height:7px;background:#9BA85C;border-radius:1px;}
+.b3a .timer{color:#9BA85C;font-weight:700;font-size:16px;}
+.b3a .cta{margin-left:auto;background:#9BA85C;color:#16170F;border:0;border-radius:2px;font:inherit;font-size:15px;font-weight:700;padding:9px 20px;cursor:pointer;}
+.b3a .cta:hover{background:#ADB973;}
+/* ── 統計 4 卡 ─────────────────────── */
+.b3a .stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px;}
+.b3a .card{background:#1C1E14;border:1px solid #2E3122;border-radius:3px;padding:14px 16px 12px;}
+.b3a .ch{display:flex;justify-content:space-between;align-items:baseline;}
+.b3a .cl{font-size:14px;font-weight:600;color:#B4B3A6;}
+.b3a .ci{font-size:11px;color:#8F9184;}
+.b3a .cn{font-size:32px;font-weight:700;line-height:1.25;color:#EAE8DC;margin:4px 0 0;}
+.b3a .den{font-size:18px;font-weight:600;color:#B4B3A6;}
+.b3a .cs{font-size:14px;color:#B4B3A6;}
+.b3a .up{color:#9BA85C;font-weight:700;}
+.b3a .hot{border-color:#9BA85C;background:repeating-linear-gradient(135deg,rgba(155,168,92,.07) 0 6px,rgba(155,168,92,0) 6px 12px),#1C1E14;}
+.b3a .hot .cn{color:#9BA85C;}
+/* ── 雙佇列 ────────────────────────── */
+.b3a .queues{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.b3a .panel{background:#1C1E14;border:1px solid #2E3122;border-radius:3px;padding:14px 16px 6px;}
+.b3a .ph{display:flex;align-items:center;gap:9px;padding-bottom:10px;border-bottom:1px solid #2E3122;}
+.b3a .sq{width:9px;height:9px;background:#9BA85C;border-radius:1px;}
+.b3a .ph h3{font-size:16px;font-weight:700;color:#EAE8DC;}
+.b3a .pc{font-size:14px;color:#9BA85C;font-weight:700;}
+.b3a .tag{margin-left:auto;font-size:11px;color:#8F9184;}
+.b3a .row{display:grid;grid-template-columns:14px 52px 1fr auto;gap:10px;align-items:center;padding:11px 2px;border-bottom:1px solid #262A1B;}
+.b3a .row:last-child{border-bottom:0;}
+.b3a .mk{width:10px;height:10px;border-radius:1px;justify-self:center;}
+.b3a .mk-h{background:#9BA85C;}
+.b3a .mk-m{border:2px solid #9BA85C;}
+.b3a .mk-l{border:2px solid #8F9184;}
+.b3a .mk-ck{justify-self:center;color:#8F9184;font-weight:700;font-size:14px;line-height:1;}
+.b3a .chip{font-size:12px;font-weight:700;text-align:center;padding:2px 6px;border-radius:2px;border:1px solid transparent;}
+.b3a .ch-h,.b3a .ch-go{background:#9BA85C;color:#16170F;}
+.b3a .ch-m,.b3a .ch-run{border-color:#9BA85C;color:#9BA85C;}
+.b3a .ch-l,.b3a .ch-done{border-color:#8F9184;color:#B4B3A6;}
+.b3a .tx{font-size:15px;color:#EAE8DC;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.b3a .tid{font-weight:700;letter-spacing:.1em;color:#EAE8DC;}
+.b3a .ts{font-size:14px;color:#B4B3A6;}
+.b3a .done .tx,.b3a .done .tid{color:#B4B3A6;}
+@media (max-width:900px){.b3a .stats{grid-template-columns:repeat(2,1fr);}.b3a .queues{grid-template-columns:1fr;}.b3a .cta{margin-left:0;}}
+</style>
+<header class="top">
+  <div class="brand"><span class="bsq"></span><span class="bname mono trk">LIGHTKEEPERS</span></div>
+  <div class="mission">任務 <span class="mid mono">BRAVO-172</span> · <span class="live"></span>進行中 <span class="timer mono">04:22:18</span></div>
+  <button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+  <article class="card">
+    <div class="ch"><span class="cl">通報總數</span><span class="ci mono trk">01</span></div>
+    <div class="cn mono">24</div>
+    <p class="cs">近1小時 <b class="up mono">+6</b></p>
+  </article>
+  <article class="card hot">
+    <div class="ch"><span class="cl">待處理</span><span class="ci mono trk">02</span></div>
+    <div class="cn mono">7</div>
+    <p class="cs">最舊 <b class="up mono">12</b> 分鐘</p>
+  </article>
+  <article class="card">
+    <div class="ch"><span class="cl">派遣隊伍</span><span class="ci mono trk">03</span></div>
+    <div class="cn mono">12<span class="den">/15</span></div>
+    <p class="cs">3隊待命</p>
+  </article>
+  <article class="card">
+    <div class="ch"><span class="cl">傷患追蹤</span><span class="ci mono trk">04</span></div>
+    <div class="cn mono">0</div>
+    <p class="cs">無MCI事件</p>
+  </article>
+</div>
+<div class="queues">
+  <section class="panel">
+    <header class="ph"><span class="sq"></span><h3>回報佇列 <span class="pc mono">(7)</span></h3><span class="tag mono trk">TRIAGE FEED</span></header>
+    <div class="row"><span class="mk mk-h"></span><span class="chip mono trk ch-h">HIGH</span><span class="tx">建物倒塌·林森北路85巷</span><span class="ts mono">23:39</span></div>
+    <div class="row"><span class="mk mk-m"></span><span class="chip mono trk ch-m">MED</span><span class="tx">道路淹水·承德路四段</span><span class="ts mono">23:35</span></div>
+    <div class="row"><span class="mk mk-l"></span><span class="chip mono trk ch-l">LOW</span><span class="tx">路樹倒伏·民族東路</span><span class="ts mono">23:28</span></div>
+  </section>
+  <section class="panel">
+    <header class="ph"><span class="sq"></span><h3>任務佇列 <span class="pc mono">(12)</span></h3><span class="tag mono trk">UNIT TASKING</span></header>
+    <div class="row"><span class="mk mk-h"></span><span class="chip ch-go">派遣</span><span class="tx"><span class="tid mono">TEAM-04</span> → 建物倒塌現場</span><span class="ts mono">4分前</span></div>
+    <div class="row"><span class="mk mk-m"></span><span class="chip ch-run">執行</span><span class="tx"><span class="tid mono">TEAM-07</span> 抽水作業</span><span class="ts mono">18分前</span></div>
+    <div class="row done"><span class="mk-ck">✓</span><span class="chip ch-done">完成</span><span class="tx"><span class="tid mono">TEAM-02</span> 物資配送</span><span class="ts mono">32分前</span></div>
+  </section>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B3b · 高對比夜視</b><span>更黑更亮：橄欖提亮為訊號色、數字 30px 粗體、chip 實心——夜視鏡裡的印刷體</span></div>
+<section class="b3b">
+<style>
+.b3b{--bg:#101107;--panel:#161810;--ink:#F2F0E6;--ink2:#BDBBAA;--mut:#8F8D7E;--ol:#B7C56D;--olD:#14150D;--line:#2B2D1D;--gray:#A8A695;
+  background:var(--bg);color:var(--ink);font:500 14px/1.6 "Noto Sans TC","Microsoft JhengHei","PingFang TC",sans-serif;
+  letter-spacing:0;padding:20px;max-width:1100px;margin:0 auto;box-sizing:border-box;border:1px solid var(--line);border-radius:3px}
+.b3b *{box-sizing:border-box;margin:0;padding:0}
+.b3b .mono{font-family:"JetBrains Mono",Consolas,monospace;font-variant-numeric:tabular-nums}
+.b3b .top{display:flex;align-items:center;gap:18px;padding-bottom:16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.b3b .brand{display:flex;align-items:center;gap:10px}
+.b3b .bmark{width:12px;height:12px;background:var(--ol);border-radius:1px}
+.b3b .bname{font-size:17px;font-weight:700;letter-spacing:.18em}
+.b3b .mission{display:flex;align-items:center;gap:8px;font-size:14px}
+.b3b .dot{width:8px;height:8px;background:var(--ol);border-radius:1px;animation:b3bPulse 1.6s infinite}
+@keyframes b3bPulse{50%{opacity:.35}}
+.b3b .mission b{font-weight:700}
+.b3b .clock{color:var(--ol);font-size:16px}
+.b3b .sep{color:var(--mut)}
+.b3b .cta{margin-left:auto;background:var(--ol);color:var(--olD);border:1px solid var(--ol);border-radius:2px;font-family:inherit;font-size:15px;font-weight:700;letter-spacing:0;padding:10px 20px;cursor:pointer}
+.b3b .cta:hover{background:#C6D37F}
+.b3b .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:16px 0}
+.b3b .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:14px 16px 12px}
+.b3b .idx{position:absolute;top:10px;right:12px;font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--mut)}
+.b3b .card h3{font-size:14px;font-weight:600;color:var(--ink2);letter-spacing:0}
+.b3b .num{font-size:30px;font-weight:700;line-height:1.15;margin:6px 0 2px}
+.b3b .den{font-size:17px;font-weight:600;color:var(--ink2)}
+.b3b .meta{font-size:13px;color:var(--gray)}
+.b3b .meta b{font-weight:700;color:var(--ink)}
+.b3b .meta .up{color:var(--ol)}
+.b3b .hot{border-color:var(--ol);background-image:repeating-linear-gradient(135deg,rgba(183,197,109,.08) 0 5px,transparent 5px 11px)}
+.b3b .hot .idx,.b3b .hot .num{color:var(--ol)}
+.b3b .queues{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.b3b .panel{background:var(--panel);border:1px solid var(--line);border-radius:3px}
+.b3b .ph{display:flex;align-items:center;gap:9px;padding:12px 14px;border-bottom:1px solid var(--line)}
+.b3b .sq{width:9px;height:9px;background:var(--ol);border-radius:1px}
+.b3b .ph h2{font-size:15px;font-weight:700;letter-spacing:0}
+.b3b .cnt{font-size:13px;font-weight:600;color:var(--ink2)}
+.b3b .tag{margin-left:auto;font-size:11px;font-weight:600;letter-spacing:.16em;color:var(--mut)}
+.b3b ul{list-style:none}
+.b3b li{display:grid;grid-template-columns:14px 52px 1fr auto;gap:10px;align-items:center;padding:12px 14px;border-top:1px solid var(--line)}
+.b3b li:first-child{border-top:0}
+.b3b .mk{width:10px;height:10px;border-radius:1px;justify-self:center}
+.b3b .mkHigh,.b3b .mkGo{background:var(--ol)}
+.b3b .mkMed,.b3b .mkRun{border:2px solid var(--ol)}
+.b3b .mkRun{background:linear-gradient(135deg,var(--ol) 50%,transparent 50%)}
+.b3b .mkLow{border:2px solid #6B6A5C}
+.b3b .mkDone{width:auto;height:auto;font-size:13px;font-weight:700;color:var(--gray);line-height:1}
+.b3b .chip{display:inline-block;text-align:center;font-size:11px;font-weight:700;letter-spacing:.12em;line-height:1;padding:4px 0;border-radius:2px;border:1px solid transparent}
+.b3b .cHigh{background:var(--ol);border-color:var(--ol);color:var(--olD)}
+.b3b .cMed{border-color:var(--ol);color:var(--ol)}
+.b3b .cLow{border-color:#6B6A5C;color:var(--gray)}
+.b3b .chip.zh{letter-spacing:0;font-size:12px;font-family:inherit}
+.b3b .tt{font-size:15px;font-weight:600;line-height:1.55}
+.b3b .loc{color:var(--ink2);font-weight:500}
+.b3b .t2{color:var(--ink2)}
+.b3b .tm{font-weight:700;letter-spacing:.06em}
+.b3b .arr{color:var(--ol);font-weight:700}
+.b3b time{font-size:13px;font-weight:600;color:var(--gray);white-space:nowrap}
+.b3b time b{font-weight:700}
+@media(max-width:880px){.b3b .queues{grid-template-columns:1fr}.b3b .stats{grid-template-columns:repeat(2,1fr)}}
+</style>
+<header class="top">
+<div class="brand"><span class="bmark"></span><span class="bname mono">LIGHTKEEPERS</span></div>
+<div class="mission"><span class="dot"></span><span>任務</span><b class="mono">BRAVO-172</b><span class="sep">·</span><span>進行中</span><b class="mono clock">04:22:18</b></div>
+<button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+<article class="card"><span class="idx mono">01</span><h3>通報總數</h3><p class="num mono">24</p><p class="meta">近1小時 <b class="mono up">+6</b></p></article>
+<article class="card hot"><span class="idx mono">02</span><h3>待處理</h3><p class="num mono">7</p><p class="meta">最舊 <b class="mono">12</b> 分鐘</p></article>
+<article class="card"><span class="idx mono">03</span><h3>派遣隊伍</h3><p class="num mono">12<span class="den">/15</span></p><p class="meta"><b class="mono">3</b> 隊待命</p></article>
+<article class="card"><span class="idx mono">04</span><h3>傷患追蹤</h3><p class="num mono">0</p><p class="meta">無 MCI 事件</p></article>
+</div>
+<div class="queues">
+<section class="panel">
+<header class="ph"><span class="sq"></span><h2>回報佇列</h2><span class="cnt mono">(7)</span><span class="tag mono">TRIAGE FEED</span></header>
+<ul>
+<li><span class="mk mkHigh"></span><span class="chip cHigh mono">HIGH</span><span class="tt">建物倒塌<span class="loc">·林森北路85巷</span></span><time class="mono">23:39</time></li>
+<li><span class="mk mkMed"></span><span class="chip cMed mono">MED</span><span class="tt">道路淹水<span class="loc">·承德路四段</span></span><time class="mono">23:35</time></li>
+<li><span class="mk mkLow"></span><span class="chip cLow mono">LOW</span><span class="tt">路樹倒伏<span class="loc">·民族東路</span></span><time class="mono">23:28</time></li>
+</ul>
+</section>
+<section class="panel">
+<header class="ph"><span class="sq"></span><h2>任務佇列</h2><span class="cnt mono">(12)</span><span class="tag mono">OPS QUEUE</span></header>
+<ul>
+<li><span class="mk mkGo"></span><span class="chip cHigh zh">派遣</span><span class="tt"><b class="mono tm">TEAM-04</b><span class="arr"> → </span>建物倒塌現場</span><time><b class="mono">4</b>分前</time></li>
+<li><span class="mk mkRun"></span><span class="chip cMed zh">執行</span><span class="tt"><b class="mono tm">TEAM-07</b> 抽水作業</span><time><b class="mono">18</b>分前</time></li>
+<li><span class="mk mkDone">✓</span><span class="chip cLow zh">完成</span><span class="tt t2"><b class="mono tm">TEAM-02</b> 物資配送</span><time><b class="mono">32</b>分前</time></li>
+</ul>
+</section>
+</div>
+</section>
+</div>
+<div class="wrap"><div class="tag"><b>B3c · 野戰手冊</b><span>印刷紀律：手冊紙白＋軍規卡其雙中性層級、正文 15px、2px 規線——印刷精良的野戰教範</span></div>
+<section class="b3c">
+<style>
+.b3c{--bg:#16140F;--panel:#23201A;--edge:#4A4433;--line:#35301F;--ink:#EDE9DA;--khaki:#C9BC8F;--olive:#B7C98A;--od:#8A9155;--alert:#F0A868;--mute:#B8B2A3;--mono:'JetBrains Mono',Consolas,monospace;background:var(--bg);color:var(--ink);font-family:'Noto Sans TC','PingFang TC','Microsoft JhengHei',system-ui,sans-serif;font-size:15px;line-height:1.6;letter-spacing:0;padding:20px}
+.b3c *{box-sizing:border-box;margin:0;padding:0}
+.b3c .lat{font-family:var(--mono);font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.b3c .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+.b3c .top{display:flex;align-items:center;flex-wrap:wrap;gap:14px 22px;background:var(--panel);border:2px solid var(--edge);border-radius:3px;padding:14px 18px;margin-bottom:14px}
+.b3c .brand{display:flex;align-items:center;gap:10px}
+.b3c .bmk{width:12px;height:12px;background:var(--olive)}
+.b3c .bname{font-size:17px;letter-spacing:.18em;color:var(--ink)}
+.b3c .mstat{display:flex;align-items:center;flex-wrap:wrap;gap:10px;font-size:15px;color:var(--khaki)}
+.b3c .mid{font-size:14px;color:var(--ink)}
+.b3c .live{display:inline-flex;align-items:center;gap:7px;border:2px solid var(--olive);border-radius:2px;padding:2px 10px;color:var(--olive);font-weight:700;font-size:13px}
+.b3c .live i{width:8px;height:8px;background:var(--olive)}
+.b3c .clock{font-size:17px;font-weight:700;color:var(--ink)}
+.b3c .cta{margin-left:auto;font:inherit;font-weight:700;color:#16140F;background:var(--olive);border:2px solid var(--olive);border-radius:2px;padding:9px 24px;cursor:pointer}
+.b3c .cta:hover{background:var(--ink);border-color:var(--ink)}
+.b3c .cta:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.b3c .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:12px;margin-bottom:14px}
+.b3c .card{background:var(--panel);border:2px solid var(--edge);border-radius:3px;padding:15px 18px 14px}
+.b3c .chead{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.b3c .ctit{font-size:15px;font-weight:700;color:var(--ink)}
+.b3c .cno{font-size:12px;color:var(--khaki)}
+.b3c .cval{font-size:34px;font-weight:700;line-height:1.15;color:var(--ink)}
+.b3c .den{font-size:19px;font-weight:700;color:var(--khaki)}
+.b3c .csub{font-size:14px;color:var(--khaki);margin-top:5px}
+.b3c .csub .num{font-weight:700;color:var(--ink)}
+.b3c .csub .up{color:var(--olive)}
+.b3c .hot{border-color:var(--od);background-image:repeating-linear-gradient(-45deg,rgba(183,201,138,.055) 0 6px,transparent 6px 14px)}
+.b3c .hot .cval{color:var(--olive)}
+.b3c .cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.b3c .panel{background:var(--panel);border:2px solid var(--edge);border-radius:3px}
+.b3c .phead{display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:2px solid var(--od)}
+.b3c .pmk{width:10px;height:10px;background:var(--olive);flex:none}
+.b3c .phead h3{font-size:16px;font-weight:700;color:var(--ink)}
+.b3c .pct{font-size:15px;color:var(--khaki)}
+.b3c .ptag{margin-left:auto;font-size:11px;color:var(--khaki)}
+.b3c .q{list-style:none;padding:4px 0}
+.b3c .q li{display:flex;align-items:center;gap:12px;padding:13px 18px}
+.b3c .q li+li{border-top:1px solid var(--line)}
+.b3c .mk{width:10px;height:10px;flex:none;border:2px solid var(--mute)}
+.b3c .mk-h{background:var(--alert);border-color:var(--alert)}
+.b3c .mk-m{background:var(--khaki);border-color:var(--khaki)}
+.b3c .mk-go{background:var(--olive);border-color:var(--olive)}
+.b3c .mk-run{border-color:var(--olive)}
+.b3c .mk-done{flex:none;border:0;color:var(--olive);font-weight:700;font-size:15px;line-height:1}
+.b3c .chip{flex:none;min-width:56px;text-align:center;font-size:12px;font-weight:700;line-height:1.3;border:2px solid;border-radius:2px;padding:2px 8px}
+.b3c .ch-h{color:var(--alert);border-color:var(--alert)}
+.b3c .ch-m{color:var(--khaki);border-color:var(--khaki)}
+.b3c .ch-l{color:var(--mute);border-color:var(--mute)}
+.b3c .ch-go{color:var(--olive);border-color:var(--olive)}
+.b3c .ch-run{color:var(--khaki);border-color:var(--khaki)}
+.b3c .ch-done{color:var(--mute);border-color:var(--edge)}
+.b3c .qt{flex:1;min-width:0;font-size:15px;color:var(--ink)}
+.b3c .tid{font-size:13px;color:var(--khaki)}
+.b3c .q time{flex:none;font-size:14px;color:var(--khaki)}
+</style>
+<header class="top">
+<div class="brand"><span class="bmk"></span><span class="lat bname">LIGHTKEEPERS</span></div>
+<div class="mstat"><span>任務</span><span class="lat mid">BRAVO-172</span><span>·</span><span class="live"><i></i>進行中</span><span class="num clock">04:22:18</span></div>
+<button class="cta" type="button">快速通報</button>
+</header>
+<div class="stats">
+<article class="card"><div class="chead"><span class="ctit">通報總數</span><span class="lat cno">01</span></div><div class="cval num">24</div><div class="csub">近 1 小時 <span class="num up">+6</span></div></article>
+<article class="card hot"><div class="chead"><span class="ctit">待處理</span><span class="lat cno">02</span></div><div class="cval num">7</div><div class="csub">最舊 <span class="num">12</span> 分鐘</div></article>
+<article class="card"><div class="chead"><span class="ctit">派遣隊伍</span><span class="lat cno">03</span></div><div class="cval num">12<span class="den">/15</span></div><div class="csub"><span class="num">3</span> 隊待命</div></article>
+<article class="card"><div class="chead"><span class="ctit">傷患追蹤</span><span class="lat cno">04</span></div><div class="cval num">0</div><div class="csub">無 MCI 事件</div></article>
+</div>
+<div class="cols">
+<section class="panel">
+<header class="phead"><span class="pmk"></span><h3>回報佇列 <span class="pct num">(7)</span></h3><span class="lat ptag">Triage Feed</span></header>
+<ul class="q">
+<li><span class="mk mk-h"></span><span class="chip ch-h lat">High</span><span class="qt"><b>建物倒塌</b> · 林森北路85巷</span><time class="num">23:39</time></li>
+<li><span class="mk mk-m"></span><span class="chip ch-m lat">Med</span><span class="qt"><b>道路淹水</b> · 承德路四段</span><time class="num">23:35</time></li>
+<li><span class="mk"></span><span class="chip ch-l lat">Low</span><span class="qt"><b>路樹倒伏</b> · 民族東路</span><time class="num">23:28</time></li>
+</ul>
+</section>
+<section class="panel">
+<header class="phead"><span class="pmk"></span><h3>任務佇列 <span class="pct num">(12)</span></h3><span class="lat ptag">Ops Tasking</span></header>
+<ul class="q">
+<li><span class="mk mk-go"></span><span class="chip ch-go">派遣</span><span class="qt"><span class="lat tid">TEAM-04</span> → 建物倒塌現場</span><time class="num">4 分前</time></li>
+<li><span class="mk mk-run"></span><span class="chip ch-run">執行</span><span class="qt"><span class="lat tid">TEAM-07</span> 抽水作業</span><time class="num">18 分前</time></li>
+<li><span class="mk-done">✓</span><span class="chip ch-done">完成</span><span class="qt"><span class="lat tid">TEAM-02</span> 物資配送</span><time class="num">32 分前</time></li>
+</ul>
+</section>
+</div>
+</section>
+</div>
+<div class="foot">選定後落成 token＋Shell＋五旗艦頁（第二次閘門）。</div>
+</body></html>

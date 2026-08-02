@@ -2,19 +2,25 @@
  * Triage Page - E-Triage 檢傷分類頁面
  * 基於 START 檢傷法
  *
- * R3a 重建（DESIGN_LANGUAGE.md §7.3 看板頁 Board archetype）：
- * BLACK/RED/YELLOW/GREEN 四種 START 檢傷分類即看板欄位，桌機四欄橫向並列，
- * 行動端以頂部 segmented tabs 切換單欄檢視（§7.3 行動端規則）。
+ * R5/T2 戰術化重排（owner 核准構圖：public/design-mockups/r5-b3c-deep.html §c6）：
+ * 頂部事件條（stencil kicker＋mono 現地時鐘）→ 紅黃綠黑合計讀數帶（分級色章＋mono
+ * 數字）→ 四欄 START 看板（IMMEDIATE 紅／DELAYED 黃／MINOR 綠／EXPECTANT 黑）→
+ * 後送讀數帶。傷票卡＝mono 票號＋4px 左緣分級色閂＋stencil 分級小標＋生命徵象
+ * mono 讀數（RR／P／CRT，來自既有 Victim 欄位）。
+ *
  * 資料層（fetchVictims/fetchStats/handleCreateVictim/handleStartTransport/
- * handleConfirmArrival）與 useParams 邏輯完全未變動。
+ * handleConfirmArrival）與 useParams 邏輯完全未變動；紅色僅用於 IMMEDIATE 生命
+ * 分級（DESIGN_LANGUAGE v2 §D 紅色憲法允許）。c6 構圖中的 MCI 名稱／開設時間／
+ * 經過時間／EVAC 序號在現況資料模型沒有對應欄位，一律不顯示、不造假；計時槽
+ * 改放「現地時鐘＋最後更新時刻」（皆為真實資料）。
  */
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
-import { MapPin, Tag as TagIcon, Plus } from 'lucide-react';
+import { MapPin, Plus } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
-import { Badge, Button, Modal, InputField, type BadgeProps } from '../design-system';
+import { Button, Modal, InputField } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import './TriagePage.css';
 
@@ -52,38 +58,41 @@ interface TriageStats {
 
 type TriageLevel = Victim['triageLevel'];
 
-const LEVELS: TriageLevel[] = ['BLACK', 'RED', 'YELLOW', 'GREEN'];
+// c6 看板欄序：IMMEDIATE 紅 → DELAYED 黃 → MINOR 綠 → EXPECTANT 黑
+const LEVELS: TriageLevel[] = ['RED', 'YELLOW', 'GREEN', 'BLACK'];
+
+// START 分級（stencil 拉丁代號＋中文標籤；語意見 DESIGN_LANGUAGE v2 §D）
+const LEVEL_META: Record<TriageLevel, { code: string; zh: string }> = {
+    RED: { code: 'IMMEDIATE', zh: '立即 · 紅' },
+    YELLOW: { code: 'DELAYED', zh: '延遲 · 黃' },
+    GREEN: { code: 'MINOR', zh: '輕傷 · 綠' },
+    BLACK: { code: 'EXPECTANT', zh: '瀕危 · 黑' },
+};
 
 // ============ Helpers (pure, no data-layer impact) ============
 
-const getLevelLabel = (level: string) => {
-    switch (level) {
-        case 'BLACK': return '黑 (死亡)';
-        case 'RED': return '紅 (危急)';
-        case 'YELLOW': return '黃 (延遲)';
-        case 'GREEN': return '綠 (輕傷)';
-        default: return level;
-    }
-};
-
-// 狀態色語意對照 DESIGN_LANGUAGE.md §3；BLACK 為 START 檢傷法標準色但無對應語意
-// token（危急/警戒/安全都不合適，見 TriagePage.css 對 --text-primary 的說明），
-// Badge 用最接近的中性 variant。
-const getLevelBadgeVariant = (level: string): BadgeProps['variant'] => {
-    switch (level) {
-        case 'RED': return 'danger';
-        case 'YELLOW': return 'warning';
-        case 'GREEN': return 'success';
-        case 'BLACK': return 'default';
-        default: return 'default';
-    }
-};
+const getLevelLabel = (level: string) =>
+    (LEVEL_META as Record<string, { code: string; zh: string } | undefined>)[level]?.zh ?? level;
 
 const formatTime = (dateStr: string) => {
     const d = new Date(dateStr);
     if (Number.isNaN(d.getTime())) return '';
     return d.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' });
 };
+
+const formatClock = (d: Date) =>
+    d.toLocaleTimeString('zh-TW', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+
+// 分級色章（形狀雙編碼：紅＝實心、黃＝半填、綠＝描邊、黑＝深章帶 ×）
+function LevelSquare({ level }: { level: TriageLevel }) {
+    return (
+        <i className={`triage-sq triage-sq--${level.toLowerCase()}`} aria-hidden="true">
+            {level === 'BLACK' ? '×' : null}
+        </i>
+    );
+}
 
 // ============ Skeleton (§7.1 loading skeleton, ≥3 列，本地版本) ============
 
@@ -101,7 +110,7 @@ function TriageSkeleton() {
     );
 }
 
-// ============ Victim Card（Board 卡片：識別+檢傷等級+位置+傷勢+後送+快速操作） ============
+// ============ Victim Card（c6 傷票卡：mono 票號＋左緣色閂＋stencil 小標＋vitals） ============
 
 interface VictimCardProps {
     victim: Victim;
@@ -114,25 +123,23 @@ function VictimCard({ victim, onSelect, onTransport, onArrived }: VictimCardProp
     const identifier = victim.braceletId || `#${victim.id.slice(-6)}`;
     // a11y：卡片本身不再用 role="button"/tabIndex 包住整張卡（footer 內有真正的
     // <Button>，兩層互動元素疊在一起會觸發 axe nested-interactive）。改用明確的
-    // 「查看詳情」按鈕承載鍵盤可達性，卡片 onClick 保留給滑鼠使用者做為額外捷徑。
+    // 票號按鈕承載鍵盤可達性，卡片 onClick 保留給滑鼠使用者做為額外捷徑。
     return (
         <article
             className={`victim-card victim-card--${victim.triageLevel.toLowerCase()}`}
             onClick={() => onSelect(victim)}
         >
-            <div className="victim-card__header">
-                <Badge variant={getLevelBadgeVariant(victim.triageLevel)} size="sm">
-                    {victim.triageLevel}
-                </Badge>
+            <div className="victim-card__row1">
                 <button
                     type="button"
-                    className="victim-card__identifier victim-card__identifier--btn"
+                    className="victim-card__tag u-mono"
                     onClick={(e) => { e.stopPropagation(); onSelect(victim); }}
                     aria-label={`查看傷患 ${identifier} 詳情`}
                 >
-                    <TagIcon size={12} aria-hidden="true" /> {identifier}
+                    {identifier}
                 </button>
-                <span className="victim-card__time">{formatTime(victim.createdAt)}</span>
+                <span className="victim-card__level u-stencil">{LEVEL_META[victim.triageLevel].code}</span>
+                <time className="victim-card__time u-mono">{formatTime(victim.createdAt)}</time>
             </div>
 
             <p className="victim-card__desc">{victim.description || '無描述'}</p>
@@ -141,11 +148,22 @@ function VictimCard({ victim, onSelect, onTransport, onArrived }: VictimCardProp
             </p>
             {victim.injuries && <p className="victim-card__injuries">{victim.injuries}</p>}
 
+            {/* 生命徵象 mono 讀數：只顯示模型裡真的有的欄位（RR/CRT 選填、P 必有） */}
+            <div className="victim-card__vitals u-mono" role="group" aria-label="生命徵象">
+                {victim.respiratoryRate != null && (
+                    <span><em className="u-stencil">RR</em>{victim.respiratoryRate}</span>
+                )}
+                <span><em className="u-stencil">P</em>{victim.hasRadialPulse ? '+' : '-'}</span>
+                {victim.capillaryRefillTime != null && (
+                    <span><em className="u-stencil">CRT</em>{victim.capillaryRefillTime}s</span>
+                )}
+            </div>
+
             <div className="victim-card__footer">
                 <span className={`victim-card__transport victim-card__transport--${victim.transportStatus.toLowerCase()}`}>
-                    {victim.transportStatus === 'PENDING' && '待送'}
-                    {victim.transportStatus === 'IN_TRANSIT' && `運送中 → ${victim.hospitalName}`}
-                    {victim.transportStatus === 'ARRIVED' && '已到院'}
+                    {victim.transportStatus === 'PENDING' && '□ 待送'}
+                    {victim.transportStatus === 'IN_TRANSIT' && `■ 運送中 → ${victim.hospitalName}`}
+                    {victim.transportStatus === 'ARRIVED' && '✓ 已到院'}
                 </span>
                 {victim.transportStatus === 'PENDING' && (
                     <Button
@@ -183,6 +201,15 @@ export const TriagePage: React.FC = () => {
     const [selectedVictim, setSelectedVictim] = useState<Victim | null>(null);
     const [filterLevel, setFilterLevel] = useState<string>('ALL');
 
+    // c6 事件條計時槽（純顯示，不影響資料層）：現地時鐘＋最後更新時刻
+    const [now, setNow] = useState(() => new Date());
+    const [lastUpdatedAt, setLastUpdatedAt] = useState<Date | null>(null);
+
+    useEffect(() => {
+        const timer = window.setInterval(() => setNow(new Date()), 1000);
+        return () => window.clearInterval(timer);
+    }, []);
+
     // ============ Form State ============
     const [formData, setFormData] = useState({
         canWalk: false,
@@ -204,6 +231,7 @@ export const TriagePage: React.FC = () => {
         try {
             const response = await api.get(`/triage/missions/${missionSessionId}/victims`);
             setVictims(response.data);
+            setLastUpdatedAt(new Date()); // 純顯示用時間戳，接線未變
         } catch (error) {
             console.error('Failed to fetch victims:', error);
         }
@@ -290,15 +318,44 @@ export const TriagePage: React.FC = () => {
 
     // ============ Render ============
 
+    // c6-top 事件條：kicker＋標題（左）／mono 時鐘（右）／主要動作
+    const renderEventBar = (isLoading: boolean) => (
+        <header className="triage-eventbar">
+            <div className="triage-eventbar__id">
+                <div className="triage-eventbar__kicker">
+                    <span className="u-stencil">E-TRIAGE · START PROTOCOL</span>
+                </div>
+                <h1 className="triage-eventbar__title">
+                    檢傷分類
+                    {missionSessionId && (
+                        <small> 場次 <span className="u-mono">#{missionSessionId.slice(-6)}</span></small>
+                    )}
+                </h1>
+            </div>
+            <div className="triage-eventbar__clock">
+                <div className="triage-eventbar__clock-label">
+                    <span className="u-stencil">TIME</span> 現地時間
+                </div>
+                <time className="triage-eventbar__time u-mono">{formatClock(now)}</time>
+                {lastUpdatedAt && (
+                    <div className="triage-eventbar__sub u-mono">最後更新 {formatClock(lastUpdatedAt)}</div>
+                )}
+            </div>
+            <Button
+                variant="primary"
+                icon={<Plus size={16} />}
+                disabled={isLoading}
+                onClick={() => setShowNewForm(true)}
+            >
+                新增傷患
+            </Button>
+        </header>
+    );
+
     if (loading) {
         return (
             <div className="triage-page">
-                <header className="triage-header">
-                    <h1>E-Triage 檢傷分類</h1>
-                    <Button variant="primary" icon={<Plus size={16} />} disabled>
-                        新增傷患
-                    </Button>
-                </header>
+                {renderEventBar(true)}
                 <TriageSkeleton />
             </div>
         );
@@ -306,40 +363,17 @@ export const TriagePage: React.FC = () => {
 
     return (
         <div className="triage-page">
-            <header className="triage-header">
-                <h1>E-Triage 檢傷分類</h1>
-                <Button variant="primary" icon={<Plus size={16} />} onClick={() => setShowNewForm(true)}>
-                    新增傷患
-                </Button>
-            </header>
+            {renderEventBar(false)}
 
-            {/* Stats Panel */}
+            {/* c6-tally 分流合計讀數帶：分級色章＋mono 數字＋總數 */}
             {stats && (
-                <div className="stats-panel">
-                    <div className="stat-card stat-card--total">
-                        <span className="label">總人數</span>
-                        <span className="value">{stats.total}</span>
-                    </div>
-                    <div className="stat-card stat-card--black">
-                        <span className="label">黑</span>
-                        <span className="value">{stats.black}</span>
-                    </div>
-                    <div className="stat-card stat-card--red">
-                        <span className="label">紅</span>
-                        <span className="value">{stats.red}</span>
-                    </div>
-                    <div className="stat-card stat-card--yellow">
-                        <span className="label">黃</span>
-                        <span className="value">{stats.yellow}</span>
-                    </div>
-                    <div className="stat-card stat-card--green">
-                        <span className="label">綠</span>
-                        <span className="value">{stats.green}</span>
-                    </div>
-                    <div className="stat-card stat-card--transport">
-                        <span className="label">待送</span>
-                        <span className="value">{stats.pendingTransport}</span>
-                    </div>
+                <div className="triage-tally" role="group" aria-label="檢傷分流合計">
+                    <span className="triage-tally__label"><span className="u-stencil">TRIAGE COUNT</span> 分流合計</span>
+                    <span className="triage-tally__item"><LevelSquare level="RED" />紅 <b className="u-mono">{pad2(stats.red)}</b></span>
+                    <span className="triage-tally__item"><LevelSquare level="YELLOW" />黃 <b className="u-mono">{pad2(stats.yellow)}</b></span>
+                    <span className="triage-tally__item"><LevelSquare level="GREEN" />綠 <b className="u-mono">{pad2(stats.green)}</b></span>
+                    <span className="triage-tally__item"><LevelSquare level="BLACK" />黑 <b className="u-mono">{pad2(stats.black)}</b></span>
+                    <span className="triage-tally__total">傷患總數 <b className="u-mono">{pad2(stats.total)}</b></span>
                 </div>
             )}
 
@@ -358,7 +392,7 @@ export const TriagePage: React.FC = () => {
                 ))}
             </div>
 
-            {/* 看板欄位：桌機四欄橫向並列；行動端只顯示 mobileVisibleLevels 內的欄 */}
+            {/* c6-board 四欄 START 看板：桌機四欄並列；行動端只顯示 mobileVisibleLevels 內的欄 */}
             <div className="board-columns">
                 {LEVELS.map(level => {
                     const levelVictims = victims.filter(v => v.triageLevel === level);
@@ -370,9 +404,10 @@ export const TriagePage: React.FC = () => {
                             aria-label={getLevelLabel(level)}
                         >
                             <header className="board-column__header">
-                                <span className={`board-column__dot board-column__dot--${level.toLowerCase()}`} aria-hidden="true" />
-                                <h2 className="board-column__title">{getLevelLabel(level)}</h2>
-                                <Badge variant={getLevelBadgeVariant(level)} size="sm">{levelVictims.length}</Badge>
+                                <LevelSquare level={level} />
+                                <span className="board-column__code u-stencil">{LEVEL_META[level].code}</span>
+                                <h2 className="board-column__title">{LEVEL_META[level].zh}</h2>
+                                <b className="board-column__count u-mono">{pad2(levelVictims.length)}</b>
                             </header>
                             <div className="board-column__body">
                                 {levelVictims.length === 0 ? (
@@ -400,6 +435,16 @@ export const TriagePage: React.FC = () => {
                     description="點擊右上角「新增傷患」開始 START 檢傷評估"
                     variant="default"
                 />
+            )}
+
+            {/* c6-foot 後送讀數帶：欄位皆來自既有 stats（待送/運送中/已到院） */}
+            {stats && (
+                <div className="triage-foot" role="group" aria-label="後送狀態合計">
+                    <span className="triage-foot__label"><span className="u-stencil">EVAC</span> 後送狀態</span>
+                    <span className="triage-foot__item">□ 待送 <b className="u-mono">{pad2(stats.pendingTransport)}</b></span>
+                    <span className="triage-foot__item">■ 運送中 <b className="u-mono">{pad2(stats.inTransit)}</b></span>
+                    <span className="triage-foot__item">✓ 已到院 <b className="u-mono">{pad2(stats.arrived)}</b></span>
+                </div>
             )}
 
             {/* New Victim Modal（§4：必須中斷目前工作的決策流程 → design-system Modal） */}

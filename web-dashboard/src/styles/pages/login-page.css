@@ -1,522 +1,496 @@
 /**
- * Login Page - Modern Carbon Copper Theme
+ * LoginPage — R5 B3c 野戰手冊（tokens.css Layer 8/9/10）
  * ═══════════════════════════════════════════════════════════════
- * Glassmorphism 2.0 + Micro-animations + Responsive Layout
+ * 構圖對照：public/design-mockups/r5-b3c-deep.html
+ *   - <section class="c3">：頂部語言（stamp 徽記＋mono 狀態、2px 橄欖規線、
+ *     教範式頁眉 zh/la/tm 三段）
+ *   - <section class="c1">：seal 燈塔章、2px 規線面板、mono 讀數
+ * 規則（DESIGN_LANGUAGE v2 §B 工藝五律＋Layer 10 排印鐵律）：
+ *   - 顏色一律 var(--token)（或 var(--token, #fallback)），禁裸 hex
+ *   - 中文字距 0；拉丁/數字小標走全域 .u-stencil；讀數走 .u-mono
+ *   - 2px 規線分層、UI radius ≤3px、無浮起陰影卡、無裝飾動畫
+ *   - 紅色不出場（本頁無生命安全情境）
+ *   - LINE 品牌綠＝第三方品牌例外（見下方 --brand-line-green 註記）
+ *
+ * 命名空間 .lk-login*：pages/LoginPage.css（BindLine/Forgot/Reset 共用的
+ * .login-page / .login-container / .login-card）與本檔並存於全域 CSS，
+ * 前綴隔離避免互相污染。
  */
 
 /* ════════════════════════════════════════════════════════════════
-   KEYFRAME ANIMATIONS
+   ROOT — #16170F 底＋32px 細格線（工藝律 1：透明度 ≤2.5%）
    ════════════════════════════════════════════════════════════════ */
 
-/* Breathing glow effect */
-@keyframes breathe-glow {
-  0%, 100% {
-    opacity: 0.15;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 0.25;
-    transform: scale(1.05);
-  }
-}
-
-/* Pulsing beacon light */
-@keyframes beacon-pulse {
-  0%, 100% {
-    opacity: 0.8;
-    filter: drop-shadow(0 0 8px rgba(195, 155, 111, 0.6));
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 20px rgba(195, 155, 111, 0.9));
-  }
-}
-
-/* Scanning line effect */
-@keyframes scan-line {
-  0% {
-    transform: translateX(-100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
-}
-
-/* Border light trail */
-@keyframes border-trail {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
-}
-
-/* Fade in and slide up */
-@keyframes fade-slide-up {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Typewriter cursor blink */
-@keyframes cursor-blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0;
-  }
-}
-
-/* Grid pattern subtle animation */
-@keyframes grid-drift {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 24px 24px;
-  }
-}
-
-/* ════════════════════════════════════════════════════════════════
-   LOGIN PAGE LAYOUT
-   ════════════════════════════════════════════════════════════════ */
-
-.login-page {
+.lk-login {
+  position: relative;
   min-height: 100vh;
   width: 100%;
   display: flex;
-  background: #0A0D12;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-  position: relative;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 16px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  letter-spacing: var(--tracking-zh);
   overflow: hidden;
 }
 
-/* Background Effects */
-.login-bg-grid {
+.lk-login__gridlines {
   position: absolute;
   inset: 0;
-  background-image: 
-    linear-gradient(rgba(195, 155, 111, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(195, 155, 111, 0.03) 1px, transparent 1px);
-  background-size: 24px 24px;
-  animation: grid-drift 30s linear infinite;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--text-primary) 2.5%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--text-primary) 2.5%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
   pointer-events: none;
-}
-
-.login-bg-glow {
-  position: absolute;
-  width: 600px;
-  height: 600px;
-  border-radius: 50%;
-  filter: blur(120px);
-  pointer-events: none;
-  animation: breathe-glow 6s ease-in-out infinite;
-}
-
-.login-bg-glow--primary {
-  top: -200px;
-  right: -200px;
-  background: radial-gradient(circle, rgba(195, 155, 111, 0.3), transparent 70%);
-}
-
-.login-bg-glow--secondary {
-  bottom: -300px;
-  left: -200px;
-  background: radial-gradient(circle, rgba(29, 38, 53, 0.8), transparent 70%);
-  animation-delay: 3s;
 }
 
 /* ════════════════════════════════════════════════════════════════
-   BRAND PANEL (Desktop Left Side)
+   BRAND PANEL（桌機 ≥1024 左欄：seal＋stencil 標＋mono 大鐘）
    ════════════════════════════════════════════════════════════════ */
 
-.login-brand-panel {
-  flex: 1;
-  display: none;
+.lk-login__brand {
+  position: relative;
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 48px;
-  position: relative;
-  background: linear-gradient(135deg, #0F1218 0%, #13171F 100%);
-  border-right: 1px solid rgba(195, 155, 111, 0.1);
-}
-
-@media (min-width: 1024px) {
-  .login-brand-panel {
-    display: flex;
-  }
-}
-
-.login-brand-content {
   text-align: center;
-  animation: fade-slide-up 0.8s ease-out;
+  padding: 48px;
+  border-right: 2px solid var(--border-default);
 }
 
-/* Lighthouse SVG Logo */
-.login-lighthouse {
-  width: 120px;
-  height: 120px;
-  margin: 0 auto 32px;
+.lk-login__seal {
+  display: grid;
+  place-items: center;
+  width: 88px;
+  height: 88px;
+  background: var(--bg-primary);
+  border: 2px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
+  color: var(--accent-gold);
 }
 
-.login-lighthouse-beacon {
-  animation: beacon-pulse 2s ease-in-out infinite;
+.lk-login__seal svg {
+  width: 52px;
+  height: 52px;
 }
 
-.login-brand-title {
-  font-size: 42px;
-  font-weight: 700;
-  letter-spacing: 0.3em;
-  color: #F5F5F5;
-  margin-bottom: 16px;
-  text-shadow: 0 0 40px rgba(195, 155, 111, 0.3);
+.lk-login__wordmark {
+  margin: 20px 0 6px;
+  font-size: 30px;
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
 }
 
-.login-brand-subtitle {
-  font-family: 'JetBrains Mono', monospace;
+.lk-login__tagline {
+  margin: 0 0 34px;
   font-size: 14px;
-  color: #6B7280;
-  letter-spacing: 0.2em;
+  color: var(--text-secondary);
+}
+
+/* mono 大鐘（讀數紀律：tabular-nums、不跳動） */
+.lk-login__clock {
+  min-width: 320px;
+  padding: 18px 28px 16px;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.lk-login__clock-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.lk-login__clock-label b {
+  margin-left: 5px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.lk-login__clock-readout {
+  display: block;
+  font-size: 56px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.lk-login__clock-readout i {
+  font-style: normal;
+  color: var(--text-tertiary);
+}
+
+.lk-login__clock-date {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--color-secondary);
+}
+
+.lk-login__clock-day {
+  display: block;
+  margin-top: 4px;
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+/* 三格讀數（c1 統計卡語彙的縮編版） */
+.lk-login__metrics {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.lk-login__metric {
+  position: relative;
+  min-width: 98px;
+  padding: 12px 14px 10px;
+  text-align: left;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
+}
+
+.lk-login__metric-idx {
+  position: absolute;
+  top: 8px;
+  right: 10px;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.lk-login__metric-value {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--text-primary);
+}
+
+.lk-login__metric-label {
+  display: block;
+  margin-top: 4px;
+  font-size: 9px;
+  color: var(--color-secondary);
+}
+
+/* 狀態安靜律：正常＝灰字＋色方塊（形狀＋顏色雙編碼） */
+.lk-login__sysline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 22px 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.lk-login__sysline b {
+  font-size: 10px;
+  color: var(--text-tertiary);
+}
+
+.lk-login__sq {
+  display: inline-block;
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: var(--color-success);
 }
 
 /* ════════════════════════════════════════════════════════════════
-   FORM PANEL (Right Side / Mobile Full)
+   MAIN／登入卡（c3 螢幕語言：2px 規線容器＋掃描角框）
    ════════════════════════════════════════════════════════════════ */
 
-.login-form-panel {
-  flex: 1;
+.lk-login__main {
+  position: relative;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+}
+
+.lk-login__card {
   position: relative;
-  z-index: 10;
-}
-
-@media (min-width: 1024px) {
-  .login-form-panel {
-    max-width: 560px;
-    padding: 48px;
-  }
-}
-
-/* Glass Card */
-.login-card {
   width: 100%;
   max-width: 420px;
-  background: rgba(15, 18, 24, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(195, 155, 111, 0.15);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 
-    0 25px 50px rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(195, 155, 111, 0.05) inset;
-  animation: fade-slide-up 0.6s ease-out;
+  background: var(--bg-secondary);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-md);
 }
 
-/* Animated border glow */
-.login-card::before {
-  content: '';
+/* 掃描角框：2px 橄欖直角，壓在卡框四角上 */
+.lk-login__corner {
   position: absolute;
-  inset: -2px;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(195, 155, 111, 0.3),
-    transparent
-  );
-  background-size: 200% 100%;
-  animation: border-trail 4s linear infinite;
-  z-index: -1;
-  border-radius: 18px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--accent-gold);
+  pointer-events: none;
 }
 
-.login-card:hover::before {
-  opacity: 1;
+.lk-login__corner--tl { top: -2px; left: -2px; border-right: none; border-bottom: none; }
+.lk-login__corner--tr { top: -2px; right: -2px; border-left: none; border-bottom: none; }
+.lk-login__corner--bl { bottom: -2px; left: -2px; border-right: none; border-top: none; }
+.lk-login__corner--br { bottom: -2px; right: -2px; border-left: none; border-top: none; }
+
+/* ── 頂條：stamp 徽記＋mono 時鐘，下壓 2px 橄欖規線（c3-top） ── */
+.lk-login__topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 13px 14px 11px;
+  border-bottom: 2px solid var(--accent-gold);
 }
 
-/* Card Header */
-.login-card-header {
-  padding: 40px 32px 24px;
-  text-align: center;
-  border-bottom: 1px solid rgba(195, 155, 111, 0.1);
-  background: rgba(19, 23, 31, 0.5);
-}
-
-/* Status Badge */
-.login-status-badge {
+.lk-login__stamp {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
-  background: rgba(11, 17, 32, 0.8);
-  border: 1px solid rgba(195, 155, 111, 0.2);
-  border-radius: 9999px;
-  margin-bottom: 24px;
+  gap: 7px;
+  padding: 4px 8px 3px;
+  font-size: 10px;
+  color: var(--accent-gold);
+  border: 2px solid var(--accent-gold);
+  border-radius: var(--radius-sm);
 }
 
-.login-status-dot {
+.lk-login__stamp i {
+  flex: none;
   width: 6px;
   height: 6px;
-  background: #C39B6F;
-  border-radius: 50%;
-  animation: beacon-pulse 1.5s ease-in-out infinite;
+  background: var(--accent-gold);
 }
 
-.login-status-text {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: #C39B6F;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-/* Mobile Title (Hidden on Desktop) */
-.login-mobile-title {
-  font-size: 28px;
+.lk-login__topclock {
+  font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.2em;
-  color: #F5F5F5;
-  margin-bottom: 8px;
+  color: var(--text-primary);
 }
 
-@media (min-width: 1024px) {
-  .login-mobile-title {
-    display: none;
-  }
+/* ── 副行：教範式頁眉 zh/la/tm（c3-sub） ── */
+.lk-login__subrow {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  padding: 9px 14px 8px;
+  border-bottom: 2px solid var(--border-default);
 }
 
-.login-mobile-subtitle {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: #6B7280;
-  letter-spacing: 0.1em;
+.lk-login__subrow-zh {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  color: var(--color-secondary);
 }
 
-@media (min-width: 1024px) {
-  .login-mobile-subtitle {
-    display: none;
-  }
-}
-
-/* Card Body */
-.login-card-body {
-  padding: 32px;
-}
-
-/* ════════════════════════════════════════════════════════════════
-   FORM ELEMENTS
-   ════════════════════════════════════════════════════════════════ */
-
-.login-form-group {
-  margin-bottom: 20px;
-}
-
-.login-label {
-  display: block;
-  font-family: 'JetBrains Mono', monospace;
+.lk-login__subrow-la {
   font-size: 10px;
-  color: #9CA3AF;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-  padding-left: 2px;
+  color: var(--text-tertiary);
 }
 
-/* Input with animated border */
-.login-input-wrapper {
-  position: relative;
+.lk-login__subrow-tm {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--color-secondary);
 }
 
-.login-input {
-  width: 100%;
-  background: rgba(19, 23, 31, 0.8);
-  border: 1px solid rgba(47, 54, 65, 0.8);
-  border-radius: 8px;
-  padding: 14px 16px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 14px;
-  color: #F5F5F5;
-  outline: none;
-  transition: all 0.3s ease;
-}
-
-.login-input::placeholder {
-  color: #4B5563;
-}
-
-.login-input:focus {
-  border-color: #C39B6F;
-  box-shadow: 
-    0 0 0 3px rgba(195, 155, 111, 0.1),
-    0 0 20px rgba(195, 155, 111, 0.1);
-}
-
-/* Focus light trail indicator */
-.login-input-trail {
-  position: absolute;
-  right: 0;
-  top: 0;
-  bottom: 0;
-  width: 3px;
-  background: linear-gradient(180deg, transparent, #C39B6F, transparent);
-  border-radius: 0 8px 8px 0;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.login-input:focus + .login-input-trail {
-  opacity: 1;
-}
-
-/* ════════════════════════════════════════════════════════════════
-   SUBMIT BUTTON
-   ════════════════════════════════════════════════════════════════ */
-
-.login-submit {
-  width: 100%;
-  background: linear-gradient(135deg, #C39B6F 0%, #D4AF37 100%);
-  border: none;
-  border-radius: 8px;
-  padding: 16px 24px;
-  font-family: 'Inter', sans-serif;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: #0F1218;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: all 0.3s ease;
-  margin-top: 8px;
-  box-shadow: 0 4px 20px rgba(195, 155, 111, 0.3);
-}
-
-.login-submit:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(195, 155, 111, 0.4);
-}
-
-.login-submit:active {
-  transform: scale(0.98);
-}
-
-.login-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Scan line effect on hover */
-.login-submit::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.3),
-    transparent
-  );
-  transform: translateX(-100%);
-  transition: none;
-}
-
-.login-submit:hover::after {
-  animation: scan-line 0.8s ease-in-out;
-}
-
-.login-submit-content {
+/* ── 行動端識別區（桌機由左欄 brand panel 承擔） ── */
+.lk-login__id {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
-  gap: 8px;
-}
-
-/* ════════════════════════════════════════════════════════════════
-   ERROR MESSAGE
-   ════════════════════════════════════════════════════════════════ */
-
-.login-error {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 12px 16px;
-  background: rgba(220, 38, 38, 0.1);
-  border: 1px solid rgba(220, 38, 38, 0.3);
-  border-radius: 8px;
-  margin-bottom: 20px;
-  animation: fade-slide-up 0.3s ease-out;
-}
-
-.login-error-icon {
-  color: #EF4444;
-  flex-shrink: 0;
-}
-
-.login-error-text {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
-  color: #EF4444;
-}
-
-/* ════════════════════════════════════════════════════════════════
-   FOOTER
-   ════════════════════════════════════════════════════════════════ */
-
-.login-footer {
-  padding: 20px 32px;
   text-align: center;
-  border-top: 1px solid rgba(195, 155, 111, 0.05);
+  padding: 22px 16px 4px;
 }
 
-.login-version {
-  display: inline-flex;
+.lk-login__id .lk-login__seal {
+  width: 64px;
+  height: 64px;
+}
+
+.lk-login__id .lk-login__seal svg {
+  width: 38px;
+  height: 38px;
+}
+
+.lk-login__id .lk-login__wordmark {
+  margin: 12px 0 4px;
+  font-size: 20px;
+}
+
+.lk-login__id .lk-login__tagline {
+  margin: 0;
+  font-size: var(--font-size-sm);
+}
+
+/* ── 卡身：說明＋OAuth 通道 ── */
+.lk-login__body {
+  padding: 18px 16px 20px;
+}
+
+.lk-login__lede {
+  margin: 0 0 16px;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-normal);
+  color: var(--text-secondary);
+}
+
+.lk-login__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* OAuth 列鈕（c4 cell 語彙：2px 框、直角、編號＋雙語標） */
+.lk-login__oauth {
+  display: flex;
   align-items: center;
-  gap: 6px;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
-  color: #4B5563;
-  letter-spacing: 0.05em;
-  opacity: 0.6;
-  transition: opacity 0.3s ease;
-  cursor: help;
+  gap: 12px;
+  width: 100%;
+  min-height: 56px; /* 觸控 ≥44px */
+  padding: 12px 14px;
+  background: var(--bg-primary);
+  border: 2px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transition-normal, 100ms ease),
+              background var(--transition-normal, 100ms ease);
 }
 
-.login-version:hover {
-  opacity: 1;
+.lk-login__oauth:hover {
+  background: var(--bg-hover);
+  border-color: var(--accent-gold);
+}
+
+.lk-login__oauth:active {
+  transform: translateY(1px);
+}
+
+.lk-login__oauth:focus-visible {
+  outline: 2px solid var(--text-primary);
+  outline-offset: 2px;
+}
+
+.lk-login__oauth-no {
+  flex: none;
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+}
+
+.lk-login__oauth svg {
+  flex: none;
+  width: 22px;
+  height: 22px;
+}
+
+.lk-login__oauth-text {
+  min-width: 0;
+}
+
+.lk-login__oauth-text b {
+  display: block;
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  line-height: var(--line-height-tight);
+  color: var(--text-primary);
+}
+
+.lk-login__oauth-text small {
+  display: block;
+  margin-top: 3px;
+  font-size: 9px;
+  color: var(--color-secondary);
+}
+
+.lk-login__oauth-arrow {
+  margin-left: auto;
+  flex: none;
+  font-weight: 700;
+  color: var(--accent-gold);
+}
+
+/* LINE 品牌例外：官方品牌綠 #06C755（LINE Login button guidelines），
+   非語義 token、僅此鈕使用——一律以 var(--brand-line-green, #06C755)
+   fallback 形式書寫（token-first gate 允許之安全退回值寫法）。 */
+.lk-login__oauth--line {
+  border-color: color-mix(in srgb, var(--brand-line-green, #06C755) 55%, var(--bg-primary));
+}
+
+.lk-login__oauth--line:hover {
+  background: color-mix(in srgb, var(--brand-line-green, #06C755) 8%, var(--bg-primary));
+  border-color: var(--brand-line-green, #06C755);
+}
+
+.lk-login__oauth--line .lk-login__oauth-text small,
+.lk-login__oauth--line .lk-login__oauth-arrow {
+  color: var(--brand-line-green, #06C755);
+}
+
+/* ── 底列：mono 小字（c3-foot） ── */
+.lk-login__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 11px 14px 12px;
+  border-top: 2px solid var(--border-default);
+  font-size: var(--font-size-xs);
+  color: var(--text-tertiary);
+}
+
+.lk-login__foot b {
+  font-weight: 700;
+  color: var(--text-secondary);
 }
 
 /* ════════════════════════════════════════════════════════════════
-   CORNER DECORATORS
+   RWD — 360 單欄（預設）→ 768 → 1024/1440 雙欄
    ════════════════════════════════════════════════════════════════ */
 
-.login-corner {
-  position: absolute;
-  width: 24px;
-  height: 24px;
-  opacity: 0.6;
+@media (min-width: 768px) {
+  .lk-login {
+    padding: 48px 32px;
+  }
+
+  .lk-login__card {
+    max-width: 460px;
+  }
+
+  .lk-login__body {
+    padding: 22px 24px 24px;
+  }
 }
 
-.login-corner--tl { top: 12px; left: 12px; }
-.login-corner--tr { top: 12px; right: 12px; transform: rotate(90deg); }
-.login-corner--bl { bottom: 12px; left: 12px; transform: rotate(-90deg); }
-.login-corner--br { bottom: 12px; right: 12px; transform: rotate(180deg); }
+@media (min-width: 1024px) {
+  .lk-login {
+    flex-direction: row;
+    align-items: stretch;
+    padding: 0;
+  }
+
+  .lk-login__brand {
+    flex: 0 0 44%;
+  }
+
+  .lk-login__main {
+    flex: 1 1 auto;
+    padding: 48px 24px;
+  }
+}

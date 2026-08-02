@@ -1,20 +1,20 @@
 /**
- * Triage Page Styles — R3a 重建（DESIGN_LANGUAGE.md §7.3 看板頁 Board archetype）
+ * Triage Page Styles — R5/T2 B3c 野戰手冊戰術化
+ * 構圖來源：public/design-mockups/r5-b3c-deep.html §c6（owner 核准）
  *
- * 全部改語意 token；不寫 light/dark/tactical 主題分支選擇器（切換由 tokens.css
- * 的 [data-theme]/[data-app-mode] 覆寫層處理，頁面 CSS 只認語義變數）。
+ * 全部語意 token；不寫 [data-theme]/[data-app-mode] 分支選擇器（tokens.css
+ * Layer 8/9 覆寫層負責雙模式切換，頁面 CSS 只認語義變數，DESIGN_LANGUAGE §1.1）。
  *
- * BLACK（死亡）色說明：START 檢傷法的黑色為國際標準色，但 DESIGN_LANGUAGE §3
- * 語意色表沒有對應 token（危急=紅、警戒=黃、安全=綠都已被 RED/YELLOW/GREEN
- * 佔用，黑不屬於這三種語意）。依 R3a 指示，改用最接近的中性深色 token
- * --text-primary 作為 BLACK 的識別色（欄頭圓點、卡片左邊框、統計卡邊框），
- * 不生造新 token。
+ * 紅色僅用於 IMMEDIATE 生命分級（v2 §D 紅色憲法允許）。
+ * BLACK（瀕危）無語意色 token：沿用中性深面（--bg-active）＋紙白斜紋左閂
+ * （c6 card-x 範式），不生造新 token。
+ * 排印鐵律（Layer 10）：中文零字距；stencil 寬字距只經 .u-stencil；
+ * 數字/時間戳一律 .u-mono（tabular-nums），本檔不散寫 letter-spacing。
  */
 
 .triage-page {
     display: flex;
     flex-direction: column;
-    gap: var(--space-4, 16px);
     padding: var(--space-3, 12px);
 }
 
@@ -30,87 +30,154 @@
     }
 }
 
-/* ── Header ─────────────────────────────────────────────────── */
+/* ── 頂部事件條（c6-top：kicker＋標題／mono 時鐘／主要動作）────────── */
 
-.triage-header {
+.triage-eventbar {
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: center;
-    gap: var(--space-3, 12px);
+    align-items: flex-end;
+    gap: var(--space-3, 12px) var(--space-4, 16px);
 }
 
-.triage-header h1 {
-    margin: 0;
-    font-size: var(--font-size-xl, 20px);
+.triage-eventbar__id {
+    min-width: 0;
+}
+
+.triage-eventbar__kicker {
+    font-size: 11px;
+    color: var(--color-secondary);
+}
+
+.triage-eventbar__title {
+    margin: 2px 0 0;
+    font-size: 20px;
     font-weight: 700;
+    line-height: var(--line-height-tight, 1.25);
     color: var(--text-primary);
 }
 
-@media (min-width: 1024px) {
-    .triage-header h1 {
-        font-size: var(--font-size-2xl, 24px);
-    }
+.triage-eventbar__title small {
+    font-size: var(--font-size-base, 15px);
+    font-weight: 400;
+    color: var(--text-secondary);
 }
 
-/* ── Stats Panel ────────────────────────────────────────────── */
-
-.stats-panel {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: var(--space-3, 12px);
+.triage-eventbar__clock {
+    margin-left: auto;
+    text-align: right;
 }
 
-@media (min-width: 640px) {
-    .stats-panel {
-        grid-template-columns: repeat(3, 1fr);
-    }
+.triage-eventbar__clock-label {
+    font-size: 11px;
+    color: var(--text-muted);
 }
 
-@media (min-width: 1024px) {
-    .stats-panel {
-        grid-template-columns: repeat(6, 1fr);
-    }
-}
-
-.stat-card {
-    min-width: 0;
-    padding: var(--space-3, 12px);
-    background: var(--surface-card, var(--bg-secondary));
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-md, 8px);
-    border-left-width: 4px;
-    border-left-style: solid;
-    text-align: center;
-}
-
-.stat-card .label {
+.triage-eventbar__time {
     display: block;
+    font-size: 24px;
+    font-weight: 700;
+    line-height: var(--line-height-tight, 1.25);
+    color: var(--accent-gold);
+}
+
+.triage-eventbar__sub {
     font-size: var(--font-size-xs, 12px);
     color: var(--text-secondary);
-    margin-bottom: var(--space-1, 4px);
 }
 
-.stat-card .value {
-    font-size: var(--font-size-xl, 20px);
+/* 360 檔：事件條換行後時鐘靠左對齊，避免孤立右緣 */
+@media (max-width: 479px) {
+    .triage-eventbar__clock {
+        margin-left: 0;
+        text-align: left;
+    }
+}
+
+/* ── 分流合計讀數帶（c6-tally：橄欖 2px 頂規線＋色章＋mono 數字）────── */
+
+.triage-tally {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px) var(--space-5, 20px);
+    margin-top: var(--space-3, 12px);
+    padding: 9px 2px;
+    border-top: 2px solid var(--accent-gold);
+    border-bottom: 1px solid var(--border-default);
+}
+
+.triage-tally__label {
+    font-size: 11px;
+    color: var(--color-secondary);
+}
+
+.triage-tally__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-secondary);
+}
+
+.triage-tally__total {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--color-secondary);
+}
+
+.triage-tally__item b,
+.triage-tally__total b {
+    font-size: 17px;
     font-weight: 700;
     color: var(--text-primary);
-    font-variant-numeric: tabular-nums;
 }
 
-.stat-card--total { border-left-color: var(--color-info); }
-.stat-card--black { border-left-color: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
-.stat-card--red { border-left-color: var(--color-danger); }
-.stat-card--yellow { border-left-color: var(--color-warning); }
-.stat-card--green { border-left-color: var(--color-success); }
-.stat-card--transport { border-left-color: var(--color-info); }
+/* ── 分級色章（狀態雙編碼：■ 實心紅／◧ 半填黃／□ 描邊綠／× 深章黑）──── */
 
-/* ── 行動端 segmented tabs（§7.3：欄切換用頂部 tabs，不做水平多欄）───── */
+.triage-sq {
+    width: 12px;
+    height: 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1px;
+    flex: none;
+    font-style: normal;
+}
+
+.triage-sq--red {
+    background: var(--color-danger); /* 生命分級，紅色憲法允許 */
+}
+
+.triage-sq--yellow {
+    border: 2px solid var(--color-warning);
+    background: linear-gradient(135deg, var(--color-warning) 50%, transparent 50%);
+}
+
+.triage-sq--green {
+    border: 2px solid var(--color-success);
+}
+
+.triage-sq--black {
+    background: var(--bg-active);
+    border: 1px solid var(--text-tertiary);
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+/* ── 行動端 segmented tabs（<768 顯示；§7.3：欄切換用頂部 tabs）─────── */
 
 .board-tabs {
     display: flex;
     gap: var(--space-2, 8px);
     overflow-x: auto;
+    margin-top: var(--space-3, 12px);
     padding-bottom: var(--space-1, 4px);
     -webkit-overflow-scrolling: touch;
 }
@@ -125,18 +192,18 @@
     flex: 0 0 auto;
     min-height: 44px;
     padding: 0 var(--space-4, 16px);
-    border-radius: var(--radius-full, 9999px);
     border: 1px solid var(--border-default);
+    border-radius: var(--radius-sm, 2px);
     background: var(--surface-card, var(--bg-secondary));
     color: var(--text-secondary);
-    font-size: var(--font-size-sm, 14px);
+    font-size: var(--font-size-sm, 13px);
     font-weight: 600;
     cursor: pointer;
     transition: background var(--duration-fast, 150ms), color var(--duration-fast, 150ms), border-color var(--duration-fast, 150ms);
 }
 
 .board-tab:hover {
-    background: var(--surface-hover, var(--bg-secondary));
+    background: var(--surface-hover, var(--bg-hover));
 }
 
 .board-tab:focus-visible {
@@ -144,73 +211,52 @@
     box-shadow: var(--focus-ring);
 }
 
-.board-tab--all.is-active {
-    background: var(--color-info);
-    border-color: var(--color-info);
-    color: var(--text-inverse);
+/* 作用態＝底緣 3px 分級色閂（不整塊填色，金色紀律／狀態安靜律） */
+.board-tab.is-active {
+    color: var(--text-primary);
+    border-color: var(--border-dark);
 }
 
-.board-tab--black.is-active {
-    background: var(--text-primary);
-    border-color: var(--text-primary);
-    color: var(--bg-inverse, var(--text-inverse));
-}
+.board-tab--all.is-active { box-shadow: inset 0 -3px 0 var(--accent-gold); }
+.board-tab--red.is-active { box-shadow: inset 0 -3px 0 var(--color-danger); }
+.board-tab--yellow.is-active { box-shadow: inset 0 -3px 0 var(--color-warning); }
+.board-tab--green.is-active { box-shadow: inset 0 -3px 0 var(--color-success); }
+.board-tab--black.is-active { box-shadow: inset 0 -3px 0 var(--text-primary); }
 
-.board-tab--red.is-active {
-    background: var(--color-danger);
-    border-color: var(--color-danger);
-    color: var(--text-inverse);
-}
-
-.board-tab--yellow.is-active {
-    background: var(--color-warning);
-    border-color: var(--color-warning);
-    color: var(--text-inverse);
-}
-
-.board-tab--green.is-active {
-    background: var(--color-success);
-    border-color: var(--color-success);
-    color: var(--text-inverse);
-}
-
-/* ── 看板欄位（桌機水平並列，行動端單欄）───────────────────────── */
+/* ── 四欄 START 看板（c6-board：360 單欄／768 二欄／1200+ 四欄）─────── */
 
 .board-columns {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4, 16px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4, 16px) 14px;
+    margin-top: var(--space-4, 16px);
 }
 
 @media (min-width: 768px) {
     .board-columns {
-        flex-direction: row;
-        align-items: flex-start;
-        overflow-x: auto;
-        padding-bottom: var(--space-2, 8px);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
+@media (min-width: 1200px) {
+    .board-columns {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+/* 欄本身透明（c6：欄頭規線＋傷票卡直接落在頁底上，不再包面板） */
 .board-column {
     display: none;
-    flex-direction: column;
-    background: var(--surface-card, var(--bg-secondary));
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-md, 8px);
-    overflow: hidden;
+    min-width: 0;
 }
 
 .board-column.is-active {
-    display: flex;
+    display: block;
 }
 
 @media (min-width: 768px) {
     .board-column {
-        display: flex !important;
-        flex: 1 1 260px;
-        min-width: 260px;
-        max-height: calc(100vh - 280px);
-        min-height: 200px;
+        display: block !important;
     }
 }
 
@@ -218,113 +264,150 @@
     display: flex;
     align-items: center;
     gap: var(--space-2, 8px);
-    padding: var(--space-3, 12px);
-    border-bottom: 1px solid var(--border-default);
-    background: var(--surface-card, var(--bg-secondary));
+    padding: 0 2px 7px;
+    border-bottom: 2px solid var(--border-default);
 }
 
-.board-column__dot {
-    width: 10px;
-    height: 10px;
-    border-radius: var(--radius-full, 9999px);
-    flex-shrink: 0;
+.board-column__code {
+    font-size: 11px;
 }
-
-.board-column__dot--black { background: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
-.board-column__dot--red { background: var(--color-danger); }
-.board-column__dot--yellow { background: var(--color-warning); }
-.board-column__dot--green { background: var(--color-success); }
 
 .board-column__title {
-    flex: 1;
     margin: 0;
-    font-size: var(--font-size-base, 16px);
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-.board-column__body {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-3, 12px);
-    padding: var(--space-3, 12px);
-    overflow-y: auto;
-}
-
-/* ── Victim Card（Board 卡片：識別+檢傷等級+位置+傷勢+後送+快速操作）──── */
-
-.victim-card {
-    padding: var(--space-3, 12px);
-    background: var(--bg-primary);
-    border: 1px solid var(--border-default);
-    border-left-width: 4px;
-    border-left-style: solid;
-    border-radius: var(--radius-md, 8px);
-    cursor: pointer;
-    transition: transform var(--duration-fast, 150ms), box-shadow var(--duration-fast, 150ms);
-}
-
-.victim-card:hover,
-.victim-card:focus-visible {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-
-.victim-card:focus-visible {
-    outline: none;
-    box-shadow: var(--focus-ring), var(--shadow-md);
-}
-
-.victim-card--black { border-left-color: var(--text-primary); } /* 見檔頭 BLACK 色說明 */
-.victim-card--red { border-left-color: var(--color-danger); }
-.victim-card--yellow { border-left-color: var(--color-warning); }
-.victim-card--green { border-left-color: var(--color-success); }
-
-.victim-card__header {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-2, 8px);
-    margin-bottom: var(--space-2, 8px);
-}
-
-.victim-card__identifier {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
     font-size: var(--font-size-xs, 12px);
+    font-weight: 400;
     color: var(--text-secondary);
 }
 
-/* a11y：實體 <button>（見 TriagePage.tsx VictimCard），視覺上維持原本文字樣式，
-   不要有 button 預設外框/底色，同時保留鍵盤焦點環。 */
-.victim-card__identifier--btn {
+.board-column__count {
+    margin-left: auto;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.board-column--red .board-column__header { border-color: var(--color-danger); }
+.board-column--red .board-column__code { color: var(--color-danger); }
+.board-column--yellow .board-column__header { border-color: var(--color-warning); }
+.board-column--yellow .board-column__code { color: var(--color-warning); }
+.board-column--green .board-column__header { border-color: var(--color-success); }
+.board-column--green .board-column__code { color: var(--color-success); }
+
+/* EXPECTANT 黑：整條欄頭改深章（c6 col-b） */
+.board-column--black .board-column__header {
+    background: var(--bg-active);
+    border-color: var(--text-tertiary);
+    padding: 6px 8px 7px;
+    border-radius: var(--radius-sm, 2px) var(--radius-sm, 2px) 0 0;
+}
+
+.board-column--black .board-column__code {
+    color: var(--text-primary);
+}
+
+/* 桌機：欄內各自捲動（看板慣例），行動端自然堆疊 */
+@media (min-width: 768px) {
+    .board-column__body {
+        max-height: calc(100vh - 320px);
+        min-height: 120px;
+        overflow-y: auto;
+        scrollbar-width: thin;
+    }
+}
+
+/* ── 傷票卡（c6 card：mono 票號＋4px 左緣色閂＋stencil 小標＋vitals）── */
+
+.victim-card {
+    background: var(--surface-card, var(--bg-secondary));
+    border: 1px solid var(--border-default);
+    border-left: 4px solid var(--border-default);
+    border-radius: var(--radius-sm, 2px);
+    padding: 10px 12px 11px;
+    margin-top: 10px;
+    cursor: pointer;
+    transition: background var(--duration-fast, 150ms), border-color var(--duration-fast, 150ms);
+}
+
+/* 印刷平面性：hover 只換底色，不浮起、不投影 */
+.victim-card:hover {
+    background: var(--bg-hover);
+}
+
+.victim-card--red { border-left-color: var(--color-danger); } /* 生命分級 */
+.victim-card--yellow { border-left-color: var(--color-warning); }
+.victim-card--green { border-left-color: var(--color-success); }
+
+/* EXPECTANT 黑：中性深面＋紙白斜紋左閂（c6 card-x） */
+.victim-card--black {
+    position: relative;
+    background: var(--bg-active);
+    border-color: var(--border-dark);
+    border-left-width: 1px;
+    padding-left: 16px;
+}
+
+.victim-card--black:hover {
+    background: var(--surface-pressed, var(--bg-active));
+}
+
+.victim-card--black::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: repeating-linear-gradient(135deg, var(--text-primary) 0 3px, var(--bg-active) 3px 7px);
+}
+
+.victim-card__row1 {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2, 8px);
+}
+
+/* 票號＝實體 <button>（a11y 鍵盤入口，見 TriagePage.tsx VictimCard 註解），
+   視覺上維持 mono 票號文字，不要 button 預設外框/底色，保留鍵盤焦點環。 */
+.victim-card__tag {
     background: none;
     border: none;
     padding: 0;
     margin: 0;
     cursor: pointer;
-    font: inherit;
+    font-size: var(--font-size-base, 15px);
+    font-weight: 700;
+    color: var(--text-primary);
 }
 
-.victim-card__identifier--btn:focus-visible {
+.victim-card__tag:focus-visible {
     outline: none;
     box-shadow: var(--focus-ring);
     border-radius: var(--radius-sm, 2px);
 }
 
+.victim-card__level {
+    font-size: 10px;
+}
+
+.victim-card--red .victim-card__level { color: var(--color-danger); }
+.victim-card--yellow .victim-card__level { color: var(--color-warning); }
+.victim-card--green .victim-card__level { color: var(--color-success); }
+.victim-card--black .victim-card__level { color: var(--text-primary); }
+
 .victim-card__time {
     margin-left: auto;
     font-size: var(--font-size-xs, 12px);
-    /* R4 a11y：--text-tertiary 對比不足（4.39:1），見 A11Y_AUDIT_R4.md */
+    color: var(--text-muted);
+}
+
+.victim-card--black .victim-card__time {
     color: var(--text-secondary);
-    font-variant-numeric: tabular-nums;
 }
 
 .victim-card__desc {
-    margin: var(--space-2, 8px) 0;
-    font-size: var(--font-size-sm, 14px);
-    color: var(--text-primary);
+    margin: 4px 0 0;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-body, var(--text-primary));
 }
 
 .victim-card__location,
@@ -332,9 +415,33 @@
     display: flex;
     align-items: flex-start;
     gap: 4px;
-    margin: var(--space-1, 4px) 0;
+    margin: 4px 0 0;
     font-size: var(--font-size-xs, 12px);
     color: var(--text-secondary);
+}
+
+/* 生命徵象 mono 讀數列（c6 .vit：頂規線＋stencil 縮寫＋tabular 數值） */
+.victim-card__vitals {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-4, 16px);
+    margin-top: 7px;
+    padding-top: 7px;
+    border-top: 1px solid var(--border-default);
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-primary);
+}
+
+.victim-card--black .victim-card__vitals {
+    border-top-color: var(--border-dark);
+}
+
+.victim-card__vitals em {
+    font-style: normal;
+    font-size: 10px;
+    color: var(--color-secondary);
+    margin-right: 5px;
 }
 
 .victim-card__footer {
@@ -343,11 +450,16 @@
     justify-content: space-between;
     align-items: center;
     gap: var(--space-2, 8px);
-    margin-top: var(--space-3, 12px);
-    padding-top: var(--space-2, 8px);
+    margin-top: 10px;
+    padding-top: 8px;
     border-top: 1px solid var(--border-default);
 }
 
+.victim-card--black .victim-card__footer {
+    border-top-color: var(--border-dark);
+}
+
+/* 後送狀態：形狀雙編碼（□ 待送／■ 運送中／✓ 已到院），正常態灰字（狀態安靜律） */
 .victim-card__transport {
     font-size: var(--font-size-xs, 12px);
     font-weight: 600;
@@ -357,58 +469,74 @@
 .victim-card__transport--in_transit { color: var(--color-info); }
 .victim-card__transport--arrived { color: var(--color-success); }
 
-/*
- * R4 a11y：--color-info/--color-success 是小面積圖示/邊框設計的語意色
- * （3:1 門檻），直接當 12px 小字文字色在 light/dark 兩主題都量到 <3.5:1
- * （見 A11Y_AUDIT_R4.md）。這裡改用同色相但過 AA 文字門檻（4.5:1）的深/淺變體。
- */
-[data-theme="light"] .victim-card__transport--in_transit,
-[data-theme="bright-steel"] .victim-card__transport--in_transit {
-    color: var(--transport-info-text, #1D4ED8);
-}
-[data-theme="light"] .victim-card__transport--arrived,
-[data-theme="bright-steel"] .victim-card__transport--arrived {
-    color: var(--transport-success-text, #15803D);
-}
-[data-theme="dark"] .victim-card__transport--in_transit,
-[data-theme="copper-steel"] .victim-card__transport--in_transit {
-    color: var(--transport-info-text, #7DD3FC);
-}
-[data-theme="dark"] .victim-card__transport--arrived,
-[data-theme="copper-steel"] .victim-card__transport--arrived {
-    color: var(--transport-success-text, #86EFAC);
-}
-
 /* 卡片內快速操作按鈕：design-system Button size=sm 桌機高度可 <44px，
    本頁為高壓/戴手套情境使用，補足點擊熱區至 44px（§2.3）。 */
 .victim-card__footer .lk-btn {
     min-height: 44px;
 }
 
+/* ── 後送讀數帶（c6-foot 範式；數字皆來自既有 stats）───────────────── */
+
+.triage-foot {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: var(--space-2, 8px) var(--space-5, 20px);
+    margin-top: var(--space-4, 16px);
+    padding-top: 10px;
+    border-top: 2px solid var(--border-default);
+}
+
+.triage-foot__label {
+    font-size: 11px;
+    color: var(--accent-gold);
+    white-space: nowrap;
+}
+
+.triage-foot__item {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 7px;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-secondary);
+}
+
+.triage-foot__item b {
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
 /* ── 載入 Skeleton（§7.1，≥3 列，本地版本）──────────────────────── */
 
 .triage-skeleton {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-4, 16px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4, 16px) 14px;
+    margin-top: var(--space-4, 16px);
 }
 
 @media (min-width: 768px) {
     .triage-skeleton {
-        flex-direction: row;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .triage-skeleton {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
     }
 }
 
 .triage-skeleton__column {
-    flex: 1 1 260px;
     display: flex;
     flex-direction: column;
-    gap: var(--space-3, 12px);
+    gap: 10px;
 }
 
 .triage-skeleton__card {
     height: 96px;
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--radius-sm, 2px);
     background: linear-gradient(90deg, var(--surface-hover, var(--bg-secondary)) 25%, var(--bg-secondary) 50%, var(--surface-hover, var(--bg-secondary)) 75%);
     background-size: 200% 100%;
     animation: triage-skeleton-shimmer 1.4s ease-in-out infinite;
@@ -429,7 +557,7 @@
 
 .start-flow {
     background: var(--surface-hover, var(--bg-secondary));
-    border-radius: var(--radius-md, 8px);
+    border-radius: var(--radius-sm, 2px);
     padding: var(--space-3, 12px);
     margin-bottom: var(--space-4, 16px);
 }
@@ -446,7 +574,7 @@
     display: block;
     margin-bottom: var(--space-2, 8px);
     font-weight: 600;
-    font-size: var(--font-size-sm, 14px);
+    font-size: var(--font-size-sm, 13px);
     color: var(--text-primary);
 }
 
@@ -462,8 +590,8 @@
     border: 2px solid var(--border-default);
     background: transparent;
     color: var(--text-primary);
-    border-radius: var(--radius-sm, 4px);
-    font-size: var(--font-size-sm, 14px);
+    border-radius: var(--radius-sm, 2px);
+    font-size: var(--font-size-sm, 13px);
     cursor: pointer;
     transition: border-color var(--duration-fast, 150ms), background var(--duration-fast, 150ms);
 }
@@ -478,6 +606,7 @@
     background: var(--color-safe-bg, var(--color-success));
 }
 
+/* 檢傷判定「否」路徑導向紅/黑分級（生命分級脈絡，紅色憲法允許） */
 .question .btn-group button.active.no {
     border-color: var(--color-danger);
     background: var(--color-danger-bg);
@@ -490,8 +619,10 @@
     border: 1px solid var(--border-default);
     background: var(--bg-primary);
     color: var(--text-primary);
-    border-radius: var(--radius-sm, 4px);
-    font-size: var(--font-size-base, 16px);
+    border-radius: var(--radius-sm, 2px);
+    font-size: var(--font-size-base, 15px);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .question input[type="number"]:focus-visible {
@@ -519,7 +650,7 @@
 .form-section > label {
     display: block;
     margin-bottom: var(--space-2, 8px);
-    font-size: var(--font-size-sm, 14px);
+    font-size: var(--font-size-sm, 13px);
     color: var(--text-secondary);
 }
 
@@ -530,8 +661,8 @@
     border: 1px solid var(--border-default);
     background: var(--bg-primary);
     color: var(--text-primary);
-    border-radius: var(--radius-sm, 4px);
-    font-size: var(--font-size-base, 16px);
+    border-radius: var(--radius-sm, 2px);
+    font-size: var(--font-size-base, 15px);
     resize: vertical;
 }
 
@@ -544,9 +675,9 @@
 
 .victim-detail p {
     margin: 0 0 var(--space-3, 12px) 0;
-    font-size: var(--font-size-sm, 14px);
+    font-size: var(--font-size-sm, 13px);
     color: var(--text-primary);
-    line-height: 1.5;
+    line-height: var(--line-height-normal, 1.6);
 }
 
 .victim-detail p:last-child {
