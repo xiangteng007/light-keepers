@@ -263,3 +263,22 @@
 [data-app-mode="emergency"] .sit-panel__header { padding: var(--space-2) var(--space-3); }
 [data-app-mode="emergency"] .sit-list { gap: var(--space-1); }
 [data-app-mode="emergency"] .sit-skeleton__row { animation: none; }
+
+/* ═══ R5/T1 戰術化：KPI＝任務牆讀數（3 秒法則） ═══ */
+.sit-kpi {
+    border: 1px solid var(--border-default);
+    border-left-width: 3px;
+    border-radius: var(--radius-md);
+    box-shadow: none;
+}
+.sit-kpi__value {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
+}
+.sit-kpi__label {
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+}

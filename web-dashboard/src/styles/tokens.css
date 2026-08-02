@@ -989,3 +989,147 @@
     --transition-slow: 100ms ease;
     --transition-spring: 100ms ease;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   LAYER 9 — R5/T1 平時模式＝戰術低張力（Tactical Ops）
+   ─────────────────────────────────────────────────────────────────────────
+   背景：owner 於 2026-08-02 否決 Phase R 視覺——「平時模式」是白底通用後台，
+   違反 lightkeepers_tactical_uiux_spec v1.0 的戰術作業台語彙。
+   本層宣告於檔案最末，以 cascade 順序覆寫 Layer 2b/2c/3/4 的亮色預設值：
+   自此「平時模式」是戰術深色的低張力變體（底色比災時擡高一階），
+   災時模式仍由 Layer 8（data-app-mode="emergency"，元素層級繼承）接管全張力色盤。
+   淺色 SaaS 主題自此不存在——這是設計決策，不是 bug。
+   規格：docs/architecture/DESIGN_LANGUAGE.md（R5 v2）§1–§3。
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root,
+:root[data-theme="light"],
+:root[data-theme="bright-steel"],
+:root[data-theme="dark"],
+:root[data-theme="copper-steel"],
+.dark {
+    /* ── 背景／表面：ops＝#1B2534 基底（災時 #161E2A 的 +1 階） ── */
+    --bg-primary: #1B2534;
+    --bg-secondary: #212C3C;
+    --bg-tertiary: #273347;
+    --bg-card: #212C3C;
+    --bg-hover: #2A3649;
+    --bg-active: #303D52;
+    --bg-inverse: #F3F3F2;
+    --surface-ground: #1B2534;
+    --surface-default: #212C3C;
+    --surface-card: #212C3C;
+    --surface-raised: #273347;
+    --surface-overlay: rgba(22, 30, 42, 0.94);
+    --surface-hover: #2A3649;
+    --surface-pressed: #303D52;
+    --surface-active: #303D52;
+    --v2-bg-void: #161E2A;
+    --v2-bg-glass: rgba(29, 38, 53, 0.92);
+    --v2-bg-glass-heavy: rgba(22, 30, 42, 0.96);
+    --v2-bg-dim: rgba(8, 10, 15, 0.45);
+    --glass-bg: rgba(29, 38, 53, 0.88);
+    --glass-bg-light: rgba(33, 44, 60, 0.92);
+    --glass-bg-subtle: rgba(29, 38, 53, 0.62);
+    --glass-border: rgba(243, 243, 242, 0.08);
+    --glass-border-light: rgba(243, 243, 242, 0.12);
+
+    /* ── 文字（tactical spec：#F3F3F2 / #D0CEC3 / #AEAEA7） ── */
+    --text-primary: #F3F3F2;
+    --text-heading: #F3F3F2;
+    --text-body: #E9E8E4;
+    --text-secondary: #D0CEC3;
+    --text-tertiary: #AEAEA7;
+    --text-muted: #AEAEA7;
+    --text-disabled: #65696A;
+    --text-inverse: #161E2A;
+    --text-link: #C39B6F;
+    --text-link-hover: #D4AC80;
+    --text-accent: #C39B6F;
+
+    /* ── 邊框：細格線 #2F3641 系 ── */
+    --border-color: #313B49;
+    --border-default: #313B49;
+    --border-light: #2A3342;
+    --border-dark: #3D4757;
+    --border-subtle: #313B49;
+    --border-focus: #C39B6F;
+    --border-accent: #C39B6F;
+    --v2-border-subtle: #313B49;
+
+    /* ── 品牌／強調：戰術金為唯一可行動高亮 ── */
+    --primary: #C39B6F;
+    --primary-color: #C39B6F;
+    --primary-hover: #D4AC80;
+    --primary-light: rgba(195, 155, 111, 0.14);
+    --accent: #C39B6F;
+    --accent-primary: #C39B6F;
+    --accent-hover: #D4AC80;
+    --accent-gold: #C39B6F;
+    --color-primary: #8B99AC;
+    --color-primary-light: #A5B1C2;
+    --color-primary-dark: #71809A;
+    --color-secondary: #C39B6F;
+    --color-secondary-light: #D4AC80;
+    --color-secondary-dark: #A98356;
+    --color-accent: #C39B6F;
+    --color-accent-light: #D4AC80;
+    --color-accent-dark: #A98356;
+    --color-brand-primary: #8B99AC;
+    --color-brand-accent: #C39B6F;
+    --color-brand-accent-light: #D4AC80;
+    --color-brand-accent-dark: #A98356;
+    --color-gold-400: #D4AC80;
+    --color-gold-500: #C39B6F;
+    --gradient-gold: linear-gradient(135deg, #D4AC80 0%, #C39B6F 100%);
+
+    /* ── 語義狀態（深底降飽和；紅=生命/安全，一般錯誤走琥珀） ── */
+    --color-success: #57A773;
+    --color-success-light: #74BC8C;
+    --color-success-dark: #468C5E;
+    --success: #57A773;
+    --success-color: #57A773;
+    --success-light: rgba(87, 167, 115, 0.14);
+    --color-safe: #57A773;
+    --color-safe-bg: rgba(87, 167, 115, 0.12);
+    --color-warning: #D9A05B;
+    --color-warning-light: #E4B57C;
+    --color-warning-dark: #C08A3E;
+    --warning: #D9A05B;
+    --warning-color: #D9A05B;
+    --warning-light: rgba(217, 160, 91, 0.14);
+    --color-warning-bg: rgba(217, 160, 91, 0.12);
+    --color-danger: #C25B5F;
+    --color-danger-light: #D67C80;
+    --color-danger-dark: #893336;
+    --danger: #C25B5F;
+    --danger-color: #C25B5F;
+    --danger-light: rgba(194, 91, 95, 0.14);
+    --color-danger-bg: rgba(137, 51, 54, 0.18);
+    --color-info: #7A96B8;
+    --color-info-light: #94ACC8;
+    --color-info-dark: #61809F;
+    --info-color: #7A96B8;
+    --info-light: rgba(122, 150, 184, 0.14);
+    --color-info-bg: rgba(122, 150, 184, 0.12);
+    --color-critical: #B08BC9;
+    --color-critical-bg: rgba(176, 139, 201, 0.16);
+    --critical: #B08BC9;
+
+    /* ── 圓角：戰術紀律（避免過度圓潤；spec §5） ── */
+    --radius-lg: 10px;
+    --radius-xl: 12px;
+
+    /* ── 陰影：墨色 #080A0F ── */
+    --shadow-xs: 0 1px 2px rgba(8, 10, 15, 0.35);
+    --shadow-sm: 0 2px 6px rgba(8, 10, 15, 0.4);
+    --shadow-md: 0 6px 16px rgba(8, 10, 15, 0.42);
+    --shadow-lg: 0 14px 36px rgba(8, 10, 15, 0.5);
+    --shadow-xl: 0 22px 52px rgba(8, 10, 15, 0.55);
+
+    /* ── 焦點環／捲軸 ── */
+    --focus-ring: 0 0 0 3px rgba(195, 155, 111, 0.35);
+    --focus-ring-accent: 0 0 0 3px rgba(195, 155, 111, 0.45);
+    --scrollbar-track: #1B2534;
+    --scrollbar-thumb: #3D4757;
+    --scrollbar-thumb-hover: #4A5568;
+}

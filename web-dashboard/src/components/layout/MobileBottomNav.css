@@ -272,3 +272,16 @@
         bottom: calc(var(--mobile-bottom-height, 72px) + env(safe-area-inset-bottom) + var(--space-4));
     }
 }
+
+/* ═══ R5/T1 戰術化：底部導航＝深面板＋金色作用態（不填整塊） ═══ */
+.mobile-bottom-nav {
+    background: var(--surface-default);
+    border-top: 1px solid var(--border-default);
+    box-shadow: 0 -4px 16px rgba(8, 10, 15, 0.35);
+}
+.mobile-nav-item.active {
+    color: var(--accent-gold);
+    background: transparent;
+    box-shadow: inset 0 2px 0 var(--accent-gold);
+}
+.mobile-nav-item.active svg { color: var(--accent-gold); }

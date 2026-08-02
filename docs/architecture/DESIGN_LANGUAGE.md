@@ -1,15 +1,56 @@
-# Light Keepers 設計語言（Design Language v1.0）
+# Light Keepers 設計語言（Design Language v2.0 — R5 戰術化）
 
-> 工作項：`FULL_SYSTEM_REDESIGN_PLAN.md` R1（FE-7 前端完整重新設計）
-> 本文件是 R2（旗艦頁重建）與 R3（全站批次套用）的**執行依據**。
-> 執行者（SONNET）遇到本文件沒有涵蓋的判斷時，回到 §0 的三條裁決原則做決定並在 PR 註記。
+> **v2.0（2026-08-02，R5/T1）**：owner 實機檢視後否決 v1.0 落地成果——「平時模式」
+> 成了白底通用後台，違反戰術規範。v2.0 的根本修正：
+> **戰術 DNA 貫穿雙模式，淺色 SaaS 主題自此不存在。**
+> 完整任務規格見 `docs/FRONTEND_TACTICAL_REBUILD_PROMPT.md`；
+> `lightkeepers_tactical_uiux_spec_utf8_bundle/` 從「精神來源」升格為**美學權威**（逐條遵守）。
+>
+> ## v2 核心增補（蓋過下方 v1 內容中矛盾處）
+>
+> ### A. 雙模式＝張力差，不是身份差
+> | | 平時（Ops，低張力） | 災時（Tactical，全張力） |
+> |---|---|---|
+> | 基底 | `#1B2534`／面板 `#212C3C`（tokens.css **Layer 9**） | `#161E2A`／面板 `#1D2635`（**Layer 8**，data-app-mode="emergency"） |
+> | 金色 `#C39B6F` | 主要 CTA 與作用態 | 只剩「立即行動」（派遣/ACK/通報） |
+> | 動效 | 極少 | 只有告警脈動 |
+> | 導航 | 完整 | 收斂到 回報→分流→任務→執行→結案＋傷檢＋SOS |
+>
+> ### B. 戰術工藝五律（每個元件都要過）
+> 1. **細格線底紋**：app shell 背景 32px 網格、透明度 ≤2.5%（作業台質感，不搶內容）
+> 2. **Hairline 分層**：面板一律 1px `--border-default` 邊框＋左側 3px 狀態閂；**不用浮起陰影卡**
+> 3. **等寬讀數**：所有數字/時間戳/座標/編號＝`--font-mono`＋`tabular-nums`（3 秒法則：讀數不跳動）
+> 4. **金色紀律**：`#C39B6F` 每屏 ≤2 個元素；作用態＝金色細閂（inset 2px），**不整塊填色**
+> 5. **狀態安靜律**：正常狀態灰字＋色點；只有異常才讓狀態色說話（參考航空 EFIS：紅色永遠最少）
+>
+> ### C. 國際參考的轉譯結論
+> TAK/ATAK（地圖優先、深底高對比符號）、MIL-STD-2525（形狀＋顏色雙編碼＝色盲安全）、
+> Palantir/Anduril（資訊密度管理、mono 數據、chip 狀態）、NASA 任務牆（大數字＋趨勢＋異常才亮）、
+> 航空 EFIS（三級告警 Advisory 白/Caution 琥珀/Warning 紅）、OCHA/IFRC GO（人道數字的克制誠實）、
+> FEMA ICS（編號/時間/簽核鏈的表單紀律）、台灣 CBS/NCDR（在地災型圖示與告警配色慣例）。
+>
+> ### D. 紅色憲法（v1 §3 收緊）
+> 紅 `#893336`（亮版 `#C25B5F`）**只給生命/安全**：SOS、BLACK 傷票、禁入區、撤離。
+> 一般錯誤（表單驗證、網路失敗、4xx/5xx）一律**琥珀 `#D9A05B`**。
+>
+> ### E. RWD 四層（v1 §6 擴充）
+> 360–430 外勤（44px 觸控/拇指區/底導 ≤5）→ 768–1024 車載（地圖+側欄雙窗格）→
+> 1280–1920 指揮所（三欄）→ **1920+ TV 牆**（唯讀、3 秒法則、自動輪播，T2 實作）。
+>
+> ### F. 落地位置（T1 已實作）
+> tokens.css Layer 9（平時＝戰術低張力，蓋掉全部亮色預設）；AppShellLayout.css／
+> MobileBottomNav.css／situational.css 的「R5/T1」段；SyncStatusIndicator 狀態章範式。
+> T2+ 依 `FRONTEND_TACTICAL_REBUILD_PROMPT.md` 分批。
 >
 > 相關文件：
 > - Token 單一來源：`web-dashboard/src/styles/tokens.css`（規則見 `docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md`）
 > - 元件庫單一來源：`web-dashboard/src/design-system/`
 > - 權限單一來源：`web-dashboard/src/config/page-policy.ts`
 > - 導覽單一來源：`web-dashboard/src/config/navigation.ts`
-> - 戰術 UI 精神來源：`lightkeepers_tactical_uiux_spec_utf8_bundle/`（取其精神，不逐條照抄）
+> - **美學權威**：`lightkeepers_tactical_uiux_spec_utf8_bundle/`（v2 起逐條遵守）
+>
+> 以下為 v1.0 原文（結構性內容仍有效；視覺敘述與上方 v2 矛盾處以 v2 為準——
+> 特別是 v1 任何暗示「平時模式＝淺色」的段落已全部作廢）。
 
 ---
 

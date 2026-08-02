@@ -634,3 +634,46 @@
     color: var(--text-primary);
     cursor: pointer;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   R5/T1 — 戰術作業台工藝層（tactical spec §2/§5/§6）
+   細格線質感、hairline 分層、等寬狀態數字。
+   =============================================================== */
+
+/* 全域細格線質感：低於 3% 不搶內容，deep bg 上形成「作業台」底紋 */
+.app-shell {
+    background-color: var(--surface-ground);
+    background-image:
+        linear-gradient(rgba(243, 243, 242, 0.022) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(243, 243, 242, 0.022) 1px, transparent 1px);
+    background-size: 32px 32px;
+}
+
+/* Header＝指揮台狀態列：面板底＋hairline，不做浮起卡片 */
+.header {
+    background: var(--surface-default);
+    border-bottom: 1px solid var(--border-default);
+    box-shadow: none;
+}
+
+/* 狀態叢（同步/模式/等級章）一律等寬——數字與時間不跳動 */
+.header .sync-chip,
+.header time,
+.header [data-mono],
+.mode-badge {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.02em;
+}
+
+/* 側欄：面板色＋hairline 右緣；作用中項目＝金色左閂（非整塊填色） */
+.sidebar {
+    background: var(--surface-default);
+    border-right: 1px solid var(--border-default);
+}
+.sidebar a.active,
+.sidebar [aria-current="page"] {
+    color: var(--accent-gold);
+    box-shadow: inset 2px 0 0 var(--accent-gold);
+    background: var(--primary-light);
+}
