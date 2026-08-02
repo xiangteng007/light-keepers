@@ -644,8 +644,8 @@
 .app-shell {
     background-color: var(--surface-ground);
     background-image:
-        linear-gradient(rgba(243, 243, 242, 0.022) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(243, 243, 242, 0.022) 1px, transparent 1px);
+        linear-gradient(rgba(237, 233, 218, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(237, 233, 218, 0.02) 1px, transparent 1px);
     background-size: 32px 32px;
 }
 
@@ -663,7 +663,7 @@
 .mode-badge {
     font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
-    letter-spacing: 0.02em;
+    letter-spacing: 0;
 }
 
 /* 側欄：面板色＋hairline 右緣；作用中項目＝金色左閂（非整塊填色） */
