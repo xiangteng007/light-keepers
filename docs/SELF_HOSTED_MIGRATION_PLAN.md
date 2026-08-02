@@ -1,7 +1,8 @@
 # Light Keepers 自主架構改造計畫（Self-Hosted Migration Plan）
 
-> **版本**: v1.1（規劃階段 — **本文件不含任何程式、schema 或部署變更**）
+> **版本**: v1.2（規劃階段 — **本文件不含任何程式、schema 或部署變更**）
 > **日期**: 2026-08-02
+> **v1.2 變更**: Owner 指示補足缺口全數寫入——新增 **S6（可觀測性、告警鏈與長期維運）**、**S7（使用者遷移與溝通）**兩期；S1.6（field-reports 附件直傳落地端點）；S5.2 補明 **Git/CI 前置鎖鏈**（憑證輪換→歷史清理→push→CI）；風險表新增 R12–R14（觀測悖論／CI 鎖鏈／PWA 換網域作廢）；決策新增 D32（搬遷行為凍結）／D33（staging＝開發機 compose）／D34（pgdata 加密，評估後定）。總工作量 21–26 → **約 28–34 人日**。
 > **v1.1 變更**: Owner 於 2026-08-02 **全數採納 v1.0 §4 的建議**。D22/D23/D25/D26/D27/D28/D29/D30/D31 已拍板；D20/D21/D24 方向確認但屬事實查證與採購/註冊，仍需 owner 執行。全文已依決策改寫，**不再有「待 Dxx」的條件分支**；§4 分期已依決策重排並補入決策衍生的新工作項。
 > **定位**: Owner 決定將希望防災平台從已失效的 GCP，改造為與 ST／DRONES 相同的自主架構：**資料庫在本地 NAS、語言模型跑桌機 GPU 的本地 Ollama、零雲端費用**。本文件盤點實際接線、提出搬遷設計、並針對「防災平台跑在家用設備上」的結構性風險做誠實分析。
 > **與既有文件的關係**:
@@ -496,6 +497,7 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 2. **明確的離線可用頁清單**：目前沒有文件說明「斷線時哪些頁面還能用」。應盤點並寫入訓練教材，避免現場人員在斷線時亂試。
 3. **演練**：`FULL_SYSTEM_REDESIGN_PLAN.md` 的 CD 主題已定義 L0–L3 降級模式（L0 正常／L1 無雲／L2 無網際網路／L3 無電力）。**L2「內網 WiFi + 離線 outbox」的基地台模式演練尚未執行**——這應該是改造完成後的第一場演練。
 4. **與 §3.1 的連結**：停電超過 UPS 續航時，正確的動作是**切離線模式繼續作業**，而不是等系統回來。這條要寫進 SOP。
+5. ⚠ **換網域的代價（v1.2 新增）**：PWA 綁定 origin。搬遷換網域後，所有使用者既有的 PWA 安裝、Service Worker 快取、IndexedDB（含離線 outbox 與已下載的 pmtiles 圖磚包）**全部作廢**，必須在新網域重裝、重下載。所幸舊網域已 NXDOMAIN、平台離線多月，理論上不存在「舊 outbox 裡還有未同步資料」的遺留問題；但「離線 PWA 是最強的牌」**在搬遷日會歸零一次**——上線後第一件事就是 S7.3 的重裝動員，否則本節列的所有能力都只存在於紙上（R14）。
 
 ---
 
@@ -514,6 +516,9 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | R9 | 告警與 NAS 共存亡 | 無措施 | **方案 (a)**：寫進 SOP + 人工替代管道；(b) CF Workers 列後續選配 | 零 | 🟠 中 | S4.7 |
 | R10 | **線上資料是否還存在，未知** | 無人能存取 GCP 專案 | **最優先釐清**（D20，owner 執行） | 零 | 🔴 **最高** | S0.1 |
 | R11 | hybrid 的 Gemini 降級變成隱形帳單 | 降級有記 WARN，但無人監看 | **監看 `/health/llm` 的 `active` 與降級 WARN**，讓費用可見 | 零 | 🟠 中 | S2.5 |
+| R12 | **觀測悖論**：所有監控住在被監控的 NAS 上 → NAS 掛了，第一個發現的是使用者不是 owner | 備份 unhealthy 只在 docker healthcheck、LLM WARN 只在容器日誌 | **外部 uptime 監控**（UptimeRobot/CF Health Checks）＋ 備份/副本/LLM 三條訊號**主動推播 owner 手機** | 零～趨近零 | 🔴 高 | S6.1／S6.2 |
+| R13 | S5.2 的 CI 部署路徑被鎖死：local main 領先 origin 161 commits 未 push，而 git 歷史含真實個資與私鑰、憑證未輪換 → **不能 push** | 交互鎖未被寫成明確前置 | 明確前置鏈：**憑證輪換 → 歷史清理 → push origin → CI 接手**；過渡期以開發機 build image 傳 NAS | 零 | 🟠 中 | S5.2 |
+| R14 | 換網域使全體使用者的 PWA／快取／離線圖磚包**作廢**（PWA 綁 origin） | 無人處理 → §3.9 的離線能力在搬遷日歸零 | **搬遷日重裝動員**＋圖磚重下載＋`OfflinePrepPage` 準備度檢查 | 零 | 🟠 中 | S7.3 |
 
 ---
 
@@ -549,6 +554,7 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | S1.3 | schema 就位（情境 A：`migrate-db.sh`；情境 B/C：`migration:run` on baseline） | OPUS | 1–3 | 🔴 資料正確性 |
 | S1.4 | 前端 build + rsync + nginx 服務驗證 | SONNET | 0.5 | 🟢 |
 | S1.5 | 更新 `infra/nas/README.md` §8 過期項（LLM provider 已實作） | SONNET | 0.2 | 🟢 |
+| S1.6 | **field-reports 附件直傳落地端點**（v1.2 新增）：local 模式 `action:'write'` 簽名 URL 在 nginx 上 405（README §8 已知缺口）——補一個驗證簽章並落檔的 backend 端點（驗證端 `LocalStorageProvider.verifySignedUrl()` 已存在），否則**現場照片直傳在 NAS 上是壞的** | OPUS | 1 | 🟠 災防關鍵功能 |
 
 ---
 
@@ -596,14 +602,42 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | # | 工作 | 分工 | 人日 | 風險 |
 |---|---|---|---|---|
 | S5.1 | Cloudflare 邊緣快取規則（靜態資產長期快取 + `/public/*` 30–60s，`/public/alerts` 縮到 5–10s）+ **Always Online** | OPUS | 0.5 | 🟢 **性價比最高** |
-| S5.2 | CI 建 image 推 registry → NAS 拉取的部署路徑（取代 NAS 上手動 build 的 10–20 分鐘） | OPUS | 1–2 | 🟡 |
+| S5.2 | CI 建 image 推 registry → NAS 拉取的部署路徑（取代 NAS 上手動 build 的 10–20 分鐘）。**🔴 前置鎖鏈（R13）：憑證輪換 → git 歷史清理 → push origin（161 commits）→ CI 才能接手**——歷史含真實個資與私鑰，push 前不可跳過清理；在鎖鏈解開前，image 一律由開發機 build 後傳 NAS（過渡程序寫進 RUNBOOK） | OPUS | 1–2 | 🟡 |
 | S5.3 | Cloudflare Pages 緊急靜態頁（不依賴 NAS，含 119／1991 指引） | SONNET | 0.5 | 🟢 |
 | S5.4 | 多通道告警降級鏈（D28）：**Web Push 死碼接回**（VAPID 金鑰 + 前端接線）、**Email 空殼補實**、LINE Push 升為主力 | OPUS | 2 | 🟠 R8 |
 | S5.5 | **刪除已被 Google 停用的 legacy FCM 路徑**（`notification-queue.sendPush` 的 `fcm.googleapis.com/fcm/send`），統一走 `firebase-admin` v1 | SONNET | 0.5 | 🟢 現在就是壞的 |
 | S5.6 | 公眾端點限流收緊；確認公眾頁**不開 WebSocket**（長連線無法被邊緣快取） | SONNET | 0.5 | 🟢 |
 | S5.7 | **Google Maps 收斂**（D31）：`MapPage`／`MapMarkers`／`MapInfoWindows`／`map-constants` 改用既有 MapLibre 元件；`DirectionsPanel` 改為**深連結開啟使用者手機原生地圖 App**，移除 `@react-google-maps/api` 依賴 | OPUS 設計 / SONNET 批次 | 2–3 | 🟡 需視覺回歸驗證 |
 | S5.8 | **L2「基地台模式」離線演練** + 離線可用頁清單文件 + `OfflinePrepPage` 加「準備度檢查」 | OPUS + owner | 1.5 | 🟠 |
-| S5.9 | 撤除 `vercel.json` 與 Vercel preview（D25）；`cloudbuild.yaml`／`DEPLOY.md` 標註 deprecated；`deploy.yml` 停用但保留作回雲參考 | SONNET | 0.3 | 🟢 |
+| S5.9 | 撤除 `vercel.json` 與 Vercel preview（D25）；`cloudbuild.yaml`／`DEPLOY.md` 標註 deprecated；`deploy.yml` 與 `deploy-staging.yml` 停用但保留作回雲參考（D33：staging 定調為開發機 compose） | SONNET | 0.3 | 🟢 |
+
+---
+
+### S6 — 可觀測性、告警鏈與長期維運（v1.2 新增；承接上位計畫 M.6）
+
+> 這一期解決的是 **R12 觀測悖論：所有監控都住在被監控的機器上**。備份 unhealthy 只存在於 docker healthcheck、第二副本失敗只是一個 `.replica-failed` 檔案、LLM 降級 WARN 只寫在容器日誌——**NAS 掛了，第一個發現的會是使用者，不是 owner**。監看者不能與被監看者同生共死。
+
+| # | 工作 | 分工 | 人日 | 風險 |
+|---|---|---|---|---|
+| S6.1 | **外部 uptime 監控**：UptimeRobot 免費方案（或 Cloudflare Health Checks）打 `https://<網域>/api/v1/health/ready` 與 nginx `/healthz`，異常即 email／推播通知 owner | owner 開帳號 + OPUS 設定 | 0.3 | 🔴 R12 |
+| S6.2 | **三條訊號主動推播到 owner 手機**：①備份心跳過期 ②第二副本推送失敗（`.replica-failed`）③LLM 降級率異常（R11）。經既有 LINE Bot push 實作（⚠ LINE Notify 已於 2025-03 終止服務，不可用）；NAS 全掛的情境由 S6.1 的外部監控涵蓋 | OPUS | 1 | 🔴 R12／R11 |
+| S6.3 | **Cloud Logging／Error Reporting 替換**（M.6 承接，v1.1 漏排）：winston 檔案輪替（rotation 進 compose，避免塞滿 NVMe）＋ Sentry 免費額度收錯誤 | SONNET 接線 / OPUS 驗收 | 1 | 🟠 |
+| S6.4 | **NAS 部署回滾機制**：image 以 git SHA tag 版本化、NAS 上保留前一版 image、回滾 SOP 寫進 RUNBOOK——雲上有 Cloud Run revision 可退，**NAS 目前的回滾能力是零** | OPUS | 0.5 | 🟠 |
+| S6.5 | **pgdata 靜態加密評估**：開啟 ADM volume 加密後量測 DB 效能代價，結果回寫為 D34。背景：傷患資料與心理健康紀錄落在家用設備，主資料本體目前未加密（D30 只加密了第二副本） | OPUS | 0.5 | 🟠 個資 |
+| S6.6 | **秘密清單與輪換程序文件**：`.env` 一個檔案集中所有秘密（JWT／DB／LINE／ENCRYPTION_KEY／rclone crypt 密碼…）——列清單、定輪換週期與步驟、納入協會密碼保管流程。⚠ `ENCRYPTION_KEY` 與 rclone crypt 密碼**換錯即資料永久不可解**，要特別標註 | SONNET | 0.3 | 🟠 |
+| S6.7 | **「每月維護日」SOP**：ADM 更新、容器 image 更新、`npm audit`／CVE 掃描、磁碟容量檢查、演練排程檢查——固定每月第一個週末照清單跑，可由 agent 陪跑。雲上 Google 幫你 patch，NAS 上沒有人幫；**沒有這個，一年後這台 NAS 就是一台沒人敢動的黑盒子** | OPUS 撰寫 + owner 確認節奏 | 0.5 | 🟡 長期存亡 |
+| S6.8 | **N5105 效能基準實測**：P95 延遲、WebSocket 連線上限、公眾端點 QPS——「百人級並發足夠」目前是推估，要量測後寫進 `docs/BASELINE_METRICS.md`。**P5 的 PostGIS 索引併入同一次 migration 停機窗口執行**（同一次停機能吃掉的事一次做完） | OPUS | 1 | 🟠 |
+
+### S7 — 使用者遷移與溝通（v1.2 新增）
+
+> 技術搬遷的每一步都寫了，**人那一側**先前是空白：JWT 換掉、網域換掉、PWA 作廢，這些對使用者都是有感的斷裂。
+
+| # | 工作 | 分工 | 人日 | 風險 |
+|---|---|---|---|---|
+| S7.1 | 搬遷公告與時程：新網址、停機窗口、**JWT 更換 → 全員強制重新登入** | SONNET 草擬 + **owner 發布** | 0.3 | 🟢 |
+| S7.2 | Firebase UID 帳號處置：若 D20 查證後 DB 中 `firebaseUid` 非空的帳號 > 0，補「Email 設定本地密碼」流程；若為 0，直接停用 `FirebaseAdminService` 的 Auth 路徑（§1.2-a 的判斷落地） | OPUS | 0.5–1 | 🟡 |
+| S7.3 | **PWA 重裝動員**（R14）：換網域使所有既有 PWA／快取／圖磚包作廢（§3.9-5）——上線後排一波重裝與圖磚下載，搭配 `OfflinePrepPage` 的準備度檢查；教學文件一頁 | **owner 動員** + SONNET 教學 | 0.3 | 🟠 |
+| S7.4 | LINE 端切換驗證：好友關係與 rich menu 不受影響（Channel 本身不變，只換 webhook URL），但 **webhook 切換期間的訊息會遺失**——選離峰時段切、切完立即實測一則通報 | OPUS | 0.2 | 🟡 |
 
 ---
 
@@ -612,16 +646,19 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | 期別 | Agent 人日 | owner 動作 | 可否並行 |
 |---|---|---|---|
 | S0 | 0.5（＋條件性 3–5） | 🔴 3 項，**阻斷全案** | — |
-| S1 | 3–6 | 1 項 | 依賴 S0 |
+| S1 | 4–7 | 1 項 | 依賴 S0 |
 | S2 | 3.2 | 1 項 | 可與 S1 尾段並行 |
 | S3 | 2.3 | 🔴 1 項（callback 重登記） | 依賴 S0.2 網域 |
 | S4 | 2.8 | 🔴 4 項（採購／實體） | 可全程並行 |
 | S5 | 9–11 | — | 依賴 S3 |
-| **合計** | **約 21–26 人日**（不含 S0.3 條件性 baseline 的 3–5） | **10 項 owner 動作** | |
+| S6 | 5.1 | 2 項（uptime 帳號、維護日節奏確認） | S6.1/S6.2 應與 S3 同日生效；其餘依賴 S1 |
+| S7 | 1.3–1.8 | 2 項（公告發布、PWA 動員） | 依賴 S3（切換日前後執行） |
+| **合計** | **約 28–34 人日**（不含 S0.3 條件性 baseline 的 3–5） | **14 項 owner 動作** | |
 
-> 誠實提醒：**agent 人日不是瓶頸，owner 動作才是。** 10 項 owner 動作中有 3 項（GCP 帳號歸屬、網域註冊、外部平台 callback 重登記）**無法由 agent 代勞**，且其中 S0.1 決定整個計畫的性質。
+> 誠實提醒：**agent 人日不是瓶頸，owner 動作才是。** 14 項 owner 動作中有 3 項（GCP 帳號歸屬、網域註冊、外部平台 callback 重登記）**無法由 agent 代勞**，且其中 S0.1 決定整個計畫的性質。
 >
 > v1.0 → v1.1 的人日變化：S2.6（VLM/Whisper）移出範圍 **−1**；S2.5 增加可觀測性 **+0.5**；S4.2 雙 WAN 由選配轉必做 **+0.5**；S4.7 SOP 三條 **+0.5**；S5.7 Google Maps 收斂由「若做 2」轉必做 **2–3**；S5.8 加準備度檢查 **+0.5**；S5.9 部署路徑清理 **+0.3**。
+> v1.1 → v1.2 的人日變化：S1.6 附件直傳落地端點 **+1**；S6 全期 **+5.1**；S7 全期 **+1.3～1.8**。
 
 ### 建議執行順序
 
@@ -634,13 +671,20 @@ S0.2 網域註冊 ──────────────┼──→ S3 對�
 S0.4 GPU 機型確認 ──────────┼──→ S2 AI 本地化
                             │
 S4 韌性硬體（採購前置期長）──┴──→ 建議與 S1/S2 同時啟動，不要排在最後
+                            │
+憑證輪換 → git 歷史清理 → push origin ──→ S5.2 CI 部署路徑（R13 鎖鏈，解開前用開發機 build）
+                            │
+S6.1/S6.2 告警鏈 ───────────┴──→ 與 S3 對外上線「同日」生效
+S7.1/S7.3 公告與 PWA 動員 ──────→ 綁定切換日前後執行
 ```
 
 **S4 要早開始**：UPS 與 4G/5G 路由器有採購與到貨時間，且 S4.3 的跨目標還原演練需要第二副本目標先就位。**把它排在最後會變成上線後才發現備份沒設定。**
 
+**S6.1／S6.2 不能晚於 S3**：對外上線而沒有告警鏈的期間等於盲飛——上線當天外部監控就要在打 health 端點。
+
 ---
 
-### 決策記錄（沿用既有 D 編號序列，現有到 D19；本計畫新增 D20–D31）
+### 決策記錄（沿用既有 D 編號序列，現有到 D19；本計畫新增 D20–D34）
 
 #### A. ✅ 已拍板（2026-08-02，owner 全數採納 v1.0 建議）
 
@@ -657,6 +701,23 @@ S4 韌性硬體（採購前置期長）──┴──→ 建議與 S1/S2 同時
 | **D31** | Google Maps 路徑規劃 | **不自架 OSRM；`DirectionsPanel` 改深連結開啟手機原生地圖 App，並把 `MapPage` 收斂到 MapLibre** | OSRM 在 N5105 上吃記憶體，而路徑規劃不在關鍵路徑上（現場人員本來就會用自己手機導航）。收斂後可完全移除 `@react-google-maps/api`，達成地圖層零雲端計費 | S5.7 |
 
 > **D29 的補充說明**：v1.0 原寫「雙 WAN 視 D26 而定，若定位 (b) 可先不買」。拍板結果 D26 = **(c)** 而非 (b)，因此雙 WAN 判定為**必買**——(c) 保護的是公眾唯讀那一面（CF 快取即可），但**內部應變協作在斷網時沒有任何替代**，而那才是這個平台真正要做的事。
+
+#### A2. ✅ v1.2 追加拍板（2026-08-02，owner 指示缺口全數寫入）
+
+| # | 決策 | 拍板內容 | 理由 | 落地工作項 |
+|---|---|---|---|---|
+| **D32** | **搬遷行為凍結原則** | 搬遷窗口內**不順手修既有 bug**——維持與雲上行為一致，搬完穩定後另開工作項修 | 搬遷期間唯一目標是「行為一致、資料對得上帳」；混入修 bug 會讓對帳失去基準，出問題時分不清是搬壞的還是修壞的 | 繼承清單見下 |
+| **D33** | staging 定調 | **開發機 compose ＝ staging**；NAS 上不開第二套（16GB 資源有限，第二套環境的維護成本高於價值）。重大變更先在開發機全棧驗證再上 NAS；`deploy-staging.yml` 隨雲端路徑一併停用 | 協會規模的務實取捨；日後若團隊擴大可翻案 | S5.9 |
+| **D34** | pgdata 靜態加密 | **評估後定**：S6.5 量測 ADM volume 加密的效能代價後回寫本欄 | 個資敏感（傷患／心理健康紀錄）vs N5105 效能餘裕未知，先量再決定 | S6.5 |
+
+**D32 的繼承清單（搬遷前不修、搬完後修）**：
+
+| 項目 | 出處 | 搬完後的處置 |
+|---|---|---|
+| 3 個從未註冊進 `app.module` 的模組（international-standards／reporting-engine／scalability） | 上位計畫 Phase 3 發現 | 註冊前須先解 `reporting-engine` 與 `reports` 的 `@Controller('reports')` 前綴衝突 |
+| 23 個 controller 雙前綴（`/api/v1/api/*`） | 上位計畫 3.3 回報 | 批次修正＋前端呼叫點同步（SONNET） |
+| `ReportSchedulePage` 前端 404（呼叫 `/report-schedules`，後端是 `reports/scheduler`） | 上位計畫 Phase 3 發現 | 小修 |
+| C-1／C-3／C-5／C-6 授權殘項、D2 路由圈選、D11 i18n | P0 補強／既有決策 | 與搬遷正交，維持原軌，不因搬遷提前或延後 |
 
 #### B. 🔴 方向已定，待 owner 執行（事實查證／採購／註冊，無法由 agent 代勞）
 
@@ -681,7 +742,7 @@ S4 韌性硬體（採購前置期長）──┴──→ 建議與 S1/S2 同時
 
 ---
 
-## 5. 拍板後的下一步（v1.1）
+## 5. 拍板後的下一步（v1.2）
 
 決策已定，**但本文件仍是規劃文件——依然沒有動任何程式碼**。實際落地的第一步是：
 
@@ -690,6 +751,8 @@ S4 韌性硬體（採購前置期長）──┴──→ 建議與 S1/S2 同時
    - **S2.1**（SONNET，0.2 人日）：補 `LLM_PROVIDER=hybrid` 與 `LLM_MODEL=qwen2.5:7b-instruct` 到 `infra/nas/docker-compose.nas.yml` 與 `.env.nas.example`。**這是全案最小、最關鍵的一行改動**——不補的話整個本地化目標落空。
    - **S1.5**（SONNET，0.2 人日）：修正 `infra/nas/README.md` §8 已過期的「LLM provider 尚未實作」。
 3. **S4 的採購（UPS、4G/5G 路由器、加密雲端冷儲存）建議即刻啟動**，不要排在最後——採購有到貨前置期，且 S4.3 的跨目標還原演練需要第二副本目標先就位。
+4. **（v1.2）S6.1／S6.2 的告警鏈必須與對外上線同日生效**——上線而沒有告警鏈的期間等於盲飛。UptimeRobot 帳號（S6.1）可以現在就開好等著。
+5. **（v1.2）R13 鎖鏈提早動**：憑證輪換 → git 歷史清理是既有最急項（`docs/security/CREDENTIAL_ROTATION_CHECKLIST.md`），它同時鎖著 S5.2 的 CI 部署路徑——越早解開，NAS 的更新流程越早脫離「開發機手動 build」的過渡狀態。
 
 > ⚠ 提醒：S2.1 與 S1.5 雖然小，但屬於**改動 repo**，需另行下指令才會執行。本次僅更新計畫文件。
 
