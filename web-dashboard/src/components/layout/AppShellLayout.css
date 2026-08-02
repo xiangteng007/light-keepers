@@ -641,7 +641,7 @@
    =============================================================== */
 
 /* 全域細格線質感：低於 3% 不搶內容，deep bg 上形成「作業台」底紋 */
-.app-shell {
+.appShellLayout {
     background-color: var(--surface-ground);
     background-image:
         linear-gradient(rgba(237, 233, 218, 0.02) 1px, transparent 1px),
@@ -676,4 +676,21 @@
     color: var(--accent-gold);
     box-shadow: inset 2px 0 0 var(--accent-gold);
     background: var(--primary-light);
+}
+
+
+/* ═══ R5 修復：前朝 App.css（Senteng 舊 shell）的 .sidebar 撞名污染 ═══
+   App.css:110 `.sidebar{width:24px;padding:16px 12px;position:relative;z-index:200}`
+   與本 shell 同名同特異性且載入在後 → 軌道被壓成 25px（owner 回報的左側空白條，
+   Phase R 起即存在）。以後代選擇器提高特異性強制取回控制權；
+   App.css 該區塊屬 T3 清理範圍（見 FRONTEND_TACTICAL_REBUILD_PROMPT）。 */
+.appShellLayout .sidebar {
+    width: var(--shell-sidebar-w);
+    padding: 0;
+    position: static;
+    z-index: auto;
+    background: var(--surface-default);
+}
+.appShellLayout .sidebar.expanded {
+    width: var(--shell-sidebar-w-expanded);
 }
