@@ -177,14 +177,8 @@ export const WorkforcePointsReportPage = lazyWithSuspense(() =>
 export const WorkforceShiftCalendarPage = lazyWithSuspense(() => 
   import('../../pages/domains/workforce').then(m => ({ default: m.ShiftCalendarPage }))
 );
-export const PersonnelManagementPage = lazyWithSuspense(() => 
-  import('../../pages/domains/workforce/PersonnelManagementPage')
-);
 
 // ===== Logistics Domain =====
-export const LogisticsEquipmentPage = lazyWithSuspense(() => 
-  import('../../pages/domains/logistics').then(m => ({ default: m.EquipmentPage }))
-);
 export const LogisticsResourcesPage = lazyWithSuspense(() => 
   import('../../pages/domains/logistics').then(m => ({ default: m.ResourcesPage }))
 );
@@ -215,16 +209,8 @@ export const CoreDashboardPage = lazyWithSuspense(() =>
   import('../../pages/domains/core').then(m => ({ default: m.DashboardPage }))
 );
 
-// ===== Air Ops Domain =====
-export const DroneControlPage = lazyWithSuspense(() => 
-  import('../../pages/domains/air-ops').then(m => ({ default: m.DroneControlPage }))
-);
-
 // ===== C2 Pages =====
-export const TaskDispatchPage = lazyWithSuspense(() => import('../../pages/command/TaskDispatchPage'));
-export const ResourceOverviewPage = lazyWithSuspense(() => import('../../pages/resources/ResourceOverviewPage'));
 export const IncidentsPage = lazyWithSuspense(() => import('../../pages/c2/IncidentsPage'));
-export const DrillsPage = lazyWithSuspense(() => import('../../pages/c2/DrillsPage'));
 export const AARPage = lazyWithSuspense(() => import('../../pages/c2/AARPage'));
 export const ReportGeneratorPage = lazyWithSuspense(() => import('../../pages/analytics/ReportGeneratorPage'));
 
