@@ -3,14 +3,16 @@
  *
  * 機構互通頁面 - 跨組織資料交換
  */
-import { Link, Database, RefreshCw } from 'lucide-react';
+/* Database(資料庫) 無 B3c 對應，誠實保留（見 notes） */
+import { Database } from 'lucide-react';
+import { LinkIcon, SyncIcon } from '../design-system/icons';
 import { Alert, Card, StatIndicator } from '../design-system';
 import './InteroperabilityPage.css';
 
 const FEATURES = [
-    { icon: Link, title: 'API 管理', description: '外部系統連接設定' },
+    { icon: LinkIcon, title: 'API 管理', description: '外部系統連接設定' },
     { icon: Database, title: 'EDXL 訊息', description: '標準化災害訊息交換' },
-    { icon: RefreshCw, title: '資料同步', description: '即時同步狀態監控' },
+    { icon: SyncIcon, title: '資料同步', description: '即時同步狀態監控' },
 ];
 
 export default function InteroperabilityPage() {

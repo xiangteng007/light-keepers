@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { login as apiLogin } from '../../api/services';
-import { ShieldCheck, Mail, Lock, Loader2, AlertCircle, X, LogIn } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Mail（電子郵件）、Loader2（載入動畫）、LogIn（登入動作）
+import { Mail, Loader2, LogIn } from 'lucide-react';
+import { ShieldIcon, LockIcon, WarningIcon, CloseIcon } from '../../design-system/icons';
 import './LoginModal.css';
 
 interface LoginModalProps {
@@ -76,13 +78,13 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             >
                 {/* Close Button */}
                 <button className="login-modal__close" onClick={onClose} aria-label="關閉">
-                    <X size={20} />
+                    <CloseIcon size={20} aria-hidden="true" />
                 </button>
 
                 {/* Header with Brand Bar */}
                 <div className="login-modal__header">
                     <div className="login-modal__brand">
-                        <ShieldCheck className="login-modal__brand-icon" />
+                        <ShieldIcon className="login-modal__brand-icon" aria-hidden="true" />
                         <span className="login-modal__brand-text">LIGHTKEEPERS</span>
                     </div>
                 </div>
@@ -96,7 +98,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     {/* Error Message */}
                     {error && (
                         <div className="login-modal__error">
-                            <AlertCircle size={16} />
+                            <WarningIcon size={16} aria-hidden="true" />
                             <span>{error}</span>
                         </div>
                     )}
@@ -105,7 +107,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
                     <form onSubmit={handleLogin} className="login-modal__form">
                         {/* Email Field */}
                         <div className={`login-modal__field ${focusedField === 'email' ? 'login-modal__field--focused' : ''}`}>
-                            <Mail className="login-modal__field-icon" size={18} />
+                            <Mail className="login-modal__field-icon" size={20} aria-hidden="true" />
                             <input
                                 type="email"
                                 value={email}
@@ -120,7 +122,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
                         {/* Password Field */}
                         <div className={`login-modal__field ${focusedField === 'password' ? 'login-modal__field--focused' : ''}`}>
-                            <Lock className="login-modal__field-icon" size={18} />
+                            <LockIcon className="login-modal__field-icon" size={20} aria-hidden="true" />
                             <input
                                 type="password"
                                 value={password}

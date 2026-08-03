@@ -18,17 +18,17 @@ import { useMemo } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import {
-    FileWarning,
-    ClipboardList,
-    Calendar,
-    Map,
-    ChevronRight,
-    Truck,
-    AlertTriangle,
-    Users,
-    Package,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+    ReportIcon,
+    TasksIcon,
+    CalendarIcon,
+    MapIcon,
+    ChevronRightIcon,
+    VehicleIcon,
+    WarningIcon,
+    TeamsIcon,
+    InventoryIcon,
+    type LkIcon,
+} from '../../../design-system/icons';
 import {
     getTaskKanban,
     getTaskStats,
@@ -86,11 +86,11 @@ function TaskRow({ task, statusOverride }: { task: Task; statusOverride?: string
 
 /* ═══ L0–L1：志工「我的工作台」═══ */
 
-const VOLUNTEER_SHORTCUTS: Array<{ to: string; icon: LucideIcon; label: string; desc: string }> = [
-    { to: '/intake', icon: FileWarning, label: '快速通報', desc: '回報災情或異常' },
-    { to: '/tasks', icon: ClipboardList, label: '任務看板', desc: '查看並認領任務' },
-    { to: '/workforce/shifts', icon: Calendar, label: '排班日曆', desc: '查看班表與簽到' },
-    { to: '/geo/map', icon: Map, label: '統一地圖', desc: '掌握周邊狀況' },
+const VOLUNTEER_SHORTCUTS: Array<{ to: string; icon: LkIcon; label: string; desc: string }> = [
+    { to: '/intake', icon: ReportIcon, label: '快速通報', desc: '回報災情或異常' },
+    { to: '/tasks', icon: TasksIcon, label: '任務看板', desc: '查看並認領任務' },
+    { to: '/workforce/shifts', icon: CalendarIcon, label: '排班日曆', desc: '查看班表與簽到' },
+    { to: '/geo/map', icon: MapIcon, label: '統一地圖', desc: '掌握周邊狀況' },
 ];
 
 function VolunteerHome({ user }: { user: User | null }) {
@@ -215,28 +215,28 @@ function OpsOverview() {
             label: '待審核志工',
             count: pendingVol,
             to: '/workforce/people',
-            icon: Users,
+            icon: TeamsIcon,
         },
         {
             key: 'pending-report',
             label: '待審核通報',
             count: rs?.pending ?? null,
             to: '/events',
-            icon: FileWarning,
+            icon: ReportIcon,
         },
         {
             key: 'low-stock',
             label: '低庫存物資',
             count: res?.lowStock ?? null,
             to: '/logistics/inventory',
-            icon: Package,
+            icon: InventoryIcon,
         },
         {
             key: 'expiring',
             label: '即期物資',
             count: res?.expiringSoon ?? null,
             to: '/logistics/inventory',
-            icon: AlertTriangle,
+            icon: WarningIcon,
         },
     ];
     const todosLoaded = todos.every(t => typeof t.count === 'number');
@@ -258,7 +258,7 @@ function OpsOverview() {
                     <KpiCard
                         label="進行中任務"
                         value={ts?.inProgress ?? null}
-                        icon={<Truck size={18} />}
+                        icon={<VehicleIcon size={20} aria-hidden="true" />}
                         tone={ts ? (ts.overdue > 0 ? 'danger' : 'default') : 'default'}
                         sub={ts ? `逾期 ${ts.overdue} 件` : undefined}
                         to="/tasks"
@@ -269,7 +269,7 @@ function OpsOverview() {
                     <KpiCard
                         label="待審核通報"
                         value={rs?.pending ?? null}
-                        icon={<AlertTriangle size={18} />}
+                        icon={<WarningIcon size={20} aria-hidden="true" />}
                         tone={rs ? (rs.pending > 0 ? 'warning' : 'success') : 'default'}
                         sub={rs ? `累計通報 ${rs.total} 件` : undefined}
                         to="/events"
@@ -280,7 +280,7 @@ function OpsOverview() {
                     <KpiCard
                         label="可動員志工"
                         value={vs?.available ?? null}
-                        icon={<Users size={18} />}
+                        icon={<TeamsIcon size={20} aria-hidden="true" />}
                         tone="success"
                         sub={vs ? `總人數 ${vs.total} 人` : undefined}
                         to="/workforce/people"
@@ -291,7 +291,7 @@ function OpsOverview() {
                     <KpiCard
                         label="低庫存物資"
                         value={res?.lowStock ?? null}
-                        icon={<Package size={18} />}
+                        icon={<InventoryIcon size={20} aria-hidden="true" />}
                         tone={res ? (res.lowStock > 0 ? 'warning' : 'success') : 'default'}
                         sub={res ? `即期品 ${res.expiringSoon} 項` : undefined}
                         to="/logistics/inventory"
@@ -412,7 +412,7 @@ function OpsOverview() {
                                         >
                                             {typeof count === 'number' ? `${count} 件` : '—'}
                                         </Badge>
-                                        <ChevronRight size={16} className="dash-todo__chevron" aria-hidden="true" />
+                                        <ChevronRightIcon size={16} className="dash-todo__chevron" aria-hidden="true" />
                                     </Link>
                                 </li>
                             ))}

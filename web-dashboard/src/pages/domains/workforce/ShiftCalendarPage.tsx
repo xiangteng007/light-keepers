@@ -1,5 +1,12 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, MapPin, Users, Pencil } from 'lucide-react';
+import {
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    PlusIcon,
+    LocationIcon,
+    TeamsIcon,
+    EditIcon,
+} from '../../../design-system/icons';
 import { Button, Card, Badge } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
@@ -71,7 +78,7 @@ export default function ShiftCalendarPage() {
                     <h1>值班行事曆</h1>
                     <p className="shift-page__subtitle">管理志工值班排程</p>
                 </div>
-                <Button icon={<Plus size={18} aria-hidden="true" />}>新增班次</Button>
+                <Button icon={<PlusIcon size={16} aria-hidden="true" />}>新增班次</Button>
             </header>
 
             <div className="shift-page__body">
@@ -83,7 +90,7 @@ export default function ShiftCalendarPage() {
                             aria-label="上個月"
                             onClick={() => setCurrentDate(new Date(year, month - 1, 1))}
                         >
-                            <ChevronLeft size={18} aria-hidden="true" />
+                            <ChevronLeftIcon size={20} aria-hidden="true" />
                         </button>
                         <h2 className="shift-calendar__title">{year} {MONTHS[month]}</h2>
                         <button
@@ -92,7 +99,7 @@ export default function ShiftCalendarPage() {
                             aria-label="下個月"
                             onClick={() => setCurrentDate(new Date(year, month + 1, 1))}
                         >
-                            <ChevronRight size={18} aria-hidden="true" />
+                            <ChevronRightIcon size={20} aria-hidden="true" />
                         </button>
                     </div>
 
@@ -183,13 +190,13 @@ export default function ShiftCalendarPage() {
                                         <h3>{shift.title}</h3>
                                     </div>
                                     <p className="shift-detail-card__time tabular-nums">{shift.startTime} – {shift.endTime}</p>
-                                    <p className="shift-detail-card__meta"><MapPin size={14} aria-hidden="true" /> {shift.location}</p>
+                                    <p className="shift-detail-card__meta"><LocationIcon size={16} aria-hidden="true" /> {shift.location}</p>
                                     <div className="shift-detail-card__footer">
                                         <span className="shift-detail-card__capacity tabular-nums">
-                                            <Users size={14} aria-hidden="true" /> {shift.volunteers.length}/{shift.capacity}
+                                            <TeamsIcon size={16} aria-hidden="true" /> {shift.volunteers.length}/{shift.capacity}
                                         </span>
                                         <button type="button" className="shift-detail-card__edit" aria-label={`編輯 ${shift.title}`}>
-                                            <Pencil size={14} aria-hidden="true" /> 編輯
+                                            <EditIcon size={16} aria-hidden="true" /> 編輯
                                         </button>
                                     </div>
                                 </Card>

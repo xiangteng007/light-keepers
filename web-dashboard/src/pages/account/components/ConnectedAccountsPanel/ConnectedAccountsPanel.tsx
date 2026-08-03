@@ -5,15 +5,16 @@
  */
 
 import React, { useState } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：Link2/Unlink/ExternalLink（連結動作）、
+// MessageCircle（LINE 品牌通道）、Mail（Email 通道）
 import {
     Link2,
     Unlink,
     ExternalLink,
     MessageCircle,
     Mail,
-    Clock,
-    CheckCircle,
 } from 'lucide-react';
+import { ClockIcon, CheckIcon } from '../../../../design-system/icons';
 import type { ConnectedAccountsPanelProps } from '../../account.types';
 import styles from './ConnectedAccountsPanel.module.css';
 
@@ -68,7 +69,7 @@ const ConnectedAccountsPanel: React.FC<ConnectedAccountsPanelProps> = ({
                         <div className={styles.statusBadge}>
                             {data.lineLinked ? (
                                 <span className={styles.connectedBadge}>
-                                    <CheckCircle size={14} />
+                                    <CheckIcon size={16} aria-hidden="true" />
                                     已連結
                                 </span>
                             ) : (
@@ -90,7 +91,7 @@ const ConnectedAccountsPanel: React.FC<ConnectedAccountsPanelProps> = ({
                             <div className={styles.detailRow}>
                                 <span className={styles.detailLabel}>連結時間</span>
                                 <span className={styles.detailValue}>
-                                    <Clock size={14} />
+                                    <ClockIcon size={16} aria-hidden="true" />
                                     {formatDate(data.lineLinkedAt)}
                                 </span>
                             </div>
@@ -131,7 +132,7 @@ const ConnectedAccountsPanel: React.FC<ConnectedAccountsPanelProps> = ({
                         <div className={styles.statusBadge}>
                             {data.googleLinked ? (
                                 <span className={styles.connectedBadge}>
-                                    <CheckCircle size={14} />
+                                    <CheckIcon size={16} aria-hidden="true" />
                                     已連結
                                 </span>
                             ) : (
@@ -153,7 +154,7 @@ const ConnectedAccountsPanel: React.FC<ConnectedAccountsPanelProps> = ({
                             <div className={styles.detailRow}>
                                 <span className={styles.detailLabel}>連結時間</span>
                                 <span className={styles.detailValue}>
-                                    <Clock size={14} />
+                                    <ClockIcon size={16} aria-hidden="true" />
                                     {formatDate(data.googleLinkedAt)}
                                 </span>
                             </div>

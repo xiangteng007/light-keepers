@@ -7,24 +7,26 @@
  * 皆為寫死數字，非 API 回傳），改為誠實的「頁面建置中」狀態（DESIGN_LANGUAGE §0.1、§4）。
  * 下方保留「預期功能」卡片作為規劃預覽，不冒充即時資料。
  */
-import { Construction, MapPin, Users, Plus } from 'lucide-react';
+/* Construction(建置中) 無 B3c 對應，誠實保留；EmptyState 的 icon prop 型別鎖 LucideIcon */
+import { Construction } from 'lucide-react';
+import { LocationIcon, TeamsIcon, PlusIcon } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Card } from '../design-system';
 import './SearchRescuePage.css';
 
 const PLANNED_FEATURES = [
     {
-        icon: MapPin,
+        icon: LocationIcon,
         title: '任務地圖',
         description: '即時搜救範圍與人員位置',
     },
     {
-        icon: Users,
+        icon: TeamsIcon,
         title: '人員調度',
         description: '搜救小隊分配與追蹤',
     },
     {
-        icon: Plus,
+        icon: PlusIcon,
         title: '新增任務',
         description: '快速建立搜救任務',
     },

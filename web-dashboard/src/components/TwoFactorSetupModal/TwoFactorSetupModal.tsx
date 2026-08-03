@@ -6,16 +6,10 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import {
-    X,
-    Shield,
-    Smartphone,
-    Key,
-    Copy,
-    Check,
-    AlertTriangle,
-    Loader2,
-} from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Smartphone（手機裝置）、Key（金鑰/備用碼）、
+// Copy（複製）、Loader2（載入動畫）
+import { Smartphone, Key, Copy, Loader2 } from 'lucide-react';
+import { CloseIcon, ShieldIcon, CheckIcon, WarningIcon } from '../../design-system/icons';
 import styles from './TwoFactorSetupModal.module.css';
 
 interface TwoFactorSetupModalProps {
@@ -136,11 +130,11 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
                 {/* Header */}
                 <div className={styles.header}>
                     <div className={styles.headerTitle}>
-                        <Shield size={24} className={styles.headerIcon} />
+                        <ShieldIcon size={24} className={styles.headerIcon} aria-hidden="true" />
                         <h2>設定兩步驟驗證</h2>
                     </div>
                     <button className={styles.closeButton} onClick={onClose}>
-                        <X size={20} />
+                        <CloseIcon size={20} aria-hidden="true" />
                     </button>
                 </div>
 
@@ -200,7 +194,7 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
                                 <div className={styles.secretValue}>
                                     <code>{setupData.secret}</code>
                                     <button onClick={handleCopySecret} title="複製">
-                                        {copied ? <Check size={16} /> : <Copy size={16} />}
+                                        {copied ? <CheckIcon size={16} aria-hidden="true" /> : <Copy size={16} />}
                                     </button>
                                 </div>
                             </div>
@@ -233,7 +227,7 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
 
                             {error && (
                                 <div className={styles.error}>
-                                    <AlertTriangle size={16} />
+                                    <WarningIcon size={16} aria-hidden="true" />
                                     {error}
                                 </div>
                             )}
@@ -273,7 +267,7 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
                                 className={styles.secondaryButton}
                                 onClick={handleCopyBackupCodes}
                             >
-                                {copied ? <Check size={16} /> : <Copy size={16} />}
+                                {copied ? <CheckIcon size={16} aria-hidden="true" /> : <Copy size={16} />}
                                 複製全部
                             </button>
 
@@ -290,7 +284,7 @@ export const TwoFactorSetupModal: React.FC<TwoFactorSetupModalProps> = ({
                     {step === 'complete' && (
                         <div className={styles.stepContent}>
                             <div className={`${styles.iconLarge} ${styles.success}`}>
-                                <Check size={48} />
+                                <CheckIcon size={48} aria-hidden="true" />
                             </div>
                             <h3>設定完成！</h3>
                             <p>

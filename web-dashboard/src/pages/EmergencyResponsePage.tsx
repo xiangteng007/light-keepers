@@ -17,10 +17,12 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+/* StopCircle(結束/停止) 無 B3c 對應，誠實保留（見 notes） */
+import { StopCircle } from 'lucide-react';
 import {
-    ClipboardList, FileText, LineChart, Map as MapIcon, Plus,
-    Radio, Siren, SquareCheckBig, StopCircle,
-} from 'lucide-react';
+    TasksIcon, ReportIcon, MonitorIcon, MapIcon, PlusIcon,
+    CommandIcon, EventsIcon, SirenIcon,
+} from '../design-system/icons';
 import { Badge, Button, Card, Modal } from '../design-system';
 import type { BadgeProps } from '../design-system';
 import api from '../api/client';
@@ -139,11 +141,11 @@ export default function EmergencyResponsePage() {
     // 工作檯快速動作（做應變的手）
     const quickActions = activeSession ? [
         { icon: MapIcon, label: 'COP 地圖', to: `/emergency-response/map/${activeSession.id}` },
-        { icon: Radio, label: '指揮中心', to: `/mission-command/${activeSession.id}` },
-        { icon: FileText, label: '作戰計畫', to: `/emergency-response/iap/${activeSession.id}` },
-        { icon: LineChart, label: '情勢報告', to: `/emergency-response/sitrep/${activeSession.id}` },
-        { icon: Siren, label: '查看事件', to: `/emergency-response/${activeSession.id}/events` },
-        { icon: ClipboardList, label: '任務管理', to: `/emergency-response/${activeSession.id}/tasks` },
+        { icon: CommandIcon, label: '指揮中心', to: `/mission-command/${activeSession.id}` },
+        { icon: ReportIcon, label: '作戰計畫', to: `/emergency-response/iap/${activeSession.id}` },
+        { icon: MonitorIcon, label: '情勢報告', to: `/emergency-response/sitrep/${activeSession.id}` },
+        { icon: EventsIcon, label: '查看事件', to: `/emergency-response/${activeSession.id}/events` },
+        { icon: TasksIcon, label: '任務管理', to: `/emergency-response/${activeSession.id}/tasks` },
     ] : [];
 
     if (isLoading) {
@@ -173,7 +175,7 @@ export default function EmergencyResponsePage() {
                     </p>
                 </div>
                 <Button size="lg" onClick={() => setShowCreateModal(true)}>
-                    <Plus size={18} aria-hidden="true" /> 發起應變任務
+                    <PlusIcon size={18} aria-hidden="true" /> 發起應變任務
                 </Button>
             </header>
 
@@ -237,7 +239,7 @@ export default function EmergencyResponsePage() {
                 </section>
             ) : (
                 <Card padding="lg" className="er-no-active">
-                    <Siren size={32} aria-hidden="true" />
+                    <SirenIcon size={32} aria-hidden="true" />
                     <p>目前沒有進行中的應變場次</p>
                     <p className="er-no-active__hint">
                         由右上「發起應變任務」建立場次，或於下方歷史清單啟動準備中的場次。

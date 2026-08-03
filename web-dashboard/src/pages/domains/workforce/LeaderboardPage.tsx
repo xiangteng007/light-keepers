@@ -11,7 +11,7 @@
  */
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { RefreshCw, Trophy } from 'lucide-react';
+import { SyncIcon, TrophyIcon } from '../../../design-system/icons';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
 import { Alert, Button } from '../../../design-system';
@@ -96,7 +96,7 @@ export default function LeaderboardPage() {
                         size="sm"
                         onClick={() => fetchLeaderboard()}
                         disabled={loading}
-                        icon={<RefreshCw size={16} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} aria-hidden="true" />}
                         aria-label="重新整理"
                     />
                     <div className="leaderboard-timeframe" role="tablist" aria-label="時間範圍">
@@ -207,7 +207,7 @@ export default function LeaderboardPage() {
             )}
 
             {!loading && entries.length === 0 && !error && (
-                <EmptyState icon={Trophy} variant="minimal" title="暫無排行資料" description="請選擇其他時間範圍，或稍後再試" />
+                <EmptyState icon={TrophyIcon} variant="minimal" title="暫無排行資料" description="請選擇其他時間範圍，或稍後再試" />
             )}
         </div>
     );

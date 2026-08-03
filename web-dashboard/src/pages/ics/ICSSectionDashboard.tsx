@@ -12,16 +12,17 @@
  * not decoration).
  */
 import { Link, useParams } from 'react-router-dom';
+// 保留 lucide（R5/T6 誠實清單）：DollarSign（財務組，無 B3c 對應）
+import { DollarSign } from 'lucide-react';
 import {
-    Command,
-    Shield,
-    ClipboardList,
-    Package,
-    DollarSign,
-    Clock,
-    AlertTriangle,
-    ArrowRight,
-} from 'lucide-react';
+    CommandIcon,
+    ShieldIcon,
+    TasksIcon,
+    InventoryIcon,
+    ClockIcon,
+    WarningIcon,
+    ChevronRightIcon,
+} from '../../design-system/icons';
 import { Badge } from '../../design-system';
 import EmptyState from '../../components/shared/EmptyState';
 import { useEmergencyContext, useEmergencyStyles, EmergencyLevel } from '../../context/useEmergencyContext';
@@ -32,7 +33,7 @@ const ICS_SECTIONS = {
     command: {
         id: 'command',
         label: '指揮組 Command',
-        icon: Command,
+        icon: CommandIcon,
         description: '整體事件指揮與決策',
         metrics: [
             { label: '進行中事件', value: 0, key: 'activeIncidents' },
@@ -48,7 +49,7 @@ const ICS_SECTIONS = {
     operations: {
         id: 'operations',
         label: '作戰組 Operations',
-        icon: Shield,
+        icon: ShieldIcon,
         description: '救援行動與現場作業',
         metrics: [
             { label: '搜救任務', value: 0, key: 'searchTasks' },
@@ -65,7 +66,7 @@ const ICS_SECTIONS = {
     planning: {
         id: 'planning',
         label: '計畫組 Planning',
-        icon: ClipboardList,
+        icon: TasksIcon,
         description: '情資蒐集與規劃',
         metrics: [
             { label: '待處理報告', value: 0, key: 'pendingReports' },
@@ -81,7 +82,7 @@ const ICS_SECTIONS = {
     logistics: {
         id: 'logistics',
         label: '後勤組 Logistics',
-        icon: Package,
+        icon: InventoryIcon,
         description: '物資與裝備管理',
         metrics: [
             { label: '物資項目', value: 0, key: 'inventoryItems' },
@@ -129,7 +130,7 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
     if (!section) {
         return (
             <div className="ics-dashboard__error">
-                <AlertTriangle size={48} />
+                <WarningIcon size={48} aria-hidden="true" />
                 <h2>找不到該 ICS 組別</h2>
                 <Link to="/command-center">返回指揮中心</Link>
             </div>
@@ -159,7 +160,7 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
                         variant={incidentBadgeVariant}
                         dot
                         pulse
-                        icon={<AlertTriangle size={14} />}
+                        icon={<WarningIcon size={16} aria-hidden="true" />}
                     >
                         {emergencyLabel}: {currentIncident.title}
                     </Badge>
@@ -205,7 +206,7 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
                             className="ics-link-card"
                         >
                             <span>{link.label}</span>
-                            <ArrowRight size={16} />
+                            <ChevronRightIcon size={16} aria-hidden="true" />
                         </Link>
                     ))}
                 </div>
@@ -217,7 +218,7 @@ export default function ICSSectionDashboard({ sectionId }: ICSSectionDashboardPr
                 <div className="ics-activity-list">
                     <EmptyState
                         variant="minimal"
-                        icon={Clock}
+                        icon={ClockIcon}
                         title="目前無活動記錄"
                     />
                 </div>

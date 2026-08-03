@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
-import { PlusIcon, EditIcon, CheckIcon } from '../design-system/icons';
+import {
+    PlusIcon, EditIcon, CheckIcon, InventoryIcon, TasksIcon, WarehouseIcon,
+    SettingsIcon, VehicleIcon, AnalyticsIcon, AuditIcon, WarningIcon,
+    ShelterIcon, MoreIcon, type LkIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { getResources, getResourceStats } from '../api/services';
 import type { Resource, ResourceCategory } from '../api/services';
@@ -12,10 +16,11 @@ import AuditTab from './resources/AuditTab';
 import './ResourcesPage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
+/* 食品/飲水/醫療/衣物/設備分類象形無 B3c 對應，誠實保留（見 notes）；
+   EmptyState 的 icon prop 型別鎖 LucideIcon（PackageOpen 於該處暫留） */
 import {
-    Package, UtensilsCrossed, Droplets, Stethoscope, Home, Shirt, Wrench,
-    ClipboardList, Factory, Settings, Truck, BarChart3, ScrollText,
-    PackageOpen, Plus, AlertTriangle, type LucideIcon,
+    UtensilsCrossed, Droplets, Stethoscope, Shirt, Wrench,
+    PackageOpen, type LucideIcon,
 } from 'lucide-react';
 
 /** 桌機表格載入骨架（≥3 列，DESIGN_LANGUAGE §7.1） */
@@ -47,15 +52,15 @@ function CardSkeletonRows({ rows = 4 }: { rows?: number }) {
     );
 }
 
-// 物資分類
-const CATEGORY_CONFIG: Record<string, { label: string; icon: LucideIcon }> = {
+// 物資分類（收容/其他已換 B3c；其餘類別象形無對應，暫留 lucide）
+const CATEGORY_CONFIG: Record<string, { label: string; icon: LucideIcon | LkIcon }> = {
     food: { label: '食品', icon: UtensilsCrossed },
     water: { label: '飲水', icon: Droplets },
     medical: { label: '醫療', icon: Stethoscope },
-    shelter: { label: '收容', icon: Home },
+    shelter: { label: '收容', icon: ShelterIcon },
     clothing: { label: '衣物', icon: Shirt },
     equipment: { label: '設備', icon: Wrench },
-    other: { label: '其他', icon: Package },
+    other: { label: '其他', icon: MoreIcon },
 };
 
 const STATUS_CONFIG = {
@@ -270,13 +275,13 @@ export default function ResourcesPage() {
         <div className="page resources-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2><Package size={24} /> 物資管理</h2>
+                    <h2><InventoryIcon size={24} /> 物資管理</h2>
                     <p className="page-subtitle">庫存管理與調度</p>
                 </div>
                 <div className="page-header__right">
                     {canManage && (
                         <Button onClick={() => setShowAddModal(true)}>
-                            <Plus size={16} /> 新增物資
+                            <PlusIcon size={16} /> 新增物資
                         </Button>
                     )}
                 </div>
@@ -288,37 +293,37 @@ export default function ResourcesPage() {
                     className={`tab-btn ${activeTab === 'manage' ? 'active' : ''}`}
                     onClick={() => setActiveTab('manage')}
                 >
-                    <ClipboardList size={16} /> 耗材管理
+                    <TasksIcon size={16} /> 耗材管理
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'warehouses' ? 'active' : ''}`}
                     onClick={() => setActiveTab('warehouses')}
                 >
-                    <Factory size={16} /> 倉庫/儲位
+                    <WarehouseIcon size={16} /> 倉庫/儲位
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'assets' ? 'active' : ''}`}
                     onClick={() => setActiveTab('assets')}
                 >
-                    <Settings size={16} /> 器材資產
+                    <SettingsIcon size={16} /> 器材資產
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'dispatch' ? 'active' : ''}`}
                     onClick={() => setActiveTab('dispatch')}
                 >
-                    <Truck size={16} /> 調度
+                    <VehicleIcon size={16} /> 調度
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'audit' ? 'active' : ''}`}
                     onClick={() => setActiveTab('audit')}
                 >
-                    <BarChart3 size={16} /> 盤點
+                    <AnalyticsIcon size={16} /> 盤點
                 </button>
                 <button
                     className={`tab-btn ${activeTab === 'logs' ? 'active' : ''}`}
                     onClick={() => setActiveTab('logs')}
                 >
-                    <ScrollText size={16} /> 異動紀錄
+                    <AuditIcon size={16} /> 異動紀錄
                 </button>
             </div>
 
@@ -387,7 +392,7 @@ export default function ResourcesPage() {
                                         <tr>
                                             <td colSpan={6} className="table-message-cell">
                                                 <div className="table-message table-message--error">
-                                                    <AlertTriangle size={16} /> {error}
+                                                    <WarningIcon size={16} /> {error}
                                                 </div>
                                             </td>
                                         </tr>
@@ -462,7 +467,7 @@ export default function ResourcesPage() {
                                 <CardSkeletonRows />
                             ) : error ? (
                                 <div className="table-message table-message--error">
-                                    <AlertTriangle size={16} /> {error}
+                                    <WarningIcon size={16} /> {error}
                                 </div>
                             ) : filteredResources.length === 0 ? (
                                 <EmptyState

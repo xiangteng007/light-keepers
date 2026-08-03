@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Map as MapIcon, MapPin, Palette, Package as PackageIcon, Check, X } from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，lucide Map 於該處暫留 */
+import { Map as LucideMapIcon } from 'lucide-react';
+import {
+    MapIcon,
+    LocationIcon,
+    ThemeIcon,
+    InventoryIcon,
+    CheckIcon,
+    CloseIcon,
+} from '../design-system/icons';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 import { Alert, Badge, Button, ProgressBar } from '../design-system';
@@ -221,7 +230,7 @@ export const OfflinePrepPage: React.FC<OfflinePrepPageProps> = ({
                         </div>
                         {packages.length === 0 ? (
                             <EmptyState
-                                icon={MapIcon}
+                                icon={LucideMapIcon}
                                 variant="minimal"
                                 title="尚無可用地圖套件"
                                 description="請稍後再試，或聯繫管理員新增地圖套件"
@@ -280,9 +289,9 @@ const PackageCard: React.FC<PackageCardProps> = ({
     const TypeIcon = (type: string) => {
         switch (type) {
             case 'pmtiles': return MapIcon;
-            case 'mbtiles': return MapPin;
-            case 'style': return Palette;
-            default: return PackageIcon;
+            case 'mbtiles': return LocationIcon;
+            case 'style': return ThemeIcon;
+            default: return InventoryIcon;
         }
     };
     const Icon = TypeIcon(pkg.type);
@@ -315,11 +324,11 @@ const PackageCard: React.FC<PackageCardProps> = ({
                 )}
                 {progress?.status === 'downloading' && (
                     <Button variant="secondary" size="sm" onClick={onCancel} aria-label={`取消下載 ${pkg.name}`}>
-                        <X size={14} aria-hidden="true" /> 取消
+                        <CloseIcon size={14} aria-hidden="true" /> 取消
                     </Button>
                 )}
                 {progress?.status === 'complete' && (
-                    <Badge variant="success" size="sm" icon={<Check size={12} aria-hidden="true" />}>
+                    <Badge variant="success" size="sm" icon={<CheckIcon size={12} aria-hidden="true" />}>
                         已完成
                     </Badge>
                 )}

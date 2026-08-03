@@ -1,5 +1,7 @@
 import { useState } from 'react';
-import { Bell, Smartphone } from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，Bell 暫留 */
+import { Bell } from 'lucide-react';
+import { NotifyIcon } from '../design-system/icons';
 import { Card, Button, Badge } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { useAuth } from '../context/AuthContext';
@@ -143,7 +145,7 @@ export default function NotificationsPage() {
             {/* LINE Bot 設定區 */}
             <Card className="notif-page__line-settings" padding="lg">
                 <div className="notif-page__line-header">
-                    <Smartphone size={20} aria-hidden="true" />
+                    <NotifyIcon size={20} aria-hidden="true" />
                     <h3>LINE 通知設定</h3>
                 </div>
                 <p className="notif-page__line-desc">綁定 LINE 帳號以接收即時推播通知</p>

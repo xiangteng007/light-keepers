@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Heart, MessageCircle, Share2 } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：MessageCircle（留言）、Share2（分享）
+import { MessageCircle, Share2 } from 'lucide-react';
+import { HeartIcon } from '../../../design-system/icons';
 import { Button, Card, Tag } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
@@ -106,7 +108,7 @@ export default function CommunityPage() {
                                         <p className="community-post__content">{post.content}</p>
                                         <div className="community-post__actions">
                                             <button type="button" className="community-post__action">
-                                                <Heart size={16} aria-hidden="true" />
+                                                <HeartIcon size={16} aria-hidden="true" />
                                                 <span className="tabular-nums">{post.likes}</span>
                                             </button>
                                             <button type="button" className="community-post__action">

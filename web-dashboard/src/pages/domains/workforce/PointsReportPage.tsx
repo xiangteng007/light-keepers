@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Download } from 'lucide-react';
+import { ExportIcon } from '../../../design-system/icons';
 import { Badge, Button } from '../../../design-system';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
 import EmptyState from '../../../components/shared/EmptyState';
@@ -49,7 +49,7 @@ export default function PointsReportPage() {
                     <h1>積分報表</h1>
                     <p className="page-header__subtitle">志工積分認可追蹤</p>
                 </div>
-                <Button variant="primary" size="sm" icon={<Download size={16} aria-hidden="true" />}>
+                <Button variant="primary" size="sm" icon={<ExportIcon size={16} aria-hidden="true" />}>
                     匯出報表
                 </Button>
             </div>

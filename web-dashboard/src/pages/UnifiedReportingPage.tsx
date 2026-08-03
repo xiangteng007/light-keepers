@@ -7,15 +7,17 @@
  * 本頁尚無真實資料來源／後端端點，維持誠實的「建置中」狀態呈現
  * （§4：空狀態一律用 EmptyState），不再顯示虛構的統計數字。
  */
-import { FileText, TrendingUp, Printer, Construction } from 'lucide-react';
+/* Construction(建置中) 無 B3c 對應，誠實保留；EmptyState 的 icon prop 型別鎖 LucideIcon */
+import { Construction } from 'lucide-react';
+import { ReportIcon, AnalyticsIcon, ExportIcon } from '../design-system/icons';
 import { Alert, Card } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import './UnifiedReportingPage.css';
 
 const EXPECTED_FEATURES = [
-    { icon: FileText, title: 'SITREP 生成', desc: '自動化情況報告' },
-    { icon: TrendingUp, title: '趨勢分析', desc: '歷史資料對比' },
-    { icon: Printer, title: '報表輸出', desc: 'PDF / Excel 匯出' },
+    { icon: ReportIcon, title: 'SITREP 生成', desc: '自動化情況報告' },
+    { icon: AnalyticsIcon, title: '趨勢分析', desc: '歷史資料對比' },
+    { icon: ExportIcon, title: '報表輸出', desc: 'PDF / Excel 匯出' },
 ];
 
 export default function UnifiedReportingPage() {

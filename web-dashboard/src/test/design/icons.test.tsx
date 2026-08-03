@@ -2,7 +2,7 @@
  * R5/T5: B3c icon 集圖形文法 gate
  *
  * 守護 `src/design-system/icons/` 的教範一致性（規則見該目錄 README.md）：
- * 1. 70 個核心語意名必須全部在 iconRegistry 註冊（寧全勿缺）。
+ * 1. 84 個核心語意名必須全部在 iconRegistry 註冊（寧全勿缺）。
  * 2. 每個 icon 渲染出來必須是 viewBox 24×24、stroke 2、square cap、miter join、
  *    currentColor、fill=none 的 <svg>，且 size prop 同步控制寬高（預設 24）。
  * 3. 幾何靜態掃描：icon 原始檔禁 circle/ellipse/arc（A 指令）/貝茲（C/Q/S/T 指令）/
@@ -29,6 +29,9 @@ const CORE_SEMANTIC_NAMES = [
     'spreadsheet', 'doc-empty', 'lock', 'shield', 'fingerprint', 'ai',
     'bot', 'flask', 'monitor', 'webhook', 'merge', 'heart', 'support',
     'trophy', 'graduation',
+    // R5/T6 chrome 批
+    'grip', 'eye', 'eye-off', 'rotate', 'fullscreen', 'mail', 'play',
+    'pause', 'trend-up', 'trend-down', 'link', 'copy', 'download', 'upload',
 ];
 
 const THIS_DIR = (() => {
@@ -41,7 +44,7 @@ const THIS_DIR = (() => {
 const ICONS_DIR = join(THIS_DIR, '..', '..', 'design-system', 'icons');
 
 describe('B3c icon 集 — 註冊完整性', () => {
-    it('70 個核心語意名全部註冊', () => {
+    it('84 個核心語意名全部註冊', () => {
         const missing = CORE_SEMANTIC_NAMES.filter((name) => !iconRegistry[name]);
         expect(missing, `iconRegistry 缺少: ${missing.join(', ')}`).toEqual([]);
     });

@@ -13,7 +13,7 @@
  * 顏色 token 對應 MapLibreTacticalMap 的 mapSymbolColors，React 端直接走 var()）。
  */
 import { useState, type FC } from 'react';
-import { ChevronDown, Layers, Siren } from 'lucide-react';
+import { ChevronDownIcon, LayersIcon, SirenIcon } from '../../design-system/icons';
 import {
     AedSymbol,
     AirRaidShelterSymbol,
@@ -107,9 +107,9 @@ export default function MapLayerPanel({
                 aria-expanded={open}
                 onClick={() => setOpen(o => !o)}
             >
-                <Layers size={16} aria-hidden="true" />
+                <LayersIcon size={16} aria-hidden="true" />
                 <span>圖層</span>
-                <ChevronDown
+                <ChevronDownIcon
                     size={16}
                     aria-hidden="true"
                     className={`map-layer-panel__chevron ${open ? 'rotated' : ''}`}
@@ -125,7 +125,7 @@ export default function MapLayerPanel({
                         title="一鍵開啟災時建議圖層：回報＋示警＋收容所＋防空避難處所"
                         onClick={() => onApplyPreset(EMERGENCY_LAYER_PRESET)}
                     >
-                        <Siren size={14} aria-hidden="true" />
+                        <SirenIcon size={16} aria-hidden="true" />
                         災時圖層組合
                     </button>
 

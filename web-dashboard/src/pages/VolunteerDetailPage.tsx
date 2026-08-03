@@ -1,6 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { ArrowLeft, Camera, MessageCircle, Pencil, Trash2, CalendarClock, MapPin, Clock, CheckCircle2, XCircle } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：MessageCircle（LINE 訊息）、Trash2（刪除）
+import { MessageCircle, Trash2 } from 'lucide-react';
+import {
+    ChevronLeftIcon,
+    CameraIcon,
+    EditIcon,
+    CalendarIcon,
+    LocationIcon,
+    ClockIcon,
+    CheckIcon,
+    CloseIcon,
+} from '../design-system/icons';
 import { getVolunteer } from '../api/services';
 import type { Volunteer as VolunteerType } from '../api/services';
 import { Badge, Button, Card, Tag, Alert } from '../design-system';
@@ -86,7 +97,7 @@ export default function VolunteerDetailPage() {
             <div className="volunteer-detail-page">
                 <Alert variant="danger" title={error}>
                     <Link to="/volunteers" className="volunteer-detail-page__back-link">
-                        <ArrowLeft size={16} aria-hidden="true" /> 返回志工列表
+                        <ChevronLeftIcon size={16} aria-hidden="true" /> 返回志工列表
                     </Link>
                 </Alert>
             </div>
@@ -114,7 +125,7 @@ export default function VolunteerDetailPage() {
             <div className="page-header">
                 <div className="page-header__title">
                     <button onClick={() => navigate('/volunteers')} className="back-link">
-                        <ArrowLeft size={16} aria-hidden="true" /> 返回列表
+                        <ChevronLeftIcon size={16} aria-hidden="true" /> 返回列表
                     </button>
                     <div className="page-header__name-row">
                         <h1>{volunteer.name}</h1>
@@ -123,7 +134,7 @@ export default function VolunteerDetailPage() {
                 </div>
                 {isAdmin && (
                     <div className="page-header__actions">
-                        <Button variant="secondary" size="sm" icon={<Pencil size={14} aria-hidden="true" />}>編輯</Button>
+                        <Button variant="secondary" size="sm" icon={<EditIcon size={16} aria-hidden="true" />}>編輯</Button>
                         <Button variant="danger" size="sm" icon={<Trash2 size={14} aria-hidden="true" />}>刪除</Button>
                     </div>
                 )}
@@ -242,14 +253,14 @@ export default function VolunteerDetailPage() {
                                             <Card key={record.id} padding="md" className={`record-item ${record.status === 'cancelled' ? 'is-cancelled' : ''}`}>
                                                 <div className="record-header">
                                                     <span className="record-title">{record.taskTitle}</span>
-                                                    <Badge variant={record.status === 'completed' ? 'success' : 'danger'} size="sm" icon={record.status === 'completed' ? <CheckCircle2 size={12} aria-hidden="true" /> : <XCircle size={12} aria-hidden="true" />}>
+                                                    <Badge variant={record.status === 'completed' ? 'success' : 'danger'} size="sm" icon={record.status === 'completed' ? <CheckIcon size={12} aria-hidden="true" /> : <CloseIcon size={12} aria-hidden="true" />}>
                                                         {record.status === 'completed' ? '完成' : '取消'}
                                                     </Badge>
                                                 </div>
                                                 <div className="record-details">
-                                                    <span className="tabular-nums"><CalendarClock size={14} aria-hidden="true" /> {record.date}</span>
-                                                    <span><MapPin size={14} aria-hidden="true" /> {record.location}</span>
-                                                    <span className="tabular-nums"><Clock size={14} aria-hidden="true" /> {record.hours} 小時</span>
+                                                    <span className="tabular-nums"><CalendarIcon size={16} aria-hidden="true" /> {record.date}</span>
+                                                    <span><LocationIcon size={16} aria-hidden="true" /> {record.location}</span>
+                                                    <span className="tabular-nums"><ClockIcon size={16} aria-hidden="true" /> {record.hours} 小時</span>
                                                 </div>
                                             </Card>
                                         ))}
@@ -299,7 +310,7 @@ export default function VolunteerDetailPage() {
                             {/* 照片上傳選項 - 志工可自行操作 */}
                             <div className="photo-actions">
                                 <label className="photo-upload-btn">
-                                    <Camera size={14} aria-hidden="true" /> 上傳照片
+                                    <CameraIcon size={16} aria-hidden="true" /> 上傳照片
                                     <input
                                         type="file"
                                         accept="image/*"
@@ -332,7 +343,7 @@ export default function VolunteerDetailPage() {
                             </div>
                         </div>
 
-                        <p className="region"><MapPin size={14} aria-hidden="true" /> {volunteer.region}</p>
+                        <p className="region"><LocationIcon size={16} aria-hidden="true" /> {volunteer.region}</p>
 
                         <div className="profile-stats">
                             <div className="stat-item">

@@ -8,7 +8,7 @@
  * 內容並非可拖拉狀態的任務清單，而是功能路線圖預告。
  */
 import type { ReactNode } from 'react';
-import { Bot, Zap, Brain, Sparkles, Clock, ListChecks } from 'lucide-react';
+import { BotIcon, AiIcon, CalendarIcon, ClockIcon, TasksIcon } from '../design-system/icons';
 import { Card, Badge, Alert, StatIndicator } from '../design-system';
 import './AITasksPage.css';
 
@@ -18,15 +18,15 @@ const STATUS_STATS: Array<{
     label: string;
     variant: 'success' | 'warning' | 'default';
 }> = [
-    { icon: <ListChecks size={20} aria-hidden="true" />, value: 8, label: '已完成任務', variant: 'success' },
-    { icon: <Clock size={20} aria-hidden="true" />, value: 3, label: '執行中', variant: 'warning' },
-    { icon: <Sparkles size={20} aria-hidden="true" />, value: 12, label: '排程中', variant: 'default' },
+    { icon: <TasksIcon size={20} aria-hidden="true" />, value: 8, label: '已完成任務', variant: 'success' },
+    { icon: <ClockIcon size={20} aria-hidden="true" />, value: 3, label: '執行中', variant: 'warning' },
+    { icon: <CalendarIcon size={20} aria-hidden="true" />, value: 12, label: '排程中', variant: 'default' },
 ];
 
 const UPCOMING_FEATURES = [
-    { icon: Zap, title: '智能排班', desc: '自動最佳化人員調度' },
-    { icon: Brain, title: '情報摘要', desc: '自動生成 SITREP 報告' },
-    { icon: Bot, title: '資源匹配', desc: '需求與供給智能配對' },
+    { icon: CalendarIcon, title: '智能排班', desc: '自動最佳化人員調度' },
+    { icon: AiIcon, title: '情報摘要', desc: '自動生成 SITREP 報告' },
+    { icon: BotIcon, title: '資源匹配', desc: '需求與供給智能配對' },
 ];
 
 export default function AITasksPage() {
@@ -39,7 +39,7 @@ export default function AITasksPage() {
                 </div>
             </div>
 
-            <Alert variant="info" title="AI 功能開發中" icon={<Bot size={20} aria-hidden="true" />}>
+            <Alert variant="info" title="AI 功能開發中" icon={<BotIcon size={20} aria-hidden="true" />}>
                 AI 自動化系統正在開發中，預計包含：智能排班、資源匹配、情報摘要、預測分析等功能。
             </Alert>
 

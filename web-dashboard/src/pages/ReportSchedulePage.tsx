@@ -14,22 +14,28 @@ import {
     type ReportSchedule,
     type ReportExecution,
 } from '../api/services';
+/* Trash2(刪除) 無 B3c 對應，誠實保留（見 notes）；
+   EmptyState 的 icon prop 型別鎖 LucideIcon（Calendar/FileText 於該處暫留） */
 import {
     Calendar,
-    Clock,
-    Play,
-    Pause,
     Trash2,
-    Plus,
     FileText,
-    Mail,
-    Download,
-    CheckCircle,
-    XCircle,
-    AlertCircle,
 } from 'lucide-react';
 import { Button, Badge, Modal, InputField } from '../design-system';
-import { iconRegistry } from '../design-system/icons';
+import {
+    iconRegistry,
+    ClockIcon,
+    PlusIcon,
+    FilesIcon,
+    CheckIcon,
+    CloseIcon,
+    SyncIcon,
+    AuditIcon,
+    MailIcon,
+    DownloadIcon,
+    PlayIcon,
+    PauseIcon,
+} from '../design-system/icons';
 import type { BadgeProps } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
@@ -60,9 +66,9 @@ const FREQUENCY_OPTIONS = [
 
 // 遞送方式
 const DELIVERY_METHODS = [
-    { value: 'email', label: '電子郵件', icon: Mail },
-    { value: 'download', label: '下載', icon: Download },
-    { value: 'storage', label: '雲端儲存', icon: FileText },
+    { value: 'email', label: '電子郵件', icon: MailIcon },
+    { value: 'download', label: '下載', icon: DownloadIcon },
+    { value: 'storage', label: '雲端儲存', icon: FilesIcon },
 ];
 
 export default function ReportSchedulePage() {
@@ -169,7 +175,7 @@ export default function ReportSchedulePage() {
                 </div>
                 <Button
                     variant="primary"
-                    icon={<Plus size={18} aria-hidden="true" />}
+                    icon={<PlusIcon size={18} aria-hidden="true" />}
                     onClick={() => setShowCreateModal(true)}
                 >
                     新增排程
@@ -216,7 +222,7 @@ export default function ReportSchedulePage() {
                                     aria-label={schedule.isActive ? `停用「${schedule.name}」排程` : `啟用「${schedule.name}」排程`}
                                     title={schedule.isActive ? '點擊停用' : '點擊啟用'}
                                 >
-                                    {schedule.isActive ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}
+                                    {schedule.isActive ? <PlayIcon size={16} aria-hidden="true" /> : <PauseIcon size={16} aria-hidden="true" />}
                                 </button>
                             </div>
 
@@ -228,11 +234,14 @@ export default function ReportSchedulePage() {
 
                             <div className="schedule-card__info">
                                 <div className="info-item">
-                                    <Clock size={14} aria-hidden="true" />
+                                    <ClockIcon size={14} aria-hidden="true" />
                                     <span className="tabular-nums">{formatFrequency(schedule)}</span>
                                 </div>
                                 <div className="info-item">
-                                    {React.createElement(DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.icon || Mail, { size: 14, 'aria-hidden': true })}
+                                    {(() => {
+                                        const DeliveryIcon = DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.icon || MailIcon;
+                                        return <DeliveryIcon size={14} aria-hidden="true" />;
+                                    })()}
                                     <span>{DELIVERY_METHODS.find(d => d.value === schedule.deliveryMethod)?.label || schedule.deliveryMethod}</span>
                                 </div>
                             </div>
@@ -248,7 +257,7 @@ export default function ReportSchedulePage() {
                                     onClick={() => handleExecute(schedule)}
                                     title="立即執行"
                                 >
-                                    <Play size={14} aria-hidden="true" /> 執行
+                                    <PlayIcon size={14} aria-hidden="true" /> 執行
                                 </button>
                                 <button
                                     type="button"
@@ -259,7 +268,7 @@ export default function ReportSchedulePage() {
                                     }}
                                     title="查看記錄"
                                 >
-                                    <FileText size={14} aria-hidden="true" /> 記錄
+                                    <AuditIcon size={14} aria-hidden="true" /> 記錄
                                 </button>
                                 <button
                                     type="button"
@@ -478,9 +487,9 @@ function ExecutionHistoryModal({
                         return (
                             <div key={exec.id} className={`execution-item execution-item--${exec.status}`}>
                                 <div className="execution-item__status" aria-hidden="true">
-                                    {exec.status === 'completed' && <CheckCircle className="is-success" />}
-                                    {exec.status === 'failed' && <XCircle className="is-error" />}
-                                    {exec.status === 'running' && <AlertCircle className="is-running" />}
+                                    {exec.status === 'completed' && <CheckIcon className="is-success" />}
+                                    {exec.status === 'failed' && <CloseIcon className="is-error" />}
+                                    {exec.status === 'running' && <SyncIcon className="is-running" />}
                                 </div>
                                 <div className="execution-item__info">
                                     <span className="time tabular-nums">
@@ -495,7 +504,7 @@ function ExecutionHistoryModal({
                                 </div>
                                 {exec.outputPath && (
                                     <a href={exec.outputPath} className="download-btn" target="_blank" rel="noopener" aria-label="下載報表">
-                                        <Download size={14} aria-hidden="true" />
+                                        <DownloadIcon size={14} aria-hidden="true" />
                                     </a>
                                 )}
                                 {exec.errorMessage && (

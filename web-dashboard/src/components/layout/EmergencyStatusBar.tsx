@@ -8,7 +8,7 @@
  */
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { AlertTriangle, ChevronRight, Radio } from 'lucide-react';
+import { WarningIcon, ChevronRightIcon, RadioIcon } from '../../design-system/icons';
 import { useEmergencyContext, useEmergencyStyles, EmergencyLevel } from '../../context/useEmergencyContext';
 import './EmergencyStatusBar.css';
 
@@ -46,9 +46,9 @@ export function EmergencyStatusBar() {
 
     const getIcon = () => {
         if (emergencyLevel >= EmergencyLevel.Emergency) {
-            return <AlertTriangle className="status-icon pulse" aria-hidden />;
+            return <WarningIcon className="status-icon pulse" aria-hidden />;
         }
-        return <Radio className="status-icon" aria-hidden />;
+        return <RadioIcon className="status-icon" aria-hidden />;
     };
 
     const getLevelClass = () => {
@@ -100,7 +100,7 @@ export function EmergencyStatusBar() {
                     )}
                     <Link to="/command-center" className="status-action">
                         前往戰情儀表板
-                        <ChevronRight size={16} aria-hidden />
+                        <ChevronRightIcon size={16} aria-hidden />
                     </Link>
                 </div>
             </div>

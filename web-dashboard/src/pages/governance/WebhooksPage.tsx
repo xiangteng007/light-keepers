@@ -9,7 +9,7 @@
  * lastSuccessAt/lastFailureAt 呈現，整體成功/失敗數改用 /webhooks/stats 的彙總值。
  */
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, AlertTriangle, Plus, Webhook as WebhookIcon } from 'lucide-react';
+import { SyncIcon, WarningIcon, PlusIcon, WebhookIcon } from '../../design-system/icons';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
 import { Alert, Badge, Button, InputField, Tag, StatIndicator, Modal } from '../../design-system';
@@ -147,18 +147,18 @@ export default function WebhooksPage() {
                         variant="secondary"
                         onClick={fetchData}
                         disabled={loading}
-                        icon={<RefreshCw size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     >
                         重新整理
                     </Button>
-                    <Button variant="primary" onClick={() => setShowCreate(true)} icon={<Plus size={16} aria-hidden="true" />}>
+                    <Button variant="primary" onClick={() => setShowCreate(true)} icon={<PlusIcon size={16} aria-hidden="true" />}>
                         新增訂閱
                     </Button>
                 </div>
             </div>
 
             {error && (
-                <Alert variant="danger" icon={<AlertTriangle size={16} />} title="載入失敗">
+                <Alert variant="danger" icon={<WarningIcon size={16} aria-hidden="true" />} title="載入失敗">
                     <div className="webhooks-page__error-body">
                         <span>{error}</span>
                         <Button size="sm" variant="secondary" onClick={fetchData}>重試</Button>

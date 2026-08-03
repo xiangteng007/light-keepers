@@ -23,7 +23,7 @@ import EmptyState from '../components/shared/EmptyState';
 import { getScrapedCourses, triggerScrape } from '../api/services';
 import type { ScrapedCourse } from '../api/services';
 import { useAuth } from '../context/AuthContext';
-import { Plus } from 'lucide-react';
+import { PlusIcon } from '../design-system/icons';
 import { createLogger } from '../utils/logger';
 import './TrainingPage.css';
 
@@ -181,7 +181,7 @@ export default function TrainingPage() {
                     {canManageCourses && (
                         <Button
                             variant="primary"
-                            icon={<Plus size={18} aria-hidden="true" />}
+                            icon={<PlusIcon size={18} aria-hidden="true" />}
                             onClick={() => setShowAddCourseModal(true)}
                         >
                             新增課程

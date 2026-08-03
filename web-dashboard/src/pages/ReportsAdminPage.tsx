@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { WarningIcon } from '../design-system/icons';
 import { Alert, Card, Button, Badge, Modal } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
@@ -198,7 +198,7 @@ export default function ReportsAdminPage() {
                         <Skeleton variant="card" height={120} count={3} className="reports-list__skeleton-row" />
                     </div>
                 ) : error ? (
-                    <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>{error}</Alert>
+                    <Alert variant="danger" icon={<WarningIcon size={16} aria-hidden="true" />}>{error}</Alert>
                 ) : reports.length === 0 ? (
                     <EmptyState variant="default" title="目前沒有回報" description="尚無符合篩選條件的回報。" />
                 ) : (

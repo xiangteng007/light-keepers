@@ -16,17 +16,8 @@ import {
     type ActivityStatus,
     type ActivityCategory,
 } from '../api/services';
-import {
-    Calendar,
-    MapPin,
-    Users,
-    Clock,
-    CheckCircle,
-    AlertCircle,
-    ChevronRight,
-    Phone,
-    Mail,
-} from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，Calendar 暫留該處 */
+import { Calendar } from 'lucide-react';
 import { Badge, Button, Modal, InputField } from '../design-system';
 import type { BadgeProps } from '../design-system';
 import {
@@ -35,6 +26,15 @@ import {
     HomeIcon,
     FlaskIcon,
     MoreIcon,
+    CalendarIcon,
+    LocationIcon,
+    TeamsIcon,
+    ClockIcon,
+    CheckIcon,
+    WarningIcon,
+    ChevronRightIcon,
+    PhoneIcon,
+    MailIcon,
     type LkIcon,
 } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
@@ -237,19 +237,19 @@ export default function ActivitiesPage() {
                                     <h3 className="activity-card__title">{activity.title}</h3>
 
                                     <div className="activity-card__info">
-                                        <span><Clock size={14} aria-hidden="true" /> {formatTime(activity.startAt)} - {formatTime(activity.endAt)}</span>
-                                        {activity.location && <span><MapPin size={14} aria-hidden="true" /> {activity.location}</span>}
-                                        <span className="tabular-nums"><Users size={14} aria-hidden="true" /> {activity.currentParticipants}/{activity.maxParticipants} 人</span>
+                                        <span><ClockIcon size={14} aria-hidden="true" /> {formatTime(activity.startAt)} - {formatTime(activity.endAt)}</span>
+                                        {activity.location && <span><LocationIcon size={14} aria-hidden="true" /> {activity.location}</span>}
+                                        <span className="tabular-nums"><TeamsIcon size={14} aria-hidden="true" /> {activity.currentParticipants}/{activity.maxParticipants} 人</span>
                                     </div>
 
                                     {isRegistered(activity.id) && (
                                         <div className="activity-card__registered">
-                                            <CheckCircle size={14} aria-hidden="true" /> 已報名
+                                            <CheckIcon size={14} aria-hidden="true" /> 已報名
                                         </div>
                                     )}
                                 </div>
 
-                                <ChevronRight size={20} className="activity-card__arrow" aria-hidden="true" />
+                                <ChevronRightIcon size={20} className="activity-card__arrow" aria-hidden="true" />
                             </article>
                         ))
                     )}
@@ -275,16 +275,16 @@ export default function ActivitiesPage() {
                                 onKeyDown={(e) => { if (e.key === 'Enter' && reg.activity) setSelectedActivity(reg.activity); }}
                             >
                                 <div className="activity-card__reg-status" aria-hidden="true">
-                                    {reg.status === 'confirmed' && <CheckCircle className="is-confirmed" />}
-                                    {reg.status === 'pending' && <AlertCircle className="is-pending" />}
-                                    {reg.attended && <CheckCircle className="is-attended" />}
+                                    {reg.status === 'confirmed' && <CheckIcon className="is-confirmed" />}
+                                    {reg.status === 'pending' && <WarningIcon className="is-pending" />}
+                                    {reg.attended && <CheckIcon className="is-attended" />}
                                 </div>
 
                                 <div className="activity-card__content">
                                     <h3 className="activity-card__title">{reg.activity?.title || '活動'}</h3>
                                     <div className="activity-card__info">
-                                        <span><Calendar size={14} aria-hidden="true" /> {reg.activity?.startAt ? formatDate(reg.activity.startAt) : ''}</span>
-                                        {reg.activity?.location && <span><MapPin size={14} aria-hidden="true" /> {reg.activity.location}</span>}
+                                        <span><CalendarIcon size={14} aria-hidden="true" /> {reg.activity?.startAt ? formatDate(reg.activity.startAt) : ''}</span>
+                                        {reg.activity?.location && <span><LocationIcon size={14} aria-hidden="true" /> {reg.activity.location}</span>}
                                     </div>
                                     <div className="activity-card__badges">
                                         {reg.status in REG_STATUS_MAP && (
@@ -389,7 +389,7 @@ function ActivityDetailModal({
 
                 <div className="activity-detail__meta">
                     <div className="meta-item">
-                        <Calendar size={18} aria-hidden="true" />
+                        <CalendarIcon size={18} aria-hidden="true" />
                         <div>
                             <span className="meta-item__label">日期時間</span>
                             <span className="meta-item__value tabular-nums">
@@ -404,7 +404,7 @@ function ActivityDetailModal({
 
                     {activity.location && (
                         <div className="meta-item">
-                            <MapPin size={18} aria-hidden="true" />
+                            <LocationIcon size={18} aria-hidden="true" />
                             <div>
                                 <span className="meta-item__label">地點</span>
                                 <span className="meta-item__value">{activity.location}</span>
@@ -413,7 +413,7 @@ function ActivityDetailModal({
                     )}
 
                     <div className="meta-item">
-                        <Users size={18} aria-hidden="true" />
+                        <TeamsIcon size={18} aria-hidden="true" />
                         <div>
                             <span className="meta-item__label">報名人數</span>
                             <span className="meta-item__value tabular-nums">{activity.currentParticipants} / {activity.maxParticipants} 人</span>
@@ -422,7 +422,7 @@ function ActivityDetailModal({
 
                     {activity.registrationDeadline && (
                         <div className="meta-item">
-                            <Clock size={18} aria-hidden="true" />
+                            <ClockIcon size={18} aria-hidden="true" />
                             <div>
                                 <span className="meta-item__label">報名截止</span>
                                 <span className="meta-item__value tabular-nums">{new Date(activity.registrationDeadline).toLocaleDateString('zh-TW')}</span>
@@ -442,8 +442,8 @@ function ActivityDetailModal({
                     <div className="activity-detail__section">
                         <h4>聯絡資訊</h4>
                         {activity.organizerName && <p>{activity.organizerName}</p>}
-                        {activity.contactPhone && <p><Phone size={14} aria-hidden="true" /> {activity.contactPhone}</p>}
-                        {activity.contactEmail && <p><Mail size={14} aria-hidden="true" /> {activity.contactEmail}</p>}
+                        {activity.contactPhone && <p><PhoneIcon size={14} aria-hidden="true" /> {activity.contactPhone}</p>}
+                        {activity.contactEmail && <p><MailIcon size={14} aria-hidden="true" /> {activity.contactEmail}</p>}
                     </div>
                 )}
 
@@ -451,7 +451,7 @@ function ActivityDetailModal({
                     {isRegistered ? (
                         <div className="registered-actions">
                             <div className="registered-badge">
-                                <CheckCircle size={18} aria-hidden="true" /> 你已報名此活動
+                                <CheckIcon size={18} aria-hidden="true" /> 你已報名此活動
                             </div>
                             <Button variant="danger" size="md" onClick={handleCancel}>
                                 取消報名
@@ -465,7 +465,7 @@ function ActivityDetailModal({
                                 value={phone}
                                 onChange={e => setPhone(e.target.value)}
                                 placeholder="09xx-xxx-xxx"
-                                prefix={<Phone size={14} aria-hidden="true" />}
+                                prefix={<PhoneIcon size={14} aria-hidden="true" />}
                                 fullWidth
                             />
                             <InputField
@@ -474,7 +474,7 @@ function ActivityDetailModal({
                                 value={email}
                                 onChange={e => setEmail(e.target.value)}
                                 placeholder="your@email.com"
-                                prefix={<Mail size={14} aria-hidden="true" />}
+                                prefix={<MailIcon size={14} aria-hidden="true" />}
                                 fullWidth
                             />
                             <div className="form-group">

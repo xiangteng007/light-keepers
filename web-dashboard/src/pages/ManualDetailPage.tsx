@@ -1,6 +1,7 @@
 import type { ComponentType } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Wifi, Inbox } from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，Inbox 暫留 */
+import { Inbox } from 'lucide-react';
 import { Card, Tag, Alert, Badge } from '../design-system';
 import {
     AedIcon,
@@ -10,6 +11,8 @@ import {
     InfoIcon,
     FilesIcon,
     CheckIcon,
+    ChevronLeftIcon,
+    OfflineIcon,
 } from '../design-system/icons';
 import {
     EarthquakePictogram,
@@ -670,7 +673,7 @@ export default function ManualDetailPage() {
                     onClick={() => navigate('/manuals')}
                     type="button"
                 >
-                    <ArrowLeft size={16} aria-hidden="true" /> 返回手冊列表
+                    <ChevronLeftIcon size={16} aria-hidden="true" /> 返回手冊列表
                 </button>
                 <div className="manual-breadcrumb">
                     {/* R4 a11y：10 種分類色多數在頁面底色上不到 4.5:1（如地震
@@ -804,7 +807,7 @@ export default function ManualDetailPage() {
             </Card>
 
             {/* 離線可用標籤 */}
-            <Badge variant="info" size="md" icon={<Wifi size={14} aria-hidden="true" />} className="manual-offline-badge">
+            <Badge variant="info" size="md" icon={<OfflineIcon size={14} aria-hidden="true" />} className="manual-offline-badge">
                 此手冊支援離線存取
             </Badge>
         </div>

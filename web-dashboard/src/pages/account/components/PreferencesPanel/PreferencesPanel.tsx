@@ -5,8 +5,10 @@
  */
 
 import React, { useState } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：通道四件組 Mail/Smartphone/MessageCircle/BellRing
+// （Email/簡訊/LINE/推播——B3c 缺 Email/簡訊/LINE 對應，整組保留維持家族一致）、
+// RotateCcw（恢復預設）、Save（儲存）
 import {
-    Bell,
     Mail,
     MessageCircle,
     Smartphone,
@@ -14,6 +16,7 @@ import {
     RotateCcw,
     Save,
 } from 'lucide-react';
+import { NotifyIcon, TasksIcon, SirenIcon } from '../../../../design-system/icons';
 import type { PreferencesPanelProps, NotificationPreferences, NotificationChannel } from '../../account.types';
 import { DEFAULT_NOTIFICATION_PREFS } from '../../account.mock';
 import styles from './PreferencesPanel.module.css';
@@ -153,21 +156,21 @@ const PreferencesPanel: React.FC<PreferencesPanelProps> = ({
             {/* Notification Categories */}
             <div className={styles.card}>
                 <NotificationRow
-                    icon={<Bell size={20} />}
+                    icon={<NotifyIcon size={20} aria-hidden="true" />}
                     title="系統公告"
                     description="平台更新、維護通知與重要公告"
                     category="systemAnnouncements"
                 />
 
                 <NotificationRow
-                    icon={<Smartphone size={20} />}
+                    icon={<TasksIcon size={20} aria-hidden="true" />}
                     title="任務指派"
                     description="被指派新任務或任務狀態變更時通知"
                     category="taskAssignments"
                 />
 
                 <NotificationRow
-                    icon={<BellRing size={20} />}
+                    icon={<SirenIcon size={20} aria-hidden="true" />}
                     title="緊急警報"
                     description="災情警報、緊急召集與即時示警"
                     category="emergencyAlerts"

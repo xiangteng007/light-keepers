@@ -1,18 +1,17 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+/* Trash2(刪除)/Ban(停權)/ArrowUpDown(排序) 無 B3c 對應，誠實保留（見 notes） */
+import { Trash2, Ban, ArrowUpDown } from 'lucide-react';
 import {
-    Shield,
-    Users,
-    FileKey,
-    Search,
-    ChevronDown,
-    ChevronUp,
-    RefreshCw,
-    AlertTriangle,
-    Trash2,
-    Ban,
-    ArrowUpDown,
-} from 'lucide-react';
+    ShieldIcon,
+    TeamsIcon,
+    LockIcon,
+    SearchIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    SyncIcon,
+    WarningIcon,
+} from '../design-system/icons';
 import { deleteAccount, blacklistAccount } from '../api/services';
 import { Button, Badge, Alert, Modal, InputField } from '../design-system';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
@@ -339,10 +338,10 @@ export default function PermissionsPage() {
         <div className="permissions-page">
             <div className="page-header">
                 <div className="page-header__text">
-                    <h1><Shield size={24} aria-hidden="true" /> 權限管理</h1>
+                    <h1><ShieldIcon size={24} aria-hidden="true" /> 權限管理</h1>
                     <p>管理用戶角色和頁面存取權限</p>
                 </div>
-                <Button variant="secondary" onClick={fetchData} icon={<RefreshCw size={16} />} disabled={isLoading}>
+                <Button variant="secondary" onClick={fetchData} icon={<SyncIcon size={16} />} disabled={isLoading}>
                     重新載入
                 </Button>
             </div>
@@ -357,7 +356,7 @@ export default function PermissionsPage() {
                 <Alert
                     variant="danger"
                     title="載入失敗"
-                    icon={<AlertTriangle size={16} />}
+                    icon={<WarningIcon size={16} />}
                 >
                     <div className="permissions-error__body">
                         <span>{error}</span>
@@ -373,7 +372,7 @@ export default function PermissionsPage() {
                     className={`permissions-tab ${activeTab === 'users' ? 'active' : ''}`}
                     onClick={() => setActiveTab('users')}
                 >
-                    <Users size={18} aria-hidden="true" />
+                    <TeamsIcon size={18} aria-hidden="true" />
                     志工權限
                 </button>
                 <button
@@ -382,7 +381,7 @@ export default function PermissionsPage() {
                     className={`permissions-tab ${activeTab === 'general' ? 'active' : ''}`}
                     onClick={() => setActiveTab('general')}
                 >
-                    <Users size={18} aria-hidden="true" />
+                    <TeamsIcon size={18} aria-hidden="true" />
                     一般民眾
                 </button>
                 <button
@@ -391,7 +390,7 @@ export default function PermissionsPage() {
                     className={`permissions-tab ${activeTab === 'pages' ? 'active' : ''}`}
                     onClick={() => setActiveTab('pages')}
                 >
-                    <FileKey size={18} aria-hidden="true" />
+                    <LockIcon size={18} aria-hidden="true" />
                     頁面權限配置
                 </button>
             </div>
@@ -402,7 +401,7 @@ export default function PermissionsPage() {
                     <div className="general-section">
                         <div className="general-toolbar">
                             <InputField
-                                prefix={<Search size={18} aria-hidden="true" />}
+                                prefix={<SearchIcon size={18} aria-hidden="true" />}
                                 placeholder="搜尋一般民眾..."
                                 value={searchTerm}
                                 onChange={e => setSearchTerm(e.target.value)}
@@ -524,7 +523,7 @@ export default function PermissionsPage() {
                 {activeTab === 'users' && (
                     <div className="users-section">
                         <InputField
-                            prefix={<Search size={18} aria-hidden="true" />}
+                            prefix={<SearchIcon size={18} aria-hidden="true" />}
                             placeholder="搜尋用戶..."
                             value={searchTerm}
                             onChange={e => setSearchTerm(e.target.value)}
@@ -606,9 +605,9 @@ export default function PermissionsPage() {
                                                     </span>
                                                 )}
                                                 {expandedUser === account.id ? (
-                                                    <ChevronUp size={20} aria-hidden="true" />
+                                                    <ChevronUpIcon size={20} aria-hidden="true" />
                                                 ) : (
-                                                    <ChevronDown size={20} aria-hidden="true" />
+                                                    <ChevronDownIcon size={20} aria-hidden="true" />
                                                 )}
                                             </div>
                                         </div>
@@ -621,14 +620,14 @@ export default function PermissionsPage() {
                                                         {renderRoleBadges(account)}
                                                         {savingUser === account.id && (
                                                             <div className="user-card__saving">
-                                                                <RefreshCw size={14} className="spin" aria-hidden="true" />
+                                                                <SyncIcon size={14} className="spin" aria-hidden="true" />
                                                                 儲存中...
                                                             </div>
                                                         )}
                                                     </>
                                                 ) : (
                                                     <div className="user-card__readonly">
-                                                        <AlertTriangle size={16} aria-hidden="true" />
+                                                        <WarningIcon size={16} aria-hidden="true" />
                                                         無法修改權限等於或高於自己的用戶
                                                     </div>
                                                 )}
@@ -643,7 +642,7 @@ export default function PermissionsPage() {
 
                 {activeTab === 'pages' && (
                     <div className="pages-section">
-                        <Alert variant="warning" icon={<AlertTriangle size={16} />}>
+                        <Alert variant="warning" icon={<WarningIcon size={16} />}>
                             頁面權限配置僅限系統擁有者 (Owner) 可以修改
                         </Alert>
 
@@ -690,7 +689,7 @@ export default function PermissionsPage() {
                                                         aria-label={`「${page.pageName}」上移`}
                                                         title="上移"
                                                     >
-                                                        <ChevronUp size={18} aria-hidden="true" />
+                                                        <ChevronUpIcon size={18} aria-hidden="true" />
                                                     </button>
                                                     <span className="sort-order-display">{page.sortOrder}</span>
                                                     <button
@@ -700,7 +699,7 @@ export default function PermissionsPage() {
                                                         aria-label={`「${page.pageName}」下移`}
                                                         title="下移"
                                                     >
-                                                        <ChevronDown size={18} aria-hidden="true" />
+                                                        <ChevronDownIcon size={18} aria-hidden="true" />
                                                     </button>
                                                 </div>
                                                 <div className="page-card__level">

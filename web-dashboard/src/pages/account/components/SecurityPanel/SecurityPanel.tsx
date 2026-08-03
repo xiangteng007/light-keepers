@@ -5,20 +5,24 @@
  */
 
 import React, { useState } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：裝置三件組 Smartphone/Tablet/Monitor（B3c monitor
+// 語意為監測非螢幕，整組保留維持家族一致）、Key（密碼金鑰）、Trash2（刪除帳號）
 import {
-    Lock,
-    Shield,
     Smartphone,
     Monitor,
     Tablet,
-    AlertTriangle,
-    LogOut,
     Key,
-    RefreshCw,
     Trash2,
-    MapPin,
-    Clock,
 } from 'lucide-react';
+import {
+    LockIcon,
+    ShieldIcon,
+    WarningIcon,
+    LogoutIcon,
+    SyncIcon,
+    LocationIcon,
+    ClockIcon,
+} from '../../../../design-system/icons';
 import type { SecurityPanelProps } from '../../account.types';
 import styles from './SecurityPanel.module.css';
 
@@ -105,7 +109,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                             onClick={handleChangePassword}
                             disabled={isChangingPassword}
                         >
-                            <RefreshCw size={16} className={isChangingPassword ? styles.spin : ''} />
+                            <SyncIcon size={16} aria-hidden="true" className={isChangingPassword ? styles.spin : ''} />
                             {isChangingPassword ? '處理中...' : '變更密碼'}
                         </button>
                     </div>
@@ -115,7 +119,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
             {/* 2FA */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <Shield size={18} />
+                    <ShieldIcon size={20} aria-hidden="true" />
                     <span>兩步驟驗證 (2FA)</span>
                 </div>
                 <div className={styles.cardContent}>
@@ -139,7 +143,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                     </div>
                     {!data.twoFactorEnabled && (
                         <div className={styles.hint}>
-                            <AlertTriangle size={14} />
+                            <WarningIcon size={16} aria-hidden="true" />
                             建議啟用兩步驟驗證以保護您的帳戶安全
                         </div>
                     )}
@@ -175,11 +179,11 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                                             {session.location && (
                                                 <>
                                                     <span className={styles.separator}>•</span>
-                                                    <span><MapPin size={12} /> {session.location}</span>
+                                                    <span><LocationIcon size={12} aria-hidden="true" /> {session.location}</span>
                                                 </>
                                             )}
                                             <span className={styles.separator}>•</span>
-                                            <span><Clock size={12} /> {formatSessionTime(session.lastActiveAt)}</span>
+                                            <span><ClockIcon size={12} aria-hidden="true" /> {formatSessionTime(session.lastActiveAt)}</span>
                                         </div>
                                     </div>
                                     {!session.isCurrent && (
@@ -188,7 +192,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                                             onClick={() => handleRevokeSession(session.id)}
                                             disabled={revokingSessionId === session.id}
                                         >
-                                            <LogOut size={14} />
+                                            <LogoutIcon size={16} aria-hidden="true" />
                                             {revokingSessionId === session.id ? '登出中...' : '登出'}
                                         </button>
                                     )}
@@ -207,7 +211,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
             {/* Danger Zone */}
             <div className={`${styles.card} ${styles.dangerCard}`}>
                 <div className={styles.cardHeader}>
-                    <AlertTriangle size={18} />
+                    <WarningIcon size={20} aria-hidden="true" />
                     <span>危險區域</span>
                 </div>
                 <div className={styles.cardContent}>
@@ -220,7 +224,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                             className={styles.dangerBtn}
                             onClick={() => setShowDeactivateConfirm(true)}
                         >
-                            <Lock size={16} />
+                            <LockIcon size={16} aria-hidden="true" />
                             停用帳戶
                         </button>
                     </div>
@@ -246,7 +250,7 @@ const SecurityPanel: React.FC<SecurityPanelProps> = ({
                 <div className={styles.dialogOverlay} onClick={() => setShowDeactivateConfirm(false)}>
                     <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
                         <div className={styles.dialogIcon}>
-                            <AlertTriangle size={32} />
+                            <WarningIcon size={32} aria-hidden="true" />
                         </div>
                         <h4>確定要停用帳戶嗎？</h4>
                         <p>停用後您將無法登入，但您的資料會被保留。如需重新啟用，請聯繫管理員。</p>

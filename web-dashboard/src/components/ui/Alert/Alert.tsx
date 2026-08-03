@@ -7,10 +7,10 @@
  * @example
  * <Alert variant="success" title="成功">操作已完成</Alert>
  * <Alert variant="danger" dismissible onDismiss={() => {}}>發生錯誤</Alert>
- * <Alert variant="warning" icon={<AlertTriangle />}>請注意安全</Alert>
+ * <Alert variant="warning" icon={<WarningIcon />}>請注意安全</Alert>
  */
 import React, { ReactNode, useState } from 'react';
-import { X, CheckCircle, AlertTriangle, AlertCircle, Info } from 'lucide-react';
+import { CloseIcon, CheckIcon, WarningIcon, SirenIcon, InfoIcon } from '../../../design-system/icons';
 import './Alert.css';
 
 export type AlertVariant = 'info' | 'success' | 'warning' | 'danger' | 'neutral';
@@ -34,12 +34,13 @@ export interface AlertProps {
   role?: 'alert' | 'status';
 }
 
+/* B3c 教範圖例：與 design-system Alert 同語彙 — danger 用 siren（紅色告警） */
 const defaultIcons: Record<AlertVariant, ReactNode> = {
-  info: <Info size={20} />,
-  success: <CheckCircle size={20} />,
-  warning: <AlertTriangle size={20} />,
-  danger: <AlertCircle size={20} />,
-  neutral: <Info size={20} />,
+  info: <InfoIcon size={20} aria-hidden="true" />,
+  success: <CheckIcon size={20} aria-hidden="true" />,
+  warning: <WarningIcon size={20} aria-hidden="true" />,
+  danger: <SirenIcon size={20} aria-hidden="true" />,
+  neutral: <InfoIcon size={20} aria-hidden="true" />,
 };
 
 export const Alert: React.FC<AlertProps> = ({
@@ -86,7 +87,7 @@ export const Alert: React.FC<AlertProps> = ({
           onClick={handleDismiss}
           aria-label="關閉通知"
         >
-          <X size={18} />
+          <CloseIcon size={16} aria-hidden="true" />
         </button>
       )}
     </div>

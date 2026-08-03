@@ -3,12 +3,14 @@
  *
  * 系統設定頁面（Detail archetype — 分段 Panel 呈現目前生效的系統設定）
  */
-import { Globe, Moon, Bell, Smartphone } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Globe（語言/國際化）、Smartphone（PWA 裝置）
+import { Globe, Smartphone } from 'lucide-react';
+import { ThemeIcon, NotifyIcon, type LkIcon } from '../../design-system/icons';
 import { Badge } from '../../design-system';
 import './SettingsPage.css';
 
 interface SettingRow {
-    icon: typeof Globe;
+    icon: typeof Globe | LkIcon;
     label: string;
     value: string;
     status?: 'success';
@@ -16,8 +18,8 @@ interface SettingRow {
 
 const SETTINGS_ROWS: SettingRow[] = [
     { icon: Globe, label: '語言設定', value: '繁體中文 (zh-TW)' },
-    { icon: Moon, label: '主題模式', value: '深色模式 (Dark Mode)' },
-    { icon: Bell, label: '通知設定', value: '已啟用', status: 'success' },
+    { icon: ThemeIcon, label: '主題模式', value: '深色模式 (Dark Mode)' },
+    { icon: NotifyIcon, label: '通知設定', value: '已啟用', status: 'success' },
     { icon: Smartphone, label: 'PWA 設定', value: '已安裝為獨立應用', status: 'success' },
 ];
 

@@ -3,7 +3,7 @@
  * Chatbot assistant powered by Gemini
  */
 import { useState, useRef, useEffect } from 'react';
-import { Bot, User } from 'lucide-react';
+import { BotIcon, UserIcon } from '../../design-system/icons';
 import { Badge, Button, InputField } from '../../design-system';
 import './AIChatPage.css';
 
@@ -90,7 +90,7 @@ export default function AIChatPage() {
                 {messages.map(msg => (
                     <div key={msg.id} className={`message message--${msg.role}`}>
                         <div className="message__avatar" aria-hidden="true">
-                            {msg.role === 'assistant' ? <Bot size={18} /> : <User size={18} />}
+                            {msg.role === 'assistant' ? <BotIcon size={20} aria-hidden="true" /> : <UserIcon size={20} aria-hidden="true" />}
                         </div>
                         <div className="message__content">
                             <p>{msg.content}</p>
@@ -111,7 +111,7 @@ export default function AIChatPage() {
                 ))}
                 {isLoading && (
                     <div className="message message--assistant">
-                        <div className="message__avatar" aria-hidden="true"><Bot size={18} /></div>
+                        <div className="message__avatar" aria-hidden="true"><BotIcon size={20} /></div>
                         <div className="message__content">
                             <div className="typing-indicator" role="status" aria-label="AI 輸入中">
                                 <span></span><span></span><span></span>

@@ -5,7 +5,15 @@
  * 任務後檢討與經驗學習 — connected to real API
  */
 import React, { useState, useEffect, useCallback } from 'react';
-import { FileCheck, Calendar, Users, Lightbulb, ChevronRight, RefreshCw } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Lightbulb（改善建議/洞見）
+import { Lightbulb } from 'lucide-react';
+import {
+    AuditIcon,
+    CalendarIcon,
+    TeamsIcon,
+    ChevronRightIcon,
+    SyncIcon,
+} from '../../design-system/icons';
 import { PageTemplate } from '../../components/PageTemplate';
 import { Button, Badge, Tag, Alert } from '../../design-system';
 import EmptyState from '../../components/shared/EmptyState';
@@ -65,7 +73,7 @@ export default function AARPage() {
         <PageTemplate
             title="AAR 檢討"
             subtitle="After Action Review - 任務後檢討與經驗學習"
-            icon={FileCheck}
+            icon={AuditIcon}
             domain="C2 指揮控制"
         >
             <div className="aar-page">
@@ -78,7 +86,7 @@ export default function AARPage() {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                icon={<RefreshCw size={14} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                                icon={<SyncIcon size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                                 onClick={fetchAARs}
                                 disabled={loading}
                                 aria-label="重新整理檢討報告列表"
@@ -123,18 +131,18 @@ export default function AARPage() {
                                                 <Tag size="sm" color="default">{aar.incidentNumber || aar.sessionId || '-'}</Tag>
                                             </div>
                                             <div className="aar-item__meta">
-                                                <span><Calendar size={12} aria-hidden="true" /> <time dateTime={aar.createdAt}>{dateLabel}</time></span>
-                                                <span><Users size={12} aria-hidden="true" /> {aar.participants || 0} 人</span>
+                                                <span><CalendarIcon size={12} aria-hidden="true" /> <time dateTime={aar.createdAt}>{dateLabel}</time></span>
+                                                <span><TeamsIcon size={12} aria-hidden="true" /> {aar.participants || 0} 人</span>
                                             </div>
                                             <div className="aar-item__stats">
                                                 <Badge variant="warning" size="sm" icon={<Lightbulb size={12} aria-hidden="true" />}>
                                                     {aar.lessonsLearned || 0} 經驗
                                                 </Badge>
-                                                <Badge variant="info" size="sm" icon={<FileCheck size={12} aria-hidden="true" />}>
+                                                <Badge variant="info" size="sm" icon={<AuditIcon size={12} aria-hidden="true" />}>
                                                     {aar.actionItems || 0} 行動項目
                                                 </Badge>
                                             </div>
-                                            <ChevronRight size={16} className="aar-item__chevron" aria-hidden="true" />
+                                            <ChevronRightIcon size={16} className="aar-item__chevron" aria-hidden="true" />
                                         </button>
                                     </li>
                                 );

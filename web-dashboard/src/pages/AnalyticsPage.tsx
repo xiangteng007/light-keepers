@@ -15,8 +15,17 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
 import { Card, Button, Badge, StatIndicator } from '../design-system';
-import { AnalyticsIcon, InventoryIcon, SirenIcon, TeamsIcon, ReportIcon } from '../design-system/icons';
-import { Package, Users, AlertTriangle, Megaphone, ClipboardList, CheckCircle2, Inbox } from 'lucide-react';
+import {
+    AnalyticsIcon,
+    InventoryIcon,
+    SirenIcon,
+    TeamsIcon,
+    ReportIcon,
+    WarningIcon,
+    EventsIcon,
+    CheckIcon,
+    DocEmptyIcon,
+} from '../design-system/icons';
 import {
     getResourceStats,
     getReportStats,
@@ -338,7 +347,7 @@ export default function AnalyticsPage() {
             <div className="kpi-grid">
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<Package size={20} aria-hidden="true" />}
+                        icon={<InventoryIcon size={20} aria-hidden="true" />}
                         value={totalResources}
                         label="物資管理・物資種類"
                         variant={lowStockCount > 0 ? 'warning' : 'success'}
@@ -350,7 +359,7 @@ export default function AnalyticsPage() {
 
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<Users size={20} aria-hidden="true" />}
+                        icon={<TeamsIcon size={20} aria-hidden="true" />}
                         value={totalVolunteers}
                         label="志工團隊・志工人數"
                         variant="default"
@@ -360,7 +369,7 @@ export default function AnalyticsPage() {
 
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<AlertTriangle size={20} aria-hidden="true" />}
+                        icon={<WarningIcon size={20} aria-hidden="true" />}
                         value={totalAlerts}
                         label="NCDR 警報・即時警報"
                         variant="default"
@@ -370,7 +379,7 @@ export default function AnalyticsPage() {
 
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<Megaphone size={20} aria-hidden="true" />}
+                        icon={<ReportIcon size={20} aria-hidden="true" />}
                         value={totalReports}
                         label="災情回報・回報總數"
                         variant={pendingReports > 0 ? 'warning' : 'success'}
@@ -382,7 +391,7 @@ export default function AnalyticsPage() {
 
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<ClipboardList size={20} aria-hidden="true" />}
+                        icon={<EventsIcon size={20} aria-hidden="true" />}
                         value={activeEvents}
                         label="事件管理・進行中事件"
                         variant="default"
@@ -392,7 +401,7 @@ export default function AnalyticsPage() {
 
                 <Card className="kpi-card" padding="md">
                     <StatIndicator
-                        icon={<CheckCircle2 size={20} aria-hidden="true" />}
+                        icon={<CheckIcon size={20} aria-hidden="true" />}
                         value={`${taskCompletionRate}%`}
                         label="任務進度・完成率"
                         variant="default"
@@ -404,7 +413,7 @@ export default function AnalyticsPage() {
             {/* 趨勢圖 */}
             <Card title="NCDR 警報趨勢" icon={<AnalyticsIcon size={20} />} padding="lg" className="chart-card">
                 <div className="chart-container chart-container--lg">
-                    <Line data={eventTrendData} options={{
+                    <Line aria-label="NCDR 警報趨勢折線圖" data={eventTrendData} options={{
                         ...chartOptions,
                         scales: {
                             y: { beginAtZero: true }
@@ -418,10 +427,10 @@ export default function AnalyticsPage() {
                 <Card title="物資類別分布" icon={<InventoryIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {Object.keys(resourceStats?.byCategory || {}).length > 0 ? (
-                            <Doughnut data={resourceCategoryData} options={chartOptions} />
+                            <Doughnut aria-label="物資類別分布圓環圖" data={resourceCategoryData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
+                                <DocEmptyIcon size={40} aria-hidden="true" />
                                 <p>尚無物資資料</p>
                             </div>
                         )}
@@ -431,10 +440,10 @@ export default function AnalyticsPage() {
                 <Card title="NCDR 警報分類" icon={<SirenIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {Object.keys(ncdrCategoryStats).length > 0 ? (
-                            <Pie data={ncdrCategoryData} options={chartOptions} />
+                            <Pie aria-label="NCDR 警報分類圓餅圖" data={ncdrCategoryData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
+                                <DocEmptyIcon size={40} aria-hidden="true" />
                                 <p>目前無警報資料</p>
                             </div>
                         )}
@@ -446,7 +455,7 @@ export default function AnalyticsPage() {
             <div className="charts-grid">
                 <Card title="志工狀態分布" icon={<TeamsIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
-                        <Bar data={volunteerStatusData} options={{
+                        <Bar aria-label="志工狀態分布長條圖" data={volunteerStatusData} options={{
                             ...chartOptions,
                             indexAxis: 'y' as const,
                         }} />
@@ -456,10 +465,10 @@ export default function AnalyticsPage() {
                 <Card title="回報處理狀態" icon={<ReportIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {totalReports > 0 ? (
-                            <Doughnut data={reportStatusData} options={chartOptions} />
+                            <Doughnut aria-label="回報處理狀態圓環圖" data={reportStatusData} options={chartOptions} />
                         ) : (
                             <div className="no-data-placeholder">
-                                <Inbox size={40} strokeWidth={1.5} aria-hidden="true" />
+                                <DocEmptyIcon size={40} aria-hidden="true" />
                                 <p>尚無回報資料</p>
                             </div>
                         )}

@@ -5,7 +5,7 @@
  * Used in TaskDispatchPage and other task management interfaces
  */
 import React, { useState } from 'react';
-import { X, MapPin, Calendar, Clock, Users, AlertTriangle } from 'lucide-react';
+import { CloseIcon, LocationIcon, CalendarIcon, ClockIcon, TeamsIcon } from '../design-system/icons';
 import './TaskModal.css';
 
 interface TaskModalProps {
@@ -80,7 +80,7 @@ export function TaskModal({ isOpen, onClose, onSubmit, initialData }: TaskModalP
                 <div className="modal-header">
                     <h2>新增任務</h2>
                     <button className="close-btn" onClick={onClose}>
-                        <X size={20} />
+                        <CloseIcon size={20} aria-hidden="true" />
                     </button>
                 </div>
 
@@ -141,7 +141,7 @@ export function TaskModal({ isOpen, onClose, onSubmit, initialData }: TaskModalP
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label"><MapPin size={14} /> 地點</label>
+                        <label className="form-label"><LocationIcon size={16} aria-hidden="true" /> 地點</label>
                         <input
                             type="text"
                             className="form-input"
@@ -152,7 +152,7 @@ export function TaskModal({ isOpen, onClose, onSubmit, initialData }: TaskModalP
                     </div>
 
                     <div className="form-section">
-                        <label className="form-label"><Users size={14} /> 指派小隊</label>
+                        <label className="form-label"><TeamsIcon size={16} aria-hidden="true" /> 指派小隊</label>
                         <select
                             className="form-select"
                             value={formData.assignedTeam}
@@ -167,7 +167,7 @@ export function TaskModal({ isOpen, onClose, onSubmit, initialData }: TaskModalP
 
                     <div className="form-row">
                         <div className="form-section">
-                            <label className="form-label"><Clock size={14} /> 預估時長（分鐘）</label>
+                            <label className="form-label"><ClockIcon size={16} aria-hidden="true" /> 預估時長（分鐘）</label>
                             <input
                                 type="number"
                                 className="form-input"
@@ -179,7 +179,7 @@ export function TaskModal({ isOpen, onClose, onSubmit, initialData }: TaskModalP
                         </div>
 
                         <div className="form-section">
-                            <label className="form-label"><Calendar size={14} /> 預定開始時間</label>
+                            <label className="form-label"><CalendarIcon size={16} aria-hidden="true" /> 預定開始時間</label>
                             <input
                                 type="datetime-local"
                                 className="form-input"

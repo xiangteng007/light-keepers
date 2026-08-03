@@ -4,8 +4,10 @@
  * iOS Widget-style card component with glass morphism design
  */
 import React, { useState, useRef, useEffect } from 'react';
-import { GripVertical, Eye, EyeOff, Lock, Unlock, Settings, Pencil, Trash2 } from 'lucide-react';
-import { EditIcon } from '../../design-system/icons';
+// 保留 lucide（R5/T6 誠實清單）：GripVertical（拖曳把手）、Eye/EyeOff（顯示切換對）、
+// Lock/Unlock（鎖定切換對——B3c 只有 lock 無 unlock，成對保留避免切換時風格跳動）、Trash2（刪除）
+import { GripVertical, Eye, EyeOff, Lock, Unlock, Trash2 } from 'lucide-react';
+import { EditIcon, SettingsIcon } from '../../design-system/icons';
 import { useTranslation } from 'react-i18next';
 import { WidgetConfig } from './widget.types';
 import { getWidgetTitle } from '../../utils/widget-i18n';
@@ -125,7 +127,7 @@ export function Widget({
                                 onClick={(e) => { e.stopPropagation(); setIsEditingTitle(true); }}
                                 title="編輯標題"
                             >
-                                <Pencil size={12} />
+                                <EditIcon size={12} aria-hidden="true" />
                             </button>
                         )}
                     </h3>
@@ -236,7 +238,7 @@ export function WidgetEditControls({
                 className={`widget-edit-controls__btn ${isEditMode ? 'active' : ''}`}
                 onClick={onToggleEditMode}
             >
-                <Settings size={18} />
+                <SettingsIcon size={20} aria-hidden="true" />
                 {isEditMode ? '完成編輯' : '編輯佈局'}
             </button>
 

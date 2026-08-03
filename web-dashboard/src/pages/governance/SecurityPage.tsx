@@ -8,7 +8,7 @@
  * 對應後端模組。
  */
 import { useState } from 'react';
-import { ShieldAlert, CheckCircle2, AlertTriangle } from 'lucide-react';
+import { ShieldIcon, CheckIcon, WarningIcon } from '../../design-system/icons';
 import { Alert, Badge, Button, StatIndicator } from '../../design-system';
 import EmptyState from '../../components/shared/EmptyState';
 import './SecurityPage.css';
@@ -61,7 +61,7 @@ export default function SecurityPage() {
         <div className="security-page">
             <div className="page-header">
                 <div className="page-header__text">
-                    <h1><ShieldAlert size={24} aria-hidden="true" /> 安全中心</h1>
+                    <h1><ShieldIcon size={24} aria-hidden="true" /> 安全中心</h1>
                     <p>異常行為偵測與安全監控</p>
                 </div>
                 <div className="security-page__stats">
@@ -104,7 +104,7 @@ export default function SecurityPage() {
             <div className="security-page__alerts">
                 {filteredAlerts.length === 0 ? (
                     <EmptyState
-                        icon={CheckCircle2}
+                        icon={CheckIcon}
                         title="目前沒有待處理的安全警報"
                         description="所有已知的登入異常都已處理完畢。"
                     />
@@ -117,7 +117,7 @@ export default function SecurityPage() {
                                         <Badge
                                             variant={SEVERITY_BADGE_VARIANT[alert.severity]}
                                             size="sm"
-                                            icon={<AlertTriangle size={11} aria-hidden="true" />}
+                                            icon={<WarningIcon size={12} aria-hidden="true" />}
                                         >
                                             {SEVERITY_LABEL[alert.severity]}
                                         </Badge>
@@ -136,7 +136,7 @@ export default function SecurityPage() {
                                 </Button>
                             )}
                             {alert.resolved && (
-                                <Badge variant="success" size="sm" icon={<CheckCircle2 size={11} aria-hidden="true" />}>
+                                <Badge variant="success" size="sm" icon={<CheckIcon size={12} aria-hidden="true" />}>
                                     已解決
                                 </Badge>
                             )}

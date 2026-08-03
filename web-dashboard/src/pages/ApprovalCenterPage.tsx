@@ -4,7 +4,9 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { ClipboardCheck, Lock, Unlock, X, Check } from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，ClipboardCheck 暫留；Unlock 無 B3c 對應（見 notes） */
+import { ClipboardCheck, Unlock } from 'lucide-react';
+import { LockIcon, CloseIcon, CheckIcon } from '../design-system/icons';
 import { Modal, Badge, Button, Alert } from '../design-system';
 import type { BadgeProps } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
@@ -287,7 +289,7 @@ export default function ApprovalCenterPage() {
                         {/* Sensitive Data Section */}
                         <div className="sensitive-section">
                             <div className="sensitive-header">
-                                <h4><Lock size={14} aria-hidden="true" /> 敏感資訊（需權限）</h4>
+                                <h4><LockIcon size={14} aria-hidden="true" /> 敏感資訊（需權限）</h4>
                                 {!sensitiveData && (
                                     <Button
                                         variant="secondary"
@@ -333,7 +335,7 @@ export default function ApprovalCenterPage() {
                             </Button>
                             <Button
                                 variant="danger"
-                                icon={<X size={14} aria-hidden="true" />}
+                                icon={<CloseIcon size={14} aria-hidden="true" />}
                                 onClick={() => setShowRejectModal(true)}
                                 disabled={actionLoading}
                             >
@@ -341,7 +343,7 @@ export default function ApprovalCenterPage() {
                             </Button>
                             <Button
                                 variant="primary"
-                                icon={<Check size={14} aria-hidden="true" />}
+                                icon={<CheckIcon size={14} aria-hidden="true" />}
                                 onClick={() => selectedApproval && handleApprove(selectedApproval.id)}
                                 loading={actionLoading}
                             >

@@ -55,6 +55,15 @@ export const SpreadsheetIcon = createIcon(
     </>,
 );
 
+/** mail 郵件 — 直角信封：函匣框＋封口斜折（R5/T6 chrome 批） */
+export const MailIcon = createIcon(
+    'MailIcon',
+    <>
+        <rect x="3" y="5" width="18" height="14" />
+        <path d="M3 7l9 6 9-6" />
+    </>,
+);
+
 /** doc-empty 空文件 — 摺角頁＋45° 斜線（空狀態；report 同族去內文） */
 export const DocEmptyIcon = createIcon(
     'DocEmptyIcon',

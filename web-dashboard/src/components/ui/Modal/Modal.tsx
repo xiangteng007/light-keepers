@@ -11,7 +11,7 @@
  */
 import React, { ReactNode, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X } from 'lucide-react';
+import { CloseIcon } from '../../../design-system/icons';
 import { FocusTrap } from '../../accessibility/SkipLink';
 import './Modal.css';
 
@@ -134,7 +134,7 @@ export const Modal: React.FC<ModalProps> = ({
                   onClick={onClose}
                   aria-label="關閉對話框"
                 >
-                  <X size={20} />
+                  <CloseIcon size={20} aria-hidden="true" />
                 </button>
               )}
             </div>

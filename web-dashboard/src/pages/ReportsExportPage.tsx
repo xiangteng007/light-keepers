@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Users, AlertTriangle, Download, FileText, BarChart3 } from 'lucide-react';
+import { TeamsIcon, WarningIcon, DownloadIcon, ReportIcon, AnalyticsIcon } from '../design-system/icons';
 import { Card, Button, Badge, InputField } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import {
@@ -145,27 +145,27 @@ export default function ReportsExportPage() {
             <div className="reports-grid">
                 {/* 志工時數報表 */}
                 <Card className="report-option" padding="lg">
-                    <div className="report-option__icon" aria-hidden="true"><Users size={32} /></div>
+                    <div className="report-option__icon" aria-hidden="true"><TeamsIcon size={32} /></div>
                     <h3>志工時數報表</h3>
                     <p>統計志工服務時數與任務數量</p>
                     <div className="report-option__actions">
                         <Button
                             variant="secondary"
-                            icon={<BarChart3 size={16} aria-hidden="true" />}
+                            icon={<AnalyticsIcon size={16} aria-hidden="true" />}
                             onClick={loadVolunteerReport}
                             loading={isLoading === 'volunteer'}
                         >
                             預覽
                         </Button>
                         <Button
-                            icon={<Download size={16} aria-hidden="true" />}
+                            icon={<DownloadIcon size={16} aria-hidden="true" />}
                             onClick={() => downloadVolunteerHoursCSV(dateRange.start, dateRange.end)}
                         >
                             CSV
                         </Button>
                         <Button
                             variant="secondary"
-                            icon={<FileText size={16} aria-hidden="true" />}
+                            icon={<ReportIcon size={16} aria-hidden="true" />}
                             onClick={() => volunteerReport && exportVolunteerPDF(volunteerReport, dateRange)}
                             disabled={!volunteerReport}
                         >
@@ -176,27 +176,27 @@ export default function ReportsExportPage() {
 
                 {/* 災情統計報表 */}
                 <Card className="report-option" padding="lg">
-                    <div className="report-option__icon" aria-hidden="true"><AlertTriangle size={32} /></div>
+                    <div className="report-option__icon" aria-hidden="true"><WarningIcon size={32} /></div>
                     <h3>災情統計報表</h3>
                     <p>災害類型分布與響應時間分析</p>
                     <div className="report-option__actions">
                         <Button
                             variant="secondary"
-                            icon={<BarChart3 size={16} aria-hidden="true" />}
+                            icon={<AnalyticsIcon size={16} aria-hidden="true" />}
                             onClick={loadDisasterReport}
                             loading={isLoading === 'disaster'}
                         >
                             預覽
                         </Button>
                         <Button
-                            icon={<Download size={16} aria-hidden="true" />}
+                            icon={<DownloadIcon size={16} aria-hidden="true" />}
                             onClick={() => downloadDisasterJSON(dateRange.start, dateRange.end)}
                         >
                             JSON
                         </Button>
                         <Button
                             variant="secondary"
-                            icon={<FileText size={16} aria-hidden="true" />}
+                            icon={<ReportIcon size={16} aria-hidden="true" />}
                             onClick={() => disasterReport && exportDisasterPDF(disasterReport, dateRange)}
                             disabled={!disasterReport}
                         >

@@ -61,6 +61,8 @@ import {
     SyncIcon,
     OnlineIcon,
     OfflineIcon,
+    TrendUpIcon,
+    TrendDownIcon,
 } from './status';
 import {
     SearchIcon,
@@ -75,6 +77,17 @@ import {
     UserIcon,
     LogoutIcon,
     ThemeIcon,
+    GripIcon,
+    EyeIcon,
+    EyeOffIcon,
+    RotateIcon,
+    FullscreenIcon,
+    LinkIcon,
+    CopyIcon,
+    DownloadIcon,
+    UploadIcon,
+    PlayIcon,
+    PauseIcon,
 } from './action';
 import {
     ChevronLeftIcon,
@@ -88,6 +101,7 @@ import {
     AuditIcon,
     FilesIcon,
     SpreadsheetIcon,
+    MailIcon,
     DocEmptyIcon,
 } from './docs';
 import {
@@ -152,6 +166,8 @@ export const iconRegistry: Record<string, LkIcon> = {
     'sync': SyncIcon,
     'online': OnlineIcon,
     'offline': OfflineIcon,
+    'trend-up': TrendUpIcon,
+    'trend-down': TrendDownIcon,
     // 操作/工具
     'search': SearchIcon,
     'layers': LayersIcon,
@@ -165,6 +181,17 @@ export const iconRegistry: Record<string, LkIcon> = {
     'user': UserIcon,
     'logout': LogoutIcon,
     'theme': ThemeIcon,
+    'grip': GripIcon,
+    'eye': EyeIcon,
+    'eye-off': EyeOffIcon,
+    'rotate': RotateIcon,
+    'fullscreen': FullscreenIcon,
+    'link': LinkIcon,
+    'copy': CopyIcon,
+    'download': DownloadIcon,
+    'upload': UploadIcon,
+    'play': PlayIcon,
+    'pause': PauseIcon,
     // 方向
     'chevron-left': ChevronLeftIcon,
     'chevron-right': ChevronRightIcon,
@@ -176,6 +203,7 @@ export const iconRegistry: Record<string, LkIcon> = {
     'audit': AuditIcon,
     'files': FilesIcon,
     'spreadsheet': SpreadsheetIcon,
+    'mail': MailIcon,
     'doc-empty': DocEmptyIcon,
     // 系統/安全
     'lock': LockIcon,

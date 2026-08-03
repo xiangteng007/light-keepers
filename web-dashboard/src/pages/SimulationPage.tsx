@@ -6,21 +6,26 @@
  * R3b 重建（DESIGN_LANGUAGE.md）：custom / Detail-base archetype（模擬控制與結果展示，
  * 尚無互動控制項與真實運算結果，故以說明卡片呈現規劃中的能力）。
  */
-import { AlertTriangle, Play, Settings, BarChart3, Waves, Mountain, Building2, ClipboardList } from 'lucide-react';
+import { WarningIcon, FlaskIcon, SettingsIcon, AnalyticsIcon, PlayIcon } from '../design-system/icons';
+import {
+    FloodPictogram,
+    LandslidePictogram,
+    EarthquakePictogram,
+} from '../design-system/icons/pictograms';
 import { Alert, Card } from '../design-system';
 import './SimulationPage.css';
 
 const SIMULATION_TYPES = [
-    { icon: Waves, title: '水災模擬', desc: '淹水範圍預估' },
-    { icon: Mountain, title: '土石流模擬', desc: '潛勢區預警' },
-    { icon: Building2, title: '地震模擬', desc: '結構損壞評估' },
-    { icon: ClipboardList, title: '桌上推演', desc: '情境演練設計' },
+    { icon: FloodPictogram, title: '水災模擬', desc: '淹水範圍預估' },
+    { icon: LandslidePictogram, title: '土石流模擬', desc: '潛勢區預警' },
+    { icon: EarthquakePictogram, title: '地震模擬', desc: '結構損壞評估' },
+    { icon: FlaskIcon, title: '桌上推演', desc: '情境演練設計' },
 ];
 
 const EXPECTED_FEATURES = [
-    { icon: Play, title: '情境執行', desc: '即時模擬執行與暫停' },
-    { icon: Settings, title: '參數調校', desc: '災害強度與範圍設定' },
-    { icon: BarChart3, title: '結果分析', desc: '損失評估報告生成' },
+    { icon: PlayIcon, title: '情境執行', desc: '即時模擬執行與暫停' },
+    { icon: SettingsIcon, title: '參數調校', desc: '災害強度與範圍設定' },
+    { icon: AnalyticsIcon, title: '結果分析', desc: '損失評估報告生成' },
 ];
 
 export default function SimulationPage() {
@@ -31,7 +36,7 @@ export default function SimulationPage() {
                 <p className="page-header__subtitle">災害情境模擬、桌上推演、能力評核</p>
             </header>
 
-            <Alert variant="info" icon={<AlertTriangle size={16} aria-hidden="true" />} title="模擬功能開發中">
+            <Alert variant="info" icon={<WarningIcon size={16} aria-hidden="true" />} title="模擬功能開發中">
                 災害模擬引擎正在開發中，預計包含：洪水範圍預估、地震損害評估、桌上推演設計器等功能。
             </Alert>
 

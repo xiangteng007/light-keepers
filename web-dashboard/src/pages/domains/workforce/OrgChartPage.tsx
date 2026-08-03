@@ -15,7 +15,9 @@
  */
 import { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { RefreshCw, Pencil, ChevronDown, ChevronRight, Network } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Network（組織圖/節點網，無 B3c 對應）
+import { Network } from 'lucide-react';
+import { SyncIcon, EditIcon, ChevronDownIcon, ChevronRightIcon } from '../../../design-system/icons';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
 import { Alert, Badge, Button } from '../../../design-system';
@@ -97,7 +99,7 @@ export default function OrgChartPage() {
                 <p className="org-node__dept">{node.department}</p>
                 {hasChildren && (
                     <span className="org-node__toggle">
-                        {isExpanded ? <ChevronDown size={12} aria-hidden="true" /> : <ChevronRight size={12} aria-hidden="true" />}
+                        {isExpanded ? <ChevronDownIcon size={12} aria-hidden="true" /> : <ChevronRightIcon size={12} aria-hidden="true" />}
                         {node.children?.length} 成員
                     </span>
                 )}
@@ -150,11 +152,11 @@ export default function OrgChartPage() {
                         size="sm"
                         onClick={() => fetchOrgChart()}
                         disabled={loading}
-                        icon={<RefreshCw size={16} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} aria-hidden="true" />}
                     >
                         {loading ? '載入中...' : '重新整理'}
                     </Button>
-                    <Button variant="primary" size="sm" icon={<Pencil size={16} aria-hidden="true" />}>
+                    <Button variant="primary" size="sm" icon={<EditIcon size={16} aria-hidden="true" />}>
                         編輯架構
                     </Button>
                 </div>

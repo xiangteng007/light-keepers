@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { WebhookIcon } from '../design-system/icons';
+import { WebhookIcon, SyncIcon, ShieldIcon, CheckIcon, CloseIcon } from '../design-system/icons';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Loader2, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { bindLineAccount } from '../api/services';
 import { Button } from '../design-system';
@@ -105,14 +104,14 @@ export default function BindLinePage() {
                 <div className="login-form" style={{ textAlign: 'center' }} role="status" aria-live="polite">
                     {status === 'loading' && (
                         <div>
-                            <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
+                            <SyncIcon size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
                             <p>處理中...</p>
                         </div>
                     )}
 
                     {status === 'needLogin' && (
                         <div>
-                            <ShieldCheck size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-info)' }} />
+                            <ShieldIcon size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-info)' }} />
                             <h2 style={{ marginBottom: '1rem', color: 'var(--text-primary)' }}>
                                 請先登入
                             </h2>
@@ -127,14 +126,14 @@ export default function BindLinePage() {
 
                     {status === 'binding' && (
                         <div>
-                            <Loader2 size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
+                            <SyncIcon size={40} className="animate-spin" style={{ margin: '0 auto 1rem', color: 'var(--text-secondary)' }} aria-hidden="true" />
                             <p>正在綁定帳號...</p>
                         </div>
                     )}
 
                     {status === 'success' && (
                         <div>
-                            <CheckCircle2 size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-success)' }} />
+                            <CheckIcon size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-success)' }} />
                             <h2 style={{ marginBottom: '1rem', color: 'var(--color-success)' }}>
                                 綁定成功！
                             </h2>
@@ -149,7 +148,7 @@ export default function BindLinePage() {
 
                     {status === 'error' && (
                         <div>
-                            <XCircle size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-danger)' }} />
+                            <CloseIcon size={56} aria-hidden="true" style={{ marginBottom: '1rem', color: 'var(--color-danger)' }} />
                             <h2 style={{ marginBottom: '1rem', color: 'var(--color-danger)' }}>
                                 綁定失敗
                             </h2>

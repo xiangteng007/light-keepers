@@ -5,19 +5,29 @@
  * 提供報表生成、匯出、排程功能
  */
 import { useState } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：Play（執行/播放動作）
+import { Play } from 'lucide-react';
 import {
-    FileText, Download, Calendar, Clock, BarChart2,
-    PieChart, TrendingUp, Filter, Play, Settings
-} from 'lucide-react';
+    AnalyticsIcon,
+    InventoryIcon,
+    TrophyIcon,
+    HeartIcon,
+    SpreadsheetIcon,
+    ExportIcon,
+    CalendarIcon,
+    ClockIcon,
+    FilterIcon,
+    SettingsIcon,
+} from '../../design-system/icons';
 import { PageTemplate } from '../../components/PageTemplate';
 import { Button, Badge, InputField } from '../../design-system';
 import './ReportGeneratorPage.css';
 
 const REPORT_TEMPLATES = [
-    { id: '1', name: '事件摘要報告', description: '所有事件的統計摘要與趨勢分析', icon: BarChart2, category: 'incident' },
-    { id: '2', name: '資源消耗報告', description: '物資使用與庫存變動追蹤', icon: PieChart, category: 'resource' },
-    { id: '3', name: '人員績效報告', description: '志工任務完成率與時數統計', icon: TrendingUp, category: 'personnel' },
-    { id: '4', name: '社區狀態報告', description: '受災戶、收容所、重建進度', icon: FileText, category: 'community' },
+    { id: '1', name: '事件摘要報告', description: '所有事件的統計摘要與趨勢分析', icon: AnalyticsIcon, category: 'incident' },
+    { id: '2', name: '資源消耗報告', description: '物資使用與庫存變動追蹤', icon: InventoryIcon, category: 'resource' },
+    { id: '3', name: '人員績效報告', description: '志工任務完成率與時數統計', icon: TrophyIcon, category: 'personnel' },
+    { id: '4', name: '社區狀態報告', description: '受災戶、收容所、重建進度', icon: HeartIcon, category: 'community' },
 ];
 
 const RECENT_REPORTS = [
@@ -34,7 +44,7 @@ export default function ReportGeneratorPage() {
         <PageTemplate
             title="報表產生器"
             subtitle="生成、匯出與排程各類統計報表"
-            icon={FileText}
+            icon={AnalyticsIcon}
             domain="Analytics 分析報表"
         >
             <div className="report-generator">
@@ -69,7 +79,7 @@ export default function ReportGeneratorPage() {
                 {/* Configuration Panel */}
                 <section className="rg-panel">
                     <h2 className="rg-panel__title">
-                        <Settings size={18} aria-hidden="true" /> 報表設定
+                        <SettingsIcon size={20} aria-hidden="true" /> 報表設定
                     </h2>
                     <div className="config-form">
                         <InputField label="報表名稱" placeholder="輸入報表名稱…" fullWidth />
@@ -77,7 +87,7 @@ export default function ReportGeneratorPage() {
                             <InputField
                                 label="開始日期"
                                 type="date"
-                                prefix={<Calendar size={14} aria-hidden="true" />}
+                                prefix={<CalendarIcon size={16} aria-hidden="true" />}
                                 value={dateRange.start}
                                 onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
                                 fullWidth
@@ -85,7 +95,7 @@ export default function ReportGeneratorPage() {
                             <InputField
                                 label="結束日期"
                                 type="date"
-                                prefix={<Calendar size={14} aria-hidden="true" />}
+                                prefix={<CalendarIcon size={16} aria-hidden="true" />}
                                 value={dateRange.end}
                                 onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
                                 fullWidth
@@ -93,7 +103,7 @@ export default function ReportGeneratorPage() {
                         </div>
                         <div className="form-group">
                             <label className="form-group__label" htmlFor="rg-filter">
-                                <Filter size={14} aria-hidden="true" /> 資料篩選
+                                <FilterIcon size={16} aria-hidden="true" /> 資料篩選
                             </label>
                             <select id="rg-filter" className="rg-select">
                                 <option>全部資料</option>
@@ -108,7 +118,7 @@ export default function ReportGeneratorPage() {
                             >
                                 產生報表
                             </Button>
-                            <Button variant="secondary" icon={<Clock size={16} aria-hidden="true" />}>
+                            <Button variant="secondary" icon={<ClockIcon size={16} aria-hidden="true" />}>
                                 設定排程
                             </Button>
                         </div>
@@ -121,7 +131,7 @@ export default function ReportGeneratorPage() {
                     <ul className="reports-list" role="list">
                         {RECENT_REPORTS.map(report => (
                             <li key={report.id} className="report-item">
-                                <FileText size={18} className="report-icon" aria-hidden="true" />
+                                <SpreadsheetIcon size={16} className="report-icon" aria-hidden="true" />
                                 <div className="report-info">
                                     <span className="report-name">{report.name}</span>
                                     <span className="report-meta tabular-nums">{report.template} · {report.generatedAt}</span>
@@ -132,7 +142,7 @@ export default function ReportGeneratorPage() {
                                     <Badge variant="warning" dot pulse>處理中</Badge>
                                 )}
                                 <button type="button" className="btn-download" aria-label={`下載 ${report.name}`}>
-                                    <Download size={16} aria-hidden="true" />
+                                    <ExportIcon size={16} aria-hidden="true" />
                                 </button>
                             </li>
                         ))}

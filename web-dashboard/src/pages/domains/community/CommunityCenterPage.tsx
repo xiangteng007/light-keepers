@@ -9,9 +9,21 @@
  */
 import { useState, useEffect, useCallback } from 'react';
 import {
-    Home, Users, Heart, MapPin, Phone, Calendar,
-    AlertTriangle, CheckCircle, Clock, ChevronRight, RefreshCw
-} from 'lucide-react';
+    BuildingIcon,
+    ShelterIcon,
+    HomeIcon,
+    LocationIcon,
+    PhoneIcon,
+    CalendarIcon,
+    WarningIcon,
+    CheckIcon,
+    ClockIcon,
+    ChevronRightIcon,
+    SyncIcon,
+    UserIcon,
+    TeamsIcon,
+    type LkIcon,
+} from '../../../design-system/icons';
 import { Alert, Badge, Button, Card, StatIndicator } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
@@ -40,10 +52,10 @@ interface Activity {
     createdAt?: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; icon: typeof AlertTriangle; variant: 'warning' | 'info' | 'success' }> = {
-    active: { label: '需關注', icon: AlertTriangle, variant: 'warning' },
-    monitoring: { label: '觀察中', icon: Clock, variant: 'info' },
-    normal: { label: '正常', icon: CheckCircle, variant: 'success' },
+const STATUS_CONFIG: Record<string, { label: string; icon: LkIcon; variant: 'warning' | 'info' | 'success' }> = {
+    active: { label: '需關注', icon: WarningIcon, variant: 'warning' },
+    monitoring: { label: '觀察中', icon: ClockIcon, variant: 'info' },
+    normal: { label: '正常', icon: CheckIcon, variant: 'success' },
 };
 
 export default function CommunityCenterPage() {
@@ -125,7 +137,7 @@ export default function CommunityCenterPage() {
                 <Button
                     variant="secondary"
                     size="sm"
-                    icon={<RefreshCw size={14} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                    icon={<SyncIcon size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     onClick={fetchData}
                     disabled={loading}
                     aria-label="重新整理社區資料"
@@ -135,17 +147,17 @@ export default function CommunityCenterPage() {
             </header>
 
             {error && (
-                <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>
+                <Alert variant="danger" icon={<WarningIcon size={16} aria-hidden="true" />}>
                     {error}
                 </Alert>
             )}
 
             {/* 統計摘要列 */}
             <div className="summary-stats">
-                <StatIndicator icon={<Home size={20} aria-hidden="true" />} value={totalStats.communities} label="聯繫社區" />
-                <StatIndicator icon={<AlertTriangle size={20} aria-hidden="true" />} value={totalStats.affected} label="受災戶" variant="warning" />
-                <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={totalStats.sheltered} label="收容中" variant="default" />
-                <StatIndicator icon={<Heart size={20} aria-hidden="true" />} value={totalStats.households.toLocaleString()} label="總戶數" />
+                <StatIndicator icon={<BuildingIcon size={20} aria-hidden="true" />} value={totalStats.communities} label="聯繫社區" />
+                <StatIndicator icon={<WarningIcon size={20} aria-hidden="true" />} value={totalStats.affected} label="受災戶" variant="warning" />
+                <StatIndicator icon={<ShelterIcon size={20} aria-hidden="true" />} value={totalStats.sheltered} label="收容中" variant="default" />
+                <StatIndicator icon={<HomeIcon size={20} aria-hidden="true" />} value={totalStats.households.toLocaleString()} label="總戶數" />
             </div>
 
             {loading ? (
@@ -188,7 +200,7 @@ export default function CommunityCenterPage() {
                                             </Badge>
                                         )}
                                         <span className="item-name">{community.name}</span>
-                                        <ChevronRight size={16} aria-hidden="true" />
+                                        <ChevronRightIcon size={16} aria-hidden="true" />
                                     </div>
                                     <div className="item-stats">
                                         <span>總戶數: {community.households}</span>
@@ -199,8 +211,8 @@ export default function CommunityCenterPage() {
                                     </div>
                                     {(community.contactPerson || community.phone) && (
                                         <div className="item-contact">
-                                            {community.contactPerson && <span><Users size={12} aria-hidden="true" /> {community.contactPerson}</span>}
-                                            {community.phone && <span><Phone size={12} aria-hidden="true" /> {community.phone}</span>}
+                                            {community.contactPerson && <span><UserIcon size={12} aria-hidden="true" /> {community.contactPerson}</span>}
+                                            {community.phone && <span><PhoneIcon size={12} aria-hidden="true" /> {community.phone}</span>}
                                         </div>
                                     )}
                                 </Card>
@@ -210,7 +222,7 @@ export default function CommunityCenterPage() {
 
                     {/* Upcoming Activities */}
                     <section className="panel activities-panel" aria-label="近期活動">
-                        <h2><Calendar size={18} aria-hidden="true" /> 近期活動</h2>
+                        <h2><CalendarIcon size={20} aria-hidden="true" /> 近期活動</h2>
                         {activities.length === 0 ? (
                             <EmptyState
                                 variant="minimal"
@@ -224,13 +236,13 @@ export default function CommunityCenterPage() {
                                 </div>
                                 <div className="activity-details">
                                     {(activity.date || activity.time) && (
-                                        <span><Calendar size={12} aria-hidden="true" /> {activity.date} {activity.time || ''}</span>
+                                        <span><CalendarIcon size={12} aria-hidden="true" /> {activity.date} {activity.time || ''}</span>
                                     )}
                                     {activity.location && (
-                                        <span><MapPin size={12} aria-hidden="true" /> {activity.location}</span>
+                                        <span><LocationIcon size={12} aria-hidden="true" /> {activity.location}</span>
                                     )}
                                     {activity.participants > 0 && (
-                                        <span><Users size={12} aria-hidden="true" /> 已報名 {activity.participants} 人</span>
+                                        <span><TeamsIcon size={12} aria-hidden="true" /> 已報名 {activity.participants} 人</span>
                                     )}
                                 </div>
                             </Card>

@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
-import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList, CheckCircle2, XCircle } from 'lucide-react';
 import { createVolunteer } from '../api/services';
 import { Alert, Badge, Button, Modal } from '../design-system';
 import type { LkIcon } from '../design-system/icons';
@@ -16,6 +15,15 @@ import {
     SupportIcon,
     CheckIcon,
     LockIcon,
+    UserIcon,
+    SettingsIcon,
+    ShieldIcon,
+    NotifyIcon,
+    LogoutIcon,
+    TasksIcon,
+    CloseIcon,
+    MailIcon,
+    LinkIcon,
 } from '../design-system/icons';
 import './ProfilePage.css';
 import api from '../api/client';
@@ -300,17 +308,17 @@ export default function ProfilePage() {
     };
 
     const tabs = [
-        { id: 'profile' as const, label: '個人資料', icon: User },
-        { id: 'security' as const, label: '安全設定', icon: Shield },
-        { id: 'notifications' as const, label: '通知偏好', icon: Bell },
+        { id: 'profile' as const, label: '個人資料', icon: UserIcon },
+        { id: 'security' as const, label: '安全設定', icon: ShieldIcon },
+        { id: 'notifications' as const, label: '通知偏好', icon: NotifyIcon },
         // 只要尚未提交志工申請的用戶都顯示志工登記 Tab (不論權限等級)
-        ...((!volunteerSubmitted && !user?.volunteerProfileCompleted) ? [{ id: 'volunteer' as const, label: '志工登記', icon: ClipboardList }] : []),
+        ...((!volunteerSubmitted && !user?.volunteerProfileCompleted) ? [{ id: 'volunteer' as const, label: '志工登記', icon: TasksIcon }] : []),
     ];
 
     return (
         <div className="profile-page">
             <header className="profile-header">
-                <h1><Settings size={28} aria-hidden="true" /> 個人設定</h1>
+                <h1><SettingsIcon size={28} aria-hidden="true" /> 個人設定</h1>
                 <p>管理您的帳號資訊和偏好設定</p>
             </header>
 
@@ -331,7 +339,7 @@ export default function ProfilePage() {
                             {user?.avatarUrl ? (
                                 <img src={user.avatarUrl} alt={user.displayName || '用戶'} />
                             ) : (
-                                <User size={40} />
+                                <UserIcon size={40} />
                             )}
                         </div>
                         <h3>{user?.displayName || user?.email || '用戶'}</h3>
@@ -356,7 +364,7 @@ export default function ProfilePage() {
                                 navigate('/login');
                             }}
                         >
-                            <LogOut size={18} />
+                            <LogoutIcon size={18} />
                             登出
                         </button>
                     </nav>
@@ -389,7 +397,7 @@ export default function ProfilePage() {
 
                             <div className="profile-form">
                                 <div className="profile-form-group">
-                                    <label><User size={16} /> 顯示名稱</label>
+                                    <label><UserIcon size={16} /> 顯示名稱</label>
                                     {isEditing ? (
                                         <input
                                             type="text"
@@ -403,12 +411,12 @@ export default function ProfilePage() {
                                 </div>
 
                                 <div className="profile-form-group">
-                                    <label><Mail size={16} /> 電子郵件</label>
+                                    <label><MailIcon size={16} /> 電子郵件</label>
                                     <div className="profile-value">{user?.email || '未設定'}</div>
                                 </div>
 
                                 <div className="profile-form-group">
-                                    <label><Shield size={16} aria-hidden="true" /> 身份</label>
+                                    <label><ShieldIcon size={16} aria-hidden="true" /> 身份</label>
                                     <div className="profile-value">
                                         <Badge variant="info" size="sm">{user?.roleDisplayName || '登記志工'}</Badge>
                                     </div>
@@ -467,7 +475,7 @@ export default function ProfilePage() {
 
                     {activeTab === 'security' && (
                         <div className="profile-section">
-                            <h2><Lock size={20} /> 安全設定</h2>
+                            <h2><LockIcon size={20} /> 安全設定</h2>
                             <div className="profile-form">
                                 <div className="security-item">
                                     <div className="security-item-info">
@@ -497,7 +505,7 @@ export default function ProfilePage() {
 
                     {activeTab === 'notifications' && (
                         <div className="profile-section">
-                            <h2><Bell size={20} /> 通知偏好</h2>
+                            <h2><NotifyIcon size={20} /> 通知偏好</h2>
                             <p className="profile-section-desc">設定您希望接收的通知類型</p>
                             <div className="notification-settings">
                                 <div className="notification-setting">
@@ -548,7 +556,7 @@ export default function ProfilePage() {
 
                     {activeTab === 'volunteer' && (
                         <div className="profile-section volunteer-register-section">
-                            <h2><ClipboardList size={20} /> 志工登記</h2>
+                            <h2><TasksIcon size={20} /> 志工登記</h2>
                             <p className="profile-section-desc">加入 Light Keepers 志工團隊</p>
 
                             {volunteerSubmitted ? (
@@ -566,9 +574,9 @@ export default function ProfilePage() {
                                     <div className="binding-checklist">
                                         <div className={`binding-item ${hasLineBinding ? 'done' : ''}`}>
                                             {hasLineBinding ? (
-                                                <CheckCircle2 size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
+                                                <CheckIcon size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
                                             ) : (
-                                                <XCircle size={18} className="binding-icon" aria-hidden="true" />
+                                                <CloseIcon size={18} className="binding-icon" aria-hidden="true" />
                                             )}
                                             <span>LINE 帳號綁定{hasLineBinding ? '（已完成）' : '（未完成）'}</span>
                                             {!hasLineBinding && (
@@ -579,9 +587,9 @@ export default function ProfilePage() {
                                         </div>
                                         <div className={`binding-item ${hasGoogleBinding ? 'done' : ''}`}>
                                             {hasGoogleBinding ? (
-                                                <CheckCircle2 size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
+                                                <CheckIcon size={18} className="binding-icon binding-icon--done" aria-hidden="true" />
                                             ) : (
-                                                <XCircle size={18} className="binding-icon" aria-hidden="true" />
+                                                <CloseIcon size={18} className="binding-icon" aria-hidden="true" />
                                             )}
                                             <span>Google 帳號綁定{hasGoogleBinding ? '（已完成）' : '（未完成）'}</span>
                                             {!hasGoogleBinding && (

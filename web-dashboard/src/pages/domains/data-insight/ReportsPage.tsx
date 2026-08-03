@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { FileText, Download, Plus } from 'lucide-react';
+import { SpreadsheetIcon, ExportIcon, PlusIcon } from '../../../design-system/icons';
 import { Button, Badge } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
@@ -53,7 +53,7 @@ export default function ReportsPage() {
                     <h1>報表中心</h1>
                     <p className="reports-page__subtitle">產生並下載系統報表</p>
                 </div>
-                <Button icon={<Plus size={18} aria-hidden="true" />}>產生報表</Button>
+                <Button icon={<PlusIcon size={16} aria-hidden="true" />}>產生報表</Button>
             </header>
 
             <div className="reports-page__stats" role="list">
@@ -94,7 +94,7 @@ export default function ReportsPage() {
                                 {reports.map((report) => (
                                     <tr key={report.id}>
                                         <td className="reports-table__name">
-                                            <FileText size={16} aria-hidden="true" />
+                                            <SpreadsheetIcon size={16} aria-hidden="true" />
                                             {report.name}
                                         </td>
                                         <td>{TYPE_LABEL[report.type]}</td>
@@ -104,7 +104,7 @@ export default function ReportsPage() {
                                         <td>
                                             {report.status === 'ready' ? (
                                                 <button type="button" className="reports-table__download" aria-label={`下載 ${report.name}`}>
-                                                    <Download size={16} aria-hidden="true" />
+                                                    <ExportIcon size={16} aria-hidden="true" />
                                                     下載
                                                 </button>
                                             ) : (
@@ -130,7 +130,7 @@ export default function ReportsPage() {
                                         <StatusBadge status={report.status} />
                                         {report.status === 'ready' && (
                                             <button type="button" className="reports-table__download" aria-label={`下載 ${report.name}`}>
-                                                <Download size={16} aria-hidden="true" />
+                                                <ExportIcon size={16} aria-hidden="true" />
                                             </button>
                                         )}
                                     </div>

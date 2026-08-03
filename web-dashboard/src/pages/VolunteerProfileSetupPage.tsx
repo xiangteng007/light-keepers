@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { createVolunteer, markVolunteerProfileCompleted } from '../api/services';
 import type { CreateVolunteerDto } from '../api/services';
-import { User, MapPin, Heart, AlertCircle, Save, ChevronRight, Check } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Save（儲存動作）
+import { Save } from 'lucide-react';
 import { Button, Alert } from '../design-system';
 import {
     AedIcon,
@@ -16,6 +17,12 @@ import {
     SupportIcon,
     InventoryIcon,
     CameraIcon,
+    UserIcon,
+    LocationIcon,
+    HeartIcon,
+    WarningIcon,
+    ChevronRightIcon,
+    CheckIcon,
     type LkIcon,
 } from '../design-system/icons';
 import './VolunteerProfileSetupPage.css';
@@ -162,7 +169,7 @@ export default function VolunteerProfileSetupPage() {
                             role="listitem"
                             aria-current={step === num ? 'step' : undefined}
                         >
-                            <div className="setup-step__number" aria-hidden="true">{step > num ? <Check size={16} /> : num}</div>
+                            <div className="setup-step__number" aria-hidden="true">{step > num ? <CheckIcon size={16} aria-hidden="true" /> : num}</div>
                             <span className="setup-step__label">
                                 {label}
                                 {step > num && <span className="sr-only">（已完成）</span>}
@@ -175,7 +182,7 @@ export default function VolunteerProfileSetupPage() {
                     {/* 步驟 1: 基本資料 */}
                     {step === 1 && (
                         <div className="setup-section">
-                            <div className="setup-section__icon"><User size={32} /></div>
+                            <div className="setup-section__icon"><UserIcon size={32} aria-hidden="true" /></div>
                             <h2>基本資料</h2>
                             <p>請填寫您的個人基本資訊</p>
 
@@ -223,7 +230,7 @@ export default function VolunteerProfileSetupPage() {
                     {/* 步驟 2: 服務區域 */}
                     {step === 2 && (
                         <div className="setup-section">
-                            <div className="setup-section__icon"><MapPin size={32} /></div>
+                            <div className="setup-section__icon"><LocationIcon size={32} aria-hidden="true" /></div>
                             <h2>服務區域</h2>
                             <p>選擇您方便服務的區域</p>
 
@@ -260,7 +267,7 @@ export default function VolunteerProfileSetupPage() {
                     {/* 步驟 3: 專業技能 */}
                     {step === 3 && (
                         <div className="setup-section">
-                            <div className="setup-section__icon"><Heart size={32} /></div>
+                            <div className="setup-section__icon"><HeartIcon size={32} aria-hidden="true" /></div>
                             <h2>專業技能</h2>
                             <p>選擇您具備的技能（可多選）</p>
 
@@ -299,7 +306,7 @@ export default function VolunteerProfileSetupPage() {
                     {/* 步驟 4: 緊急聯絡 */}
                     {step === 4 && (
                         <div className="setup-section">
-                            <div className="setup-section__icon"><AlertCircle size={32} /></div>
+                            <div className="setup-section__icon"><WarningIcon size={32} aria-hidden="true" /></div>
                             <h2>緊急聯絡人</h2>
                             <p>以便在緊急情況時聯繫</p>
 
@@ -378,7 +385,7 @@ export default function VolunteerProfileSetupPage() {
                                 type="button"
                                 variant="primary"
                                 className="setup-btn setup-btn--primary"
-                                icon={<ChevronRight size={18} aria-hidden="true" />}
+                                icon={<ChevronRightIcon size={16} aria-hidden="true" />}
                                 onClick={nextStep}
                             >
                                 下一步

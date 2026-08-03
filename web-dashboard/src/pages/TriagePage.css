@@ -282,7 +282,9 @@
 }
 
 .board-column--red .board-column__header { border-color: var(--color-danger); }
-.board-column--red .board-column__code { color: var(--color-danger); }
+/* R5/T4 a11y：11px bold 小字用 danger-light（同色相提亮階，#16170F 底 6.06:1；
+   base danger 只有 4.26:1 不過 AA 4.5:1）——紅色憲法語意不變（IMMEDIATE＝生命/安全） */
+.board-column--red .board-column__code { color: var(--color-danger-light); }
 .board-column--yellow .board-column__header { border-color: var(--color-warning); }
 .board-column--yellow .board-column__code { color: var(--color-warning); }
 .board-column--green .board-column__header { border-color: var(--color-success); }

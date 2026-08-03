@@ -7,9 +7,15 @@
  *          此處僅顯示唯讀等級徽章（消滅第二份 minLevel）。
  */
 import React, { useState, useRef } from 'react';
-// 殘留 lucide：eye/eye-off/grip-vertical/rotate-ccw 尚無 B3c 教範對應語意（R5/T5b 批次外）
-import { GripVertical, Eye, EyeOff, RotateCcw } from 'lucide-react';
-import { CloseIcon, CheckIcon, ShieldIcon } from '../../design-system/icons';
+import {
+    CloseIcon,
+    CheckIcon,
+    ShieldIcon,
+    GripIcon,
+    EyeIcon,
+    EyeOffIcon,
+    RotateIcon,
+} from '../../design-system/icons';
 import { NavItemConfig, NavGroup, NAV_GROUPS, ICON_MAP } from './useSidebarConfig';
 import './SidebarSettings.css';
 
@@ -141,7 +147,7 @@ export function SidebarSettings({
                                                     onDragEnd={handleDragEnd}
                                                 >
                                                     <div className="sidebar-settings__drag-handle">
-                                                        <GripVertical size={16} />
+                                                        <GripIcon size={16} />
                                                     </div>
 
                                                     <div className="sidebar-settings__icon">
@@ -180,7 +186,7 @@ export function SidebarSettings({
                                                         onClick={() => onUpdateItem(item.id, { visible: !item.visible })}
                                                         title={item.visible ? '隱藏' : '顯示'}
                                                     >
-                                                        {item.visible ? <Eye size={16} /> : <EyeOff size={16} />}
+                                                        {item.visible ? <EyeIcon size={16} /> : <EyeOffIcon size={16} />}
                                                     </button>
                                                 </div>
                                             );
@@ -194,7 +200,7 @@ export function SidebarSettings({
 
                 <div className="sidebar-settings__footer">
                     <button className="sidebar-settings__reset" onClick={onReset}>
-                        <RotateCcw size={14} />
+                        <RotateIcon size={16} />
                         重置為預設
                     </button>
                     <button className="sidebar-settings__done" onClick={onClose}>

@@ -5,18 +5,16 @@
  */
 
 import React, { useState, useEffect } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：Mail（Email 欄位）、Save（儲存）、Send（寄送驗證信）
+import { Mail, Save, Send } from 'lucide-react';
 import {
-    User,
-    Mail,
-    Phone,
-    Building2,
-    Edit3,
-    Save,
-    X,
-    CheckCircle,
-    AlertCircle,
-    Send,
-} from 'lucide-react';
+    UserIcon,
+    BuildingIcon,
+    EditIcon,
+    CloseIcon,
+    CheckIcon,
+    WarningIcon,
+} from '../../../../design-system/icons';
 import type { ProfilePanelProps, ProfileFormData, ProfileFormErrors } from '../../account.types';
 import styles from './ProfilePanel.module.css';
 
@@ -129,7 +127,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
                 <h3 className={styles.sectionTitle}>個人資料</h3>
                 {!isEditing ? (
                     <button className={styles.editBtn} onClick={() => setIsEditing(true)}>
-                        <Edit3 size={16} />
+                        <EditIcon size={16} aria-hidden="true" />
                         <span>編輯資料</span>
                     </button>
                 ) : (
@@ -139,7 +137,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
                             onClick={handleCancel}
                             disabled={isSaving}
                         >
-                            <X size={16} />
+                            <CloseIcon size={16} aria-hidden="true" />
                             <span>取消</span>
                         </button>
                         <button
@@ -157,7 +155,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
             {/* Basic Information */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <User size={18} />
+                    <UserIcon size={20} aria-hidden="true" />
                     <span>基本資訊</span>
                 </div>
                 <div className={styles.cardContent}>
@@ -252,12 +250,12 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
                                     <span>{data.email}</span>
                                     {data.emailVerified ? (
                                         <span className={styles.verifiedBadge}>
-                                            <CheckCircle size={14} />
+                                            <CheckIcon size={16} aria-hidden="true" />
                                             已驗證
                                         </span>
                                     ) : (
                                         <span className={styles.unverifiedBadge}>
-                                            <AlertCircle size={14} />
+                                            <WarningIcon size={16} aria-hidden="true" />
                                             未驗證
                                         </span>
                                     )}
@@ -301,12 +299,12 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
                                         {data.phone && (
                                             data.phoneVerified ? (
                                                 <span className={styles.verifiedBadge}>
-                                                    <CheckCircle size={14} />
+                                                    <CheckIcon size={16} aria-hidden="true" />
                                                     已驗證
                                                 </span>
                                             ) : (
                                                 <span className={styles.unverifiedBadge}>
-                                                    <AlertCircle size={14} />
+                                                    <WarningIcon size={16} aria-hidden="true" />
                                                     未驗證
                                                 </span>
                                             )
@@ -333,7 +331,7 @@ const ProfilePanel: React.FC<ProfilePanelProps> = ({
             {data.organizations.length > 0 && (
                 <div className={styles.card}>
                     <div className={styles.cardHeader}>
-                        <Building2 size={18} />
+                        <BuildingIcon size={20} aria-hidden="true" />
                         <span>所屬單位</span>
                     </div>
                     <div className={styles.cardContent}>

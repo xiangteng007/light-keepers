@@ -1,5 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, Users, UserCheck, UserX, Clock } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：UserCheck/UserX（出席/缺席人形複合語意，無 B3c 對應）
+import { UserCheck, UserX } from 'lucide-react';
+import { SyncIcon, TeamsIcon, ClockIcon } from '../../../design-system/icons';
 import api from '../../../api/client';
 import { getApiErrorMessage } from '../../../api/errors';
 import { Alert, Badge, Button, Card, StatIndicator } from '../../../design-system';
@@ -98,7 +100,7 @@ export default function AttendancePage() {
                         size="sm"
                         onClick={fetchRecords}
                         disabled={loading}
-                        icon={<RefreshCw size={16} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} aria-hidden="true" />}
                     >
                         {loading ? '載入中...' : '重新整理'}
                     </Button>
@@ -118,7 +120,7 @@ export default function AttendancePage() {
             {/* 統計摘要列 */}
             <div className="attendance-stats-grid">
                 <Card padding="md" className="attendance-stat-card">
-                    <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={stats.total} label="總計" variant="default" />
+                    <StatIndicator icon={<TeamsIcon size={20} aria-hidden="true" />} value={stats.total} label="總計" variant="default" />
                 </Card>
                 <Card padding="md" className="attendance-stat-card">
                     <StatIndicator icon={<UserCheck size={20} aria-hidden="true" />} value={stats.present} label="出席" variant="success" />
@@ -127,7 +129,7 @@ export default function AttendancePage() {
                     <StatIndicator icon={<UserX size={20} aria-hidden="true" />} value={stats.absent} label="缺席" variant="danger" />
                 </Card>
                 <Card padding="md" className="attendance-stat-card">
-                    <StatIndicator icon={<Clock size={20} aria-hidden="true" />} value={stats.late} label="遲到" variant="warning" />
+                    <StatIndicator icon={<ClockIcon size={20} aria-hidden="true" />} value={stats.late} label="遲到" variant="warning" />
                 </Card>
             </div>
 

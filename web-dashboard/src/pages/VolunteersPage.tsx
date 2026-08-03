@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Phone, Clock, ClipboardList, Users, Check, X } from 'lucide-react';
+import {
+    LocationIcon,
+    PhoneIcon,
+    ClockIcon,
+    TasksIcon,
+    TeamsIcon,
+    CheckIcon,
+    CloseIcon,
+} from '../design-system/icons';
 import { Card, Button, Badge, Alert, ToastContainer, StatIndicator } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
@@ -197,7 +205,7 @@ export default function VolunteersPage() {
                     className={`tab-btn ${activeTab === 'list' ? 'active' : ''}`}
                     onClick={() => setActiveTab('list')}
                 >
-                    <Users size={14} aria-hidden="true" /> 志工名單
+                    <TeamsIcon size={16} aria-hidden="true" /> 志工名單
                 </button>
             </div>
 
@@ -273,8 +281,8 @@ export default function VolunteersPage() {
                                     </div>
                                     <div className="pending-volunteer-details">
                                         <h3>{volunteer.name}</h3>
-                                        <p><MapPin size={14} aria-hidden="true" /> {volunteer.region}</p>
-                                        <p><Phone size={14} aria-hidden="true" /> {volunteer.phone}</p>
+                                        <p><LocationIcon size={16} aria-hidden="true" /> {volunteer.region}</p>
+                                        <p><PhoneIcon size={16} aria-hidden="true" /> {volunteer.phone}</p>
                                         <p className="pending-volunteer-skills">
                                             {volunteer.skills.map(skill => (
                                                 <span key={skill} className="skill-tag">{getSkillLabel(skill)}</span>
@@ -286,7 +294,7 @@ export default function VolunteersPage() {
                                     <Button
                                         variant="primary"
                                         size="sm"
-                                        icon={<Check size={16} aria-hidden="true" />}
+                                        icon={<CheckIcon size={16} aria-hidden="true" />}
                                         onClick={() => handleApprove(volunteer.id)}
                                         disabled={processingId === volunteer.id}
                                     >
@@ -295,7 +303,7 @@ export default function VolunteersPage() {
                                     <Button
                                         variant="secondary"
                                         size="sm"
-                                        icon={<X size={16} aria-hidden="true" />}
+                                        icon={<CloseIcon size={16} aria-hidden="true" />}
                                         onClick={() => handleReject(volunteer.id)}
                                         disabled={processingId === volunteer.id}
                                     >
@@ -332,7 +340,7 @@ export default function VolunteersPage() {
                                 </div>
                                 <div className="volunteer-card__info">
                                     <h3 className="volunteer-card__name">{volunteer.name}</h3>
-                                    <p className="volunteer-card__region"><MapPin size={13} aria-hidden="true" /> {volunteer.region}</p>
+                                    <p className="volunteer-card__region"><LocationIcon size={12} aria-hidden="true" /> {volunteer.region}</p>
                                 </div>
                                 <Badge variant={STATUS_BADGE_VARIANT[volunteer.status as VolunteerStatus]} dot>
                                     {STATUS_LABEL[volunteer.status as VolunteerStatus]}
@@ -348,9 +356,9 @@ export default function VolunteersPage() {
                             </div>
 
                             <div className="volunteer-card__stats">
-                                <span><Phone size={13} aria-hidden="true" /> {volunteer.phone}</span>
-                                <span className="tabular-nums"><Clock size={13} aria-hidden="true" /> {volunteer.serviceHours} 小時</span>
-                                <span className="tabular-nums"><ClipboardList size={13} aria-hidden="true" /> {volunteer.taskCount} 次任務</span>
+                                <span><PhoneIcon size={12} aria-hidden="true" /> {volunteer.phone}</span>
+                                <span className="tabular-nums"><ClockIcon size={12} aria-hidden="true" /> {volunteer.serviceHours} 小時</span>
+                                <span className="tabular-nums"><TasksIcon size={12} aria-hidden="true" /> {volunteer.taskCount} 次任務</span>
                             </div>
 
                             <div className="volunteer-card__actions">
@@ -362,7 +370,7 @@ export default function VolunteersPage() {
                                 <Button
                                     variant="primary"
                                     size="sm"
-                                    icon={<ClipboardList size={16} aria-hidden="true" />}
+                                    icon={<TasksIcon size={16} aria-hidden="true" />}
                                     onClick={() => openAssignModal(volunteer)}
                                     disabled={volunteer.status !== 'available'}
                                 >

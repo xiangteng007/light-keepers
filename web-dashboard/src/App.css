@@ -244,12 +244,6 @@ body {
   background: var(--bg-hover);
 }
 
-/* 仍被 SpectrumViewer.tsx 使用（`severity ${anomaly.severity}` 撞名沿用）；
-   注意：SpectrumViewer 本身零 import（孤兒元件候選），該元件圈掉後此規則可同刪 */
-.severity {
-  color: var(--warning);
-}
-
 /* 仍被 EventsPage 使用 */
 .category-tag {
   background: rgba(196, 167, 125, 0.2);
@@ -413,7 +407,7 @@ body {
   margin-bottom: 12px;
 }
 
-/* 仍被 field-reports/ReportsPanel/map/MapSidebar/LowStockWidget 使用 */
+/* 仍被 field-reports/ReportsPanel/map/MapSidebar 使用（LowStockWidget 已於 R5/T6 刪除） */
 .loading {
   display: flex;
   align-items: center;
@@ -982,37 +976,6 @@ body {
   border-bottom: none;
 }
 
-/* View more link — 仍被 LowStockWidget.tsx 使用；
-   注意：LowStockWidget 本身零 import（孤兒元件候選），圈掉後可同刪 */
-.view-more-link {
-  display: block;
-  text-align: right;
-  color: var(--accent-primary);
-  font-size: 13px;
-  margin-top: 12px;
-  text-decoration: none;
-}
-
-.view-more-link:hover {
-  text-decoration: underline;
-}
-
-/* Empty state mini — 仍被 LowStockWidget.tsx 使用（同上，孤兒元件候選） */
-.empty-state-mini {
-  padding: 20px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 13px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-.empty-state-mini .empty-icon {
-  font-size: 32px;
-}
-
 /* Resource grid — 仍被 MentalHealthPage 使用 */
 .resource-grid {
   display: grid;
@@ -1290,29 +1253,6 @@ body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
-}
-
-/* 離線指示器 — 仍被 ui/OfflineIndicator.tsx 使用；
-   注意：OfflineIndicator 本身零 import（孤兒元件候選），圈掉後可同刪 */
-.offline-indicator {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #FF9800;
-  color: white;
-  padding: 12px 24px;
-  border-radius: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.offline-indicator::before {
-  content: '📡';
 }
 
 /* 仍被 notifications/NotificationBell.tsx 使用 */

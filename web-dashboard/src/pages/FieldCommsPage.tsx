@@ -8,19 +8,22 @@
  * DESIGN_LANGUAGE §0「高壓可用性 > 美觀」原則，改為誠實的「頁面建置中」狀態（§4）。
  * 下方保留「預期功能」卡片作為規劃預覽，不冒充即時資料。
  */
-import { Construction, Radio, Wifi, Satellite } from 'lucide-react';
+/* Construction(建置中)/Satellite(衛星) 無 B3c 對應，誠實保留（見 notes）；
+   EmptyState 的 icon prop 型別鎖 LucideIcon */
+import { Construction, Satellite } from 'lucide-react';
+import { RadioIcon, OnlineIcon } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Card } from '../design-system';
 import './FieldCommsPage.css';
 
 const PLANNED_FEATURES = [
     {
-        icon: Radio,
+        icon: RadioIcon,
         title: '無線電管理',
         description: '頻道分配與通話紀錄',
     },
     {
-        icon: Wifi,
+        icon: OnlineIcon,
         title: 'Mesh 網路',
         description: '節點狀態與拓撲圖',
     },

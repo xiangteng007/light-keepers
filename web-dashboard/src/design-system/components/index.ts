@@ -36,3 +36,10 @@ export type { WidgetWrapperProps } from './WidgetWrapper';
 export { ProgressBar, CircularProgress, StatIndicator } from './Indicators';
 export type { ProgressBarProps, CircularProgressProps, StatIndicatorProps } from './Indicators';
 
+// R5/T6：補齊 T3 規格缺件（未接線任何頁面；接線前請先讀各檔頭規格註解）
+export { Tabs, getTabId, getPanelId } from './Tabs';
+export type { TabsProps, TabItem } from './Tabs';
+
+export { Select } from './Select';
+export type { SelectProps, SelectOption } from './Select';
+

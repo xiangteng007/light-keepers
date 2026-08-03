@@ -15,18 +15,18 @@
 import React, { useState, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import {
-    Search,
-    Download,
-    RefreshCw,
-    User,
-    Clock,
-    AlertTriangle,
-    Check,
-    X,
-    ChevronDown,
-    ChevronRight,
-    Eye,
-} from 'lucide-react';
+    SearchIcon,
+    ExportIcon,
+    SyncIcon,
+    UserIcon,
+    ClockIcon,
+    WarningIcon,
+    CheckIcon,
+    CloseIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    AuditIcon,
+} from '../design-system/icons';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 import { Alert, Badge, Tag, Button, InputField, StatIndicator } from '../design-system';
@@ -165,7 +165,7 @@ const AuditLogPage: React.FC = () => {
             {log.error && (
                 <div className={styles.detailItem}>
                     <span className={`${styles.detailLabel} ${styles.dangerText}`}>
-                        <AlertTriangle size={14} aria-hidden="true" /> 錯誤:
+                        <WarningIcon size={14} aria-hidden="true" /> 錯誤:
                     </span>
                     <span className={styles.dangerText}>{log.error}</span>
                 </div>
@@ -178,7 +178,7 @@ const AuditLogPage: React.FC = () => {
             <header className={styles.header}>
                 <div className={styles.headerLeft}>
                     <h1 className={styles.title}>
-                        <Eye size={24} aria-hidden="true" />
+                        <AuditIcon size={24} aria-hidden="true" />
                         稽核日誌
                     </h1>
                     <p className={styles.subtitle}>
@@ -190,11 +190,11 @@ const AuditLogPage: React.FC = () => {
                         variant="secondary"
                         onClick={() => fetchLogs()}
                         disabled={loading}
-                        icon={<RefreshCw size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     >
                         重新整理
                     </Button>
-                    <Button variant="primary" icon={<Download size={16} aria-hidden="true" />}>
+                    <Button variant="primary" icon={<ExportIcon size={16} aria-hidden="true" />}>
                         匯出
                     </Button>
                 </div>
@@ -218,7 +218,7 @@ const AuditLogPage: React.FC = () => {
             {/* Toolbar */}
             <div className={styles.filters}>
                 <InputField
-                    prefix={<Search size={18} aria-hidden="true" />}
+                    prefix={<SearchIcon size={18} aria-hidden="true" />}
                     placeholder="搜尋用戶、動作、資源..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
@@ -259,7 +259,7 @@ const AuditLogPage: React.FC = () => {
             {/* Error */}
             {error && (
                 <div className={styles.errorBannerWrap}>
-                    <Alert variant="danger" icon={<AlertTriangle size={16} />} title="載入失敗">
+                    <Alert variant="danger" icon={<WarningIcon size={16} />} title="載入失敗">
                         <div className={styles.errorBody}>
                             <span>{error}</span>
                             <Button size="sm" variant="secondary" onClick={() => fetchLogs()}>重試</Button>
@@ -317,18 +317,18 @@ const AuditLogPage: React.FC = () => {
                                     >
                                         <td className={styles.expandCell}>
                                             {expandedLogId === log.id ? (
-                                                <ChevronDown size={16} aria-hidden="true" />
+                                                <ChevronDownIcon size={16} aria-hidden="true" />
                                             ) : (
-                                                <ChevronRight size={16} aria-hidden="true" />
+                                                <ChevronRightIcon size={16} aria-hidden="true" />
                                             )}
                                         </td>
                                         <td className={styles.timeCell}>
-                                            <Clock size={14} aria-hidden="true" />
+                                            <ClockIcon size={14} aria-hidden="true" />
                                             {formatTime(log.timestamp)}
                                         </td>
                                         <td>
                                             <div className={styles.userCell}>
-                                                <User size={14} aria-hidden="true" />
+                                                <UserIcon size={14} aria-hidden="true" />
                                                 {log.userName}
                                             </div>
                                         </td>
@@ -345,7 +345,7 @@ const AuditLogPage: React.FC = () => {
                                             <Badge
                                                 variant={log.status === 'success' ? 'success' : 'danger'}
                                                 size="sm"
-                                                icon={log.status === 'success' ? <Check size={12} aria-hidden="true" /> : <X size={12} aria-hidden="true" />}
+                                                icon={log.status === 'success' ? <CheckIcon size={12} aria-hidden="true" /> : <CloseIcon size={12} aria-hidden="true" />}
                                             >
                                                 {log.status === 'success' ? '成功' : '失敗'}
                                             </Badge>
@@ -388,20 +388,20 @@ const AuditLogPage: React.FC = () => {
                         >
                             <div className={styles.logCardTop}>
                                 <span className={styles.timeCell}>
-                                    <Clock size={14} aria-hidden="true" />
+                                    <ClockIcon size={14} aria-hidden="true" />
                                     {formatTime(log.timestamp)}
                                 </span>
                                 <Badge
                                     variant={log.status === 'success' ? 'success' : 'danger'}
                                     size="sm"
-                                    icon={log.status === 'success' ? <Check size={12} aria-hidden="true" /> : <X size={12} aria-hidden="true" />}
+                                    icon={log.status === 'success' ? <CheckIcon size={12} aria-hidden="true" /> : <CloseIcon size={12} aria-hidden="true" />}
                                 >
                                     {log.status === 'success' ? '成功' : '失敗'}
                                 </Badge>
                             </div>
                             <div className={styles.logCardMain}>
                                 <div className={styles.userCell}>
-                                    <User size={14} aria-hidden="true" />
+                                    <UserIcon size={14} aria-hidden="true" />
                                     {log.userName}
                                 </div>
                                 <Tag color={ACTION_TAG_COLOR[log.action] ?? 'default'} size="sm">

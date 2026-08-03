@@ -1,0 +1,76 @@
+/* ============================================
+   Tabs Component — B3c 野戰手冊（R5/T6，補齊 T3 規格缺件）
+   tablist＝hairline 底規線；作用態＝底緣 3px 橄欖閂
+   （inset box-shadow，不整塊填色——金色紀律／狀態安靜律）。
+   前朝 styles/tokens/components.css 無 .lk-tabs 同名類，
+   毋需 InputField 式的雙重選擇器防禦。
+============================================ */
+
+.lk-tabs {
+    display: flex;
+    align-items: stretch;
+    gap: var(--spacing-1, 4px);
+    border-bottom: 1px solid var(--border-default);
+    overflow-x: auto;
+}
+
+.lk-tabs--full-width .lk-tabs__tab {
+    flex: 1 1 0;
+}
+
+/* ===== Tab ===== */
+.lk-tabs__tab {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 0 var(--spacing-4, 16px);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    color: var(--text-secondary);
+    font-family: var(--font-sans, var(--font-family-primary));
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-semibold, 600);
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: color var(--duration-fast) var(--ease-smooth),
+        background-color var(--duration-fast) var(--ease-smooth),
+        box-shadow var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-tabs__tab:hover {
+    color: var(--text-primary);
+    background: var(--bg-hover);
+}
+
+.lk-tabs__tab:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+/* 作用態＝底緣 3px 橄欖閂（不整塊填色） */
+.lk-tabs__tab--active {
+    color: var(--text-primary);
+    box-shadow: inset 0 -3px 0 var(--accent-primary);
+}
+
+.lk-tabs__tab--active:hover {
+    background: transparent;
+}
+
+.lk-tabs__tab--active:focus-visible {
+    box-shadow: var(--focus-ring), inset 0 -3px 0 var(--accent-primary);
+}
+
+.lk-tabs__tab:disabled {
+    color: var(--text-disabled);
+    cursor: not-allowed;
+    background: transparent;
+}
+
+/* ===== Size: sm（密排工具列） ===== */
+.lk-tabs--sm .lk-tabs__tab {
+    min-height: 36px;
+    padding: 0 var(--spacing-3, 12px);
+    font-size: var(--font-size-xs);
+}

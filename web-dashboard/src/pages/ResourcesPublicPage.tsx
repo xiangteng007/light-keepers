@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Camera, RefreshCw } from 'lucide-react';
+import { CameraIcon, SyncIcon } from '../design-system/icons';
 import { Alert, Badge, Button, Card } from '../design-system';
 import {
     WarningIcon,
@@ -185,7 +185,7 @@ export default function ResourcesPublicPage() {
                     <p className="page-subtitle">查看庫存與儲位資訊</p>
                 </div>
                 <div className="page-header__right">
-                    <Button variant="secondary" icon={<Camera size={16} aria-hidden="true" />} onClick={handleScan} aria-label="掃碼查詢">
+                    <Button variant="secondary" icon={<CameraIcon size={16} aria-hidden="true" />} onClick={handleScan} aria-label="掃碼查詢">
                         掃碼
                     </Button>
                 </div>
@@ -368,7 +368,7 @@ export default function ResourcesPublicPage() {
                 <Button
                     size="sm"
                     variant="secondary"
-                    icon={<RefreshCw size={14} className={isLoading ? 'spin' : ''} aria-hidden="true" />}
+                    icon={<SyncIcon size={14} className={isLoading ? 'spin' : ''} aria-hidden="true" />}
                     onClick={fetchData}
                     disabled={isLoading}
                 >

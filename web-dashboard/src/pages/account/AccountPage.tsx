@@ -9,7 +9,7 @@
 
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { User } from 'lucide-react';
+import { UserIcon } from '../../design-system/icons';
 import { useAuth } from '../../context/AuthContext';
 import LoginModal from '../../components/auth/LoginModal';
 import { Button } from '../../design-system';
@@ -339,7 +339,7 @@ const AccountPage: React.FC = () => {
             <div className={styles.accountPage}>
                 <header className={styles.pageHeader}>
                     <h1 className={styles.pageTitle}>
-                        <User size={28} className={styles.pageTitleIcon} />
+                        <UserIcon size={24} className={styles.pageTitleIcon} aria-hidden="true" />
                         我的帳戶
                     </h1>
                     <p className={styles.pageSubtitle}>管理您的個人資料、安全設定與連結帳戶</p>
@@ -364,7 +364,7 @@ const AccountPage: React.FC = () => {
                 <LoginModal isOpen={isLoginModalOpen} onClose={() => setIsLoginModalOpen(false)} />
                 <header className={styles.pageHeader}>
                     <h1 className={styles.pageTitle}>
-                        <User size={28} className={styles.pageTitleIcon} />
+                        <UserIcon size={24} className={styles.pageTitleIcon} aria-hidden="true" />
                         我的帳戶
                     </h1>
                     <p className={styles.pageSubtitle}>請先登入以查看您的帳戶資訊</p>
@@ -391,7 +391,7 @@ const AccountPage: React.FC = () => {
             {/* Page Header */}
             <header className={styles.pageHeader}>
                 <h1 className={styles.pageTitle}>
-                    <User size={28} className={styles.pageTitleIcon} />
+                    <UserIcon size={24} className={styles.pageTitleIcon} aria-hidden="true" />
                     我的帳戶
                 </h1>
                 <p className={styles.pageSubtitle}>管理您的個人資料、安全設定與連結帳戶</p>

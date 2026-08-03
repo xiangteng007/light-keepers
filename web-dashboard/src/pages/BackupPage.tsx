@@ -11,18 +11,9 @@ import {
     deleteBackup,
     type BackupInfo,
 } from '../api/services';
-import {
-    Database,
-    Download,
-    Upload,
-    Trash2,
-    Plus,
-    Clock,
-    HardDrive,
-    CheckCircle,
-    RefreshCw,
-    FileJson,
-} from 'lucide-react';
+/* Database(資料庫)/HardDrive(硬碟)/Trash2(刪除) 無 B3c 對應，誠實保留（見 notes）；
+   EmptyState 的 icon prop 型別鎖 LucideIcon */
+import { Database, Trash2, HardDrive } from 'lucide-react';
 import { Button, Badge, Modal, InputField, StatIndicator } from '../design-system';
 import {
     TeamsIcon,
@@ -31,6 +22,13 @@ import {
     InventoryIcon,
     UserIcon,
     SettingsIcon,
+    SyncIcon,
+    PlusIcon,
+    ClockIcon,
+    FilesIcon,
+    DownloadIcon,
+    UploadIcon,
+    CheckIcon,
     type LkIcon,
 } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
@@ -157,14 +155,14 @@ export default function BackupPage() {
                     <Button
                         variant="ghost"
                         size="md"
-                        icon={<RefreshCw size={18} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                        icon={<SyncIcon size={18} className={loading ? 'spin' : ''} aria-hidden="true" />}
                         onClick={loadBackups}
                         disabled={loading}
                         aria-label="重新整理備份列表"
                     />
                     <Button
                         variant="primary"
-                        icon={<Plus size={18} aria-hidden="true" />}
+                        icon={<PlusIcon size={18} aria-hidden="true" />}
                         onClick={() => setShowCreateModal(true)}
                         disabled={creating}
                     >
@@ -182,7 +180,7 @@ export default function BackupPage() {
                     label="總使用空間"
                 />
                 <StatIndicator
-                    icon={<Clock size={20} aria-hidden="true" />}
+                    icon={<ClockIcon size={20} aria-hidden="true" />}
                     value={backups.length > 0 ? formatDate(backups[0].createdAt).split(' ')[0] : '-'}
                     label="最近備份"
                 />
@@ -212,7 +210,7 @@ export default function BackupPage() {
                         {backups.map(backup => (
                             <div key={backup.id} className="backup-row" role="row">
                                 <div className="backup-row__info">
-                                    <FileJson size={20} aria-hidden="true" />
+                                    <FilesIcon size={20} aria-hidden="true" />
                                     <div>
                                         <span className="backup-name">
                                             {backup.description || `備份 ${backup.id.slice(0, 8)}`}
@@ -240,7 +238,7 @@ export default function BackupPage() {
                                         aria-label={`下載備份 ${backup.description || backup.id}`}
                                         title="下載"
                                     >
-                                        <Download size={16} aria-hidden="true" />
+                                        <DownloadIcon size={16} aria-hidden="true" />
                                     </button>
                                     <button
                                         className="action-btn action-btn--restore"
@@ -250,9 +248,9 @@ export default function BackupPage() {
                                         title="還原"
                                     >
                                         {restoring === backup.id ? (
-                                            <RefreshCw size={16} className="spin" aria-hidden="true" />
+                                            <SyncIcon size={16} className="spin" aria-hidden="true" />
                                         ) : (
-                                            <Upload size={16} aria-hidden="true" />
+                                            <UploadIcon size={16} aria-hidden="true" />
                                         )}
                                     </button>
                                     <button
@@ -340,7 +338,7 @@ function CreateBackupModal({
                         type="submit"
                         form="create-backup-form"
                         variant="primary"
-                        icon={creating ? <RefreshCw size={16} className="spin" aria-hidden="true" /> : <Database size={16} aria-hidden="true" />}
+                        icon={creating ? <SyncIcon size={16} className="spin" aria-hidden="true" /> : <Database size={16} aria-hidden="true" />}
                         disabled={creating || selectedModules.length === 0}
                         loading={creating}
                     >
@@ -366,7 +364,7 @@ function CreateBackupModal({
                                     <span className="module-icon" aria-hidden="true"><mod.Icon size={20} /></span>
                                     <span className="module-label">{mod.label}</span>
                                     {selected && (
-                                        <CheckCircle size={16} className="check-icon" aria-hidden="true" />
+                                        <CheckIcon size={16} className="check-icon" aria-hidden="true" />
                                     )}
                                 </button>
                             );

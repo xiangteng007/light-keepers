@@ -1,0 +1,160 @@
+/* ============================================
+   Select Component — B3c 野戰手冊（R5/T6，補齊 T3 規格缺件）
+   深面板底＋1px 規線；focus＝橄欖環（--focus-ring）。
+   紅色憲法（DESIGN_LANGUAGE v2 §D）：表單驗證錯誤屬一般錯誤，
+   一律琥珀（--color-warning），紅色只留給生命/安全。
+   前朝 styles/tokens/components.css 無 .lk-select 同名類，
+   毋需 InputField 式的雙重選擇器防禦。
+============================================ */
+
+.lk-select {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1-5);
+}
+
+.lk-select--full-width {
+    width: 100%;
+}
+
+/* ===== Label ===== */
+.lk-select__label {
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium);
+    color: var(--text-secondary);
+    transition: color var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-select--focused .lk-select__label {
+    color: var(--text-accent, var(--accent-primary));
+}
+
+.lk-select--error .lk-select__label {
+    color: var(--color-warning);
+}
+
+/* ===== Wrapper（深面板底＋1px 規線） ===== */
+.lk-select__wrapper {
+    display: flex;
+    align-items: center;
+    position: relative;
+    background: var(--bg-secondary);
+    border: var(--input-border);
+    border-radius: var(--input-radius);
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-select--focused .lk-select__wrapper {
+    border-color: var(--border-focus);
+    background: var(--bg-tertiary);
+}
+
+.lk-select--error .lk-select__wrapper {
+    border-color: var(--color-warning);
+}
+
+.lk-select--disabled .lk-select__wrapper {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ===== Focus Ring（橄欖環） ===== */
+.lk-select__focus-ring {
+    position: absolute;
+    inset: -1px;
+    border-radius: var(--input-radius);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity var(--duration-fast) var(--ease-smooth);
+    box-shadow: var(--focus-ring);
+}
+
+.lk-select--focused .lk-select__focus-ring {
+    opacity: 1;
+}
+
+/* 錯誤態焦點環＝琥珀（一般錯誤不掛紅） */
+.lk-select--error .lk-select__focus-ring {
+    box-shadow: 0 0 0 3px var(--color-warning-bg);
+}
+
+/* ===== Field（原生 select；appearance 歸零、chevron 讓位） ===== */
+.lk-select__field {
+    appearance: none;
+    -webkit-appearance: none;
+    flex: 1;
+    min-width: 0;
+    background: transparent;
+    border: none;
+    outline: none;
+    font-family: var(--font-sans, var(--font-family-primary));
+    font-size: var(--font-size-base);
+    color: var(--text-primary);
+    padding: var(--input-padding);
+    padding-right: calc(var(--spacing-3) * 2 + 16px);
+    cursor: pointer;
+    /* 下拉面板走 UA 深色（深面板；popup 樣式各瀏覽器支援度不一，option 底色為備援） */
+    color-scheme: dark;
+}
+
+.lk-select__field:disabled {
+    cursor: not-allowed;
+}
+
+/* 下拉選單面板（UA 允許範圍內）＝深面板＋紙白文字 */
+.lk-select__field option {
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.lk-select__field option:disabled {
+    color: var(--text-disabled);
+}
+
+/* ===== Chevron（B3c 折線 icon，純指示不可點） ===== */
+.lk-select__chevron {
+    position: absolute;
+    right: var(--spacing-3);
+    display: flex;
+    align-items: center;
+    pointer-events: none;
+    color: var(--text-muted);
+    transition: color var(--duration-fast) var(--ease-smooth);
+}
+
+.lk-select--focused .lk-select__chevron {
+    color: var(--text-accent, var(--accent-primary));
+}
+
+/* ===== Sizes ===== */
+.lk-select--sm .lk-select__wrapper {
+    height: var(--input-height-sm);
+}
+
+.lk-select--sm .lk-select__field {
+    font-size: var(--font-size-sm);
+}
+
+.lk-select--md .lk-select__wrapper {
+    height: var(--input-height-md);
+}
+
+.lk-select--lg .lk-select__wrapper {
+    height: var(--input-height-lg);
+}
+
+.lk-select--lg .lk-select__field {
+    font-size: var(--font-size-md);
+}
+
+/* ===== Helper Text ===== */
+.lk-select__helper {
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    line-height: var(--line-height-normal);
+}
+
+.lk-select__helper--error {
+    color: var(--color-warning);
+}

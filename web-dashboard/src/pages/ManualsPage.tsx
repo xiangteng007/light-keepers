@@ -1,6 +1,7 @@
 import { useState, useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, X, ArrowLeft, ArrowRight, Inbox } from 'lucide-react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，Inbox 暫留 */
+import { Inbox } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Card, Tag } from '../design-system';
 import {
@@ -8,6 +9,10 @@ import {
     ShelterIcon,
     LocationIcon,
     RadioIcon,
+    SearchIcon,
+    CloseIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
 } from '../design-system/icons';
 import {
     EarthquakePictogram,
@@ -405,7 +410,7 @@ export default function ManualsPage() {
 
             {/* 搜尋欄 */}
             <div className="manuals-search">
-                <Search size={18} className="manuals-search__icon" aria-hidden="true" />
+                <SearchIcon size={18} className="manuals-search__icon" aria-hidden="true" />
                 <input
                     type="text"
                     placeholder="搜尋手冊標題、內容或標籤..."
@@ -421,7 +426,7 @@ export default function ManualsPage() {
                         aria-label="清除搜尋"
                         type="button"
                     >
-                        <X size={14} aria-hidden="true" />
+                        <CloseIcon size={14} aria-hidden="true" />
                     </button>
                 )}
             </div>
@@ -461,7 +466,7 @@ export default function ManualsPage() {
                             onClick={() => setSelectedCategory(null)}
                             type="button"
                         >
-                            <ArrowLeft size={16} aria-hidden="true" /> 返回分類
+                            <ChevronLeftIcon size={16} aria-hidden="true" /> 返回分類
                         </button>
                         <div className="manuals-list-title">
                             <span aria-hidden="true" className="manuals-list-title__icon">
@@ -488,7 +493,7 @@ export default function ManualsPage() {
                                             ))}
                                         </div>
                                     </div>
-                                    <ArrowRight size={20} className="manual-item__arrow" aria-hidden="true" />
+                                    <ChevronRightIcon size={20} className="manual-item__arrow" aria-hidden="true" />
                                 </Link>
                             ))
                         ) : (
@@ -523,7 +528,7 @@ export default function ManualsPage() {
                                             <h3 className="manual-item__title">{manual.title}</h3>
                                             <p className="manual-item__summary">{manual.summary}</p>
                                         </div>
-                                        <ArrowRight size={20} className="manual-item__arrow" aria-hidden="true" />
+                                        <ChevronRightIcon size={20} className="manual-item__arrow" aria-hidden="true" />
                                     </Link>
                                 );
                             })

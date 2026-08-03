@@ -6,15 +6,15 @@
 
 import React, { useState } from 'react';
 import {
-    Building2,
-    Award,
-    GraduationCap,
-    Calendar,
-    CheckCircle,
-    Clock,
-    AlertCircle,
-    Filter,
-} from 'lucide-react';
+    BuildingIcon,
+    TrophyIcon,
+    GraduationIcon,
+    CalendarIcon,
+    CheckIcon,
+    ClockIcon,
+    WarningIcon,
+    FilterIcon,
+} from '../../../../design-system/icons';
 import type { VolunteerOrgPanelProps, Badge, Certification } from '../../account.types';
 import styles from './VolunteerOrgPanel.module.css';
 
@@ -84,7 +84,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
             {/* Organizations */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <Building2 size={18} />
+                    <BuildingIcon size={20} aria-hidden="true" />
                     <span>所屬單位</span>
                 </div>
                 <div className={styles.cardContent}>
@@ -102,7 +102,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                                         {org.department && <span>{org.department}</span>}
                                         {org.role && <span>{org.role}</span>}
                                         <span className={styles.orgDate}>
-                                            <Calendar size={12} />
+                                            <CalendarIcon size={12} aria-hidden="true" />
                                             {formatDate(org.joinedAt)} 加入
                                         </span>
                                     </div>
@@ -111,7 +111,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                         </div>
                     ) : (
                         <div className={styles.emptyState}>
-                            <Building2 size={32} />
+                            <BuildingIcon size={32} aria-hidden="true" />
                             <p>尚未加入任何單位</p>
                         </div>
                     )}
@@ -121,7 +121,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
             {/* Certifications */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <GraduationCap size={18} />
+                    <GraduationIcon size={20} aria-hidden="true" />
                     <span>證照與培訓</span>
                 </div>
                 <div className={styles.cardContent}>
@@ -134,16 +134,16 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                                         <div className={styles.certMain}>
                                             <h4>{cert.name}</h4>
                                             <span className={`${styles.certStatus} ${status.className}`}>
-                                                {cert.status === 'valid' && <CheckCircle size={12} />}
-                                                {cert.status === 'expired' && <AlertCircle size={12} />}
-                                                {cert.status === 'pending' && <Clock size={12} />}
+                                                {cert.status === 'valid' && <CheckIcon size={12} aria-hidden="true" />}
+                                                {cert.status === 'expired' && <WarningIcon size={12} aria-hidden="true" />}
+                                                {cert.status === 'pending' && <ClockIcon size={12} aria-hidden="true" />}
                                                 {status.label}
                                             </span>
                                         </div>
                                         <div className={styles.certMeta}>
                                             <span>發證單位：{cert.issuer}</span>
                                             <span>
-                                                <Calendar size={12} />
+                                                <CalendarIcon size={12} aria-hidden="true" />
                                                 {formatDate(cert.issuedAt)}
                                                 {cert.expiresAt && ` ~ ${formatDate(cert.expiresAt)}`}
                                             </span>
@@ -154,7 +154,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                         </div>
                     ) : (
                         <div className={styles.emptyState}>
-                            <GraduationCap size={32} />
+                            <GraduationIcon size={32} aria-hidden="true" />
                             <p>尚無證照記錄</p>
                         </div>
                     )}
@@ -164,7 +164,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
             {/* Badges Wall */}
             <div className={styles.card}>
                 <div className={styles.cardHeader}>
-                    <Award size={18} />
+                    <TrophyIcon size={20} aria-hidden="true" />
                     <span>志工徽章</span>
                     <span className={styles.badgeCount}>
                         {data.badges.filter(b => b.isEarned).length} / {data.badges.length}
@@ -174,7 +174,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                 {/* Filters */}
                 <div className={styles.filterBar}>
                     <div className={styles.filterGroup}>
-                        <Filter size={14} />
+                        <FilterIcon size={16} aria-hidden="true" />
                         <button
                             className={`${styles.filterBtn} ${badgeFilter === 'all' ? styles.active : ''}`}
                             onClick={() => setBadgeFilter('all')}
@@ -222,7 +222,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                                         : 'var(--account-text-muted)',
                                 }}
                             >
-                                <Award size={24} />
+                                <TrophyIcon size={24} aria-hidden="true" />
                             </div>
                             <div className={styles.badgeInfo}>
                                 <h5>{badge.name}</h5>
@@ -235,7 +235,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
                                 <p className={styles.badgeDesc}>{badge.description}</p>
                                 {badge.isEarned && badge.earnedAt && (
                                     <span className={styles.badgeDate}>
-                                        <CheckCircle size={12} />
+                                        <CheckIcon size={12} aria-hidden="true" />
                                         {formatDate(badge.earnedAt)}
                                     </span>
                                 )}
@@ -246,7 +246,7 @@ const VolunteerOrgPanel: React.FC<VolunteerOrgPanelProps> = ({ data }) => {
 
                 {sortedBadges.length === 0 && (
                     <div className={styles.emptyState}>
-                        <Award size={32} />
+                        <TrophyIcon size={32} aria-hidden="true" />
                         <p>沒有符合條件的徽章</p>
                     </div>
                 )}

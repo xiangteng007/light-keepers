@@ -6,19 +6,20 @@
  */
 
 import React, { useState } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：Target（目標/出勤率，無貼切 B3c 語意）
+import { Target } from 'lucide-react';
 import {
-    Shield,
-    Edit3,
-    Lock,
-    Download,
-    LogOut,
-    ChevronDown,
-    ChevronUp,
-    Clock,
-    Award,
-    CheckCircle,
-    Target,
-} from 'lucide-react';
+    ShieldIcon,
+    EditIcon,
+    LockIcon,
+    ExportIcon,
+    LogoutIcon,
+    ChevronDownIcon,
+    ChevronUpIcon,
+    ClockIcon,
+    TrophyIcon,
+    CheckIcon,
+} from '../../../../design-system/icons';
 import type { AccountSummaryProps } from '../../account.types';
 import styles from './AccountSummary.module.css';
 
@@ -82,7 +83,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                             <span className={styles.collapseRole}>{data.roleDisplayName}</span>
                         </div>
                     </div>
-                    {isCollapsed ? <ChevronDown size={20} /> : <ChevronUp size={20} />}
+                    {isCollapsed ? <ChevronDownIcon size={20} aria-hidden="true" /> : <ChevronUpIcon size={20} aria-hidden="true" />}
                 </button>
             )}
 
@@ -109,7 +110,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                     <p className={styles.userEmail}>{data.email}</p>
 
                     <div className={styles.roleBadge}>
-                        <Shield size={14} />
+                        <ShieldIcon size={16} aria-hidden="true" />
                         <span>Level {data.roleLevel} • {data.roleDisplayName}</span>
                     </div>
 
@@ -118,7 +119,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                             {status.label}
                         </span>
                         <span className={styles.lastLogin}>
-                            <Clock size={12} />
+                            <ClockIcon size={12} aria-hidden="true" />
                             {formatLastLogin(data.lastLoginAt)}
                         </span>
                     </div>
@@ -131,7 +132,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                 <div className={styles.kpiGrid}>
                     <div className={styles.kpiCard}>
                         <div className={styles.kpiIcon}>
-                            <Award size={18} />
+                            <TrophyIcon size={16} aria-hidden="true" />
                         </div>
                         <div className={styles.kpiValue}>{data.contributionPoints.toLocaleString()}</div>
                         <div className={styles.kpiLabel}>貢獻積分</div>
@@ -139,7 +140,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
 
                     <div className={styles.kpiCard}>
                         <div className={styles.kpiIcon}>
-                            <Clock size={18} />
+                            <ClockIcon size={16} aria-hidden="true" />
                         </div>
                         <div className={styles.kpiValue}>{data.serviceHours}</div>
                         <div className={styles.kpiLabel}>服務時數</div>
@@ -156,7 +157,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                     {data.recentContribution !== undefined && (
                         <div className={styles.kpiCard}>
                             <div className={styles.kpiIcon}>
-                                <CheckCircle size={18} />
+                                <CheckIcon size={16} aria-hidden="true" />
                             </div>
                             <div className={styles.kpiValue}>+{data.recentContribution}</div>
                             <div className={styles.kpiLabel}>近30天</div>
@@ -170,12 +171,12 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                 {/* Quick Actions */}
                 <div className={styles.quickActions}>
                     <button className={styles.actionBtn} onClick={onEditProfile}>
-                        <Edit3 size={16} />
+                        <EditIcon size={16} aria-hidden="true" />
                         <span>編輯資料</span>
                     </button>
 
                     <button className={styles.actionBtn} onClick={onSecuritySettings}>
-                        <Lock size={16} />
+                        <LockIcon size={16} aria-hidden="true" />
                         <span>安全設定</span>
                     </button>
 
@@ -194,7 +195,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                         }}
                         title="資料匯出功能開發中 - 點擊查看詳情"
                     >
-                        <Download size={16} />
+                        <ExportIcon size={16} aria-hidden="true" />
                         <span>匯出個資</span>
                     </button>
 
@@ -202,7 +203,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                         className={`${styles.actionBtn} ${styles.actionDanger}`}
                         onClick={onLogout}
                     >
-                        <LogOut size={16} />
+                        <LogoutIcon size={16} aria-hidden="true" />
                         <span>登出帳戶</span>
                     </button>
                 </div>

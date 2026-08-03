@@ -21,19 +21,18 @@
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+// 保留 lucide（R5/T6 誠實清單）：Target（目標策略）、Save（儲存）、
+// Printer（列印）、Share2（分享）
+import { Target, Save, Printer, Share2 } from 'lucide-react';
 import {
-    FileText,
-    MapPin,
-    Calendar,
-    Clock,
-    Users,
-    Target,
-    AlertTriangle,
-    Save,
-    Printer,
-    Share2,
-    ChevronLeft,
-} from 'lucide-react';
+    FilesIcon,
+    LocationIcon,
+    CalendarIcon,
+    ClockIcon,
+    TeamsIcon,
+    WarningIcon,
+    ChevronLeftIcon,
+} from '../../design-system/icons';
 import { Button, InputField } from '../../design-system';
 import { createLogger } from '../../utils/logger';
 import './ICS201BriefingPage.css';
@@ -135,11 +134,11 @@ export default function ICS201BriefingPage() {
             <header className="ics201-header">
                 <div className="ics201-header-left">
                     <Link to="/ics" className="ics201-back">
-                        <ChevronLeft size={20} />
+                        <ChevronLeftIcon size={20} aria-hidden="true" />
                         <span>ICS 儀表板</span>
                     </Link>
                     <div className="ics201-title">
-                        <FileText size={28} />
+                        <FilesIcon size={24} aria-hidden="true" />
                         <div>
                             <h1>ICS 201 - 事件簡報</h1>
                             <p>Incident Briefing</p>
@@ -162,11 +161,11 @@ export default function ICS201BriefingPage() {
             {/* Section Navigation */}
             <nav className="ics201-sections-nav" role="tablist">
                 {[
-                    { id: 1, label: '基本資訊', icon: FileText },
-                    { id: 2, label: '情況摘要', icon: AlertTriangle },
+                    { id: 1, label: '基本資訊', icon: FilesIcon },
+                    { id: 2, label: '情況摘要', icon: WarningIcon },
                     { id: 3, label: '目標策略', icon: Target },
-                    { id: 4, label: '組織架構', icon: Users },
-                    { id: 5, label: '資源摘要', icon: MapPin },
+                    { id: 4, label: '組織架構', icon: TeamsIcon },
+                    { id: 5, label: '資源摘要', icon: LocationIcon },
                 ].map(section => (
                     <button
                         key={section.id}
@@ -217,7 +216,7 @@ export default function ICS201BriefingPage() {
                                     type="datetime-local"
                                     value={briefing.dateTimePrepared}
                                     onChange={e => updateField('dateTimePrepared', e.target.value)}
-                                    prefix={<Calendar size={14} />}
+                                    prefix={<CalendarIcon size={16} aria-hidden="true" />}
                                     fullWidth
                                 />
                             </div>
@@ -242,7 +241,7 @@ export default function ICS201BriefingPage() {
                         <h2>2. 情況摘要</h2>
                         <div className="ics201-field full-width">
                             <label htmlFor="situationSummary" className="ics201-label">
-                                <AlertTriangle size={14} />
+                                <WarningIcon size={16} aria-hidden="true" />
                                 當前情況描述
                             </label>
                             <textarea
@@ -257,7 +256,7 @@ export default function ICS201BriefingPage() {
                         <div className="ics201-field full-width">
                             <label className="ics201-label">地圖/草圖</label>
                             <div className="ics201-map-placeholder">
-                                <MapPin size={32} />
+                                <LocationIcon size={32} aria-hidden="true" />
                                 <p>點擊上傳地圖或草圖</p>
                             </div>
                         </div>
@@ -442,7 +441,7 @@ export default function ICS201BriefingPage() {
             {/* Footer */}
             <footer className="ics201-footer">
                 <div className="ics201-footer-left">
-                    <Clock size={14} />
+                    <ClockIcon size={16} aria-hidden="true" />
                     <span>自動儲存於 {new Date().toLocaleTimeString('zh-TW')}</span>
                 </div>
                 <div className="ics201-footer-right">

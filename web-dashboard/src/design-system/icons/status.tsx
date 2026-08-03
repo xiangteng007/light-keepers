@@ -73,3 +73,21 @@ export const OfflineIcon = createIcon(
         <path d="M3 3l18 18" />
     </>,
 );
+
+/** trend-up 上升趨勢 — 45° 攀升折線＋出向角括（R5/T6 chrome 批） */
+export const TrendUpIcon = createIcon(
+    'TrendUpIcon',
+    <>
+        <path d="M3 17l6-6 4 4 8-8" />
+        <path d="M15 7h6v6" />
+    </>,
+);
+
+/** trend-down 下降趨勢 — trend-up 垂直鏡像（R5/T6 chrome 批） */
+export const TrendDownIcon = createIcon(
+    'TrendDownIcon',
+    <>
+        <path d="M3 7l6 6 4-4 8 8" />
+        <path d="M15 17h6v-6" />
+    </>,
+);

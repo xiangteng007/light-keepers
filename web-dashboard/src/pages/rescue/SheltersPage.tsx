@@ -18,17 +18,18 @@
  * 載入用 skeleton row（§7.1）。
  */
 import { useState, useEffect, useCallback } from 'react';
+// 保留 lucide（R5/T6 誠實清單）：Bed（床位，無 B3c 對應）
+import { Bed } from 'lucide-react';
 import {
-    Building,
-    Users,
-    Bed,
-    AlertTriangle,
-    MapPin,
-    Plus,
-    Search,
-    Filter,
-    RefreshCw,
-} from 'lucide-react';
+    ShelterIcon,
+    TeamsIcon,
+    WarningIcon,
+    LocationIcon,
+    PlusIcon,
+    SearchIcon,
+    FilterIcon,
+    SyncIcon,
+} from '../../design-system/icons';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
 import { Alert, Badge, Button } from '../../design-system';
@@ -114,7 +115,7 @@ export default function SheltersPage() {
             {/* page-header：h1 ＋ 主要動作（DESIGN_LANGUAGE §7.1） */}
             <header className="shelters-page__header">
                 <h1 className="shelters-page__title">
-                    <Building size={24} aria-hidden="true" />
+                    <ShelterIcon size={24} aria-hidden="true" />
                     避難所管理
                 </h1>
                 <div className="shelters-page__actions">
@@ -123,7 +124,7 @@ export default function SheltersPage() {
                         size="md"
                         onClick={fetchShelters}
                         disabled={loading}
-                        icon={<RefreshCw size={18} className={loading ? 'spin' : ''} aria-hidden="true" />}
+                        icon={<SyncIcon size={16} className={loading ? 'spin' : ''} aria-hidden="true" />}
                     >
                         重新整理
                     </Button>
@@ -132,7 +133,7 @@ export default function SheltersPage() {
                         size="md"
                         disabled
                         title="表單建置中"
-                        icon={<Plus size={18} aria-hidden="true" />}
+                        icon={<PlusIcon size={16} aria-hidden="true" />}
                     >
                         新增避難所
                     </Button>
@@ -140,14 +141,14 @@ export default function SheltersPage() {
             </header>
 
             {error && (
-                <Alert variant="danger" icon={<AlertTriangle size={16} aria-hidden="true" />}>{error}</Alert>
+                <Alert variant="danger" icon={<WarningIcon size={16} aria-hidden="true" />}>{error}</Alert>
             )}
 
             {/* 統計摘要列（4 個，§7.1） */}
             <div className="shelters-stats">
                 <div className="shelters-stat-card">
                     <span className="shelters-stat-card__icon" aria-hidden="true">
-                        <Building size={22} />
+                        <ShelterIcon size={20} aria-hidden="true" />
                     </span>
                     <div className="shelters-stat-card__content">
                         <span className="shelters-stat-card__value">{activeShelters}</span>
@@ -156,7 +157,7 @@ export default function SheltersPage() {
                 </div>
                 <div className="shelters-stat-card">
                     <span className="shelters-stat-card__icon" aria-hidden="true">
-                        <Users size={22} />
+                        <TeamsIcon size={20} aria-hidden="true" />
                     </span>
                     <div className="shelters-stat-card__content">
                         <span className="shelters-stat-card__value">{totalOccupancy}</span>
@@ -165,7 +166,7 @@ export default function SheltersPage() {
                 </div>
                 <div className="shelters-stat-card">
                     <span className="shelters-stat-card__icon" aria-hidden="true">
-                        <Bed size={22} />
+                        <Bed size={20} />
                     </span>
                     <div className="shelters-stat-card__content">
                         <span className="shelters-stat-card__value">{totalCapacity - totalOccupancy}</span>
@@ -174,7 +175,7 @@ export default function SheltersPage() {
                 </div>
                 <div className="shelters-stat-card shelters-stat-card--warning">
                     <span className="shelters-stat-card__icon" aria-hidden="true">
-                        <AlertTriangle size={22} />
+                        <WarningIcon size={20} aria-hidden="true" />
                     </span>
                     <div className="shelters-stat-card__content">
                         <span className="shelters-stat-card__value">
@@ -188,7 +189,7 @@ export default function SheltersPage() {
             {/* panel: toolbar（搜尋＋篩選，§7.1） */}
             <div className="panel shelters-toolbar">
                 <div className="shelters-search">
-                    <Search size={18} aria-hidden="true" />
+                    <SearchIcon size={20} aria-hidden="true" />
                     <input
                         type="text"
                         placeholder="搜尋避難所..."
@@ -198,7 +199,7 @@ export default function SheltersPage() {
                     />
                 </div>
                 <div className="shelters-filter">
-                    <Filter size={18} aria-hidden="true" />
+                    <FilterIcon size={20} aria-hidden="true" />
                     <select
                         value={statusFilter}
                         onChange={e => setStatusFilter(e.target.value)}
@@ -241,7 +242,7 @@ export default function SheltersPage() {
 
                                 <div className="shelter-card__body">
                                     <div className="shelter-card__address">
-                                        <MapPin size={14} aria-hidden="true" />
+                                        <LocationIcon size={16} aria-hidden="true" />
                                         <span>{shelter.address}</span>
                                     </div>
 

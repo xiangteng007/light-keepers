@@ -6,7 +6,9 @@
  */
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Globe, Check, ChevronDown } from 'lucide-react';
+// Globe（語言/國際化）無貼切 B3c 語意 icon，誠實保留 lucide（R5/T6）
+import { Globe } from 'lucide-react';
+import { CheckIcon, ChevronDownIcon } from '../../design-system/icons';
 import { LANGUAGES, changeLanguage } from '../../i18n';
 import './LanguageSwitcher.css';
 
@@ -32,7 +34,7 @@ export default function LanguageSwitcher() {
                 <Globe size={16} />
                 <span className="lang-flag">{currentLang.flag}</span>
                 <span className="lang-name">{currentLang.name}</span>
-                <ChevronDown size={14} className={`lang-chevron ${isOpen ? 'open' : ''}`} />
+                <ChevronDownIcon size={16} aria-hidden="true" className={`lang-chevron ${isOpen ? 'open' : ''}`} />
             </button>
 
             {isOpen && (
@@ -45,7 +47,7 @@ export default function LanguageSwitcher() {
                         >
                             <span className="lang-flag">{lang.flag}</span>
                             <span className="lang-name">{lang.name}</span>
-                            {lang.code === i18n.language && <Check size={14} />}
+                            {lang.code === i18n.language && <CheckIcon size={16} aria-hidden="true" />}
                         </button>
                     ))}
                 </div>

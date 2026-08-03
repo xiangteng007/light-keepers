@@ -18,15 +18,10 @@
  */
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import {
-    Radio,
-    Save,
-    Printer,
-    Share2,
-    ChevronLeft,
-    Plus,
-    Trash2,
-} from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Save（儲存）、Printer（列印）、
+// Share2（分享）、Trash2（刪除）
+import { Save, Printer, Share2, Trash2 } from 'lucide-react';
+import { RadioIcon, ChevronLeftIcon, PlusIcon } from '../../design-system/icons';
 import { Button, InputField } from '../../design-system';
 import { createLogger } from '../../utils/logger';
 import './ICS205CommsPage.css';
@@ -155,11 +150,11 @@ export default function ICS205CommsPage() {
             <header className="ics205-header">
                 <div className="ics205-header-left">
                     <Link to="/ics" className="ics205-back">
-                        <ChevronLeft size={20} />
+                        <ChevronLeftIcon size={20} aria-hidden="true" />
                         <span>ICS 儀表板</span>
                     </Link>
                     <div className="ics205-title">
-                        <Radio size={28} className="ics205-title-icon" />
+                        <RadioIcon size={24} className="ics205-title-icon" aria-hidden="true" />
                         <div>
                             <h1>ICS 205 - 通訊計畫</h1>
                             <p>Incident Radio Communications Plan</p>
@@ -246,7 +241,7 @@ export default function ICS205CommsPage() {
                 <section className="ics205-section">
                     <div className="ics205-section-header">
                         <h2>3. 無線電頻率分配</h2>
-                        <Button variant="secondary" size="sm" icon={<Plus size={16} />} onClick={addChannel}>
+                        <Button variant="secondary" size="sm" icon={<PlusIcon size={16} aria-hidden="true" />} onClick={addChannel}>
                             新增頻道
                         </Button>
                     </div>

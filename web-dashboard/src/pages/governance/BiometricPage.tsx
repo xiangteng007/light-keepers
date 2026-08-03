@@ -7,7 +7,10 @@
  * 待 Phase 4/5 排入後端 WebAuthn API 後再接上。
  */
 import { useState } from 'react';
-import { Fingerprint, KeyRound, ShieldCheck, Apple, MonitorSmartphone, Smartphone, Trash2 } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：平台三件組 Apple/MonitorSmartphone/Smartphone
+// （品牌/裝置平台，無 B3c 對應）、KeyRound（Passkey 金鑰）、Trash2（刪除）
+import { KeyRound, Apple, MonitorSmartphone, Smartphone, Trash2 } from 'lucide-react';
+import { FingerprintIcon, ShieldIcon } from '../../design-system/icons';
 import { Alert, Button, Card, Tag } from '../../design-system';
 import EmptyState from '../../components/shared/EmptyState';
 import './BiometricPage.css';
@@ -61,7 +64,7 @@ export default function BiometricPage() {
         <div className="biometric-page">
             <div className="page-header">
                 <div className="page-header__text">
-                    <h1><Fingerprint size={24} aria-hidden="true" /> 生物辨識</h1>
+                    <h1><FingerprintIcon size={24} aria-hidden="true" /> 生物辨識</h1>
                     <p>管理 FIDO2/WebAuthn 安全金鑰與生物辨識登入</p>
                 </div>
                 <Button
@@ -69,7 +72,7 @@ export default function BiometricPage() {
                     onClick={handleRegister}
                     disabled={isRegistering}
                     loading={isRegistering}
-                    icon={isRegistering ? undefined : <Fingerprint size={16} aria-hidden="true" />}
+                    icon={isRegistering ? undefined : <FingerprintIcon size={16} aria-hidden="true" />}
                 >
                     {isRegistering ? '註冊中...' : '註冊新裝置'}
                 </Button>
@@ -79,7 +82,7 @@ export default function BiometricPage() {
                 此頁目前顯示示範資料，功能建置中。後端尚未提供 WebAuthn/生物辨識 API。
             </Alert>
 
-            <Card icon={<ShieldCheck size={28} aria-hidden="true" />} title="更安全的登入方式">
+            <Card icon={<ShieldIcon size={24} aria-hidden="true" />} title="更安全的登入方式">
                 使用生物辨識或安全金鑰取代密碼，防止網路釣魚和帳號盜用。
             </Card>
 
@@ -99,8 +102,8 @@ export default function BiometricPage() {
                             <div key={cred.id} className="credential-card">
                                 <div className="credential-icon">
                                     {cred.deviceType === 'platform'
-                                        ? <Fingerprint size={22} aria-hidden="true" />
-                                        : <KeyRound size={22} aria-hidden="true" />}
+                                        ? <FingerprintIcon size={20} aria-hidden="true" />
+                                        : <KeyRound size={20} aria-hidden="true" />}
                                 </div>
                                 <div className="credential-info">
                                     <h4>{cred.deviceName}</h4>

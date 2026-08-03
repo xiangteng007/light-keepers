@@ -10,18 +10,23 @@ import {
     type VolunteerLeaderboardEntry,
     type VolunteerRecognition,
 } from '../api/services';
+/* Award(獎章)/Star(星)/Medal(獎牌)/Crown(冠冕) 無 B3c 對應，誠實保留（見 notes）；
+   EmptyState 的 icon prop 型別鎖 LucideIcon（Trophy 於該處暫留） */
 import {
     Trophy,
     Award,
     Star,
     Medal,
     Crown,
-    TrendingUp,
-    Clock,
-    Calendar,
-    Users,
-    ChevronRight,
 } from 'lucide-react';
+import {
+    TrophyIcon,
+    ClockIcon,
+    CalendarIcon,
+    TeamsIcon,
+    ChevronRightIcon,
+    TrendUpIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './LeaderboardPage.css';
@@ -113,7 +118,7 @@ export default function LeaderboardPage() {
             {/* 頁面標題 */}
             <header className="leaderboard-header">
                 <div className="leaderboard-header__title">
-                    <h1><Trophy size={24} aria-hidden="true" /> 志工表揚</h1>
+                    <h1><TrophyIcon size={24} aria-hidden="true" /> 志工表揚</h1>
                     <p>服務時數排行榜與表揚紀錄</p>
                 </div>
             </header>
@@ -128,7 +133,7 @@ export default function LeaderboardPage() {
                         <span className="label">我的排名</span>
                         <span className="rank tabular-nums">第 {myRank} 名</span>
                     </div>
-                    <ChevronRight size={20} aria-hidden="true" />
+                    <ChevronRightIcon size={20} aria-hidden="true" />
                 </div>
             )}
 
@@ -141,7 +146,7 @@ export default function LeaderboardPage() {
                     className={`tab-btn ${activeTab === 'leaderboard' ? 'active' : ''}`}
                     onClick={() => setActiveTab('leaderboard')}
                 >
-                    <Trophy size={16} aria-hidden="true" />
+                    <TrophyIcon size={16} aria-hidden="true" />
                     排行榜
                 </button>
                 <button
@@ -160,7 +165,7 @@ export default function LeaderboardPage() {
                 <>
                     {/* 時間篩選 */}
                     <div className="time-filter" role="group" aria-label="時間區間篩選">
-                        <Clock size={16} aria-hidden="true" />
+                        <ClockIcon size={16} aria-hidden="true" />
                         {TIME_PERIODS.map(period => (
                             <button
                                 key={period.value}
@@ -229,11 +234,11 @@ export default function LeaderboardPage() {
                                     <div className="leaderboard-item__info">
                                         <span className="name">{entry.volunteerName}</span>
                                         <span className="meta">
-                                            <Users size={12} aria-hidden="true" /> <span className="tabular-nums">{entry.eventCount}</span> 場活動
+                                            <TeamsIcon size={12} aria-hidden="true" /> <span className="tabular-nums">{entry.eventCount}</span> 場活動
                                         </span>
                                     </div>
                                     <div className="leaderboard-item__hours tabular-nums">
-                                        <TrendingUp size={14} aria-hidden="true" />
+                                        <TrendUpIcon size={14} aria-hidden="true" />
                                         {formatHours(entry.totalHours)} 小時
                                     </div>
                                 </div>
@@ -260,7 +265,7 @@ export default function LeaderboardPage() {
                                     <p className="recognition-card__title">{rec.title}</p>
                                     <p className="recognition-card__reason">{rec.reason}</p>
                                     <div className="recognition-card__meta">
-                                        <span><Calendar size={12} aria-hidden="true" /> {formatDate(rec.awardedAt)}</span>
+                                        <span><CalendarIcon size={12} aria-hidden="true" /> {formatDate(rec.awardedAt)}</span>
                                         {rec.awardedBy && <span>頒發人：{rec.awardedBy}</span>}
                                     </div>
                                 </div>

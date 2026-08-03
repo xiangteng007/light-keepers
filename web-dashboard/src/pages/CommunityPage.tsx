@@ -18,15 +18,11 @@ import {
     type PostComment,
     type PostCategory,
 } from '../api/services';
+/* MessageSquare(留言)/Send(送出)/Pin(置頂) 無 B3c 對應，誠實保留（見 notes） */
 import {
     MessageSquare,
-    Heart,
-    Eye,
     Send,
-    Plus,
     Pin,
-    TrendingUp,
-    Users,
 } from 'lucide-react';
 import { Badge, Button, Card, InputField, Modal, StatIndicator } from '../design-system';
 import {
@@ -36,6 +32,11 @@ import {
     CalendarIcon,
     SirenIcon,
     UserIcon,
+    HeartIcon,
+    PlusIcon,
+    TeamsIcon,
+    TrendUpIcon,
+    EyeIcon,
     type LkIcon,
 } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
@@ -146,7 +147,7 @@ export default function CommunityPage() {
                     <h1>社群牆</h1>
                     <p>與志工夥伴交流、分享經驗</p>
                 </div>
-                <Button variant="primary" icon={<Plus size={18} aria-hidden="true" />} onClick={() => setShowCreateModal(true)}>
+                <Button variant="primary" icon={<PlusIcon size={18} aria-hidden="true" />} onClick={() => setShowCreateModal(true)}>
                     發表貼文
                 </Button>
             </header>
@@ -155,8 +156,8 @@ export default function CommunityPage() {
             {stats && (
                 <div className="community-stats">
                     <StatIndicator icon={<MessageSquare size={20} aria-hidden="true" />} value={stats.totalPosts} label="總貼文" />
-                    <StatIndicator icon={<TrendingUp size={20} aria-hidden="true" />} value={stats.todayPosts} label="今日新增" />
-                    <StatIndicator icon={<Users size={20} aria-hidden="true" />} value={stats.topContributors?.length || 0} label="活躍貢獻者" />
+                    <StatIndicator icon={<TrendUpIcon size={20} aria-hidden="true" />} value={stats.todayPosts} label="今日新增" />
+                    <StatIndicator icon={<TeamsIcon size={20} aria-hidden="true" />} value={stats.topContributors?.length || 0} label="活躍貢獻者" />
                 </div>
             )}
 
@@ -251,7 +252,7 @@ export default function CommunityPage() {
                                     onClick={() => handleLike(post.id)}
                                     aria-label={`按讚，目前 ${post.likeCount} 個讚`}
                                 >
-                                    <Heart size={16} aria-hidden="true" />
+                                    <HeartIcon size={16} aria-hidden="true" />
                                     {post.likeCount}
                                 </button>
                                 <button className="action-btn" aria-label={`留言，共 ${post.commentCount} 則`}>
@@ -259,7 +260,7 @@ export default function CommunityPage() {
                                     {post.commentCount}
                                 </button>
                                 <span className="action-btn view-count" aria-label={`瀏覽 ${post.viewCount} 次`}>
-                                    <Eye size={16} aria-hidden="true" />
+                                    <EyeIcon size={16} aria-hidden="true" />
                                     {post.viewCount}
                                 </span>
                             </div>
@@ -474,13 +475,13 @@ function PostDetailModal({
 
                     <div className="post-detail__stats">
                         <button onClick={() => onLike(post.id)} aria-label={`按讚，目前 ${post.likeCount} 個讚`}>
-                            <Heart size={18} aria-hidden="true" /> {post.likeCount} 讚
+                            <HeartIcon size={18} aria-hidden="true" /> {post.likeCount} 讚
                         </button>
                         <span>
                             <MessageSquare size={18} aria-hidden="true" /> {post.commentCount} 則留言
                         </span>
                         <span>
-                            <Eye size={18} aria-hidden="true" /> {post.viewCount} 次瀏覽
+                            <EyeIcon size={18} aria-hidden="true" /> {post.viewCount} 次瀏覽
                         </span>
                     </div>
                 </div>

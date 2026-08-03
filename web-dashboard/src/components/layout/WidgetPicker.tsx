@@ -4,8 +4,7 @@
  * Modal component for selecting and adding new widgets from available modules
  */
 import React, { useState } from 'react';
-import { X, Plus } from 'lucide-react';
-import { iconRegistry } from '../../design-system/icons';
+import { CloseIcon, PlusIcon, iconRegistry } from '../../design-system/icons';
 import { WidgetModule, AVAILABLE_WIDGET_MODULES } from './widget.types';
 import './WidgetPicker.css';
 
@@ -54,7 +53,7 @@ export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerPr
                 <div className="widget-picker__header">
                     <h2>新增 Widget</h2>
                     <button className="widget-picker__close" onClick={onClose}>
-                        <X size={20} />
+                        <CloseIcon size={20} aria-hidden="true" />
                     </button>
                 </div>
 
@@ -123,7 +122,7 @@ export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerPr
                                     </span>
                                 </div>
                                 <div className="card-add">
-                                    <Plus size={20} />
+                                    <PlusIcon size={20} aria-hidden="true" />
                                 </div>
                             </div>
                             );

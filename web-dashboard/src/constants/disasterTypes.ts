@@ -9,32 +9,17 @@
  *
  * R5/T5c：emoji 欄位已移除——災型圖示一律走 B3c 象形
  * （`design-system/icons/pictograms` 的 `disasterPictogramRegistry`，
- * key 與本檔 ReportType 對齊）；lucide `Icon` 保留給民防分組等舊版 UI。
+ * key 與本檔 ReportType 對齊）。
+ * R5/T6：12 災型的 lucide `Icon` 欄位零呼叫端（全數已被 pictogram 取代），刪除；
+ * `MASS_CASUALTY_META.Icon`（lucide Users）仍有呼叫端（ReportPage 大量傷患勾選列），保留。
  */
 
-import {
-    Biohazard,
-    Bomb,
-    Building2,
-    Car,
-    CircleHelp,
-    CloudRainWind,
-    Flame,
-    Mountain,
-    ShieldAlert,
-    Siren,
-    Users,
-    Waves,
-    Wind,
-    type LucideIcon,
-} from 'lucide-react';
+import { Users } from 'lucide-react';
 import type { ReportType } from '../api/services/reports';
 
 export interface DisasterTypeMeta {
     /** 中文標籤 */
     label: string;
-    /** lucide 圖標，新版 UI 與民防分組使用 */
-    Icon: LucideIcon;
     /**
      * 類別色。既有 8 類為擴充前的原始 hex（bespoke categorical palette，
      * 無 1:1 semantic token 對應）；民防四類取 design token 的
@@ -68,62 +53,54 @@ export const CIVIL_DEFENSE_DISASTER_TYPES = [
 /**
  * 災型中繼資料。
  * `Record<ReportType, …>` 是刻意的：union 加值時 TypeScript 會在這裡報錯，
- * 逼迫新增者補齊標籤與圖標。
+ * 逼迫新增者補齊標籤與說明（象形圖示補在 pictograms/DisasterPictograms.tsx）。
  */
 export const DISASTER_TYPE_META: Record<ReportType, DisasterTypeMeta> = {
     // ---- 既有 8 類：label / color 為擴充前原值，不得更動 ----
     earthquake: {
         label: '地震',
-        Icon: Waves,
         color: '#795548',
         description: '地震造成的損害',
         civilDefense: false,
     },
     flood: {
         label: '淹水',
-        Icon: CloudRainWind,
         color: '#2196F3',
         description: '淹水、積水情況',
         civilDefense: false,
     },
     fire: {
         label: '火災',
-        Icon: Flame,
         color: '#FF5722',
         description: '火災、濃煙、瓦斯氣爆',
         civilDefense: false,
     },
     typhoon: {
         label: '颱風',
-        Icon: Wind,
         color: '#00BCD4',
         description: '颱風、強風災害',
         civilDefense: false,
     },
     landslide: {
         label: '土石流',
-        Icon: Mountain,
         color: '#795548',
         description: '山崩、土石滑動',
         civilDefense: false,
     },
     traffic: {
         label: '交通事故',
-        Icon: Car,
         color: '#FF9800',
         description: '車禍、道路阻塞',
         civilDefense: false,
     },
     infrastructure: {
         label: '設施損壞',
-        Icon: Building2,
         color: '#F44336',
         description: '建築、設施損毀',
         civilDefense: false,
     },
     other: {
         label: '其他',
-        Icon: CircleHelp,
         color: '#607D8B',
         description: '其他緊急狀況',
         civilDefense: false,
@@ -132,28 +109,24 @@ export const DISASTER_TYPE_META: Record<ReportType, DisasterTypeMeta> = {
     // ---- D16 民防類別（CD-1）----
     air_raid: {
         label: '空襲／砲擊',
-        Icon: Siren,
         color: '#B71C1C',
         description: '空襲、砲擊、飛彈、防空警報',
         civilDefense: true,
     },
     explosion: {
         label: '爆炸／爆裂物',
-        Icon: Bomb,
         color: '#E64A19',
         description: '爆裂物、可疑包裹、不明爆炸',
         civilDefense: true,
     },
     terror_attack: {
         label: '恐怖攻擊',
-        Icon: ShieldAlert,
         color: '#880E4F',
         description: '槍擊、持刀攻擊、挾持人質',
         civilDefense: true,
     },
     cbrn: {
         label: '化生放核',
-        Icon: Biohazard,
         color: '#6A1B9A',
         description: '化學／生物／放射／核事件',
         civilDefense: true,

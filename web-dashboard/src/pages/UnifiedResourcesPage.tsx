@@ -9,7 +9,15 @@
  * 修復本頁先前完全依賴已移除的 Tailwind class（無實際樣式效果）的問題。
  */
 import { useState, useEffect, useCallback } from 'react';
-import { Package, Users, ArrowRightLeft, RefreshCw, Clock, TrendingUp, Trophy } from 'lucide-react';
+import {
+    InventoryIcon,
+    TeamsIcon,
+    MergeIcon,
+    SyncIcon,
+    ClockIcon,
+    TrophyIcon,
+    TrendUpIcon,
+} from '../design-system/icons';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 import { Card, Badge, Button, Alert } from '../design-system';
@@ -96,7 +104,7 @@ export default function UnifiedResourcesPage() {
                 <Button
                     variant="secondary"
                     size="lg"
-                    icon={<RefreshCw size={18} aria-hidden="true" />}
+                    icon={<SyncIcon size={18} aria-hidden="true" />}
                     onClick={fetchData}
                     disabled={loading}
                 >
@@ -126,7 +134,7 @@ export default function UnifiedResourcesPage() {
                     <section className="ures-stats" aria-label="資源匹配統計摘要">
                         <Card className="ures-stat-card" padding="md">
                             <div className="ures-stat-card__head">
-                                <Package size={18} aria-hidden="true" />
+                                <InventoryIcon size={18} aria-hidden="true" />
                                 <span>捐贈總數</span>
                             </div>
                             <p className="ures-stat-card__value">{stats?.totalDonations ?? 0}</p>
@@ -135,7 +143,7 @@ export default function UnifiedResourcesPage() {
 
                         <Card className="ures-stat-card" padding="md">
                             <div className="ures-stat-card__head">
-                                <Users size={18} aria-hidden="true" />
+                                <TeamsIcon size={18} aria-hidden="true" />
                                 <span>需求總數</span>
                             </div>
                             <p className="ures-stat-card__value">{stats?.totalNeeds ?? 0}</p>
@@ -147,7 +155,7 @@ export default function UnifiedResourcesPage() {
 
                         <Card className="ures-stat-card" padding="md">
                             <div className="ures-stat-card__head">
-                                <ArrowRightLeft size={18} aria-hidden="true" />
+                                <MergeIcon size={18} aria-hidden="true" />
                                 <span>匹配總數</span>
                             </div>
                             <p className="ures-stat-card__value">{stats?.totalMatches ?? 0}</p>
@@ -159,7 +167,7 @@ export default function UnifiedResourcesPage() {
 
                         <Card className="ures-stat-card" padding="md">
                             <div className="ures-stat-card__head">
-                                <Clock size={18} aria-hidden="true" />
+                                <ClockIcon size={18} aria-hidden="true" />
                                 <span>平均配對時間</span>
                             </div>
                             <p className="ures-stat-card__value">
@@ -173,7 +181,7 @@ export default function UnifiedResourcesPage() {
                     {stats?.topItemTypes && stats.topItemTypes.length > 0 && (
                         <section className="ures-panel">
                             <h2 className="ures-panel__title">
-                                <TrendingUp size={18} aria-hidden="true" />
+                                <TrendUpIcon size={18} aria-hidden="true" />
                                 熱門物資類型
                             </h2>
                             <div className="ures-tag-list">
@@ -190,7 +198,7 @@ export default function UnifiedResourcesPage() {
                     {/* 捐贈者排行榜 */}
                     <section className="ures-panel">
                         <h2 className="ures-panel__title">
-                            <Trophy size={18} aria-hidden="true" />
+                            <TrophyIcon size={18} aria-hidden="true" />
                             捐贈者排行榜
                         </h2>
                         {leaderboard.length === 0 ? (

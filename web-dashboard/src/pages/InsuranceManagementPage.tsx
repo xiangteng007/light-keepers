@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
+/* EmptyState 的 icon prop 型別鎖 LucideIcon，ShieldCheck 暫留該處 */
 import { ShieldCheck } from 'lucide-react';
+import { ShieldIcon } from '../design-system/icons';
 import { useAuth } from '../context/AuthContext';
 import { insuranceApi } from '../api/vms';
 import type { VolunteerInsurance, InsuranceType } from '../api/vms';
@@ -200,7 +202,7 @@ export default function InsuranceManagementPage() {
             {/* 保障狀態摘要 */}
             <Card padding="md" className="coverage-summary">
                 <div className="summary-content">
-                    <ShieldCheck size={28} aria-hidden="true" className="summary-icon" />
+                    <ShieldIcon size={28} aria-hidden="true" className="summary-icon" />
                     <div className="summary-text">
                         <strong>保障狀態：</strong>
                         {insurances.some(ins => getInsuranceStatus(ins).status === 'active') ? (

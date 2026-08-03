@@ -1,6 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { Users, X, ChevronDown, ChevronRight, Check, Plus, Minus } from 'lucide-react';
+import {
+    TeamsIcon,
+    CloseIcon,
+    ChevronDownIcon,
+    ChevronRightIcon,
+    CheckIcon,
+    PlusIcon,
+    MinusIcon,
+} from '../design-system/icons';
 import { Card, Button, Badge, Modal } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { getAccounts } from '../api/services';
@@ -358,7 +366,7 @@ export default function VolunteerSchedulePage() {
                             aria-label="減少班別"
                             title="減少班別"
                         >
-                            <Minus size={16} aria-hidden="true" />
+                            <MinusIcon size={16} aria-hidden="true" />
                         </button>
                         <span className="shift-count tabular-nums">{shifts.length} 班</span>
                         <button
@@ -369,7 +377,7 @@ export default function VolunteerSchedulePage() {
                             aria-label="增加班別"
                             title="增加班別"
                         >
-                            <Plus size={16} aria-hidden="true" />
+                            <PlusIcon size={16} aria-hidden="true" />
                         </button>
                     </div>
                 </div>
@@ -443,7 +451,7 @@ export default function VolunteerSchedulePage() {
                                             onClick={() => setEditingTime(null)}
                                             aria-label="完成編輯時間"
                                         >
-                                            <Check size={12} aria-hidden="true" />
+                                            <CheckIcon size={12} aria-hidden="true" />
                                         </button>
                                     </div>
                                 ) : (
@@ -494,7 +502,7 @@ export default function VolunteerSchedulePage() {
                                                         removeVolunteerFromSlot(date, shift.id, slot!.volunteers[0].id);
                                                     }}
                                                 >
-                                                    <X size={12} aria-hidden="true" />
+                                                    <CloseIcon size={12} aria-hidden="true" />
                                                 </button>
                                             </div>
                                         ) : (
@@ -505,12 +513,12 @@ export default function VolunteerSchedulePage() {
                                                     onClick={() => toggleExpand(slotKey)}
                                                     aria-expanded={isExpanded}
                                                 >
-                                                    <Users size={14} aria-hidden="true" />
+                                                    <TeamsIcon size={16} aria-hidden="true" />
                                                     <span className="slot-multi__count tabular-nums">
                                                         {volunteerCount} 人
                                                     </span>
                                                     <span className="slot-multi__toggle" aria-hidden="true">
-                                                        {isExpanded ? <ChevronDown size={12} /> : <ChevronRight size={12} />}
+                                                        {isExpanded ? <ChevronDownIcon size={12} aria-hidden="true" /> : <ChevronRightIcon size={12} aria-hidden="true" />}
                                                     </span>
                                                 </button>
                                                 {isExpanded && (
@@ -527,7 +535,7 @@ export default function VolunteerSchedulePage() {
                                                                         removeVolunteerFromSlot(date, shift.id, v.id);
                                                                     }}
                                                                 >
-                                                                    <X size={12} aria-hidden="true" />
+                                                                    <CloseIcon size={12} aria-hidden="true" />
                                                                 </button>
                                                             </div>
                                                         ))}
@@ -580,7 +588,7 @@ export default function VolunteerSchedulePage() {
                                     onClick={() => assignVolunteer(volunteer)}
                                 >
                                     <span className="volunteer-avatar" aria-hidden="true">
-                                        <Users size={18} />
+                                        <TeamsIcon size={16} aria-hidden="true" />
                                     </span>
                                     <div className="volunteer-info">
                                         <span className="name">{volunteer.name}</span>

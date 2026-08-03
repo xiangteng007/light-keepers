@@ -1,5 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Radio, Satellite, Wifi, Send, Plus, Users } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Satellite（衛星連結）、Send（傳送）
+import { Satellite, Send } from 'lucide-react';
+import {
+    RadioIcon,
+    OnlineIcon,
+    PlusIcon,
+    TeamsIcon,
+    type LkIcon,
+} from '../../../design-system/icons';
 import { Button, Badge, StatIndicator } from '../../../design-system';
 import EmptyState from '../../../components/shared/EmptyState';
 import { Skeleton } from '../../../components/ui/Skeleton/Skeleton';
@@ -23,10 +31,10 @@ interface Message {
     priority: 'normal' | 'urgent';
 }
 
-const TYPE_ICON: Record<Channel['type'], typeof Radio> = {
-    radio: Radio,
+const TYPE_ICON: Record<Channel['type'], typeof Satellite | LkIcon> = {
+    radio: RadioIcon,
     satellite: Satellite,
-    mesh: Wifi,
+    mesh: OnlineIcon,
 };
 
 const TYPE_LABEL: Record<Channel['type'], string> = {
@@ -90,7 +98,7 @@ export default function CommunicationsPage() {
                     <h1>通訊中心</h1>
                     <p className="comms-page__subtitle">多頻道通訊管理</p>
                 </div>
-                <Button icon={<Plus size={18} aria-hidden="true" />}>新增頻道</Button>
+                <Button icon={<PlusIcon size={16} aria-hidden="true" />}>新增頻道</Button>
             </header>
 
             <div className="comms-page__stats" role="list">
@@ -110,7 +118,7 @@ export default function CommunicationsPage() {
                     value={loading ? '—' : channels.filter((c) => c.status === 'offline').length}
                 />
                 <StatIndicator
-                    icon={<Users size={18} aria-hidden="true" />}
+                    icon={<TeamsIcon size={20} aria-hidden="true" />}
                     label="總人數"
                     value={loading ? '—' : channels.reduce((sum, c) => sum + c.members, 0)}
                 />

@@ -5,13 +5,16 @@
  * Uses consistent styling with the tactical UI theme
  */
 import React from 'react';
+// Construction（施工中）無貼切 B3c 語意 icon，誠實保留 lucide（R5/T6）
 import { LucideIcon, Construction } from 'lucide-react';
+import type { LkIcon } from '../design-system/icons';
 import './PageTemplate.css';
 
 interface PageTemplateProps {
     title: string;
     subtitle?: string;
-    icon?: LucideIcon;
+    /** 可傳 B3c LkIcon 或（過渡期）lucide icon */
+    icon?: LucideIcon | LkIcon;
     domain?: string;
     children?: React.ReactNode;
 }

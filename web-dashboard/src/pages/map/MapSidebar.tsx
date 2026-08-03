@@ -10,7 +10,9 @@
  */
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ClipboardList, Compass, ExternalLink, MapPin, X } from 'lucide-react';
+// 保留 lucide（R5/T6 誠實清單）：Compass（導航/羅盤）、ExternalLink（外開來源）
+import { Compass, ExternalLink } from 'lucide-react';
+import { TasksIcon, LocationIcon, CloseIcon } from '../../design-system/icons';
 import { ReportIcon, WarningIcon, DocEmptyIcon } from '../../design-system/icons';
 import { Badge, Button, Card } from '../../design-system';
 import type { Event, NcdrAlert } from '../../api';
@@ -164,7 +166,7 @@ export default function MapSidebar({
                                             {event.category || '其他'}
                                         </Badge>
                                         {event.latitude && event.longitude && (
-                                            <MapPin size={14} aria-label="有座標" className="map-event-item__location" />
+                                            <LocationIcon size={12} aria-label="有座標" className="map-event-item__location" />
                                         )}
                                     </div>
                                     <div className="map-event-item__title">{event.title}</div>
@@ -235,7 +237,7 @@ export default function MapSidebar({
                                                 {alert.alertTypeName}
                                             </Badge>
                                             {alert.latitude && alert.longitude && (
-                                                <MapPin size={14} aria-label="有座標" className="map-event-item__location" />
+                                                <LocationIcon size={12} aria-label="有座標" className="map-event-item__location" />
                                             )}
                                         </div>
                                         <div className="map-event-item__title">{alert.title}</div>
@@ -273,7 +275,7 @@ function ActionCard({
                 aria-label="關閉詳情"
                 onClick={onClear}
             >
-                <X size={16} aria-hidden="true" />
+                <CloseIcon size={16} aria-hidden="true" />
             </button>
             <ActionCardBody selection={selection} onCreateTask={onCreateTask} />
         </div>
@@ -345,7 +347,7 @@ function ActionCardBody({
                         )}
                         {/* 派遣捷徑：帶到任務頁建立派遣 */}
                         <Button variant="secondary" size="sm" onClick={onCreateTask}>
-                            <ClipboardList size={16} aria-hidden="true" /> 建立任務
+                            <TasksIcon size={16} aria-hidden="true" /> 建立任務
                         </Button>
                     </div>
                 </>

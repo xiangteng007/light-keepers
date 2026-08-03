@@ -6,14 +6,6 @@ import { AuthProvider } from '../context/AuthContext';
 import { ThemeProvider } from '../context/ThemeProvider';
 import { PermissionLevel } from '../components/layout/widget.types';
 
-// Mock Lucide icons
-vi.mock('lucide-react', async (importOriginal) => {
-    const mod = await importOriginal<typeof import('lucide-react')>()
-    return {
-        ...mod,
-    }
-})
-
 function renderShell(ui: React.ReactElement) {
     return render(
         <BrowserRouter>
