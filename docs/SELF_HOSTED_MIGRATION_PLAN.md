@@ -719,6 +719,13 @@ S7.1/S7.3 公告與 PWA 動員 ──────→ 綁定切換日前後執行
 | `ReportSchedulePage` 前端 404（呼叫 `/report-schedules`，後端是 `reports/scheduler`） | 上位計畫 Phase 3 發現 | 小修 |
 | C-1／C-3／C-5／C-6 授權殘項、D2 路由圈選、D11 i18n | P0 補強／既有決策 | 與搬遷正交，維持原軌，不因搬遷提前或延後 |
 
+#### A3. ✅ 2026-08-03 定案（owner 回覆）
+
+| # | 定案 | 全案影響 |
+|---|---|---|
+| **D20** | **GCP 資料判定不可取回** → 本案自「搬遷」轉為**「重新開站」**路線 | ①S0.3 baseline migration 升為**硬前置**（且因線上 DB 已不存在，**D7/D15 停機窗口約束全部解除**——baseline 隨時可做，這是重大簡化）②S1.3 走全新 `migration:run`，`migrate-db.sh`/`migrate-gcs-files.sh` 降為不適用③S7.2（Firebase UID 帳號處置）自動消滅——無帳號可遷，**全員重新註冊**④誠實記載：歷史通報/志工/物資資料歸零，協會如有離線備份（Excel/紙本）另議匯入工作項 |
+| **D24** | **網域已於 Vercel 註冊** | 計畫的 Cloudflare 依賴（Tunnel Public Hostname／邊緣快取／Pages／Always Online）需要 zone 在 Cloudflare——**註冊商不用動，把 NS 指到 Cloudflare 免費方案即可**（Vercel 支援自訂 nameserver）。owner 動作：Cloudflare 開 zone → 抄兩筆 NS → Vercel 網域設定貼上。D25（撤 Vercel）微調：**帳號保留**（管網域用），只撤 preview 部署 |
+
 #### B. 🔴 方向已定，待 owner 執行（事實查證／採購／註冊，無法由 agent 代勞）
 
 | # | 事項 | 需要 owner 做什麼 | 為何無法代勞 | 影響 |
