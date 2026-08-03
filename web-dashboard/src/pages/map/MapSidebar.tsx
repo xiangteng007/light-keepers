@@ -11,6 +11,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Compass, ExternalLink, MapPin, X } from 'lucide-react';
+import { ReportIcon, WarningIcon, DocEmptyIcon } from '../../design-system/icons';
 import { Badge, Button, Card } from '../../design-system';
 import type { Event, NcdrAlert } from '../../api';
 import { NCDR_CORE_TYPES, NCDR_EXTENDED_TYPES } from '../map-constants';
@@ -95,13 +96,13 @@ export default function MapSidebar({
                         className={`sidebar-tab ${tab === 'events' ? 'sidebar-tab--active' : ''}`}
                         onClick={() => setTab('events')}
                     >
-                        📍 災害回報 <span className="sidebar-tab__count">{filteredEvents.length}</span>
+                        <ReportIcon size={15} aria-hidden style={{ verticalAlign: "-2px", marginRight: 5 }} />災害回報 <span className="sidebar-tab__count">{filteredEvents.length}</span>
                     </button>
                     <button
                         className={`sidebar-tab ${tab === 'ncdr' ? 'sidebar-tab--active' : ''}`}
                         onClick={() => setTab('ncdr')}
                     >
-                        ⚠️ NCDR示警 <span className="sidebar-tab__count">{ncdrAlerts.length}</span>
+                        <WarningIcon size={15} aria-hidden style={{ verticalAlign: "-2px", marginRight: 5 }} />NCDR示警 <span className="sidebar-tab__count">{ncdrAlerts.length}</span>
                     </button>
                 </div>
 
@@ -142,7 +143,7 @@ export default function MapSidebar({
 
                         {!isLoadingEvents && filteredEvents.length === 0 && (
                             <div className="empty-state">
-                                <span>📭</span>
+                                <span><DocEmptyIcon size={30} aria-hidden /></span>
                                 <p>沒有符合條件的事件</p>
                             </div>
                         )}
@@ -214,7 +215,7 @@ export default function MapSidebar({
 
                         {filteredNcdr.length === 0 ? (
                             <div className="empty-state">
-                                <span>📭</span>
+                                <span><DocEmptyIcon size={30} aria-hidden /></span>
                                 <p>沒有符合條件的 NCDR 示警</p>
                             </div>
                         ) : (
