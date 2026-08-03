@@ -183,7 +183,7 @@ const AccountSummary: React.FC<AccountSummaryProps> = ({
                         className={`${styles.actionBtn} ${styles.actionDisabled}`}
                         onClick={() => {
                             window.confirm(
-                                '📦 匯出個資功能\n\n' +
+                                '匯出個資功能\n\n' +
                                 '此功能正在開發中，預計包含：\n' +
                                 '• 匯出個人資料（JSON/CSV）\n' +
                                 '• GDPR 合規資料可攜性\n' +

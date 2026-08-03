@@ -310,7 +310,7 @@ export default function VolunteerDetailPage() {
                                                 const reader = new FileReader();
                                                 reader.onloadend = () => {
                                                     // 預覽並模擬上傳
-                                                    alert(`✅ 照片已選擇: ${file.name}\n\n實際上傳功能需連接後端 API`);
+                                                    alert(`照片已選擇: ${file.name}\n\n實際上傳功能需連接後端 API`);
                                                 };
                                                 reader.readAsDataURL(file);
                                             }
@@ -323,7 +323,7 @@ export default function VolunteerDetailPage() {
                                         type="button"
                                         className="photo-line-btn"
                                         onClick={() => {
-                                            alert(`📱 將從 LINE 帳號引入照片\n\nLINE User ID: ${volunteer.lineUserId}\n\n實際功能需整合 LINE Messaging API`);
+                                            alert(`將從 LINE 帳號引入照片\n\nLINE User ID: ${volunteer.lineUserId}\n\n實際功能需整合 LINE Messaging API`);
                                         }}
                                     >
                                         <MessageCircle size={14} aria-hidden="true" /> 使用 LINE 照片

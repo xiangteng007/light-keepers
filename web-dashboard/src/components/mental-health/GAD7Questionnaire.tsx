@@ -4,6 +4,7 @@
  * Generalized Anxiety Disorder 7-item (GAD-7) scale
  */
 import React, { useState } from 'react';
+import { SosIcon } from '../../design-system/icons';
 import './Questionnaire.css';
 
 interface GAD7QuestionnaireProps {
@@ -83,7 +84,7 @@ export function GAD7Questionnaire({ onComplete }: GAD7QuestionnaireProps) {
 
                 {score >= 10 && (
                     <div className="questionnaire__hotline">
-                        <strong>🆘 需要幫助嗎？</strong>
+                        <strong><SosIcon size={16} aria-hidden="true" /> 需要幫助嗎？</strong>
                         <p>安心專線：<a href="tel:1925">1925</a>（24小時免費）</p>
                     </div>
                 )}

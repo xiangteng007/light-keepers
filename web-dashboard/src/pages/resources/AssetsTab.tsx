@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
+import { ClockIcon, LocationIcon, ExportIcon, SyncIcon } from '../../design-system/icons';
 import { ResourcesTabSkeleton } from './ResourcesSkeleton';
 import './AssetsTab.css';
 import api from '../../api/client';
@@ -27,12 +28,12 @@ interface AssetsTabProps {
     userName: string;
 }
 
-const STATUS_CONFIG: Record<AssetStatus, { label: string; color: string; icon: string }> = {
-    in_stock: { label: '在庫', color: '#4CAF50', icon: '✅' },
-    borrowed: { label: '借出中', color: '#FF9800', icon: '📤' },
-    maintenance: { label: '維修中', color: '#2196F3', icon: '🔧' },
-    disposed: { label: '已報廢', color: '#9E9E9E', icon: '🗑️' },
-    lost: { label: '遺失', color: '#F44336', icon: '⚠️' },
+const STATUS_CONFIG: Record<AssetStatus, { label: string; color: string }> = {
+    in_stock: { label: '在庫', color: '#4CAF50' },
+    borrowed: { label: '借出中', color: '#FF9800' },
+    maintenance: { label: '維修中', color: '#2196F3' },
+    disposed: { label: '已報廢', color: '#9E9E9E' },
+    lost: { label: '遺失', color: '#F44336' },
 };
 
 export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
@@ -163,14 +164,14 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
                                 </div>
                                 <div className="asset-badges">
                                     <Badge variant={asset.status === 'in_stock' ? 'success' : asset.status === 'borrowed' ? 'warning' : 'default'}>
-                                        {statusConfig.icon} {statusConfig.label}
+                                        {statusConfig.label}
                                     </Badge>
-                                    {overdue && <Badge variant="danger">⏰ 逾期</Badge>}
+                                    {overdue && <Badge variant="danger"><ClockIcon size={16} aria-hidden="true" /> 逾期</Badge>}
                                 </div>
                             </div>
 
                             {asset.status === 'in_stock' && asset.location && (
-                                <div className="asset-location">📍 {asset.location.fullPath}</div>
+                                <div className="asset-location"><LocationIcon size={16} aria-hidden="true" /> {asset.location.fullPath}</div>
                             )}
 
                             {asset.status === 'borrowed' && (
@@ -184,10 +185,10 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
                             {canManage && (
                                 <div className="asset-actions">
                                     {asset.status === 'in_stock' && (
-                                        <Button size="sm" onClick={() => openBorrow(asset)}>📤 借出</Button>
+                                        <Button size="sm" onClick={() => openBorrow(asset)}><ExportIcon size={16} aria-hidden="true" /> 借出</Button>
                                     )}
                                     {asset.status === 'borrowed' && (
-                                        <Button size="sm" variant="secondary" onClick={() => openReturn(asset)}>📥 歸還</Button>
+                                        <Button size="sm" variant="secondary" onClick={() => openReturn(asset)}><SyncIcon size={16} aria-hidden="true" /> 歸還</Button>
                                     )}
                                 </div>
                             )}
@@ -201,7 +202,7 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
             {showBorrowModal && selectedAsset && (
                 <div className="modal-overlay" onClick={() => setShowBorrowModal(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3>📤 借出資產</h3>
+                        <h3><ExportIcon size={20} aria-hidden="true" /> 借出資產</h3>
                         <p className="modal-subtitle">{selectedAsset.assetNo} - {selectedAsset.item?.name}</p>
                         <div className="form-group">
                             <label>借用人姓名 *</label>
@@ -237,7 +238,7 @@ export default function AssetsTab({ canManage, userName }: AssetsTabProps) {
             {showReturnModal && selectedAsset && (
                 <div className="modal-overlay" onClick={() => setShowReturnModal(false)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3>📥 歸還資產</h3>
+                        <h3><SyncIcon size={20} aria-hidden="true" /> 歸還資產</h3>
                         <p className="modal-subtitle">{selectedAsset.assetNo} - {selectedAsset.item?.name}</p>
                         <div className="form-group">
                             <label>歸還狀態 *</label>

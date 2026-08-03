@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { InventoryIcon, SettingsIcon, RadioIcon, BuildingIcon, AedIcon } from '../design-system/icons';
+import { LandslidePictogram, FloodPictogram } from '../design-system/icons/pictograms';
 import { ManualButton } from '../components/manual/ManualButton';
 import { ManualCard } from '../components/manual/ManualCard';
 import { ManualTag } from '../components/manual/ManualTag';
@@ -59,7 +61,7 @@ export const ComponentShowcase: React.FC = () => {
                             variant="task-flow"
                             title="出勤前準備"
                             description="裝備檢查、風險評估、任務簡報"
-                            icon="🎒"
+                            icon={<InventoryIcon size={24} aria-hidden="true" />}
                             tags={['裝備', '檢查']}
                             riskLevel="low"
                             onClick={() => alert('卡片點擊！')}
@@ -68,7 +70,7 @@ export const ComponentShowcase: React.FC = () => {
                             variant="task-flow"
                             title="現場執行"
                             description="執行救援、管理現場、持續通報"
-                            icon="🔧"
+                            icon={<SettingsIcon size={24} aria-hidden="true" />}
                             tags={['救援', '執行']}
                             riskLevel="high"
                             onClick={() => alert('卡片點擊！')}
@@ -85,7 +87,7 @@ export const ComponentShowcase: React.FC = () => {
                             variant="manual-list"
                             title="志工出勤基本裝備清單"
                             description="完整的個人裝備準備指南"
-                            icon="🎒"
+                            icon={<InventoryIcon size={24} aria-hidden="true" />}
                             riskLevel="low"
                             onClick={() => alert('卡片點擊！')}
                         />
@@ -93,7 +95,7 @@ export const ComponentShowcase: React.FC = () => {
                             variant="manual-list"
                             title="無線電通聯標準流程"
                             description="基本通訊協定與緊急呼叫"
-                            icon="📻"
+                            icon={<RadioIcon size={24} aria-hidden="true" />}
                             riskLevel="medium"
                             onClick={() => alert('卡片點擊！')}
                         />
@@ -108,21 +110,21 @@ export const ComponentShowcase: React.FC = () => {
                         <ManualCard
                             variant="field-entry"
                             title="都會環境"
-                            icon="🏙️"
+                            icon={<BuildingIcon size={32} aria-hidden="true" />}
                             articleCount={15}
                             onClick={() => alert('卡片點擊！')}
                         />
                         <ManualCard
                             variant="field-entry"
                             title="山域/戶外"
-                            icon="⛰️"
+                            icon={<LandslidePictogram size={32} aria-hidden="true" />}
                             articleCount={12}
                             onClick={() => alert('卡片點擊！')}
                         />
                         <ManualCard
                             variant="field-entry"
                             title="水域"
-                            icon="🌊"
+                            icon={<FloodPictogram size={32} aria-hidden="true" />}
                             articleCount={8}
                             onClick={() => alert('卡片點擊！')}
                         />
@@ -138,7 +140,7 @@ export const ComponentShowcase: React.FC = () => {
                             variant="featured"
                             title="CPR 與 AED 操作指南"
                             description="緊急情況下的心肺復甦術完整流程"
-                            icon="❤️"
+                            icon={<AedIcon size={32} aria-hidden="true" />}
                             onClick={() => alert('卡片點擊！')}
                         />
                     </div>

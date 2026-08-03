@@ -6,6 +6,7 @@
  */
 import { useTranslation } from 'react-i18next';
 import { Users, MapPin } from 'lucide-react';
+import { DotStamp } from '../../../design-system/icons/pictograms';
 
 export const SocialFeedWidget = () => {
     const { t } = useTranslation();
@@ -13,7 +14,9 @@ export const SocialFeedWidget = () => {
         <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px' }}>
                 <div style={{ fontSize: '13px', color: 'var(--accent-gold)', fontWeight: 600 }}>社群情資</div>
-                <span style={{ fontSize: '11px', color: '#22c55e' }}>● Live</span>
+                <span style={{ fontSize: '11px', color: '#22c55e', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <DotStamp size={8} /> Live
+                </span>
             </div>
             {[
                 { platform: 'Facebook', content: '信義區積水嚴重，車輛無法通行...', time: '2m ago', urgency: 'high' },

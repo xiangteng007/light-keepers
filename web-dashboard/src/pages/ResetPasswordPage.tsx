@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { LockIcon, CheckIcon, WarningIcon } from '../design-system/icons';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { resetPassword } from '../api/services';
 import './LoginPage.css';
@@ -61,7 +62,7 @@ export default function ResetPasswordPage() {
             <div className="login-container">
                 <div className="login-header">
                     <div className="login-logo">
-                        <span className="login-logo-icon">🔑</span>
+                        <span className="login-logo-icon" aria-hidden="true"><LockIcon size={32} /></span>
                         <h1>重設密碼</h1>
                         <p className="login-subtitle">請設定您的新密碼</p>
                     </div>
@@ -70,7 +71,7 @@ export default function ResetPasswordPage() {
                 {success ? (
                     <div className="login-form">
                         <div className="login-success" role="status">
-                            ✅ 密碼重設成功！即將跳轉至登入頁面...
+                            <CheckIcon size={16} aria-hidden="true" /> 密碼重設成功！即將跳轉至登入頁面...
                         </div>
                         <Link to="/login" className="login-submit" style={{ display: 'block', textAlign: 'center', textDecoration: 'none' }}>
                             立即登入
@@ -140,7 +141,7 @@ export default function ResetPasswordPage() {
 
                         {error && (
                             <div className="login-error" role="alert">
-                                ⚠️ {error}
+                                <WarningIcon size={16} aria-hidden="true" /> {error}
                             </div>
                         )}
 

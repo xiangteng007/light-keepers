@@ -76,12 +76,12 @@ export default function ApprovalCenterPage() {
         try {
             setActionLoading(true);
             await api.post(`/approvals/${approvalId}/approve`);
-            alert('✅ 覆核通過！');
+            alert('覆核通過！');
             fetchPendingApprovals();
             setShowDetailModal(false);
         } catch (err: unknown) {
             const msg = getApiErrorMessage(err, '未知錯誤');
-            alert(`❌ 覆核失敗：${msg}`);
+            alert(`覆核失敗：${msg}`);
         } finally {
             setActionLoading(false);
         }
@@ -99,14 +99,14 @@ export default function ApprovalCenterPage() {
             await api.post(`/approvals/${selectedApproval.id}/reject`, {
                 rejectReason,
             });
-            alert('✅ 已拒絕覆核');
+            alert('已拒絕覆核');
             fetchPendingApprovals();
             setShowRejectModal(false);
             setShowDetailModal(false);
             setRejectReason('');
         } catch (err: unknown) {
             const msg = getApiErrorMessage(err, '未知錯誤');
-            alert(`❌ 拒絕失敗：${msg}`);
+            alert(`拒絕失敗：${msg}`);
         } finally {
             setActionLoading(false);
         }
@@ -122,10 +122,10 @@ export default function ApprovalCenterPage() {
                 reasonCode: 'approval_review',
             });
             setSensitiveData(response.data.data);
-            alert(`✅ 已記錄查閱（稽核 ID: ${response.data.auditLogId}）`);
+            alert(`已記錄查閱（稽核 ID: ${response.data.auditLogId}）`);
         } catch (err: unknown) {
             const msg = getApiErrorMessage(err, '權限不足');
-            alert(`❌ 無權查看：${msg}`);
+            alert(`無權查看：${msg}`);
         }
     };
 

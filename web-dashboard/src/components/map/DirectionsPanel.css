@@ -100,11 +100,13 @@
 
 .directions-mode-btn {
     flex: 1;
-    padding: 0.625rem 0.5rem;
+    padding: 0.625rem 0.25rem;
     background: var(--bg-secondary, #f8fafc);
     border: 1px solid var(--border-color, #e2e8f0);
     border-radius: 0.5rem;
-    font-size: 1.25rem;
+    /* R5/T5c：emoji 圖標改為文字標籤，字級對齊面板內文 */
+    font-size: 0.8125rem;
+    white-space: nowrap;
     cursor: pointer;
     transition: all 0.2s;
 }

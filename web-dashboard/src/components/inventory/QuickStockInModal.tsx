@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { WarningIcon, CheckIcon, InfoIcon, CloseIcon } from '../../design-system/icons';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { Modal, Button, Badge } from '../../design-system';
 import { BarcodeScanner } from '../barcode';
@@ -113,7 +114,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
         <Modal
             isOpen={isOpen}
             onClose={handleClose}
-            title="📷 條碼掃描入庫"
+            title="條碼掃描入庫"
             size="md"
         >
             <div className="quick-stock-in-content">
@@ -174,7 +175,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
 
                         {error && (
                             <div className="quick-stock-in-error">
-                                ⚠️ {error}
+                                <WarningIcon size={16} aria-hidden="true" /> {error}
                             </div>
                         )}
 
@@ -187,7 +188,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
                                 onClick={handleConfirmStockIn}
                                 disabled={stockInMutation.isPending}
                             >
-                                {stockInMutation.isPending ? '處理中...' : '✓ 確認入庫'}
+                                {stockInMutation.isPending ? '處理中...' : <><CheckIcon size={16} aria-hidden="true" /> 確認入庫</>}
                             </Button>
                         </div>
                     </div>
@@ -196,7 +197,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
                 {/* 找不到物資 */}
                 {scanState === 'not-found' && (
                     <div className="quick-stock-in-not-found">
-                        <div className="quick-stock-in-not-found-icon">❓</div>
+                        <div className="quick-stock-in-not-found-icon" aria-hidden="true"><InfoIcon size={32} /></div>
                         <h4>找不到此條碼對應的物資</h4>
                         <p>條碼：<code>{scannedBarcode}</code></p>
                         <p>請確認條碼正確，或先在系統中建立此物資。</p>
@@ -211,7 +212,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
                 {/* 入庫成功 */}
                 {scanState === 'success' && foundResource && (
                     <div className="quick-stock-in-success">
-                        <div className="quick-stock-in-success-icon">✓</div>
+                        <div className="quick-stock-in-success-icon" aria-hidden="true"><CheckIcon size={32} /></div>
                         <h4>入庫成功！</h4>
                         <p>
                             <strong>{foundResource.name}</strong> 已入庫 <strong>{quantity}</strong> {foundResource.unit}
@@ -233,7 +234,7 @@ export function QuickStockInModal({ isOpen, onClose, operatorName }: QuickStockI
                 {/* 入庫失敗 */}
                 {scanState === 'error' && (
                     <div className="quick-stock-in-error-state">
-                        <div className="quick-stock-in-error-icon">✕</div>
+                        <div className="quick-stock-in-error-icon" aria-hidden="true"><CloseIcon size={32} /></div>
                         <h4>入庫失敗</h4>
                         <p>{error}</p>
                         <div className="quick-stock-in-actions">

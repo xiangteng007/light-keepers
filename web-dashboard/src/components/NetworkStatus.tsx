@@ -3,6 +3,7 @@
  * 顯示離線狀態和待同步回報數量
  */
 import { useNetworkStatus } from '../hooks/useOfflineReports';
+import { OnlineIcon, OfflineIcon } from '../design-system/icons';
 import './NetworkStatus.css';
 
 interface NetworkStatusProps {
@@ -20,8 +21,8 @@ export function NetworkStatus({ pendingCount = 0, onSync, className = '' }: Netw
 
     return (
         <div className={`network-status ${isOnline ? 'online' : 'offline'} ${className}`}>
-            <div className="network-status-icon">
-                {isOnline ? '🟢' : '🔴'}
+            <div className="network-status-icon" aria-hidden="true">
+                {isOnline ? <OnlineIcon size={16} /> : <OfflineIcon size={16} />}
             </div>
             <div className="network-status-content">
                 <span className="network-status-text">
@@ -50,7 +51,7 @@ export function OfflineBanner() {
 
     return (
         <div className="offline-banner">
-            <span className="offline-icon">📡</span>
+            <span className="offline-icon" aria-hidden="true"><OfflineIcon size={20} /></span>
             <span>您目前處於離線模式，部分功能可能受限。資料將在連線後自動同步。</span>
         </div>
     );

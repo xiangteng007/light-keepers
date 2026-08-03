@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Form, Button, Alert, Badge, Table } from 'react-bootstrap';
+import { SearchIcon } from '../design-system/icons';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 
@@ -108,7 +109,7 @@ export default function SensitiveAuditPage() {
     return (
         <div className="container-fluid py-4">
             <div className="mb-4">
-                <h2>🔍 敏感稽核查詢</h2>
+                <h2><SearchIcon size={20} aria-hidden="true" /> 敏感稽核查詢</h2>
                 <p className="text-muted">
                     查看所有敏感資料讀取與貼紙列印稽核日誌（幹部專用）
                 </p>
@@ -161,7 +162,7 @@ export default function SensitiveAuditPage() {
                         </div>
                         <div className="mt-3">
                             <Button variant="primary" onClick={handleSearch}>
-                                🔍 查詢
+                                <SearchIcon size={16} aria-hidden="true" /> 查詢
                             </Button>
                             <Button
                                 variant="outline-secondary"

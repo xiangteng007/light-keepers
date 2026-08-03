@@ -4,23 +4,40 @@ import { LayoutGrid, List as ListIcon } from 'lucide-react';
 import { getReports, createTask, getAccounts, deleteReport, getTasks, getReportStats } from '../api/services';
 import type { Report, ReportType, ReportSeverity, ReportSource, Task } from '../api/services';
 import { Alert, Badge, Modal, Button, Card, StatIndicator } from '../design-system';
+import { SolidSquareStamp, OutlineSquareStamp } from '../design-system/icons/pictograms';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import { DISASTER_TYPE_META, MASS_CASUALTY_META } from '../constants/disasterTypes';
+import { disasterPictogramRegistry } from '../design-system/icons/pictograms';
+import {
+    LocationIcon,
+    ClockIcon,
+    CalendarIcon,
+    UserIcon,
+    PhoneIcon,
+    CheckIcon,
+    TriageIcon,
+} from '../design-system/icons';
 import { useAuth } from '../context/AuthContext';
 import './EventsPage.css';
 
 // 類型配置
-// CD-1: 改讀 disasterTypes SSOT（既有 8 類的 label/emoji/色碼在 SSOT 中逐字沿用
-// 原值，本頁視覺輸出與擴充前相同）；bespoke categorical palette 的 literal hex
-// 說明見 constants/disasterTypes.ts
-const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> =
+// CD-1: 改讀 disasterTypes SSOT；R5/T5c：災型圖示改走 B3c 象形
+// （disasterPictogramRegistry，key 對齊 SSOT），不再使用 emoji。
+// bespoke categorical palette 的 literal hex 說明見 constants/disasterTypes.ts
+const TYPE_CONFIG: Record<ReportType, { label: string; color: string }> =
     Object.fromEntries(
         Object.entries(DISASTER_TYPE_META).map(([type, meta]) => [
             type,
-            { label: meta.label, icon: meta.emoji, color: meta.color },
+            { label: meta.label, color: meta.color },
         ]),
-    ) as Record<ReportType, { label: string; icon: string; color: string }>;
+    ) as Record<ReportType, { label: string; color: string }>;
+
+/** 災型象形（16px 行內尺寸），未知型別退回 other。 */
+function TypePictogram({ type, size = 16 }: { type: ReportType; size?: number }) {
+    const Pictogram = disasterPictogramRegistry[type] ?? disasterPictogramRegistry.other;
+    return <Pictogram size={size} aria-hidden="true" />;
+}
 
 // Bespoke severity color scale (distinct from success/warning/danger — 4 discrete levels), left as literal hex
 const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; color: string }> = {
@@ -31,9 +48,9 @@ const SEVERITY_CONFIG: Record<ReportSeverity, { label: string; stars: number; co
 };
 
 // Source brand colors (LINE official green, generic web blue) — no semantic token equivalent, left as literal hex
-const SOURCE_CONFIG: Record<ReportSource, { label: string; icon: string; color: string }> = {
-    line: { label: 'LINE', icon: '💬', color: '#00B900' },
-    web: { label: '網頁', icon: '🌐', color: '#1976D2' },
+const SOURCE_CONFIG: Record<ReportSource, { label: string; color: string }> = {
+    line: { label: 'LINE', color: '#00B900' },
+    web: { label: '網頁', color: '#1976D2' },
 };
 
 // 格式化時間
@@ -303,7 +320,7 @@ export default function EventsPage() {
                     >
                         <option value="">所有類別</option>
                         {Object.entries(TYPE_CONFIG).map(([key, config]) => (
-                            <option key={key} value={key}>{config.icon} {config.label}</option>
+                            <option key={key} value={key}>{config.label}</option>
                         ))}
                     </select>
                     <select
@@ -313,8 +330,8 @@ export default function EventsPage() {
                         aria-label="篩選事件來源"
                     >
                         <option value="">所有來源</option>
-                        <option value="line">💬 LINE</option>
-                        <option value="web">🌐 網頁</option>
+                        <option value="line">LINE</option>
+                        <option value="web">網頁</option>
                     </select>
                     <input
                         type="text"
@@ -369,13 +386,13 @@ export default function EventsPage() {
                                         className="event-card__type"
                                         style={{ backgroundColor: `${TYPE_CONFIG[report.type]?.color}20`, color: TYPE_CONFIG[report.type]?.color }}
                                     >
-                                        {TYPE_CONFIG[report.type]?.icon} {TYPE_CONFIG[report.type]?.label}
+                                        <TypePictogram type={report.type} /> {TYPE_CONFIG[report.type]?.label}
                                     </span>
                                     <span
                                         className="event-card__source"
                                         style={{ backgroundColor: `${SOURCE_CONFIG[source]?.color}20`, color: SOURCE_CONFIG[source]?.color }}
                                     >
-                                        {SOURCE_CONFIG[source]?.icon} {SOURCE_CONFIG[source]?.label}
+                                        {SOURCE_CONFIG[source]?.label}
                                     </span>
                                 </div>
 
@@ -395,17 +412,20 @@ export default function EventsPage() {
 
                                 {/* 嚴重程度 */}
                                 <div className="event-card__severity">
-                                    <span style={{ color: SEVERITY_CONFIG[report.severity]?.color }}>
-                                        {'★'.repeat(SEVERITY_CONFIG[report.severity]?.stars || 2)}
-                                        {'☆'.repeat(4 - (SEVERITY_CONFIG[report.severity]?.stars || 2))}
+                                    <span className="severity-pips" style={{ color: SEVERITY_CONFIG[report.severity]?.color }} aria-hidden="true">
+                                        {Array.from({ length: 4 }, (_, i) =>
+                                            i < (SEVERITY_CONFIG[report.severity]?.stars || 2)
+                                                ? <SolidSquareStamp key={i} size={10} />
+                                                : <OutlineSquareStamp key={i} size={10} />
+                                        )}
                                     </span>
                                     <span className="severity-label">{SEVERITY_CONFIG[report.severity]?.label}</span>
                                 </div>
 
                                 {/* 位置與時間 */}
                                 <div className="event-card__meta">
-                                    <span>📍 {report.address || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}</span>
-                                    <span>🕐 {formatTimeAgo(report.createdAt)}</span>
+                                    <span><LocationIcon size={16} aria-hidden="true" /> {report.address || `${report.latitude.toFixed(4)}, ${report.longitude.toFixed(4)}`}</span>
+                                    <span><ClockIcon size={16} aria-hidden="true" /> {formatTimeAgo(report.createdAt)}</span>
                                 </div>
 
                                 {/* 任務狀態 */}
@@ -468,15 +488,18 @@ export default function EventsPage() {
                                                 className="source-badge"
                                                 style={{ backgroundColor: `${SOURCE_CONFIG[source]?.color}20`, color: SOURCE_CONFIG[source]?.color }}
                                             >
-                                                {SOURCE_CONFIG[source]?.icon}
+                                                {SOURCE_CONFIG[source]?.label}
                                             </span>
                                         </td>
                                         <td>
                                             <span
-                                                className="severity-badge"
+                                                className="severity-badge severity-pips"
                                                 style={{ color: SEVERITY_CONFIG[report.severity]?.color }}
+                                                aria-label={SEVERITY_CONFIG[report.severity]?.label}
                                             >
-                                                {'★'.repeat(SEVERITY_CONFIG[report.severity]?.stars || 2)}
+                                                {Array.from({ length: SEVERITY_CONFIG[report.severity]?.stars || 2 }, (_, i) => (
+                                                    <SolidSquareStamp key={i} size={10} />
+                                                ))}
                                             </span>
                                         </td>
                                         <td>{report.title}</td>
@@ -485,7 +508,7 @@ export default function EventsPage() {
                                                 className="category-tag"
                                                 style={{ backgroundColor: `${TYPE_CONFIG[report.type]?.color}20`, color: TYPE_CONFIG[report.type]?.color }}
                                             >
-                                                {TYPE_CONFIG[report.type]?.icon} {TYPE_CONFIG[report.type]?.label || report.type}
+                                                <TypePictogram type={report.type} /> {TYPE_CONFIG[report.type]?.label || report.type}
                                             </span>
                                         </td>
                                         <td>
@@ -550,7 +573,7 @@ export default function EventsPage() {
                                 className="event-detail__type"
                                 style={{ backgroundColor: TYPE_CONFIG[selectedReport.type]?.color }}
                             >
-                                {TYPE_CONFIG[selectedReport.type]?.icon} {TYPE_CONFIG[selectedReport.type]?.label}
+                                <TypePictogram type={selectedReport.type} /> {TYPE_CONFIG[selectedReport.type]?.label}
                             </span>
                             {/* CD-1: 大量傷患是跨災型旗標，與災型徽章並列而非取代 */}
                             {selectedReport.isMassCasualty && (
@@ -558,7 +581,7 @@ export default function EventsPage() {
                                     className="event-detail__type"
                                     style={{ backgroundColor: MASS_CASUALTY_META.color }}
                                 >
-                                    {MASS_CASUALTY_META.emoji} {MASS_CASUALTY_META.label}
+                                    <TriageIcon size={16} aria-hidden="true" /> {MASS_CASUALTY_META.label}
                                     {selectedReport.casualtyEstimate ? `（約 ${selectedReport.casualtyEstimate} 人）` : ''}
                                 </span>
                             )}
@@ -566,7 +589,7 @@ export default function EventsPage() {
                                 className="event-detail__source"
                                 style={{ backgroundColor: SOURCE_CONFIG[selectedReport.source || 'web']?.color }}
                             >
-                                {SOURCE_CONFIG[selectedReport.source || 'web']?.icon} {SOURCE_CONFIG[selectedReport.source || 'web']?.label}
+                                {SOURCE_CONFIG[selectedReport.source || 'web']?.label}
                             </span>
                             <span
                                 className="event-detail__severity"
@@ -590,29 +613,29 @@ export default function EventsPage() {
 
                         <div className="event-detail__info">
                             <div className="info-row">
-                                <span className="info-label">📍 位置</span>
+                                <span className="info-label"><LocationIcon size={16} aria-hidden="true" /> 位置</span>
                                 <span className="info-value">
                                     {selectedReport.address || `${selectedReport.latitude}, ${selectedReport.longitude}`}
                                 </span>
                             </div>
                             <div className="info-row">
-                                <span className="info-label">📅 回報時間</span>
+                                <span className="info-label"><CalendarIcon size={16} aria-hidden="true" /> 回報時間</span>
                                 <span className="info-value">{formatDateTime(selectedReport.createdAt)}</span>
                             </div>
                             <div className="info-row">
-                                <span className="info-label">👤 回報人</span>
+                                <span className="info-label"><UserIcon size={16} aria-hidden="true" /> 回報人</span>
                                 <span className="info-value">
                                     {selectedReport.reporterLineDisplayName || selectedReport.contactName || '(未提供)'}
                                 </span>
                             </div>
                             {selectedReport.contactPhone && (
                                 <div className="info-row">
-                                    <span className="info-label">📞 聯絡電話</span>
+                                    <span className="info-label"><PhoneIcon size={16} aria-hidden="true" /> 聯絡電話</span>
                                     <span className="info-value">{selectedReport.contactPhone}</span>
                                 </div>
                             )}
                             <div className="info-row">
-                                <span className="info-label">✅ 審核人</span>
+                                <span className="info-label"><CheckIcon size={16} aria-hidden="true" /> 審核人</span>
                                 <span className="info-value">{selectedReport.reviewedBy || '(未審核)'}</span>
                             </div>
                         </div>
@@ -622,7 +645,7 @@ export default function EventsPage() {
                                 variant="secondary"
                                 onClick={() => window.open(`/map?lat=${selectedReport.latitude}&lng=${selectedReport.longitude}`, '_self')}
                             >
-                                📍 在地圖查看
+                                <LocationIcon size={16} aria-hidden="true" /> 在地圖查看
                             </Button>
                             {canAssignTask && (
                                 <Button
@@ -648,7 +671,7 @@ export default function EventsPage() {
                         <div className="form-group">
                             <label>關聯事件</label>
                             <Card padding="sm" className="related-event-card">
-                                <span>{TYPE_CONFIG[selectedReport.type]?.icon}</span>
+                                <span><TypePictogram type={selectedReport.type} /></span>
                                 <span>{selectedReport.title}</span>
                             </Card>
                         </div>
@@ -679,9 +702,9 @@ export default function EventsPage() {
                                 value={taskForm.priority}
                                 onChange={(e) => setTaskForm(prev => ({ ...prev, priority: e.target.value }))}
                             >
-                                <option value="low">🟢 低</option>
-                                <option value="medium">🟡 中</option>
-                                <option value="high">🔴 高</option>
+                                <option value="low">低</option>
+                                <option value="medium">中</option>
+                                <option value="high">高</option>
                             </select>
                         </div>
 

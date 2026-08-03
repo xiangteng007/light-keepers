@@ -2,6 +2,7 @@ import React from 'react';
 import { useSensitiveData, SENSITIVE_FIELDS } from '../hooks/useSensitiveData';
 import type { SensitiveField as SensitiveFieldType } from '../hooks/useSensitiveData';
 import { Badge } from '../design-system';
+import { LockIcon } from '../design-system/icons';
 import './SensitiveField.css';
 
 interface SensitiveFieldDisplayProps {
@@ -37,7 +38,7 @@ export function SensitiveFieldDisplay({
         <span className={`sensitive-field ${hasAccess ? '' : 'sensitive-field--masked'} ${className}`}>
             {displayValue}
             {!hasAccess && showLockIcon && (
-                <span className="sensitive-field__lock" title="需要更高權限查看">🔒</span>
+                <span className="sensitive-field__lock" title="需要更高權限查看" aria-hidden="true"><LockIcon size={16} /></span>
             )}
         </span>
     );
@@ -71,7 +72,7 @@ export function SensitiveLabel({
             {displayLabel}
             {showBadge && !hasAccess && (
                 <Badge variant="info" size="sm" className="sensitive-label__badge">
-                    🔒 限權限
+                    <LockIcon size={16} aria-hidden="true" /> 限權限
                 </Badge>
             )}
         </span>

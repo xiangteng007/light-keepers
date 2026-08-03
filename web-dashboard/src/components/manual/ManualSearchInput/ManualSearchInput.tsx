@@ -1,4 +1,5 @@
 import React from 'react';
+import { SearchIcon } from '../../../design-system/icons';
 import './ManualSearchInput.css';
 
 interface ManualSearchInputProps {
@@ -19,7 +20,7 @@ export const ManualSearchInput: React.FC<ManualSearchInputProps> = ({
     return (
         <div className={`manual-search-input ${className}`}>
             <span className="manual-search-input__icon" aria-hidden="true">
-                🔍
+                <SearchIcon size={16} />
             </span>
             <input
                 type="text"

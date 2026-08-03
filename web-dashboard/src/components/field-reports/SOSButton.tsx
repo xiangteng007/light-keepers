@@ -1,4 +1,5 @@
 import React, { useState, useCallback } from 'react';
+import { CheckIcon, WarningIcon } from '../../design-system/icons';
 import './SOSButton.css';
 
 interface SOSButtonProps {
@@ -90,7 +91,7 @@ export const SOSButton: React.FC<SOSButtonProps> = ({ onTrigger, isEnabled = tru
     if (showConfirmation) {
         return (
             <div className="sos-confirmation">
-                <div className="sos-confirmation-icon">✓</div>
+                <div className="sos-confirmation-icon" aria-hidden="true"><CheckIcon size={24} /></div>
                 <div className="sos-confirmation-text">
                     <strong>SOS 已發送</strong>
                     <p>指揮中心已收到您的求救信號</p>
@@ -132,7 +133,7 @@ export const SOSButton: React.FC<SOSButtonProps> = ({ onTrigger, isEnabled = tru
 
             {error && (
                 <div className="sos-error">
-                    ⚠️ {error}
+                    <WarningIcon size={16} aria-hidden="true" /> {error}
                 </div>
             )}
 

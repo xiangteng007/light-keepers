@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
+import { mapSymbolToSvgString, sosDefinition } from '../../design-system/icons/map-symbols';
 import './SOSMarker.css';
 
 export interface SOSMarkerProps {
@@ -54,10 +55,10 @@ export function SOSMarker({
             el.appendChild(pulse);
         }
 
-        // Inner circle
+        // Inner circle（B3c sos 符號：菱＋閃電，白線在狀態色圓底上）
         const inner = document.createElement('div');
         inner.className = 'sos-marker__inner';
-        inner.innerHTML = '🆘';
+        inner.innerHTML = mapSymbolToSvgString(sosDefinition, '#ffffff');
         inner.style.backgroundColor = STATUS_COLORS[status];
         el.appendChild(inner);
 
@@ -71,7 +72,7 @@ export function SOSMarker({
         const popupContent = `
             <div style="padding: 12px; min-width: 200px;">
                 <div style="font-weight: 600; color: ${STATUS_COLORS[status]}; font-size: 16px; margin-bottom: 8px;">
-                    🆘 SOS 求救信號
+                    SOS 求救信號
                 </div>
                 <div style="font-size: 14px; margin-bottom: 4px;">
                     <strong>求助者:</strong> ${userName}
@@ -84,7 +85,7 @@ export function SOSMarker({
                 </div>
                 ${ackedAt ? `
                     <div style="font-size: 12px; color: #22c55e;">
-                        ✓ 已確認 by ${ackedBy || '指揮官'} (${new Date(ackedAt).toLocaleTimeString('zh-TW')})
+                        已確認 by ${ackedBy || '指揮官'} (${new Date(ackedAt).toLocaleTimeString('zh-TW')})
                     </div>
                 ` : ''}
                 <div style="margin-top: 8px; padding: 4px 8px; background: ${STATUS_COLORS[status]}20; border-radius: 4px; display: inline-block; font-size: 12px; color: ${STATUS_COLORS[status]}; font-weight: 600;">

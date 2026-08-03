@@ -3,10 +3,14 @@
  *
  * Disaster report intake: forms, tips and recent submissions.
  */
+import { EditIcon, InfoIcon, LocationIcon, SirenIcon } from '../../../design-system/icons';
 
 export const IntakeFormWidget = () => (
     <div style={{ height: '100%', padding: '16px', overflow: 'auto' }}>
-        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)', marginBottom: '16px' }}>📝 災情通報表單</div>
+        <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)', marginBottom: '16px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <EditIcon size={16} aria-hidden="true" />
+            災情通報表單
+        </div>
         <div style={{ marginBottom: '12px' }}>
             <label style={{ display: 'block', fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>災情類型</label>
             <select style={{ width: '100%', padding: '10px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px' }}>
@@ -32,7 +36,10 @@ export const IntakeFormWidget = () => (
 
 export const IntakeTipsWidget = () => (
     <div style={{ height: '100%', padding: '12px' }}>
-        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>💡 通報提示</div>
+        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <InfoIcon size={14} aria-hidden="true" />
+            通報提示
+        </div>
         <ul style={{ margin: 0, padding: '0 0 0 16px', fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.8' }}>
             <li>請盡量提供精確的地址或GPS座標</li>
             <li>拍照時請注意自身安全</li>
@@ -54,7 +61,10 @@ export const RecentIntakesWidget = () => (
                     <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}><span className="u-mono">{r.id}</span> {r.type}</span>
                     <span className="u-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{r.time}</span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>📍 {r.location}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <LocationIcon size={12} aria-hidden="true" />
+                    {r.location}
+                </div>
             </div>
         ))}
     </div>
@@ -73,7 +83,10 @@ export const ReportFormWidget = () => (
                 )}
             </div>
         ))}
-        <button style={{ width: '100%', padding: '12px', background: 'rgba(239, 68, 68, 0.8)', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: 600, cursor: 'pointer' }}>🚨 緊急通報</button>
+        <button style={{ width: '100%', padding: '12px', background: 'rgba(239, 68, 68, 0.8)', border: 'none', borderRadius: '8px', color: '#fff', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+            <SirenIcon size={16} aria-hidden="true" />
+            緊急通報
+        </button>
     </div>
 );
 

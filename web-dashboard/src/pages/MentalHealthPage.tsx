@@ -14,6 +14,7 @@
  * 不接上會 404 的端點。PHQ-9/GAD-7 問卷則完全沒有對應後端儲存端點。
  */
 import React, { useState, useEffect } from 'react';
+import { HeartIcon, SupportIcon, MicIcon, BookIcon, ClockIcon } from '../design-system/icons';
 import {
     MoodSelector,
     PHQ9Questionnaire,
@@ -162,22 +163,22 @@ export default function MentalHealthPage() {
 
                         {/* Quick Resources */}
                         <div className="mh-resources">
-                            <h4>🌿 自我照顧資源</h4>
+                            <h4><HeartIcon size={16} aria-hidden="true" /> 自我照顧資源</h4>
                             <div className="resource-grid">
                                 <a href="#" className="resource-card">
-                                    <span>🧘</span>
+                                    <span aria-hidden="true"><SupportIcon size={20} /></span>
                                     <span>呼吸放鬆</span>
                                 </a>
                                 <a href="#" className="resource-card">
-                                    <span>🎵</span>
+                                    <span aria-hidden="true"><MicIcon size={20} /></span>
                                     <span>舒壓音樂</span>
                                 </a>
                                 <a href="#" className="resource-card">
-                                    <span>📖</span>
+                                    <span aria-hidden="true"><BookIcon size={20} /></span>
                                     <span>正念練習</span>
                                 </a>
                                 <a href="#" className="resource-card">
-                                    <span>💤</span>
+                                    <span aria-hidden="true"><ClockIcon size={20} /></span>
                                     <span>睡眠指南</span>
                                 </a>
                             </div>

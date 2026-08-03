@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { LayersIcon, WarningIcon, LocationIcon, CloseIcon, type LkIcon } from '../../design-system/icons';
 import type { OverlayFeature } from '../map';
 import './PublishWorkflowPanel.css';
 
@@ -50,12 +51,13 @@ export const PublishWorkflowPanel: React.FC<PublishWorkflowPanelProps> = ({
         setSelectedIds(new Set());
     };
 
-    const getTypeIcon = (type: string) => {
+    // R5/T5c：B3c 教範圖例，不再使用 emoji
+    const getTypeIcon = (type: string): LkIcon => {
         switch (type) {
-            case 'aoi': return '⬜';
-            case 'hazard': return '⚠️';
-            case 'poi': return '📍';
-            default: return '📌';
+            case 'aoi': return LayersIcon;
+            case 'hazard': return WarningIcon;
+            case 'poi': return LocationIcon;
+            default: return LocationIcon;
         }
     };
 
@@ -107,8 +109,8 @@ export const PublishWorkflowPanel: React.FC<PublishWorkflowPanelProps> = ({
                                         onChange={() => toggleSelection(draft.id)}
                                     />
                                 </label>
-                                <span className="pwp-item-icon">
-                                    {getTypeIcon(draft.type)}
+                                <span className="pwp-item-icon" aria-hidden="true">
+                                    {(() => { const TypeIcon = getTypeIcon(draft.type); return <TypeIcon size={16} />; })()}
                                 </span>
                                 <div className="pwp-item-info">
                                     <span className="pwp-item-name">
@@ -122,7 +124,7 @@ export const PublishWorkflowPanel: React.FC<PublishWorkflowPanelProps> = ({
                                     disabled={isProcessing}
                                     title="捨棄草稿"
                                 >
-                                    🗑️
+                                    <CloseIcon size={16} aria-hidden="true" />
                                 </button>
                             </div>
                         ))}

@@ -3,6 +3,14 @@
  *
  * Air-ops domain: drone fleet list, flight controls, telemetry and log.
  */
+import type { ReactNode } from 'react';
+import {
+    ChevronUpIcon,
+    ChevronDownIcon,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+} from '../../../design-system/icons';
+import { SolidSquareStamp } from '../../../design-system/icons/pictograms';
 
 export const DroneListWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
@@ -34,20 +42,35 @@ export const DroneListWidget = () => (
     </div>
 );
 
+/** 方向鍵盤（R5/T5c）：chevron 族＋45° 旋轉出對角，中央停止＝實心方章（紅） */
+const DRONE_CONTROL_CELLS: { key: string; label: string; el: ReactNode }[] = [
+    { key: 'up', label: '上升', el: <ChevronUpIcon size={16} /> },
+    { key: 'up-left', label: '左前', el: <ChevronUpIcon size={16} style={{ transform: 'rotate(-45deg)' }} /> },
+    { key: 'up-right', label: '右前', el: <ChevronUpIcon size={16} style={{ transform: 'rotate(45deg)' }} /> },
+    { key: 'left', label: '左移', el: <ChevronLeftIcon size={16} /> },
+    { key: 'hold', label: '停止', el: <SolidSquareStamp size={12} /> },
+    { key: 'right', label: '右移', el: <ChevronRightIcon size={16} /> },
+    { key: 'down-left', label: '左後', el: <ChevronDownIcon size={16} style={{ transform: 'rotate(45deg)' }} /> },
+    { key: 'down', label: '下降', el: <ChevronDownIcon size={16} /> },
+    { key: 'down-right', label: '右後', el: <ChevronDownIcon size={16} style={{ transform: 'rotate(-45deg)' }} /> },
+];
+
 export const DroneControlsWidget = () => (
     <div style={{ padding: '12px' }}>
         <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>飛行控制</div>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            {['⬆', '↖', '↗', '⬅', '⏸', '➡', '↙', '⬇', '↘'].map((dir, i) => (
-                <button key={i} style={{
+            {DRONE_CONTROL_CELLS.map((cell, i) => (
+                <button key={cell.key} title={cell.label} aria-label={cell.label} style={{
                     padding: '12px',
                     background: i === 4 ? 'rgba(239, 68, 68, 0.2)' : 'rgba(47, 54, 65, 0.5)',
                     border: i === 4 ? '1px solid #ef4444' : '1px solid rgba(195, 155, 111, 0.2)',
                     borderRadius: '8px',
                     color: i === 4 ? '#ef4444' : 'var(--text-primary)',
-                    fontSize: '16px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     cursor: 'pointer',
-                }}>{dir}</button>
+                }}>{cell.el}</button>
             ))}
         </div>
     </div>

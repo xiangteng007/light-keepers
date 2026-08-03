@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckIcon, WarningIcon } from '../../../design-system/icons';
 import './ManualCard.css';
 
 export type ManualCardVariant = 'task-flow' | 'manual-list' | 'field-entry' | 'featured';
@@ -69,10 +70,9 @@ export const ManualCard: React.FC<ManualCardProps> = ({
                         {riskLevel && (
                             <div className={`manual-card__risk manual-card__risk--${riskLevel}`}>
                                 <span className="manual-card__risk-icon">
-                                    {riskLevel === 'low' && '✓'}
-                                    {riskLevel === 'medium' && '⚠'}
-                                    {riskLevel === 'high' && '⚠'}
-                                    {riskLevel === 'critical' && '⚠'}
+                                    {riskLevel === 'low'
+                                        ? <CheckIcon size={16} aria-hidden="true" />
+                                        : <WarningIcon size={16} aria-hidden="true" />}
                                 </span>
                                 <span className="manual-card__risk-text">
                                     {riskLevel === 'low' && '低風險'}
@@ -98,10 +98,9 @@ export const ManualCard: React.FC<ManualCardProps> = ({
                     {riskLevel && (
                         <div className={`manual-card__risk manual-card__risk--${riskLevel}`}>
                             <span className="manual-card__risk-icon">
-                                {riskLevel === 'low' && '✓'}
-                                {riskLevel === 'medium' && '⚠'}
-                                {riskLevel === 'high' && '⚠'}
-                                {riskLevel === 'critical' && '⚠'}
+                                {riskLevel === 'low'
+                                    ? <CheckIcon size={16} aria-hidden="true" />
+                                    : <WarningIcon size={16} aria-hidden="true" />}
                             </span>
                             <span className="manual-card__risk-text">
                                 {riskLevel === 'low' && '低風險'}

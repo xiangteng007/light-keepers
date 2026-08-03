@@ -4,6 +4,7 @@
  * AI & analytics hub: task list, predictions, suggestions, reports, trends.
  */
 import { Brain } from 'lucide-react';
+import { AiIcon, InfoIcon, ExportIcon } from '../../../design-system/icons';
 
 export const AICommandWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
@@ -55,7 +56,10 @@ export const AITaskListWidget = () => (
 
 export const AIPredictionWidget = () => (
     <div style={{ height: '100%', padding: '12px' }}>
-        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px' }}>🔮 趨勢預測</div>
+        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <AiIcon size={14} aria-hidden="true" />
+            趨勢預測
+        </div>
         <div style={{ padding: '12px', background: 'rgba(168, 85, 247, 0.1)', borderRadius: '8px' }}>
             <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>未來 24 小時預測</div>
             <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>降雨機率：80%、預估任務量：+25%</div>
@@ -65,7 +69,10 @@ export const AIPredictionWidget = () => (
 
 export const AISuggestionsWidget = () => (
     <div style={{ height: '100%', padding: '12px', overflow: 'auto' }}>
-        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px' }}>💡 智慧建議</div>
+        <div style={{ fontSize: '12px', color: '#A855F7', marginBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <InfoIcon size={14} aria-hidden="true" />
+            智慧建議
+        </div>
         {[
             { suggestion: '建議增派物資至信義區', priority: 'high' },
             { suggestion: '預警：松山區可能出現交通壅塞', priority: 'medium' },
@@ -154,7 +161,10 @@ export const DashboardStatsWidget = () => (
 
 export const ReportGeneratorWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
-        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>📄 報表生成</div>
+        <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <ExportIcon size={14} aria-hidden="true" />
+            報表生成
+        </div>
         <select style={{ padding: '8px', marginBottom: '8px', background: 'rgba(47, 54, 65, 0.5)', border: '1px solid rgba(195, 155, 111, 0.3)', borderRadius: '6px', color: 'var(--text-primary)', fontSize: '12px' }}>
             <option>日報表</option>
             <option>週報表</option>

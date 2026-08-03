@@ -4,6 +4,7 @@
  * Operations domain: tasks, events, incidents, dispatch, triage, drills.
  */
 import { MetricCard } from '../shared/primitives';
+import { SolidSquareStamp } from '../../../design-system/icons/pictograms';
 
 export const TaskBoardWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
@@ -194,7 +195,7 @@ export const DrillControlsWidget = () => (
             fontWeight: 600,
             cursor: 'pointer',
             marginBottom: '8px',
-        }}>▶ 開始演練</button>
+        }}>開始演練</button>
         <button style={{
             width: '100%',
             padding: '12px',
@@ -204,7 +205,11 @@ export const DrillControlsWidget = () => (
             color: '#ef4444',
             fontSize: '14px',
             cursor: 'pointer',
-        }}>⏹ 停止</button>
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: '6px',
+        }}><SolidSquareStamp size={10} /> 停止</button>
     </div>
 );
 

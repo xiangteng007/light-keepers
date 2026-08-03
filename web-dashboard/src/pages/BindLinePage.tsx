@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { WebhookIcon } from '../design-system/icons';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Loader2, ShieldCheck, CheckCircle2, XCircle } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -94,7 +95,7 @@ export default function BindLinePage() {
             <div className="login-container">
                 <div className="login-header">
                     <div className="login-logo">
-                        <span className="login-logo-icon" aria-hidden="true">🔗</span>
+                        <span className="login-logo-icon" aria-hidden="true"><WebhookIcon size={32} /></span>
                         <h1>LINE 帳號綁定</h1>
                         <p className="login-subtitle">將 LINE 與您的志工帳號連結</p>
                     </div>

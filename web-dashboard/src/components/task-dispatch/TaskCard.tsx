@@ -1,9 +1,26 @@
+import type { CSSProperties } from 'react';
 import {
     TaskStatus,
     TaskPriority,
     TaskCategory,
 } from '../../services/taskDispatchApi';
 import type { DispatchTask } from '../../services/taskDispatchApi';
+import {
+    SirenIcon,
+    AedIcon,
+    InventoryIcon,
+    RadioIcon,
+    ShelterIcon,
+    AuditIcon,
+    DocEmptyIcon,
+    LocationIcon,
+    TeamsIcon,
+    ClockIcon,
+    CheckIcon,
+    CloseIcon,
+    UserIcon,
+    type LkIcon,
+} from '../../design-system/icons';
 import './TaskCard.css';
 
 interface TaskCardProps {
@@ -45,14 +62,28 @@ const STATUS_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
-    [TaskCategory.RESCUE]: '🚨 救援',
-    [TaskCategory.MEDICAL]: '🏥 醫療',
-    [TaskCategory.LOGISTICS]: '📦 後勤',
-    [TaskCategory.COMMUNICATION]: '📡 通訊',
-    [TaskCategory.EVACUATION]: '🏃 疏散',
-    [TaskCategory.ASSESSMENT]: '📋 評估',
-    [TaskCategory.OTHER]: '📝 其他',
+    [TaskCategory.RESCUE]: '救援',
+    [TaskCategory.MEDICAL]: '醫療',
+    [TaskCategory.LOGISTICS]: '後勤',
+    [TaskCategory.COMMUNICATION]: '通訊',
+    [TaskCategory.EVACUATION]: '疏散',
+    [TaskCategory.ASSESSMENT]: '評估',
+    [TaskCategory.OTHER]: '其他',
 };
+
+/** 任務類別 → B3c 教範圖例（R5/T5c） */
+const CATEGORY_ICONS: Record<string, LkIcon> = {
+    [TaskCategory.RESCUE]: SirenIcon,
+    [TaskCategory.MEDICAL]: AedIcon,
+    [TaskCategory.LOGISTICS]: InventoryIcon,
+    [TaskCategory.COMMUNICATION]: RadioIcon,
+    [TaskCategory.EVACUATION]: ShelterIcon,
+    [TaskCategory.ASSESSMENT]: AuditIcon,
+    [TaskCategory.OTHER]: DocEmptyIcon,
+};
+
+/** 行內 icon 統一對齊字級的內距（14px 對應 13px 上下的行內文字） */
+const inlineIconStyle: CSSProperties = { verticalAlign: 'text-bottom', marginRight: 4 };
 
 /**
  * Task Card Component for displaying dispatch tasks
@@ -81,6 +112,7 @@ export function TaskCard({
         return date.toLocaleDateString('zh-TW');
     };
 
+    const CategoryIcon = CATEGORY_ICONS[task.category];
     const myAssignment = task.assignments?.find((a) => a.status !== 'cancelled');
     const isPending = myAssignment?.status === 'pending';
     const isAccepted = task.status === TaskStatus.ACCEPTED;
@@ -100,6 +132,7 @@ export function TaskCard({
                     {PRIORITY_LABELS[task.priority] || '未知'}
                 </span>
                 <span className="task-category">
+                    {CategoryIcon && <CategoryIcon size={14} aria-hidden="true" style={inlineIconStyle} />}
                     {CATEGORY_LABELS[task.category] || task.category}
                 </span>
                 <span className="task-time">{formatTime(task.createdAt)}</span>
@@ -116,7 +149,8 @@ export function TaskCard({
             {/* Location */}
             {task.locationDescription && (
                 <div className="task-location">
-                    📍 {task.locationDescription}
+                    <LocationIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                    {task.locationDescription}
                 </div>
             )}
 
@@ -142,12 +176,14 @@ export function TaskCard({
                 </span>
                 {task.assignments?.length > 0 && (
                     <span className="assignment-count">
-                        👥 {task.assignments.length}人
+                        <TeamsIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                        {task.assignments.length}人
                     </span>
                 )}
                 {task.estimatedDurationMin && (
                     <span className="duration">
-                        ⏱️ {task.estimatedDurationMin}分鐘
+                        <ClockIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                        {task.estimatedDurationMin}分鐘
                     </span>
                 )}
             </div>
@@ -164,7 +200,8 @@ export function TaskCard({
                                 onAccept?.(task.id);
                             }}
                         >
-                            ✓ 接受
+                            <CheckIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                            接受
                         </button>
                         <button
                             className="btn-decline"
@@ -173,7 +210,8 @@ export function TaskCard({
                                 onDecline?.(task.id);
                             }}
                         >
-                            ✗ 拒絕
+                            <CloseIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                            拒絕
                         </button>
                     </>
                 )}
@@ -185,7 +223,7 @@ export function TaskCard({
                             onStart?.(task.id);
                         }}
                     >
-                        ▶ 開始執行
+                        開始執行
                     </button>
                 )}
                 {isMyTask && isInProgress && (
@@ -196,7 +234,8 @@ export function TaskCard({
                             onComplete?.(task.id);
                         }}
                     >
-                        ✓ 完成
+                        <CheckIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                        完成
                     </button>
                 )}
 
@@ -209,7 +248,8 @@ export function TaskCard({
                             onAssign(task.id);
                         }}
                     >
-                        👤 指派
+                        <UserIcon size={14} aria-hidden="true" style={inlineIconStyle} />
+                        指派
                     </button>
                 )}
                 {!isMyTask && task.status !== TaskStatus.COMPLETED &&

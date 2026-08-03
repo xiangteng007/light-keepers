@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { ShelterIcon, AedIcon, GraduationIcon, BuildingIcon, SirenIcon, ShieldIcon, LocationIcon, ClockIcon, SearchIcon, type LkIcon } from '../../design-system/icons';
 import { overlaysApi } from '../../services/overlaysApi';
 import type { LocationDto } from '../../services/overlaysApi';
 import './LocationAutocomplete.css';
@@ -157,21 +158,19 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         };
     }, []);
 
-    // Get icon for category
-    const getCategoryIcon = (category: string): string => {
-        const icons: Record<string, string> = {
-            shelter: '🏠',
-            hospital: '🏥',
-            school: '🏫',
-            government: '🏛️',
-            fire_station: '🚒',
-            police: '👮',
-            temple: '🛕',
-            landmark: '📍',
-            default: '📌',
-        };
-        return icons[category] || icons.default;
+    // Get icon for category（R5/T5c：B3c 教範圖例，不再使用 emoji）
+    const CATEGORY_ICONS: Record<string, LkIcon> = {
+        shelter: ShelterIcon,
+        hospital: AedIcon,
+        school: GraduationIcon,
+        government: BuildingIcon,
+        fire_station: SirenIcon,
+        police: ShieldIcon,
+        temple: BuildingIcon,
+        landmark: LocationIcon,
+        default: LocationIcon,
     };
+    const getCategoryIcon = (category: string): LkIcon => CATEGORY_ICONS[category] || CATEGORY_ICONS.default;
 
     return (
         <div className="loc-autocomplete">
@@ -190,8 +189,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                     aria-expanded={isOpen}
                     role="combobox"
                 />
-                <span className="loc-input-icon">
-                    {isLoading ? '⏳' : '🔍'}
+                <span className="loc-input-icon" aria-hidden="true">
+                    {isLoading ? <ClockIcon size={16} /> : <SearchIcon size={16} />}
                 </span>
             </div>
 
@@ -210,8 +209,8 @@ export const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
                             role="option"
                             aria-selected={index === selectedIndex}
                         >
-                            <span className="loc-result-icon">
-                                {getCategoryIcon(location.category)}
+                            <span className="loc-result-icon" aria-hidden="true">
+                                {(() => { const CatIcon = getCategoryIcon(location.category); return <CatIcon size={16} />; })()}
                             </span>
                             <div className="loc-result-content">
                                 <div className="loc-result-name">{location.name}</div>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button } from '../../design-system';
+import { WarehouseIcon, LocationIcon, TrophyIcon, QrIcon } from '../../design-system/icons';
 import { ResourcesTabSkeleton } from './ResourcesSkeleton';
 import './WarehousesTab.css';
 import api from '../../api/client';
@@ -114,7 +115,7 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
             {/* 倉庫列表 */}
             <div className="section">
                 <div className="section-header">
-                    <h3>🏭 倉庫/據點</h3>
+                    <h3><WarehouseIcon size={20} aria-hidden="true" /> 倉庫/據點</h3>
                     {canManage && (
                         <Button size="sm" onClick={() => setShowAddWarehouse(true)}>
                             + 新增倉庫
@@ -128,7 +129,7 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
                             className={`warehouse-chip ${selectedWarehouse === wh.id ? 'active' : ''}`}
                             onClick={() => setSelectedWarehouse(wh.id)}
                         >
-                            {wh.isPrimary && <span className="primary-badge">⭐</span>}
+                            {wh.isPrimary && <span className="primary-badge" title="主倉庫"><TrophyIcon size={16} aria-hidden="true" /></span>}
                             {wh.name}
                             <span className="code">({wh.code})</span>
                         </button>
@@ -141,7 +142,7 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
             {selectedWarehouse && (
                 <div className="section">
                     <div className="section-header">
-                        <h3>📍 儲位管理</h3>
+                        <h3><LocationIcon size={20} aria-hidden="true" /> 儲位管理</h3>
                         {canManage && (
                             <Button size="sm" onClick={() => setShowAddLocation(true)}>
                                 + 新增儲位
@@ -152,7 +153,7 @@ export default function WarehousesTab({ canManage }: WarehousesTabProps) {
                         {locations.map(loc => (
                             <Card key={loc.id} className="location-card" padding="sm">
                                 <div className="location-path">{loc.fullPath}</div>
-                                {loc.barcode && <div className="location-barcode">🏷️ {loc.barcode}</div>}
+                                {loc.barcode && <div className="location-barcode"><QrIcon size={16} aria-hidden="true" /> {loc.barcode}</div>}
                                 {loc.capacity && <div className="location-capacity">容量: {loc.capacity}</div>}
                             </Card>
                         ))}

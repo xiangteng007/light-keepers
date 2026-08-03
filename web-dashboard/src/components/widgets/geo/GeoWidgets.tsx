@@ -4,6 +4,8 @@
  * Geo-intel domain: alerts feed, weather and earthquake monitoring.
  */
 import { CloudRain } from 'lucide-react';
+import { LocationIcon } from '../../../design-system/icons';
+import { EarthquakePictogram } from '../../../design-system/icons/pictograms';
 
 export const WeatherAlertWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column' }}>
@@ -42,7 +44,10 @@ export const GeoAlertFeedWidget = () => (
                     <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{a.alert}</span>
                     <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{a.source} • <span className="u-mono">{a.time}</span></span>
                 </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>📍 {a.region}</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                    <LocationIcon size={12} aria-hidden="true" />
+                    {a.region}
+                </div>
             </div>
         ))}
     </div>
@@ -66,7 +71,7 @@ export const GeoSummaryWidget = () => (
 
 export const EarthquakeMonitorWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌋</div>
+        <div style={{ marginBottom: '8px', color: 'var(--text-secondary)' }} aria-hidden="true"><EarthquakePictogram size={32} /></div>
         <div style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>目前無地震</div>
         <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最後更新: <span className="u-mono">10:30</span></div>
     </div>
@@ -75,9 +80,9 @@ export const EarthquakeMonitorWidget = () => (
 export const ForecastCardsWidget = () => (
     <div style={{ padding: '8px' }}>
         {[
-            { day: '今天', temp: '28°', condition: '☀️ 晴' },
-            { day: '明天', temp: '26°', condition: '🌧️ 雨' },
-            { day: '後天', temp: '25°', condition: '⛅ 多雲' },
+            { day: '今天', temp: '28°', condition: '晴' },
+            { day: '明天', temp: '26°', condition: '雨' },
+            { day: '後天', temp: '25°', condition: '多雲' },
         ].map((f, i) => (
             <div key={i} style={{
                 padding: '12px',

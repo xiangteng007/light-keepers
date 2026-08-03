@@ -3,7 +3,19 @@ import maplibregl from 'maplibre-gl';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Protocol } from 'pmtiles';
 import type { FieldReport, SosSignal, LiveLocation } from '../../services/fieldReportsApi';
+import {
+    aedDefinition,
+    hazardAoiDefinition,
+    mapSymbolToSvgString,
+    reportIncidentDefinition,
+    sosDefinition,
+    teamDefinition,
+    type MapSymbolDefinition,
+} from '../../design-system/icons/map-symbols';
 import './MapContainer.css';
+
+/** B3c 地圖符號 → inline SVG（stroke=currentColor，色由 .marker-icon 的 CSS color 決定） */
+const symbolMarkup = (def: MapSymbolDefinition) => mapSymbolToSvgString(def, 'currentColor');
 
 // Taiwan center coordinates
 const TAIWAN_CENTER: [number, number] = [120.9605, 23.6978];
@@ -112,17 +124,18 @@ export function MapContainer({
         if (type === 'sos') {
             el.innerHTML = `
                 <div class="marker-pulse"></div>
-                <div class="marker-icon">🆘</div>
+                <div class="marker-icon">${symbolMarkup(sosDefinition)}</div>
             `;
         } else if (type === 'report') {
             const report = data as FieldReport;
-            const icon = report.type === 'medical' ? '🏥' :
-                report.type === 'incident' ? '🔥' :
-                    report.type === 'traffic' ? '🚗' :
-                        report.type === 'sos' ? '🆘' : '📋';
-            el.innerHTML = `<div class="marker-icon">${icon}</div>`;
+            // B3c 地圖符號：medical→aed（圓＋心電）、traffic→hazard-aoi（三角＋斜紋）、
+            // sos→sos（菱＋閃電）、incident／其餘→report-incident（菱＋驚嘆）
+            const def = report.type === 'medical' ? aedDefinition :
+                report.type === 'traffic' ? hazardAoiDefinition :
+                    report.type === 'sos' ? sosDefinition : reportIncidentDefinition;
+            el.innerHTML = `<div class="marker-icon">${symbolMarkup(def)}</div>`;
         } else if (type === 'location') {
-            el.innerHTML = `<div class="marker-icon">👤</div>`;
+            el.innerHTML = `<div class="marker-icon">${symbolMarkup(teamDefinition)}</div>`;
         }
 
         return el;
@@ -190,7 +203,7 @@ export function MapContainer({
 
             const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
                 <div class="marker-popup sos-popup">
-                    <strong>🆘 SOS 緊急求救</strong>
+                    <strong>SOS 緊急求救</strong>
                     <p class="popup-user">${sos.userName || '未知'}</p>
                     <span class="popup-time">${new Date(sos.createdAt).toLocaleString('zh-TW')}</span>
                 </div>
@@ -233,7 +246,7 @@ export function MapContainer({
 
             const popup = new maplibregl.Popup({ offset: 25 }).setHTML(`
                 <div class="marker-popup location-popup">
-                    <strong>👤 ${loc.displayName || '志工'}</strong>
+                    <strong>${loc.displayName || '志工'}</strong>
                     <p>${loc.callsign || ''}</p>
                     <span class="popup-time">更新: ${new Date(loc.lastAt).toLocaleTimeString('zh-TW')}</span>
                 </div>

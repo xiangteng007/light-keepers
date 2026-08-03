@@ -5,6 +5,14 @@ import { useFieldReports } from '../hooks/useFieldReports';
 import { useAiQueue } from '../hooks/useAiQueue';
 import { ReportsPanel, SOSButton } from '../components/field-reports';
 import { MapContainer } from '../components/map';
+import {
+    SirenIcon,
+    OnlineIcon,
+    OfflineIcon,
+    TeamsIcon,
+    ReportIcon,
+    LocationIcon,
+} from '../design-system/icons';
 import { createLogger } from '../utils/logger';
 import './MissionCommandPage.css';
 
@@ -123,15 +131,17 @@ export function MissionCommandPage() {
             {/* Header */}
             <header className="command-header">
                 <div className="header-left">
-                    <h1>🚨 任務指揮中心</h1>
+                    <h1><SirenIcon size={24} aria-hidden="true" /> 任務指揮中心</h1>
                     <span className="mission-id">{missionSessionId}</span>
                 </div>
                 <div className="header-right">
                     <span className={`connection-status ${isConnected ? 'connected' : 'disconnected'}`}>
-                        {isConnected ? '🟢 已連線' : '🔴 離線'}
+                        {isConnected
+                            ? <><OnlineIcon size={16} aria-hidden="true" /> 已連線</>
+                            : <><OfflineIcon size={16} aria-hidden="true" /> 離線</>}
                     </span>
                     <span className="online-count">
-                        👥 {liveLocations.length} 人在線
+                        <TeamsIcon size={16} aria-hidden="true" /> {liveLocations.length} 人在線
                     </span>
                 </div>
             </header>
@@ -146,13 +156,13 @@ export function MissionCommandPage() {
                             className={`tab ${selectedTab === 'reports' ? 'active' : ''}`}
                             onClick={() => setSelectedTab('reports')}
                         >
-                            📋 回報 ({reports.length})
+                            <ReportIcon size={16} aria-hidden="true" /> 回報 ({reports.length})
                         </button>
                         <button
                             className={`tab ${selectedTab === 'locations' ? 'active' : ''}`}
                             onClick={() => setSelectedTab('locations')}
                         >
-                            📍 位置 ({liveLocations.length})
+                            <LocationIcon size={16} aria-hidden="true" /> 位置 ({liveLocations.length})
                         </button>
                     </div>
 

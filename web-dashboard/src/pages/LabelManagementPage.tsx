@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Form, Alert, Badge, Modal } from 'react-bootstrap';
+import { QrIcon, PlusIcon, FilesIcon, ClockIcon, InfoIcon, InventoryIcon } from '../design-system/icons';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 
@@ -55,7 +56,7 @@ export default function LabelManagementPage() {
 
     const handleCreateTemplate = async () => {
         if (!templateName || templateName.length < 3) {
-            alert('❌ 模板名稱至少 3 個字');
+            alert('模板名稱至少 3 個字');
             return;
         }
 
@@ -76,12 +77,12 @@ export default function LabelManagementPage() {
                     ],
                 },
             });
-            alert('✅ 模板創建成功！');
+            alert('模板創建成功！');
             setShowTemplateModal(false);
             fetchTemplates();
             resetTemplateForm();
         } catch (err: any) {
-            alert(`❌ 創建失敗：${getApiErrorMessage(err, '未知錯誤')}`);
+            alert(`創建失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         } finally {
             setLoading(false);
         }
@@ -101,10 +102,10 @@ export default function LabelManagementPage() {
             await api.patch(`/label-templates/${templateId}`, {
                 isActive: !isActive,
             });
-            alert(`✅ 模板已${!isActive ? '啟用' : '停用'}`);
+            alert(`模板已${!isActive ? '啟用' : '停用'}`);
             fetchTemplates();
         } catch (err: any) {
-            alert(`❌ 更新失敗：${getApiErrorMessage(err, '未知錯誤')}`);
+            alert(`更新失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         }
     };
 
@@ -112,7 +113,7 @@ export default function LabelManagementPage() {
         <div className="container-fluid py-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                    <h2>🏷️ 貼紙管理中心</h2>
+                    <h2><QrIcon size={24} style={{ verticalAlign: '-4px' }} /> 貼紙管理中心</h2>
                     <p className="text-muted mb-0">模板管理、產碼、列印歷史（幹部專用）</p>
                 </div>
                 {activeTab === 'templates' && (
@@ -120,7 +121,7 @@ export default function LabelManagementPage() {
                         variant="success"
                         onClick={() => setShowTemplateModal(true)}
                     >
-                        ➕ 新增模板
+                        <PlusIcon size={16} style={{ verticalAlign: '-3px' }} /> 新增模板
                     </Button>
                 )}
             </div>
@@ -132,21 +133,21 @@ export default function LabelManagementPage() {
                     onClick={() => setActiveTab('templates')}
                     aria-pressed={activeTab === 'templates'}
                 >
-                    📄 模板管理
+                    <FilesIcon size={16} style={{ verticalAlign: '-3px' }} /> 模板管理
                 </Button>
                 <Button
                     variant={activeTab === 'generate' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('generate')}
                     aria-pressed={activeTab === 'generate'}
                 >
-                    🔐 手動產碼
+                    <QrIcon size={16} style={{ verticalAlign: '-3px' }} /> 手動產碼
                 </Button>
                 <Button
                     variant={activeTab === 'history' ? 'primary' : 'outline-primary'}
                     onClick={() => setActiveTab('history')}
                     aria-pressed={activeTab === 'history'}
                 >
-                    📊 列印歷史
+                    <ClockIcon size={16} style={{ verticalAlign: '-3px' }} /> 列印歷史
                 </Button>
             </div>
 
@@ -241,13 +242,13 @@ export default function LabelManagementPage() {
                         <Card>
                             <Card.Body>
                                 <Alert variant="info">
-                                    <strong>ℹ️ 手動產碼功能</strong>
+                                    <strong><InfoIcon size={16} style={{ verticalAlign: '-3px' }} /> 手動產碼功能</strong>
                                     <div className="mt-2">
                                         此功能通常整合在入庫流程中。若需手動產碼，請前往物資管理頁面的入庫功能。
                                     </div>
                                 </Alert>
                                 <div className="p-4 bg-light rounded">
-                                    <h5 className="text-muted mb-3">🔨 獨立產碼功能籌備中</h5>
+                                    <h5 className="text-muted mb-3">獨立產碼功能籌備中</h5>
                                     <p className="text-muted small mb-3">預計包含以下功能：</p>
                                     <ul className="text-muted small">
                                         <li>選擇物資與批號產生 QR Code</li>
@@ -260,7 +261,7 @@ export default function LabelManagementPage() {
                                         size="sm"
                                         onClick={() => (window.location.href = '/resources/inventory')}
                                     >
-                                        📦 前往物資入庫
+                                        <InventoryIcon size={16} style={{ verticalAlign: '-3px' }} /> 前往物資入庫
                                     </Button>
                                 </div>
                             </Card.Body>

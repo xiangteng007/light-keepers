@@ -67,6 +67,7 @@ export interface WidgetModule {
     id: string;
     title: string;
     description: string;
+    /** B3c iconRegistry 的 kebab-case 語意名（R5/T5c），由 WidgetPicker 查表渲染 */
     icon: string;
     category: 'map' | 'data' | 'tools' | 'community' | 'analytics' | 'core';
     defaultSize: { w: number; h: number; minW: number; minH: number };

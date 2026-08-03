@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CloseIcon, LocationIcon, LayersIcon, MinusIcon } from '../../design-system/icons';
 import './CreateOverlayDialog.css';
 
 export type OverlayTypeForCreation = 'aoi' | 'hazard' | 'poi';
@@ -141,7 +142,7 @@ export const CreateOverlayDialog: React.FC<CreateOverlayDialogProps> = ({
                 <div className="cod-header">
                     <h2 className="cod-title">{getTitle()}</h2>
                     <button className="cod-close" onClick={handleCancel} title="取消">
-                        ✕
+                        <CloseIcon size={16} aria-hidden="true" />
                     </button>
                 </div>
                 <form onSubmit={handleSubmit}>
@@ -245,9 +246,9 @@ export const CreateOverlayDialog: React.FC<CreateOverlayDialogProps> = ({
                             <label className="cod-label">幾何資訊</label>
                             <div className="cod-geometry-info">
                                 <span className="cod-geometry-type">
-                                    {geometry.type === 'Point' && '📍 點位'}
-                                    {geometry.type === 'Polygon' && '⬡ 多邊形'}
-                                    {geometry.type === 'LineString' && '〰 線段'}
+                                    {geometry.type === 'Point' && <><LocationIcon size={16} aria-hidden="true" /> 點位</>}
+                                    {geometry.type === 'Polygon' && <><LayersIcon size={16} aria-hidden="true" /> 多邊形</>}
+                                    {geometry.type === 'LineString' && <><MinusIcon size={16} aria-hidden="true" /> 線段</>}
                                 </span>
                                 {geometry.type === 'Polygon' && (
                                     <span className="cod-geometry-detail">

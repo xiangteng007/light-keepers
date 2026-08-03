@@ -15,6 +15,7 @@ import {
 } from 'chart.js';
 import { Line, Bar, Doughnut, Pie } from 'react-chartjs-2';
 import { Card, Button, Badge, StatIndicator } from '../design-system';
+import { AnalyticsIcon, InventoryIcon, SirenIcon, TeamsIcon, ReportIcon } from '../design-system/icons';
 import { Package, Users, AlertTriangle, Megaphone, ClipboardList, CheckCircle2, Inbox } from 'lucide-react';
 import {
     getResourceStats,
@@ -67,15 +68,15 @@ const NCDR_CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
     other: { label: '其他', color: 'rgba(156, 163, 175, 0.8)' },
 };
 
-// 物資類別配置
-const RESOURCE_CATEGORY_CONFIG: Record<string, { label: string; icon: string }> = {
-    food: { label: '食品', icon: '🍎' },
-    water: { label: '飲水', icon: '💧' },
-    medical: { label: '醫療', icon: '🏥' },
-    shelter: { label: '收容', icon: '🏠' },
-    clothing: { label: '衣物', icon: '👕' },
-    equipment: { label: '設備', icon: '🔧' },
-    other: { label: '其他', icon: '📦' },
+// 物資類別配置（圖表僅使用 label；R5/T5c 移除未入圖的 emoji 欄位）
+const RESOURCE_CATEGORY_CONFIG: Record<string, { label: string }> = {
+    food: { label: '食品' },
+    water: { label: '飲水' },
+    medical: { label: '醫療' },
+    shelter: { label: '收容' },
+    clothing: { label: '衣物' },
+    equipment: { label: '設備' },
+    other: { label: '其他' },
 };
 
 export default function AnalyticsPage() {
@@ -401,7 +402,7 @@ export default function AnalyticsPage() {
             </div>
 
             {/* 趨勢圖 */}
-            <Card title="📈 NCDR 警報趨勢" padding="lg" className="chart-card">
+            <Card title="NCDR 警報趨勢" icon={<AnalyticsIcon size={20} />} padding="lg" className="chart-card">
                 <div className="chart-container chart-container--lg">
                     <Line data={eventTrendData} options={{
                         ...chartOptions,
@@ -414,7 +415,7 @@ export default function AnalyticsPage() {
 
             {/* 雙欄圖表 */}
             <div className="charts-grid">
-                <Card title="📦 物資類別分布" padding="lg" className="chart-card">
+                <Card title="物資類別分布" icon={<InventoryIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {Object.keys(resourceStats?.byCategory || {}).length > 0 ? (
                             <Doughnut data={resourceCategoryData} options={chartOptions} />
@@ -427,7 +428,7 @@ export default function AnalyticsPage() {
                     </div>
                 </Card>
 
-                <Card title="🚨 NCDR 警報分類" padding="lg" className="chart-card">
+                <Card title="NCDR 警報分類" icon={<SirenIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {Object.keys(ncdrCategoryStats).length > 0 ? (
                             <Pie data={ncdrCategoryData} options={chartOptions} />
@@ -443,7 +444,7 @@ export default function AnalyticsPage() {
 
             {/* 第二排雙欄圖表 */}
             <div className="charts-grid">
-                <Card title="👥 志工狀態分布" padding="lg" className="chart-card">
+                <Card title="志工狀態分布" icon={<TeamsIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         <Bar data={volunteerStatusData} options={{
                             ...chartOptions,
@@ -452,7 +453,7 @@ export default function AnalyticsPage() {
                     </div>
                 </Card>
 
-                <Card title="📢 回報處理狀態" padding="lg" className="chart-card">
+                <Card title="回報處理狀態" icon={<ReportIcon size={20} />} padding="lg" className="chart-card">
                     <div className="chart-container">
                         {totalReports > 0 ? (
                             <Doughnut data={reportStatusData} options={chartOptions} />
@@ -469,7 +470,7 @@ export default function AnalyticsPage() {
             {/* 即時活動摘要 */}
             <div className="activity-section">
                 <div className="activity-grid">
-                    <Card title="📦 最近物資異動" padding="md" className="activity-card">
+                    <Card title="最近物資異動" icon={<InventoryIcon size={20} />} padding="md" className="activity-card">
                         <div className="activity-list">
                             {recentTransactions && recentTransactions.length > 0 ? (
                                 recentTransactions.slice(0, 5).map((tx: { id: string; type: string; operatorName: string; createdAt: string; quantity: number }) => {
@@ -490,7 +491,7 @@ export default function AnalyticsPage() {
                         </div>
                     </Card>
 
-                    <Card title="🚨 最新 NCDR 警報" padding="md" className="activity-card">
+                    <Card title="最新 NCDR 警報" icon={<SirenIcon size={20} />} padding="md" className="activity-card">
                         <div className="activity-list">
                             {alertsData && alertsData.length > 0 ? (
                                 alertsData.slice(0, 5).map((alert: { id: string; title: string; severity?: string; createdAt?: string }) => (
@@ -515,7 +516,7 @@ export default function AnalyticsPage() {
                         </div>
                     </Card>
 
-                    <Card title="📢 最新災情回報" padding="md" className="activity-card">
+                    <Card title="最新災情回報" icon={<ReportIcon size={20} />} padding="md" className="activity-card">
                         <div className="activity-list">
                             {recentReports && recentReports.length > 0 ? (
                                 recentReports.slice(0, 5).map((report: { id: string; title: string; status: string; createdAt: string }) => (

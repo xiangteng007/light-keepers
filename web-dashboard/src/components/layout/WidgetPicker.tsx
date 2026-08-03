@@ -5,6 +5,7 @@
  */
 import React, { useState } from 'react';
 import { X, Plus } from 'lucide-react';
+import { iconRegistry } from '../../design-system/icons';
 import { WidgetModule, AVAILABLE_WIDGET_MODULES } from './widget.types';
 import './WidgetPicker.css';
 
@@ -14,12 +15,13 @@ interface WidgetPickerProps {
     onSelectModule: (module: WidgetModule) => void;
 }
 
+/** icon 為 B3c iconRegistry 語意名（R5/T5c，見 icons/README.md） */
 const CATEGORY_LABELS: Record<string, { label: string; icon: string }> = {
-    map: { label: '地圖', icon: '🗺️' },
-    data: { label: '數據', icon: '📊' },
-    tools: { label: '工具', icon: '🔧' },
-    community: { label: '社群', icon: '❤️' },
-    analytics: { label: '分析', icon: '📈' },
+    map: { label: '地圖', icon: 'map' },
+    data: { label: '數據', icon: 'spreadsheet' },
+    tools: { label: '工具', icon: 'settings' },
+    community: { label: '社群', icon: 'heart' },
+    analytics: { label: '分析', icon: 'analytics' },
 };
 
 export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerProps) {
@@ -74,15 +76,25 @@ export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerPr
                     >
                         全部
                     </button>
-                    {categories.map(cat => (
-                        <button
-                            key={cat}
-                            className={`tab ${selectedCategory === cat ? 'active' : ''}`}
-                            onClick={() => setSelectedCategory(cat)}
-                        >
-                            {CATEGORY_LABELS[cat].icon} {CATEGORY_LABELS[cat].label}
-                        </button>
-                    ))}
+                    {categories.map(cat => {
+                        const CatIcon = iconRegistry[CATEGORY_LABELS[cat].icon];
+                        return (
+                            <button
+                                key={cat}
+                                className={`tab ${selectedCategory === cat ? 'active' : ''}`}
+                                onClick={() => setSelectedCategory(cat)}
+                            >
+                                {CatIcon && (
+                                    <CatIcon
+                                        size={16}
+                                        aria-hidden="true"
+                                        style={{ verticalAlign: 'text-bottom', marginRight: 4 }}
+                                    />
+                                )}
+                                {CATEGORY_LABELS[cat].label}
+                            </button>
+                        );
+                    })}
                 </div>
 
                 {/* Module Grid */}
@@ -92,13 +104,17 @@ export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerPr
                             沒有符合的模組
                         </div>
                     ) : (
-                        filteredModules.map(module => (
+                        filteredModules.map(module => {
+                            const ModIcon = iconRegistry[module.icon];
+                            return (
                             <div
                                 key={module.id}
                                 className="widget-picker__card"
                                 onClick={() => handleSelect(module)}
                             >
-                                <div className="card-icon">{module.icon}</div>
+                                <div className="card-icon">
+                                    {ModIcon && <ModIcon size={24} aria-hidden="true" />}
+                                </div>
                                 <div className="card-info">
                                     <h4>{module.title}</h4>
                                     <p>{module.description}</p>
@@ -110,7 +126,8 @@ export function WidgetPicker({ isOpen, onClose, onSelectModule }: WidgetPickerPr
                                     <Plus size={20} />
                                 </div>
                             </div>
-                        ))
+                            );
+                        })
                     )}
                 </div>
 

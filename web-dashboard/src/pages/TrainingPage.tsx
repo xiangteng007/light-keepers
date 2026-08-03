@@ -1,5 +1,24 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge, Modal, InputField, StatIndicator } from '../design-system';
+import type { LkIcon } from '../design-system/icons';
+import {
+    LayersIcon,
+    VehicleIcon,
+    ShieldIcon,
+    TriageIcon,
+    DroneIcon,
+    SearchIcon,
+    AedIcon,
+    WarningIcon,
+    BookIcon,
+    InventoryIcon,
+    RadioIcon,
+    TeamsIcon,
+    BuildingIcon,
+    CalendarIcon,
+    LocationIcon,
+    ClockIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { getScrapedCourses, triggerScrape } from '../api/services';
 import type { ScrapedCourse } from '../api/services';
@@ -10,27 +29,27 @@ import './TrainingPage.css';
 
 const logger = createLogger('Training');
 
-// 🏷️ 爬取課程分類（顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
-const SCRAPED_CATEGORY_CONFIG = {
-    all: { label: '全部', icon: '📋', color: 'var(--text-secondary, #64748b)' },
-    emt: { label: 'EMT 救護', icon: '🚑', color: 'var(--color-danger-dark, #DC2626)' },
-    tecc: { label: 'TECC', icon: '⚔️', color: 'var(--color-critical, #7C3AED)' },
-    tccc: { label: 'TCCC', icon: '🎖️', color: 'var(--color-safe, #059669)' },
-    drone: { label: '無人機', icon: '🚁', color: 'var(--color-info-dark, #2563EB)' },
-    rescue: { label: '搜救', icon: '🔍', color: 'var(--color-secondary-dark, #EA580C)' },
-    first_aid: { label: '急救', icon: '🏥', color: 'var(--color-success, #10B981)' },
-    disaster: { label: '防災', icon: '🌊', color: '#0891B2' /* 品牌裝飾色，無對應語義 token */ },
-    other: { label: '其他', icon: '📚', color: 'var(--text-secondary, #6B7280)' },
+// 爬取課程分類（icon 為 B3c 教範圖例；顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
+const SCRAPED_CATEGORY_CONFIG: Record<string, { label: string; Icon: LkIcon; color: string }> = {
+    all: { label: '全部', Icon: LayersIcon, color: 'var(--text-secondary, #64748b)' },
+    emt: { label: 'EMT 救護', Icon: VehicleIcon, color: 'var(--color-danger-dark, #DC2626)' },
+    tecc: { label: 'TECC', Icon: ShieldIcon, color: 'var(--color-critical, #7C3AED)' },
+    tccc: { label: 'TCCC', Icon: TriageIcon, color: 'var(--color-safe, #059669)' },
+    drone: { label: '無人機', Icon: DroneIcon, color: 'var(--color-info-dark, #2563EB)' },
+    rescue: { label: '搜救', Icon: SearchIcon, color: 'var(--color-secondary-dark, #EA580C)' },
+    first_aid: { label: '急救', Icon: AedIcon, color: 'var(--color-success, #10B981)' },
+    disaster: { label: '防災', Icon: WarningIcon, color: '#0891B2' /* 品牌裝飾色，無對應語義 token */ },
+    other: { label: '其他', Icon: BookIcon, color: 'var(--text-secondary, #6B7280)' },
 };
 
-// 內部課程分類（顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
-const INTERNAL_CATEGORY_CONFIG = {
-    disaster_basics: { label: '災害基礎', icon: '📚', color: '#2196F3' /* 品牌裝飾色，無對應語義 token */ },
-    first_aid: { label: '急救技能', icon: '🏥', color: 'var(--color-success, #4CAF50)' },
-    rescue: { label: '搜救技術', icon: '🚒', color: '#FF5722' /* 品牌裝飾色，無對應語義 token */ },
-    logistics: { label: '物資調度', icon: '📦', color: 'var(--color-warning, #FF9800)' },
-    communication: { label: '通訊聯絡', icon: '📡', color: '#9C27B0' /* 品牌裝飾色，無對應語義 token */ },
-    leadership: { label: '領導管理', icon: '👔', color: 'var(--text-secondary, #607D8B)' },
+// 內部課程分類（icon 為 B3c 教範圖例；顏色使用 design tokens，含原始 hex fallback；無精確語義對應者保留品牌色）
+const INTERNAL_CATEGORY_CONFIG: Record<string, { label: string; Icon: LkIcon; color: string }> = {
+    disaster_basics: { label: '災害基礎', Icon: BookIcon, color: '#2196F3' /* 品牌裝飾色，無對應語義 token */ },
+    first_aid: { label: '急救技能', Icon: AedIcon, color: 'var(--color-success, #4CAF50)' },
+    rescue: { label: '搜救技術', Icon: SearchIcon, color: '#FF5722' /* 品牌裝飾色，無對應語義 token */ },
+    logistics: { label: '物資調度', Icon: InventoryIcon, color: 'var(--color-warning, #FF9800)' },
+    communication: { label: '通訊聯絡', Icon: RadioIcon, color: '#9C27B0' /* 品牌裝飾色，無對應語義 token */ },
+    leadership: { label: '領導管理', Icon: TeamsIcon, color: 'var(--text-secondary, #607D8B)' },
 };
 
 const LEVEL_CONFIG = {
@@ -110,13 +129,13 @@ export default function TrainingPage() {
         try {
             const response = await triggerScrape();
             const result = response.data.data;
-            alert(`✅ 課程資料已更新！\n成功: ${result.success} 個來源\n失敗: ${result.failed} 個來源`);
+            alert(`課程資料已更新！\n成功: ${result.success} 個來源\n失敗: ${result.failed} 個來源`);
             // 重新載入課程
             const coursesResponse = await getScrapedCourses();
             setScrapedCourses(coursesResponse.data.data);
         } catch (err) {
             logger.error('Scrape trigger failed:', err);
-            alert('❌ 更新失敗，請稍後再試');
+            alert('更新失敗，請稍後再試');
         } finally {
             setIsLoading(false);
         }
@@ -132,7 +151,7 @@ export default function TrainingPage() {
         logger.debug('New course:', newCourse);
         
         window.confirm(
-            '📚 內部課程系統\n\n' +
+            '內部課程系統\n\n' +
             '課程管理功能正在籌備中，預計包含：\n' +
             '• 建立與編輯內部培訓課程\n' +
             '• 設定必修/選修類別\n' +
@@ -218,7 +237,7 @@ export default function TrainingPage() {
                                 } as React.CSSProperties}
                                 onClick={() => setScrapedCategory(key)}
                             >
-                                <span className="scraped-category-icon">{config.icon}</span>
+                                <span className="scraped-category-icon"><config.Icon size={16} /></span>
                                 <span>{config.label}</span>
                             </button>
                         ))}
@@ -246,14 +265,14 @@ export default function TrainingPage() {
                                                 className="scraped-badge"
                                                 style={{ background: cat.color }}
                                             >
-                                                {cat.icon} {cat.label}
+                                                <cat.Icon size={14} /> {cat.label}
                                             </span>
                                         </div>
                                         <h4 className="scraped-course-title">{course.title}</h4>
                                         <div className="scraped-course-meta">
-                                            <span>🏢 {course.organizer}</span>
-                                            {course.courseDate && <span>📅 {course.courseDate}</span>}
-                                            {course.location && <span>📍 {course.location}</span>}
+                                            <span><BuildingIcon size={14} /> {course.organizer}</span>
+                                            {course.courseDate && <span><CalendarIcon size={14} /> {course.courseDate}</span>}
+                                            {course.location && <span><LocationIcon size={14} /> {course.location}</span>}
                                         </div>
                                         <div className="scraped-course-actions">
                                             <Button
@@ -271,8 +290,8 @@ export default function TrainingPage() {
 
                     {/* 資料來源說明 */}
                     <div className="data-source-info">
-                        <p>📡 資料來源：天使之翼協會、中華搜救總隊、王英基金會、緊急醫療救護學會</p>
-                        <p>⏰ 每日早上 6:00 自動更新 • 資料保留 24 小時</p>
+                        <p>資料來源：天使之翼協會、中華搜救總隊、王英基金會、緊急醫療救護學會</p>
+                        <p>每日早上 6:00 自動更新 • 資料保留 24 小時</p>
                     </div>
                 </>
             )}
@@ -297,7 +316,7 @@ export default function TrainingPage() {
                                     <Card key={course.id} className="course-card" padding="md">
                                         <div className="course-card__header">
                                             <span className="course-card__icon" style={{ background: category?.color }}>
-                                                {category?.icon}
+                                                {category && <category.Icon size={20} />}
                                             </span>
                                             {course.isRequired && (
                                                 <Badge variant="danger" size="sm">必修</Badge>
@@ -307,7 +326,7 @@ export default function TrainingPage() {
                                         <p className="course-card__desc">{course.description}</p>
                                         <div className="course-card__meta">
                                             <span style={{ color: level?.color }}>{level?.label}</span>
-                                            <span>⏱️ {course.durationMinutes} 分鐘</span>
+                                            <span><ClockIcon size={14} /> {course.durationMinutes} 分鐘</span>
                                         </div>
                                         <div className="course-card__actions">
                                             <Button
@@ -350,7 +369,7 @@ export default function TrainingPage() {
                                     title="課程分類"
                                 >
                                     {Object.entries(INTERNAL_CATEGORY_CONFIG).map(([key, config]) => (
-                                        <option key={key} value={key}>{config.icon} {config.label}</option>
+                                        <option key={key} value={key}>{config.label}</option>
                                     ))}
                                 </select>
                             </div>

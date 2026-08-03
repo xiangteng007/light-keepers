@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../design-system';
+import { PlusIcon, EditIcon, CheckIcon } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { getResources, getResourceStats } from '../api/services';
 import type { Resource, ResourceCategory } from '../api/services';
@@ -600,7 +601,7 @@ export default function ResourcesPage() {
             {showAddModal && (
                 <div className="modal-overlay" onClick={() => setShowAddModal(false)}>
                     <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>➕ 新增物資</h3>
+                        <h3><PlusIcon size={20} aria-hidden="true" /> 新增物資</h3>
 
                         <div className="form-row">
                             <div className="form-section">
@@ -689,7 +690,7 @@ export default function ResourcesPage() {
                                 取消
                             </Button>
                             <Button onClick={handleAddResource} disabled={isSubmitting}>
-                                {isSubmitting ? '新增中...' : '✅ 確認新增'}
+                                {isSubmitting ? '新增中...' : <><CheckIcon size={16} aria-hidden="true" /> 確認新增</>}
                             </Button>
                         </div>
                     </Card>
@@ -700,7 +701,7 @@ export default function ResourcesPage() {
             {editModal && (
                 <div className="modal-overlay" onClick={() => setEditModal(null)}>
                     <Card className="modal-content modal-content--lg" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>✏️ 編輯物資</h3>
+                        <h3><EditIcon size={20} aria-hidden="true" /> 編輯物資</h3>
 
                         <div className="form-row">
                             <div className="form-section">
@@ -773,7 +774,7 @@ export default function ResourcesPage() {
                                 取消
                             </Button>
                             <Button onClick={handleEditResource} disabled={isSubmitting}>
-                                {isSubmitting ? '儲存中...' : '✅ 儲存變更'}
+                                {isSubmitting ? '儲存中...' : <><CheckIcon size={16} aria-hidden="true" /> 儲存變更</>}
                             </Button>
                         </div>
                     </Card>
@@ -784,7 +785,7 @@ export default function ResourcesPage() {
             {stockModal && stockModal.resource && (
                 <div className="modal-overlay" onClick={() => setStockModal(null)}>
                     <Card className="modal-content" padding="lg" onClick={e => e.stopPropagation()}>
-                        <h3>{stockModal.type === 'add' ? '📥 入庫' : '📤 出庫'} - {stockModal.resource.name}</h3>
+                        <h3>{stockModal.type === 'add' ? '入庫' : '出庫'} - {stockModal.resource.name}</h3>
                         <p className="modal-desc">
                             目前數量：<strong>{stockModal.resource.quantity}</strong> {stockModal.resource.unit}
                         </p>
@@ -816,7 +817,7 @@ export default function ResourcesPage() {
                                 取消
                             </Button>
                             <Button onClick={handleStockChange} disabled={isSubmitting}>
-                                {isSubmitting ? '處理中...' : '✅ 確認'}
+                                {isSubmitting ? '處理中...' : <><CheckIcon size={16} aria-hidden="true" /> 確認</>}
                             </Button>
                         </div>
                     </Card>

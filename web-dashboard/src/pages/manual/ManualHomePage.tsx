@@ -4,28 +4,53 @@ import { ManualCard } from '../../components/manual/ManualCard';
 import { ManualTag } from '../../components/manual/ManualTag';
 import { RiskBadge } from '../../components/manual/RiskBadge';
 import { ManualSearchInput } from '../../components/manual/ManualSearchInput';
+import {
+    LocationIcon,
+    TeamsIcon,
+    RadioIcon,
+    WarningIcon,
+    ShieldIcon,
+    LogoutIcon,
+    SyncIcon,
+    EditIcon,
+    InventoryIcon,
+    VehicleIcon,
+    SettingsIcon,
+    TasksIcon,
+    BuildingIcon,
+    ShelterIcon,
+    HomeIcon,
+    MenuIcon,
+    UserIcon,
+    type LkIcon,
+} from '../../design-system/icons';
+import {
+    LandslidePictogram,
+    FloodPictogram,
+    type PictogramProps,
+} from '../../design-system/icons/pictograms';
 import { createLogger } from '../../utils/logger';
 import './ManualHomePage.css';
 
 const logger = createLogger('Manual');
 
-// 值勤快捷操作
-const QUICK_ACTIONS = [
-    { id: 'check-in', icon: '📍', label: '集合報到' },
-    { id: 'assign', icon: '👥', label: '分工指派' },
-    { id: 'comm', icon: '📻', label: '通聯設定' },
-    { id: 'risk', icon: '⚠️', label: '風險評估' },
-    { id: 'safety', icon: '🛡️', label: '現場安全' },
-    { id: 'evac', icon: '🚪', label: '撤離程序' },
-    { id: 'handover', icon: '🔄', label: '交接流程' },
-    { id: 'report', icon: '📝', label: '回報範本' },
+// 值勤快捷操作（R5/T5c：B3c 教範圖例，不再使用 emoji）
+const QUICK_ACTIONS: { id: string; Icon: LkIcon; label: string }[] = [
+    { id: 'check-in', Icon: LocationIcon, label: '集合報到' },
+    { id: 'assign', Icon: TeamsIcon, label: '分工指派' },
+    { id: 'comm', Icon: RadioIcon, label: '通聯設定' },
+    { id: 'risk', Icon: WarningIcon, label: '風險評估' },
+    { id: 'safety', Icon: ShieldIcon, label: '現場安全' },
+    { id: 'evac', Icon: LogoutIcon, label: '撤離程序' },
+    { id: 'handover', Icon: SyncIcon, label: '交接流程' },
+    { id: 'report', Icon: EditIcon, label: '回報範本' },
 ];
 
 // 任務流程
 const TASK_FLOWS = [
     {
         id: 'pre-deploy',
-        icon: '🎒',
+        Icon: InventoryIcon,
         title: '出勤前準備',
         description: '裝備檢查、風險評估、任務簡報',
         tags: ['裝備', '檢查'],
@@ -33,7 +58,7 @@ const TASK_FLOWS = [
     },
     {
         id: 'arrival',
-        icon: '🚗',
+        Icon: VehicleIcon,
         title: '到場初期',
         description: '現場評估、設置管制、回報狀況',
         tags: ['評估', '管制'],
@@ -41,7 +66,7 @@ const TASK_FLOWS = [
     },
     {
         id: 'execution',
-        icon: '🔧',
+        Icon: SettingsIcon,
         title: '現場執行',
         description: '執行救援、管理現場、持續通報',
         tags: ['救援', '執行'],
@@ -49,7 +74,7 @@ const TASK_FLOWS = [
     },
     {
         id: 'evacuation',
-        icon: '🏃',
+        Icon: LogoutIcon,
         title: '撤離與交接',
         description: '安全撤離、交接任務、裝備歸還',
         tags: ['撤離', '交接'],
@@ -57,7 +82,7 @@ const TASK_FLOWS = [
     },
     {
         id: 'debrief',
-        icon: '📋',
+        Icon: TasksIcon,
         title: '任務復原',
         description: '任務檢討、經驗分享、裝備維護',
         tags: ['檢討', '維護'],
@@ -69,35 +94,35 @@ const TASK_FLOWS = [
 const BEGINNER_GUIDES = [
     {
         id: 'equipment',
-        icon: '🎒',
+        Icon: InventoryIcon,
         title: '志工出勤基本裝備清單',
         description: '完整的個人裝備準備指南',
         riskLevel: 'low' as const,
     },
     {
         id: 'communication',
-        icon: '📻',
+        Icon: RadioIcon,
         title: '無線電通聯標準流程',
         description: '基本通訊協定與緊急呼叫',
         riskLevel: 'low' as const,
     },
     {
         id: 'safety',
-        icon: '🛡️',
+        Icon: ShieldIcon,
         title: '現場安全三要素',
         description: '自我保護與團隊安全原則',
         riskLevel: 'low' as const,
     },
 ];
 
-// 場域入口
-const FIELD_ENTRIES = [
-    { id: 'urban', icon: '🏙️', label: '都會環境', count: 15 },
-    { id: 'mountain', icon: '⛰️', label: '山域/戶外', count: 12 },
-    { id: 'water', icon: '🌊', label: '水域', count: 8 },
-    { id: 'shelter', icon: '🏠', label: '避難所', count: 10 },
-    { id: 'traffic', icon: '🚗', label: '交通', count: 6 },
-    { id: 'community', icon: '🏘️', label: '社區/居家', count: 14 },
+// 場域入口（山域/水域取災型象形，同屬 B3c 圖例系統）
+const FIELD_ENTRIES: { id: string; Icon: React.FC<PictogramProps>; label: string; count: number }[] = [
+    { id: 'urban', Icon: BuildingIcon, label: '都會環境', count: 15 },
+    { id: 'mountain', Icon: LandslidePictogram, label: '山域/戶外', count: 12 },
+    { id: 'water', Icon: FloodPictogram, label: '水域', count: 8 },
+    { id: 'shelter', Icon: ShelterIcon, label: '避難所', count: 10 },
+    { id: 'traffic', Icon: VehicleIcon, label: '交通', count: 6 },
+    { id: 'community', Icon: HomeIcon, label: '社區/居家', count: 14 },
 ];
 
 export const ManualHomePage: React.FC = () => {
@@ -113,7 +138,7 @@ export const ManualHomePage: React.FC = () => {
                     onClick={() => setMenuOpen(!menuOpen)}
                     aria-label="選單"
                 >
-                    ☰
+                    <MenuIcon size={24} aria-hidden="true" />
                 </button>
                 <h1 className="manual-header__logo">應急響應指揮系統手冊</h1>
                 <div className="manual-header__search">
@@ -124,7 +149,7 @@ export const ManualHomePage: React.FC = () => {
                     />
                 </div>
                 <button className="manual-header__user" aria-label="用戶">
-                    👤
+                    <UserIcon size={24} aria-hidden="true" />
                 </button>
             </header>
 
@@ -137,7 +162,7 @@ export const ManualHomePage: React.FC = () => {
                     <div className="quick-buttons">
                         {QUICK_ACTIONS.map((action) => (
                             <ManualButton key={action.id} className="quick-button">
-                                <span className="quick-button__icon">{action.icon}</span>
+                                <span className="quick-button__icon"><action.Icon size={24} aria-hidden="true" /></span>
                                 <span className="quick-button__label">{action.label}</span>
                             </ManualButton>
                         ))}
@@ -154,7 +179,7 @@ export const ManualHomePage: React.FC = () => {
                                 variant="task-flow"
                                 title={flow.title}
                                 description={flow.description}
-                                icon={flow.icon}
+                                icon={<flow.Icon size={24} aria-hidden="true" />}
                                 tags={flow.tags}
                                 riskLevel={flow.riskLevel}
                                 onClick={() => logger.debug('Navigate to', flow.id)}
@@ -173,7 +198,7 @@ export const ManualHomePage: React.FC = () => {
                                 variant="manual-list"
                                 title={guide.title}
                                 description={guide.description}
-                                icon={guide.icon}
+                                icon={<guide.Icon size={24} aria-hidden="true" />}
                                 riskLevel={guide.riskLevel}
                                 onClick={() => logger.debug('Navigate to', guide.id)}
                             />
@@ -190,7 +215,7 @@ export const ManualHomePage: React.FC = () => {
                                 key={field.id}
                                 variant="field-entry"
                                 title={field.label}
-                                icon={field.icon}
+                                icon={<field.Icon size={32} aria-hidden="true" />}
                                 articleCount={field.count}
                                 onClick={() => logger.debug('Navigate to field', field.id)}
                             />

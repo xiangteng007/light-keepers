@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { NotifyIcon, CheckIcon, WarningIcon, SirenIcon, InfoIcon, CloseIcon } from '../../icons';
 import './Toast.css';
 
 export interface ToastProps {
@@ -12,12 +13,12 @@ export interface ToastProps {
     icon?: React.ReactNode;
 }
 
-const defaultIcons: Record<string, string> = {
-    default: '💬',
-    success: '✅',
-    warning: '⚠️',
-    danger: '🚨',
-    info: 'ℹ️',
+const defaultIcons: Record<string, React.ReactNode> = {
+    default: <NotifyIcon size={20} aria-hidden="true" />,
+    success: <CheckIcon size={20} aria-hidden="true" />,
+    warning: <WarningIcon size={20} aria-hidden="true" />,
+    danger: <SirenIcon size={20} aria-hidden="true" />,
+    info: <InfoIcon size={20} aria-hidden="true" />,
 };
 
 export const Toast: React.FC<ToastProps> = ({
@@ -67,7 +68,7 @@ export const Toast: React.FC<ToastProps> = ({
                     onClick={handleClose}
                     aria-label="關閉"
                 >
-                    ✕
+                    <CloseIcon size={16} aria-hidden="true" />
                 </button>
             )}
             {duration > 0 && (

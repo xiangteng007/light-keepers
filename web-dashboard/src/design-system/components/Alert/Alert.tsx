@@ -1,4 +1,5 @@
 import React from 'react';
+import { InfoIcon, CheckIcon, WarningIcon, SirenIcon, CloseIcon } from '../../icons';
 import './Alert.css';
 
 export interface AlertProps {
@@ -20,11 +21,11 @@ export const Alert: React.FC<AlertProps> = ({
     onClose,
     className = '',
 }) => {
-    const defaultIcons = {
-        info: 'ℹ️',
-        success: '✅',
-        warning: '⚠️',
-        danger: '🚨',
+    const defaultIcons: Record<NonNullable<AlertProps['variant']>, React.ReactNode> = {
+        info: <InfoIcon size={20} aria-hidden="true" />,
+        success: <CheckIcon size={20} aria-hidden="true" />,
+        warning: <WarningIcon size={20} aria-hidden="true" />,
+        danger: <SirenIcon size={20} aria-hidden="true" />,
     };
 
     return (
@@ -36,7 +37,7 @@ export const Alert: React.FC<AlertProps> = ({
             </div>
             {closable && (
                 <button className="lk-alert__close" onClick={onClose} aria-label="關閉">
-                    ✕
+                    <CloseIcon size={16} aria-hidden="true" />
                 </button>
             )}
         </div>

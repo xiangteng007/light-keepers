@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, Button, Badge, Modal, Alert } from '../design-system';
+import {
+    LockIcon,
+    HeartIcon,
+    ExportIcon,
+    PlusIcon,
+    AnalyticsIcon,
+    AuditIcon,
+    TeamsIcon,
+    CalendarIcon,
+    ClockIcon,
+    FilesIcon,
+    DocEmptyIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import {
     getDonationStats,
@@ -209,7 +222,7 @@ export default function DonationsPage() {
             <div className="page donations-page">
                 <Card padding="lg">
                     <div className="access-denied">
-                        <span className="icon">🔒</span>
+                        <span className="icon"><LockIcon size={32} /></span>
                         <h3>權限不足</h3>
                         <p>此功能僅限系統擁有者使用</p>
                     </div>
@@ -222,7 +235,7 @@ export default function DonationsPage() {
         <div className="page donations-page">
             <div className="page-header">
                 <div className="page-header__left">
-                    <h2>💰 捐款管理</h2>
+                    <h2><HeartIcon size={24} /> 捐款管理</h2>
                     <p className="page-subtitle">公益捐款收支管理</p>
                 </div>
                 <div className="page-header__actions">
@@ -231,10 +244,10 @@ export default function DonationsPage() {
                         className="export-btn"
                         download
                     >
-                        📊 匯出報表
+                        <ExportIcon size={16} /> 匯出報表
                     </a>
-                    <Button variant="primary" onClick={() => setShowDonationModal(true)}>
-                        ➕ 新增捐款
+                    <Button variant="primary" icon={<PlusIcon size={16} />} onClick={() => setShowDonationModal(true)}>
+                        新增捐款
                     </Button>
                 </div>
             </div>
@@ -242,13 +255,13 @@ export default function DonationsPage() {
             {/* 標籤切換 */}
             <div className="tab-bar">
                 <button className={activeTab === 'overview' ? 'active' : ''} onClick={() => setActiveTab('overview')}>
-                    📊 總覽
+                    <AnalyticsIcon size={16} /> 總覽
                 </button>
                 <button className={activeTab === 'donations' ? 'active' : ''} onClick={() => setActiveTab('donations')}>
-                    📋 捐款紀錄
+                    <AuditIcon size={16} /> 捐款紀錄
                 </button>
                 <button className={activeTab === 'donors' ? 'active' : ''} onClick={() => setActiveTab('donors')}>
-                    👥 捐款人
+                    <TeamsIcon size={16} /> 捐款人
                 </button>
             </div>
 
@@ -269,42 +282,42 @@ export default function DonationsPage() {
                     ) : stats ? (
                         <div className="stats-grid">
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">💰</div>
+                                <div className="stat-card__icon"><HeartIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">{formatCurrency(stats.totalAmount)}</div>
                                     <div className="stat-card__label">累計捐款</div>
                                 </div>
                             </Card>
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">📅</div>
+                                <div className="stat-card__icon"><CalendarIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">{formatCurrency(stats.monthAmount)}</div>
                                     <div className="stat-card__label">本月捐款</div>
                                 </div>
                             </Card>
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">🎯</div>
+                                <div className="stat-card__icon"><ClockIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">{formatCurrency(stats.todayAmount)}</div>
                                     <div className="stat-card__label">今日捐款</div>
                                 </div>
                             </Card>
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">👥</div>
+                                <div className="stat-card__icon"><TeamsIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">{stats.donorCount}</div>
                                     <div className="stat-card__label">捐款人數</div>
                                 </div>
                             </Card>
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">📝</div>
+                                <div className="stat-card__icon"><FilesIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">{stats.totalDonations}</div>
                                     <div className="stat-card__label">捐款筆數</div>
                                 </div>
                             </Card>
                             <Card className="stat-card" padding="md">
-                                <div className="stat-card__icon">📊</div>
+                                <div className="stat-card__icon"><AnalyticsIcon size={32} /></div>
                                 <div className="stat-card__content">
                                     <div className="stat-card__value">
                                         {stats.totalDonations > 0 ? formatCurrency(stats.totalAmount / stats.totalDonations) : '$0'}
@@ -374,7 +387,7 @@ export default function DonationsPage() {
                                                                 rel="noopener noreferrer"
                                                                 className="receipt-download-link"
                                                             >
-                                                                📄 {donation.receipt.receiptNo}
+                                                                <DocEmptyIcon size={14} /> {donation.receipt.receiptNo}
                                                             </a>
                                                         ) : '-'}
                                                     </td>
@@ -428,7 +441,7 @@ export default function DonationsPage() {
                                                         rel="noopener noreferrer"
                                                         className="receipt-download-link"
                                                     >
-                                                        📄 {donation.receipt.receiptNo}
+                                                        <DocEmptyIcon size={14} /> {donation.receipt.receiptNo}
                                                     </a>
                                                 ) : (
                                                     <span>無收據</span>

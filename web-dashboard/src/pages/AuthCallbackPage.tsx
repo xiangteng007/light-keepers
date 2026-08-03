@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
+import { CheckIcon, WarningIcon } from '../design-system/icons';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
@@ -143,13 +144,13 @@ const AuthCallbackPage: React.FC = () => {
             )}
             {status === 'success' && (
                 <>
-                    <h2 style={{...styles.title, ...styles.success}}>✓ ACCESS GRANTED</h2>
+                    <h2 style={{...styles.title, ...styles.success}}><CheckIcon size={20} aria-hidden="true" /> ACCESS GRANTED</h2>
                     <p style={styles.message}>Redirecting to command center...</p>
                 </>
             )}
             {status === 'error' && (
                 <>
-                    <h2 style={{...styles.title, ...styles.error}}>⚠ ACCESS DENIED</h2>
+                    <h2 style={{...styles.title, ...styles.error}}><WarningIcon size={20} aria-hidden="true" /> ACCESS DENIED</h2>
                     <p style={{...styles.message, ...styles.error}}>{error}</p>
                     <p style={styles.message}>Redirecting to login...</p>
                 </>

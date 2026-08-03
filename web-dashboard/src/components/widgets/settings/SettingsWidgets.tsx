@@ -5,6 +5,7 @@
  */
 import { useState } from 'react';
 import { Settings, Activity, Shield, Zap } from 'lucide-react';
+import { CheckIcon, FilesIcon, UserIcon } from '../../../design-system/icons';
 
 export const SettingsNavWidget = () => {
     const [active, setActive] = useState('general');
@@ -102,7 +103,7 @@ export const SettingsPanelWidget = () => (
 export const BackupStatusWidget = () => (
     <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
         <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(34, 197, 94, 0.1)', borderRadius: '10px' }}>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>✓</div>
+            <div style={{ color: '#22c55e' }} aria-hidden="true"><CheckIcon size={20} /></div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>上次備份成功</div>
         </div>
         <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
@@ -131,7 +132,7 @@ export const BackupListWidget = () => (
                 borderRadius: '8px',
                 marginBottom: '8px',
             }}>
-                <div style={{ fontSize: '16px', marginRight: '12px' }}>💾</div>
+                <div style={{ marginRight: '12px', color: 'var(--text-secondary)', display: 'flex' }} aria-hidden="true"><FilesIcon size={16} /></div>
                 <div style={{ flex: 1 }}>
                     <div style={{ fontSize: '12px', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{backup.name}</div>
                     <div className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{backup.size}</div>
@@ -162,14 +163,14 @@ export const ProfileCardWidget = () => (
             width: '80px', height: '80px', borderRadius: '50%',
             background: 'rgba(195, 155, 111, 0.2)', border: '3px solid var(--accent-gold)',
             margin: '0 auto 16px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: '32px', color: 'var(--accent-gold)',
-        }}>👤</div>
+            color: 'var(--accent-gold)',
+        }} aria-hidden="true"><UserIcon size={32} /></div>
         <div style={{ fontSize: '18px', fontWeight: 600, color: 'var(--text-primary)', marginBottom: '4px' }}>使用者名稱</div>
         <div style={{ fontSize: '12px', color: 'var(--accent-gold)', marginBottom: '16px' }}>系統擁有者</div>
         <div style={{ padding: '12px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '8px', textAlign: 'left' }}>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📧 電子郵件</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>電子郵件</div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>user@example.com</div>
-            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📱 電話</div>
+            <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>電話</div>
             <div className="u-mono" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>0912-345-678</div>
         </div>
     </div>

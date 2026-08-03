@@ -4,6 +4,7 @@
  */
 
 import React, { useState, useRef } from 'react';
+import { LocationIcon, LayersIcon, TeamsIcon } from '../../design-system/icons';
 import './FloorPlanOverlay.css';
 
 // Types
@@ -76,10 +77,10 @@ export const FloorPlanOverlay: React.FC<FloorPlanOverlayProps> = ({
     return (
         <div className="floor-plan-overlay">
             <div className="overlay-header">
-                <h3>📍 {floorName}</h3>
+                <h3><LocationIcon size={16} aria-hidden="true" /> {floorName}</h3>
                 <div className="stats">
-                    <span className="beacon-count">🔷 {beacons.length} Beacons</span>
-                    <span className="person-count">👥 {trackedPersons.length} 人員</span>
+                    <span className="beacon-count"><LayersIcon size={16} aria-hidden="true" /> {beacons.length} Beacons</span>
+                    <span className="person-count"><TeamsIcon size={16} aria-hidden="true" /> {trackedPersons.length} 人員</span>
                 </div>
             </div>
 
@@ -111,7 +112,7 @@ export const FloorPlanOverlay: React.FC<FloorPlanOverlayProps> = ({
                             title={`${beacon.name} (RSSI: ${beacon.rssi})`}
                         >
                             <div className="beacon-pulse" />
-                            <span className="beacon-icon">🔷</span>
+                            <span className="beacon-icon" aria-hidden="true"><LayersIcon size={16} /></span>
                         </div>
                     ))}
 

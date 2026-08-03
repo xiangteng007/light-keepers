@@ -24,6 +24,15 @@ import {
     FileJson,
 } from 'lucide-react';
 import { Button, Badge, Modal, InputField, StatIndicator } from '../design-system';
+import {
+    TeamsIcon,
+    SirenIcon,
+    CalendarIcon,
+    InventoryIcon,
+    UserIcon,
+    SettingsIcon,
+    type LkIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { SkeletonList } from '../components/ui/Skeleton/Skeleton';
 import './BackupPage.css';
@@ -89,7 +98,7 @@ export default function BackupPage() {
 
     // 還原備份
     const handleRestore = async (backup: BackupInfo) => {
-        if (!confirm(`確定要還原備份「${backup.description || backup.id}」嗎？\n\n⚠️ 此操作會覆蓋現有資料！`)) return;
+        if (!confirm(`確定要還原備份「${backup.description || backup.id}」嗎？\n\n注意：此操作會覆蓋現有資料！`)) return;
 
         try {
             setRestoring(backup.id);
@@ -284,13 +293,14 @@ function CreateBackupModal({
     onConfirm: (modules: string[], description: string) => void;
     creating: boolean;
 }) {
-    const MODULE_OPTIONS = [
-        { value: 'volunteers', label: '志工資料', icon: '👥' },
-        { value: 'events', label: '事件資料', icon: '🚨' },
-        { value: 'activities', label: '活動資料', icon: '📅' },
-        { value: 'resources', label: '物資資料', icon: '📦' },
-        { value: 'users', label: '使用者資料', icon: '👤' },
-        { value: 'settings', label: '系統設定', icon: '⚙️' },
+    // R5/T5c：B3c 教範圖例，不再使用 emoji
+    const MODULE_OPTIONS: { value: string; label: string; Icon: LkIcon }[] = [
+        { value: 'volunteers', label: '志工資料', Icon: TeamsIcon },
+        { value: 'events', label: '事件資料', Icon: SirenIcon },
+        { value: 'activities', label: '活動資料', Icon: CalendarIcon },
+        { value: 'resources', label: '物資資料', Icon: InventoryIcon },
+        { value: 'users', label: '使用者資料', Icon: UserIcon },
+        { value: 'settings', label: '系統設定', Icon: SettingsIcon },
     ];
 
     const [selectedModules, setSelectedModules] = useState<string[]>(
@@ -353,7 +363,7 @@ function CreateBackupModal({
                                     onClick={() => toggleModule(mod.value)}
                                     aria-pressed={selected}
                                 >
-                                    <span className="module-icon" aria-hidden="true">{mod.icon}</span>
+                                    <span className="module-icon" aria-hidden="true"><mod.Icon size={20} /></span>
                                     <span className="module-label">{mod.label}</span>
                                     {selected && (
                                         <CheckCircle size={16} className="check-icon" aria-hidden="true" />

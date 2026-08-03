@@ -4,6 +4,14 @@
  * Logistics domain: matching, requests, supplies, equipment, donations, approvals.
  */
 import { Zap, GitMerge, Package } from 'lucide-react';
+import {
+    CameraIcon,
+    InventoryIcon,
+    RadioIcon,
+    ShelterIcon,
+    AedIcon,
+    type LkIcon,
+} from '../../../design-system/icons';
 import { ListItem, MetricCard } from '../shared/primitives';
 
 export const AIMatchesWidget = () => (
@@ -204,7 +212,7 @@ export const EquipmentScannerWidget = () => (
             justifyContent: 'center',
             marginBottom: '16px',
         }}>
-            <span style={{ fontSize: '48px' }}>📷</span>
+            <span style={{ color: 'var(--accent-gold)' }} aria-hidden="true"><CameraIcon size={48} /></span>
         </div>
         <div style={{ fontSize: '13px', color: 'var(--text-secondary)', textAlign: 'center' }}>
             掃描 QR Code 或輸入裝備編號
@@ -223,25 +231,38 @@ export const EquipmentScannerWidget = () => (
     </div>
 );
 
+/** 裝備 → B3c 教範圖例（R5/T5c）；無專屬圖例者收斂到物資箱 */
+const EQUIPMENT_ICONS: LkIcon[] = [
+    InventoryIcon,  // 發電機
+    RadioIcon,      // 對講機
+    ShelterIcon,    // 帳篷
+    AedIcon,        // 急救箱
+    InventoryIcon,  // 照明燈
+    InventoryIcon,  // 繩索
+];
+
 export const EquipmentGridWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: '12px' }}>
-            {['發電機', '對講機', '帳篷', '急救箱', '照明燈', '繩索'].map((item, i) => (
+            {['發電機', '對講機', '帳篷', '急救箱', '照明燈', '繩索'].map((item, i) => {
+                const EquipIcon = EQUIPMENT_ICONS[i] || InventoryIcon;
+                return (
                 <div key={i} style={{
                     padding: '16px',
                     background: 'rgba(47, 54, 65, 0.3)',
                     borderRadius: '10px',
                     textAlign: 'center',
                 }}>
-                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>
-                        {['⚡', '📻', '⛺', '🩹', '💡', '🪢'][i]}
+                    <div style={{ marginBottom: '8px', color: 'var(--text-secondary)' }} aria-hidden="true">
+                        <EquipIcon size={24} />
                     </div>
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
                         可用: <span className="u-mono">{Math.floor(Math.random() * 20 + 5)}</span>
                     </div>
                 </div>
-            ))}
+                );
+            })}
         </div>
     </div>
 );

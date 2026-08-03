@@ -1,21 +1,30 @@
 import { useState, useEffect } from 'react';
 import { Camera, RefreshCw } from 'lucide-react';
 import { Alert, Badge, Button, Card } from '../design-system';
+import {
+    WarningIcon,
+    ClockIcon,
+    ChevronUpIcon,
+    ChevronDownIcon,
+    LocationIcon,
+    InfoIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './ResourcesPublicPage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 
-// 物資分類配置
-const CATEGORY_CONFIG: Record<string, { label: string; icon: string; color: string }> = {
-    food: { label: '食品', icon: '🍚', color: '#FF9800' },
-    water: { label: '飲水', icon: '💧', color: '#2196F3' },
-    medical: { label: '醫療', icon: '🏥', color: '#F44336' },
-    shelter: { label: '收容', icon: '🏠', color: '#4CAF50' },
-    clothing: { label: '衣物', icon: '👕', color: '#9C27B0' },
-    equipment: { label: '設備', icon: '🔧', color: '#607D8B' },
-    other: { label: '其他', icon: '📦', color: '#795548' },
+// 物資分類配置（R5/T5c：B3c 無對應各分類語意的 icon，移除 emoji 欄位，
+// 分類識別由卡片上的分類文字（label）承擔）
+const CATEGORY_CONFIG: Record<string, { label: string; color: string }> = {
+    food: { label: '食品', color: '#FF9800' },
+    water: { label: '飲水', color: '#2196F3' },
+    medical: { label: '醫療', color: '#F44336' },
+    shelter: { label: '收容', color: '#4CAF50' },
+    clothing: { label: '衣物', color: '#9C27B0' },
+    equipment: { label: '設備', color: '#607D8B' },
+    other: { label: '其他', color: '#795548' },
 };
 
 interface Resource {
@@ -149,7 +158,7 @@ export default function ResourcesPublicPage() {
             if (file) {
                 // 顯示詳細功能說明
                 window.confirm(
-                    '📷 QR Code 掃描功能\n\n' +
+                    'QR Code 掃描功能\n\n' +
                     '掃碼查詢功能正在開發中，預計包含：\n' +
                     '• 掃描物資 QR Code 查看詳細資訊\n' +
                     '• 快速查詢儲位與庫存狀態\n' +
@@ -208,28 +217,28 @@ export default function ResourcesPublicPage() {
                     onClick={() => setActiveFilter('low')}
                     aria-pressed={activeFilter === 'low'}
                 >
-                    ⚠️ 低庫存
+                    <WarningIcon size={14} /> 低庫存
                 </button>
                 <button
                     className={`filter-chip filter-chip--danger ${activeFilter === 'expiring' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('expiring')}
                     aria-pressed={activeFilter === 'expiring'}
                 >
-                    ⏰ 即期品
+                    <ClockIcon size={14} /> 即期品
                 </button>
                 <button
                     className={`filter-chip ${activeFilter === 'equipment' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('equipment')}
                     aria-pressed={activeFilter === 'equipment'}
                 >
-                    🔧 器材
+                    器材
                 </button>
                 <button
                     className={`filter-chip ${activeFilter === 'consumable' ? 'active' : ''}`}
                     onClick={() => setActiveFilter('consumable')}
                     aria-pressed={activeFilter === 'consumable'}
                 >
-                    📦 耗材
+                    耗材
                 </button>
             </div>
 
@@ -267,15 +276,14 @@ export default function ResourcesPublicPage() {
                                     >
                                         <div className="resource-card__header">
                                             <div className="resource-card__info">
-                                                <span className="resource-icon">{category.icon}</span>
                                                 <div className="resource-details">
                                                     <h4 className="resource-name">{resource.name}</h4>
                                                     <span className="resource-category">{category.label}</span>
                                                 </div>
                                             </div>
                                             <div className="resource-card__badges">
-                                                {isLow && <Badge variant="warning">⚠️ 低庫存</Badge>}
-                                                {expiring && <Badge variant="danger">⏰ 即期</Badge>}
+                                                {isLow && <Badge variant="warning" icon={<WarningIcon size={12} />}>低庫存</Badge>}
+                                                {expiring && <Badge variant="danger" icon={<ClockIcon size={12} />}>即期</Badge>}
                                             </div>
                                         </div>
 
@@ -289,7 +297,9 @@ export default function ResourcesPublicPage() {
                                         </div>
 
                                         <div className="resource-card__expand-hint">
-                                            {isExpanded ? '▲ 收合' : '▼ 點擊查看儲位'}
+                                            {isExpanded
+                                                ? <><ChevronUpIcon size={12} /> 收合</>
+                                                : <><ChevronDownIcon size={12} /> 點擊查看儲位</>}
                                         </div>
 
                                         {/* 展開的儲位詳情 */}
@@ -298,7 +308,7 @@ export default function ResourcesPublicPage() {
                                                 <div className="location-header">儲位分布</div>
                                                 {resource.location ? (
                                                     <div className="location-item">
-                                                        <span className="location-path">📍 {resource.location}</span>
+                                                        <span className="location-path"><LocationIcon size={14} /> {resource.location}</span>
                                                         <span className="location-qty">{resource.quantity} {resource.unit}</span>
                                                     </div>
                                                 ) : (
@@ -317,7 +327,7 @@ export default function ResourcesPublicPage() {
                     {/* 器材區塊 */}
                     {(activeFilter === 'all' || activeFilter === 'equipment') && assets.length > 0 && (
                         <div className="assets-section">
-                            <h3 className="section-title">🔧 器材狀態</h3>
+                            <h3 className="section-title">器材狀態</h3>
                             <div className="asset-stats">
                                 <div className="asset-stat">
                                     <span className="stat-value">{assetStats.inStock}</span>
@@ -339,12 +349,12 @@ export default function ResourcesPublicPage() {
                                             {asset.status === 'in_stock' ? '在庫' : '借出中'}
                                         </Badge>
                                         {asset.status === 'in_stock' && asset.location && (
-                                            <span className="asset-location">📍 {asset.location.fullPath}</span>
+                                            <span className="asset-location"><LocationIcon size={14} /> {asset.location.fullPath}</span>
                                         )}
                                     </div>
                                 ))}
                             </div>
-                            <p className="assets-note">ⓘ 如需借用請聯繫倉管人員</p>
+                            <p className="assets-note"><InfoIcon size={14} /> 如需借用請聯繫倉管人員</p>
                         </div>
                     )}
                 </>

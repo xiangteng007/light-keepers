@@ -3,11 +3,15 @@
  *
  * Offline hub: sync status, pending queue and mesh network.
  */
+import { WebhookIcon } from '../../../design-system/icons';
+import { DotStamp } from '../../../design-system/icons/pictograms';
 
 export const SyncStatusWidget = () => (
     <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'space-around', padding: '8px' }}>
         <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>● 上線</div>
+            <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}>
+                <DotStamp size={12} /> 上線
+            </div>
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>網路狀態</div>
         </div>
         <div style={{ textAlign: 'center' }}>
@@ -42,7 +46,7 @@ export const PendingQueueWidget = () => (
 
 export const MeshNetworkWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌐</div>
+        <div style={{ marginBottom: '8px', color: 'var(--text-secondary)' }} aria-hidden="true"><WebhookIcon size={32} /></div>
         <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text-primary)' }}>P2P 網路</div>
         <div style={{ fontSize: '12px', color: '#22c55e', marginTop: '4px' }}>2 個節點連線中</div>
     </div>

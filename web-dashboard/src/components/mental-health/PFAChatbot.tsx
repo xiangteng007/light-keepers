@@ -4,6 +4,7 @@
  * Psychological First Aid (PFA) AI Chatbot interface
  */
 import React, { useState, useRef, useEffect } from 'react';
+import { SupportIcon, InfoIcon, SosIcon } from '../../design-system/icons';
 import './PFAChatbot.css';
 
 interface ChatMessage {
@@ -96,7 +97,7 @@ export function PFAChatbot({ onSendMessage }: PFAChatbotProps) {
     return (
         <div className="pfa-chatbot">
             <div className="pfa-chatbot__header">
-                <div className="chatbot-avatar">🌱</div>
+                <div className="chatbot-avatar" aria-hidden="true"><SupportIcon size={20} /></div>
                 <div className="chatbot-info">
                     <h3>心理急救助理</h3>
                     <span className="chatbot-status">● 隨時在線</span>
@@ -167,8 +168,8 @@ export function PFAChatbot({ onSendMessage }: PFAChatbotProps) {
             </div>
 
             <div className="pfa-chatbot__footer">
-                <p>💡 此為 AI 輔助工具，無法取代專業心理諮詢</p>
-                <p>🆘 緊急求助：<a href="tel:1925">1925 安心專線</a></p>
+                <p><InfoIcon size={16} aria-hidden="true" /> 此為 AI 輔助工具，無法取代專業心理諮詢</p>
+                <p><SosIcon size={16} aria-hidden="true" /> 緊急求助：<a href="tel:1925">1925 安心專線</a></p>
             </div>
         </div>
     );

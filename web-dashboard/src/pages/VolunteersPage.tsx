@@ -9,16 +9,16 @@ import { useAuth } from '../context/AuthContext';
 import type { Volunteer as VolunteerType, VolunteerStatus } from '../api/services';
 import './VolunteersPage.css';
 
-// 技能選項
+// 技能選項（R5/T5c：技能標籤純文字，不再使用 emoji）
 const SKILL_OPTIONS = [
-    { value: 'medical', label: '醫療救護', icon: '🏥' },
-    { value: 'rescue', label: '搜救救難', icon: '🚒' },
-    { value: 'logistics', label: '物資運送', icon: '📦' },
-    { value: 'cooking', label: '炊事料理', icon: '🍳' },
-    { value: 'communication', label: '通訊聯絡', icon: '📡' },
-    { value: 'driving', label: '駕駛運輸', icon: '🚗' },
-    { value: 'construction', label: '土木修繕', icon: '🔧' },
-    { value: 'social', label: '社工關懷', icon: '💝' },
+    { value: 'medical', label: '醫療救護' },
+    { value: 'rescue', label: '搜救救難' },
+    { value: 'logistics', label: '物資運送' },
+    { value: 'cooking', label: '炊事料理' },
+    { value: 'communication', label: '通訊聯絡' },
+    { value: 'driving', label: '駕駛運輸' },
+    { value: 'construction', label: '土木修繕' },
+    { value: 'social', label: '社工關懷' },
 ];
 
 // 狀態語意對照（DESIGN_LANGUAGE.md §3）：available→success、busy→warning、offline→default(中性)
@@ -105,7 +105,7 @@ export default function VolunteersPage() {
 
     const getSkillLabel = (skillValue: string) => {
         const skill = SKILL_OPTIONS.find(s => s.value === skillValue);
-        return skill ? `${skill.icon} ${skill.label}` : skillValue;
+        return skill ? skill.label : skillValue;
     };
 
 

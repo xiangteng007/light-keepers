@@ -1,4 +1,5 @@
 import React from 'react';
+import { CheckIcon, WarningIcon } from '../../../design-system/icons';
 import './RiskBadge.css';
 
 export type RiskLevel = 'low' | 'medium' | 'high' | 'critical';
@@ -10,24 +11,25 @@ interface RiskBadgeProps {
     className?: string;
 }
 
+// R5/T5c：icon 改用 B3c 教範圖例（低風險＝勾核、其餘＝三角警告）
 const RISK_CONFIG = {
     low: {
-        icon: '✓',
+        icon: <CheckIcon size={16} aria-hidden="true" />,
         text: '低風險',
         label: 'Low Risk',
     },
     medium: {
-        icon: '⚠',
+        icon: <WarningIcon size={16} aria-hidden="true" />,
         text: '中風險',
         label: 'Medium Risk',
     },
     high: {
-        icon: '⚠',
+        icon: <WarningIcon size={16} aria-hidden="true" />,
         text: '高風險',
         label: 'High Risk',
     },
     critical: {
-        icon: '⚠',
+        icon: <WarningIcon size={16} aria-hidden="true" />,
         text: '極危',
         label: 'Critical Risk',
     },

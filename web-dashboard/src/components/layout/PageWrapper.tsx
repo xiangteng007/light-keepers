@@ -43,8 +43,8 @@ export default function PageWrapper({
     const { user } = useAuth();
 
     // Map user role to PermissionLevel
-    // 🔧 DevMode: Use SystemOwner level to show all sidebar items
-    // ⚠️ DEV build 專用 — production build 中 isDevModeUser() 會被 tree-shaking 成 false
+    // DevMode: Use SystemOwner level to show all sidebar items
+    // DEV build 專用 — production build 中 isDevModeUser() 會被 tree-shaking 成 false
     const devModeEnabled = isDevModeUser();
     const userLevel = devModeEnabled
         ? PermissionLevel.SystemOwner

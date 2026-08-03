@@ -5,6 +5,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useTheme } from '../hooks/useTheme';
 import type { ThemeMode } from '../hooks/useTheme';
+import { ThemeIcon, CheckIcon } from '../design-system/icons';
 import '../styles/theme.css';
 
 // 簡單切換按鈕（淺/深色切換）
@@ -18,8 +19,8 @@ export function ThemeToggle() {
             title={isDark ? '切換到淺色模式' : '切換到深色模式'}
             aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
         >
-            <span className="theme-toggle__icon">
-                {isDark ? '☀️' : '🌙'}
+            <span className="theme-toggle__icon" aria-hidden="true">
+                <ThemeIcon size={20} />
             </span>
         </button>
     );
@@ -48,10 +49,11 @@ export function ThemeSelector() {
         };
     }, [isOpen]);
 
-    const options: { value: ThemeMode; icon: string; label: string }[] = [
-        { value: 'light', icon: '☀️', label: '淺色模式' },
-        { value: 'dark', icon: '🌙', label: '深色模式' },
-        { value: 'system', icon: '💻', label: '跟隨系統' },
+    // R5/T5c：選單以文字為主（B3c 無晝/夜專屬圖例，按鈕統一 ThemeIcon）
+    const options: { value: ThemeMode; label: string }[] = [
+        { value: 'light', label: '淺色模式' },
+        { value: 'dark', label: '深色模式' },
+        { value: 'system', label: '跟隨系統' },
     ];
 
     const currentOption = options.find(o => o.value === mode) || options[2];
@@ -65,7 +67,7 @@ export function ThemeSelector() {
                 aria-label="Select theme"
                 aria-expanded={isOpen}
             >
-                <span className="theme-toggle__icon">{currentOption.icon}</span>
+                <span className="theme-toggle__icon" aria-hidden="true"><ThemeIcon size={20} /></span>
             </button>
 
             {isOpen && (
@@ -79,10 +81,9 @@ export function ThemeSelector() {
                                 setIsOpen(false);
                             }}
                         >
-                            <span className="theme-selector__option-icon">{option.icon}</span>
                             <span className="theme-selector__option-label">{option.label}</span>
                             {mode === option.value && (
-                                <span className="theme-selector__option-check">✓</span>
+                                <span className="theme-selector__option-check" aria-hidden="true"><CheckIcon size={16} /></span>
                             )}
                         </button>
                     ))}

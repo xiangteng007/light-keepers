@@ -4,6 +4,7 @@
  * Governance domain: audit log, accounts, tenants, roles/permissions, feature flags.
  */
 import { CheckCircle, AlertTriangle, Shield, Building, Users, Database, Percent } from 'lucide-react';
+import { CheckIcon, CloseIcon } from '../../../design-system/icons';
 
 export const AuditTableWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
@@ -265,7 +266,9 @@ export const PermissionMatrixWidget = () => (
                         <td style={{ padding: '8px', color: 'var(--text-secondary)' }}>{perm}</td>
                         {[1, 2, 3, 4, 5].map(level => (
                             <td key={level} style={{ padding: '8px', textAlign: 'center' }}>
-                                {level >= i + 1 ? '✅' : '❌'}
+                                {level >= i + 1
+                                    ? <CheckIcon size={14} aria-hidden="true" style={{ color: '#22c55e', verticalAlign: 'middle' }} />
+                                    : <CloseIcon size={14} aria-hidden="true" style={{ color: '#ef4444', verticalAlign: 'middle' }} />}
                             </td>
                         ))}
                     </tr>

@@ -29,18 +29,27 @@ import {
     Users,
 } from 'lucide-react';
 import { Badge, Button, Card, InputField, Modal, StatIndicator } from '../design-system';
+import {
+    MoreIcon,
+    SupportIcon,
+    ExportIcon,
+    CalendarIcon,
+    SirenIcon,
+    UserIcon,
+    type LkIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './CommunityPage.css';
 
-// 分類標籤
-const CATEGORY_OPTIONS: { value: PostCategory; label: string; emoji: string; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }[] = [
-    { value: 'general', label: '一般討論', emoji: '💬', variant: 'default' },
-    { value: 'help', label: '求助', emoji: '🆘', variant: 'warning' },
-    { value: 'share', label: '分享', emoji: '📢', variant: 'success' },
-    { value: 'event', label: '活動', emoji: '📅', variant: 'info' },
-    { value: 'emergency', label: '緊急', emoji: '🚨', variant: 'danger' },
-    { value: 'volunteer', label: '志工', emoji: '🙋', variant: 'default' },
+// 分類標籤（R5/T5c：B3c 教範圖例，不再使用 emoji）
+const CATEGORY_OPTIONS: { value: PostCategory; label: string; Icon: LkIcon; variant: 'default' | 'success' | 'warning' | 'danger' | 'info' }[] = [
+    { value: 'general', label: '一般討論', Icon: MoreIcon, variant: 'default' },
+    { value: 'help', label: '求助', Icon: SupportIcon, variant: 'warning' },
+    { value: 'share', label: '分享', Icon: ExportIcon, variant: 'success' },
+    { value: 'event', label: '活動', Icon: CalendarIcon, variant: 'info' },
+    { value: 'emergency', label: '緊急', Icon: SirenIcon, variant: 'danger' },
+    { value: 'volunteer', label: '志工', Icon: UserIcon, variant: 'default' },
 ];
 
 export default function CommunityPage() {
@@ -167,7 +176,7 @@ export default function CommunityPage() {
                         onClick={() => setSelectedCategory(cat.value)}
                         aria-pressed={selectedCategory === cat.value}
                     >
-                        {cat.emoji} {cat.label}
+                        <cat.Icon size={16} aria-hidden="true" /> {cat.label}
                     </button>
                 ))}
             </div>
@@ -208,7 +217,7 @@ export default function CommunityPage() {
                                     <span className="post-card__time">{formatTime(post.createdAt)}</span>
                                 </div>
                                 <Badge variant={getCategoryInfo(post.category).variant} size="sm">
-                                    {getCategoryInfo(post.category).emoji} {getCategoryInfo(post.category).label}
+                                    {getCategoryInfo(post.category).label}
                                 </Badge>
                             </div>
 
@@ -335,7 +344,7 @@ function CreatePostModal({
                                 onClick={() => setCategory(cat.value)}
                                 aria-pressed={category === cat.value}
                             >
-                                {cat.emoji} {cat.label}
+                                <cat.Icon size={16} aria-hidden="true" /> {cat.label}
                             </button>
                         ))}
                     </div>
@@ -450,7 +459,7 @@ function PostDetailModal({
 
                 <div className="post-detail__content">
                     <Badge variant={getCategoryInfo(post.category).variant} size="sm">
-                        {getCategoryInfo(post.category).emoji} {getCategoryInfo(post.category).label}
+                        {getCategoryInfo(post.category).label}
                     </Badge>
 
                     <p>{post.content}</p>

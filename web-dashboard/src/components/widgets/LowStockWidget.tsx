@@ -6,19 +6,31 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { Card, Badge } from '../../design-system';
+import {
+    InventoryIcon,
+    AedIcon,
+    ShelterIcon,
+    SettingsIcon,
+    WarningIcon,
+    CheckIcon,
+    type LkIcon,
+} from '../../design-system/icons';
 import { getLowStockResources, getExpiringResources } from '../../api/services';
 
-function getCategoryIcon(category: string): string {
-    const icons: Record<string, string> = {
-        food: '🍚',
-        water: '💧',
-        medical: '💊',
-        shelter: '🏠',
-        clothing: '👕',
-        equipment: '🔧',
-        other: '📦',
-    };
-    return icons[category] || '📦';
+/** 物資類別 → B3c 教範圖例（R5/T5c）；無專屬圖例者收斂到最接近語意 */
+const CATEGORY_ICONS: Record<string, LkIcon> = {
+    food: InventoryIcon,
+    water: InventoryIcon,
+    medical: AedIcon,
+    shelter: ShelterIcon,
+    clothing: InventoryIcon,
+    equipment: SettingsIcon,
+    other: InventoryIcon,
+};
+
+function getCategoryIcon(category: string) {
+    const Icon = CATEGORY_ICONS[category] || InventoryIcon;
+    return <Icon size={16} aria-hidden="true" />;
 }
 
 
@@ -98,13 +110,13 @@ export function LowStockWidget() {
     const displayAlerts = allAlerts.slice(0, 8);
 
     return (
-        <Card title="庫存告警" icon="⚠️" padding="md">
+        <Card title="庫存告警" icon={<WarningIcon size={16} aria-hidden="true" />} padding="md">
             <div className="stock-alert-list">
                 {isLoading && <div className="loading">載入中...</div>}
 
                 {!isLoading && displayAlerts.length === 0 && (
                     <div className="empty-state-mini">
-                        <span className="empty-icon">✅</span>
+                        <span className="empty-icon" aria-hidden="true"><CheckIcon size={20} /></span>
                         <span>物資庫存充足</span>
                     </div>
                 )}

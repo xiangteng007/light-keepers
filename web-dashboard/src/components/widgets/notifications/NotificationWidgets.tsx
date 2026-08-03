@@ -3,6 +3,7 @@
  *
  * Notification hub: feed, summary, channel status and preferences.
  */
+import { DotStamp } from '../../../design-system/icons/pictograms';
 
 export const NotificationFeedWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
@@ -52,7 +53,9 @@ export const ChannelStatusWidget = () => (
         ].map((ch, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
                 <span style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{ch.name}</span>
-                <span style={{ fontSize: '11px', color: ch.status === 'online' ? '#22c55e' : '#ef4444' }}>● {ch.status === 'online' ? '連線中' : '離線'}</span>
+                <span style={{ fontSize: '11px', color: ch.status === 'online' ? '#22c55e' : '#ef4444', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                    <DotStamp size={8} /> {ch.status === 'online' ? '連線中' : '離線'}
+                </span>
             </div>
         ))}
     </div>

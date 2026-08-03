@@ -233,15 +233,32 @@
     border-top: 1px solid var(--border-default);
 }
 
-/* 來源標籤（表格） */
+/* 來源標籤（表格）— R5/T5c 移除 emoji 後改顯示文字 */
 .source-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
+    min-width: 28px;
     height: 28px;
+    padding: 0 var(--space-2);
     border-radius: var(--radius-sm);
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-xs);
+    white-space: nowrap;
+}
+
+/* R5/T5c: 嚴重度星等改 B3c 方章（實心=等級、空心=餘格） */
+.severity-pips {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+}
+
+/* R5/T5c: 行內 icon 與文字對齊 */
+.event-card__meta span,
+.info-label {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
 }
 
 /* 表格視圖 */

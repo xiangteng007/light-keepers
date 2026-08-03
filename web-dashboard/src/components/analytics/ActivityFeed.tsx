@@ -3,6 +3,7 @@
  * Displays recent activity timeline
  */
 
+import { ReportIcon, SosIcon, TasksIcon, type LkIcon } from '../../design-system/icons';
 import './ActivityFeed.css';
 
 export interface ActivityItem {
@@ -20,10 +21,11 @@ export interface ActivityFeedProps {
     maxItems?: number;
 }
 
-const TYPE_ICONS: Record<string, string> = {
-    report: '📋',
-    sos: '🆘',
-    task: '📝',
+// R5/T5c：B3c 教範圖例，不再使用 emoji
+const TYPE_ICONS: Record<string, LkIcon> = {
+    report: ReportIcon,
+    sos: SosIcon,
+    task: TasksIcon,
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -88,7 +90,7 @@ export function ActivityFeed({ activities, loading, maxItems = 10 }: ActivityFee
                                 className="activity-item__icon"
                                 style={{ borderColor: TYPE_COLORS[item.type] }}
                             >
-                                {TYPE_ICONS[item.type]}
+                                {(() => { const TypeIcon = TYPE_ICONS[item.type]; return TypeIcon ? <TypeIcon size={16} aria-hidden="true" /> : null; })()}
                             </div>
                             <div className="activity-item__content">
                                 <div className="activity-item__description">

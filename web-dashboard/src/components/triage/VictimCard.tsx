@@ -3,6 +3,14 @@
  */
 
 import React from 'react';
+import {
+    ClockIcon,
+    VehicleIcon,
+    CheckIcon,
+    CloseIcon,
+    LocationIcon,
+    type LkIcon,
+} from '../../design-system/icons';
 import './VictimCard.css';
 
 // Types
@@ -49,13 +57,21 @@ export const VictimCard: React.FC<VictimCardProps> = ({
         return labels[level];
     };
 
+    /** 運送狀態 → B3c 教範圖例（R5/T5c）：待送＝時鐘、運送中＝載具、已到院＝勾 */
     const getTransportIcon = (status: Victim['transportStatus']) => {
-        const icons = {
-            PENDING: '⏳',
-            IN_TRANSIT: '🚑',
-            ARRIVED: '🏥',
+        const icons: Record<Victim['transportStatus'], LkIcon> = {
+            PENDING: ClockIcon,
+            IN_TRANSIT: VehicleIcon,
+            ARRIVED: CheckIcon,
         };
-        return icons[status];
+        const TransportIcon = icons[status];
+        return (
+            <TransportIcon
+                size={14}
+                aria-hidden="true"
+                style={{ verticalAlign: 'text-bottom', marginRight: 4 }}
+            />
+        );
     };
 
     const formatTime = (dateStr: string) => {
@@ -104,19 +120,27 @@ export const VictimCard: React.FC<VictimCardProps> = ({
 
             <div className="vital-signs">
                 <div className={`vital ${victim.breathing ? 'ok' : 'alert'}`}>
-                    <span className="icon">{victim.breathing ? '✅' : '❌'}</span>
+                    <span className="icon" aria-hidden="true">
+                        {victim.breathing ? <CheckIcon size={14} /> : <CloseIcon size={14} />}
+                    </span>
                     <span>呼吸</span>
                 </div>
                 <div className={`vital ${victim.hasRadialPulse ? 'ok' : 'alert'}`}>
-                    <span className="icon">{victim.hasRadialPulse ? '✅' : '❌'}</span>
+                    <span className="icon" aria-hidden="true">
+                        {victim.hasRadialPulse ? <CheckIcon size={14} /> : <CloseIcon size={14} />}
+                    </span>
                     <span>脈搏</span>
                 </div>
                 <div className={`vital ${victim.canFollowCommands ? 'ok' : 'alert'}`}>
-                    <span className="icon">{victim.canFollowCommands ? '✅' : '❌'}</span>
+                    <span className="icon" aria-hidden="true">
+                        {victim.canFollowCommands ? <CheckIcon size={14} /> : <CloseIcon size={14} />}
+                    </span>
                     <span>意識</span>
                 </div>
                 <div className={`vital ${victim.canWalk ? 'ok' : 'alert'}`}>
-                    <span className="icon">{victim.canWalk ? '✅' : '❌'}</span>
+                    <span className="icon" aria-hidden="true">
+                        {victim.canWalk ? <CheckIcon size={14} /> : <CloseIcon size={14} />}
+                    </span>
                     <span>行走</span>
                 </div>
             </div>
@@ -129,7 +153,7 @@ export const VictimCard: React.FC<VictimCardProps> = ({
 
             {victim.locationDescription && (
                 <div className="location">
-                    <span className="label">📍</span> {victim.locationDescription}
+                    <span className="label" aria-hidden="true"><LocationIcon size={14} /></span> {victim.locationDescription}
                 </div>
             )}
 
@@ -152,7 +176,12 @@ export const VictimCard: React.FC<VictimCardProps> = ({
                         onTransport(victim);
                     }}
                 >
-                    🚑 派送運輸
+                    <VehicleIcon
+                        size={14}
+                        aria-hidden="true"
+                        style={{ verticalAlign: 'text-bottom', marginRight: 4 }}
+                    />
+                    派送運輸
                 </button>
             )}
         </div>

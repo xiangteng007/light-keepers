@@ -4,6 +4,7 @@
  */
 
 import React, { useRef, useEffect, useState } from 'react';
+import { RadioIcon } from '../../design-system/icons';
 import './SpectrumViewer.css';
 
 // Types
@@ -172,9 +173,9 @@ export const SpectrumViewer: React.FC<SpectrumViewerProps> = ({
 
     const getTypeLabel = (type: Anomaly['type']) => {
         const labels = {
-            jamming: '🚨 干擾器',
-            interference: '⚠️ 雜訊',
-            unknown: '❓ 未知',
+            jamming: '干擾器',
+            interference: '雜訊',
+            unknown: '未知',
         };
         return labels[type];
     };
@@ -182,7 +183,7 @@ export const SpectrumViewer: React.FC<SpectrumViewerProps> = ({
     return (
         <div className="spectrum-viewer">
             <div className="viewer-header">
-                <h3>📡 頻譜分析</h3>
+                <h3><RadioIcon size={20} aria-hidden="true" /> 頻譜分析</h3>
                 <div className="freq-range">
                     {(frequencyRange.min / 1e6).toFixed(0)} - {(frequencyRange.max / 1e6).toFixed(0)} MHz
                 </div>

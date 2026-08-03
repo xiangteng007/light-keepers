@@ -16,7 +16,6 @@ export interface ThemeInfo {
   displayName: string;
   displayNameEn: string;
   description: string;
-  icon: string;
   isOledOptimized?: boolean;
 }
 
@@ -27,14 +26,12 @@ export const AVAILABLE_THEMES: ThemeInfo[] = [
     displayName: '亮鋼版',
     displayNameEn: 'Bright Steel',
     description: '日間模式，適合辦公環境',
-    icon: '🔩',
   },
   {
     name: 'dark',
     displayName: '銅鋼版',
     displayNameEn: 'Copper Steel',
     description: '暗色模式，OLED 省電優化',
-    icon: '🟤',
     isOledOptimized: true,
   },
 ];

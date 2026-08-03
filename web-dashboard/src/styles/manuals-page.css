@@ -630,3 +630,18 @@
   }
 }
 
+
+/* R5/T5c：手冊詳情頁 B3c 圖例與文字對齊 */
+.manual-breadcrumb__category {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.manual-tips h2,
+.manual-pocket-card h2,
+.manual-checklists h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

@@ -1,4 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom';
+import { LockIcon } from '../design-system/icons';
 import { useAuth } from '../context/AuthContext';
 import { isDevModeUser } from '../utils/devMode';
 
@@ -77,7 +78,7 @@ export default function ProtectedRoute({ children, requiredLevel = 1 }: Protecte
         return (
             <div className="access-denied">
                 <div className="access-denied__content">
-                    <span className="access-denied__icon">🔒</span>
+                    <span className="access-denied__icon" aria-hidden="true"><LockIcon size={32} /></span>
                     <h2>權限不足</h2>
                     <p>您的權限等級不足以訪問此頁面</p>
                     <p className="access-denied__info">

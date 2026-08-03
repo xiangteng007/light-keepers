@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { WarningIcon, CloseIcon } from '../../design-system/icons';
 import { useQuery } from '@tanstack/react-query';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
@@ -136,7 +137,7 @@ export function TimelineView({ sessionId, onEventClick }: TimelineViewProps) {
     if (error) {
         return (
             <div className="timeline-error">
-                <span>⚠️ 無法載入時間軸資料</span>
+                <span><WarningIcon size={16} aria-hidden="true" /> 無法載入時間軸資料</span>
             </div>
         );
     }
@@ -238,7 +239,7 @@ export function TimelineView({ sessionId, onEventClick }: TimelineViewProps) {
                                 className="timeline-detail-close"
                                 onClick={() => setSelectedEvent(null)}
                             >
-                                ✕
+                                <CloseIcon size={16} aria-hidden="true" />
                             </button>
                         </div>
                         <div className="timeline-detail-body">

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
+import { LocationIcon, CheckIcon, CloseIcon, InventoryIcon } from '../../design-system/icons';
 import { ResourcesTabSkeleton } from './ResourcesSkeleton';
 import './DispatchTab.css';
 import api from '../../api/client';
@@ -161,7 +162,7 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
                         size="sm" 
                         onClick={() => {
                             const confirmed = window.confirm(
-                                '📦 建立調度單功能\n\n' +
+                                '建立調度單功能\n\n' +
                                 '此功能正在開發中，預計包含：\n' +
                                 '• 選擇物資品項與數量\n' +
                                 '• 指定配送目的地\n' +
@@ -195,7 +196,7 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
                             </div>
 
                             <div className="order-destination">
-                                📍 {order.destination}
+                                <LocationIcon size={16} aria-hidden="true" /> {order.destination}
                                 {order.contactName && <span> ({order.contactName})</span>}
                             </div>
 
@@ -215,15 +216,15 @@ export default function DispatchTab({ canManage, userName }: DispatchTabProps) {
                                 <div className="order-actions">
                                     {order.status === 'pending' && (
                                         <>
-                                            <Button size="sm" onClick={() => handleApprove(order)}>✅ 審核通過</Button>
-                                            <Button size="sm" variant="ghost" onClick={() => handleReject(order)}>❌ 駁回</Button>
+                                            <Button size="sm" onClick={() => handleApprove(order)}><CheckIcon size={16} aria-hidden="true" /> 審核通過</Button>
+                                            <Button size="sm" variant="ghost" onClick={() => handleReject(order)}><CloseIcon size={16} aria-hidden="true" /> 駁回</Button>
                                         </>
                                     )}
                                     {order.status === 'approved' && (
-                                        <Button size="sm" onClick={() => handleStartPicking(order)}>📦 開始配貨</Button>
+                                        <Button size="sm" onClick={() => handleStartPicking(order)}><InventoryIcon size={16} aria-hidden="true" /> 開始配貨</Button>
                                     )}
                                     {order.status === 'delivering' && (
-                                        <Button size="sm" onClick={() => handleComplete(order)}>🎉 確認送達</Button>
+                                        <Button size="sm" onClick={() => handleComplete(order)}><CheckIcon size={16} aria-hidden="true" /> 確認送達</Button>
                                     )}
                                 </div>
                             )}

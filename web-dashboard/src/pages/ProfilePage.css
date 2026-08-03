@@ -543,9 +543,15 @@ input:checked+.slider:before {
 }
 
 .register-success .success-icon {
-    font-size: var(--font-size-4xl);
     display: block;
     margin-bottom: var(--space-4);
+    color: var(--color-success);
+}
+
+.skill-btn__icon,
+.skill-btn__check {
+    display: inline-flex;
+    align-items: center;
 }
 
 .register-success h3 {

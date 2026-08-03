@@ -1,16 +1,38 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, X, ArrowLeft, ArrowRight, Inbox } from 'lucide-react';
 import Fuse from 'fuse.js';
 import { Card, Tag } from '../design-system';
+import {
+    AedIcon,
+    ShelterIcon,
+    LocationIcon,
+    RadioIcon,
+} from '../design-system/icons';
+import {
+    EarthquakePictogram,
+    TyphoonPictogram,
+    FirePictogram,
+    AirRaidPictogram,
+    CbrnPictogram,
+    InfrastructurePictogram,
+    type PictogramProps,
+} from '../design-system/icons/pictograms';
 import EmptyState from '../components/shared/EmptyState';
 
-// 手冊分類（10 大類別）
-const MANUAL_CATEGORIES = [
+// 手冊分類（10 大類別；R5/T5c：icon 為 B3c 教範圖例/災型象形，不再使用 emoji）
+const MANUAL_CATEGORIES: {
+    id: string;
+    name: string;
+    Icon: FC<PictogramProps>;
+    color: string;
+    description: string;
+    manualCount: number;
+}[] = [
     {
         id: 'earthquake',
         name: '地震',
-        icon: '🌍',
+        Icon: EarthquakePictogram,
         color: '#5BA3C0',
         description: '地震發生時的應變措施與避難要點',
         manualCount: 3,
@@ -18,7 +40,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'typhoon',
         name: '颱風水災',
-        icon: '🌀',
+        Icon: TyphoonPictogram,
         color: '#7B6FA6',
         description: '颱風、水災、土石流的預防與應變',
         manualCount: 3,
@@ -26,7 +48,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'fire',
         name: '火災',
-        icon: '🔥',
+        Icon: FirePictogram,
         color: '#E85A5A',
         description: '火災逃生與滅火器使用方法',
         manualCount: 3,
@@ -34,7 +56,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'firstaid',
         name: '急救',
-        icon: '❤️',
+        Icon: AedIcon,
         color: '#E53935',
         description: 'CPR、AED 使用與緊急傷患處理',
         manualCount: 3,
@@ -42,7 +64,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'shelter',
         name: '避難',
-        icon: '🏠',
+        Icon: ShelterIcon,
         color: '#4CAF50',
         description: '避難所使用規則與生存物資準備',
         manualCount: 2,
@@ -50,7 +72,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'war',
         name: '戰爭',
-        icon: '⚔️',
+        Icon: AirRaidPictogram,
         color: '#607D8B',
         description: '空襲警報、防空避難與戰時應變',
         manualCount: 3,
@@ -58,7 +80,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'nuclear',
         name: '核化災害',
-        icon: '☢️',
+        Icon: CbrnPictogram,
         color: '#FF9800',
         description: '核災與化學災害的防護與應變',
         manualCount: 2,
@@ -66,7 +88,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'infrastructure',
         name: '設施故障',
-        icon: '⚡',
+        Icon: InfrastructurePictogram,
         color: '#795548',
         description: '停電、瓦斯外洩等日常緊急狀況',
         manualCount: 2,
@@ -74,7 +96,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'outdoor',
         name: '戶外活動',
-        icon: '🏕️',
+        Icon: LocationIcon,
         color: '#2E7D32',
         description: '野營、露營、登山越野的安全須知',
         manualCount: 3,
@@ -82,7 +104,7 @@ const MANUAL_CATEGORIES = [
     {
         id: 'radio',
         name: '無線電通訊',
-        icon: '📻',
+        Icon: RadioIcon,
         color: '#1565C0',
         description: '無線電操作、通聯禮儀、台灣法規與緊急通訊',
         manualCount: 4,
@@ -418,7 +440,7 @@ export default function ManualsPage() {
                                 className="category-card__icon"
                                 style={{ backgroundColor: `${category.color}20` }}
                             >
-                                <span style={{ fontSize: '32px' }}>{category.icon}</span>
+                                <category.Icon size={32} aria-hidden="true" />
                             </div>
                             <div className="category-card__content">
                                 <h3 className="category-card__title">{category.name}</h3>
@@ -442,7 +464,9 @@ export default function ManualsPage() {
                             <ArrowLeft size={16} aria-hidden="true" /> 返回分類
                         </button>
                         <div className="manuals-list-title">
-                            <span aria-hidden="true" className="manuals-list-title__icon">{selectedCategoryInfo?.icon}</span>
+                            <span aria-hidden="true" className="manuals-list-title__icon">
+                                {selectedCategoryInfo && <selectedCategoryInfo.Icon size={24} />}
+                            </span>
                             <h2>{selectedCategoryInfo?.name}</h2>
                         </div>
                     </div>
@@ -493,7 +517,7 @@ export default function ManualsPage() {
                                         className="manual-item"
                                     >
                                         <div className="manual-item__category" aria-hidden="true">
-                                            <span>{category?.icon}</span>
+                                            <span>{category && <category.Icon size={24} />}</span>
                                         </div>
                                         <div className="manual-item__content">
                                             <h3 className="manual-item__title">{manual.title}</h3>

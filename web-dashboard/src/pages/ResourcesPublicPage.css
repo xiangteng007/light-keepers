@@ -162,8 +162,23 @@
     gap: var(--space-3);
 }
 
-.resource-icon {
-    font-size: var(--font-size-2xl);
+/* R5/T5c：分類 emoji 移除後，行內 icon 與文字的對齊支援 */
+.filter-chip,
+.location-path,
+.asset-location,
+.assets-note {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+}
+
+.assets-note {
+    justify-content: center;
+    width: 100%;
+}
+
+.resource-card__expand-hint svg {
+    vertical-align: -1px;
 }
 
 .resource-details {

@@ -34,7 +34,7 @@ export function ThemeSwitcher({ showLabel = false, size = 'md' }: ThemeSwitcherP
       
       {showLabel && (
         <span className={styles.label}>
-          {themeInfo.icon} {themeInfo.displayName}
+          {themeInfo.displayName}
         </span>
       )}
     </button>

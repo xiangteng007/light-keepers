@@ -29,6 +29,7 @@ import {
     AlertCircle,
 } from 'lucide-react';
 import { Button, Badge, Modal, InputField } from '../design-system';
+import { iconRegistry } from '../design-system/icons';
 import type { BadgeProps } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
@@ -41,13 +42,13 @@ const EXECUTION_STATUS: Record<string, { label: string; variant: BadgeProps['var
     running: { label: '執行中', variant: 'warning' },
 };
 
-// 報表類型選項
+// 報表類型選項（R5/T5c：icon 為 B3c iconRegistry 語意名，卡片以查表渲染；option 純文字）
 const REPORT_TYPES = [
-    { value: 'volunteer_hours', label: '志工時數報表', icon: '👥' },
-    { value: 'disaster', label: '災害統計報表', icon: '🚨' },
-    { value: 'inventory', label: '物資庫存報表', icon: '📦' },
-    { value: 'inventory_transaction', label: '物資異動報表', icon: '📊' },
-    { value: 'activity_attendance', label: '活動出席報表', icon: '📅' },
+    { value: 'volunteer_hours', label: '志工時數報表', icon: 'teams' },
+    { value: 'disaster', label: '災害統計報表', icon: 'siren' },
+    { value: 'inventory', label: '物資庫存報表', icon: 'inventory' },
+    { value: 'inventory_transaction', label: '物資異動報表', icon: 'analytics' },
+    { value: 'activity_attendance', label: '活動出席報表', icon: 'calendar' },
 ];
 
 // 頻率選項
@@ -155,7 +156,7 @@ export default function ReportSchedulePage() {
 
     // 取得報表類型資訊
     const getReportTypeInfo = (type: string) => {
-        return REPORT_TYPES.find(r => r.value === type) || { label: type, icon: '📄' };
+        return REPORT_TYPES.find(r => r.value === type) || { label: type, icon: 'files' };
     };
 
     return (
@@ -196,7 +197,10 @@ export default function ReportSchedulePage() {
                         >
                             <div className="schedule-card__header">
                                 <span className="schedule-card__icon" aria-hidden="true">
-                                    {getReportTypeInfo(schedule.reportType).icon}
+                                    {(() => {
+                                        const TypeIcon = iconRegistry[getReportTypeInfo(schedule.reportType).icon] ?? iconRegistry.files;
+                                        return <TypeIcon size={24} />;
+                                    })()}
                                 </span>
                                 <div className="schedule-card__title">
                                     <h3>{schedule.name}</h3>
@@ -360,7 +364,7 @@ function CreateScheduleModal({
                     <select id="report-type" value={reportType} onChange={e => setReportType(e.target.value)}>
                         {REPORT_TYPES.map(type => (
                             <option key={type.value} value={type.value}>
-                                {type.icon} {type.label}
+                                {type.label}
                             </option>
                         ))}
                     </select>

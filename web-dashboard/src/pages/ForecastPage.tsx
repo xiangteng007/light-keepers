@@ -4,6 +4,7 @@ import './ForecastPage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
 import { Alert, Button } from '../design-system';
+import { ChevronUpIcon, ChevronDownIcon } from '../design-system/icons';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import EmptyState from '../components/shared/EmptyState';
 import { CloudOff } from 'lucide-react';
@@ -97,25 +98,14 @@ const COUNTIES = [
 ];
 
 // 標籤定義
-const TABS: Array<{ id: string; label: string; emoji: string }> = [
-    { id: 'general', label: '一般天氣', emoji: '🏠' },
-    { id: 'marine', label: '海面天氣', emoji: '🌊' },
-    { id: 'tide', label: '潮汐預報', emoji: '🌙' },
-    { id: 'mountain', label: '登山天氣', emoji: '⛰️' },
-    { id: 'scenic', label: '風景區', emoji: '🏞️' },
-    { id: 'farm', label: '農場旅遊', emoji: '🌾' },
+const TABS: Array<{ id: string; label: string }> = [
+    { id: 'general', label: '一般天氣' },
+    { id: 'marine', label: '海面天氣' },
+    { id: 'tide', label: '潮汐預報' },
+    { id: 'mountain', label: '登山天氣' },
+    { id: 'scenic', label: '風景區' },
+    { id: 'farm', label: '農場旅遊' },
 ];
-
-// 天氣圖標對應
-const getWeatherIcon = (description: string): string => {
-    if (!description) return '🌤️';
-    if (description.includes('雨')) return '🌧️';
-    if (description.includes('雷')) return '⛈️';
-    if (description.includes('陰')) return '☁️';
-    if (description.includes('晴')) return '☀️';
-    if (description.includes('多雲')) return '⛅';
-    return '🌤️';
-};
 
 export default function ForecastPage() {
     const [selectedCounty, setSelectedCounty] = useState('臺北市');
@@ -297,7 +287,7 @@ export default function ForecastPage() {
                         className={`forecast-tab ${activeTab === tab.id ? 'is-active' : ''}`}
                         onClick={() => setActiveTab(tab.id)}
                     >
-                        <span aria-hidden="true">{tab.emoji}</span> {tab.label}
+                        {tab.label}
                     </button>
                 ))}
             </div>
@@ -349,7 +339,7 @@ export default function ForecastPage() {
 
                     {generalForecast.length > 0 && generalForecast[0] && (
                         <>
-                            <h2>📍 {generalForecast[0].locationName} 一週天氣預報</h2>
+                            <h2>{generalForecast[0].locationName} 一週天氣預報</h2>
                             <div className="weekly-table-container">
                                 {(() => {
                                     const elements = parseWeatherElements(generalForecast[0].weatherElements);
@@ -414,7 +404,7 @@ export default function ForecastPage() {
                                                     {days.map((day, idx) => (
                                                         <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
                                                             <div className="weather-cell">
-                                                                <span className="cell-icon">{getWeatherIcon(day.dayWx)}</span>
+                                                                <span className="cell-wx">{day.dayWx}</span>
                                                                 <span className="cell-temp">{day.dayMinT} - {day.dayMaxT}°C</span>
                                                             </div>
                                                         </td>
@@ -425,7 +415,7 @@ export default function ForecastPage() {
                                                     {days.map((day, idx) => (
                                                         <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
                                                             <div className="weather-cell">
-                                                                <span className="cell-icon">{getWeatherIcon(day.nightWx)}</span>
+                                                                <span className="cell-wx">{day.nightWx}</span>
                                                                 <span className="cell-temp">{day.nightMinT} - {day.nightMaxT}°C</span>
                                                             </div>
                                                         </td>
@@ -436,7 +426,7 @@ export default function ForecastPage() {
                                                     {days.map((day, idx) => (
                                                         <td key={idx} className={day.isWeekend ? 'weekend' : ''}>
                                                             <div className="weather-cell pop-cell">
-                                                                <span className="cell-pop">💧 {day.dayPop}%</span>
+                                                                <span className="cell-pop">{day.dayPop}%</span>
                                                             </div>
                                                         </td>
                                                     ))}
@@ -457,26 +447,26 @@ export default function ForecastPage() {
             )}
             {!loading && activeTab === 'marine' && marineForecast.length > 0 && (
                 <div className="forecast-section">
-                    <h2>🌊 海面天氣預報</h2>
+                    <h2>海面天氣預報</h2>
                     <div className="marine-grid">
                         {marineForecast.map((region: MarineRegion, idx: number) => (
                             <div key={idx} className="marine-card">
                                 <h3>{region.region}</h3>
                                 <div className="marine-details">
                                     <div className="detail-row">
-                                        <span>🌬️ 風向</span>
+                                        <span>風向</span>
                                         <span>{region.wind || '-'}</span>
                                     </div>
                                     <div className="detail-row">
-                                        <span>💨 風速</span>
+                                        <span>風速</span>
                                         <span>{region.windSpeed || '-'}</span>
                                     </div>
                                     <div className="detail-row">
-                                        <span>🌊 海況</span>
+                                        <span>海況</span>
                                         <span>{region.seaCondition || '-'}</span>
                                     </div>
                                     <div className="detail-row">
-                                        <span>📏 浪高</span>
+                                        <span>浪高</span>
                                         <span>{region.waveHeight || '-'}</span>
                                     </div>
                                 </div>
@@ -492,18 +482,18 @@ export default function ForecastPage() {
             )}
             {!loading && activeTab === 'tide' && tideForecast.length > 0 && (
                 <div className="forecast-section">
-                    <h2>🌙 潮汐預報（未來一個月）</h2>
+                    <h2>潮汐預報（未來一個月）</h2>
                     <div className="tide-grid">
                         {tideForecast.slice(0, 6).map((station: TideStation, idx: number) => (
                             <div key={idx} className="tide-card">
-                                <h3>📍 {station.station}</h3>
+                                <h3>{station.station}</h3>
                                 {station.forecasts && station.forecasts.slice(0, 3).map((day: TideForecast, dIdx: number) => (
                                     <div key={dIdx} className="tide-day">
                                         <div className="tide-date">{day.date}</div>
                                         <div className="tide-events">
                                             {day.tides && day.tides.map((tide: TideEvent, tIdx: number) => (
                                                 <span key={tIdx} className={`tide-event ${tide.type}`}>
-                                                    {tide.type === 'high' ? '🔺' : '🔻'}
+                                                    {tide.type === 'high' ? <ChevronUpIcon size={12} /> : <ChevronDownIcon size={12} />}
                                                     {new Date(tide.time).toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })}
                                                     ({tide.height}cm)
                                                 </span>
@@ -523,7 +513,7 @@ export default function ForecastPage() {
             )}
             {!loading && activeTab === 'mountain' && mountainForecast.length > 0 && (
                 <div className="forecast-section">
-                    <h2>⛰️ 登山天氣預報（一週）</h2>
+                    <h2>登山天氣預報（一週）</h2>
                     <div className="recreational-grid">
                         {mountainForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
@@ -532,7 +522,7 @@ export default function ForecastPage() {
                                     {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
-                                            <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
+                                            <span className="weather">{f.weather || '-'}</span>
                                             <span className="temp">{f.minTemp}~{f.maxTemp}°C</span>
                                         </div>
                                     ))}
@@ -549,7 +539,7 @@ export default function ForecastPage() {
             )}
             {!loading && activeTab === 'scenic' && scenicForecast.length > 0 && (
                 <div className="forecast-section">
-                    <h2>🏞️ 國家風景區預報（一週）</h2>
+                    <h2>國家風景區預報（一週）</h2>
                     <div className="recreational-grid">
                         {scenicForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
@@ -558,7 +548,7 @@ export default function ForecastPage() {
                                     {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
-                                            <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
+                                            <span className="weather">{f.weather || '-'}</span>
                                             <span className="temp">{f.minTemp}~{f.maxTemp}°C</span>
                                         </div>
                                     ))}
@@ -575,7 +565,7 @@ export default function ForecastPage() {
             )}
             {!loading && activeTab === 'farm' && farmForecast.length > 0 && (
                 <div className="forecast-section">
-                    <h2>🌾 農場旅遊預報（一週）</h2>
+                    <h2>農場旅遊預報（一週）</h2>
                     <div className="recreational-grid">
                         {farmForecast.slice(0, 12).map((location: RecreationalLocation, idx: number) => (
                             <div key={idx} className="recreational-card">
@@ -584,7 +574,7 @@ export default function ForecastPage() {
                                     {location.forecasts && location.forecasts.slice(0, 3).map((f: DailyForecast, fIdx: number) => (
                                         <div key={fIdx} className="forecast-item">
                                             <span className="date">{f.date}</span>
-                                            <span className="weather">{getWeatherIcon(f.weather)} {f.weather || '-'}</span>
+                                            <span className="weather">{f.weather || '-'}</span>
                                             <span className="temp">{f.minTemp}~{f.maxTemp}°C</span>
                                         </div>
                                     ))}

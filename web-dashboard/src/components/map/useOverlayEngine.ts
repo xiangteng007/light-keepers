@@ -4,6 +4,7 @@ import {
     Map,
     GeoJSONSource,
 } from 'maplibre-gl';
+import { mapSymbolRegistry, type MapSymbolId } from '../../design-system/icons/map-symbols';
 
 // Overlay types matching backend enums
 export type OverlayType = 'aoi' | 'hazard' | 'poi' | 'line' | 'polygon';
@@ -42,16 +43,26 @@ const SEVERITY_COLORS: Record<number, string> = {
     4: 'rgba(239, 68, 68, 0.4)',   // Red
 };
 
-// POI icon mapping
-const POI_ICONS: Record<string, string> = {
-    shelter: '🏠',
-    aed: '💚',
-    rally_point: '🚩',
-    supply: '📦',
-    hospital: '🏥',
-    fire_station: '🚒',
-    police: '👮',
+/**
+ * POI → B3c 地圖符號對照（design-system/icons/map-symbols，取代 emoji text-field）。
+ * hospital／fire_station／police 無專屬符號，取最接近語意：
+ * hospital→aed（圓＋心電，醫療設施）、fire_station→hq（駐地）、police→team（方＋人，執勤單位）。
+ */
+const POI_SYMBOLS: Record<string, MapSymbolId> = {
+    shelter: 'shelter',
+    aed: 'aed',
+    rally_point: 'rally',
+    supply: 'warehouse',
+    hospital: 'aed',
+    fire_station: 'hq',
+    police: 'team',
 };
+
+/** MapLibre image id 前綴（同 map-symbols README 建議命名） */
+const POI_IMAGE_PREFIX = 'lk-symbol-';
+
+/** 符號色 token（設施＝safe 綠，對齊 MapLibreTacticalMap mapSymbolColors）；fallback 同 tokens.css B3c 平時模式 */
+const POI_SYMBOL_COLOR = { token: '--color-safe', fallback: '#8CA353' };
 
 interface UseOverlayEngineOptions {
     map: Map | null;
@@ -77,6 +88,22 @@ export function useOverlayEngine(options: UseOverlayEngineOptions) {
 
         // Wait for map to be loaded
         const setup = () => {
+            // 載入 POI 符號影像（B3c 地圖符號 data URI；token 色值執行期解析，
+            // data URI 內無法用 var(--token)，見 map-symbols README）
+            const containerStyles = getComputedStyle(map.getContainer());
+            const symbolColor =
+                containerStyles.getPropertyValue(POI_SYMBOL_COLOR.token).trim() ||
+                POI_SYMBOL_COLOR.fallback;
+            [...new Set(Object.values(POI_SYMBOLS))].forEach((symbolId) => {
+                const imageId = `${POI_IMAGE_PREFIX}${symbolId}`;
+                if (map.hasImage(imageId)) return;
+                const img = new Image(28, 28);
+                img.onload = () => {
+                    if (!map.hasImage(imageId)) map.addImage(imageId, img);
+                };
+                img.src = mapSymbolRegistry[symbolId].toDataUri(symbolColor);
+            });
+
             // Add GeoJSON source
             if (!map.getSource(SOURCE_ID)) {
                 map.addSource(SOURCE_ID, {
@@ -172,7 +199,7 @@ export function useOverlayEngine(options: UseOverlayEngineOptions) {
                 });
             }
 
-            // Add POI layer (using text symbols for now - icon sprites later)
+            // Add POI layer（B3c 地圖符號 icon-image，取代 emoji text-field）
             if (!map.getLayer(LAYER_POI_SYMBOL)) {
                 map.addLayer({
                     id: LAYER_POI_SYMBOL,
@@ -180,22 +207,23 @@ export function useOverlayEngine(options: UseOverlayEngineOptions) {
                     source: SOURCE_ID,
                     filter: ['==', ['get', 'type'], 'poi'],
                     layout: {
-                        'text-field': [
+                        'icon-image': [
                             'match',
                             ['get', 'poiType'],
-                            'shelter', '🏠',
-                            'aed', '💚',
-                            'rally_point', '🚩',
-                            'supply', '📦',
-                            'hospital', '🏥',
-                            '📍',
+                            'shelter', 'lk-symbol-shelter',
+                            'aed', 'lk-symbol-aed',
+                            'rally_point', 'lk-symbol-rally',
+                            'supply', 'lk-symbol-warehouse',
+                            'hospital', 'lk-symbol-aed',
+                            'fire_station', 'lk-symbol-hq',
+                            'police', 'lk-symbol-team',
+                            'lk-symbol-warehouse',
                         ],
-                        'text-size': 24,
-                        'text-anchor': 'center',
-                        'text-allow-overlap': true,
+                        'icon-anchor': 'center',
+                        'icon-allow-overlap': true,
                     },
                     paint: {
-                        'text-opacity': [
+                        'icon-opacity': [
                             'case',
                             ['==', ['get', 'state'], 'draft'],
                             0.6,
@@ -220,6 +248,11 @@ export function useOverlayEngine(options: UseOverlayEngineOptions) {
             if (map.getLayer(LAYER_AOI_OUTLINE)) map.removeLayer(LAYER_AOI_OUTLINE);
             if (map.getLayer(LAYER_AOI_FILL)) map.removeLayer(LAYER_AOI_FILL);
             if (map.getSource(SOURCE_ID)) map.removeSource(SOURCE_ID);
+            // Cleanup symbol images
+            [...new Set(Object.values(POI_SYMBOLS))].forEach((symbolId) => {
+                const imageId = `${POI_IMAGE_PREFIX}${symbolId}`;
+                if (map.hasImage(imageId)) map.removeImage(imageId);
+            });
         };
     }, [map]);
 
@@ -306,7 +339,7 @@ export function useOverlayEngine(options: UseOverlayEngineOptions) {
     return {
         highlightOverlay,
         SEVERITY_COLORS,
-        POI_ICONS,
+        POI_SYMBOLS,
     };
 }
 

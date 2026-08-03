@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FilesIcon, AiIcon } from '../../design-system/icons';
 import type { FieldReport, SosSignal } from '../../services/fieldReportsApi';
 import type { ReportSummaryOutput } from '../../services/aiQueueApi';
 import { AiResultCard } from './AiResultCard';
@@ -187,7 +188,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                             <div className="report-meta">
                                 <span>回報者: {report.reporterName}</span>
                                 {report.attachmentsCount > 0 && (
-                                    <span>📎 {report.attachmentsCount}</span>
+                                    <span><FilesIcon size={16} aria-hidden="true" /> {report.attachmentsCount}</span>
                                 )}
                             </div>
                         </div>
@@ -231,7 +232,7 @@ export const ReportsPanel: React.FC<ReportsPanelProps> = ({
                                             分析中...
                                         </>
                                     ) : (
-                                        '🤖 AI 分析'
+                                        <><AiIcon size={16} aria-hidden="true" /> AI 分析</>
                                     )}
                                 </button>
                             )}

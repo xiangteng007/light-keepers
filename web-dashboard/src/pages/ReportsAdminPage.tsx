@@ -10,18 +10,33 @@ import {
 } from '../constants/disasterTypes';
 import { getReports, reviewReport } from '../api/services';
 import type { Report, ReportStatus, ReportType, ReportSeverity } from '../api/services';
+import { disasterPictogramRegistry } from '../design-system/icons/pictograms';
+import {
+    LocationIcon,
+    WarningIcon,
+    ClockIcon,
+    CheckIcon,
+    CloseIcon,
+    TriageIcon,
+} from '../design-system/icons';
 import './ReportsAdminPage.css';
 
 // 回報類型設定
-// CD-1: 改讀 disasterTypes SSOT（既有 8 類的 label/emoji/色碼在 SSOT 中逐字沿用
-// 原值，本頁視覺輸出與擴充前相同）
-const TYPE_CONFIG: Record<ReportType, { label: string; icon: string; color: string }> =
+// CD-1: 改讀 disasterTypes SSOT；R5/T5c：災型圖示改走 B3c 象形
+// （disasterPictogramRegistry，key 對齊 SSOT），不再使用 emoji。
+const TYPE_CONFIG: Record<ReportType, { label: string; color: string }> =
     Object.fromEntries(
         Object.entries(DISASTER_TYPE_META).map(([type, meta]) => [
             type,
-            { label: meta.label, icon: meta.emoji, color: meta.color },
+            { label: meta.label, color: meta.color },
         ]),
-    ) as Record<ReportType, { label: string; icon: string; color: string }>;
+    ) as Record<ReportType, { label: string; color: string }>;
+
+/** 災型象形（16px 行內尺寸），未知型別退回 other。 */
+function TypePictogram({ type, size = 16 }: { type: ReportType; size?: number }) {
+    const Pictogram = disasterPictogramRegistry[type] ?? disasterPictogramRegistry.other;
+    return <Pictogram size={size} aria-hidden="true" />;
+}
 
 // 狀態設定
 const STATUS_CONFIG: Record<string, { label: string; color: string }> = {
@@ -158,7 +173,7 @@ export default function ReportsAdminPage() {
                         <optgroup key={group.title} label={group.title}>
                             {group.options.map((option) => (
                                 <option key={option.value} value={option.value}>
-                                    {option.emoji} {option.label}
+                                    {option.label}
                                 </option>
                             ))}
                         </optgroup>
@@ -172,7 +187,7 @@ export default function ReportsAdminPage() {
                         checked={massCasualtyOnly}
                         onChange={(e) => setMassCasualtyOnly(e.target.checked)}
                     />
-                    {MASS_CASUALTY_META.emoji} 只看{MASS_CASUALTY_META.label}
+                    <TriageIcon size={16} aria-hidden="true" /> 只看{MASS_CASUALTY_META.label}
                 </label>
             </div>
 
@@ -200,14 +215,14 @@ export default function ReportsAdminPage() {
                             >
                                 <div className="report-card__header">
                                     <span className="report-type">
-                                        {typeConfig.icon} {typeConfig.label}
+                                        <TypePictogram type={report.type} /> {typeConfig.label}
                                     </span>
                                     {report.isMassCasualty && (
                                         <span
                                             className="report-type"
                                             style={{ color: MASS_CASUALTY_META.color }}
                                         >
-                                            {MASS_CASUALTY_META.emoji} {MASS_CASUALTY_META.label}
+                                            <TriageIcon size={16} aria-hidden="true" /> {MASS_CASUALTY_META.label}
                                             {report.casualtyEstimate ? `（約 ${report.casualtyEstimate} 人）` : ''}
                                         </span>
                                     )}
@@ -222,11 +237,11 @@ export default function ReportsAdminPage() {
                                     {report.description?.substring(0, 100)}...
                                 </p>
                                 <div className="report-card__meta">
-                                    <span>📍 {report.address || '未提供地址'}</span>
+                                    <span><LocationIcon size={16} aria-hidden="true" /> {report.address || '未提供地址'}</span>
                                     <span style={{ color: severityConfig.color }}>
-                                        ⚠️ {severityConfig.label}
+                                        <WarningIcon size={16} aria-hidden="true" /> {severityConfig.label}
                                     </span>
-                                    <span>🕐 {new Date(report.createdAt).toLocaleDateString('zh-TW')}</span>
+                                    <span><ClockIcon size={16} aria-hidden="true" /> {new Date(report.createdAt).toLocaleDateString('zh-TW')}</span>
                                 </div>
                             </Card>
                         );
@@ -240,7 +255,7 @@ export default function ReportsAdminPage() {
                         <div className="report-detail">
                             <div className="report-detail__row">
                                 <span className="label">類型</span>
-                                <span>{TYPE_CONFIG[selectedReport.type]?.icon} {TYPE_CONFIG[selectedReport.type]?.label}</span>
+                                <span><TypePictogram type={selectedReport.type} /> {TYPE_CONFIG[selectedReport.type]?.label}</span>
                             </div>
                             <div className="report-detail__row">
                                 <span className="label">嚴重程度</span>
@@ -288,13 +303,13 @@ export default function ReportsAdminPage() {
                                 onClick={() => handleReview('rejected')}
                                 disabled={isReviewing}
                             >
-                                {isReviewing ? '處理中...' : '❌ 駁回'}
+                                {isReviewing ? '處理中...' : <><CloseIcon size={16} aria-hidden="true" /> 駁回</>}
                             </Button>
                             <Button
                                 onClick={() => handleReview('confirmed')}
                                 disabled={isReviewing}
                             >
-                                {isReviewing ? '處理中...' : '✅ 確認'}
+                                {isReviewing ? '處理中...' : <><CheckIcon size={16} aria-hidden="true" /> 確認</>}
                             </Button>
                         </div>
                 </Modal>

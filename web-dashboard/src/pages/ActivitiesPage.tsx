@@ -29,17 +29,25 @@ import {
 } from 'lucide-react';
 import { Badge, Button, Modal, InputField } from '../design-system';
 import type { BadgeProps } from '../design-system';
+import {
+    GraduationIcon,
+    SupportIcon,
+    HomeIcon,
+    FlaskIcon,
+    MoreIcon,
+    type LkIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './ActivitiesPage.css';
 
-// 分類選項
-const CATEGORY_OPTIONS: { value: ActivityCategory; label: string; emoji: string }[] = [
-    { value: 'training', label: '培訓', emoji: '📚' },
-    { value: 'volunteer', label: '志工服務', emoji: '🙋' },
-    { value: 'community', label: '社區', emoji: '🏘️' },
-    { value: 'drill', label: '演習', emoji: '🚨' },
-    { value: 'other', label: '其他', emoji: '📋' },
+// 分類選項（R5/T5c：B3c 教範圖例，不再使用 emoji）
+const CATEGORY_OPTIONS: { value: ActivityCategory; label: string; Icon: LkIcon }[] = [
+    { value: 'training', label: '培訓', Icon: GraduationIcon },
+    { value: 'volunteer', label: '志工服務', Icon: SupportIcon },
+    { value: 'community', label: '社區', Icon: HomeIcon },
+    { value: 'drill', label: '演習', Icon: FlaskIcon },
+    { value: 'other', label: '其他', Icon: MoreIcon },
 ];
 
 // 狀態標籤（對照 DESIGN_LANGUAGE.md §3：success=可報名、warning=待處理/已截止、danger=已取消、default=中性）
@@ -127,7 +135,7 @@ export default function ActivitiesPage() {
 
     // 取得分類資訊
     const getCategoryInfo = (category: ActivityCategory) => {
-        return CATEGORY_OPTIONS.find(c => c.value === category) || { label: category, emoji: '📋' };
+        return CATEGORY_OPTIONS.find(c => c.value === category) || { label: category, Icon: MoreIcon };
     };
 
     const myActiveRegistrations = myRegistrations.filter(r => r.status !== 'cancelled');
@@ -181,7 +189,7 @@ export default function ActivitiesPage() {
                                 className={`filter-chip ${selectedCategory === cat.value ? 'is-active' : ''}`}
                                 onClick={() => setSelectedCategory(cat.value)}
                             >
-                                {cat.emoji} {cat.label}
+                                <cat.Icon size={16} aria-hidden="true" /> {cat.label}
                             </button>
                         ))}
                     </div>
@@ -219,7 +227,7 @@ export default function ActivitiesPage() {
                                 <div className="activity-card__content">
                                     <div className="activity-card__header">
                                         <span className="activity-card__category">
-                                            {getCategoryInfo(activity.category).emoji} {getCategoryInfo(activity.category).label}
+                                            {(() => { const CatIcon = getCategoryInfo(activity.category).Icon; return <CatIcon size={16} aria-hidden="true" />; })()} {getCategoryInfo(activity.category).label}
                                         </span>
                                         <Badge variant={STATUS_MAP[activity.status].variant} size="sm">
                                             {STATUS_MAP[activity.status].label}

@@ -6,7 +6,24 @@
  */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
+import {
+    CheckIcon,
+    CloseIcon,
+    ExportIcon,
+    InventoryIcon,
+    LayersIcon,
+    LocationIcon,
+    MapIcon,
+    SirenIcon,
+    TasksIcon,
+    UserIcon,
+    WarningIcon,
+    type LkIcon,
+} from '../../design-system/icons';
 import styles from './TacticalMap.module.css';
+
+/** 行內 icon 對齊字級（同 MapSidebar 的行內樣式） */
+const inlineIcon = { verticalAlign: '-2px', marginRight: 5 } as const;
 
 // Types
 export interface MapMarker {
@@ -105,16 +122,16 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
         };
     };
 
-    // Get marker icon based on type
-    const getMarkerIcon = (type: MapMarker['type']) => {
-        const icons = {
-            task: '📋',
-            volunteer: '👤',
-            resource: '📦',
-            alert: '⚠️',
-            incident: '🚨',
+    // Get marker icon based on type（B3c 教範圖例，取代 emoji）
+    const getMarkerIcon = (type: MapMarker['type']): LkIcon => {
+        const icons: Record<MapMarker['type'], LkIcon> = {
+            task: TasksIcon,
+            volunteer: UserIcon,
+            resource: InventoryIcon,
+            alert: WarningIcon,
+            incident: SirenIcon,
         };
-        return icons[type] || '📍';
+        return icons[type] || LocationIcon;
     };
 
     useEffect(() => {
@@ -132,7 +149,9 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
                     <div className={styles.staticMap}>
                         <div className={styles.mapOverlay}>
                             <div className={styles.mapCenter}>
-                                <span className={styles.centerIcon}>🎯</span>
+                                <span className={styles.centerIcon}>
+                                    <LocationIcon size={32} />
+                                </span>
                                 <span className={styles.coordinates}>
                                     {center[1].toFixed(4)}, {center[0].toFixed(4)}
                                 </span>
@@ -146,6 +165,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
                                 if (relX < 0 || relX > 100 || relY < 0 || relY > 100) return null;
 
+                                const MarkerGlyph = getMarkerIcon(marker.type);
                                 return (
                                     <div
                                         key={marker.id}
@@ -158,14 +178,14 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
                                         onClick={() => handleMarkerClick(marker)}
                                         title={marker.title}
                                     >
-                                        {getMarkerIcon(marker.type)}
+                                        <MarkerGlyph size={16} style={{ color: '#fff' }} />
                                     </div>
                                 );
                             })}
                         </div>
 
                         <div className={styles.noMapboxMessage}>
-                            <p>🗺️ 地圖預覽模式</p>
+                            <p><MapIcon size={15} style={inlineIcon} />地圖預覽模式</p>
                             <span>設定 VITE_MAPBOX_TOKEN 以啟用完整地圖功能</span>
                         </div>
                     </div>
@@ -179,7 +199,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
                             </div>
                         ) : (
                             <div className={styles.mapReady}>
-                                <p>✅ Mapbox 地圖已載入</p>
+                                <p><CheckIcon size={15} style={inlineIcon} />Mapbox 地圖已載入</p>
                             </div>
                         )}
                     </div>
@@ -190,7 +210,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             {showLayers && (
                 <div className={styles.layerPanel}>
                     <div className={styles.layerHeader}>
-                        <span>📊 圖層</span>
+                        <span><LayersIcon size={14} style={inlineIcon} />圖層</span>
                     </div>
                     <div className={styles.layerList}>
                         {layers.map(layer => (
@@ -218,12 +238,18 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             {selectedMarker && (
                 <div className={styles.popup}>
                     <div className={styles.popupHeader}>
-                        <span>{getMarkerIcon(selectedMarker.type)} {selectedMarker.title}</span>
+                        <span>
+                            {(() => {
+                                const SelectedGlyph = getMarkerIcon(selectedMarker.type);
+                                return <SelectedGlyph size={15} style={inlineIcon} />;
+                            })()}
+                            {selectedMarker.title}
+                        </span>
                         <button
                             className={styles.popupClose}
                             onClick={() => setSelectedMarker(null)}
                         >
-                            ✕
+                            <CloseIcon size={16} style={{ display: 'block' }} />
                         </button>
                     </div>
                     {selectedMarker.description && (
@@ -242,7 +268,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
                         </div>
                     )}
                     <div className={styles.popupCoords}>
-                        📍 {selectedMarker.coordinates[1].toFixed(4)}, {selectedMarker.coordinates[0].toFixed(4)}
+                        {selectedMarker.coordinates[1].toFixed(4)}, {selectedMarker.coordinates[0].toFixed(4)}
                     </div>
                 </div>
             )}
@@ -251,13 +277,20 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
             <div className={styles.controls}>
                 <button className={styles.controlBtn} title="放大">+</button>
                 <button className={styles.controlBtn} title="縮小">−</button>
-                <button className={styles.controlBtn} title="我的位置">📍</button>
-                <button className={styles.controlBtn} title="全螢幕">⛶</button>
+                <button className={styles.controlBtn} title="我的位置">
+                    <LocationIcon size={20} style={{ display: 'block', margin: '0 auto' }} />
+                </button>
+                <button className={styles.controlBtn} title="全螢幕">
+                    <ExportIcon size={20} style={{ display: 'block', margin: '0 auto' }} />
+                </button>
             </div>
 
             {/* Stats Bar */}
             <div className={styles.statsBar}>
-                <span>📍 {visibleMarkers.length} 個標記</span>
+                <span>
+                    <LocationIcon size={14} style={inlineIcon} />
+                    {visibleMarkers.length} 個標記
+                </span>
                 <span>|</span>
                 <span>縮放: {zoom}x</span>
                 <span>|</span>

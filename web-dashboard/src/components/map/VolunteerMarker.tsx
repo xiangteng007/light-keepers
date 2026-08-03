@@ -5,6 +5,7 @@
 
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
+import { teamToDataUri } from '../../design-system/icons/map-symbols';
 
 export interface VolunteerMarkerProps {
     map: maplibregl.Map | null;
@@ -50,7 +51,15 @@ export function VolunteerMarker({
             transition: all 0.3s;
             position: relative;
         `;
-        el.innerHTML = '👤';
+        // B3c team 符號（方＋人，我方單位），白線在狀態色圓底上
+        const symbolImg = document.createElement('img');
+        symbolImg.src = teamToDataUri('#ffffff');
+        symbolImg.width = 18;
+        symbolImg.height = 18;
+        symbolImg.alt = '';
+        symbolImg.draggable = false;
+        symbolImg.style.display = 'block';
+        el.appendChild(symbolImg);
         el.dataset.id = id;
 
         // Add accuracy ring if available
@@ -91,7 +100,7 @@ export function VolunteerMarker({
         const popupContent = `
             <div style="padding: 8px; min-width: 150px;">
                 <div style="font-weight: 600; margin-bottom: 4px;">
-                    👤 ${userName}
+                    ${userName}
                 </div>
                 <div style="font-size: 12px; color: ${isSharing ? '#22c55e' : '#6b7280'}; margin-bottom: 4px;">
                     ${isSharing ? '● 分享中' : '○ 未分享'}

@@ -3,6 +3,7 @@
  *
  * Workforce domain: volunteer/personnel rosters, shift calendar, leaderboard.
  */
+import { DotStamp } from '../../../design-system/icons/pictograms';
 
 export const VolunteerGridWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
@@ -29,7 +30,9 @@ export const VolunteerGridWidget = () => (
                     }}>{name.charAt(0)}</div>
                     <div>
                         <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{name}</div>
-                        <div style={{ fontSize: '11px', color: '#22c55e' }}>● 在線</div>
+                        <div style={{ fontSize: '11px', color: '#22c55e', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <DotStamp size={8} /> 在線
+                        </div>
                     </div>
                 </div>
             ))}

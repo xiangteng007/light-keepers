@@ -1,20 +1,38 @@
+import type { ComponentType } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Wifi, Inbox } from 'lucide-react';
 import { Card, Tag, Alert, Badge } from '../design-system';
+import {
+    AedIcon,
+    ShelterIcon,
+    LocationIcon,
+    RadioIcon,
+    InfoIcon,
+    FilesIcon,
+    CheckIcon,
+} from '../design-system/icons';
+import {
+    EarthquakePictogram,
+    TyphoonPictogram,
+    FirePictogram,
+    AirRaidPictogram,
+    CbrnPictogram,
+    InfrastructurePictogram,
+} from '../design-system/icons/pictograms';
 import EmptyState from '../components/shared/EmptyState';
 
-// 手冊分類
-const MANUAL_CATEGORIES: Record<string, { name: string; icon: string; color: string }> = {
-    earthquake: { name: '地震', icon: '🌍', color: '#5BA3C0' },
-    typhoon: { name: '颱風水災', icon: '🌀', color: '#7B6FA6' },
-    fire: { name: '火災', icon: '🔥', color: '#E85A5A' },
-    firstaid: { name: '急救', icon: '❤️', color: '#E53935' },
-    shelter: { name: '避難', icon: '🏠', color: '#4CAF50' },
-    war: { name: '戰爭', icon: '⚔️', color: '#607D8B' },
-    nuclear: { name: '核化災害', icon: '☢️', color: '#FF9800' },
-    infrastructure: { name: '設施故障', icon: '⚡', color: '#795548' },
-    outdoor: { name: '戶外活動', icon: '🏕️', color: '#2E7D32' },
-    radio: { name: '無線電通訊', icon: '📻', color: '#1565C0' },
+// 手冊分類（R5/T5c：icon 改 B3c 教範圖例／災型象形，色由 currentColor 繼承）
+const MANUAL_CATEGORIES: Record<string, { name: string; Icon: ComponentType<{ size?: number }>; color: string }> = {
+    earthquake: { name: '地震', Icon: EarthquakePictogram, color: '#5BA3C0' },
+    typhoon: { name: '颱風水災', Icon: TyphoonPictogram, color: '#7B6FA6' },
+    fire: { name: '火災', Icon: FirePictogram, color: '#E85A5A' },
+    firstaid: { name: '急救', Icon: AedIcon, color: '#E53935' },
+    shelter: { name: '避難', Icon: ShelterIcon, color: '#4CAF50' },
+    war: { name: '戰爭', Icon: AirRaidPictogram, color: '#607D8B' },
+    nuclear: { name: '核化災害', Icon: CbrnPictogram, color: '#FF9800' },
+    infrastructure: { name: '設施故障', Icon: InfrastructurePictogram, color: '#795548' },
+    outdoor: { name: '戶外活動', Icon: LocationIcon, color: '#2E7D32' },
+    radio: { name: '無線電通訊', Icon: RadioIcon, color: '#1565C0' },
 };
 
 // 擴展型手冊內容類型
@@ -544,15 +562,15 @@ const MANUAL_CONTENTS: Record<string, {
         // 擴展內容
         sections: [
             {
-                title: '🎒 通訊裝備清單',
+                title: '通訊裝備清單',
                 content: '每人必備：無線電手持機（VHF/UHF 雙頻、5W）、備用電池（至少 1 組滿電）、耳機麥克風。指揮者額外：通訊計畫表、隊員名單、備用手持機。',
             },
             {
-                title: '📍 回報內容範例',
+                title: '回報內容範例',
                 content: '「XX隊一號，這裡是XX隊三號。位置：三叉路口涼亭。狀況：全員到齊，無異常。預計 30 分鐘後抵達稜線。完畢。」',
             },
             {
-                title: '🆘 緊急狀況處置',
+                title: '緊急狀況處置',
                 content: '人員受傷：立即通報指揮說明位置與傷況，確保傷者安全（遮蔽、保暖），派人接應救援。天氣惡化：指揮評估是否撤退，通報所有單位，清點人數依序撤離。通訊全面中斷：往約定集合點移動，使用備援通訊方式（手機、哨子），視野開闘處等待。',
             },
         ],
@@ -657,8 +675,8 @@ export default function ManualDetailPage() {
                 <div className="manual-breadcrumb">
                     {/* R4 a11y：10 種分類色多數在頁面底色上不到 4.5:1（如地震
                         #5BA3C0 只有 2.57:1，見 A11Y_AUDIT_R4.md）；分類識別
-                        改靠 emoji 圖示＋下方數字圓圈背景色，文字用一般可讀色 */}
-                    <span>{category.icon} {category.name}</span>
+                        改靠 B3c 圖例＋下方數字圓圈背景色，文字用一般可讀色 */}
+                    <span className="manual-breadcrumb__category"><category.Icon size={16} /> {category.name}</span>
                 </div>
             </div>
 
@@ -712,7 +730,7 @@ export default function ManualDetailPage() {
                 {/* 小技巧 */}
                 {manual.tips && (
                     <div className="manual-tips">
-                        <h2>💡 小技巧</h2>
+                        <h2><InfoIcon size={20} /> 小技巧</h2>
                         <ul>
                             {manual.tips.map((tip, index) => (
                                 <li key={index}>{tip}</li>
@@ -736,7 +754,7 @@ export default function ManualDetailPage() {
                 {/* 口袋卡 */}
                 {manual.pocketCard && (
                     <div className="manual-pocket-card">
-                        <h2>📇 口袋卡（速查）</h2>
+                        <h2><FilesIcon size={20} /> 口袋卡（速查）</h2>
                         <div className="pocket-card-box">
                             {manual.pocketCard.map((line, index) => (
                                 <div key={index} className="pocket-card-line">{line}</div>
@@ -748,7 +766,7 @@ export default function ManualDetailPage() {
                 {/* 檢核清單 */}
                 {manual.checklists && (
                     <div className="manual-checklists">
-                        <h2>✅ 檢核清單</h2>
+                        <h2><CheckIcon size={20} /> 檢核清單</h2>
                         <div className="checklists-grid">
                             {manual.checklists.map((checklist, cIndex) => (
                                 <div key={cIndex} className="checklist-card">
@@ -772,7 +790,7 @@ export default function ManualDetailPage() {
                 {/* FAQ */}
                 {manual.faq && (
                     <div className="manual-faq">
-                        <h2>❓ 常見問題</h2>
+                        <h2>常見問題</h2>
                         <div className="faq-list">
                             {manual.faq.map((item, index) => (
                                 <details key={index} className="faq-item">

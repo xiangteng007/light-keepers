@@ -4,18 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import { vehiclesApi } from '../api/vms';
 import type { VolunteerVehicle, VehicleType, VehiclePurpose } from '../api/vms';
 import { Card, Button, Badge, Tag, Alert, Modal, InputField } from '../design-system';
+import { VehicleIcon } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './VehicleManagementPage.css';
 
-// 車輛類型選項
-const VEHICLE_TYPES: { code: VehicleType; name: string; icon: string }[] = [
-    { code: 'car', name: '汽車', icon: '🚗' },
-    { code: 'motorcycle', name: '機車', icon: '🏍️' },
-    { code: 'boat', name: '船艇', icon: '🚤' },
-    { code: 'atv', name: 'ATV/沙灘車', icon: '🛻' },
-    { code: 'truck', name: '貨車/卡車', icon: '🚚' },
-    { code: 'other', name: '其他', icon: '🚙' },
+// 車輛類型選項（R5/T5c：卡片圖示統一用 B3c VehicleIcon，選項純文字）
+const VEHICLE_TYPES: { code: VehicleType; name: string }[] = [
+    { code: 'car', name: '汽車' },
+    { code: 'motorcycle', name: '機車' },
+    { code: 'boat', name: '船艇' },
+    { code: 'atv', name: 'ATV/沙灘車' },
+    { code: 'truck', name: '貨車/卡車' },
+    { code: 'other', name: '其他' },
 ];
 
 // 車輛用途選項
@@ -221,7 +222,7 @@ export default function VehicleManagementPage() {
                         return (
                             <Card key={vehicle.id} padding="md" className="vehicle-card">
                                 <div className="vehicle-header">
-                                    <span className="vehicle-icon">{typeInfo?.icon || '🚙'}</span>
+                                    <span className="vehicle-icon"><VehicleIcon size={24} aria-hidden="true" /></span>
                                     <span className="vehicle-plate">{vehicle.licensePlate}</span>
                                 </div>
 
@@ -300,7 +301,7 @@ export default function VehicleManagementPage() {
                             >
                                 {VEHICLE_TYPES.map(type => (
                                     <option key={type.code} value={type.code}>
-                                        {type.icon} {type.name}
+                                        {type.name}
                                     </option>
                                 ))}
                             </select>

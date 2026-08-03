@@ -220,18 +220,6 @@ export function generateNavigation(
 }
 
 /**
- * Hazard icon mappings
- */
-export const HAZARD_ICONS: Record<ARHazardMarker['type'], string> = {
-    fire: '🔥',
-    flood: '🌊',
-    collapse: '🏚️',
-    gas: '☠️',
-    radiation: '☢️',
-    other: '⚠️',
-};
-
-/**
  * Severity colors
  */
 export const SEVERITY_COLORS: Record<ARHazardMarker['severity'], string> = {

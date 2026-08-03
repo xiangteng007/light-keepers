@@ -2,6 +2,7 @@
  * 語言切換元件
  */
 import { useState, useRef, useEffect } from 'react';
+import { ChevronUpIcon, ChevronDownIcon, CheckIcon } from '../design-system/icons';
 import { useTranslation } from 'react-i18next';
 import { LANGUAGES, changeLanguage } from '../i18n';
 import './LanguageSelector.css';
@@ -66,7 +67,7 @@ export function LanguageSelector() {
             >
                 <span className="language-selector__flag">{currentLang.flag}</span>
                 <span className="language-selector__name">{currentLang.name}</span>
-                <span className="language-selector__arrow">{isOpen ? '▲' : '▼'}</span>
+                <span className="language-selector__arrow" aria-hidden="true">{isOpen ? <ChevronUpIcon size={16} /> : <ChevronDownIcon size={16} />}</span>
             </button>
 
             {isOpen && (
@@ -80,7 +81,7 @@ export function LanguageSelector() {
                             <span className="language-selector__option-flag">{lang.flag}</span>
                             <span className="language-selector__option-name">{lang.name}</span>
                             {lang.code === i18n.language && (
-                                <span className="language-selector__check">✓</span>
+                                <span className="language-selector__check" aria-hidden="true"><CheckIcon size={16} /></span>
                             )}
                         </button>
                     ))}

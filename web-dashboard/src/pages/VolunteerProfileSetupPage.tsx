@@ -5,6 +5,19 @@ import { createVolunteer, markVolunteerProfileCompleted } from '../api/services'
 import type { CreateVolunteerDto } from '../api/services';
 import { User, MapPin, Heart, AlertCircle, Save, ChevronRight, Check } from 'lucide-react';
 import { Button, Alert } from '../design-system';
+import {
+    AedIcon,
+    VehicleIcon,
+    FlaskIcon,
+    BuildingIcon,
+    TriageIcon,
+    RadioIcon,
+    BookIcon,
+    SupportIcon,
+    InventoryIcon,
+    CameraIcon,
+    type LkIcon,
+} from '../design-system/icons';
 import './VolunteerProfileSetupPage.css';
 
 // 台灣地區選項
@@ -15,18 +28,18 @@ const REGIONS = [
     '台東縣', '澎湖縣', '金門縣', '連江縣'
 ];
 
-// 技能選項
-const SKILL_OPTIONS = [
-    { id: 'first_aid', label: '急救/CPR', icon: '🏥' },
-    { id: 'driving', label: '駕駛（汽機車）', icon: '🚗' },
-    { id: 'cooking', label: '烹飪', icon: '🍳' },
-    { id: 'construction', label: '土木/水電', icon: '🔧' },
-    { id: 'medical', label: '醫療護理', icon: '💊' },
-    { id: 'communication', label: '通訊操作', icon: '📻' },
-    { id: 'translation', label: '翻譯（外語）', icon: '🌐' },
-    { id: 'counseling', label: '心理輔導', icon: '💬' },
-    { id: 'logistics', label: '物資管理', icon: '📦' },
-    { id: 'photography', label: '攝影記錄', icon: '📷' },
+// 技能選項（R5/T5c：B3c 教範圖例，不再使用 emoji）
+const SKILL_OPTIONS: { id: string; label: string; Icon: LkIcon }[] = [
+    { id: 'first_aid', label: '急救/CPR', Icon: AedIcon },
+    { id: 'driving', label: '駕駛（汽機車）', Icon: VehicleIcon },
+    { id: 'cooking', label: '烹飪', Icon: FlaskIcon },
+    { id: 'construction', label: '土木/水電', Icon: BuildingIcon },
+    { id: 'medical', label: '醫療護理', Icon: TriageIcon },
+    { id: 'communication', label: '通訊操作', Icon: RadioIcon },
+    { id: 'translation', label: '翻譯（外語）', Icon: BookIcon },
+    { id: 'counseling', label: '心理輔導', Icon: SupportIcon },
+    { id: 'logistics', label: '物資管理', Icon: InventoryIcon },
+    { id: 'photography', label: '攝影記錄', Icon: CameraIcon },
 ];
 
 export default function VolunteerProfileSetupPage() {
@@ -131,7 +144,7 @@ export default function VolunteerProfileSetupPage() {
         <div className="volunteer-setup-page">
             <div className="volunteer-setup-container">
                 <div className="volunteer-setup-header">
-                    <h1>🎉 歡迎加入曦望燈塔！</h1>
+                    <h1>歡迎加入曦望燈塔！</h1>
                     <p>請填寫您的志工資料，完成後即可開始服務</p>
                 </div>
 
@@ -262,7 +275,7 @@ export default function VolunteerProfileSetupPage() {
                                             onClick={() => toggleSkill(skill.id)}
                                             aria-pressed={selected}
                                         >
-                                            <span className="skill-chip__icon" aria-hidden="true">{skill.icon}</span>
+                                            <span className="skill-chip__icon" aria-hidden="true"><skill.Icon size={16} /></span>
                                             <span className="skill-chip__label">{skill.label}</span>
                                         </button>
                                     );

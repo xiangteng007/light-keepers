@@ -22,10 +22,17 @@
   padding: 3rem 2rem;
 }
 
+/* R5/T5c：頁首標題 icon 與文字對齊 */
+.donations-page .page-header__left h2 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
 .access-denied .icon {
-  font-size: 4rem;
   display: block;
   margin-bottom: var(--space-3);
+  color: var(--text-secondary);
 }
 
 .access-denied h3 {
@@ -82,6 +89,10 @@
 
 .donations-page .tab-bar button {
   flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-1);
   padding: 0.75rem 1rem;
   border: none;
   background: transparent;

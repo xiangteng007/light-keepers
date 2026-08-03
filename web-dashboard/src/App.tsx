@@ -5,6 +5,7 @@ import { RealtimeProvider } from './context/RealtimeContext'
 import { EmergencyProvider } from './context/useEmergencyContext'
 import { ThemeProvider } from './context/ThemeProvider'
 import { CommandPalette } from './components/CommandPalette'
+import { SyncIcon } from './design-system/icons'
 
 // ===== Route Groups (extracted for maintainability) =====
 import {
@@ -64,7 +65,7 @@ function App() {
         {needRefresh && (
           <div className="pwa-update-prompt">
             <div className="pwa-update-prompt__content">
-              <span className="pwa-update-prompt__icon">🔄</span>
+              <span className="pwa-update-prompt__icon" aria-hidden="true"><SyncIcon size={24} /></span>
               <span className="pwa-update-prompt__text">有新版本可用</span>
               <button
                 className="pwa-update-prompt__btn pwa-update-prompt__btn--primary"

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { forgotPassword } from '../api/services';
+import { LockIcon, CheckIcon, WarningIcon } from '../design-system/icons';
 import './LoginPage.css';
 
 export default function ForgotPasswordPage() {
@@ -30,7 +31,7 @@ export default function ForgotPasswordPage() {
             <div className="login-container">
                 <div className="login-header">
                     <div className="login-logo">
-                        <span className="login-logo-icon">🔐</span>
+                        <span className="login-logo-icon" aria-hidden="true"><LockIcon size={32} /></span>
                         <h1>忘記密碼</h1>
                         <p className="login-subtitle">輸入您的電子郵件以重設密碼</p>
                     </div>
@@ -39,7 +40,7 @@ export default function ForgotPasswordPage() {
                 {success ? (
                     <div className="login-form">
                         <div className="login-success" role="status">
-                            ✅ 重設連結已發送至您的信箱，請檢查您的電子郵件（包含垃圾郵件資料夾）
+                            <CheckIcon size={16} aria-hidden="true" /> 重設連結已發送至您的信箱，請檢查您的電子郵件（包含垃圾郵件資料夾）
                         </div>
                         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '20px' }}>
                             如果您未收到郵件，請稍等幾分鐘或再次嘗試。
@@ -64,7 +65,7 @@ export default function ForgotPasswordPage() {
 
                         {error && (
                             <div className="login-error" role="alert">
-                                ⚠️ {error}
+                                <WarningIcon size={16} aria-hidden="true" /> {error}
                             </div>
                         )}
 

@@ -4,6 +4,7 @@
  * Knowledge domain: training progress, courses and operating manuals.
  */
 import { MetricCard } from '../shared/primitives';
+import { BookIcon } from '../../../design-system/icons';
 
 export const TrainingProgressWidget = () => (
     <div style={{ display: 'flex', gap: '16px', justifyContent: 'space-around', height: '100%', alignItems: 'center', padding: '8px' }}>
@@ -40,7 +41,7 @@ export const CourseGridWidget = () => (
 
 export const ManualCategoriesWidget = () => (
     <div style={{ height: '100%', padding: '8px' }}>
-        {['🚒 消防', '🏥 醫療', '🚧 交通', '⚡ 電力', '📡 通訊'].map((cat, i) => (
+        {['消防', '醫療', '交通', '電力', '通訊'].map((cat, i) => (
             <div key={i} style={{
                 padding: '12px',
                 background: i === 0 ? 'rgba(195, 155, 111, 0.15)' : 'transparent',
@@ -64,7 +65,7 @@ export const ManualListWidget = () => (
                     borderRadius: '10px',
                     cursor: 'pointer',
                 }}>
-                    <div style={{ fontSize: '24px', marginBottom: '8px' }}>📘</div>
+                    <div style={{ marginBottom: '8px', color: 'var(--accent-gold)' }} aria-hidden="true"><BookIcon size={24} /></div>
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>{manual}</div>
                     <div className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>v2.1 • 更新於 3 天前</div>
                 </div>

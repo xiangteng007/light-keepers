@@ -4,6 +4,19 @@ import { useAuth } from '../context/AuthContext';
 import { User, Settings, Mail, Shield, LinkIcon, Bell, Lock, LogOut, ClipboardList, CheckCircle2, XCircle } from 'lucide-react';
 import { createVolunteer } from '../api/services';
 import { Alert, Badge, Button, Modal } from '../design-system';
+import type { LkIcon } from '../design-system/icons';
+import {
+    AedIcon,
+    SearchIcon,
+    InventoryIcon,
+    FlaskIcon,
+    RadioIcon,
+    VehicleIcon,
+    BuildingIcon,
+    SupportIcon,
+    CheckIcon,
+    LockIcon,
+} from '../design-system/icons';
 import './ProfilePage.css';
 import api from '../api/client';
 import { getApiErrorMessage } from '../api/errors';
@@ -16,16 +29,16 @@ const LINE_REDIRECT_URI = `${window.location.origin}/profile?action=bind-line`;
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 const GOOGLE_REDIRECT_URI = `${window.location.origin}/profile?action=bind-google`;
 
-// 志工技能選項
-const SKILL_OPTIONS = [
-    { value: 'medical', label: '醫療救護', icon: '🏥' },
-    { value: 'rescue', label: '搜救救難', icon: '🚒' },
-    { value: 'logistics', label: '物資運送', icon: '📦' },
-    { value: 'cooking', label: '炑事料理', icon: '🍳' },
-    { value: 'communication', label: '通訊聯絡', icon: '📡' },
-    { value: 'driving', label: '駕駛運輸', icon: '🚗' },
-    { value: 'construction', label: '土木修繕', icon: '🔧' },
-    { value: 'social', label: '社工關懷', icon: '💝' },
+// 志工技能選項（R5/T5c：icon 改 B3c 教範圖例，取最接近語意者）
+const SKILL_OPTIONS: Array<{ value: string; label: string; Icon: LkIcon }> = [
+    { value: 'medical', label: '醫療救護', Icon: AedIcon },
+    { value: 'rescue', label: '搜救救難', Icon: SearchIcon },
+    { value: 'logistics', label: '物資運送', Icon: InventoryIcon },
+    { value: 'cooking', label: '炑事料理', Icon: FlaskIcon },
+    { value: 'communication', label: '通訊聯絡', Icon: RadioIcon },
+    { value: 'driving', label: '駕駛運輸', Icon: VehicleIcon },
+    { value: 'construction', label: '土木修繕', Icon: BuildingIcon },
+    { value: 'social', label: '社工關懷', Icon: SupportIcon },
 ];
 
 export default function ProfilePage() {
@@ -540,7 +553,7 @@ export default function ProfilePage() {
 
                             {volunteerSubmitted ? (
                                 <div className="register-success">
-                                    <span className="success-icon">✅</span>
+                                    <span className="success-icon"><CheckIcon size={32} /></span>
                                     <h3>志工登記申請已送出</h3>
                                     <p>感謝您願意加入 Light Keepers 志工團隊！</p>
                                     <p className="note">您的申請正在等待管理員審核，審核通過後您將收到通知。</p>
@@ -630,7 +643,7 @@ export default function ProfilePage() {
                                     <div className="form-section">
                                         <label className="form-label">
                                             詳細地址
-                                            <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                            <Badge variant="info" size="sm" icon={<LockIcon size={12} />}>僅管理員可見</Badge>
                                         </label>
                                         <input
                                             type="text"
@@ -651,10 +664,10 @@ export default function ProfilePage() {
                                                     className={`skill-btn ${volunteerForm.skills.includes(skill.value) ? 'skill-btn--selected' : ''}`}
                                                     onClick={() => toggleSkill(skill.value)}
                                                 >
-                                                    <span className="skill-btn__icon">{skill.icon}</span>
+                                                    <span className="skill-btn__icon"><skill.Icon size={16} /></span>
                                                     <span className="skill-btn__label">{skill.label}</span>
                                                     {volunteerForm.skills.includes(skill.value) && (
-                                                        <span className="skill-btn__check">✓</span>
+                                                        <span className="skill-btn__check"><CheckIcon size={14} /></span>
                                                     )}
                                                 </button>
                                             ))}
@@ -665,7 +678,7 @@ export default function ProfilePage() {
                                         <div className="form-section">
                                             <label className="form-label">
                                                 緊急聯絡人 *
-                                                <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                                <Badge variant="info" size="sm" icon={<LockIcon size={12} />}>僅管理員可見</Badge>
                                             </label>
                                             <input
                                                 type="text"
@@ -678,7 +691,7 @@ export default function ProfilePage() {
                                         <div className="form-section">
                                             <label className="form-label">
                                                 緊急聯絡電話 *
-                                                <Badge variant="info" size="sm">🔒 僅管理員可見</Badge>
+                                                <Badge variant="info" size="sm" icon={<LockIcon size={12} />}>僅管理員可見</Badge>
                                             </label>
                                             <input
                                                 type="tel"
@@ -707,7 +720,7 @@ export default function ProfilePage() {
                                             onClick={handleVolunteerSubmit}
                                             disabled={isVolunteerSubmitting}
                                         >
-                                            {isVolunteerSubmitting ? '提交中...' : '✅ 提交申請'}
+                                            {isVolunteerSubmitting ? '提交中...' : '提交申請'}
                                         </Button>
                                     </div>
                                 </div>

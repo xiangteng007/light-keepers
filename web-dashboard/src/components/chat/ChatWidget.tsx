@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { BotIcon, CloseIcon, SupportIcon } from '../../design-system/icons';
 import './ChatWidget.css';
 
 interface Message {
@@ -85,8 +86,8 @@ export const ChatWidget: React.FC = () => {
             {isOpen && (
                 <div className="chat-window">
                     <div className="chat-header">
-                        <span className="chat-title">🤖 AI 助手</span>
-                        <button className="chat-close" onClick={() => setIsOpen(false)}>✕</button>
+                        <span className="chat-title"><BotIcon size={16} aria-hidden="true" /> AI 助手</span>
+                        <button className="chat-close" onClick={() => setIsOpen(false)} aria-label="關閉"><CloseIcon size={16} aria-hidden="true" /></button>
                     </div>
                     <div className="chat-messages">
                         {messages.map((msg) => (
@@ -131,7 +132,7 @@ export const ChatWidget: React.FC = () => {
                 </div>
             )}
             <button className="chat-fab" onClick={() => setIsOpen(!isOpen)}>
-                {isOpen ? '✕' : '💬'}
+                {isOpen ? <CloseIcon size={20} aria-hidden="true" /> : <SupportIcon size={20} aria-hidden="true" />}
             </button>
         </div>
     );

@@ -12,6 +12,12 @@ export const EVENT_ZOOM_LEVEL = 16;
 
 // NCDR 核心示警類型定義（使用官方 AlertType ID）
 // 來源: https://alerts.ncdr.nat.gov.tw/RSS.aspx
+//
+// R5/T5c 註記：icon 欄位（emoji）暫予保留——唯一呼叫端是 MapSidebar 的原生
+// <option>（NCDR 類型篩選下拉），原生 option 無法渲染 SVG，B3c 圖例系統
+// 無從接入；NCDR 示警類型（多為氣象類）亦無對應災型象形。待該下拉改為
+// 自訂元件時一併移除 icon 欄位。地圖上的 NCDR marker 不用本欄位
+// （map-utils createNcdrMarkerIcon 只取 color）。
 export const NCDR_CORE_TYPES = [
     { id: 6, name: '地震', icon: '🌍', color: '#5BA3C0' },       // 地震(中央氣象署)
     { id: 7, name: '海嘯', icon: '🌊', color: '#4DA6E8' },       // 海嘯(中央氣象署)

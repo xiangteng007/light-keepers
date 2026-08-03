@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Html5Qrcode, Html5QrcodeScannerState } from 'html5-qrcode';
 import { Button, Card } from '../../design-system';
+import { CloseIcon, WarningIcon, SyncIcon, CameraIcon } from '../../design-system/icons';
 import './BarcodeScanner.css';
 
 export interface BarcodeScannerProps {
@@ -144,7 +145,7 @@ export function BarcodeScanner({
                 <h3>{title}</h3>
                 {onClose && (
                     <button className="barcode-scanner-close" onClick={onClose}>
-                        ✕
+                        <CloseIcon size={16} aria-hidden="true" />
                     </button>
                 )}
             </div>
@@ -180,7 +181,7 @@ export function BarcodeScanner({
                 {/* 錯誤訊息 */}
                 {error && (
                     <div className="barcode-scanner-error">
-                        ⚠️ {error}
+                        <WarningIcon size={16} aria-hidden="true" /> {error}
                     </div>
                 )}
 
@@ -194,7 +195,7 @@ export function BarcodeScanner({
                             onClick={resetLastScanned}
                             title="重新掃描"
                         >
-                            🔄
+                            <SyncIcon size={16} aria-hidden="true" />
                         </button>
                     </div>
                 )}
@@ -207,11 +208,11 @@ export function BarcodeScanner({
                             onClick={startScanning}
                             disabled={!selectedCamera}
                         >
-                            📷 開始掃描
+                            <CameraIcon size={16} aria-hidden="true" /> 開始掃描
                         </Button>
                     ) : (
                         <Button variant="secondary" onClick={stopScanning}>
-                            ⏹️ 停止掃描
+                            <CloseIcon size={16} aria-hidden="true" /> 停止掃描
                         </Button>
                     )}
                 </div>

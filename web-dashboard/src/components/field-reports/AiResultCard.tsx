@@ -1,4 +1,5 @@
 import type { ReportSummaryOutput } from '../../services/aiQueueApi';
+import { AiIcon, CloseIcon, InventoryIcon, InfoIcon, CheckIcon } from '../../design-system/icons';
 import './AiResultCard.css';
 
 interface AiResultCardProps {
@@ -48,12 +49,12 @@ export function AiResultCard({
             {/* Header */}
             <div className="ai-result-header">
                 <div className="ai-result-title">
-                    <span className="ai-icon">🤖</span>
+                    <span className="ai-icon" aria-hidden="true"><AiIcon size={20} /></span>
                     <span>AI 分析結果</span>
                     {isFallback && <span className="fallback-badge">備用</span>}
                 </div>
                 <button className="dismiss-btn" onClick={onDismiss} aria-label="關閉">
-                    ✕
+                    <CloseIcon size={16} aria-hidden="true" />
                 </button>
             </div>
 
@@ -100,7 +101,7 @@ export function AiResultCard({
             {/* Identified Needs */}
             {result.identifiedNeeds.length > 0 && (
                 <div className="ai-result-section">
-                    <h4>🔧 需要的資源</h4>
+                    <h4><InventoryIcon size={16} aria-hidden="true" /> 需要的資源</h4>
                     <ul className="needs-list">
                         {result.identifiedNeeds.map((need, idx) => (
                             <li key={idx}>{need}</li>
@@ -112,7 +113,7 @@ export function AiResultCard({
             {/* Questions to Ask */}
             {result.questionsToAsk.length > 0 && (
                 <div className="ai-result-section">
-                    <h4>❓ 建議詢問</h4>
+                    <h4><InfoIcon size={16} aria-hidden="true" /> 建議詢問</h4>
                     <ul className="questions-list">
                         {result.questionsToAsk.map((q, idx) => (
                             <li key={idx}>{q}</li>
@@ -128,14 +129,14 @@ export function AiResultCard({
                     onClick={onAccept}
                     disabled={isLoading}
                 >
-                    ✓ 套用建議
+                    <CheckIcon size={16} aria-hidden="true" /> 套用建議
                 </button>
                 <button
                     className="btn-reject"
                     onClick={onReject}
                     disabled={isLoading}
                 >
-                    ✗ 拒絕
+                    <CloseIcon size={16} aria-hidden="true" /> 拒絕
                 </button>
             </div>
         </div>

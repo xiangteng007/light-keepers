@@ -1,4 +1,5 @@
 import { Component, type ReactNode, type ErrorInfo } from 'react';
+import { WarningIcon } from '../design-system/icons';
 
 interface Props {
   children: ReactNode;
@@ -60,7 +61,7 @@ export class ErrorBoundary extends Component<Props, State> {
             maxWidth: '480px',
             textAlign: 'center',
           }}>
-            <div style={{ fontSize: '48px', marginBottom: '16px' }}>⚠️</div>
+            <div style={{ marginBottom: '16px', color: '#fbbf24' }} aria-hidden="true"><WarningIcon size={48} /></div>
             <h1 style={{
               fontSize: '20px',
               fontWeight: 600,

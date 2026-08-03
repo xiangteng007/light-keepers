@@ -5,16 +5,24 @@ import { pointsApi } from '../api/vms';
 import type { PointsRecord, PointsSummary } from '../api/vms';
 import { Card, Badge, StatIndicator } from '../design-system';
 import type { BadgeProps } from '../design-system';
+import {
+    VehicleIcon,
+    GraduationIcon,
+    TrophyIcon,
+    SettingsIcon,
+    MoreIcon,
+    type LkIcon,
+} from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './PointsReportPage.css';
 
-// 紀錄類型標籤（Badge variant 對照 DESIGN_LANGUAGE.md §3）
-const RECORD_TYPE_LABELS: Record<string, { name: string; variant: BadgeProps['variant']; icon: string }> = {
-    task: { name: '任務出勤', variant: 'success', icon: '🚒' },
-    training: { name: '教育訓練', variant: 'info', icon: '📚' },
-    special: { name: '特殊貢獻', variant: 'warning', icon: '⭐' },
-    adjustment: { name: '積分調整', variant: 'default', icon: '⚙️' },
+// 紀錄類型標籤（Badge variant 對照 DESIGN_LANGUAGE.md §3；R5/T5c：B3c 教範圖例）
+const RECORD_TYPE_LABELS: Record<string, { name: string; variant: BadgeProps['variant']; Icon: LkIcon }> = {
+    task: { name: '任務出勤', variant: 'success', Icon: VehicleIcon },
+    training: { name: '教育訓練', variant: 'info', Icon: GraduationIcon },
+    special: { name: '特殊貢獻', variant: 'warning', Icon: TrophyIcon },
+    adjustment: { name: '積分調整', variant: 'default', Icon: SettingsIcon },
 };
 
 export default function PointsReportPage() {
@@ -65,12 +73,13 @@ export default function PointsReportPage() {
 
     // 年度績效等級（獎章分級為裝飾性類別色，非狀態色 — 依 DESIGN_LANGUAGE.md §3
     // 刻意避開與 --color-warning/--color-success 完全相同的色值，避免誤讀為狀態）
-    const getPerformanceLevel = (totalPoints: number): { level: string; color: string; icon: string } => {
-        if (totalPoints >= 500) return { level: '白金志工', color: '#9333EA', icon: '💎' };
-        if (totalPoints >= 300) return { level: '金牌志工', color: '#B8860B', icon: '🥇' };
-        if (totalPoints >= 150) return { level: '銀牌志工', color: '#6B7280', icon: '🥈' };
-        if (totalPoints >= 50) return { level: '銅牌志工', color: '#B87333', icon: '🥉' };
-        return { level: '新進志工', color: '#0D9488', icon: '🌱' };
+    // R5/T5c：獎章一律 B3c TrophyIcon（分級由色彩＋文字承擔），新進志工用 GraduationIcon。
+    const getPerformanceLevel = (totalPoints: number): { level: string; color: string; Icon: LkIcon } => {
+        if (totalPoints >= 500) return { level: '白金志工', color: '#9333EA', Icon: TrophyIcon };
+        if (totalPoints >= 300) return { level: '金牌志工', color: '#B8860B', Icon: TrophyIcon };
+        if (totalPoints >= 150) return { level: '銀牌志工', color: '#6B7280', Icon: TrophyIcon };
+        if (totalPoints >= 50) return { level: '銅牌志工', color: '#B87333', Icon: TrophyIcon };
+        return { level: '新進志工', color: '#0D9488', Icon: GraduationIcon };
     };
 
     const performance = summary ? getPerformanceLevel(summary.totalPoints) : null;
@@ -127,7 +136,7 @@ export default function PointsReportPage() {
                     {summary && performance && (
                         <Card padding="lg" className="performance-card">
                             <div className="performance-header">
-                                <span className="performance-icon" aria-hidden="true">{performance.icon}</span>
+                                <span className="performance-icon" aria-hidden="true" style={{ color: performance.color }}><performance.Icon size={32} /></span>
                                 <div className="performance-info">
                                     <span className="performance-level" style={{ color: performance.color }}>
                                         {performance.level}
@@ -156,7 +165,7 @@ export default function PointsReportPage() {
                                     return (
                                         <Card key={type} padding="md" className="category-card">
                                             <div className="category-header">
-                                                <span className="category-icon" aria-hidden="true">{typeInfo.icon}</span>
+                                                <span className="category-icon" aria-hidden="true"><typeInfo.Icon size={20} /></span>
                                                 <span className="category-name">{typeInfo.name}</span>
                                             </div>
                                             <div className="category-data">
@@ -211,7 +220,7 @@ export default function PointsReportPage() {
                                                 const typeInfo = RECORD_TYPE_LABELS[record.recordType] || {
                                                     name: '未知',
                                                     variant: 'default' as BadgeProps['variant'],
-                                                    icon: '❓'
+                                                    Icon: MoreIcon,
                                                 };
 
                                                 return (
@@ -222,7 +231,7 @@ export default function PointsReportPage() {
                                                                 variant={typeInfo.variant}
                                                                 size="sm"
                                                             >
-                                                                {typeInfo.icon} {typeInfo.name}
+                                                                <typeInfo.Icon size={16} aria-hidden="true" /> {typeInfo.name}
                                                             </Badge>
                                                         </td>
                                                         <td className="description-cell">

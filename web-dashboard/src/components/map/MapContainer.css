@@ -70,6 +70,8 @@
 .marker-icon {
     width: 36px;
     height: 36px;
+    /* B3c 地圖符號（inline SVG stroke=currentColor）；色與外框同語意 */
+    color: var(--navy-primary, #1E3A6C);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -80,9 +82,16 @@
     border: 2px solid var(--navy-primary, #1E3A6C);
 }
 
+.marker-icon svg {
+    width: 20px;
+    height: 20px;
+    display: block;
+}
+
 /* Report Marker */
 .marker-report .marker-icon {
     border-color: var(--gold-primary, #C59750);
+    color: var(--gold-primary, #C59750);
 }
 
 /* SOS Marker with Pulse Animation */
@@ -93,6 +102,7 @@
 .marker-sos .marker-icon {
     border-color: #dc2626;
     background: #fee2e2;
+    color: #dc2626;
     z-index: 1;
     position: relative;
 }
@@ -125,6 +135,7 @@
 .marker-location .marker-icon {
     border-color: #10b981;
     background: #d1fae5;
+    color: #059669;
 }
 
 /* Popup Styles */

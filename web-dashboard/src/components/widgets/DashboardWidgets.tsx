@@ -5,6 +5,14 @@
 
 import React from 'react';
 import type { ReactNode } from 'react';
+import {
+    SyncIcon,
+    CheckIcon,
+    SosIcon,
+    UserIcon,
+    WeatherIcon,
+} from '../../design-system/icons';
+import { DotStamp } from '../../design-system/icons/pictograms';
 import './DashboardWidgets.css';
 
 // ==================== Widget Types ====================
@@ -34,7 +42,8 @@ export type WidgetType =
 
 interface WidgetContainerProps {
     title: string;
-    icon?: string;
+    /** B3c icon 元件節點（R5/T5c：字串 emoji 出清） */
+    icon?: ReactNode;
     size?: 'small' | 'medium' | 'large';
     loading?: boolean;
     children: ReactNode;
@@ -60,8 +69,8 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
                 </h3>
                 <div className="widget-actions">
                     {onRefresh && (
-                        <button className="refresh-btn" onClick={onRefresh} disabled={loading}>
-                            🔄
+                        <button className="refresh-btn" onClick={onRefresh} disabled={loading} title="重新整理">
+                            <SyncIcon size={16} aria-hidden="true" />
                         </button>
                     )}
                     {actions}
@@ -85,7 +94,8 @@ export const WidgetContainer: React.FC<WidgetContainerProps> = ({
 interface StatsCardProps {
     label: string;
     value: number | string;
-    icon: string;
+    /** B3c icon 元件節點（R5/T5c：字串 emoji 出清） */
+    icon: ReactNode;
     trend?: { value: number; label: string };
     color?: 'primary' | 'success' | 'warning' | 'danger';
 }
@@ -120,7 +130,8 @@ interface ActivityItem {
     type: string;
     message: string;
     timestamp: string;
-    icon?: string;
+    /** B3c icon 元件節點（R5/T5c：字串 emoji 出清） */
+    icon?: ReactNode;
 }
 
 interface RecentActivityWidgetProps {
@@ -142,7 +153,7 @@ export const RecentActivityWidget: React.FC<RecentActivityWidgetProps> = ({
                 <ul className="activity-list">
                     {displayItems.map(item => (
                         <li key={item.id} className="activity-item">
-                            <span className="activity-icon">{item.icon || '📌'}</span>
+                            <span className="activity-icon" aria-hidden="true">{item.icon || <DotStamp size={10} />}</span>
                             <div className="activity-content">
                                 <p>{item.message}</p>
                                 <span className="activity-time">
@@ -214,13 +225,13 @@ export const SOSMonitorWidget: React.FC<SOSMonitorWidgetProps> = ({
         <div className="sos-monitor-widget">
             {activeSignals.length === 0 ? (
                 <div className="sos-safe">
-                    <span className="safe-icon">✅</span>
+                    <span className="safe-icon" aria-hidden="true"><CheckIcon size={32} /></span>
                     <p>目前無緊急求救信號</p>
                 </div>
             ) : (
                 <div className="sos-alerts">
                     <div className="alert-header">
-                        <span className="alert-icon pulse">🚨</span>
+                        <span className="alert-icon pulse" aria-hidden="true"><SosIcon size={24} /></span>
                         <strong>{activeSignals.length} 個進行中的求救信號</strong>
                     </div>
                     <ul className="sos-list">
@@ -290,7 +301,14 @@ export const TaskListWidget: React.FC<TaskListWidgetProps> = ({
                             <div className="task-info">
                                 <p className="task-title">{task.title}</p>
                                 {task.assignee && (
-                                    <span className="task-assignee">👤 {task.assignee}</span>
+                                    <span className="task-assignee">
+                                        <UserIcon
+                                            size={12}
+                                            aria-hidden="true"
+                                            style={{ verticalAlign: 'text-bottom', marginRight: 4 }}
+                                        />
+                                        {task.assignee}
+                                    </span>
                                 )}
                             </div>
                             <span className="task-status">{task.status}</span>
@@ -329,7 +347,7 @@ export const WeatherAlertWidget: React.FC<WeatherAlertWidgetProps> = ({ alerts }
         <div className="weather-alert-widget">
             {alerts.length === 0 ? (
                 <div className="no-alerts">
-                    <span>☀️</span>
+                    <span aria-hidden="true"><WeatherIcon size={32} /></span>
                     <p>目前無天氣警報</p>
                 </div>
             ) : (

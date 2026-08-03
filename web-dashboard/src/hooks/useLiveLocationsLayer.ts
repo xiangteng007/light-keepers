@@ -29,7 +29,7 @@ export function useLiveLocationsLayer({
                 ${location.displayName.charAt(0).toUpperCase()}
             </div>
             <div class="marker-label">${location.callsign || location.displayName}</div>
-            ${location.isStale ? '<div class="stale-badge">⚠</div>' : ''}
+            ${location.isStale ? '<div class="stale-badge" aria-hidden="true">!</div>' : ''}
         `;
         el.title = `${location.displayName}${location.callsign ? ` (${location.callsign})` : ''}\n最後更新: ${new Date(location.lastAt).toLocaleTimeString()}`;
 

@@ -4,6 +4,7 @@
  * Community blessing wall for mutual support
  */
 import React, { useState, useEffect } from 'react';
+import { HeartIcon } from '../../design-system/icons';
 import './BlessingWall.css';
 
 interface Blessing {
@@ -62,13 +63,13 @@ export function BlessingWall({ blessings, onPostBlessing, onLikeBlessing }: Bles
     return (
         <div className="blessing-wall">
             <div className="blessing-wall__header">
-                <h3>🕯️ 祈福牆</h3>
+                <h3><HeartIcon size={20} aria-hidden="true" /> 祈福牆</h3>
                 <p>為災區與夥伴們送上祝福</p>
                 <button
                     className="blessing-wall__add-btn"
                     onClick={() => setShowForm(!showForm)}
                 >
-                    {showForm ? '取消' : '✨ 送上祝福'}
+                    {showForm ? '取消' : '送上祝福'}
                 </button>
             </div>
 
@@ -109,7 +110,7 @@ export function BlessingWall({ blessings, onPostBlessing, onLikeBlessing }: Bles
             <div className="blessing-grid">
                 {blessings.length === 0 ? (
                     <div className="blessing-empty">
-                        <span>🕯️</span>
+                        <span aria-hidden="true"><HeartIcon size={32} /></span>
                         <p>還沒有祝福，成為第一個送上祝福的人吧！</p>
                     </div>
                 ) : (
@@ -129,7 +130,7 @@ export function BlessingWall({ blessings, onPostBlessing, onLikeBlessing }: Bles
                                 className="blessing-card__like"
                                 onClick={() => onLikeBlessing(blessing.id)}
                             >
-                                ❤️ {blessing.likes}
+                                <HeartIcon size={16} aria-hidden="true" /> {blessing.likes}
                             </button>
                         </div>
                     ))

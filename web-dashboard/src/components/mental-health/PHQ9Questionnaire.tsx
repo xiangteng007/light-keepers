@@ -5,6 +5,7 @@
  * Standard 9-question assessment tool
  */
 import React, { useState } from 'react';
+import { SosIcon, WarningIcon } from '../../design-system/icons';
 import './Questionnaire.css';
 
 interface PHQ9QuestionnaireProps {
@@ -88,7 +89,7 @@ export function PHQ9Questionnaire({ onComplete }: PHQ9QuestionnaireProps) {
 
                 {score >= 10 && (
                     <div className="questionnaire__hotline">
-                        <strong>🆘 需要幫助嗎？</strong>
+                        <strong><SosIcon size={16} aria-hidden="true" /> 需要幫助嗎？</strong>
                         <p>安心專線：<a href="tel:1925">1925</a>（24小時免費）</p>
                         <p>生命線：<a href="tel:1995">1995</a></p>
                     </div>
@@ -132,7 +133,7 @@ export function PHQ9Questionnaire({ onComplete }: PHQ9QuestionnaireProps) {
                         <div className="question-content">
                             <p className="question-text">
                                 {question}
-                                {idx === 8 && <span className="warning-badge">⚠️ 重要</span>}
+                                {idx === 8 && <span className="warning-badge"><WarningIcon size={16} aria-hidden="true" /> 重要</span>}
                             </p>
                             <div className="question-options">
                                 {FREQUENCY_OPTIONS.map(opt => (

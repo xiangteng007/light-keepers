@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Card, Button, Badge } from '../../design-system';
+import { InventoryIcon, SettingsIcon, CheckIcon, CloseIcon } from '../../design-system/icons';
 import { ResourcesTabSkeleton } from './ResourcesSkeleton';
 import './AuditTab.css';
 import api from '../../api/client';
@@ -139,8 +140,8 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
                 </select>
                 {canManage && (
                     <div className="action-buttons">
-                        <Button size="sm" onClick={handleStartConsumableAudit}>📦 耗材盤點</Button>
-                        <Button size="sm" variant="secondary" onClick={handleStartAssetAudit}>🔧 器材盤點</Button>
+                        <Button size="sm" onClick={handleStartConsumableAudit}><InventoryIcon size={16} aria-hidden="true" /> 耗材盤點</Button>
+                        <Button size="sm" variant="secondary" onClick={handleStartAssetAudit}><SettingsIcon size={16} aria-hidden="true" /> 器材盤點</Button>
                     </div>
                 )}
             </div>
@@ -156,7 +157,7 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
                         <Card key={audit.id} className="audit-card" padding="md" onClick={() => setSelectedAudit(audit)}>
                             <div className="audit-header">
                                 <div className="audit-info">
-                                    <span className="audit-type">{audit.type === 'consumable' ? '📦 耗材盤點' : '🔧 器材盤點'}</span>
+                                    <span className="audit-type">{audit.type === 'consumable' ? '耗材盤點' : '器材盤點'}</span>
                                     <span className="audit-date">{new Date(audit.createdAt).toLocaleString('zh-TW')}</span>
                                 </div>
                                 <Badge variant={audit.status === 'completed' ? 'success' : audit.status === 'in_progress' ? 'info' : 'default'}>
@@ -173,7 +174,7 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
                                 <div className="audit-result">
                                     {audit.gainCount !== undefined && audit.gainCount > 0 && <span className="result-gain">+{audit.gainCount} 盤盈</span>}
                                     {audit.lossCount !== undefined && audit.lossCount > 0 && <span className="result-loss">-{audit.lossCount} 盤虧</span>}
-                                    {(!audit.gainCount && !audit.lossCount) && <span className="result-ok">✅ 無差異</span>}
+                                    {(!audit.gainCount && !audit.lossCount) && <span className="result-ok"><CheckIcon size={16} aria-hidden="true" /> 無差異</span>}
                                 </div>
                             )}
 
@@ -187,8 +188,8 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
 
                             {canManage && audit.status === 'in_progress' && (
                                 <div className="audit-actions" onClick={e => e.stopPropagation()}>
-                                    <Button size="sm" onClick={() => handleCompleteAudit(audit)}>✅ 完成盤點</Button>
-                                    <Button size="sm" variant="ghost" onClick={() => handleCancelAudit(audit)}>❌ 取消</Button>
+                                    <Button size="sm" onClick={() => handleCompleteAudit(audit)}><CheckIcon size={16} aria-hidden="true" /> 完成盤點</Button>
+                                    <Button size="sm" variant="ghost" onClick={() => handleCancelAudit(audit)}><CloseIcon size={16} aria-hidden="true" /> 取消</Button>
                                 </div>
                             )}
                         </Card>
@@ -201,7 +202,7 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
             {selectedAudit && (
                 <div className="modal-overlay" onClick={() => setSelectedAudit(null)}>
                     <div className="modal-content" onClick={e => e.stopPropagation()}>
-                        <h3>{selectedAudit.type === 'consumable' ? '📦 耗材盤點詳情' : '🔧 器材盤點詳情'}</h3>
+                        <h3>{selectedAudit.type === 'consumable' ? '耗材盤點詳情' : '器材盤點詳情'}</h3>
 
                         {selectedAudit.type === 'consumable' ? (
                             <div className="items-table">
@@ -242,7 +243,7 @@ export default function AuditTab({ canManage, userName }: AuditTabProps) {
                                         {parseAssets(selectedAudit.assets).map(asset => (
                                             <tr key={asset.assetId} className={!asset.scanned ? 'missing-row' : ''}>
                                                 <td>{asset.assetNo}</td>
-                                                <td>{asset.scanned ? '✅ 已掃' : '❓ 未掃'}</td>
+                                                <td>{asset.scanned ? '已掃' : '未掃'}</td>
                                                 <td>{asset.missingNote || '-'}</td>
                                             </tr>
                                         ))}

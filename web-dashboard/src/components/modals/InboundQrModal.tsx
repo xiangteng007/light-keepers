@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { QrIcon, WarningIcon, CheckIcon, InfoIcon, ExportIcon } from '../../design-system/icons';
 import { Modal, Form, Button, Alert, Badge } from 'react-bootstrap';
 import api from '../../api/client';
 import { getApiErrorMessage } from '../../api/errors';
@@ -36,12 +37,12 @@ export default function InboundQrModal({
 
     const handleGenerate = async () => {
         if (!canGenerateQr) {
-            alert('❌ 民生物品不可產生系統 QR Code');
+            alert('民生物品不可產生系統 QR Code');
             return;
         }
 
         if ((controlLevel === 'controlled' || controlLevel === 'medical') && !lotNumber) {
-            alert('❌ 管控/藥品必須填寫批號');
+            alert('管控/藥品必須填寫批號');
             return;
         }
 
@@ -58,13 +59,13 @@ export default function InboundQrModal({
             });
 
             setGeneratedQr(response.data.qrValue);
-            alert('✅ QR Code 已產生！');
+            alert('QR Code 已產生！');
 
             if (onSuccess) {
                 onSuccess();
             }
         } catch (err: any) {
-            alert(`❌ 產生失敗：${getApiErrorMessage(err, '未知錯誤')}`);
+            alert(`產生失敗：${getApiErrorMessage(err, '未知錯誤')}`);
         } finally {
             setLoading(false);
         }
@@ -74,7 +75,7 @@ export default function InboundQrModal({
         if (!generatedQr) return;
 
         window.confirm(
-            '🖨️ 貼紙列印功能\n\n' +
+            '貼紙列印功能\n\n' +
             '標籤列印功能正在開發中，預計包含：\n' +
             '• 產生 PDF 標籤（含 QR Code）\n' +
             '• 支援多種標籤尺寸（30x20mm, 50x30mm）\n' +
@@ -114,13 +115,13 @@ export default function InboundQrModal({
         <Modal show={show} onHide={onHide} size="lg">
             <Modal.Header closeButton>
                 <Modal.Title>
-                    📦 入庫產碼 - {resourceName} {getControlLevelBadge()}
+                    <QrIcon size={20} aria-hidden="true" /> 入庫產碼 - {resourceName} {getControlLevelBadge()}
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
                 {!canGenerateQr ? (
                     <Alert variant="warning">
-                        ⚠️ <strong>民生物品不可產生系統 QR Code</strong>
+                        <WarningIcon size={16} aria-hidden="true" /> <strong>民生物品不可產生系統 QR Code</strong>
                         <div className="mt-2">
                             根據系統規範，僅 <Badge bg="warning">管控</Badge>、<Badge bg="danger">藥品</Badge>、<Badge bg="primary">資產</Badge> 品項可產生 QR Code 與貼紙。
                         </div>
@@ -129,7 +130,7 @@ export default function InboundQrModal({
                     // QR 已產生
                     <div>
                         <Alert variant="success">
-                            ✅ <strong>QR Code 已產生！</strong>
+                            <CheckIcon size={16} aria-hidden="true" /> <strong>QR Code 已產生！</strong>
                         </Alert>
                         <div className="bg-light p-4 rounded text-center mb-3">
                             <div className="mb-3">
@@ -145,7 +146,7 @@ export default function InboundQrModal({
                                 </div>
                             </div>
                             <div className="text-muted small">
-                                ℹ️ 實際部署時，此處會顯示可掃描的 QR Code 圖片
+                                <InfoIcon size={16} aria-hidden="true" /> 實際部署時，此處會顯示可掃描的 QR Code 圖片
                             </div>
                         </div>
 
@@ -170,7 +171,7 @@ export default function InboundQrModal({
 
                         <div className="d-grid gap-2">
                             <Button variant="primary" onClick={handlePrintLabel}>
-                                🖨️ 列印貼紙
+                                <ExportIcon size={16} aria-hidden="true" /> 列印貼紙
                             </Button>
                             <Button variant="outline-secondary" onClick={handleReset}>
                                 產生新批次
@@ -223,7 +224,7 @@ export default function InboundQrModal({
                         </Form.Group>
 
                         <Alert variant="info" className="mb-0">
-                            <strong>ℹ️ QR Code 防偽機制</strong>
+                            <strong><InfoIcon size={16} aria-hidden="true" /> QR Code 防偽機制</strong>
                             <div className="mt-1 small">
                                 系統將使用 SHA256 演算法產生 8 位校驗碼，確保 QR Code 無法偽造。
                             </div>
@@ -243,7 +244,7 @@ export default function InboundQrModal({
                                 onClick={handleGenerate}
                                 disabled={loading}
                             >
-                                {loading ? '產生中...' : '🔐 產生 QR Code'}
+                                {loading ? '產生中...' : <><QrIcon size={16} aria-hidden="true" /> 產生 QR Code</>}
                             </Button>
                         )}
                     </>

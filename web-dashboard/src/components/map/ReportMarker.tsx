@@ -5,6 +5,13 @@
 
 import { useEffect, useRef } from 'react';
 import maplibregl from 'maplibre-gl';
+import {
+    aedToDataUri,
+    hazardAoiToDataUri,
+    reportIncidentToDataUri,
+    sosToDataUri,
+    warehouseToDataUri,
+} from '../../design-system/icons/map-symbols';
 
 export interface ReportMarkerProps {
     map: maplibregl.Map | null;
@@ -19,13 +26,18 @@ export interface ReportMarkerProps {
     onClick?: () => void;
 }
 
-const TYPE_ICONS: Record<string, string> = {
-    incident: '⚠️',
-    resource: '📦',
-    medical: '🏥',
-    traffic: '🚗',
-    sos: '🆘',
-    other: '📍',
+/**
+ * 通報類型 → B3c 地圖符號 data URI（design-system/icons/map-symbols）。
+ * traffic 無專屬符號，取最接近語意 hazard-aoi（路線上的危害）；
+ * other 落回 report-incident（一般通報，菱＋驚嘆）。
+ */
+const TYPE_SYMBOL_URIS: Record<string, (color: string) => string> = {
+    incident: reportIncidentToDataUri,
+    resource: warehouseToDataUri,
+    medical: aedToDataUri,
+    traffic: hazardAoiToDataUri,
+    sos: sosToDataUri,
+    other: reportIncidentToDataUri,
 };
 
 const SEVERITY_COLORS: Record<number, string> = {
@@ -70,7 +82,15 @@ export function ReportMarker({
             cursor: pointer;
             transition: transform 0.2s;
         `;
-        el.innerHTML = TYPE_ICONS[type] || TYPE_ICONS.other;
+        const toSymbolUri = TYPE_SYMBOL_URIS[type] || TYPE_SYMBOL_URIS.other;
+        const symbolImg = document.createElement('img');
+        symbolImg.src = toSymbolUri('#ffffff');
+        symbolImg.width = 20;
+        symbolImg.height = 20;
+        symbolImg.alt = '';
+        symbolImg.draggable = false;
+        symbolImg.style.display = 'block';
+        el.appendChild(symbolImg);
         el.dataset.id = id;
 
         // Hover effect
@@ -90,7 +110,7 @@ export function ReportMarker({
         const popupContent = `
             <div style="padding: 8px; min-width: 180px;">
                 <div style="font-weight: 600; margin-bottom: 4px;">
-                    ${TYPE_ICONS[type]} ${type.charAt(0).toUpperCase() + type.slice(1)}
+                    ${type.charAt(0).toUpperCase() + type.slice(1)}
                 </div>
                 <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
                     嚴重程度: ${'●'.repeat(severity)}${'○'.repeat(5 - severity)}

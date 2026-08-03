@@ -9,6 +9,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import api from '../api/client';
 import { Button, Badge, Modal } from '../design-system';
+import { InventoryIcon, UserIcon } from '../design-system/icons';
 import EmptyState from '../components/shared/EmptyState';
 import './EquipmentPage.css';
 
@@ -166,16 +167,17 @@ export const EquipmentPage: React.FC = () => {
 
     // ============ Render Helpers ============
 
+    // R5/T5c：分類標籤純文字（emoji 移除；卡片另有狀態 Badge 與電量條承擔視覺區辨）
     const getCategoryLabel = (cat: string) => {
         const labels: Record<string, string> = {
-            RADIO: '📻 無線電',
-            GPS: '📍 GPS',
-            TABLET: '📱 平板',
-            DRONE: '🛸 無人機',
-            FIRST_AID: '🏥 急救包',
-            LIGHT: '🔦 照明',
-            POWER_BANK: '🔋 行動電源',
-            OTHER: '📦 其他',
+            RADIO: '無線電',
+            GPS: 'GPS',
+            TABLET: '平板',
+            DRONE: '無人機',
+            FIRST_AID: '急救包',
+            LIGHT: '照明',
+            POWER_BANK: '行動電源',
+            OTHER: '其他',
         };
         return labels[cat] || cat;
     };
@@ -199,7 +201,7 @@ export const EquipmentPage: React.FC = () => {
     return (
         <div className="equipment-page">
             <header className="equipment-header">
-                <h1>📦 設備管理</h1>
+                <h1><InventoryIcon size={24} aria-hidden="true" /> 設備管理</h1>
                 <Button variant="primary" onClick={() => setShowNewModal(true)}>
                     + 新增設備
                 </Button>
@@ -272,7 +274,7 @@ export const EquipmentPage: React.FC = () => {
                                     )}
 
                                     {item.currentHolderName && (
-                                        <p className="holder">👤 {item.currentHolderName}</p>
+                                        <p className="holder"><UserIcon size={16} aria-hidden="true" /> {item.currentHolderName}</p>
                                     )}
 
                                     <div className="card-actions">

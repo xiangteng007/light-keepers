@@ -1,6 +1,12 @@
 import { useState, useCallback, useRef } from 'react';
 import { DirectionsRenderer, Autocomplete } from '@react-google-maps/api';
 import { Button, Card } from '../../design-system';
+import {
+    CloseIcon,
+    LocationIcon,
+    SearchIcon,
+    WarningIcon,
+} from '../../design-system/icons';
 import './DirectionsPanel.css';
 
 export interface DirectionsPanelProps {
@@ -118,22 +124,22 @@ export function DirectionsPanel({ userLocation, onClose }: DirectionsPanelProps)
         }
     }, []);
 
-    // 交通模式選項
+    // 交通模式選項（B3c 無對應載具圖例，依規則移除 emoji 保留文字）
     const travelModes = [
-        { mode: google.maps.TravelMode.DRIVING, label: '🚗 開車', icon: '🚗' },
-        { mode: google.maps.TravelMode.WALKING, label: '🚶 步行', icon: '🚶' },
-        { mode: google.maps.TravelMode.BICYCLING, label: '🚲 騎車', icon: '🚲' },
-        { mode: google.maps.TravelMode.TRANSIT, label: '🚌 大眾運輸', icon: '🚌' },
+        { mode: google.maps.TravelMode.DRIVING, label: '開車' },
+        { mode: google.maps.TravelMode.WALKING, label: '步行' },
+        { mode: google.maps.TravelMode.BICYCLING, label: '騎車' },
+        { mode: google.maps.TravelMode.TRANSIT, label: '大眾運輸' },
     ];
 
     return (
         <>
             <Card className="directions-panel">
                 <div className="directions-panel-header">
-                    <h3>🧭 路線規劃</h3>
+                    <h3>路線規劃</h3>
                     {onClose && (
-                        <button className="directions-panel-close" onClick={onClose}>
-                            ✕
+                        <button className="directions-panel-close" onClick={onClose} aria-label="關閉">
+                            <CloseIcon size={20} style={{ display: 'block' }} />
                         </button>
                     )}
                 </div>
@@ -161,7 +167,7 @@ export function DirectionsPanel({ userLocation, onClose }: DirectionsPanelProps)
                                     onClick={useCurrentLocation}
                                     title="使用目前位置"
                                 >
-                                    📍
+                                    <LocationIcon size={16} style={{ display: 'block' }} />
                                 </button>
                             )}
                         </div>
@@ -186,14 +192,14 @@ export function DirectionsPanel({ userLocation, onClose }: DirectionsPanelProps)
 
                     {/* 交通模式 */}
                     <div className="directions-travel-modes">
-                        {travelModes.map(({ mode, label, icon }) => (
+                        {travelModes.map(({ mode, label }) => (
                             <button
                                 key={mode}
                                 className={`directions-mode-btn ${travelMode === mode ? 'active' : ''}`}
                                 onClick={() => setTravelMode(mode)}
                                 title={label}
                             >
-                                {icon}
+                                {label}
                             </button>
                         ))}
                     </div>
@@ -201,7 +207,8 @@ export function DirectionsPanel({ userLocation, onClose }: DirectionsPanelProps)
                     {/* 錯誤訊息 */}
                     {error && (
                         <div className="directions-error">
-                            ⚠️ {error}
+                            <WarningIcon size={14} style={{ verticalAlign: '-2px', marginRight: 5 }} />
+                            {error}
                         </div>
                     )}
 
@@ -231,7 +238,11 @@ export function DirectionsPanel({ userLocation, onClose }: DirectionsPanelProps)
                                 onClick={calculateRoute}
                                 disabled={isLoading || !origin || !destination}
                             >
-                                {isLoading ? '計算中...' : '🔍 規劃路線'}
+                                {isLoading ? '計算中...' : (
+                                    <>
+                                        <SearchIcon size={16} aria-hidden="true" /> 規劃路線
+                                    </>
+                                )}
                             </Button>
                         )}
                     </div>

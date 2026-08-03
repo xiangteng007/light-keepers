@@ -5,6 +5,7 @@
  */
 import React, { useState, useRef, useEffect } from 'react';
 import { GripVertical, Eye, EyeOff, Lock, Unlock, Settings, Pencil, Trash2 } from 'lucide-react';
+import { EditIcon } from '../../design-system/icons';
 import { useTranslation } from 'react-i18next';
 import { WidgetConfig } from './widget.types';
 import { getWidgetTitle } from '../../utils/widget-i18n';
@@ -216,7 +217,9 @@ export function WidgetEditControls({
                         letterSpacing: '0.5px',
                         whiteSpace: 'nowrap'
                     }}>
-                        編輯模式：拖曳移動 · 拉伸大小 · 點擊 ✏️ 編輯標題
+                        編輯模式：拖曳移動 · 拉伸大小 · 點擊{' '}
+                        <EditIcon size={16} aria-hidden="true" style={{ verticalAlign: 'text-bottom' }} />
+                        {' '}編輯標題
                     </span>
                     {onAddWidget && (
                         <button
