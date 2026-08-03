@@ -20,7 +20,9 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { FileText, AlertTriangle, Truck, HeartPulse, MapPin } from 'lucide-react';
+import { MapPin } from 'lucide-react';
+import { ReportIcon, WarningIcon, TasksIcon, TriageIcon } from '../design-system/icons';
+import { SolidSquareStamp, OutlineSquareStamp, CheckStamp } from '../design-system/icons/pictograms';
 import {
     getReportStats,
     getReports,
@@ -74,11 +76,12 @@ const ALERT_CHIP: Record<NcdrAlert['severity'], ChipSpec> = {
     info: { label: '資訊', shape: '□', tone: 'lo' },
 };
 
-/** 佇列列狀態 chip：■ 實心／□ 描邊雙編碼（形狀先於顏色） */
+/** 佇列列狀態 chip：■ 實心／□ 描邊雙編碼（形狀先於顏色；R5/T5 章元件渲染） */
 function Chip({ shape, tone, children }: { shape: ChipSpec['shape']; tone: ChipTone; children: ReactNode }) {
+    const ShapeStamp = shape === '■' ? SolidSquareStamp : OutlineSquareStamp;
     return (
         <span className={`cc-chip cc-chip--${tone}`}>
-            <i className="cc-chip__shape" aria-hidden="true">{shape}</i>
+            <i className="cc-chip__shape" aria-hidden="true"><ShapeStamp size={10} /></i>
             {children}
         </span>
     );
@@ -228,7 +231,7 @@ export default function CommandCenterPage() {
                 <div className="sit-row__main">
                     <div className="sit-row__title">{report.title}</div>
                     <div className="sit-row__meta">
-                        {meta.label} · {done && <i className="cc-done-mark" aria-hidden="true">✓ </i>}
+                        {meta.label} · {done && <i className="cc-done-mark" aria-hidden="true"><CheckStamp size={11} /></i>}
                         {STATUS_LABEL[report.status] ?? report.status}
                         {report.isMassCasualty && ' · 大量傷患'}
                     </div>
@@ -259,7 +262,9 @@ export default function CommandCenterPage() {
                             <div className="cc-mission__row">
                                 <b className={`cc-mission__code${mission ? '' : ' u-mono'}`}>{missionCode}</b>
                                 <span className={`cc-mission__state${mission ? ' cc-mission__state--live' : ''}`}>
-                                    <i aria-hidden="true">{mission ? '■' : '□'}</i>
+                                    <i aria-hidden="true">
+                                        {mission ? <SolidSquareStamp size={10} /> : <OutlineSquareStamp size={10} />}
+                                    </i>
                                     {mission ? '進行中' : '值守'}
                                 </span>
                             </div>
@@ -278,8 +283,14 @@ export default function CommandCenterPage() {
                             <span className="cc-updated u-mono" aria-live="polite">更新於 {lastUpdated}</span>
                         )}
                         <Button variant="secondary" size="sm" onClick={refreshAll}>重新整理</Button>
-                        <Button variant="primary" size="sm" className="cc-cta" onClick={() => navigate('/intake')}>
-                            ＋ 快速通報
+                        <Button
+                            variant="primary"
+                            size="sm"
+                            className="cc-cta"
+                            icon={<ReportIcon size={16} />}
+                            onClick={() => navigate('/intake')}
+                        >
+                            快速通報
                         </Button>
                     </div>
                 </header>
@@ -290,7 +301,7 @@ export default function CommandCenterPage() {
                         <KpiCard
                             label="通報總數"
                             value={rs?.total ?? null}
-                            icon={<FileText size={18} />}
+                            icon={<ReportIcon size={18} />}
                             tone="info"
                             sub={rs ? `已確認 ${rs.confirmed} 件 · 近 7 日趨勢` : undefined}
                             to="/events"
@@ -304,7 +315,7 @@ export default function CommandCenterPage() {
                         <KpiCard
                             label="未處理通報"
                             value={rs?.pending ?? null}
-                            icon={<AlertTriangle size={18} />}
+                            icon={<WarningIcon size={18} />}
                             tone={rs ? (rs.pending > 0 ? 'warning' : 'success') : 'default'}
                             sub={rs ? (rs.pending > 0 ? '待審核佇列累積中' : '審核佇列已清空') : undefined}
                             to="/events"
@@ -317,7 +328,7 @@ export default function CommandCenterPage() {
                         <KpiCard
                             label="派遣中任務"
                             value={ts?.inProgress ?? null}
-                            icon={<Truck size={18} />}
+                            icon={<TasksIcon size={18} />}
                             tone={ts ? (ts.overdue > 0 ? 'danger' : 'default') : 'default'}
                             sub={ts ? `逾期 ${ts.overdue} 件 · 待指派 ${ts.pending} 件` : undefined}
                             to="/tasks"
@@ -330,7 +341,7 @@ export default function CommandCenterPage() {
                         <KpiCard
                             label="大量傷患事件"
                             value={mciQ.isLoading ? null : mciReports.length}
-                            icon={<HeartPulse size={18} />}
+                            icon={<TriageIcon size={18} />}
                             tone={mciReports.length > 0 ? 'danger' : 'success'}
                             sub={mciReports.length > 0 ? `預估傷患 ${casualtyTotal} 人` : '目前無 MCI 事件'}
                             to="/rescue/triage"
@@ -543,12 +554,16 @@ export default function CommandCenterPage() {
                 {/* ── ④ 系統狀態列（c1-foot：模式／圖例／同步／OUTBOX／版本）── */}
                 <footer className="cc-sysbar" aria-label="系統狀態">
                     <span className="cc-sysbar__seg">
-                        <i className="cc-sysbar__glyph" aria-hidden="true">{isEmergencyMode ? '■' : '□'}</i>
+                        <i className="cc-sysbar__glyph" aria-hidden="true">
+                            {isEmergencyMode ? <SolidSquareStamp size={10} /> : <OutlineSquareStamp size={10} />}
+                        </i>
                         {isEmergencyMode ? '災時模式' : '平時模式'}
                         <b className="u-stencil cc-sysbar__code">{isEmergencyMode ? 'TACTICAL' : 'STANDBY'}</b>
                     </span>
                     <span className="cc-sysbar__seg cc-sysbar__legend">
-                        圖例 <i aria-hidden="true">■</i> 高 · <i aria-hidden="true">□</i> 中 · <i aria-hidden="true">✓</i> 完成
+                        圖例 <i aria-hidden="true"><SolidSquareStamp size={10} /></i> 高
+                        · <i aria-hidden="true"><OutlineSquareStamp size={10} /></i> 中
+                        · <i aria-hidden="true"><CheckStamp size={10} /></i> 完成
                     </span>
                     <span className="cc-sysbar__seg">
                         {syncText}

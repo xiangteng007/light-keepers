@@ -7,9 +7,23 @@
  * 另提供「災時圖層組合」一鍵套用（§1 災時模式預設圖層組合）。
  *
  * C1.2 保留：防空避難處所圖層開關（含與避難收容所區分的說明 tooltip）。
+ *
+ * R5/T5 主題化圖文系統：圖層列與嚴重程度圖例換裝 B3c 地圖符號
+ * （design-system/icons/map-symbols，與 MapLibreTacticalMap 圖上 marker 同款；
+ * 顏色 token 對應 MapLibreTacticalMap 的 mapSymbolColors，React 端直接走 var()）。
  */
-import { useState } from 'react';
+import { useState, type FC } from 'react';
 import { ChevronDown, Layers, Siren } from 'lucide-react';
+import {
+    AedSymbol,
+    AirRaidShelterSymbol,
+    HazardAoiSymbol,
+    RallySymbol,
+    ReportIncidentSymbol,
+    ShelterSymbol,
+    WarehouseSymbol,
+    type MapSymbolProps,
+} from '../../design-system/icons/map-symbols';
 import { MAP_TYPES, type MapTypeKey, AED_MIN_ZOOM } from '../map-constants';
 import { getSeverityColor, getSeverityLabel } from '../map-utils';
 import { EMERGENCY_LAYER_PRESET, type LayerState } from './types';
@@ -17,23 +31,29 @@ import { EMERGENCY_LAYER_PRESET, type LayerState } from './types';
 interface LayerToggleDef {
     key: keyof LayerState;
     label: string;
+    /** B3c 地圖符號（與圖上 marker 同款） */
+    Symbol: FC<MapSymbolProps>;
+    /** 符號色（token var()；對應 MapLibreTacticalMap mapSymbolColors 同名 token） */
+    symbolColor: string;
     /** hover 補充說明（例如 C1.2 防空避難處所與收容所的差異） */
     title?: string;
 }
 
 const SITUATION_LAYERS: LayerToggleDef[] = [
-    { key: 'events', label: '📍 災害回報' },
-    { key: 'ncdr', label: '⚠️ NCDR示警' },
-    { key: 'hotspots', label: '🔥 熱點分析', title: '顯示災情回報熱點分析' },
+    { key: 'events', label: '災害回報', Symbol: ReportIncidentSymbol, symbolColor: 'var(--color-warning)' },
+    { key: 'ncdr', label: 'NCDR示警', Symbol: HazardAoiSymbol, symbolColor: 'var(--color-warning)' },
+    { key: 'hotspots', label: '熱點分析', Symbol: RallySymbol, symbolColor: 'var(--accent-primary)', title: '顯示災情回報熱點分析' },
 ];
 
 const RESOURCE_LAYERS: LayerToggleDef[] = [
-    { key: 'shelters', label: '🏠 避難收容所' },
-    { key: 'aed', label: '❤️ AED', title: '需放大至 50m 比例尺才會顯示' },
-    { key: 'warehouses', label: '📦 物資倉庫' },
+    { key: 'shelters', label: '避難收容所', Symbol: ShelterSymbol, symbolColor: 'var(--color-safe)' },
+    { key: 'aed', label: 'AED', Symbol: AedSymbol, symbolColor: 'var(--color-safe)', title: '需放大至 50m 比例尺才會顯示' },
+    { key: 'warehouses', label: '物資倉庫', Symbol: WarehouseSymbol, symbolColor: 'var(--color-safe)' },
     {
         key: 'airRaidShelters',
-        label: '🛡️ 防空避難處所',
+        label: '防空避難處所',
+        Symbol: AirRaidShelterSymbol,
+        symbolColor: 'var(--color-safe)',
         // C1.2：與避難收容所（長期收容）為不同設施類型
         title: '政府公告防空避難處所（空襲/飛彈警報短時掩蔽用，與避難收容所不同）',
     },
@@ -62,13 +82,14 @@ export default function MapLayerPanel({
         typeof window !== 'undefined' ? window.innerWidth >= 1024 : true,
     );
 
-    const renderToggle = ({ key, label, title }: LayerToggleDef) => (
+    const renderToggle = ({ key, label, Symbol, symbolColor, title }: LayerToggleDef) => (
         <label key={key} className="map-layer-panel__toggle-row" title={title}>
             <input
                 type="checkbox"
                 checked={layers[key]}
                 onChange={() => onToggleLayer(key)}
             />
+            <Symbol size={16} style={{ color: symbolColor, flexShrink: 0 }} aria-hidden="true" />
             <span>
                 {label}
                 {key === 'aed' && layers.aed && currentZoom < AED_MIN_ZOOM && (
@@ -138,16 +159,21 @@ export default function MapLayerPanel({
                     <div className="map-layer-panel__group">
                         <h4 className="map-layer-panel__group-title">嚴重程度</h4>
                         <div className="map-layer-panel__legend">
-                            {[5, 4, 3, 2, 1].map((level) => (
-                                <span key={level} className="map-layer-panel__legend-item">
-                                    <span
-                                        className="map-layer-panel__legend-dot"
-                                        style={{ background: getSeverityColor(level) }}
-                                        aria-hidden="true"
-                                    />
-                                    {getSeverityLabel(level)}
-                                </span>
-                            ))}
+                            {/* R5/T5：色點換 B3c 符號，與圖上 marker 對齊——
+                                危機（severity>=5）＝hazard 三角、其餘＝incident 菱 */}
+                            {[5, 4, 3, 2, 1].map((level) => {
+                                const SeveritySymbol = level >= 5 ? HazardAoiSymbol : ReportIncidentSymbol;
+                                return (
+                                    <span key={level} className="map-layer-panel__legend-item">
+                                        <SeveritySymbol
+                                            size={14}
+                                            style={{ color: getSeverityColor(level), flexShrink: 0 }}
+                                            aria-hidden="true"
+                                        />
+                                        {getSeverityLabel(level)}
+                                    </span>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>

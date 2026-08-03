@@ -1146,8 +1146,10 @@
    4. 基準字級 15px（手冊可讀性），次要 13px、註記 12px 為下限。
    ═══════════════════════════════════════════════════════════════════════════ */
 :root {
+    /* 字體隨 app 打包（fontsource），OS 字型只作備援——災防離線一致性 */
     --font-sans: 'Noto Sans TC', 'Inter', 'PingFang TC', 'Microsoft JhengHei', -apple-system, sans-serif;
-    --font-mono: 'JetBrains Mono', 'Noto Sans Mono CJK TC', 'Consolas', monospace;
+    --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Noto Sans Mono CJK TC', 'Consolas', monospace;
+    --font-stencil: 'Rajdhani', 'JetBrains Mono Variable', monospace;
 
     --font-size-base: 15px;
     --font-size-sm: 13px;
@@ -1171,7 +1173,7 @@ body {
 /* 拉丁/數字小標的唯一合法寬字距入口 */
 .u-stencil,
 [data-stencil] {
-    font-family: var(--font-mono);
+    font-family: var(--font-stencil);
     font-weight: 700;
     letter-spacing: var(--tracking-stencil);
     font-variant-numeric: tabular-nums;

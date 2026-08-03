@@ -7,12 +7,11 @@
 
 import React from 'react';
 import {
-    Cloud,
-    CloudOff,
-    RefreshCw,
-    CheckCircle,
-    AlertTriangle,
-} from 'lucide-react';
+    OnlineIcon,
+    OfflineIcon,
+    SyncIcon,
+    WarningIcon,
+} from '../../design-system/icons';
 import { useSyncStatus } from '../../hooks/useSyncStatus';
 import styles from './SyncStatusIndicator.module.css';
 
@@ -30,15 +29,15 @@ export const SyncStatusIndicator: React.FC = () => {
 
     const getStatusIcon = () => {
         if (!isOnline) {
-            return <CloudOff size={16} className={styles.offlineIcon} />;
+            return <OfflineIcon size={16} className={styles.offlineIcon} />;
         }
         if (isSyncing) {
-            return <RefreshCw size={16} className={styles.syncingIcon} />;
+            return <SyncIcon size={16} className={styles.syncingIcon} />;
         }
         if (pendingChanges > 0) {
-            return <AlertTriangle size={16} className={styles.pendingIcon} />;
+            return <WarningIcon size={16} className={styles.pendingIcon} />;
         }
-        return <Cloud size={16} className={styles.onlineIcon} />;
+        return <OnlineIcon size={16} className={styles.onlineIcon} />;
     };
 
     const getStatusText = () => {

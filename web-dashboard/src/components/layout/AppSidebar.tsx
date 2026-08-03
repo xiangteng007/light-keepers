@@ -11,9 +11,23 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { ChevronsLeft, ChevronsRight, Plus, Minus, Settings } from 'lucide-react';
+import {
+    iconRegistry,
+    ChevronLeftIcon,
+    ChevronRightIcon,
+    PlusIcon,
+    MinusIcon,
+    SettingsIcon,
+} from '../../design-system/icons';
 import { ICON_MAP, NAV_GROUPS, type NavItemConfig, type NavGroupConfig, type AppMode } from './useSidebarConfig';
 import { PermissionLevel } from './widget.types';
+
+/**
+ * icon 解析：優先 B3c 教範圖例集（iconRegistry 語意名），
+ * 未收錄語意者 fallback 舊 lucide ICON_MAP（不硬換，見 R5/T5）。
+ */
+const resolveIcon = (name: string) =>
+    iconRegistry[name] || ICON_MAP[name] || ICON_MAP.default;
 
 /** kebab-case id → camelCase i18n key（沿用 sidebar.items.* 字典） */
 function toCamel(id: string): string {
@@ -55,7 +69,7 @@ export function SidebarNavContent({
         t(`sidebar.items.${toCamel(item.id)}`, item.label);
 
     const renderItem = (item: NavItemConfig, options?: { large?: boolean }) => {
-        const Icon = ICON_MAP[item.icon] || ICON_MAP.default;
+        const Icon = resolveIcon(item.icon);
         const isActive =
             location.pathname === item.path ||
             location.pathname.startsWith(item.path + '/');
@@ -72,7 +86,7 @@ export function SidebarNavContent({
                 aria-current={isActive ? 'page' : undefined}
                 onClick={onNavigate}
             >
-                <Icon size={20} strokeWidth={1.75} aria-hidden />
+                <Icon size={20} aria-hidden />
                 {expanded && <span className="sidebar__item-label">{itemLabel(item)}</span>}
             </Link>
         );
@@ -120,7 +134,7 @@ export function SidebarNavContent({
             {groups.map(group => {
                 const items = (groupedItems[group.id] || []).filter(i => !i.isQuickAction || group.isPinned);
                 if (items.length === 0) return null;
-                const GroupIcon = ICON_MAP[group.icon] || ICON_MAP.default;
+                const GroupIcon = resolveIcon(group.icon);
                 const isCollapsed = group.isPinned ? false : !expandedGroups.has(group.id);
 
                 return (
@@ -135,7 +149,7 @@ export function SidebarNavContent({
                             aria-expanded={!isCollapsed}
                             title={expanded ? undefined : t(`sidebar.groups.${group.id}`, group.label)}
                         >
-                            <GroupIcon size={16} strokeWidth={1.75} aria-hidden />
+                            <GroupIcon size={16} aria-hidden />
                             {expanded && (
                                 <>
                                     <span className="sidebar__group-label">
@@ -143,7 +157,7 @@ export function SidebarNavContent({
                                     </span>
                                     {!group.isPinned && (
                                         <span className="sidebar__group-toggle" aria-hidden>
-                                            {isCollapsed ? <Plus size={14} /> : <Minus size={14} />}
+                                            {isCollapsed ? <PlusIcon size={14} /> : <MinusIcon size={14} />}
                                         </span>
                                     )}
                                 </>
@@ -186,7 +200,7 @@ export default function AppSidebar({
                     title={expanded ? '收合側欄' : '展開側欄'}
                     aria-label={expanded ? '收合側欄' : '展開側欄'}
                 >
-                    {expanded ? <ChevronsLeft size={20} /> : <ChevronsRight size={20} />}
+                    {expanded ? <ChevronLeftIcon size={20} /> : <ChevronRightIcon size={20} />}
                 </button>
             </div>
             <div className="sidebar__scroll">
@@ -200,7 +214,7 @@ export default function AppSidebar({
                         onClick={onOpenSettings}
                         title="側欄設定"
                     >
-                        <Settings size={20} aria-hidden />
+                        <SettingsIcon size={20} aria-hidden />
                         {expanded && <span>側欄設定</span>}
                     </button>
                 )}

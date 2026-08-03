@@ -135,40 +135,35 @@
     color: var(--text-primary);
 }
 
-/* ── 分級色章（狀態雙編碼：■ 實心紅／◧ 半填黃／□ 描邊綠／× 深章黑）──── */
+/* ── 分級章（R5/T5 triageStampRegistry：形由章元件畫——■ 實心紅／◧ 半填黃／
+   □ 描邊綠／方框帶 × 黑；此處只給 currentColor 的分級色）──────────────── */
 
 .triage-sq {
-    width: 12px;
-    height: 12px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 1px;
     flex: none;
     font-style: normal;
 }
 
+.triage-sq svg {
+    display: block;
+}
+
 .triage-sq--red {
-    background: var(--color-danger); /* 生命分級，紅色憲法允許 */
+    color: var(--color-danger); /* 生命分級，紅色憲法允許 */
 }
 
 .triage-sq--yellow {
-    border: 2px solid var(--color-warning);
-    background: linear-gradient(135deg, var(--color-warning) 50%, transparent 50%);
+    color: var(--color-warning);
 }
 
 .triage-sq--green {
-    border: 2px solid var(--color-success);
+    color: var(--color-success);
 }
 
 .triage-sq--black {
-    background: var(--bg-active);
-    border: 1px solid var(--text-tertiary);
     color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 9px;
-    font-weight: 700;
-    line-height: 1;
 }
 
 /* ── 行動端 segmented tabs（<768 顯示；§7.3：欄切換用頂部 tabs）─────── */
@@ -459,11 +454,19 @@
     border-top-color: var(--border-dark);
 }
 
-/* 後送狀態：形狀雙編碼（□ 待送／■ 運送中／✓ 已到院），正常態灰字（狀態安靜律） */
+/* 後送狀態：形狀雙編碼（□ 待送／■ 運送中／✓ 已到院，R5/T5 章元件），
+   正常態灰字（狀態安靜律） */
 .victim-card__transport {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
     font-size: var(--font-size-xs, 12px);
     font-weight: 600;
     color: var(--text-secondary);
+}
+
+.victim-card__transport svg {
+    flex: none;
 }
 
 .victim-card__transport--in_transit { color: var(--color-info); }
@@ -499,6 +502,12 @@
     gap: 7px;
     font-size: var(--font-size-sm, 13px);
     color: var(--text-secondary);
+}
+
+/* R5/T5 章元件（svg）在 baseline 對齊列中改光學置中 */
+.triage-foot__item svg {
+    align-self: center;
+    flex: none;
 }
 
 .triage-foot__item b {

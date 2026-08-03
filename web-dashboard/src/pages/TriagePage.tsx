@@ -18,6 +18,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { MapPin, Plus } from 'lucide-react';
+import {
+    triageStampRegistry,
+    OutlineSquareStamp,
+    SolidSquareStamp,
+    CheckStamp,
+} from '../design-system/icons/pictograms';
 import { useAuth } from '../context/AuthContext';
 import api from '../api/client';
 import { Button, Modal, InputField } from '../design-system';
@@ -85,11 +91,13 @@ const formatClock = (d: Date) =>
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 
-// 分級色章（形狀雙編碼：紅＝實心、黃＝半填、綠＝描邊、黑＝深章帶 ×）
+// 分級章（R5/T5：triageStampRegistry 章元件——形狀雙編碼：紅＝■ 實心、黃＝◧ 半填、
+// 綠＝□ 描邊、黑＝方框帶 ×。章只畫形，色仍由 triage-sq--* 分級 class 控制）
 function LevelSquare({ level }: { level: TriageLevel }) {
+    const Stamp = triageStampRegistry[level];
     return (
         <i className={`triage-sq triage-sq--${level.toLowerCase()}`} aria-hidden="true">
-            {level === 'BLACK' ? '×' : null}
+            <Stamp size={14} />
         </i>
     );
 }
@@ -161,9 +169,9 @@ function VictimCard({ victim, onSelect, onTransport, onArrived }: VictimCardProp
 
             <div className="victim-card__footer">
                 <span className={`victim-card__transport victim-card__transport--${victim.transportStatus.toLowerCase()}`}>
-                    {victim.transportStatus === 'PENDING' && '□ 待送'}
-                    {victim.transportStatus === 'IN_TRANSIT' && `■ 運送中 → ${victim.hospitalName}`}
-                    {victim.transportStatus === 'ARRIVED' && '✓ 已到院'}
+                    {victim.transportStatus === 'PENDING' && <><OutlineSquareStamp size={12} /> 待送</>}
+                    {victim.transportStatus === 'IN_TRANSIT' && <><SolidSquareStamp size={12} /> 運送中 → {victim.hospitalName}</>}
+                    {victim.transportStatus === 'ARRIVED' && <><CheckStamp size={12} /> 已到院</>}
                 </span>
                 {victim.transportStatus === 'PENDING' && (
                     <Button
@@ -441,9 +449,9 @@ export const TriagePage: React.FC = () => {
             {stats && (
                 <div className="triage-foot" role="group" aria-label="後送狀態合計">
                     <span className="triage-foot__label"><span className="u-stencil">EVAC</span> 後送狀態</span>
-                    <span className="triage-foot__item">□ 待送 <b className="u-mono">{pad2(stats.pendingTransport)}</b></span>
-                    <span className="triage-foot__item">■ 運送中 <b className="u-mono">{pad2(stats.inTransit)}</b></span>
-                    <span className="triage-foot__item">✓ 已到院 <b className="u-mono">{pad2(stats.arrived)}</b></span>
+                    <span className="triage-foot__item"><OutlineSquareStamp size={12} /> 待送 <b className="u-mono">{pad2(stats.pendingTransport)}</b></span>
+                    <span className="triage-foot__item"><SolidSquareStamp size={12} /> 運送中 <b className="u-mono">{pad2(stats.inTransit)}</b></span>
+                    <span className="triage-foot__item"><CheckStamp size={12} /> 已到院 <b className="u-mono">{pad2(stats.arrived)}</b></span>
                 </div>
             )}
 

@@ -123,6 +123,8 @@
 
     .tasks-page__mobile-tab-glyph {
         color: var(--text-tertiary);
+        display: inline-flex;
+        flex: none;
     }
 
     .tasks-page__mobile-tab:focus-visible {
@@ -222,6 +224,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 4px; /* R5/T5：形狀章（svg）與代號間距（flex 內空白字元不渲染） */
     font-size: 10px;
     line-height: 1.2;
     padding: 4px 8px;
@@ -327,6 +330,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    gap: 4px; /* R5/T5：形狀章（svg）與 P 級距（flex 內空白字元不渲染） */
     min-width: 48px;
     font-size: 10px;
     line-height: 1.2;
@@ -514,6 +518,8 @@
 .tasks-page__legend i {
     font-style: normal;
     color: var(--color-secondary);
+    display: inline-flex;
+    vertical-align: -2px;
 }
 
 .tasks-page__legend i.is-solid {

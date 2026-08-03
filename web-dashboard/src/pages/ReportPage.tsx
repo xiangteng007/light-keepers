@@ -22,7 +22,8 @@
  * - 行動端優先：主要動作固定在下半屏（sticky 底欄），觸控目標 ≥44px。
  *
  * C1.1（CD-1）保留清單——不得移除：
- * - 災型選單依 DISASTER_TYPE_GROUPS 分組（天災／民防），lucide 圖標
+ * - 災型選單依 DISASTER_TYPE_GROUPS 分組（天災／民防）；災型格圖形採
+ *   R5/T5 B3c 主題化象形（disasterPictogramRegistry，key 對齊災型 SSOT）
  * - 大量傷患（MCI）跨災型旗標 + 概估人數（isMassCasualty / casualtyEstimate）
  */
 import { useState, useEffect, useRef, useCallback } from 'react';
@@ -32,6 +33,8 @@ import {
     MapPin, Mic, Send, X,
 } from 'lucide-react';
 import { Card, Button, Badge } from '../design-system';
+import { disasterPictogramRegistry } from '../design-system/icons/pictograms';
+import type { PictogramProps } from '../design-system/icons/pictograms';
 import {
     DISASTER_TYPE_GROUPS,
     DISASTER_TYPE_OPTIONS,
@@ -84,6 +87,15 @@ const STEPS: {
 /** c4 構圖的災型格號：依 SSOT 選單順序跨分組連號（01 起），一律 mono 呈現 */
 function disasterOrdinal(value: string): string {
     return String(DISASTER_TYPE_OPTIONS.findIndex(o => o.value === value) + 1).padStart(2, '0');
+}
+
+/**
+ * 災型象形（R5/T5 主題化圖文系統）：以災型 SSOT key 查 disasterPictogramRegistry。
+ * 色由 currentColor 繼承——`color` 一律透傳既有 SSOT 類別色，行為與換裝前一致。
+ */
+function DisasterGlyph({ type, ...rest }: { type: ReportType } & PictogramProps) {
+    const Pictogram = disasterPictogramRegistry[type];
+    return <Pictogram {...rest} />;
 }
 
 // 嚴重程度：語意對照 DESIGN_LANGUAGE §3（low=安全綠、medium=警戒橙、
@@ -440,7 +452,7 @@ export default function ReportPage() {
                                                     {disasterOrdinal(type.value)}
                                                 </span>
                                                 <span className="disaster-type-card__icon">
-                                                    <type.Icon size={22} color={type.color} aria-hidden="true" />
+                                                    <DisasterGlyph type={type.value} size={22} color={type.color} />
                                                 </span>
                                             </span>
                                             <span className="disaster-type-card__label">{type.label}</span>
@@ -627,8 +639,8 @@ export default function ReportPage() {
                             <div className="confirm-item">
                                 <span className="confirm-label">災害類型</span>
                                 <span className="confirm-value confirm-value--type">
-                                    {selectedMeta && (
-                                        <selectedMeta.Icon size={18} color={selectedMeta.color} aria-hidden="true" />
+                                    {selectedMeta && formData.type && (
+                                        <DisasterGlyph type={formData.type} size={18} color={selectedMeta.color} />
                                     )}
                                     {selectedMeta?.label}
                                 </span>

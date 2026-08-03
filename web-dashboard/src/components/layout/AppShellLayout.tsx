@@ -13,7 +13,8 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useEmergencyStyles } from '../../context/useEmergencyContext';
-import { Menu, X, Bell, User, Siren } from 'lucide-react';
+import { Menu } from 'lucide-react';
+import { CloseIcon, NotifyIcon, UserIcon, WarningIcon } from '../../design-system/icons';
 import { WidgetGrid } from './WidgetGrid';
 import { WidgetEditControls } from './Widget';
 import { WidgetPicker } from './WidgetPicker';
@@ -162,12 +163,12 @@ export default function AppShellLayout({
                         onClick={() => setDrawerOpen(!drawerOpen)}
                         aria-label={drawerOpen ? '關閉選單' : '開啟選單'}
                     >
-                        {drawerOpen ? <X size={24} /> : <Menu size={24} />}
+                        {drawerOpen ? <CloseIcon size={24} /> : <Menu size={24} />}
                     </button>
                     <span className="header__logo">LIGHTKEEPERS</span>
                     {isEmergencyMode && (
                         <span className="header__mode-badge" role="status">
-                            <Siren size={12} aria-hidden />
+                            <WarningIcon size={12} aria-hidden />
                             災時模式{emergencyStyles.isActive ? ` · ${emergencyStyles.label}` : ''}
                         </span>
                     )}
@@ -186,7 +187,7 @@ export default function AppShellLayout({
                             title={isEmergencyMode ? '退出災時模式' : '進入災時模式'}
                             aria-pressed={isEmergencyMode}
                         >
-                            <Siren size={20} />
+                            <WarningIcon size={20} />
                         </button>
                     )}
 
@@ -217,7 +218,7 @@ export default function AppShellLayout({
                             aria-haspopup="true"
                             aria-expanded={notificationOpen}
                         >
-                            <Bell size={20} />
+                            <NotifyIcon size={20} />
                         </button>
                         {notificationOpen && (
                             <div className="header__dropdown-panel header__dropdown-panel--notification">
@@ -240,13 +241,13 @@ export default function AppShellLayout({
                             aria-haspopup="true"
                             aria-expanded={accountOpen}
                         >
-                            <User size={18} />
+                            <UserIcon size={18} />
                         </button>
                         {accountOpen && (
                             <div className="header__dropdown-panel header__dropdown-panel--account">
                                 <div className="header__account-user">
                                     <div className="header__account-avatar">
-                                        <User size={24} />
+                                        <UserIcon size={24} />
                                     </div>
                                     <div>
                                         <div className="header__account-name">
@@ -322,14 +323,14 @@ export default function AppShellLayout({
             <aside className={`drawer ${drawerOpen ? 'open' : ''}`} aria-label="行動端導覽">
                 <div className="drawerTop">
                     <div className="drawer__user">
-                        <User size={36} className="drawer__user-avatar" aria-hidden />
+                        <UserIcon size={36} className="drawer__user-avatar" aria-hidden />
                         <div>
                             <div className="drawer__user-name">{authUser?.displayName || '光守護者'}</div>
                             <div className="drawer__user-level">Level {userLevel}</div>
                         </div>
                     </div>
                     <button type="button" className="drawer__close" onClick={closeDrawer} aria-label="關閉選單">
-                        <X size={24} />
+                        <CloseIcon size={24} />
                     </button>
                 </div>
                 <div className="drawerScroll">

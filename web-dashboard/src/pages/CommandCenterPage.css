@@ -118,7 +118,11 @@
     color: var(--text-muted);
 }
 
-.cc-mission__state i { font-style: normal; }
+.cc-mission__state i {
+    font-style: normal;
+    display: inline-flex;
+    align-self: center;
+}
 
 .cc-mission__state--live { color: var(--accent-gold); }
 
@@ -296,6 +300,9 @@
     font-style: normal;
     font-weight: var(--font-weight-bold);
     color: var(--accent-gold);
+    display: inline-flex;
+    vertical-align: -1px;
+    margin-right: 3px;
 }
 
 /* 狀態 chip：形狀（■實心/□描邊）先於顏色＝色盲安全雙編碼 */
@@ -317,7 +324,11 @@
     white-space: nowrap;
 }
 
-.cc-chip__shape { font-style: normal; }
+.cc-chip__shape {
+    font-style: normal;
+    display: inline-flex;
+    flex: none;
+}
 
 .cc-chip--hi {
     background: var(--accent-gold);
@@ -374,6 +385,8 @@
 .cc-sysbar__legend i {
     font-style: normal;
     color: var(--accent-gold);
+    display: inline-flex;
+    align-self: center;
 }
 
 .cc-sysbar__code {

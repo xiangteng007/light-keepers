@@ -2,6 +2,14 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+// R5/T5 主題化圖文系統：字體隨 app 打包，不依賴使用者 OS（災防離線一致性）
+import '@fontsource-variable/jetbrains-mono' // 'JetBrains Mono Variable' — 讀數/時間戳/座標
+import '@fontsource/rajdhani/500.css' // 'Rajdhani' — stencil 小標
+import '@fontsource/rajdhani/600.css'
+import '@fontsource/rajdhani/700.css'
+import '@fontsource/noto-sans-tc/400.css' // 'Noto Sans TC' — 中文正文
+import '@fontsource/noto-sans-tc/500.css'
+import '@fontsource/noto-sans-tc/700.css'
 import App from './App.tsx'
 import ErrorBoundary from './components/ErrorBoundary'
 import { defaultQueryRetry } from './api/errors'

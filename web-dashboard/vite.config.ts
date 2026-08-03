@@ -41,7 +41,9 @@ export default defineConfig({
         lang: 'zh-TW'
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg,woff,woff2}'],
+        // 字體（woff/woff2）不走 precache——fontsource CJK subset 上百檔會塞爆
+        // precache manifest；改由下方 runtimeCaching 'fonts' CacheFirst 按需快取
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,jpg}'],
         // Allow larger files (3MB) for main bundle - default is 2MB
         maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
         // Exclude Firebase reserved URLs from navigation fallback
@@ -96,6 +98,22 @@ export default defineConfig({
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              }
+            }
+          },
+          {
+            // 自帶字體（fontsource woff/woff2）：按需 CacheFirst，
+            // 瀏覽器只抓用到的 unicode-range subset，快取後離線可用
+            urlPattern: /\.(?:woff2?)$/i,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'fonts',
+              expiration: {
+                maxEntries: 200,
+                maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [0, 200]
               }
             }
           },

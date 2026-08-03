@@ -243,6 +243,11 @@ export default function MapPage() {
     //   事件（危機）→ hazard｜事件/通報 → task｜NCDR 示警 → sector｜
     //   收容所/AED/倉庫/防空避難處所 → resource（selection kind 仍分流，C1.2 不合併）｜
     //   熱點 → rally｜使用者定位 → volunteer
+    // R5/T5 符號對應（B3c map-symbols；type 決定 token 色、symbol 決定形狀）：
+    //   危機 → hazard-aoi（三角）｜事件/通報 → report-incident（菱＋驚嘆）｜
+    //   NCDR → hazard-aoi（三角，warning 琥珀與危機紅區分）｜
+    //   收容所 → shelter｜AED → aed｜倉庫 → warehouse｜防空 → air-raid-shelter（皆圓框）｜
+    //   熱點 → rally（方旗）｜使用者定位 → team（方＋人）
     const { tacticalMarkers, selectionById } = useMemo(() => {
         const markers: TacticalMarker[] = [];
         const byId = new Map<string, MapSelection>();
@@ -253,10 +258,12 @@ export default function MapPage() {
 
         if (layers.events) {
             for (const event of eventsWithLocation) {
+                const isCrisis = (event.severity || 0) >= 5;
                 push({
                     id: `event-${event.id}`,
                     position: [event.longitude, event.latitude],
-                    type: (event.severity || 0) >= 5 ? 'hazard' : 'task',
+                    type: isCrisis ? 'hazard' : 'task',
+                    symbol: isCrisis ? 'hazard-aoi' : 'report-incident',
                     label: event.title,
                 }, { kind: 'event', event });
             }
@@ -273,6 +280,7 @@ export default function MapPage() {
                     id: `report-${report.id}`,
                     position: [Number(report.longitude), Number(report.latitude)],
                     type: 'task',
+                    symbol: 'report-incident',
                     label: report.title,
                 }, { kind: 'event', event: eventLike });
             }
@@ -285,6 +293,7 @@ export default function MapPage() {
                     id: `ncdr-${alert.id}`,
                     position: [Number(alert.longitude), Number(alert.latitude)],
                     type: 'sector',
+                    symbol: 'hazard-aoi',
                     label: alert.title,
                 }, { kind: 'ncdr', alert });
             }
@@ -296,6 +305,7 @@ export default function MapPage() {
                     id: `shelter-${shelter.id}`,
                     position: [shelter.longitude, shelter.latitude],
                     type: 'resource',
+                    symbol: 'shelter',
                     label: shelter.name,
                 }, { kind: 'shelter', shelter });
             }
@@ -307,6 +317,7 @@ export default function MapPage() {
                     id: `aed-${aed.id}`,
                     position: [aed.longitude, aed.latitude],
                     type: 'resource',
+                    symbol: 'aed',
                     label: aed.name,
                 }, { kind: 'aed', aed });
             }
@@ -318,6 +329,7 @@ export default function MapPage() {
                     id: `warehouse-${warehouse.id}`,
                     position: [Number(warehouse.longitude), Number(warehouse.latitude)],
                     type: 'resource',
+                    symbol: 'warehouse',
                     label: warehouse.name,
                 }, { kind: 'warehouse', warehouse });
             }
@@ -330,6 +342,7 @@ export default function MapPage() {
                     id: `air-raid-${shelter.id}`,
                     position: [shelter.longitude, shelter.latitude],
                     type: 'resource',
+                    symbol: 'air-raid-shelter',
                     label: shelter.name,
                 }, { kind: 'airRaidShelter', shelter });
             }
@@ -342,6 +355,7 @@ export default function MapPage() {
                     id: `hotspot-${hotspot.gridId ?? i}`,
                     position: [hotspot.centerLng, hotspot.centerLat],
                     type: 'rally',
+                    symbol: 'rally',
                     label: `熱點 ×${hotspot.count}`,
                 });
             });
@@ -352,6 +366,7 @@ export default function MapPage() {
                 id: 'user-location',
                 position: [userLocation.lng, userLocation.lat],
                 type: 'volunteer',
+                symbol: 'team',
                 label: '您的位置',
             });
         }

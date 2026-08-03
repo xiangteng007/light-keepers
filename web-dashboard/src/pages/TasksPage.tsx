@@ -4,6 +4,8 @@ import { ChevronDown, ChevronRight, X, CalendarClock, ArrowRight } from 'lucide-
 import { getTaskKanban, createTask, updateTask, deleteTask } from '../api';
 import type { Task } from '../api';
 import { Button, Modal, InputField } from '../design-system';
+import { OutlineSquareStamp, SolidSquareStamp, CheckStamp } from '../design-system/icons/pictograms';
+import type { PictogramProps } from '../design-system/icons/pictograms';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';
 import './TasksPage.css';
@@ -23,13 +25,13 @@ const COLUMNS: {
     title: string;
     /** 拉丁小標（stencil）——與中文標題並置，chip 內做形狀雙編碼 */
     code: string;
-    /** 形狀編碼：□ 待指派（描邊）/ ■ 進行中（實心）/ ✓ 完成 */
-    glyph: string;
+    /** 形狀編碼（R5/T5 章元件）：□ 待指派（描邊）/ ■ 進行中（實心）/ ✓ 完成 */
+    Glyph: React.FC<PictogramProps>;
     chipClass: string;
 }[] = [
-    { status: 'pending', title: '待指派', code: 'PENDING', glyph: '□', chipClass: 'status-chip--pending' },
-    { status: 'in_progress', title: '進行中', code: 'ACTIVE', glyph: '■', chipClass: 'status-chip--active' },
-    { status: 'completed', title: '完成', code: 'DONE', glyph: '✓', chipClass: 'status-chip--done' },
+    { status: 'pending', title: '待指派', code: 'PENDING', Glyph: OutlineSquareStamp, chipClass: 'status-chip--pending' },
+    { status: 'in_progress', title: '進行中', code: 'ACTIVE', Glyph: SolidSquareStamp, chipClass: 'status-chip--active' },
+    { status: 'completed', title: '完成', code: 'DONE', Glyph: CheckStamp, chipClass: 'status-chip--done' },
 ];
 
 /** 排印鐵律：stencil 寬字距只准用於拉丁/數字；中文代號退回一般字距 */
@@ -132,7 +134,7 @@ export default function TasksPage() {
                         className={`tasks-page__mobile-tab ${activeColumn === col.status ? 'is-active' : ''}`}
                         onClick={() => setActiveColumn(col.status)}
                     >
-                        <span className="tasks-page__mobile-tab-glyph" aria-hidden="true">{col.glyph}</span>
+                        <span className="tasks-page__mobile-tab-glyph" aria-hidden="true"><col.Glyph size={12} /></span>
                         {col.title}
                         <span className="tasks-page__mobile-tab-count u-mono">{columnTasks[col.status].length}</span>
                     </button>
@@ -167,7 +169,9 @@ export default function TasksPage() {
             {/* 圖例：狀態雙編碼（形狀＋顏色，不靠透明度） */}
             <footer className="tasks-page__legend">
                 <span>
-                    圖例 <i aria-hidden="true">□</i> 待指派 · <i aria-hidden="true" className="is-solid">■</i> 進行中 · <i aria-hidden="true">✓</i> 完成
+                    圖例 <i aria-hidden="true"><OutlineSquareStamp size={11} /></i> 待指派
+                    · <i aria-hidden="true" className="is-solid"><SolidSquareStamp size={11} /></i> 進行中
+                    · <i aria-hidden="true"><CheckStamp size={11} /></i> 完成
                 </span>
                 <span className="tasks-page__legend-code u-stencil">TASK BOARD · B3C</span>
             </footer>
@@ -259,10 +263,11 @@ function TaskColumn({ column, tasks, onStatusChange, onDelete, className = '' }:
     const nextStatusLabel = nextStatus === 'in_progress' ? '開始處理' : '標記完成';
 
     // 紅色憲法：優先度不是生命安全語義，不用紅——高＝橄欖實心、中＝橄欖描邊、低＝灰描邊
-    const getPriorityChip = (priority: number): { cls: string; glyph: string } => {
-        if (priority >= 4) return { cls: 'prio-chip--high', glyph: '■' };
-        if (priority === 3) return { cls: 'prio-chip--mid', glyph: '□' };
-        return { cls: 'prio-chip--low', glyph: '□' };
+    // （形狀字元同步升級為 R5/T5 章元件：■＝SolidSquareStamp、□＝OutlineSquareStamp）
+    const getPriorityChip = (priority: number): { cls: string; Glyph: React.FC<PictogramProps> } => {
+        if (priority >= 4) return { cls: 'prio-chip--high', Glyph: SolidSquareStamp };
+        if (priority === 3) return { cls: 'prio-chip--mid', Glyph: OutlineSquareStamp };
+        return { cls: 'prio-chip--low', Glyph: OutlineSquareStamp };
     };
 
     const handleDelete = (e: React.MouseEvent, taskId: string, taskTitle: string) => {
@@ -281,7 +286,7 @@ function TaskColumn({ column, tasks, onStatusChange, onDelete, className = '' }:
         <section className={`task-column ${className}`} role="tabpanel" aria-label={title}>
             <header className="task-column__header">
                 <span className={`status-chip ${column.chipClass} u-stencil`} aria-hidden="true">
-                    {column.glyph} {column.code}
+                    <column.Glyph size={10} /> {column.code}
                 </span>
                 <h2>{title}</h2>
                 <span className="task-column__count u-mono" aria-label={`${title} ${tasks.length} 項`}>{tasks.length}</span>
@@ -309,7 +314,7 @@ function TaskColumn({ column, tasks, onStatusChange, onDelete, className = '' }:
                                 >
                                     {isExpanded ? <ChevronDown size={16} aria-hidden="true" /> : <ChevronRight size={16} aria-hidden="true" />}
                                     <span className={`prio-chip ${prio.cls} u-stencil`}>
-                                        {prio.glyph} P{task.priority}
+                                        <prio.Glyph size={10} /> P{task.priority}
                                     </span>
                                     <span className="task-card__title">{task.title}</span>
                                 </button>
