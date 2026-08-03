@@ -31,7 +31,7 @@ export const CourseGridWidget = () => (
                     <div style={{ height: '4px', background: 'rgba(47, 54, 65, 0.5)', borderRadius: '2px', overflow: 'hidden' }}>
                         <div style={{ width: `${course.progress}%`, height: '100%', background: course.status === 'completed' ? '#22c55e' : '#3B82F6' }} />
                     </div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}>{course.progress}% 完成</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' }}><span className="u-mono">{course.progress}%</span> 完成</div>
                 </div>
             ))}
         </div>
@@ -66,7 +66,7 @@ export const ManualListWidget = () => (
                 }}>
                     <div style={{ fontSize: '24px', marginBottom: '8px' }}>📘</div>
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)', marginBottom: '4px' }}>{manual}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>v2.1 • 更新於 3 天前</div>
+                    <div className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>v2.1 • 更新於 3 天前</div>
                 </div>
             ))}
         </div>

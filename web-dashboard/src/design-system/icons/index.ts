@@ -16,6 +16,9 @@ export * from './field';
 export * from './status';
 export * from './action';
 export * from './chevron';
+export * from './docs';
+export * from './system';
+export * from './community';
 
 import type { LkIcon } from './IconBase';
 import {
@@ -29,6 +32,9 @@ import {
     EventsIcon,
     AnalyticsIcon,
     SettingsIcon,
+    MenuIcon,
+    MoreIcon,
+    HomeIcon,
 } from './nav';
 import {
     ShelterIcon,
@@ -41,6 +47,11 @@ import {
     CameraIcon,
     MicIcon,
     QrIcon,
+    SirenIcon,
+    PhoneIcon,
+    WeatherIcon,
+    VehicleIcon,
+    BuildingIcon,
 } from './field';
 import {
     NotifyIcon,
@@ -63,6 +74,7 @@ import {
     ExportIcon,
     UserIcon,
     LogoutIcon,
+    ThemeIcon,
 } from './action';
 import {
     ChevronLeftIcon,
@@ -70,6 +82,31 @@ import {
     ChevronUpIcon,
     ChevronDownIcon,
 } from './chevron';
+import {
+    BookIcon,
+    CalendarIcon,
+    AuditIcon,
+    FilesIcon,
+    SpreadsheetIcon,
+    DocEmptyIcon,
+} from './docs';
+import {
+    LockIcon,
+    ShieldIcon,
+    FingerprintIcon,
+    AiIcon,
+    BotIcon,
+    FlaskIcon,
+    MonitorIcon,
+    WebhookIcon,
+    MergeIcon,
+} from './system';
+import {
+    HeartIcon,
+    SupportIcon,
+    TrophyIcon,
+    GraduationIcon,
+} from './community';
 
 /**
  * 語意名 → 元件 查表。
@@ -88,6 +125,9 @@ export const iconRegistry: Record<string, LkIcon> = {
     'events': EventsIcon,
     'analytics': AnalyticsIcon,
     'settings': SettingsIcon,
+    'menu': MenuIcon,
+    'more': MoreIcon,
+    'home': HomeIcon,
     // 野戰/設施
     'shelter': ShelterIcon,
     'aed': AedIcon,
@@ -99,6 +139,11 @@ export const iconRegistry: Record<string, LkIcon> = {
     'camera': CameraIcon,
     'mic': MicIcon,
     'qr': QrIcon,
+    'siren': SirenIcon,
+    'phone': PhoneIcon,
+    'weather': WeatherIcon,
+    'vehicle': VehicleIcon,
+    'building': BuildingIcon,
     // 狀態/告警
     'notify': NotifyIcon,
     'warning': WarningIcon,
@@ -119,9 +164,32 @@ export const iconRegistry: Record<string, LkIcon> = {
     'export': ExportIcon,
     'user': UserIcon,
     'logout': LogoutIcon,
+    'theme': ThemeIcon,
     // 方向
     'chevron-left': ChevronLeftIcon,
     'chevron-right': ChevronRightIcon,
     'chevron-up': ChevronUpIcon,
     'chevron-down': ChevronDownIcon,
+    // 文件/資料
+    'book': BookIcon,
+    'calendar': CalendarIcon,
+    'audit': AuditIcon,
+    'files': FilesIcon,
+    'spreadsheet': SpreadsheetIcon,
+    'doc-empty': DocEmptyIcon,
+    // 系統/安全
+    'lock': LockIcon,
+    'shield': ShieldIcon,
+    'fingerprint': FingerprintIcon,
+    'ai': AiIcon,
+    'bot': BotIcon,
+    'flask': FlaskIcon,
+    'monitor': MonitorIcon,
+    'webhook': WebhookIcon,
+    'merge': MergeIcon,
+    // 社群/照護
+    'heart': HeartIcon,
+    'support': SupportIcon,
+    'trophy': TrophyIcon,
+    'graduation': GraduationIcon,
 };

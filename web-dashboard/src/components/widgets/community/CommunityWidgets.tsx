@@ -29,7 +29,7 @@ export const SocialFeedWidget = () => {
                 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                         <span style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>{post.platform}</span>
-                        <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{post.time}</span>
+                        <span className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{post.time}</span>
                     </div>
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{post.content}</div>
                 </div>
@@ -63,7 +63,7 @@ export const ActivityFeedWidget = () => (
                 marginBottom: '8px',
             }}>
                 <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{act}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>下週六 10:00</div>
+                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>下週六 <span className="u-mono">10:00</span></div>
             </div>
         ))}
     </div>
@@ -77,7 +77,7 @@ export const ActivityCalendarWidget = () => (
                 <div key={d} style={{ color: 'var(--text-muted)', padding: '8px' }}>{d}</div>
             ))}
             {Array.from({ length: 31 }, (_, i) => (
-                <div key={i} style={{
+                <div key={i} className="u-mono" style={{
                     padding: '8px',
                     borderRadius: '4px',
                     background: i === 11 ? 'var(--accent-gold)' : 'transparent',
@@ -117,7 +117,7 @@ export const MissingCasesWidget = () => (
                         </div>
                         <div>
                             <div style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text-primary)' }}>{person.name}</div>
-                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{person.age}歲</div>
+                            <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}><span className="u-mono">{person.age}</span>歲</div>
                         </div>
                         <span style={{
                             marginLeft: 'auto',
@@ -151,7 +151,7 @@ export const MoodTrackerWidget = () => (
             <input type="range" min="1" max="10" defaultValue="5" style={{ flex: 1 }} />
             <span>10</span>
         </div>
-        <div style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>5 / 10</div>
+        <div className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color: 'var(--text-primary)', marginBottom: '16px' }}>5 / 10</div>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', justifyContent: 'center' }}>
             {['放鬆', '忙碌', '疲倦', '焦慮', '開心'].map((tag, i) => (
                 <span key={i} style={{

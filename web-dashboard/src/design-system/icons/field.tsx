@@ -103,3 +103,50 @@ export const QrIcon = createIcon(
         <path d="M21 14v.01M14 21h.01M21 21v.01" />
     </>,
 );
+
+/** siren 警笛 — 稜角燈罩＋底座＋放射光線（45° 律） */
+export const SirenIcon = createIcon(
+    'SirenIcon',
+    <>
+        <path d="M7 21v-8l2-6h6l2 6v8" />
+        <path d="M4 21h16" />
+        <path d="M12 2v2M5 4l2 2M19 4l-2 2" />
+    </>,
+);
+
+/** phone 電話 — 45° 斜置聽筒（單筆閉合多邊形，直角重譯） */
+export const PhoneIcon = createIcon(
+    'PhoneIcon',
+    <path d="M3 3h6v4l-2 2 8 8 2-2h4v6h-6L3 9z" />,
+);
+
+/** weather 氣象 — 稜角雲體＋45° 雨線 */
+export const WeatherIcon = createIcon(
+    'WeatherIcon',
+    <>
+        <path d="M4 16v-3l2-2h3l2-4h5l2 4 2 2v3z" />
+        <path d="M9 18l-2 2M14 18l-2 2M19 18l-2 2" />
+    </>,
+);
+
+/** vehicle 載具 — 方卡車：貨箱＋斜角車頭＋方輪（方點律放大） */
+export const VehicleIcon = createIcon(
+    'VehicleIcon',
+    <>
+        <rect x="2" y="6" width="12" height="11" />
+        <path d="M14 10h4l3 3v4h-7" />
+        <rect x="4" y="17" width="4" height="4" />
+        <rect x="15" y="17" width="4" height="4" />
+    </>,
+);
+
+/** building 建物 — 塔樓＋窗格＋門＋地平線 */
+export const BuildingIcon = createIcon(
+    'BuildingIcon',
+    <>
+        <rect x="6" y="3" width="12" height="18" />
+        <path d="M9 7h2M13 7h2M9 11h2M13 11h2" />
+        <path d="M10 21v-4h4v4" />
+        <path d="M3 21h18" />
+    </>,
+);

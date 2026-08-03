@@ -36,7 +36,7 @@ export const MetricCard = ({ label, value, trend, color = '#C39B6F' }: { label: 
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
         border: '1px solid var(--border-default, rgba(0, 0, 0, 0.06))',
     }}>
-        <span style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
+        <span className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
         <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>{label}</span>
         {trend && (
             <span style={{ marginTop: '4px', color: trend === 'up' ? '#22c55e' : trend === 'down' ? '#ef4444' : '#94A3B8' }}>
@@ -88,7 +88,7 @@ export const TranslatedMetricCard = ({ labelKey, value, trend, color = '#C39B6F'
             boxShadow: '0 2px 8px rgba(0, 0, 0, 0.08)',
             border: '1px solid var(--border-default, rgba(0, 0, 0, 0.06))',
         }}>
-            <span style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
+            <span className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color }}>{value}</span>
             <span style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '4px' }}>{t(labelKey)}</span>
             {trend && (
                 <span style={{ marginTop: '4px', color: trend === 'up' ? '#22c55e' : trend === 'down' ? '#ef4444' : '#94A3B8' }}>

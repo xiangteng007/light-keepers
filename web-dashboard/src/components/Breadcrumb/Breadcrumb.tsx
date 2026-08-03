@@ -7,7 +7,7 @@
 
 import React, { useMemo } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRightIcon, HomeIcon } from '../../design-system/icons';
 import styles from './Breadcrumb.module.css';
 
 interface BreadcrumbItem {
@@ -94,7 +94,7 @@ export const Breadcrumb: React.FC = () => {
                 {/* Home link */}
                 <li className={styles.item}>
                     <Link to="/" className={styles.link}>
-                        <Home size={14} />
+                        <HomeIcon size={16} />
                         <span className={styles.homeText}>首頁</span>
                     </Link>
                 </li>
@@ -102,7 +102,7 @@ export const Breadcrumb: React.FC = () => {
                 {/* Path segments */}
                 {breadcrumbs.map((item, index) => (
                     <li key={item.path} className={styles.item}>
-                        <ChevronRight size={14} className={styles.separator} />
+                        <ChevronRightIcon size={16} className={styles.separator} />
                         {item.isActive ? (
                             <span className={styles.current} aria-current="page">
                                 {item.label}

@@ -7,7 +7,9 @@
  *          此處僅顯示唯讀等級徽章（消滅第二份 minLevel）。
  */
 import React, { useState, useRef } from 'react';
-import { X, GripVertical, Eye, EyeOff, RotateCcw, Check, Shield } from 'lucide-react';
+// 殘留 lucide：eye/eye-off/grip-vertical/rotate-ccw 尚無 B3c 教範對應語意（R5/T5b 批次外）
+import { GripVertical, Eye, EyeOff, RotateCcw } from 'lucide-react';
+import { CloseIcon, CheckIcon, ShieldIcon } from '../../design-system/icons';
 import { NavItemConfig, NavGroup, NAV_GROUPS, ICON_MAP } from './useSidebarConfig';
 import './SidebarSettings.css';
 
@@ -98,7 +100,7 @@ export function SidebarSettings({
                 <div className="sidebar-settings__header">
                     <h3>導航設定</h3>
                     <button className="sidebar-settings__close" onClick={onClose}>
-                        <X size={20} />
+                        <CloseIcon size={20} />
                     </button>
                 </div>
 
@@ -169,7 +171,7 @@ export function SidebarSettings({
                                                         className="sidebar-settings__level-btn sidebar-settings__level-btn--readonly"
                                                         title="權限等級由 page-policy.ts 統一管理，此處僅顯示"
                                                     >
-                                                        <Shield size={12} />
+                                                        <ShieldIcon size={12} />
                                                         <span>L{item.minLevel ?? 0}</span>
                                                     </span>
 
@@ -196,7 +198,7 @@ export function SidebarSettings({
                         重置為預設
                     </button>
                     <button className="sidebar-settings__done" onClick={onClose}>
-                        <Check size={14} />
+                        <CheckIcon size={16} />
                         完成
                     </button>
                 </div>

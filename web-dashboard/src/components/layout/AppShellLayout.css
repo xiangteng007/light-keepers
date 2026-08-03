@@ -612,7 +612,9 @@
 }
 
 @media (min-width: 901px) {
-    .burgerBtn {
+    /* R5/T5b：帶 .appShellLayout 前綴壓過下方 .burgerBtn 基礎規則（後宣告的
+       display:flex 原本蓋掉本条 → 桌機出現無作用的死漢堡鍵，drawer 同時 display:none） */
+    .appShellLayout .burgerBtn {
         display: none;
     }
 
@@ -693,4 +695,196 @@
 }
 .appShellLayout .sidebar.expanded {
     width: var(--shell-sidebar-w-expanded);
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   R5/T5b — 窄幅 Header 溢出修復（owner 回報 390px 按鈕堆疊重合）
+
+   根因：headerRight 內聯工具（災時切換/編輯佈局/主題/語言選單）的
+   min-content 總寬 ≈500px，加上 headerLeft ≈250px，遠超 ≤480px 視窗。
+   固定寬 36px 圖示鍵 flex-shrink:1 被壓扁成幾 px，20px SVG 溢出
+   壓縮後的盒 → 相鄰按鈕圖形互疊（「堆疊重合」）。
+
+   修法：
+   - ≤900px（行動殼，與漢堡/底欄斷點對齊）：四工具收進單一 more 選單；
+     保留 漢堡/品牌/災時徽章/同步章/通知/頭像。
+   - 觸控目標 ≥44px（≤900px 圖示鍵 44×44；more 選單列 min-height 44）。
+   - headerLeft 可收縮（品牌字 ellipsis），headerRight 不收縮 → 永不重疊。
+   - z-index 收斂：所有 header 下拉一律 var(--z-popover, 600)。
+   =============================================================== */
+
+/* 桌機內聯工具群（>900px） */
+.header__inline-tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    min-width: 0;
+}
+
+/* more 選單：桌機隱藏 */
+.header__more {
+    display: none;
+}
+
+.header__dropdown-panel--more {
+    width: 240px;
+    max-width: calc(100vw - 24px);
+    padding: var(--space-2, 8px);
+}
+
+.header__more-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2, 8px);
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: none;
+    border-radius: var(--radius-md, 8px);
+    background: transparent;
+    color: var(--text-primary);
+    font-size: var(--font-size-sm, 14px);
+    text-align: left;
+    cursor: pointer;
+    transition: background var(--transition-fast, 100ms ease);
+}
+
+.header__more-item:hover {
+    background: var(--surface-hover);
+}
+
+.header__more-item:focus-visible {
+    outline: none;
+    box-shadow: var(--focus-ring);
+}
+
+.header__more-item--active {
+    background: var(--color-info-bg);
+    color: var(--color-info);
+    font-weight: 600;
+}
+
+.header__more-item--warning {
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.header__more-check {
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.header__more-flag {
+    width: 20px;
+    text-align: center;
+    flex-shrink: 0;
+}
+
+.header__more-divider {
+    height: 1px;
+    background: var(--border-default);
+    margin: var(--space-2, 8px) 0;
+}
+
+.header__more-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-tertiary, var(--text-muted));
+    padding: 4px 12px;
+}
+
+/* 語言清單過長：選單內卷動，不撐爆視窗 */
+.header__more-langs {
+    max-height: min(44vh, 320px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+/* 左叢收縮秩序：漢堡與徽章不縮，品牌字可截斷 */
+.burgerBtn,
+.header__mode-badge {
+    flex-shrink: 0;
+}
+
+/* a11y.css 全域 [role="status"]{border-left:4px 藍;padding-left:12px} 污染
+   災時徽章（膠囊左緣出現藍半月）——同 .sidebar 撞名教訓，以後代選擇器取回控制權 */
+.appShellLayout .header__mode-badge {
+    border-left: 1px solid var(--color-warning);
+    padding-left: 10px;
+}
+
+.header__logo {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ── 行動殼（≤900px，與漢堡/底欄同斷點） ── */
+@media (max-width: 900px) {
+    .header__inline-tools {
+        display: none;
+    }
+
+    .header__more {
+        display: block;
+    }
+
+    /* Level 章＝管理密度資訊，非保留清單成員 → 窄幅隱藏 */
+    .header__level-badge {
+        display: none;
+    }
+
+    /* 觸控目標 ≥44px */
+    .header__icon-btn,
+    .header__avatar-btn {
+        width: 44px;
+        height: 44px;
+    }
+
+    /* 左叢吃剩餘空間並可收縮；中欄退場；右叢固定寬不被壓縮 */
+    .headerLeft {
+        flex: 1 1 auto;
+        overflow: hidden;
+    }
+
+    .headerCenter {
+        display: none;
+    }
+
+    .headerRight {
+        flex-shrink: 0;
+    }
+}
+
+/* ── 超窄幅（≤640px；與同步章縮圖示斷點對齊） ── */
+@media (max-width: 640px) {
+    .headerLeft {
+        gap: var(--space-2, 8px);
+    }
+
+    .headerRight {
+        gap: var(--space-1, 4px);
+    }
+
+    /* 災時徽章縮純圖示（aria-label 保留完整語意）
+       選擇器帶 .appShellLayout 前綴：壓過 a11y.css [role="status"] 的 padding-left */
+    .header__mode-badge-text {
+        display: none;
+    }
+
+    .appShellLayout .header__mode-badge {
+        padding: 8px;
+    }
+
+    .header__logo {
+        font-size: var(--font-size-xs, 12px);
+    }
+
+    /* 通知/帳戶/more 下拉不超出視窗 */
+    .header__dropdown-panel--notification,
+    .header__dropdown-panel--account {
+        max-width: calc(100vw - 24px);
+    }
 }

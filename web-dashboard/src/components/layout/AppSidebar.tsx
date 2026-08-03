@@ -23,8 +23,9 @@ import { ICON_MAP, NAV_GROUPS, type NavItemConfig, type NavGroupConfig, type App
 import { PermissionLevel } from './widget.types';
 
 /**
- * icon 解析：優先 B3c 教範圖例集（iconRegistry 語意名），
- * 未收錄語意者 fallback 舊 lucide ICON_MAP（不硬換，見 R5/T5）。
+ * icon 解析：B3c 教範圖例集（iconRegistry 語意名）。
+ * R5/T5b 起 ICON_MAP 亦接 iconRegistry（lucide 已出清），
+ * 查無語意名時落到 ICON_MAP.default（user 單兵形）。
  */
 const resolveIcon = (name: string) =>
     iconRegistry[name] || ICON_MAP[name] || ICON_MAP.default;

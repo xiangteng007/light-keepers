@@ -24,7 +24,7 @@ export const AuditTableWidget = () => (
                     { time: '10:38:50', user: 'unknown', action: 'LOGIN_FAILED', resource: '系統登入', status: 'error' },
                 ].map((log, i) => (
                     <tr key={i} style={{ borderBottom: '1px solid rgba(47, 54, 65, 0.3)' }}>
-                        <td style={{ padding: '10px', fontFamily: 'monospace', color: 'var(--text-muted)' }}>{log.time}</td>
+                        <td style={{ padding: '10px', fontFamily: 'var(--font-mono)', color: 'var(--text-muted)' }}>{log.time}</td>
                         <td style={{ padding: '10px', color: 'var(--text-secondary)' }}>{log.user}</td>
                         <td style={{ padding: '10px' }}>
                             <span style={{
@@ -148,7 +148,7 @@ export const TenantDetailWidget = () => (
             <div style={{ padding: '16px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
                 <Users size={18} style={{ color: 'var(--accent-gold)', marginBottom: '8px' }} />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>用戶數</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>150 / 500</div>
+                <div className="u-mono" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>150 / 500</div>
                 <div style={{ height: '4px', background: 'rgba(47, 54, 65, 0.5)', borderRadius: '2px', marginTop: '8px', overflow: 'hidden' }}>
                     <div style={{ width: '30%', height: '100%', background: 'linear-gradient(90deg, #22c55e, #C39B6F)' }} />
                 </div>
@@ -156,7 +156,7 @@ export const TenantDetailWidget = () => (
             <div style={{ padding: '16px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
                 <Database size={18} style={{ color: 'var(--accent-gold)', marginBottom: '8px' }} />
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginBottom: '4px' }}>儲存空間</div>
-                <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>45 / 100 GB</div>
+                <div className="u-mono" style={{ fontSize: '14px', color: 'var(--text-primary)' }}>45 / 100 GB</div>
                 <div style={{ height: '4px', background: 'rgba(47, 54, 65, 0.5)', borderRadius: '2px', marginTop: '8px', overflow: 'hidden' }}>
                     <div style={{ width: '45%', height: '100%', background: 'linear-gradient(90deg, #22c55e, #C39B6F)' }} />
                 </div>
@@ -206,7 +206,7 @@ export const FeatureFlagsWidget = () => (
                         <div style={{ marginTop: '8px' }}>
                             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>
                                 <Percent size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                                灰度 {flag.rollout}%
+                                灰度 <span className="u-mono">{flag.rollout}%</span>
                             </div>
                             <div style={{ height: '4px', background: 'rgba(47, 54, 65, 0.5)', borderRadius: '2px', overflow: 'hidden' }}>
                                 <div style={{ width: `${flag.rollout}%`, height: '100%', background: '#eab308' }} />
@@ -238,7 +238,7 @@ export const RoleListWidget = () => (
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: role.color }} />
                     <span style={{ fontSize: '13px', color: i === 0 ? role.color : 'var(--text-primary)' }}>{role.name}</span>
-                    <span style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)' }}>Lv.{role.level}</span>
+                    <span className="u-mono" style={{ marginLeft: 'auto', fontSize: '10px', color: 'var(--text-muted)' }}>Lv.{role.level}</span>
                 </div>
             </div>
         ))}

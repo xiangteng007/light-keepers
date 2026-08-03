@@ -87,12 +87,30 @@
 }
 
 /* Responsive */
+
+/* R5/T5b：行動殼觸控目標 ≥44px——視覺維持章形，
+   以透明 ::after 擴大命中區（WCAG 目標尺寸含命中範圍） */
+@media (max-width: 900px) {
+    .indicator {
+        position: relative;
+        min-height: 32px;
+    }
+
+    .indicator::after {
+        content: '';
+        position: absolute;
+        inset: -6px;
+    }
+}
+
 @media (max-width: 640px) {
     .text {
         display: none;
     }
 
+    /* 窄幅縮純圖示章 */
     .indicator {
         padding: 6px 8px;
+        justify-content: center;
     }
 }

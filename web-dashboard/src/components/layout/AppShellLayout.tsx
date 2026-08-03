@@ -9,12 +9,24 @@
  *   權限一律由 page-policy 解析（useSidebarConfig）
  * - Widget 儀表板系統保留（dashboard 類頁面使用）
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../context/AuthContext';
 import { useEmergencyStyles } from '../../context/useEmergencyContext';
-import { Menu } from 'lucide-react';
-import { CloseIcon, NotifyIcon, UserIcon, WarningIcon } from '../../design-system/icons';
+import { useTheme } from '../../context/ThemeProvider';
+import {
+    CheckIcon,
+    CloseIcon,
+    EditIcon,
+    MenuIcon,
+    MoreIcon,
+    NotifyIcon,
+    ThemeIcon,
+    UserIcon,
+    WarningIcon,
+} from '../../design-system/icons';
+import { LANGUAGES, changeLanguage } from '../../i18n';
 import { WidgetGrid } from './WidgetGrid';
 import { WidgetEditControls } from './Widget';
 import { WidgetPicker } from './WidgetPicker';
@@ -46,6 +58,8 @@ export default function AppShellLayout({
 }: AppShellLayoutProps) {
     const { user: authUser } = useAuth();
     const navigate = useNavigate();
+    const { i18n } = useTranslation();
+    const { isDark, toggleTheme } = useTheme();
 
     // ── 雙模式判定（自動 + L2+ 手動覆寫） ──
     const { mode, isEmergencyMode, toggleMode } = useAppMode();
@@ -58,6 +72,9 @@ export default function AppShellLayout({
     const [sidebarSettingsOpen, setSidebarSettingsOpen] = useState(false);
     const [notificationOpen, setNotificationOpen] = useState(false);
     const [accountOpen, setAccountOpen] = useState(false);
+    // 窄幅 more 選單（R5/T5b：≤900px 收納 編輯佈局/災時切換/主題/語言）
+    const [moreOpen, setMoreOpen] = useState(false);
+    const moreRef = useRef<HTMLDivElement>(null);
     const [sidebarExpanded, setSidebarExpanded] = useState(() => {
         return localStorage.getItem('sidebarExpanded') === 'true';
     });
@@ -116,6 +133,18 @@ export default function AppShellLayout({
         if (!isMobile) setDrawerOpen(false);
     }, [isMobile]);
 
+    // more 選單：點外側關閉
+    useEffect(() => {
+        if (!moreOpen) return;
+        const handleOutside = (event: MouseEvent) => {
+            if (moreRef.current && !moreRef.current.contains(event.target as Node)) {
+                setMoreOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleOutside);
+        return () => document.removeEventListener('mousedown', handleOutside);
+    }, [moreOpen]);
+
     const toggleGroupExpansion = (groupId: string) => {
         setExpandedGroups(prev => {
             const next = new Set(prev);
@@ -163,13 +192,19 @@ export default function AppShellLayout({
                         onClick={() => setDrawerOpen(!drawerOpen)}
                         aria-label={drawerOpen ? '關閉選單' : '開啟選單'}
                     >
-                        {drawerOpen ? <CloseIcon size={24} /> : <Menu size={24} />}
+                        {drawerOpen ? <CloseIcon size={24} /> : <MenuIcon size={24} />}
                     </button>
                     <span className="header__logo">LIGHTKEEPERS</span>
                     {isEmergencyMode && (
-                        <span className="header__mode-badge" role="status">
+                        <span
+                            className="header__mode-badge"
+                            role="status"
+                            aria-label={`災時模式${emergencyStyles.isActive ? ` · ${emergencyStyles.label}` : ''}`}
+                        >
                             <WarningIcon size={12} aria-hidden />
-                            災時模式{emergencyStyles.isActive ? ` · ${emergencyStyles.label}` : ''}
+                            <span className="header__mode-badge-text" aria-hidden>
+                                災時模式{emergencyStyles.isActive ? ` · ${emergencyStyles.label}` : ''}
+                            </span>
                         </span>
                     )}
                     {canEdit && (
@@ -178,32 +213,118 @@ export default function AppShellLayout({
                 </div>
                 <div className="headerCenter" />
                 <div className="headerRight">
-                    {/* 災時模式手動切換（L2+ 幹部；演練/復盤用） */}
-                    {userLevel >= PermissionLevel.Supervisor && (
-                        <button
-                            type="button"
-                            className={`header__icon-btn header__mode-toggle ${isEmergencyMode ? 'active' : ''}`}
-                            onClick={toggleMode}
-                            title={isEmergencyMode ? '退出災時模式' : '進入災時模式'}
-                            aria-pressed={isEmergencyMode}
-                        >
-                            <WarningIcon size={20} />
-                        </button>
-                    )}
+                    {/* 桌機內聯工具（>900px；窄幅收進 more 選單） */}
+                    <div className="header__inline-tools">
+                        {/* 災時模式手動切換（L2+ 幹部；演練/復盤用） */}
+                        {userLevel >= PermissionLevel.Supervisor && (
+                            <button
+                                type="button"
+                                className={`header__icon-btn header__mode-toggle ${isEmergencyMode ? 'active' : ''}`}
+                                onClick={toggleMode}
+                                title={isEmergencyMode ? '退出災時模式' : '進入災時模式'}
+                                aria-pressed={isEmergencyMode}
+                            >
+                                <WarningIcon size={20} />
+                            </button>
+                        )}
 
-                    <WidgetEditControls
-                        isEditMode={editState.isEditMode}
-                        canEdit={canEdit}
-                        hiddenWidgets={widgets.filter(w => !w.visible)}
-                        onToggleEditMode={toggleEditMode}
-                        onResetLayout={resetLayout}
-                        onShowWidget={toggleWidgetVisibility}
-                        onAddWidget={() => setPickerOpen(true)}
-                    />
+                        <WidgetEditControls
+                            isEditMode={editState.isEditMode}
+                            canEdit={canEdit}
+                            hiddenWidgets={widgets.filter(w => !w.visible)}
+                            onToggleEditMode={toggleEditMode}
+                            onResetLayout={resetLayout}
+                            onShowWidget={toggleWidgetVisibility}
+                            onAddWidget={() => setPickerOpen(true)}
+                        />
+
+                        <ThemeSwitcher />
+                        <LanguageSelector />
+                    </div>
 
                     <SyncStatusIndicator />
-                    <ThemeSwitcher />
-                    <LanguageSelector />
+
+                    {/* 窄幅 more 選單（≤900px 顯示；收納 編輯佈局/災時切換/主題/語言） */}
+                    <div className="header__dropdown-container header__more" ref={moreRef}>
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setMoreOpen(!moreOpen);
+                                setNotificationOpen(false);
+                                setAccountOpen(false);
+                            }}
+                            className="header__icon-btn"
+                            title="更多工具"
+                            aria-label="更多工具"
+                            aria-haspopup="true"
+                            aria-expanded={moreOpen}
+                        >
+                            <MoreIcon size={20} />
+                        </button>
+                        {moreOpen && (
+                            <div className="header__dropdown-panel header__dropdown-panel--more">
+                                {userLevel >= PermissionLevel.Supervisor && (
+                                    <button
+                                        type="button"
+                                        className={`header__more-item ${isEmergencyMode ? 'header__more-item--warning' : ''}`}
+                                        onClick={() => {
+                                            toggleMode();
+                                            setMoreOpen(false);
+                                        }}
+                                        aria-pressed={isEmergencyMode}
+                                    >
+                                        <WarningIcon size={18} aria-hidden />
+                                        {isEmergencyMode ? '退出災時模式' : '進入災時模式'}
+                                    </button>
+                                )}
+                                {canEdit && (
+                                    <button
+                                        type="button"
+                                        className="header__more-item"
+                                        onClick={() => {
+                                            toggleEditMode();
+                                            setMoreOpen(false);
+                                        }}
+                                    >
+                                        <EditIcon size={18} aria-hidden />
+                                        {editState.isEditMode ? '完成編輯' : '編輯佈局'}
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    className="header__more-item"
+                                    onClick={() => {
+                                        toggleTheme();
+                                        setMoreOpen(false);
+                                    }}
+                                >
+                                    <ThemeIcon size={18} aria-hidden />
+                                    切換到{isDark ? '亮鋼版' : '銅鋼版'}
+                                </button>
+                                <div className="header__more-divider" role="separator" />
+                                <div className="header__more-label">語言</div>
+                                <div className="header__more-langs">
+                                    {LANGUAGES.map(lang => (
+                                        <button
+                                            key={lang.code}
+                                            type="button"
+                                            className={`header__more-item ${lang.code === i18n.language ? 'header__more-item--active' : ''}`}
+                                            onClick={() => {
+                                                changeLanguage(lang.code);
+                                                setMoreOpen(false);
+                                            }}
+                                        >
+                                            <span className="header__more-flag" aria-hidden>{lang.flag}</span>
+                                            {lang.name}
+                                            {lang.code === i18n.language && (
+                                                <CheckIcon size={16} className="header__more-check" aria-hidden />
+                                            )}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
 
                     {/* 通知 */}
                     <div className="header__dropdown-container">
@@ -212,6 +333,7 @@ export default function AppShellLayout({
                             onClick={() => {
                                 setNotificationOpen(!notificationOpen);
                                 setAccountOpen(false);
+                                setMoreOpen(false);
                             }}
                             className="header__icon-btn"
                             title="通知"
@@ -235,6 +357,7 @@ export default function AppShellLayout({
                             onClick={() => {
                                 setAccountOpen(!accountOpen);
                                 setNotificationOpen(false);
+                                setMoreOpen(false);
                             }}
                             className="header__avatar-btn"
                             title="帳戶"

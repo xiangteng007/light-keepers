@@ -78,7 +78,7 @@ export const TacticalMapWidget = () => (
             backgroundSize: '30px 30px',
         }} />
         <MapPin size={48} style={{ color: 'rgba(195, 155, 111, 0.3)' }} />
-        <div style={{ position: 'absolute', bottom: '12px', left: '12px', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
+        <div style={{ position: 'absolute', bottom: '12px', left: '12px', fontSize: '11px', color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
             25.0330°N, 121.5654°E
         </div>
     </div>

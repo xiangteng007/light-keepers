@@ -87,7 +87,7 @@ export const PersonnelStatsWidget = () => (
                 marginBottom: '8px',
                 textAlign: 'center',
             }}>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: stat.color }}>{stat.value}</div>
+                <div className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color: stat.color }}>{stat.value}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{stat.label}</div>
             </div>
         ))}
@@ -102,7 +102,7 @@ export const CalendarViewWidget = () => (
                 <div key={d} style={{ color: 'var(--text-muted)', padding: '12px', textAlign: 'center' }}>{d}</div>
             ))}
             {Array.from({ length: 31 }, (_, i) => (
-                <div key={i} style={{
+                <div key={i} className="u-mono" style={{
                     padding: '12px',
                     borderRadius: '6px',
                     background: i === 11 ? 'var(--accent-gold)' : [4, 5, 11, 12, 18, 19, 25, 26].includes(i) ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
@@ -132,7 +132,7 @@ export const ShiftSummaryWidget = () => (
                 marginBottom: '6px',
             }}>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
+                <span className="u-mono" style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
             </div>
         ))}
     </div>
@@ -142,7 +142,7 @@ export const MyShiftsWidget = () => (
     <div style={{ padding: '12px' }}>
         <div style={{ fontSize: '13px', color: 'var(--accent-gold)', marginBottom: '12px' }}>我的班表</div>
         {['1/12 (日) 08:00-16:00', '1/13 (一) 16:00-00:00'].map((shift, i) => (
-            <div key={i} style={{
+            <div key={i} className="u-mono" style={{
                 padding: '10px',
                 background: i === 0 ? 'rgba(195, 155, 111, 0.15)' : 'rgba(47, 54, 65, 0.3)',
                 borderRadius: '6px',
@@ -172,13 +172,13 @@ export const TopVolunteersWidget = () => (
                 alignItems: 'center',
                 gap: '16px',
             }}>
-                <span style={{
+                <span className="u-mono" style={{
                     fontSize: '18px',
                     fontWeight: 700,
                     color: i === 0 ? '#C39B6F' : i === 1 ? '#94A3B8' : '#CD7F32',
                 }}>#{v.rank}</span>
                 <span style={{ flex: 1, fontSize: '14px', color: 'var(--text-primary)' }}>{v.name}</span>
-                <span style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)' }}>{v.points} pts</span>
+                <span className="u-mono" style={{ fontSize: '14px', fontWeight: 600, color: 'var(--accent-gold)' }}>{v.points} pts</span>
             </div>
         ))}
     </div>
@@ -186,10 +186,10 @@ export const TopVolunteersWidget = () => (
 
 export const MyRankingWidget = () => (
     <div style={{ padding: '16px', textAlign: 'center' }}>
-        <div style={{ fontSize: '48px', fontWeight: 700, color: 'var(--accent-gold)' }}>15</div>
+        <div className="u-mono" style={{ fontSize: '48px', fontWeight: 700, color: 'var(--accent-gold)' }}>15</div>
         <div style={{ fontSize: '14px', color: 'var(--text-muted)', marginTop: '8px' }}>目前排名</div>
         <div style={{ marginTop: '24px', padding: '16px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
-            <div style={{ fontSize: '24px', fontWeight: 600, color: '#22c55e' }}>850</div>
+            <div className="u-mono" style={{ fontSize: '24px', fontWeight: 600, color: '#22c55e' }}>850</div>
             <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px' }}>累積積分</div>
         </div>
     </div>

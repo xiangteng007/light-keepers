@@ -106,11 +106,11 @@ export const BackupStatusWidget = () => (
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>上次備份成功</div>
         </div>
         <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>2h 前</div>
+            <div className="u-mono" style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>2h 前</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最近備份時間</div>
         </div>
         <div style={{ textAlign: 'center', padding: '12px 24px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '10px' }}>
-            <div style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>45.2 GB</div>
+            <div className="u-mono" style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>45.2 GB</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>總備份大小</div>
         </div>
     </div>
@@ -133,8 +133,8 @@ export const BackupListWidget = () => (
             }}>
                 <div style={{ fontSize: '16px', marginRight: '12px' }}>💾</div>
                 <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: '12px', color: 'var(--text-primary)', fontFamily: 'monospace' }}>{backup.name}</div>
-                    <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{backup.size}</div>
+                    <div style={{ fontSize: '12px', color: 'var(--text-primary)', fontFamily: 'var(--font-mono)' }}>{backup.name}</div>
+                    <div className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{backup.size}</div>
                 </div>
                 <button style={{ padding: '6px 12px', background: 'rgba(59, 130, 246, 0.2)', border: 'none', borderRadius: '6px', color: '#3B82F6', fontSize: '11px', cursor: 'pointer' }}>還原</button>
             </div>
@@ -170,7 +170,7 @@ export const ProfileCardWidget = () => (
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📧 電子郵件</div>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '12px' }}>user@example.com</div>
             <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '4px' }}>📱 電話</div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>0912-345-678</div>
+            <div className="u-mono" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>0912-345-678</div>
         </div>
     </div>
 );
@@ -203,7 +203,7 @@ export const ProfileActivityWidget = () => (
                 justifyContent: 'space-between',
             }}>
                 <span>{activity}</span>
-                <span style={{ color: 'var(--text-muted)' }}>{i === 0 ? '剛剛' : `${i * 2}h 前`}</span>
+                <span className="u-mono" style={{ color: 'var(--text-muted)' }}>{i === 0 ? '剛剛' : `${i * 2}h 前`}</span>
             </div>
         ))}
     </div>

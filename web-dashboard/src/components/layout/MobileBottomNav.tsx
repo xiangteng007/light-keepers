@@ -10,7 +10,6 @@
  */
 import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { GraduationCap, BookOpen, MoreHorizontal, LucideIcon } from 'lucide-react';
 import {
     CommandIcon,
     MapIcon,
@@ -25,6 +24,9 @@ import {
     NotifyIcon,
     WarningIcon,
     CloseIcon,
+    GraduationIcon,
+    BookIcon,
+    MoreIcon,
     type LkIcon,
 } from '../../design-system/icons';
 import { pagePolicy } from '../../config/page-policy';
@@ -34,8 +36,8 @@ import './MobileBottomNav.css';
 
 interface NavItem {
     id: string;
-    /** B3c 教範圖例（LkIcon）優先；無貼切語意者暫留 lucide（R5/T5） */
-    icon: LkIcon | LucideIcon;
+    /** B3c 教範圖例（R5/T5b 起 100% LkIcon，lucide 已出清） */
+    icon: LkIcon;
     label: string;
     path: string;
 }
@@ -66,8 +68,8 @@ const NORMAL_MORE: NavItem[] = [
     { id: 'workforce', icon: TeamsIcon, label: '人員動員', path: '/workforce/people' },
     { id: 'inventory', icon: InventoryIcon, label: '物資庫存', path: '/logistics/inventory' },
     { id: 'analytics', icon: AnalyticsIcon, label: '分析儀表板', path: '/hub/analytics' },
-    { id: 'training', icon: GraduationCap, label: '訓練課程', path: '/training' },
-    { id: 'manuals', icon: BookOpen, label: '作業手冊', path: '/knowledge/manuals' },
+    { id: 'training', icon: GraduationIcon, label: '訓練課程', path: '/training' },
+    { id: 'manuals', icon: BookIcon, label: '作業手冊', path: '/knowledge/manuals' },
 ];
 
 const EMERGENCY_MORE: NavItem[] = [
@@ -171,7 +173,7 @@ export default function MobileBottomNav({
                     aria-haspopup="menu"
                     aria-expanded={isMoreOpen}
                 >
-                    <MoreHorizontal size={22} aria-hidden />
+                    <MoreIcon size={22} aria-hidden />
                     <span>更多</span>
                 </button>
             </nav>

@@ -202,6 +202,8 @@
     font-size: var(--font-size-sm);
     color: var(--text-tertiary);
     white-space: nowrap;
+    /* 排印鐵律 §3：時間戳（N 分鐘前/N 小時前）一律 mono＋tabular-nums */
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
 
@@ -225,6 +227,8 @@
     font-weight: var(--font-weight-bold);
     line-height: var(--line-height-tight);
     color: var(--text-primary);
+    /* 排印鐵律 §3：數字讀數一律 mono＋tabular-nums */
+    font-family: var(--font-mono);
     font-variant-numeric: tabular-nums;
 }
 

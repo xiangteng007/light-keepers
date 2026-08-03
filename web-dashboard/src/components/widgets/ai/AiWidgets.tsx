@@ -102,12 +102,12 @@ export const AIReportsWidget = () => (
                         {report.type === 'recommendation' && '建議'}
                         {report.type === 'analysis' && '分析'}
                     </span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{report.time}</span>
+                    <span className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{report.time}</span>
                 </div>
                 <div style={{ fontSize: '14px', color: 'var(--text-primary)', marginBottom: '8px' }}>{report.title}</div>
                 <div style={{ fontSize: '11px', color: '#22c55e' }}>
                     <Brain size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                    信心度: {report.confidence}%
+                    信心度: <span className="u-mono">{report.confidence}%</span>
                 </div>
             </div>
         ))}
@@ -129,7 +129,7 @@ export const TrendsChartWidget = () => (
                 borderRadius: '10px',
             }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginBottom: '8px' }}>{item.label}</div>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: item.color }}>{item.value}</div>
+                <div className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color: item.color }}>{item.value}</div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{item.prediction}</div>
             </div>
         ))}
@@ -145,7 +145,7 @@ export const DashboardStatsWidget = () => (
             { label: '待處理', value: '6', color: '#f97316' },
         ].map((m, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '24px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div className="u-mono" style={{ fontSize: '24px', fontWeight: 700, color: m.color }}>{m.value}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
             </div>
         ))}
@@ -174,7 +174,7 @@ export const ScheduledReportsWidget = () => (
         ].map((r, i) => (
             <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px' }}>
                 <div style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{r.name}</div>
-                <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{r.schedule} → 下次: {r.next}</div>
+                <div className="u-mono" style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '4px' }}>{r.schedule} → 下次: {r.next}</div>
             </div>
         ))}
     </div>

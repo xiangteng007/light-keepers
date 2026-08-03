@@ -104,3 +104,29 @@ export const SettingsIcon = createIcon(
         <rect x="11" y="16" width="4" height="4" />
     </>,
 );
+
+/** menu 選單 — 漢堡三橫（無旋鈕，與 settings 滑桿區分） */
+export const MenuIcon = createIcon(
+    'MenuIcon',
+    <>
+        <path d="M4 6h16" />
+        <path d="M4 12h16" />
+        <path d="M4 18h16" />
+    </>,
+);
+
+/** more 更多 — 水平三方點（方點律） */
+export const MoreIcon = createIcon(
+    'MoreIcon',
+    <path d="M5 12v.01M12 12v.01M19 12v.01" />,
+);
+
+/** home 首頁 — 懸挑屋簷＋屋身＋門（shelter 是閉合五邊形，此為開放簷線，同族不撞形） */
+export const HomeIcon = createIcon(
+    'HomeIcon',
+    <>
+        <path d="M3 11l9-8 9 8" />
+        <path d="M5 13v8h14v-8" />
+        <path d="M10 21v-5h4v5" />
+    </>,
+);

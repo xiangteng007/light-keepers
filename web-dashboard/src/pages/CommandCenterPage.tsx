@@ -444,7 +444,10 @@ export default function CommandCenterPage() {
                                         <li key={h.gridId} className="sit-row">
                                             <span className="sit-row__emoji" aria-hidden="true"><MapPin size={18} /></span>
                                             <div className="sit-row__main">
-                                                <div className="sit-row__title">熱點 {i + 1} · {h.count} 件通報</div>
+                                                <div className="sit-row__title">
+                                                    熱點 <span className="u-mono">{i + 1}</span> ·{' '}
+                                                    <span className="u-mono">{h.count}</span> 件通報
+                                                </div>
                                                 {h.recentReports?.[0] && (
                                                     <div className="sit-row__meta">{h.recentReports[0].title}</div>
                                                 )}
@@ -492,7 +495,8 @@ export default function CommandCenterPage() {
                                                 <div className="sit-row__main">
                                                     <div className="sit-row__title">{item.name}</div>
                                                     <div className="sit-row__meta">
-                                                        剩餘 {item.quantity}{item.unit ? ` ${item.unit}` : ''}
+                                                        剩餘 <span className="u-mono">{item.quantity}</span>
+                                                        {item.unit ? ` ${item.unit}` : ''}
                                                     </div>
                                                 </div>
                                                 <Chip

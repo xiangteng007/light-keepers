@@ -286,9 +286,7 @@
 
 .cc-page .sit-row:hover { background: var(--surface-hover); }
 
-.cc-page .sit-row__time {
-    font-family: var(--font-mono);
-}
+/* 時間戳 mono 已由 situational.css 基座（.sit-row__time）統一提供 */
 
 /* 完成（已確認）列：降張力＋✓ 記號 */
 .cc-page .cc-row--done .sit-row__title {

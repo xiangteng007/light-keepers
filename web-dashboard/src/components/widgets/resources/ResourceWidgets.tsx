@@ -28,7 +28,7 @@ export const AIMatchesWidget = () => (
                 borderRadius: '8px',
                 marginBottom: '8px',
             }}>
-                <div style={{
+                <div className="u-mono" style={{
                     width: '48px',
                     height: '48px',
                     borderRadius: '50%',
@@ -46,7 +46,7 @@ export const AIMatchesWidget = () => (
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{match.from}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
                         <GitMerge size={12} style={{ verticalAlign: 'middle', marginRight: '4px' }} />
-                        {match.to} · {match.distance}
+                        {match.to} · <span className="u-mono">{match.distance}</span>
                     </div>
                 </div>
                 <button style={{
@@ -100,7 +100,7 @@ export const SuppliesGridWidget = () => (
                     borderRadius: '8px',
                     textAlign: 'center',
                 }}>
-                    <div style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>{supply.available}</div>
+                    <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: '#22c55e' }}>{supply.available}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{supply.type}</div>
                 </div>
             ))}
@@ -122,7 +122,7 @@ export const ResourceCategoriesWidget = () => (
                 justifyContent: 'space-between',
             }}>
                 <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{cat}</span>
-                <span style={{
+                <span className="u-mono" style={{
                     padding: '4px 10px',
                     borderRadius: '12px',
                     fontSize: '11px',
@@ -148,7 +148,7 @@ export const DonationListWidget = () => (
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{d.donor}</span>
-                    <span style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>NT$ {d.amount.toLocaleString()}</span>
+                    <span className="u-mono" style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>NT$ {d.amount.toLocaleString()}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{d.time}</div>
             </div>
@@ -238,7 +238,7 @@ export const EquipmentGridWidget = () => (
                     </div>
                     <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item}</div>
                     <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                        可用: {Math.floor(Math.random() * 20 + 5)}
+                        可用: <span className="u-mono">{Math.floor(Math.random() * 20 + 5)}</span>
                     </div>
                 </div>
             ))}

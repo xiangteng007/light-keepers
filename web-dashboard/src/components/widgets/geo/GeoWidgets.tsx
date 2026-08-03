@@ -17,11 +17,11 @@ export const WeatherAlertWidget = () => (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', flex: 1 }}>
             <div style={{ background: 'rgba(59, 130, 246, 0.1)', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>雨量</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#3B82F6' }}>120mm</div>
+                <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: '#3B82F6' }}>120mm</div>
             </div>
             <div style={{ background: 'rgba(234, 179, 8, 0.1)', borderRadius: '8px', padding: '12px', textAlign: 'center' }}>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>風速</div>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: '#eab308' }}>6級</div>
+                <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: '#eab308' }}>6級</div>
             </div>
         </div>
     </div>
@@ -40,7 +40,7 @@ export const GeoAlertFeedWidget = () => (
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{a.alert}</span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{a.source} • {a.time}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{a.source} • <span className="u-mono">{a.time}</span></span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)' }}>📍 {a.region}</div>
             </div>
@@ -57,7 +57,7 @@ export const GeoSummaryWidget = () => (
             { label: '社群情資', value: '3', color: '#22c55e' },
         ].map((m, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
             </div>
         ))}
@@ -68,7 +68,7 @@ export const EarthquakeMonitorWidget = () => (
     <div style={{ height: '100%', padding: '12px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ fontSize: '32px', marginBottom: '8px' }}>🌋</div>
         <div style={{ fontSize: '14px', fontWeight: 600, color: '#22c55e' }}>目前無地震</div>
-        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最後更新: 10:30</div>
+        <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>最後更新: <span className="u-mono">10:30</span></div>
     </div>
 );
 
@@ -89,7 +89,7 @@ export const ForecastCardsWidget = () => (
                 alignItems: 'center',
             }}>
                 <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>{f.day}</span>
-                <span style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{f.temp}</span>
+                <span className="u-mono" style={{ fontSize: '16px', fontWeight: 600, color: 'var(--text-primary)' }}>{f.temp}</span>
                 <span>{f.condition}</span>
             </div>
         ))}

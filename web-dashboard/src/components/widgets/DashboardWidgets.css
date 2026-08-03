@@ -134,6 +134,9 @@
     font-size: 1.75rem;
     font-weight: 700;
     color: var(--text-primary, #1a1a2e);
+    /* 排印鐵律 §3：數字讀數一律 mono＋tabular-nums */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .stats-label {
@@ -144,6 +147,9 @@
 .stats-trend {
     font-size: 0.75rem;
     margin-top: 0.25rem;
+    /* 百分比讀數：mono＋tabular-nums */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .stats-trend.up {
@@ -191,6 +197,9 @@
 .activity-time {
     font-size: 0.75rem;
     color: var(--text-muted, #9ca3af);
+    /* 時間戳一律 mono＋tabular-nums */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .empty-activity {

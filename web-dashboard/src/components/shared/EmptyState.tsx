@@ -1,5 +1,6 @@
 import React from 'react';
-import { FileX, SearchX, Inbox, AlertCircle, LucideIcon } from 'lucide-react';
+import { SearchX, Inbox, AlertCircle, LucideIcon } from 'lucide-react';
+import { DocEmptyIcon } from '../../design-system/icons';
 import './EmptyState.css';
 
 interface EmptyStateProps {
@@ -14,11 +15,11 @@ interface EmptyStateProps {
     className?: string;
 }
 
+/* minimal（檔案/空文件語意）改用 B3c doc-empty；其餘變體暫留 lucide */
 const VARIANT_ICONS: Record<string, LucideIcon> = {
     default: Inbox,
     search: SearchX,
     error: AlertCircle,
-    minimal: FileX,
 };
 
 const EmptyState: React.FC<EmptyStateProps> = ({
@@ -29,12 +30,17 @@ const EmptyState: React.FC<EmptyStateProps> = ({
     variant = 'default',
     className = '',
 }) => {
-    const Icon = icon || VARIANT_ICONS[variant] || Inbox;
+    const Icon = icon || VARIANT_ICONS[variant];
 
     return (
         <div className={`empty-state empty-state--${variant} ${className}`}>
             <div className="empty-state__icon-wrapper">
-                <Icon size={48} strokeWidth={1.5} />
+                {Icon ? (
+                    <Icon size={48} strokeWidth={1.5} />
+                ) : (
+                    /* B3c 圖形文法鎖 stroke 2，不傳 strokeWidth 覆寫 */
+                    <DocEmptyIcon size={48} />
+                )}
             </div>
             <h3 className="empty-state__title">{title}</h3>
             {description && (

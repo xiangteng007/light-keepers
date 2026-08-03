@@ -23,7 +23,9 @@ Light Keepers 主題化圖文系統的 icon 單一來源。
   菱形＝events（事態框）、八角＝sos（停止/求援，紅色憲法唯一 icon 對象）。
   三者內部同用「豎線＋方點」驚嘆號，構成同族。
 - **人形**＝方首＋梯形肩：user 是放大單兵，teams 是併肩雙兵（共用中線），同族縮放。
-- **方框族**：info、clock 共用 16×16 方框，內容物（i / 直角指針）區分語義。
+- **方框族**：info、clock、theme 共用 16×16 方框，內容物（i / 直角指針 / 半面剖線）區分語義。
+- **弧形直角重譯**：一切弧形概念（鎖弓、指紋同心弧、脈搏波、半填圓）不畫弧，
+  以直角折線／45° 剖面線重譯（lock、fingerprint、monitor、theme）。
 - **45° 律**：所有斜線優先取 45°（search 柄、close、edit、online 波、offline 斬斷線、
   drone 臂），並排時斜線角度不打架。
 - **方點律**：online/offline 訊號點、location 中心點、驚嘆號下點、qr 資料點全部是
@@ -36,7 +38,8 @@ Light Keepers 主題化圖文系統的 icon 單一來源。
 - 註冊表 key：kebab-case **語意名**（`'map'`、`'chevron-left'`、`'triage'`），
   對齊導覽/policy 的語意 id，不用視覺描述名（是 `'sos'` 不是 `'octagon-alert'`）。
 - 分組檔：`nav.tsx`（導覽/旗艦頁）、`field.tsx`(野戰/設施)、`status.tsx`(狀態/告警)、
-  `action.tsx`(操作/工具)、`chevron.tsx`(方向)。新 icon 依語義入組，出口一律走 `index.ts`。
+  `action.tsx`(操作/工具)、`chevron.tsx`(方向)、`docs.tsx`(文件/資料)、
+  `system.tsx`(系統/安全)、`community.tsx`(社群/照護)。新 icon 依語義入組，出口一律走 `index.ts`。
 
 ## 用法
 

@@ -52,7 +52,7 @@ export const EventListWidget = () => (
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                     <span style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{event.title}</span>
-                    <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{event.time}</span>
+                    <span className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{event.time}</span>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{event.location}</div>
             </div>
@@ -94,7 +94,7 @@ export const DispatchQueueWidget = () => (
             }}>
                 <div style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{task.title}</div>
                 <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>
-                    {task.location} · {task.time}
+                    {task.location} · <span className="u-mono">{task.time}</span>
                 </div>
             </div>
         ))}
@@ -119,7 +119,7 @@ export const TriageQueueWidget = () => (
                 justifyContent: 'space-between',
             }}>
                 <span style={{ fontSize: '13px', color: 'var(--text-primary)' }}>{item.type}</span>
-                <span style={{
+                <span className="u-mono" style={{
                     padding: '4px 12px',
                     borderRadius: '12px',
                     fontSize: '12px',
@@ -210,7 +210,7 @@ export const DrillControlsWidget = () => (
 
 export const DrillLogWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
-        <div style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-muted)' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
             <div>[10:00:00] 演練開始</div>
             <div>[10:00:15] 地震警報發布</div>
             <div>[10:00:30] 疏散程序啟動</div>

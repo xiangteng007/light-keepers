@@ -51,8 +51,8 @@ export const RecentIntakesWidget = () => (
         ].map((r, i) => (
             <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{r.id} {r.type}</span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{r.time}</span>
+                    <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}><span className="u-mono">{r.id}</span> {r.type}</span>
+                    <span className="u-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{r.time}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>📍 {r.location}</div>
             </div>

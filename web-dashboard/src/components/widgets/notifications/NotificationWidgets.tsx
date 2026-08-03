@@ -17,7 +17,7 @@ export const NotificationFeedWidget = () => (
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <span style={{ fontSize: '12px', fontWeight: 600, color: 'var(--text-primary)' }}>{n.title}</span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '8px' }}>{n.type} • {n.time}</span>
+                    <span style={{ fontSize: '10px', color: 'var(--text-muted)', marginLeft: '8px' }}>{n.type} • <span className="u-mono">{n.time}</span></span>
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>{n.body}</div>
             </div>
@@ -34,7 +34,7 @@ export const NotificationSummaryWidget = () => (
             { label: 'Push', value: '15', color: '#3B82F6' },
         ].map((m, i) => (
             <div key={i} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
+                <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: m.color }}>{m.value}</div>
                 <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>{m.label}</div>
             </div>
         ))}
@@ -73,7 +73,7 @@ export const NotificationCenterWidget = () => (
             }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <span style={{ fontSize: '12px', fontWeight: 500, color: 'var(--text-primary)' }}>{notif.title}</span>
-                    <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{notif.time}</span>
+                    <span className="u-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{notif.time}</span>
                 </div>
                 <div style={{ fontSize: '11px', color: 'var(--text-secondary)', marginTop: '2px' }}>{notif.body}</div>
             </div>
@@ -95,7 +95,7 @@ export const NotificationListWidget = () => (
                 marginBottom: '8px',
             }}>
                 <div style={{ fontSize: '14px', color: 'var(--text-primary)' }}>{notif.title}</div>
-                <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{notif.time}</div>
+                <div className="u-mono" style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' }}>{notif.time}</div>
             </div>
         ))}
     </div>

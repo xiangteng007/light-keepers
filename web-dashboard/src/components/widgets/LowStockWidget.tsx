@@ -192,6 +192,9 @@ export function LowStockWidget() {
                     font-size: 0.85rem;
                     color: var(--color-text-secondary);
                     padding-left: 1.6rem;
+                    /* 數量/天數讀數：mono＋tabular-nums（排印鐵律 §3） */
+                    font-family: var(--font-mono);
+                    font-variant-numeric: tabular-nums;
                 }
 
                 .more-alerts-hint {

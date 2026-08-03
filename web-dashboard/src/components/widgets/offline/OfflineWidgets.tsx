@@ -11,11 +11,11 @@ export const SyncStatusWidget = () => (
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>網路狀態</div>
         </div>
         <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#C39B6F' }}>3</div>
+            <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: '#C39B6F' }}>3</div>
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>待同步</div>
         </div>
         <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: '20px', fontWeight: 700, color: '#3b82f6' }}>10:35</div>
+            <div className="u-mono" style={{ fontSize: '20px', fontWeight: 700, color: '#3b82f6' }}>10:35</div>
             <div style={{ fontSize: '10px', color: 'var(--text-muted)', marginTop: '2px' }}>最後同步</div>
         </div>
     </div>
@@ -32,9 +32,9 @@ export const PendingQueueWidget = () => (
             <div key={i} style={{ padding: '10px', marginBottom: '6px', background: 'rgba(47, 54, 65, 0.3)', borderRadius: '6px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <div>
                     <div style={{ fontSize: '12px', color: 'var(--text-primary)' }}>{q.action}</div>
-                    <div style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{q.time}</div>
+                    <div className="u-mono" style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{q.time}</div>
                 </div>
-                <span style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{q.size}</span>
+                <span className="u-mono" style={{ fontSize: '10px', color: 'var(--text-secondary)' }}>{q.size}</span>
             </div>
         ))}
     </div>

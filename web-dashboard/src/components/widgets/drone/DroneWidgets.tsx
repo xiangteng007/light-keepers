@@ -63,7 +63,7 @@ export const DroneStatusWidget = () => (
         ].map((stat, i) => (
             <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '8px 0', borderBottom: '1px solid rgba(47, 54, 65, 0.5)' }}>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>{stat.label}</span>
-                <span style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
+                <span className="u-mono" style={{ fontSize: '12px', color: 'var(--text-primary)', fontWeight: 600 }}>{stat.value}</span>
             </div>
         ))}
     </div>
@@ -71,7 +71,7 @@ export const DroneStatusWidget = () => (
 
 export const DroneLogWidget = () => (
     <div style={{ height: '100%', overflow: 'auto', padding: '8px' }}>
-        <div style={{ fontFamily: 'monospace', fontSize: '11px', color: 'var(--text-muted)' }}>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '11px', color: 'var(--text-muted)' }}>
             <div>[14:30:00] DJI-01 起飛</div>
             <div>[14:30:15] 到達指定高度 120m</div>
             <div>[14:32:00] 開始偵察任務</div>

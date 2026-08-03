@@ -64,8 +64,8 @@ export const NAV_ITEMS: NavItemDef[] = [
     // ── ⚡ 緊急快捷（pinned）──
     { id: 'quick-report', icon: 'report', label: '快速通報', path: '/intake', group: 'emergency', order: 0, visible: true, isQuickAction: true, volunteerCore: true, emergencyCore: true, emergencyRank: 0 },
     { id: 'sos', icon: 'sos', label: 'SOS 求救', path: '/emergency/sos', group: 'emergency', order: 1, visible: true, isQuickAction: true, emergencyCore: true, emergencyRank: 90 },
-    { id: 'evacuation', icon: 'Siren', label: '撤離資訊', path: '/emergency/evacuation', group: 'emergency', order: 2, visible: false, isQuickAction: true, emergencyCore: true, emergencyRank: 91 },
-    { id: 'hotline', icon: 'Phone', label: '緊急專線', path: '/emergency/hotline', group: 'emergency', order: 3, visible: false, isQuickAction: true, emergencyCore: true, emergencyRank: 92 },
+    { id: 'evacuation', icon: 'siren', label: '撤離資訊', path: '/emergency/evacuation', group: 'emergency', order: 2, visible: false, isQuickAction: true, emergencyCore: true, emergencyRank: 91 },
+    { id: 'hotline', icon: 'phone', label: '緊急專線', path: '/emergency/hotline', group: 'emergency', order: 3, visible: false, isQuickAction: true, emergencyCore: true, emergencyRank: 92 },
 
     // ── 🎯 應變指揮 (ops) ──
     { id: 'command-center', icon: 'command', label: '戰情儀表板', path: '/command-center', group: 'ops', order: 0, visible: true, emergencyCore: true, emergencyRank: 10 },
@@ -79,47 +79,47 @@ export const NAV_ITEMS: NavItemDef[] = [
     // ── 🗺️ 情資地圖 (geo) ──
     { id: 'unified-map', icon: 'map', label: '統一地圖', path: '/geo/map', group: 'geo', order: 0, visible: true, volunteerCore: true, emergencyCore: true, emergencyRank: 2 },
     { id: 'alerts', icon: 'warning', label: '警報中心', path: '/hub/geo-alerts', group: 'geo', order: 1, visible: true, volunteerCore: true, emergencyCore: true, emergencyRank: 13 },
-    { id: 'weather', icon: 'CloudRain', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: true },
+    { id: 'weather', icon: 'weather', label: '氣象預報', path: '/hub/weather', group: 'geo', order: 2, visible: true },
     { id: 'shelters', icon: 'shelter', label: '避難所', path: '/geo/shelters', group: 'geo', order: 3, visible: true, emergencyCore: true, emergencyRank: 14 },
 
     // ── 🏥 救援行動 (rescue) ──
     { id: 'triage', icon: 'triage', label: '傷患分類', path: '/rescue/triage', group: 'rescue', order: 0, visible: true, emergencyCore: true, emergencyRank: 3 },
     { id: 'search-rescue', icon: 'search', label: '搜救任務', path: '/rescue/search-rescue', group: 'rescue', order: 1, visible: true, emergencyCore: true, emergencyRank: 15 },
     { id: 'reunification', icon: 'teams', label: '家庭重聚', path: '/rescue/reunification', group: 'rescue', order: 2, visible: true },
-    { id: 'medical-transport', icon: 'Truck', label: '醫療後送', path: '/rescue/medical-transport', group: 'rescue', order: 3, visible: false },
+    { id: 'medical-transport', icon: 'vehicle', label: '醫療後送', path: '/rescue/medical-transport', group: 'rescue', order: 3, visible: false },
     { id: 'field-comms', icon: 'radio', label: '現地通訊', path: '/rescue/field-comms', group: 'rescue', order: 4, visible: false, emergencyCore: true, emergencyRank: 16 },
 
     // ── 📦 資源後勤 (logistics) ──
     { id: 'inventory', icon: 'inventory', label: '物資庫存', path: '/logistics/inventory', group: 'logistics', order: 0, visible: true, emergencyCore: true, emergencyRank: 17 },
     { id: 'equipment', icon: 'qr', label: '裝備管理', path: '/logistics/equipment', group: 'logistics', order: 1, visible: true },
-    { id: 'donations', icon: 'Heart', label: '捐贈追蹤', path: '/logistics/donations', group: 'logistics', order: 2, visible: true },
-    { id: 'unified-resources', icon: 'Combine', label: '資源整合', path: '/logistics/unified-resources', group: 'logistics', order: 3, visible: false },
+    { id: 'donations', icon: 'heart', label: '捐贈追蹤', path: '/logistics/donations', group: 'logistics', order: 2, visible: true },
+    { id: 'unified-resources', icon: 'merge', label: '資源整合', path: '/logistics/unified-resources', group: 'logistics', order: 3, visible: false },
     { id: 'approvals', icon: 'check', label: '審批中心', path: '/approvals', group: 'logistics', order: 4, visible: true },
 
     // ── 👥 人員動員 (workforce) ──
     { id: 'people', icon: 'teams', label: '人員名冊', path: '/workforce/people', group: 'workforce', order: 0, visible: true, emergencyCore: true, emergencyRank: 18 },
-    { id: 'shifts', icon: 'Calendar', label: '排班日曆', path: '/workforce/shifts', group: 'workforce', order: 1, visible: true, volunteerCore: true },
-    { id: 'performance', icon: 'Trophy', label: '績效中心', path: '/workforce/performance', group: 'workforce', order: 2, visible: true },
-    { id: 'community-hub', icon: 'Building2', label: '社區活動', path: '/community/hub', group: 'workforce', order: 3, visible: true, volunteerCore: true },
-    { id: 'mental-health', icon: 'HeartHandshake', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 4, visible: false },
+    { id: 'shifts', icon: 'calendar', label: '排班日曆', path: '/workforce/shifts', group: 'workforce', order: 1, visible: true, volunteerCore: true },
+    { id: 'performance', icon: 'trophy', label: '績效中心', path: '/workforce/performance', group: 'workforce', order: 2, visible: true },
+    { id: 'community-hub', icon: 'building', label: '社區活動', path: '/community/hub', group: 'workforce', order: 3, visible: true, volunteerCore: true },
+    { id: 'mental-health', icon: 'support', label: '心理支持', path: '/community/mental-health', group: 'workforce', order: 4, visible: false },
 
     // ── 📊 分析知識 (insights) ──
     { id: 'analytics', icon: 'analytics', label: '分析儀表板', path: '/hub/analytics', group: 'insights', order: 0, visible: true },
-    { id: 'reports', icon: 'FileSpreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true },
-    { id: 'unified-reporting', icon: 'Files', label: '綜合報表', path: '/analytics/unified-reporting', group: 'insights', order: 2, visible: false },
-    { id: 'simulation-engine', icon: 'FlaskConical', label: '模擬引擎', path: '/analytics/simulation', group: 'insights', order: 3, visible: false },
-    { id: 'ai-tasks', icon: 'Brain', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 4, visible: false },
-    { id: 'ai-chat', icon: 'Bot', label: 'AI 助手', path: '/hub/ai-chat', group: 'insights', order: 5, visible: false },
-    { id: 'training', icon: 'GraduationCap', label: '訓練課程', path: '/training', group: 'insights', order: 6, visible: true, volunteerCore: true },
-    { id: 'manuals', icon: 'BookOpen', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 7, visible: true, volunteerCore: true },
+    { id: 'reports', icon: 'spreadsheet', label: '報表中心', path: '/analytics/reports', group: 'insights', order: 1, visible: true },
+    { id: 'unified-reporting', icon: 'files', label: '綜合報表', path: '/analytics/unified-reporting', group: 'insights', order: 2, visible: false },
+    { id: 'simulation-engine', icon: 'flask', label: '模擬引擎', path: '/analytics/simulation', group: 'insights', order: 3, visible: false },
+    { id: 'ai-tasks', icon: 'ai', label: 'AI 任務', path: '/hub/ai', group: 'insights', order: 4, visible: false },
+    { id: 'ai-chat', icon: 'bot', label: 'AI 助手', path: '/hub/ai-chat', group: 'insights', order: 5, visible: false },
+    { id: 'training', icon: 'graduation', label: '訓練課程', path: '/training', group: 'insights', order: 6, visible: true, volunteerCore: true },
+    { id: 'manuals', icon: 'book', label: '作業手冊', path: '/knowledge/manuals', group: 'insights', order: 7, visible: true, volunteerCore: true },
 
     // ── ⚙️ 系統管理 (admin) ──
-    { id: 'iam', icon: 'Lock', label: '權限管理', path: '/governance/iam', group: 'admin', order: 0, visible: true },
-    { id: 'audit', icon: 'ScrollText', label: '審計日誌', path: '/governance/audit', group: 'admin', order: 1, visible: true },
-    { id: 'security', icon: 'Shield', label: '安全中心', path: '/governance/security', group: 'admin', order: 2, visible: false },
+    { id: 'iam', icon: 'lock', label: '權限管理', path: '/governance/iam', group: 'admin', order: 0, visible: true },
+    { id: 'audit', icon: 'audit', label: '審計日誌', path: '/governance/audit', group: 'admin', order: 1, visible: true },
+    { id: 'security', icon: 'shield', label: '安全中心', path: '/governance/security', group: 'admin', order: 2, visible: false },
     { id: 'interoperability', icon: 'sync', label: '機構互通', path: '/governance/interoperability', group: 'admin', order: 3, visible: false },
-    { id: 'monitor', icon: 'Activity', label: '系統監控', path: '/governance/monitor', group: 'admin', order: 4, visible: false },
-    { id: 'webhooks', icon: 'Webhook', label: 'Webhook 管理', path: '/governance/webhooks', group: 'admin', order: 5, visible: false },
-    { id: 'biometric', icon: 'Fingerprint', label: '生物辨識', path: '/governance/biometric', group: 'admin', order: 6, visible: false },
+    { id: 'monitor', icon: 'monitor', label: '系統監控', path: '/governance/monitor', group: 'admin', order: 4, visible: false },
+    { id: 'webhooks', icon: 'webhook', label: 'Webhook 管理', path: '/governance/webhooks', group: 'admin', order: 5, visible: false },
+    { id: 'biometric', icon: 'fingerprint', label: '生物辨識', path: '/governance/biometric', group: 'admin', order: 6, visible: false },
     { id: 'settings', icon: 'settings', label: '系統設定', path: '/governance/settings', group: 'admin', order: 7, visible: false },
 ];

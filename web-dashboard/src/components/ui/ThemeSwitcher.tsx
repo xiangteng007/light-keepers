@@ -7,7 +7,7 @@
 
 import React from 'react';
 import { useTheme } from '../../context/ThemeProvider';
-import { Sun, Moon } from 'lucide-react';
+import { ThemeIcon } from '../../design-system/icons';
 import styles from './ThemeSwitcher.module.css';
 
 interface ThemeSwitcherProps {
@@ -28,11 +28,8 @@ export function ThemeSwitcher({ showLabel = false, size = 'md' }: ThemeSwitcherP
       aria-label={`當前主題: ${themeInfo.displayName}，點擊切換`}
     >
       <span className={styles.iconWrapper}>
-        {isDark ? (
-          <Sun size={iconSize} className={styles.icon} />
-        ) : (
-          <Moon size={iconSize} className={styles.icon} />
-        )}
+        {/* B3c 教範圖例：theme 半面剖線方框，同一 icon 表達雙態（亮/暗由 aria/title 說明） */}
+        <ThemeIcon size={iconSize} className={styles.icon} />
       </span>
       
       {showLabel && (

@@ -96,3 +96,13 @@ export const LogoutIcon = createIcon(
         <path d="M16 8l4 4-4 4" />
     </>,
 );
+
+/** theme 對比切換 — 方框族＋中分線＋半面 45° 剖面線（工程圖「實體」畫法＝半填圓的直角重譯） */
+export const ThemeIcon = createIcon(
+    'ThemeIcon',
+    <>
+        <rect x="4" y="4" width="16" height="16" />
+        <path d="M12 4v16" />
+        <path d="M12 12l8-8M12 20l8-8" />
+    </>,
+);

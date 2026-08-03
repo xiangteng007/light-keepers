@@ -15,27 +15,7 @@
  * 角色分層（§5）：volunteerItems 提供 L0–L1 扁平清單。
  */
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import {
-    // Emergency
-    AlertCircle, Phone, Siren, FileWarning,
-    // Ops
-    LayoutDashboard, AlertTriangle, ClipboardList, Target, FileStack, BellRing, HardDrive,
-    // Geo
-    Map, Bell, CloudRain, MapPin,
-    // Rescue
-    Stethoscope, Search, Users2, Truck, Radio,
-    // Logistics
-    Package, QrCode, Heart, Combine, CheckSquare,
-    // Workforce
-    Users, Calendar, Trophy, Building2, HeartHandshake,
-    // Insights
-    BarChart3, FileSpreadsheet, Files, FlaskConical, Brain, Bot, GraduationCap, BookOpen,
-    // Admin
-    Lock, ScrollText, Shield, Share2, Activity, Webhook, Fingerprint, Settings,
-    // Utility
-    User,
-    LucideIcon,
-} from 'lucide-react';
+import { iconRegistry, UserIcon, type LkIcon } from '../../design-system/icons';
 import {
     NAV_GROUPS as NAV_GROUP_DEFS,
     NAV_ITEMS as NAV_ITEM_DEFS,
@@ -75,17 +55,14 @@ export type AppMode = 'normal' | 'emergency';
 // ==========================================
 // Icon mapping for rendering
 // ==========================================
-export const ICON_MAP: Record<string, LucideIcon> = {
-    AlertCircle, Phone, Siren, FileWarning,
-    LayoutDashboard, AlertTriangle, ClipboardList, Target, FileStack, BellRing, HardDrive,
-    Map, Bell, CloudRain, MapPin,
-    Stethoscope, Search, Users2, Truck, Radio,
-    Package, QrCode, Heart, Combine, CheckSquare,
-    Users, Calendar, Trophy, Building2, HeartHandshake,
-    BarChart3, FileSpreadsheet, Files, FlaskConical, Brain, Bot, GraduationCap, BookOpen,
-    Lock, ScrollText, Shield, Share2, Activity, Webhook, Fingerprint, Settings,
-    User,
-    default: User,
+/**
+ * R5/T5b：ICON_MAP 直接接上 B3c iconRegistry（語意名 → LkIcon）。
+ * navigation.ts 的 icon 欄位已 100% 使用 kebab-case 語意名，
+ * lucide fallback 出清；查無語意名時落到 default（user 單兵形）。
+ */
+export const ICON_MAP: Record<string, LkIcon> = {
+    ...iconRegistry,
+    default: UserIcon,
 };
 
 function loadOverrides(): OverrideMap {
