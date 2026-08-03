@@ -3,7 +3,7 @@
 .page-content {
     height: 100%;
     overflow: auto;
-    padding: 16px;
+    padding: var(--space-4, 16px);
 }
 
 /* Placeholder shown when a pageId has neither children nor a widget config */
@@ -11,4 +11,48 @@
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+/* ══════════════════════════════════════════════════════════════════════
+   B3c 頁首標題列（R5/T3）— stencil kicker 槽
+   選用式 class：頁面自行掛用，不強制。用法：
+     <header class="page-content__titlebar">
+       <span class="page-content__kicker u-stencil">OPS QUEUE</span>
+       <h1 class="page-content__title">任務佇列</h1>
+       <span class="page-content__meta u-mono">…讀數…</span>
+     </header>
+   kicker 為拉丁/數字小標，寬字距一律經 .u-stencil（排印鐵律 #1）。
+   ⚠ 刻意不用 .page-header —— 該名已被前朝 App.css/index.css 佔用
+   （撞名污染教訓見 commit f457144）。
+   ══════════════════════════════════════════════════════════════════════ */
+.page-content__titlebar {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-3, 12px);
+    flex-wrap: wrap;
+    padding-bottom: var(--space-3, 12px);
+    margin-bottom: var(--space-4, 16px);
+    border-bottom: 2px solid var(--border-default);
+}
+
+/* kicker：軍規卡其小標（stencil 字距由 .u-stencil 提供，此處不寫 letter-spacing） */
+.page-content__kicker {
+    font-size: 10px;
+    color: var(--color-secondary);
+}
+
+.page-content__title {
+    margin: 0;
+    font-size: var(--font-size-xl, 20px);
+    font-weight: var(--font-weight-bold, 700);
+    line-height: var(--line-height-tight, 1.25);
+    letter-spacing: var(--tracking-zh, 0);
+    color: var(--text-primary);
+}
+
+/* 頁首讀數槽（計數/時間戳；mono 由 .u-mono 提供） */
+.page-content__meta {
+    margin-left: auto;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-secondary);
 }

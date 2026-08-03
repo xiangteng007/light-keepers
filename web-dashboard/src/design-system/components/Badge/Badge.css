@@ -1,9 +1,20 @@
 /* ============================================
-   Badge Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Badge Component — B3c 野戰手冊（R5/T3）
+   c1 佇列樣式三級張力：
+   ・實心＝高張力（danger／gradient=橄欖實心）
+   ・彩色描邊＝中張力（success / warning / info / outline）
+   ・灰描邊＝低張力（default / subtle）
+   排印鐵律：中文字距 0；全大寫拉丁小標請由消費端
+   加 .u-stencil（mono＋0.12em），本檔不散寫 letter-spacing。
+   對比基礎（B3c 深底 #16170F/#1C1E14，取代 R4 淺色 pastel 方案）：
+   彩色描邊字色對深底 ≥6:1；實心深紅底配紙白字 ≥6.8:1。
+
+   ⚠ 選擇器一律 .lk-badge.lk-badge：前朝 styles/tokens/components.css
+   宣告了同名 .lk-badge（pill 圓角＋寬字距＋pastel 底），cascade 順序
+   不定會覆蓋本檔；根治＝移除 globals.css 的該 @import（不在本批檔案集）。
 ============================================ */
 
-.lk-badge {
+.lk-badge.lk-badge {
     display: inline-flex;
     align-items: center;
     gap: var(--spacing-1);
@@ -12,91 +23,93 @@
     font-weight: var(--font-weight-semibold);
     border-radius: var(--badge-radius);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    letter-spacing: var(--tracking-zh);
     white-space: nowrap;
-    transition: all var(--duration-fast) var(--ease-smooth);
+    border: 1px solid transparent;
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth),
+        color var(--duration-fast) var(--ease-smooth);
 }
 
 /* ===== Sizes ===== */
-.lk-badge--xs {
+.lk-badge.lk-badge--xs {
     padding: var(--badge-padding-xs);
     font-size: var(--font-size-2xs);
     border-radius: var(--radius-sm);
 }
 
-.lk-badge--sm {
+.lk-badge.lk-badge--sm {
     padding: var(--badge-padding-sm);
     font-size: 10px;
     border-radius: var(--radius-sm);
 }
 
-.lk-badge--md {
+.lk-badge.lk-badge--md {
     padding: var(--badge-padding);
     font-size: var(--badge-font-size);
 }
 
-.lk-badge--lg {
+.lk-badge.lk-badge--lg {
     padding: var(--badge-padding-lg);
     font-size: var(--font-size-sm);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-md);
 }
 
 /* ===== Variants ===== */
 
-/* Default（中性狀態，如「離線」）
- * R4 a11y 修正：原本 color: var(--accent-primary) 在 light/dark 主題下這個
- * token 根本沒定義（只有少數自訂主題有值），等於吃到 unset/繼承，量到對比
- * 低到 1.07:1。改用固定的中性灰不透明底＋深灰字，理由同上其他變體。 */
-.lk-badge--default {
-    background: #E5E7EB;
-    color: #374151;
-}
-
-/*
- * Success/Warning/Danger/Info：R4 a11y 修正（原本用半透明 rgba() 疊在頁面背景上，
- * 疊色後的實際對比因底色而異——四種主題量到的組合最低到 1.77:1，全部低於
- * AA 文字門檛 4.5:1，見 docs/audit/A11Y_AUDIT_R4.md）。
- * 改用不透明淺色底＋深色字：對比與底下頁面背景無關，四主題共用同一組值即可
- * 保證 ≥6:1（見稽核報告的驗算）。
- */
-.lk-badge--success {
-    background: #DCFCE7;
-    color: #166534;
-}
-
-.lk-badge--warning {
-    background: #FEF3C7;
-    color: #92400E;
-}
-
-.lk-badge--danger {
-    background: #FEE2E2;
-    color: #991B1B;
-}
-
-.lk-badge--info {
-    background: #DBEAFE;
-    color: #1E40AF;
-}
-
-/* Outline */
-.lk-badge--outline {
+/* Default — 低張力：灰描邊＋次要字（狀態安靜律） */
+.lk-badge.lk-badge--default {
     background: transparent;
-    border: 1.5px solid var(--accent-primary);
-    color: var(--accent-primary);
-}
-
-/* Gradient */
-.lk-badge--gradient {
-    background: var(--gradient-gold);
-    color: var(--color-brown-900);
-    box-shadow: var(--shadow-glow-sm);
-}
-
-/* Subtle */
-.lk-badge--subtle {
-    background: var(--bg-secondary);
+    border-color: var(--border-default);
     color: var(--text-secondary);
+}
+
+/* Subtle — 低張力：面板底＋灰描邊 */
+.lk-badge.lk-badge--subtle {
+    background: var(--bg-secondary);
+    border-color: var(--border-light);
+    color: var(--text-secondary);
+}
+
+/* Success / Warning / Info — 中張力：彩色描邊＋同色字＋極淡底 */
+.lk-badge.lk-badge--success {
+    background: var(--color-safe-bg);
+    border-color: var(--color-success);
+    color: var(--color-success);
+}
+
+.lk-badge.lk-badge--warning {
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
+}
+
+.lk-badge.lk-badge--info {
+    background: var(--color-info-bg);
+    border-color: var(--color-info);
+    color: var(--color-info);
+}
+
+/* Danger — 高張力實心。紅色憲法（DESIGN_LANGUAGE v2 §D）：
+   只准生命/安全語義（SOS、BLACK 傷票、禁入、撤離）。 */
+.lk-badge.lk-badge--danger {
+    background: var(--color-danger-dark, var(--color-danger));
+    border-color: var(--color-danger);
+    color: var(--text-primary);
+}
+
+/* Outline — 中張力：橄欖描邊（作用中/選取語義） */
+.lk-badge.lk-badge--outline {
+    background: transparent;
+    border-color: var(--border-accent);
+    color: var(--text-accent, var(--accent-primary));
+}
+
+/* Gradient（沿用舊 API 名）— 高張力實心橄欖＋深字，無漸層無光暈 */
+.lk-badge.lk-badge--gradient {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--text-inverse);
 }
 
 /* ===== Dot ===== */
@@ -113,7 +126,7 @@
     height: 8px;
 }
 
-/* ===== Pulse Animation ===== */
+/* ===== Pulse Animation（狀態訊號，非裝飾；reduced-motion 由全域歸零） ===== */
 .lk-badge--pulse .lk-badge__dot {
     animation: badgePulse 2s var(--ease-in-out) infinite;
 }

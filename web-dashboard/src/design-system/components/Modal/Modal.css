@@ -1,13 +1,14 @@
 /* ============================================
-   Modal Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Modal Component — B3c 野戰手冊（R5/T3）
+   2px 規線頂欄＋標題左側小方塊色標；
+   平面印刷：1px 外框、近直角、無漸層水洗、動效收短。
 ============================================ */
 
-/* ===== Overlay - Glass Background ===== */
+/* ===== Overlay ===== */
 .lk-modal-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(61, 46, 36, 0.6);
+    background: var(--v2-bg-dim, rgba(0, 0, 0, 0.45));
     backdrop-filter: blur(var(--glass-blur-sm));
     -webkit-backdrop-filter: blur(var(--glass-blur-sm));
     display: flex;
@@ -15,7 +16,7 @@
     justify-content: center;
     z-index: var(--z-modal);
     padding: var(--spacing-6);
-    animation: modalOverlayIn var(--duration-normal) var(--ease-smooth);
+    animation: modalOverlayIn var(--duration-fast) var(--ease-smooth);
 }
 
 @keyframes modalOverlayIn {
@@ -30,40 +31,28 @@
 
 /* ===== Modal Container ===== */
 .lk-modal {
-    background: var(--bg-card);
-    border-radius: var(--modal-radius);
-    box-shadow: var(--shadow-2xl);
+    background: var(--surface-card, var(--bg-card));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     width: 100%;
     max-height: calc(100vh - var(--spacing-12));
     overflow: hidden;
     display: flex;
     flex-direction: column;
-    animation: modalSlideIn var(--duration-slow) var(--ease-spring);
+    animation: modalSlideIn var(--duration-fast) var(--ease-out);
     position: relative;
-}
-
-/* Subtle gradient overlay */
-.lk-modal::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 120px;
-    background: linear-gradient(180deg, rgba(196, 167, 125, 0.03) 0%, transparent 100%);
-    pointer-events: none;
-    border-radius: var(--modal-radius) var(--modal-radius) 0 0;
 }
 
 @keyframes modalSlideIn {
     from {
         opacity: 0;
-        transform: translateY(20px) scale(0.95);
+        transform: translateY(8px);
     }
 
     to {
         opacity: 1;
-        transform: translateY(0) scale(1);
+        transform: translateY(0);
     }
 }
 
@@ -84,7 +73,7 @@
     max-width: var(--modal-width-xl);
 }
 
-/* ===== Header ===== */
+/* ===== Header — 2px 規線頂欄 ===== */
 .lk-modal__header {
     display: flex;
     align-items: flex-start;
@@ -92,7 +81,7 @@
     gap: var(--spacing-4);
     padding: var(--modal-padding);
     padding-bottom: var(--spacing-4);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 2px solid var(--border-default);
     position: relative;
     z-index: 1;
 }
@@ -110,9 +99,19 @@
     line-height: var(--line-height-tight);
 }
 
+/* 標題左側小方塊色標（野戰手冊章節記號） */
+.lk-modal__title::before {
+    content: '';
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    margin-right: var(--spacing-2);
+    background: var(--accent-primary);
+}
+
 .lk-modal__subtitle {
     font-size: var(--font-size-sm);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin: var(--spacing-1) 0 0;
 }
 
@@ -123,24 +122,27 @@
     justify-content: center;
     width: 36px;
     height: 36px;
-    border-radius: var(--radius-lg);
-    border: none;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-default);
     background: var(--bg-secondary);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: all var(--duration-fast) var(--ease-smooth);
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth),
+        color var(--duration-fast) var(--ease-smooth);
     flex-shrink: 0;
 }
 
 .lk-modal__close:hover {
-    background: var(--bg-hover);
+    background: var(--surface-hover, var(--bg-hover));
+    border-color: var(--border-dark);
     color: var(--text-primary);
-    transform: rotate(90deg);
 }
 
 .lk-modal__close:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px var(--accent-primary);
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
 }
 
 /* ===== Body ===== */
@@ -159,7 +161,7 @@
     justify-content: flex-end;
     gap: var(--spacing-3);
     padding: var(--spacing-5) var(--modal-padding);
-    border-top: 1px solid var(--border-color);
+    border-top: 1px solid var(--border-default);
     background: var(--bg-secondary);
     position: relative;
     z-index: 1;

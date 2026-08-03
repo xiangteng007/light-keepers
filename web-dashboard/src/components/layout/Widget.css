@@ -1,8 +1,11 @@
 /**
- * Widget.css
- * 
- * iOS Widget-style with glassmorphism and smooth animations
- * Uses CSS variables from design-tokens.css for theme switching
+ * Widget.css — R5/T3 B3c 野戰手冊化
+ *
+ * 工藝律 #2（Hairline 分層）：widget 框＝1px 規線，不用浮起陰影卡；
+ * 標題列＝2px 底規線。近直角（radius token ≤4px）。
+ * 金色紀律：橄欖只給選取態/懸停作用；紅色憲法：移除 widget＝一般破壞性
+ * 操作（非生命安全）→ 琥珀。讀數（region 座標）＝mono＋tabular-nums。
+ * 顏色一律語義 token；平時/災時由 tokens.css Layer 8/9 自動換盤。
  */
 
 /* ===== Base Widget ===== */
@@ -10,31 +13,29 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    border-radius: var(--radius-lg, 20px);
+    border-radius: var(--radius-lg, 4px);
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* Card style - solid background */
+/* Card style - 深面板＋hairline，無浮起陰影 */
 .widget--card {
-    background: var(--surface-default, #FFFFFF);
-    border: 1px solid var(--border-default, #D4D4D8);
-    box-shadow: var(--shadow-md, 0 4px 6px rgba(0, 0, 0, 0.1));
+    background: var(--surface-card);
+    border: 1px solid var(--border-default);
 }
 
-/* Glass style - glassmorphism */
+/* Glass style - 玻璃仍走 token 玻璃層 */
 .widget--glass {
-    background: var(--surface-overlay, rgba(255, 255, 255, 0.8));
+    background: var(--glass-bg, rgba(28, 30, 20, 0.88));
     -webkit-backdrop-filter: blur(20px);
     backdrop-filter: blur(20px);
-    border: 1px solid var(--border-light, #E4E4E7);
-    box-shadow: var(--shadow-lg, 0 8px 32px rgba(0, 0, 0, 0.1));
+    border: 1px solid var(--border-default);
 }
 
 /* Minimal style */
 .widget--minimal {
     background: transparent;
-    border: 1px dashed var(--border-default, #D4D4D8);
+    border: 1px dashed var(--border-default);
 }
 
 /* ===== Edit Mode States ===== */
@@ -46,12 +47,10 @@
     cursor: grabbing;
 }
 
+/* 選取態＝橄欖框（作用態，合法用金；不放大不發光） */
 .widget--selected {
-    border-color: var(--color-secondary, #F97316) !important;
-    box-shadow:
-        0 0 0 2px var(--color-secondary, #F97316),
-        0 8px 32px rgba(249, 115, 22, 0.3);
-    transform: scale(1.02);
+    border-color: var(--accent-gold) !important;
+    box-shadow: 0 0 0 1px var(--accent-gold);
 }
 
 .widget--locked {
@@ -60,39 +59,40 @@
 }
 
 .widget--locked .widget__header {
-    background: var(--surface-hover, rgba(100, 100, 100, 0.1));
+    background: var(--surface-hover);
 }
 
-/* ===== Widget Header ===== */
+/* ===== Widget Header：標題列規線（2px） ===== */
 .widget__header {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 12px 16px;
-    background: var(--surface-hover, #F4F4F5);
-    border-bottom: 1px solid var(--border-light, #E4E4E7);
+    background: var(--surface-raised);
+    border-bottom: 2px solid var(--border-default);
 }
 
 .widget__drag-handle {
     display: flex;
     align-items: center;
     padding: 4px;
-    color: var(--text-tertiary, #71717A);
+    color: var(--text-tertiary);
     cursor: grab;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition: all 0.2s;
 }
 
 .widget__drag-handle:hover {
-    color: var(--color-secondary, #F97316);
-    background: var(--surface-active, #E4E4E7);
+    color: var(--accent-gold);
+    background: var(--surface-active);
 }
 
 .widget__title {
     flex: 1;
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--text-primary, #18181B);
+    font-size: var(--font-size-sm, 13px);
+    font-weight: var(--font-weight-semibold, 600);
+    letter-spacing: var(--tracking-zh, 0);
+    color: var(--text-primary);
     margin: 0;
     display: flex;
     align-items: center;
@@ -107,8 +107,8 @@
     height: 20px;
     background: transparent;
     border: none;
-    border-radius: 4px;
-    color: var(--text-tertiary, #71717A);
+    border-radius: var(--radius-xs);
+    color: var(--text-tertiary);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -118,30 +118,33 @@
 }
 
 .widget__title-edit-btn:hover {
-    background: var(--surface-active, #E4E4E7);
-    color: var(--color-secondary, #F97316);
+    background: var(--surface-active);
+    color: var(--accent-gold);
 }
 
+/* 改名輸入框：編輯中＝橄欖框（作用態） */
 .widget__title-input {
     flex: 1;
     padding: 4px 8px;
-    background: var(--bg-primary, #F4F4F5);
-    border: 1px solid var(--color-secondary, #F97316);
-    border-radius: 4px;
-    color: var(--text-primary, #18181B);
-    font-size: 13px;
-    font-weight: 600;
+    background: var(--bg-primary);
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
+    font-size: var(--font-size-sm, 13px);
+    font-weight: var(--font-weight-semibold, 600);
     outline: none;
 }
 
 .widget__title-input:focus {
-    box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.3);
+    box-shadow: var(--focus-ring, 0 0 0 3px rgba(155, 168, 92, 0.35));
 }
 
+/* 讀數：region 座標＝mono 不跳動 */
 .widget__region {
     font-size: 10px;
-    color: var(--text-tertiary, #71717A);
-    font-family: var(--font-mono, 'SF Mono', monospace);
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .widget__controls {
@@ -156,27 +159,28 @@
     justify-content: center;
     width: 28px;
     height: 28px;
-    background: var(--surface-hover, #F4F4F5);
+    background: var(--surface-hover);
     border: none;
-    border-radius: 6px;
-    color: var(--text-secondary, #52525B);
+    border-radius: var(--radius-xs);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .widget__control-btn:hover {
-    background: var(--surface-active, #E4E4E7);
-    color: var(--text-primary, #18181B);
+    background: var(--surface-active);
+    color: var(--text-primary);
 }
 
+/* 移除 widget＝一般破壞性操作（非生命安全）→ 琥珀（紅色憲法 §D） */
 .widget__control-btn--danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--color-danger, #EF4444);
+    background: var(--color-warning-bg, rgba(201, 162, 62, 0.12));
+    color: var(--color-warning);
 }
 
 .widget__control-btn--danger:hover {
-    background: rgba(239, 68, 68, 0.2);
-    color: #FFFFFF;
+    background: var(--warning-light, rgba(201, 162, 62, 0.14));
+    color: var(--color-warning-light);
 }
 
 /* ===== Widget Content ===== */
@@ -184,8 +188,8 @@
     flex: 1;
     padding: 16px;
     overflow: auto;
-    background: var(--surface-default, #FFFFFF);
-    color: var(--text-primary, #18181B);
+    background: var(--surface-card);
+    color: var(--text-primary);
 }
 
 .widget__placeholder {
@@ -193,8 +197,8 @@
     align-items: center;
     justify-content: center;
     height: 100%;
-    color: var(--text-tertiary, #71717A);
-    font-size: 14px;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-sm, 13px);
 }
 
 /* ===== Resize Indicator ===== */
@@ -204,8 +208,8 @@
     bottom: 8px;
     width: 16px;
     height: 16px;
-    background: linear-gradient(135deg, transparent 50%, var(--color-secondary, #F97316) 50%);
-    border-radius: 2px;
+    background: linear-gradient(135deg, transparent 50%, var(--accent-gold) 50%);
+    border-radius: var(--radius-xs);
     opacity: 0.6;
     pointer-events: none;
 }
@@ -222,33 +226,36 @@
     align-items: center;
     gap: 6px;
     padding: 8px 14px;
-    background: var(--surface-hover, #F4F4F5);
-    border: 1px solid var(--border-default, #D4D4D8);
-    border-radius: 8px;
-    color: var(--text-primary, #18181B);
-    font-size: 12px;
-    font-weight: 500;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
+    font-size: var(--font-size-xs, 12px);
+    font-weight: var(--font-weight-medium, 500);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .widget-edit-controls__btn:hover {
-    background: var(--surface-active, #E4E4E7);
+    background: var(--surface-active);
 }
 
+/* 作用中的編輯鍵＝橄欖實心（工具列唯一填色鍵） */
 .widget-edit-controls__btn.active {
-    background: var(--color-secondary, #F97316);
-    color: #FFFFFF;
-    border-color: var(--color-secondary, #F97316);
+    background: var(--accent-gold);
+    color: var(--text-inverse);
+    border-color: var(--accent-gold);
 }
 
+/* 破壞性工具鍵（清空/移除）→ 琥珀 */
 .widget-edit-controls__btn--danger {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--color-danger, #EF4444);
+    background: var(--color-warning-bg, rgba(201, 162, 62, 0.12));
+    border-color: var(--color-warning-dark);
+    color: var(--color-warning);
 }
 
 .widget-edit-controls__btn--danger:hover {
-    background: rgba(239, 68, 68, 0.2);
+    background: var(--warning-light, rgba(201, 162, 62, 0.14));
 }
 
 .widget-edit-controls__hidden {
@@ -256,9 +263,9 @@
     align-items: center;
     gap: 8px;
     padding-left: 12px;
-    border-left: 1px solid var(--border-default, #D4D4D8);
+    border-left: 1px solid var(--border-default);
     font-size: 11px;
-    color: var(--text-tertiary, #71717A);
+    color: var(--text-tertiary);
 }
 
 .widget-edit-controls__show-btn {
@@ -266,45 +273,17 @@
     align-items: center;
     gap: 4px;
     padding: 4px 8px;
-    background: rgba(34, 197, 94, 0.1);
+    background: var(--color-safe-bg, rgba(140, 163, 83, 0.12));
     border: none;
-    border-radius: 4px;
-    color: var(--color-success, #22C55E);
+    border-radius: var(--radius-xs);
+    color: var(--color-success);
     font-size: 10px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .widget-edit-controls__show-btn:hover {
-    background: rgba(34, 197, 94, 0.2);
-}
-
-/* ===== Dark Theme Overrides ===== */
-[data-theme="dark"] .widget--card {
-    background: var(--surface-default, #292524);
-    border-color: var(--border-default, #57534E);
-}
-
-[data-theme="dark"] .widget--glass {
-    background: rgba(41, 37, 36, 0.9);
-    border-color: var(--border-light, #78716C);
-}
-
-[data-theme="dark"] .widget__header {
-    background: var(--surface-raised, #3D3835);
-}
-
-[data-theme="dark"] .widget__content {
-    background: var(--surface-default, #292524);
-}
-
-[data-theme="dark"] .widget__control-btn {
-    background: var(--surface-raised, #3D3835);
-}
-
-[data-theme="dark"] .widget-edit-controls__btn {
-    background: var(--surface-raised, #3D3835);
-    border-color: var(--border-default, #57534E);
+    background: var(--success-light, rgba(140, 163, 83, 0.14));
 }
 
 /* ===== Animations ===== */

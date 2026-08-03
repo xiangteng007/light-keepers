@@ -31,17 +31,18 @@
 /* ═══════════════════════════════════════════════════════════════
    UTILITY - BACKGROUND PATTERNS (Light Theme)
    ═══════════════════════════════════════════════════════════════ */
+/* B3c：格線／點陣改用手冊紙白低透明度（舊海軍藍 rgba(0,31,63,*) 為亮底殘留） */
 .bg-grid-pattern {
   background-size: 40px 40px;
   background-image:
-    linear-gradient(to right, rgba(0, 31, 63, 0.03) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(0, 31, 63, 0.03) 1px, transparent 1px);
+    linear-gradient(to right, rgba(237, 233, 218, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(237, 233, 218, 0.04) 1px, transparent 1px);
   background-position: center center;
 }
 
 .bg-dot-pattern {
   background-size: 20px 20px;
-  background-image: radial-gradient(rgba(0, 31, 63, 0.05) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(237, 233, 218, 0.05) 1px, transparent 1px);
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -80,23 +81,23 @@
     font-family: 'JetBrains Mono', 'Consolas', monospace;
   }
 
-  /* Custom Scrollbar (Light Theme) */
+  /* Custom Scrollbar（B3c：改走 tokens.css Layer 9 捲軸 token） */
   ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
   }
 
   ::-webkit-scrollbar-track {
-    background: #F1F5F9;
+    background: var(--scrollbar-track, #16170F);
   }
 
   ::-webkit-scrollbar-thumb {
-    background: #CBD5E1;
+    background: var(--scrollbar-thumb, #3A3E2A);
     border-radius: 3px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
-    background: #94A3B8;
+    background: var(--scrollbar-thumb-hover, #4A4F36);
   }
 }
 
@@ -198,11 +199,11 @@
     background: var(--bg-card);
   }
 
-  /* ── Light Theme Button ── */
+  /* ── Button（B3c：橄欖強調；舊琥珀/海軍藍亮底殘留已除役） ── */
   .v2-btn {
     @apply inline-flex items-center justify-center;
     @apply px-4 py-2;
-    background: rgba(217, 119, 6, 0.1);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
     border: 1px solid var(--accent);
     border-radius: var(--radius);
     color: var(--primary);
@@ -214,19 +215,19 @@
 
   .v2-btn:hover {
     background: var(--accent);
-    color: #FFFFFF;
+    color: var(--text-inverse, #16170F);
     box-shadow: var(--shadow-md);
   }
 
   .v2-btn--primary {
     border-color: var(--primary);
     color: var(--primary);
-    background: rgba(0, 31, 63, 0.05);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
   }
 
   .v2-btn--primary:hover {
     background: var(--primary);
-    color: #FFFFFF;
+    color: var(--text-inverse, #16170F);
     box-shadow: var(--shadow-md);
   }
 }

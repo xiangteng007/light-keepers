@@ -1,6 +1,6 @@
 /* ============================================
-   Toast Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Toast Component — B3c 野戰手冊（R5/T3）
+   Hairline 面板＋左側狀態閂；平面色、無漸層。
 ============================================ */
 
 /* ===== Toast Container ===== */
@@ -53,9 +53,10 @@
     align-items: flex-start;
     gap: var(--spacing-3);
     padding: var(--toast-padding);
-    background: var(--bg-card);
+    background: var(--surface-card, var(--bg-card));
+    border: 1px solid var(--border-default);
     border-radius: var(--toast-radius);
-    box-shadow: var(--shadow-xl);
+    box-shadow: var(--shadow-md);
     pointer-events: auto;
     position: relative;
     overflow: hidden;
@@ -92,34 +93,34 @@
     }
 }
 
-/* ===== Left Indicator Bar ===== */
+/* ===== Left Indicator Bar — 3px 狀態閂（平面色） ===== */
 .lk-toast__indicator {
     position: absolute;
     left: 0;
     top: 0;
     bottom: 0;
-    width: 4px;
-    border-radius: var(--radius-full) 0 0 var(--radius-full);
+    width: 3px;
 }
 
 .lk-toast--default .lk-toast__indicator {
-    background: var(--gradient-gold);
+    background: var(--accent-primary);
 }
 
 .lk-toast--success .lk-toast__indicator {
-    background: var(--gradient-success);
+    background: var(--color-success);
 }
 
 .lk-toast--warning .lk-toast__indicator {
-    background: var(--gradient-warning);
+    background: var(--color-warning);
 }
 
+/* 紅色憲法：danger toast 只准生命/安全語義；一般錯誤請用 warning */
 .lk-toast--danger .lk-toast__indicator {
-    background: var(--gradient-danger);
+    background: var(--color-danger);
 }
 
 .lk-toast--info .lk-toast__indicator {
-    background: var(--gradient-info);
+    background: var(--color-info);
 }
 
 /* ===== Icon ===== */
@@ -179,7 +180,7 @@
     left: 0;
     right: 0;
     height: 3px;
-    background: rgba(0, 0, 0, 0.05);
+    background: var(--border-light);
 }
 
 .lk-toast__progress::after {

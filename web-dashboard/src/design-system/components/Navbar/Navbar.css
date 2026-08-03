@@ -1,4 +1,4 @@
-/* Navbar Component Styles */
+/* Navbar Component — B3c 野戰手冊（R5/T3）：hairline 規線、平面色 */
 
 .lk-navbar {
     display: flex;
@@ -7,7 +7,7 @@
     height: var(--navbar-height);
     padding: var(--navbar-padding);
     background: var(--bg-secondary);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-default);
 }
 
 .lk-navbar__brand {
@@ -22,7 +22,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, var(--color-gold-400), var(--color-gold-600));
+    background: var(--accent-primary);
+    color: var(--text-inverse);
     border-radius: var(--radius-md);
     font-size: 20px;
 }
@@ -35,14 +36,16 @@
 .lk-navbar__title {
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-bold);
-    color: var(--accent-primary);
-    line-height: 1.2;
+    /* 金色紀律：標題非行動元素，不吃橄欖高亮 */
+    color: var(--text-primary);
+    line-height: var(--line-height-tight);
 }
 
 .lk-navbar__subtitle {
     font-size: var(--font-size-xs);
     color: var(--text-muted);
-    letter-spacing: 0.5px;
+    /* 中文字距 0；拉丁小標請由消費端加 .u-stencil（排印鐵律 §1） */
+    letter-spacing: var(--tracking-zh);
 }
 
 .lk-navbar__content {

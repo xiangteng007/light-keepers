@@ -1,4 +1,11 @@
-/* Tag Component Styles */
+/* ============================================
+   Tag (Chip) Component — B3c 野戰手冊（R5/T3）
+   c1 佇列樣式三級張力（同 Badge）：
+   ・實心＝高張力（danger／gold=橄欖實心）
+   ・彩色描邊＝中張力（success / warning / brown=卡其）
+   ・灰描邊＝低張力（default）
+   中文字距 0；全大寫拉丁請由消費端加 .u-stencil。
+============================================ */
 
 .lk-tag {
     display: inline-flex;
@@ -9,6 +16,8 @@
     font-weight: var(--font-weight-bold);
     border-radius: var(--tag-radius);
     text-transform: uppercase;
+    letter-spacing: var(--tracking-zh);
+    border: 1px solid transparent;
 }
 
 /* Sizes */
@@ -23,36 +32,47 @@
 }
 
 /* Colors */
+
+/* 低張力：灰描邊（狀態安靜律） */
 .lk-tag--default {
-    background: var(--bg-hover);
-    /* R4 a11y：--text-secondary 在 dark 主題的 --bg-hover 底色上只有 4.03:1
-       （9px 粗體不算 WCAG 大字，門檻仍是 4.5:1），見 A11Y_AUDIT_R4.md */
-    color: var(--text-primary);
+    background: transparent;
+    border-color: var(--border-default);
+    color: var(--text-secondary);
 }
 
+/* brown（沿用舊 API 名）— 卡其描邊：小標/單位語義 */
 .lk-tag--brown {
-    background: var(--color-brown-700);
-    color: var(--color-beige-200);
+    background: transparent;
+    border-color: var(--color-secondary);
+    color: var(--color-secondary);
 }
 
+/* gold（沿用舊 API 名）— 橄欖實心＋深字：作用中/選取 */
 .lk-tag--gold {
-    background: var(--color-gold-500);
-    color: var(--color-brown-900);
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: var(--text-inverse);
 }
 
+/* 中張力：彩色描邊＋極淡底 */
 .lk-tag--success {
-    background: var(--color-success);
-    color: white;
+    background: var(--color-safe-bg);
+    border-color: var(--color-success);
+    color: var(--color-success);
 }
 
 .lk-tag--warning {
-    background: var(--color-warning);
-    color: var(--color-brown-900);
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning);
+    color: var(--color-warning);
 }
 
+/* 高張力實心。紅色憲法（DESIGN_LANGUAGE v2 §D）：
+   只准生命/安全語義（SOS、BLACK 傷票、禁入、撤離）。 */
 .lk-tag--danger {
-    background: var(--color-danger);
-    color: white;
+    background: var(--color-danger-dark, var(--color-danger));
+    border-color: var(--color-danger);
+    color: var(--text-primary);
 }
 
 .lk-tag__remove {

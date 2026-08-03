@@ -1,6 +1,6 @@
 /* ============================================
-   Indicators Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Indicators Component — B3c 野戰手冊（R5/T3）
+   平面色、無漸層無光暈；讀數走 mono＋tabular-nums。
 ============================================ */
 
 /* ===== Progress Bar ===== */
@@ -26,6 +26,9 @@
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
+    /* 讀數不跳動（排印鐵律 §3） */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .lk-progress__track {
@@ -68,7 +71,7 @@
     bottom: 0;
     background: linear-gradient(90deg,
             transparent 0%,
-            rgba(255, 255, 255, 0.3) 50%,
+            var(--glass-border-light, rgba(237, 233, 218, 0.12)) 50%,
             transparent 100%);
     animation: progressShimmer 2s infinite;
 }
@@ -83,29 +86,27 @@
     }
 }
 
-/* Progress bar variants */
+/* Progress bar variants — 平面實色（無漸層/光暈） */
 .lk-progress__bar--default {
     background: var(--accent-primary);
 }
 
 .lk-progress__bar--gradient {
-    background: var(--gradient-gold);
-    box-shadow: var(--shadow-glow-sm);
+    /* 沿用舊 API 名；B3c 下＝橄欖實色 */
+    background: var(--accent-primary);
 }
 
 .lk-progress__bar--success {
-    background: var(--gradient-success);
-    box-shadow: var(--shadow-glow-success);
+    background: var(--color-success);
 }
 
 .lk-progress__bar--warning {
-    background: var(--gradient-warning);
-    box-shadow: var(--shadow-glow-warning);
+    background: var(--color-warning);
 }
 
+/* 紅色憲法：danger 只准生命/安全語義 */
 .lk-progress__bar--danger {
-    background: var(--gradient-danger);
-    box-shadow: var(--shadow-glow-danger);
+    background: var(--color-danger);
 }
 
 /* ===== Circular Progress ===== */
@@ -137,7 +138,8 @@
 }
 
 .lk-circular__bar--gradient {
-    stroke: url(#gradient-gold);
+    /* 沿用舊 API 名；B3c 下＝橄欖實色 */
+    stroke: var(--accent-primary);
 }
 
 .lk-circular__bar--success {
@@ -165,6 +167,9 @@
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     line-height: 1;
+    /* 讀數不跳動（排印鐵律 §3） */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .lk-circular__label {
@@ -172,7 +177,8 @@
     color: var(--text-muted);
     margin-top: var(--spacing-0-5);
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    /* 中文字距 0；拉丁小標請由消費端加 .u-stencil（排印鐵律 §1） */
+    letter-spacing: var(--tracking-zh);
 }
 
 /* ===== Stat Indicator ===== */
@@ -188,12 +194,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(196, 167, 125, 0.12);
-    border: 1.5px solid rgba(196, 167, 125, 0.25);
-    border-radius: var(--radius-lg);
+    background: var(--primary-light, var(--surface-raised));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     font-size: 22px;
-    color: var(--color-gold-600);
-    transition: all var(--duration-fast) var(--ease-smooth);
+    color: var(--text-accent, var(--accent-primary));
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-stat--sm .lk-stat__icon {
@@ -208,22 +214,23 @@
     font-size: 26px;
 }
 
-/* Variant icons */
+/* Variant icons — 狀態安靜律：淡底＋狀態色描邊 */
 .lk-stat--success .lk-stat__icon {
-    background: rgba(107, 142, 92, 0.12);
-    border-color: rgba(107, 142, 92, 0.25);
+    background: var(--color-safe-bg);
+    border-color: var(--color-success);
     color: var(--color-success);
 }
 
 .lk-stat--warning .lk-stat__icon {
-    background: rgba(201, 162, 86, 0.12);
-    border-color: rgba(201, 162, 86, 0.25);
+    background: var(--color-warning-bg);
+    border-color: var(--color-warning);
     color: var(--color-warning);
 }
 
+/* 紅色憲法：danger 只准生命/安全語義 */
 .lk-stat--danger .lk-stat__icon {
-    background: rgba(184, 92, 92, 0.12);
-    border-color: rgba(184, 92, 92, 0.25);
+    background: var(--color-danger-bg);
+    border-color: var(--color-danger);
     color: var(--color-danger);
 }
 
@@ -237,6 +244,9 @@
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     line-height: var(--line-height-tight);
+    /* 讀數不跳動（排印鐵律 §3） */
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
 }
 
 .lk-stat--sm .lk-stat__value {
@@ -266,12 +276,12 @@
 
 .lk-stat__trend--up {
     color: var(--color-success);
-    background: rgba(107, 142, 92, 0.1);
+    background: var(--color-safe-bg);
 }
 
 .lk-stat__trend--down {
     color: var(--color-danger);
-    background: rgba(184, 92, 92, 0.1);
+    background: var(--color-danger-bg);
 }
 
 .lk-stat__trend--neutral {

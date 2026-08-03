@@ -1,32 +1,43 @@
-/* Alert Component Styles */
+/* ============================================
+   Alert Component — B3c 野戰手冊（R5/T3）
+   Hairline 面板＋左側 3px 狀態閂（戰術工藝五律 §2）。
+   紅色憲法：danger 只准生命/安全語義；一般錯誤請用 warning。
 
-.lk-alert {
+   ⚠ 選擇器一律 .lk-alert.lk-alert：前朝 styles/tokens/components.css
+   宣告了同名 .lk-alert（四邊彩框），cascade 順序不定會覆蓋本檔的
+   3px 狀態閂；根治＝移除 globals.css 的該 @import（不在本批檔案集）。
+============================================ */
+
+.lk-alert.lk-alert {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-3);
     padding: var(--alert-padding);
     border-radius: var(--alert-radius);
-    border-left: var(--alert-border-width) solid;
+    background: var(--surface-card, var(--bg-card));
+    border: 1px solid var(--border-default);
+    /* 左側 3px 狀態閂（覆蓋 token 的 4px——五律規定 3px） */
+    border-left: 3px solid;
 }
 
 /* Variants */
-.lk-alert--info {
-    background: rgba(92, 123, 142, 0.1);
+.lk-alert.lk-alert--info {
+    background: var(--color-info-bg);
     border-left-color: var(--color-info);
 }
 
-.lk-alert--success {
-    background: rgba(107, 142, 92, 0.1);
+.lk-alert.lk-alert--success {
+    background: var(--color-safe-bg);
     border-left-color: var(--color-success);
 }
 
-.lk-alert--warning {
-    background: rgba(201, 162, 86, 0.1);
+.lk-alert.lk-alert--warning {
+    background: var(--color-warning-bg);
     border-left-color: var(--color-warning);
 }
 
-.lk-alert--danger {
-    background: rgba(184, 92, 92, 0.1);
+.lk-alert.lk-alert--danger {
+    background: var(--color-danger-bg);
     border-left-color: var(--color-danger);
 }
 
@@ -46,10 +57,10 @@
     color: var(--text-primary);
 }
 
-.lk-alert__message {
+.lk-alert .lk-alert__message {
     color: var(--text-secondary);
     font-size: var(--font-size-base);
-    line-height: 1.5;
+    line-height: var(--line-height-normal);
 }
 
 .lk-alert__close {
@@ -60,7 +71,7 @@
     padding: var(--spacing-1);
     font-size: 14px;
     opacity: 0.7;
-    transition: opacity 0.2s;
+    transition: opacity var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-alert__close:hover {

@@ -1,13 +1,15 @@
 /**
- * MobileBottomNav.css
- * 
- * Expert Council Navigation Design v3.0
- * Mobile bottom navigation bar styling
- * Using unified design tokens from tokens/index.css
+ * MobileBottomNav.css — R5/T3 B3c 野戰手冊化
+ *
+ * 行動端底部導航＋更多選單。
+ * - 底欄＝深面板＋頂規線；作用態＝橄欖細閂（inset 2px），不整塊填色
+ * - more-overlay／更多選單＝深面板化：2px 規線＋近直角＋標題列規線
+ * - SOS FAB 保留紅色（紅色憲法：生命安全）
+ * 顏色一律語義 token；平時/災時由 tokens.css Layer 8/9 自動換盤。
  */
 
 /* ==========================================
-   SOS Floating Action Button
+   SOS Floating Action Button（紅＝生命安全，合法）
    ========================================== */
 .mobile-fab-sos {
     display: none;
@@ -17,8 +19,8 @@
     width: 56px;
     height: 56px;
     border-radius: var(--radius-full);
-    background: linear-gradient(135deg, var(--color-danger) 0%, #dc2626 100%);
-    color: white;
+    background: var(--color-danger);
+    color: var(--text-inverse);
     box-shadow: 0 4px 20px var(--color-danger-bg);
     z-index: 110;
     align-items: center;
@@ -29,24 +31,24 @@
 }
 
 @keyframes pulse-sos {
-    0%, 100% { 
+    0%, 100% {
         box-shadow: 0 4px 20px var(--color-danger-bg);
         transform: scale(1);
     }
-    50% { 
-        box-shadow: 0 4px 30px rgba(220, 38, 38, 0.6);
+    50% {
+        box-shadow: 0 4px 30px var(--color-danger-bg);
         transform: scale(1.05);
     }
 }
 
 .mobile-fab-sos:hover,
 .mobile-fab-sos:active {
-    background: linear-gradient(135deg, #f87171 0%, var(--color-danger) 100%);
+    background: var(--color-danger-light);
     transform: scale(1.1);
 }
 
 /* ==========================================
-   Bottom Navigation Bar
+   Bottom Navigation Bar — 深面板＋頂規線
    ========================================== */
 .mobile-bottom-nav {
     display: none;
@@ -55,8 +57,9 @@
     right: 0;
     bottom: 0;
     height: var(--mobile-bottom-height, 72px);
-    background: var(--surface-card);
+    background: var(--surface-default);
     border-top: 1px solid var(--border-default);
+    box-shadow: 0 -4px 16px rgba(8, 10, 15, 0.35);
     z-index: 100;
     justify-content: space-around;
     align-items: center;
@@ -77,7 +80,7 @@
     font-size: var(--font-size-xs);
     font-weight: var(--font-weight-medium);
     padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-sm);
     transition: all var(--transition-fast);
     min-width: 56px;
     min-height: 48px; /* Touch target - minimum 44px per WCAG */
@@ -105,23 +108,25 @@
     transform: scale(0.95);
 }
 
+/* 作用態＝橄欖細閂（頂緣 inset 2px），不整塊填色（金色紀律） */
 .mobile-nav-item.active {
-    color: var(--color-brand-accent);
-    background: rgba(217, 119, 6, 0.1);
+    color: var(--accent-gold);
+    background: transparent;
+    box-shadow: inset 0 2px 0 var(--accent-gold);
 }
 
 .mobile-nav-item.active svg {
-    filter: drop-shadow(0 0 4px rgba(217, 119, 6, 0.4));
+    color: var(--accent-gold);
 }
 
 /* ==========================================
-   More Menu Overlay
+   More Menu Overlay — 深面板化（2px 規線＋近直角）
    ========================================== */
 .mobile-more-overlay {
     display: none;
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--v2-bg-dim, rgba(0, 0, 0, 0.45));
     -webkit-backdrop-filter: blur(4px);
     backdrop-filter: blur(4px);
     z-index: 105;
@@ -139,34 +144,35 @@
 .mobile-more-menu {
     width: calc(100% - var(--space-8));
     max-width: 400px;
-    background: var(--surface-card);
-    border: 1px solid var(--border-default);
-    border-radius: var(--radius-xl);
+    background: var(--surface-default);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-lg);
     overflow: hidden;
     animation: slideUp 200ms var(--ease-out);
     box-shadow: var(--shadow-lg);
 }
 
 @keyframes slideUp {
-    from { 
-        transform: translateY(20px); 
-        opacity: 0; 
+    from {
+        transform: translateY(20px);
+        opacity: 0;
     }
-    to { 
-        transform: translateY(0); 
-        opacity: 1; 
+    to {
+        transform: translateY(0);
+        opacity: 1;
     }
 }
 
+/* 標題列規線（2px） */
 .mobile-more-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: var(--space-4);
-    border-bottom: 1px solid var(--border-light);
+    border-bottom: 2px solid var(--border-default);
     font-size: var(--font-size-sm);
     font-weight: var(--font-weight-semibold);
-    color: var(--text-heading);
+    color: var(--text-primary);
 }
 
 .mobile-more-close {
@@ -179,13 +185,13 @@
     border: none;
     color: var(--text-secondary);
     cursor: pointer;
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xs);
     transition: all var(--transition-fast);
 }
 
 .mobile-more-close:hover {
     background: var(--surface-hover);
-    color: var(--text-heading);
+    color: var(--text-primary);
 }
 
 .mobile-more-items {
@@ -202,13 +208,13 @@
     color: var(--text-body);
     text-decoration: none;
     font-size: var(--font-size-sm);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-xs);
     transition: all var(--transition-fast);
 }
 
 .mobile-more-item:hover {
     background: var(--surface-hover);
-    color: var(--text-heading);
+    color: var(--text-primary);
 }
 
 .mobile-more-item:active {
@@ -216,13 +222,11 @@
     transform: scale(0.98);
 }
 
+/* 作用態＝橄欖細閂（左緣 inset 2px），不整塊填色 */
 .mobile-more-item.active {
-    background: rgba(217, 119, 6, 0.1);
-    color: var(--color-brand-accent);
-}
-
-.mobile-more-item.active svg {
-    filter: drop-shadow(0 0 4px rgba(217, 119, 6, 0.3));
+    background: transparent;
+    box-shadow: inset 2px 0 0 var(--accent-gold);
+    color: var(--accent-gold);
 }
 
 /* ==========================================
@@ -231,11 +235,6 @@
    ========================================== */
 .mobile-bottom-nav--emergency {
     border-top: 2px solid var(--color-warning);
-}
-
-.mobile-bottom-nav--emergency .mobile-nav-item.active {
-    color: var(--accent-primary, #C39B6F);
-    background: rgba(195, 155, 111, 0.16);
 }
 
 /* ==========================================
@@ -256,7 +255,7 @@
         min-width: 48px;
         font-size: 9px;
     }
-    
+
     .mobile-more-menu {
         width: calc(100% - var(--space-4));
     }
@@ -267,21 +266,8 @@
     .mobile-bottom-nav {
         padding-bottom: calc(env(safe-area-inset-bottom) + var(--space-2));
     }
-    
+
     .mobile-fab-sos {
         bottom: calc(var(--mobile-bottom-height, 72px) + env(safe-area-inset-bottom) + var(--space-4));
     }
 }
-
-/* ═══ R5/T1 戰術化：底部導航＝深面板＋金色作用態（不填整塊） ═══ */
-.mobile-bottom-nav {
-    background: var(--surface-default);
-    border-top: 1px solid var(--border-default);
-    box-shadow: 0 -4px 16px rgba(8, 10, 15, 0.35);
-}
-.mobile-nav-item.active {
-    color: var(--accent-gold);
-    background: transparent;
-    box-shadow: inset 0 2px 0 var(--accent-gold);
-}
-.mobile-nav-item.active svg { color: var(--accent-gold); }

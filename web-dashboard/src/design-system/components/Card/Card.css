@@ -1,13 +1,21 @@
 /* ============================================
-   Card Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Card Component — B3c 野戰手冊（R5/T3）
+   Hairline 分層：一般卡 1px 規線、重要卡 2px；
+   印刷平面性——不用浮起大陰影、不用位移動效。
+
+   ⚠ 選擇器一律 .lk-card.lk-card／.lk-card .lk-card__part：
+   前朝 styles/tokens/components.css（經 globals.css 載入）宣告了
+   同名 .lk-card 家族（含 __header/__body/__footer 的 padding 與底色），
+   cascade 順序不定會互相覆蓋；提高特異性＋顯式歸零以固定本檔語義。
+   根治＝移除該 @import（globals.css 不在本批檔案集內）。
 ============================================ */
 
-.lk-card {
-    background: var(--bg-card);
-    border-radius: var(--card-radius);
-    border: var(--card-border);
-    transition: all var(--duration-normal) var(--ease-smooth);
+.lk-card.lk-card {
+    background: var(--surface-card, var(--bg-card));
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth);
     position: relative;
 }
 
@@ -30,125 +38,92 @@
 
 /* ===== Variants ===== */
 
-/* Default */
-.lk-card--default {
-    background: var(--bg-card);
-    box-shadow: var(--shadow-xs);
-}
-
-/* Elevated */
-.lk-card--elevated {
-    background: var(--bg-card);
-    box-shadow: var(--shadow-md);
-    border: none;
-}
-
-.lk-card--elevated:hover {
-    transform: translateY(-6px);
-    box-shadow: var(--shadow-xl), var(--shadow-glow-sm);
-}
-
-/* Outlined */
-.lk-card--outlined {
-    background: transparent;
-    border: 2px solid var(--border-color);
+/* Default — 1px hairline，無陰影 */
+.lk-card.lk-card--default {
+    background: var(--surface-card, var(--bg-card));
     box-shadow: none;
 }
 
-.lk-card--outlined:hover {
-    border-color: var(--accent-primary);
+/* Elevated — 「重要卡」：2px 規線＋略亮面板（取代浮起陰影） */
+.lk-card.lk-card--elevated {
+    background: var(--surface-raised, var(--bg-tertiary));
+    border: 2px solid var(--border-dark);
+    box-shadow: var(--shadow-xs);
 }
 
-/* Glass - 玻璃態 */
-.lk-card--glass {
+/* Outlined — 2px 描邊、透明底 */
+.lk-card.lk-card--outlined {
+    background: transparent;
+    border: 2px solid var(--border-default);
+    box-shadow: none;
+}
+
+.lk-card.lk-card--outlined:hover {
+    border-color: var(--border-dark);
+}
+
+/* Glass — 僅供地圖/影像疊層使用 */
+.lk-card.lk-card--glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur-sm));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm));
     border: 1px solid var(--glass-border);
-    box-shadow: var(--shadow-md);
+    box-shadow: none;
 }
 
-.lk-card--glass:hover {
-    background: var(--glass-bg-light);
-    box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
+/* Gradient（沿用舊 API 名）— 重點卡：頂緣 2px 橄欖規線，無漸層 */
+.lk-card.lk-card--gradient {
+    background: var(--surface-card, var(--bg-card));
+    border: 1px solid var(--border-default);
+    border-top: 2px solid var(--border-accent);
+    box-shadow: none;
 }
 
-/* Gradient - 漸變邊框 */
-.lk-card--gradient {
-    background: var(--bg-card);
-    border: none;
-    position: relative;
-    box-shadow: var(--shadow-sm);
-}
-
-.lk-card--gradient::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    padding: 1.5px;
-    background: var(--gradient-gold);
-    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    mask-composite: xor;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    pointer-events: none;
-    opacity: 0.6;
-    transition: opacity var(--duration-fast) var(--ease-smooth);
-}
-
-.lk-card--gradient:hover::before {
-    opacity: 1;
-}
-
-.lk-card--gradient:hover {
-    box-shadow: var(--shadow-lg), var(--shadow-glow-sm);
-}
-
-/* Interactive - 可互動 */
-.lk-card--interactive {
-    background: var(--bg-card);
-    box-shadow: var(--shadow-sm);
+/* Interactive — 可互動：hover 換面色，不位移 */
+.lk-card.lk-card--interactive {
     cursor: pointer;
 }
 
-.lk-card--interactive:hover {
-    transform: translateY(-4px) scale(1.01);
-    box-shadow: var(--shadow-xl), var(--shadow-glow);
-    border-color: var(--accent-primary);
+.lk-card.lk-card--interactive:hover {
+    background: var(--surface-hover, var(--bg-hover));
+    border-color: var(--border-dark);
 }
 
-.lk-card--interactive:active {
-    transform: translateY(-2px) scale(0.99);
-    box-shadow: var(--shadow-md);
+.lk-card.lk-card--interactive:active {
+    background: var(--surface-pressed, var(--bg-active));
 }
 
 /* ===== Hoverable Modifier ===== */
-.lk-card--hoverable {
+.lk-card.lk-card--hoverable {
     cursor: pointer;
 }
 
-.lk-card--hoverable:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lg);
+.lk-card.lk-card--hoverable:hover {
+    background: var(--surface-hover, var(--bg-hover));
+    border-color: var(--border-dark);
 }
 
 /* ===== Clickable Modifier ===== */
-.lk-card--clickable {
+.lk-card.lk-card--clickable {
     cursor: pointer;
 }
 
-.lk-card--clickable:focus {
+.lk-card.lk-card--clickable:focus {
     outline: none;
-    box-shadow: 0 0 0 2px var(--bg-primary), 0 0 0 4px var(--accent-primary);
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
 }
 
 /* ===== Header ===== */
-.lk-card__header {
+.lk-card .lk-card__header {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-3);
     margin-bottom: var(--spacing-5);
+    /* 歸零前朝 __header 的 padding／底色／分隔線 */
+    padding: 0;
+    background: transparent;
+    border-bottom: none;
 }
 
 .lk-card__icon {
@@ -157,19 +132,12 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(196, 167, 125, 0.12);
-    border: 1.5px solid rgba(196, 167, 125, 0.25);
-    border-radius: var(--radius-lg);
+    background: var(--primary-light, var(--surface-raised));
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-md);
     font-size: 22px;
     flex-shrink: 0;
-    color: var(--color-gold-600);
-    transition: all var(--duration-normal) var(--ease-smooth);
-}
-
-.lk-card:hover .lk-card__icon {
-    background: rgba(196, 167, 125, 0.18);
-    border-color: rgba(196, 167, 125, 0.4);
-    transform: scale(1.05);
+    color: var(--text-accent, var(--accent-primary));
 }
 
 .lk-card__header-text {
@@ -177,7 +145,8 @@
     min-width: 0;
 }
 
-.lk-card__title {
+.lk-card .lk-card__title {
+    font-family: inherit;
     font-size: var(--font-size-lg);
     font-weight: var(--font-weight-semibold);
     color: var(--text-primary);
@@ -187,21 +156,25 @@
 
 .lk-card__subtitle {
     font-size: var(--font-size-sm);
-    color: var(--text-muted);
+    color: var(--text-secondary);
     margin: var(--spacing-1) 0 0;
     line-height: var(--line-height-normal);
 }
 
 /* ===== Body ===== */
-.lk-card__body {
+.lk-card .lk-card__body {
     color: var(--text-primary);
     position: relative;
     z-index: 1;
+    /* 內距由卡片根節點的 padding-* class 統一供給；歸零前朝 __body padding */
+    padding: 0;
 }
 
 /* ===== Footer ===== */
-.lk-card__footer {
+.lk-card .lk-card__footer {
     margin-top: var(--spacing-5);
-    padding-top: var(--spacing-4);
-    border-top: 1px solid var(--border-color);
+    /* 只留頂部內距＋歸零前朝 __footer 的四邊 padding／底色 */
+    padding: var(--spacing-4) 0 0;
+    background: transparent;
+    border-top: 1px solid var(--border-default);
 }

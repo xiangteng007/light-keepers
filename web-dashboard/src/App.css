@@ -1,11 +1,30 @@
-﻿/* ============================================
-   Light Keepers 鏇︽湜鐕堝 Design System
-   棰ㄦ牸: Senteng Design System 瀹屾暣绉绘
-============================================ */
+/* ============================================================
+   App.css — 前朝「Senteng Style」版型殘存規則（R5/T3 考古清掃後）
+   ------------------------------------------------------------
+   2026-08-03 R5/T3：對 3,292 行原檔做系統性考古——列出全部頂層 class
+   選擇器，逐一 grep src/**（tsx/ts）確認真實 className 使用者：
+   - 無使用者的規則整塊刪除（含 media query 分身），刪除內容可從
+     git history（本 commit 前一版）取回。
+   - 有使用者的保留，區塊頂註記「仍被 X 使用」。
+   - 撞名通用 class 清查結果：
+     .layout / .logo / .main-content / .nav / .nav-item / .header / .card
+     → 零 className 使用者（main-content 僅作為 id 存在，不匹配 class
+       選擇器），全刪。
+     .sidebar → 唯一同名 tsx 是新 shell AppSidebar.tsx（樣式由
+       AppShellLayout.css 主導）；App.css 這條正是「左側 25px 空白條」
+       事故（commit f457144）的污染根因，於此連同全部 media query
+       分身移除。
+   ============================================================ */
 
+/* ------------------------------------------------------------
+   前朝 Senteng 變數層。styles/tokens.css 較晚載入，同名變數
+   （--text-primary/--bg-* 等）以 tokens 為準；但本檔與其他舊頁
+   仍引用此處獨有的 --accent-primary/--gold-*/--slate-*/--shadow-*
+   等定義，非 class 選擇器、不在本批清掃範圍，整塊保留。
+   ------------------------------------------------------------ */
 :root {
-  /* ===== Senteng 鏍稿績鑹?===== */
-  /* Slate 娣辫壊绯?*/
+  /* ===== Senteng 核心色 ===== */
+  /* Slate 深色系 */
   --slate-900: #0f172a;
   --slate-800: #1e293b;
   --slate-700: #334155;
@@ -17,18 +36,18 @@
   --slate-100: #f1f5f9;
   --slate-50: #f8fafc;
 
-  /* 涓昏壊 - Emerald */
+  /* 主色 - Emerald */
   --primary-500: #10b981;
   --primary-600: #059669;
   --primary-700: #047857;
 
-  /* ===== 鍔熻兘鑹?===== */
+  /* ===== 功能色 ===== */
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
   --info: #3b82f6;
 
-  /* ===== Senteng 涓婚 ===== */
+  /* ===== Senteng 主題 ===== */
   --bg-primary: #ffffff;
   --bg-secondary: #f8fafc;
   --bg-card: #ffffff;
@@ -42,7 +61,6 @@
   --border-color: #e2e8f0;
   --border-light: #f1f5f9;
 
-  /* 灏庤閬镐腑鐙€鎱?- Senteng 娣辫棈鐏?*/
   --nav-active-bg: #334155;
   --nav-active-text: #ffffff;
   --nav-hover-bg: #f1f5f9;
@@ -52,12 +70,12 @@
   --accent-active-bg: #334155;
   --accent-active-text: #ffffff;
 
-  /* ===== 闄板奖 ===== */
+  /* ===== 陰影 ===== */
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 
-  /* 鐩稿鑸婅畩鏁?*/
+  /* 相容別名 */
   --brown-900: #1e293b;
   --brown-800: #334155;
   --gold-400: #10b981;
@@ -75,13 +93,8 @@
   --color-info: #3b82f6;
 }
 
-/* 涓婚宸茬当涓€浣跨敤 Senteng Design System */
-/* 瑭宠 senteng-theme.css */
-
-/* ============================================
-   鍩虹妯ｅ紡
-============================================ */
-
+/* 全域 reset／body 基準：非 class 選擇器，不在本批清掃範圍。
+   globals.css / theme.css 較晚載入，同屬性以其為準。 */
 * {
   margin: 0;
   padding: 0;
@@ -97,278 +110,10 @@ body {
 }
 
 /* ============================================
-   Layout 浣堝眬 - Senteng Clean Design
-============================================ */
-
-.layout {
-  display: flex;
-  min-height: 100vh;
-  background: var(--bg-secondary, #F9FAFB);
-}
-
-/* ===== Senteng Style Sidebar ===== */
-.sidebar {
-  width: var(--sidebar-w-collapsed, 24px);
-  background: var(--bg-sidebar);
-  padding: 16px 12px;
-  display: flex;
-  flex-direction: column;
-  border-right: 1px solid var(--border-color);
-  position: relative;
-  z-index: 200;
-}
-
-/* ===== Logo - Senteng Style ===== */
-.logo {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 12px 24px;
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 16px;
-}
-
-.logo-icon {
-  width: 40px;
-  height: 40px;
-  background: transparent;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.logo-image {
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 4px;
-}
-
-.logo h1 {
-  font-size: 16px;
-  font-weight: 700;
-  color: var(--text-primary);
-  letter-spacing: -0.02em;
-}
-
-.logo-subtitle {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 2px;
-}
-
-/* ===== Navigation - Senteng Style ===== */
-.nav {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.nav-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px 12px;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  text-decoration: none;
-  transition: all 0.15s ease;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.nav-item:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.nav-item.active {
-  background: var(--nav-active-bg, #334155);
-  color: var(--nav-active-text, #ffffff);
-  font-weight: 600;
-}
-
-.nav-icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-}
-
-.nav-label {
-  font-size: 14px;
-}
-
-/* ===== Navigation Groups - 鍒嗙祫灏庤埅 ===== */
-.nav-group {
-  margin-bottom: 4px;
-}
-
-.nav-group__header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-  padding: 10px 12px;
-  background: transparent;
-  border: none;
-  border-radius: 8px;
-  color: var(--text-secondary);
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  transition: all 0.15s ease;
-}
-
-.nav-group__header:hover {
-  background: var(--bg-hover);
-  color: var(--text-primary);
-}
-
-.nav-group.has-active>.nav-group__header {
-  color: var(--accent-primary);
-}
-
-.nav-group__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  flex-shrink: 0;
-  opacity: 0.7;
-}
-
-.nav-group__label {
-  flex: 1;
-  text-align: left;
-}
-
-.nav-group__arrow {
-  display: flex;
-  align-items: center;
-  opacity: 0.5;
-  transition: transform 0.2s ease;
-}
-
-.nav-group.open .nav-group__arrow {
-  transform: rotate(0deg);
-}
-
-.nav-group__items {
-  margin-left: 12px;
-  padding-left: 12px;
-  border-left: 1px solid var(--border-color);
-  margin-top: 4px;
-  margin-bottom: 8px;
-}
-
-.nav-group__items .nav-item {
-  padding: 8px 12px;
-  font-size: 13px;
-  margin-bottom: 2px;
-}
-
-.nav-group__items .nav-item__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 16px;
-  height: 16px;
-  flex-shrink: 0;
-  margin-right: 10px;
-}
-
-.nav-group__items .nav-item__label {
-  font-size: 13px;
-}
-
-/* Sidebar Reminder */
-.sidebar-reminder {
-  padding: 12px;
-  margin: 8px 0;
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(245, 158, 11, 0.05) 100%);
-  border-radius: 8px;
-  border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.sidebar-reminder__link {
-  color: var(--warning);
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 500;
-  display: block;
-}
-
-.sidebar-reminder__link:hover {
-  text-decoration: underline;
-}
-
-/* ===== Sidebar Footer ===== */
-.sidebar-footer {
-  padding: 16px 12px;
-  text-align: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  border-top: 1px solid var(--border-color);
-  margin-top: 16px;
-}
-
-/* ===== Main Content ===== */
-.main-content {
-  flex: 1;
-  padding: 24px;
-  overflow-y: auto;
-  background: var(--bg-primary);
-}
-
-
-/* ===== Sidebar Footer ===== */
-.sidebar-footer {
-  padding: var(--spacing-4) var(--spacing-3);
-  text-align: center;
-  color: var(--text-muted);
-  font-size: var(--font-size-xs);
-  border-top: 1px solid var(--border-color, #e2e8f0);
-  margin-top: var(--spacing-4);
-  letter-spacing: var(--letter-spacing-wide);
-}
-
-/* ===== Main Content ===== */
-.main-content {
-  flex: 1;
-  padding: var(--spacing-8);
-  overflow-y: auto;
-  background: var(--gradient-warm);
-  position: relative;
-}
-
-/* Subtle pattern for main content */
-.main-content::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 50%;
-  height: 50%;
-  background: radial-gradient(circle at 100% 0%, rgba(196, 167, 125, 0.03) 0%, transparent 50%);
-  pointer-events: none;
-  z-index: 0;
-}
-
-/* ============================================
    Page Header
 ============================================ */
 
+/* 仍被 ReportPage/ResourcesPage/VolunteersPage/TrainingPage 使用（className="page x-page"） */
 .page h2 {
   font-size: 28px;
   margin-bottom: 24px;
@@ -376,6 +121,8 @@ body {
   font-weight: 700;
 }
 
+/* 仍被 20+ 頁使用（EventsPage/ActivitiesPage/ApprovalCenterPage/BackupPage…）；
+   後方「VI Design System」段有同名加強版（加 gap），兩塊並存維持原疊加行為 */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -384,9 +131,10 @@ body {
 }
 
 /* ============================================
-   Stats Cards 绲辫▓鍗＄墖
+   Stats Cards 統計卡片
 ============================================ */
 
+/* 仍被 DonationsPage/ReportsExportPage 使用 */
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -394,6 +142,8 @@ body {
   margin-bottom: 32px;
 }
 
+/* 仍被 DonationsPage/ReportsAdminPage/ResourcesPage/resources 各 Tab 使用；
+   後方 Volunteers 段有同名補充（text-align），兩塊並存維持原疊加行為 */
 .stat-card {
   background: var(--bg-card);
   padding: 24px;
@@ -410,22 +160,7 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-.stat-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
-}
-
-.stat-content {
-  display: flex;
-  flex-direction: column;
-}
-
+/* 仍被 c2/IncidentsPage/ReportsExportPage/resources 各 Tab 使用 */
 .stat-value {
   font-size: 32px;
   font-weight: 700;
@@ -433,6 +168,7 @@ body {
   line-height: 1.2;
 }
 
+/* 仍被 c2/IncidentsPage/ReportsExportPage/resources 各 Tab 使用 */
 .stat-label {
   color: var(--text-secondary);
   font-size: 14px;
@@ -440,179 +176,17 @@ body {
 }
 
 /* ============================================
-   Dashboard Sections
+   Filter Bar 篩選列
 ============================================ */
 
-.dashboard-sections {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 24px;
-}
-
-.recent-events,
-.map-preview {
-  background: var(--bg-card);
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid var(--border-color);
-}
-
-.recent-events h3,
-.map-preview h3 {
-  font-size: 16px;
-  margin-bottom: 16px;
-  color: var(--text-secondary);
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.event-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.event-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px;
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  transition: background 0.2s ease;
-}
-
-.event-item:hover {
-  background: var(--bg-hover);
-}
-
-.event-item.priority-high {
-  border-left: 3px solid var(--danger);
-}
-
-.event-item.priority-medium {
-  border-left: 3px solid var(--warning);
-}
-
-.event-item.priority-low {
-  border-left: 3px solid var(--success);
-}
-
-.event-category {
-  background: var(--accent-primary);
-  color: var(--brown-900);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.event-title {
-  flex: 1;
-  font-weight: 500;
-}
-
-.event-time {
-  color: var(--text-muted);
-  font-size: 12px;
-}
-
-.map-placeholder {
-  height: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: var(--bg-secondary);
-  border-radius: 12px;
-  color: var(--text-muted);
-  border: 2px dashed var(--border-color);
-  gap: 8px;
-}
-
-.map-placeholder span {
-  font-size: 36px;
-  margin-bottom: 4px;
-}
-
-.map-placeholder p {
-  font-size: 13px;
-  color: var(--text-secondary);
-  margin: 0;
-}
-
-/* ============================================
-   Buttons 鎸夐垥
-============================================ */
-
-.btn-primary {
-  background: linear-gradient(135deg, var(--gold-400), var(--gold-600));
-  color: var(--brown-900);
-  border: none;
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 14px;
-}
-
-.btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn-primary:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn-secondary {
-  background: transparent;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-  padding: 12px 24px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-secondary:hover {
-  background: var(--bg-hover);
-  border-color: var(--border-light);
-}
-
-.btn-small {
-  background: transparent;
-  color: var(--accent-primary);
-  border: 1px solid var(--accent-primary);
-  padding: 6px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.btn-small:hover {
-  background: var(--accent-primary);
-  color: var(--brown-900);
-}
-
-/* ============================================
-   Filter Bar 绡╅伕娆?
-============================================ */
-
+/* 仍被 EquipmentPage/EventsPage 使用 */
 .filter-bar {
   display: flex;
   gap: 12px;
   margin-bottom: 24px;
 }
 
+/* 仍被 EventsPage/ReportsAdminPage 使用 */
 .filter-select,
 .filter-search {
   background: var(--bg-card);
@@ -634,9 +208,10 @@ body {
 }
 
 /* ============================================
-   Table 琛ㄦ牸
+   Table 表格
 ============================================ */
 
+/* 仍被 EventsPage 使用 */
 .events-table {
   background: var(--bg-card);
   border-radius: 16px;
@@ -669,10 +244,13 @@ body {
   background: var(--bg-hover);
 }
 
+/* 仍被 SpectrumViewer.tsx 使用（`severity ${anomaly.severity}` 撞名沿用）；
+   注意：SpectrumViewer 本身零 import（孤兒元件候選），該元件圈掉後此規則可同刪 */
 .severity {
   color: var(--warning);
 }
 
+/* 仍被 EventsPage 使用 */
 .category-tag {
   background: rgba(196, 167, 125, 0.2);
   color: var(--accent-primary);
@@ -682,33 +260,18 @@ body {
   font-weight: 500;
 }
 
-.status {
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-active {
-  background: rgba(184, 92, 92, 0.2);
-  color: var(--danger);
-}
-
-.status-resolved {
-  background: rgba(107, 142, 92, 0.2);
-  color: var(--success);
-}
-
 /* ============================================
-   Task Board 浠诲嫏鐪嬫澘
+   Task Board 任務看板
 ============================================ */
 
+/* 仍被 TasksPage 使用 */
 .task-board {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 24px;
 }
 
+/* 仍被 TasksPage 使用 */
 .task-column {
   background: var(--bg-card);
   border-radius: 16px;
@@ -716,39 +279,7 @@ body {
   border: 1px solid var(--border-color);
 }
 
-.column-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  border-radius: 8px;
-  margin-bottom: 16px;
-  font-weight: 600;
-}
-
-.column-header.pending {
-  background: rgba(201, 162, 86, 0.2);
-  color: var(--warning);
-}
-
-.column-header.in-progress,
-.column-header.in_progress {
-  background: rgba(196, 167, 125, 0.2);
-  color: var(--accent-primary);
-}
-
-.column-header.completed {
-  background: rgba(107, 142, 92, 0.2);
-  color: var(--success);
-}
-
-.column-header .count {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-}
-
+/* 仍被 DashboardWidgets.tsx（TaskListWidget）使用 */
 .task-list {
   display: flex;
   flex-direction: column;
@@ -756,6 +287,7 @@ body {
   min-height: 100px;
 }
 
+/* 仍被 task-dispatch/TaskCard.tsx 與 TasksPage 使用 */
 .task-card {
   background: var(--bg-secondary);
   padding: 16px;
@@ -771,43 +303,25 @@ body {
   border-color: var(--accent-primary);
 }
 
-.task-card.completed {
-  opacity: 0.6;
-}
-
-.task-priority {
-  display: inline-block;
-  background: var(--danger);
-  color: white;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 10px;
-  font-weight: 700;
-  margin-bottom: 8px;
-}
-
+/* 仍被 task-dispatch/TaskCard.tsx 與 DashboardWidgets.tsx 使用 */
 .task-title {
   font-weight: 500;
   margin-bottom: 8px;
   color: var(--text-primary);
 }
 
-.task-desc {
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-bottom: 12px;
-  line-height: 1.4;
-}
-
+/* 仍被 DashboardWidgets.tsx 使用 */
 .task-assignee {
   color: var(--text-muted);
   font-size: 12px;
 }
 
 /* ============================================
-   Modal 褰堢獥
+   Modal 彈窗
 ============================================ */
 
+/* 仍被 ui/Modal/Modal.tsx 與 resources 各 Tab/ResourcesPage/VolunteersPage 使用；
+   後方 Volunteers 段有同名覆寫（背景色），兩塊並存維持原疊加行為 */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -822,6 +336,7 @@ body {
   backdrop-filter: blur(4px);
 }
 
+/* 仍被 ui/Modal/Modal.tsx 使用（組字串 'modal' + 'modal--size'） */
 .modal {
   background: var(--bg-card);
   padding: 32px;
@@ -832,12 +347,7 @@ body {
   box-shadow: var(--shadow-lg);
 }
 
-.modal h3 {
-  margin-bottom: 24px;
-  font-size: 20px;
-  color: var(--text-primary);
-}
-
+/* 仍被 ActivitiesPage/BackupPage/CommunityPage 等 50+ 處使用 */
 .form-group {
   margin-bottom: 20px;
 }
@@ -875,6 +385,8 @@ body {
   resize: vertical;
 }
 
+/* 仍被 TaskModal/ApprovalCenterPage/BackupPage 等 19 處使用；
+   後方 Volunteers 段有同名精簡版，兩塊並存維持原疊加行為 */
 .modal-actions {
   display: flex;
   gap: 12px;
@@ -883,9 +395,10 @@ body {
 }
 
 /* ============================================
-   Empty State 绌虹媭鎱?
+   Empty State 空狀態
 ============================================ */
 
+/* 仍被 shared/EmptyState.tsx/MapSidebar/MissionCommandPage/resources 各 Tab 使用 */
 .empty-state {
   text-align: center;
   padding: 40px 20px;
@@ -900,14 +413,7 @@ body {
   margin-bottom: 12px;
 }
 
-.empty-column {
-  text-align: center;
-  padding: 24px;
-  color: var(--text-muted);
-  font-size: 14px;
-}
-
-/* Loading */
+/* 仍被 field-reports/ReportsPanel/map/MapSidebar/LowStockWidget 使用 */
 .loading {
   display: flex;
   align-items: center;
@@ -917,28 +423,13 @@ body {
 }
 
 /* ============================================
-   Responsive 闊挎噳寮?
+   Responsive 響應式
 ============================================ */
 
 @media (max-width: 1024px) {
-  .dashboard-sections {
-    grid-template-columns: 1fr;
-  }
-
+  /* 仍被 TasksPage 使用 */
   .task-board {
     grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  /* 鎵嬫鐗堝伌閭婃瑒 - Senteng 棰ㄦ牸瑷▓ */
-  /* 鍋撮倞娆勭敱 hamburger menu 鎺у埗锛屽睍闁嬫檪椤ず瀹屾暣鏂囧瓧 */
-
-  /* 鍋撮倞娆勯毐钘忔檪鐨勭媭鎱嬬敱 hamburger menu CSS 鎺у埗 */
-  /* 姝ゅ崁濉婁笉鍐嶉毐钘?nav-label锛岃畵鍋撮倞娆勫睍闁嬫檪椤ず瀹屾暣灏庤 */
-
-  .main-content {
-    padding: 16px;
   }
 }
 
@@ -946,7 +437,7 @@ body {
    VI Design System - Additional Styles
 ============================================ */
 
-/* Page Header Enhanced */
+/* Page Header Enhanced — 仍被 20+ 頁使用（同名基礎版見前段） */
 .page-header {
   display: flex;
   justify-content: space-between;
@@ -955,6 +446,7 @@ body {
   gap: 16px;
 }
 
+/* 仍被 AnalyticsPage/BackupPage/DonationsPage/EventsPage 等 18 處使用 */
 .page-header__left {
   display: flex;
   align-items: center;
@@ -965,201 +457,11 @@ body {
   margin: 0;
 }
 
-/* Stat Card VI Style */
-.stat-card-vi {
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.stat-card-vi:hover {
-  transform: translateY(-4px);
-}
-
-.stat-card-vi__content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.stat-card-vi__icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 26px;
-  background: rgba(196, 167, 125, 0.12);
-  border: 1.5px solid rgba(196, 167, 125, 0.25);
-  color: var(--color-gold-600);
-  flex-shrink: 0;
-  transition: all 0.2s ease;
-}
-
-.stat-card-vi:hover .stat-card-vi__icon {
-  background: rgba(196, 167, 125, 0.18);
-  border-color: rgba(196, 167, 125, 0.4);
-  transform: scale(1.05);
-}
-
-.stat-card-vi__data {
-  display: flex;
-  flex-direction: column;
-}
-
-.stat-card-vi__value {
-  font-size: 32px;
-  font-weight: 700;
-  line-height: 1.2;
-}
-
-.stat-card-vi__value--default {
-  color: var(--accent-primary);
-}
-
-.stat-card-vi__value--success {
-  color: var(--color-success);
-}
-
-.stat-card-vi__value--warning {
-  color: var(--color-warning);
-}
-
-.stat-card-vi__value--danger {
-  color: var(--color-danger);
-}
-
-.stat-card-vi__label {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-top: 4px;
-}
-
-/* Task Card VI Style */
-.task-card-vi {
-  transition: all 0.2s ease;
-  cursor: pointer;
-}
-
-.task-card-vi:hover {
-  transform: translateY(-2px);
-  border-color: var(--accent-primary);
-}
-
-.task-card-vi--completed {
-  opacity: 0.6;
-}
-
-.task-card-vi__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.task-card-vi__toggle {
-  cursor: pointer;
-  padding: 4px 0;
-}
-
-.task-card-vi__header-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 0;
-}
-
-.task-card-vi__header-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.task-card-vi__title-inline {
-  font-weight: 500;
-  color: var(--text-primary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 13px;
-}
-
-.task-card-vi__chevron {
-  font-size: 10px;
-  color: var(--text-muted);
-  transition: transform 0.2s ease;
-}
-
-.task-delete-btn {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 2px 6px;
-  font-size: 14px;
-  opacity: 0.6;
-  transition: all 0.2s ease;
-}
-
-.task-delete-btn:hover {
-  color: #F44336;
-  opacity: 1;
-}
-
-.task-card-vi__content {
-  padding-top: 12px;
-  border-top: 1px solid var(--border);
-  margin-top: 8px;
-}
-
-.task-card-vi__title {
-  font-weight: 500;
-  margin-bottom: 8px;
-  color: var(--text-primary);
-}
-
-.task-card-vi__desc {
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-bottom: 12px;
-  line-height: 1.4;
-  white-space: pre-wrap;
-}
-
-.task-card-vi__due {
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-bottom: 12px;
-}
-
-/* Dashboard Alert */
-.dashboard-alert {
-  margin-bottom: 24px;
-}
-
-/* Column Header Enhanced */
-.column-header.pending {
-  background: rgba(201, 162, 86, 0.2);
-  color: var(--color-warning);
-}
-
-.column-header.in-progress {
-  background: rgba(92, 123, 142, 0.2);
-  color: var(--color-info);
-}
-
-.column-header.completed {
-  background: rgba(107, 142, 92, 0.2);
-  color: var(--color-success);
-}
-
-
-/* Map/Geo styles  see styles/map-page.css */
-/* NCDR styles  see styles/ncdr-page.css */
-
 /* ============================================
-   PWA Update Prompt 鏇存柊鎻愮ず
+   PWA Update Prompt 更新提示
 ============================================ */
 
+/* 仍被 App.tsx 使用（整段：pwa-update-prompt 家族＋slideInUp/spin keyframes） */
 .pwa-update-prompt {
   position: fixed;
   bottom: 24px;
@@ -1241,7 +543,7 @@ body {
   background: var(--bg-hover);
 }
 
-/* RWD - 灏忚灑骞?PWA 鎻愮ず */
+/* RWD - 小螢幕 PWA 提示 */
 @media (max-width: 480px) {
   .pwa-update-prompt {
     left: 16px;
@@ -1262,21 +564,21 @@ body {
 }
 
 
-/* Manuals styles  see styles/manuals-page.css */
+/* Map/Geo styles — see styles/map-page.css */
+/* NCDR styles — see styles/ncdr-page.css */
+/* Manuals styles — see styles/manuals-page.css */
 
 /* ============================================
-   Report Page 鐏芥儏鍥炲牨闋侀潰
+   Report Page 災情回報頁面
 ============================================ */
 
+/* 仍被 ReportPage 使用 */
 .report-page {
   max-width: 700px;
   margin: 0 auto;
 }
 
-.report-form {
-  margin-bottom: 24px;
-}
-
+/* 仍被 ReportPage 使用 */
 .report-error {
   background: rgba(244, 67, 54, 0.1);
   border: 1px solid rgba(244, 67, 54, 0.3);
@@ -1287,10 +589,12 @@ body {
   font-weight: 500;
 }
 
+/* 仍被 TaskModal/ReportPage/ProfilePage 等 60 處使用 */
 .form-section {
   margin-bottom: 24px;
 }
 
+/* 仍被 TaskModal/ReportPage 等 47 處使用 */
 .form-label {
   display: block;
   font-weight: 600;
@@ -1299,6 +603,7 @@ body {
   font-size: 14px;
 }
 
+/* 仍被 TaskModal/ProfilePage/ReportPage 等 32+ 處使用 */
 .form-input,
 .form-textarea {
   width: 100%;
@@ -1323,52 +628,15 @@ body {
   min-height: 120px;
 }
 
-/* Disaster Type Grid */
+/* Disaster Type Grid — 仍被 ReportPage 使用
+   （內部按鈕已改用 .disaster-type-card 系列，樣式在別檔；舊 .disaster-type-btn 家族已刪） */
 .disaster-type-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 
-.disaster-type-btn {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 16px 8px;
-  border: 2px solid var(--border-color);
-  border-radius: 12px;
-  background: var(--bg-secondary);
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.disaster-type-btn:hover {
-  border-color: var(--accent-primary);
-  background: var(--bg-hover);
-}
-
-.disaster-type-btn.active {
-  border-color: var(--accent-primary);
-  background: rgba(184, 151, 111, 0.15);
-}
-
-.disaster-type-btn__icon {
-  font-size: 28px;
-  margin-bottom: 6px;
-}
-
-.disaster-type-btn__label {
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--text-secondary);
-}
-
-.disaster-type-btn.active .disaster-type-btn__label {
-  color: var(--text-primary);
-}
-
-/* Severity Grid */
+/* Severity Grid — 仍被 ReportPage 使用 */
 .severity-grid {
   display: flex;
   gap: 10px;
@@ -1396,50 +664,14 @@ body {
   border-radius: 50%;
 }
 
-/* Location Section */
-.location-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.location-coords {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.location-btn {
-  padding: 6px 12px;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background: var(--bg-secondary);
-  cursor: pointer;
-  font-size: 13px;
-  color: var(--text-secondary);
-  transition: all 0.2s ease;
-}
-
-.location-btn:hover {
-  background: var(--bg-hover);
-}
-
-/* Contact Grid */
+/* Contact Grid — 仍被 ReportPage 使用 */
 .contact-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
 }
 
-/* Submit Button */
-.report-submit-btn {
-  width: 100%;
-  padding: 16px;
-  font-size: 16px;
-  margin-top: 8px;
-}
-
-/* Success State */
+/* Success State — 仍被 ReportPage 使用 */
 .report-success {
   text-align: center;
   padding: 60px 40px !important;
@@ -1482,14 +714,15 @@ body {
 }
 
 /* ============================================
-   Volunteers Page 蹇楀伐绠＄悊闋侀潰
+   Volunteers Page 志工管理頁面
 ============================================ */
 
+/* 仍被 VolunteersPage 使用 */
 .volunteers-page {
   max-width: 1200px;
 }
 
-/* Stats Cards */
+/* Stats Cards — 仍被 VolunteersPage 使用（後方另有 5 欄覆寫） */
 .volunteers-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -1497,10 +730,12 @@ body {
   margin-bottom: 24px;
 }
 
+/* 仍被 DonationsPage/ReportsAdminPage/ResourcesPage 等使用（同名基礎版見前段） */
 .stat-card {
   text-align: center;
 }
 
+/* 仍被 DonationsPage/ReportsAdminPage/ResourcesPage 等 13 處使用 */
 .stat-card__value {
   font-size: 32px;
   font-weight: 700;
@@ -1513,19 +748,17 @@ body {
   margin-top: 4px;
 }
 
+/* 仍被 ReportsAdminPage/ResourcesPage 使用 */
 .stat-card--success .stat-card__value {
   color: #4CAF50;
 }
 
+/* 仍被 ReportsAdminPage/ResourcesPage 使用 */
 .stat-card--warning .stat-card__value {
   color: #FF9800;
 }
 
-.stat-card--info .stat-card__value {
-  color: #2196F3;
-}
-
-/* Filters */
+/* Filters — 仍被 VolunteersPage 使用 */
 .volunteers-filters {
   display: flex;
   gap: 16px;
@@ -1544,6 +777,8 @@ body {
   gap: 8px;
 }
 
+/* 仍被 VolunteersPage 使用（active 態走 --active modifier，樣式在別檔；
+   舊 .status-filter-btn.active 無使用者已刪） */
 .status-filter-btn {
   padding: 8px 16px;
   border: 1px solid var(--border-color);
@@ -1559,19 +794,14 @@ body {
   background: var(--bg-hover);
 }
 
-.status-filter-btn.active {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: white;
-}
-
-/* Volunteer List */
+/* Volunteer List — 仍被 VolunteersPage 使用 */
 .volunteers-list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
   gap: 16px;
 }
 
+/* 仍被 VolunteersPage 使用（整個 volunteer-card 家族） */
 .volunteer-card {
   display: flex;
   flex-direction: column;
@@ -1620,6 +850,7 @@ body {
   gap: 6px;
 }
 
+/* 仍被 task-dispatch/TaskCard.tsx 與 VolunteersPage 使用 */
 .skill-tag {
   padding: 4px 10px;
   background: var(--bg-hover);
@@ -1646,20 +877,8 @@ body {
   padding-top: 8px;
 }
 
-.volunteers-empty {
-  grid-column: 1 / -1;
-  text-align: center;
-  padding: 60px 20px;
-  color: var(--text-muted);
-}
-
-.volunteers-empty span {
-  font-size: 48px;
-  display: block;
-  margin-bottom: 12px;
-}
-
-/* Modal */
+/* Modal — 仍被 resources 各 Tab/ResourcesPage/VolunteersPage 使用
+   （.modal-overlay 同名覆寫見前段註記） */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -1682,6 +901,7 @@ body {
   margin-top: 0;
 }
 
+/* 仍被 ResourcesPage 使用 */
 .modal-desc {
   color: var(--text-muted);
   margin-bottom: 20px;
@@ -1693,7 +913,7 @@ body {
   justify-content: flex-end;
 }
 
-/* RWD */
+/* RWD — volunteers 家族皆有使用者 */
 @media (max-width: 768px) {
   .volunteers-stats {
     grid-template-columns: repeat(2, 1fr);
@@ -1718,43 +938,11 @@ body {
 }
 
 /* ============================================
-   Enhanced Dashboard 姹虹瓥鍎€琛ㄦ澘寮峰寲
+   Enhanced Dashboard 殘存有主規則
 ============================================ */
 
-/* 6-column stats grid */
-.stats-grid--6 {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-/* Trend indicator */
-.trend {
-  font-size: 14px;
-  margin-left: 4px;
-}
-
-.trend--up {
-  color: #4CAF50;
-}
-
-.trend--down {
-  color: #F44336;
-}
-
-/* Info variant */
-.stat-card-vi__value--info {
-  color: #2196F3;
-}
-
-/* Quick Actions Grid */
-.quick-actions-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-}
-
+/* 仍被 DashboardWidgets.tsx（QuickActionsWidget）使用
+   （內部 icon/label 已改用 .action-icon/.action-label，舊 __icon/__label 已刪） */
 .quick-action-btn {
   display: flex;
   flex-direction: column;
@@ -1775,25 +963,7 @@ body {
   transform: translateY(-2px);
 }
 
-.quick-action-btn__icon {
-  font-size: 28px;
-  margin-bottom: 8px;
-}
-
-.quick-action-btn__label {
-  font-size: 13px;
-  font-weight: 500;
-}
-
-/* 3-column dashboard layout */
-.dashboard-sections--3col {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
-  margin-bottom: 24px;
-}
-
-/* Alert list */
+/* Alert list — 仍被 DashboardWidgets.tsx（WeatherAlertWidget）使用 */
 .alert-list {
   display: flex;
   flex-direction: column;
@@ -1812,16 +982,8 @@ body {
   border-bottom: none;
 }
 
-.alert-title {
-  flex: 1;
-  font-size: 13px;
-  color: var(--text-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* View more link */
+/* View more link — 仍被 LowStockWidget.tsx 使用；
+   注意：LowStockWidget 本身零 import（孤兒元件候選），圈掉後可同刪 */
 .view-more-link {
   display: block;
   text-align: right;
@@ -1835,7 +997,7 @@ body {
   text-decoration: underline;
 }
 
-/* Empty state mini */
+/* Empty state mini — 仍被 LowStockWidget.tsx 使用（同上，孤兒元件候選） */
 .empty-state-mini {
   padding: 20px;
   text-align: center;
@@ -1851,175 +1013,7 @@ body {
   font-size: 32px;
 }
 
-/* ============================================
-   Alert Cards V2 - 閲嶆柊瑷▓鐨勮鍫卞崱鐗?
-============================================ */
-
-.alert-list-v2 {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.alert-card-v2 {
-  padding: 12px;
-  border-radius: 8px;
-  border-left: 4px solid var(--border-color);
-  background: var(--bg-secondary);
-  transition: all 0.2s ease;
-}
-
-.alert-card-v2:hover {
-  background: var(--bg-hover);
-  transform: translateX(4px);
-}
-
-.alert-card-v2--critical {
-  border-left-color: #E53935;
-  background: rgba(229, 57, 53, 0.08);
-}
-
-.alert-card-v2--warning {
-  border-left-color: #FB8C00;
-  background: rgba(251, 140, 0, 0.08);
-}
-
-.alert-card-v2--info {
-  border-left-color: #FDD835;
-  background: rgba(253, 216, 53, 0.08);
-}
-
-.alert-card-v2__header {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 6px;
-}
-
-.alert-card-v2__severity {
-  font-size: 14px;
-}
-
-.alert-card-v2__type {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-secondary);
-  background: var(--bg-card);
-  padding: 2px 8px;
-  border-radius: 4px;
-}
-
-.alert-card-v2__time {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-left: auto;
-}
-
-.alert-card-v2__title {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text-primary);
-  line-height: 1.4;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
-.alert-card-v2__source {
-  font-size: 11px;
-  color: var(--text-muted);
-  margin-top: 6px;
-}
-
-/* ============================================
-   Map Preview V2 - 閲嶆柊瑷▓鐨勫湴鍦栨瑕?
-============================================ */
-
-.map-preview-v2 {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.map-preview-v2__stats {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-}
-
-.map-stat {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
-  padding: 12px;
-  background: var(--bg-secondary);
-  border-radius: 8px;
-}
-
-.map-stat__icon {
-  font-size: 24px;
-  margin-bottom: 4px;
-}
-
-.map-stat__value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.map-stat__label {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.map-preview-v2__visual {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.map-visual-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  border: 2px dashed var(--border-color);
-  border-radius: 12px;
-  width: 100%;
-  background: linear-gradient(135deg, rgba(33, 150, 243, 0.05), rgba(76, 175, 80, 0.05));
-}
-
-.map-visual-placeholder .map-icon {
-  font-size: 48px;
-  margin-bottom: 8px;
-}
-
-.map-visual-placeholder .map-text {
-  font-size: 14px;
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.map-visual-placeholder .map-text-sub {
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.map-preview-v2__btn {
-  display: block;
-  text-decoration: none;
-}
-
-.map-preview-v2__btn .lk-btn,
-.map-preview-v2__btn button {
-  width: 100%;
-}
-
-/* Resource grid */
+/* Resource grid — 仍被 MentalHealthPage 使用 */
 .resource-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2027,97 +1021,19 @@ body {
   margin-bottom: 12px;
 }
 
-.resource-item {
-  text-align: center;
-}
-
-.resource-label {
-  display: block;
-  font-size: 12px;
-  color: var(--text-muted);
-  margin-bottom: 4px;
-}
-
-.resource-value {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.resource-value--success {
-  color: #4CAF50;
-}
-
-.resource-value--warning {
-  color: #FF9800;
-}
-
 /* RWD */
-@media (max-width: 1200px) {
-  .stats-grid--6 {
-    grid-template-columns: repeat(3, 1fr);
-  }
-
-  .dashboard-sections--3col {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
 @media (max-width: 768px) {
-  .stats-grid--6 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .dashboard-sections--3col {
-    grid-template-columns: 1fr;
-  }
-
   .resource-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* ============================================
-   Enhanced Volunteer System CSS
-============================================ */
-
-/* Success Toast */
-.success-toast {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #4CAF50;
-  color: white;
-  padding: 16px 24px;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
-  animation: slideIn 0.3s ease;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
-/* Primary stat card */
-.stat-card--primary .stat-card__value {
-  color: var(--accent-primary);
-}
-
-/* Larger modal */
+/* Larger modal — 仍被 ResourcesPage/VolunteersPage 使用 */
 .modal-content--lg {
   max-width: 600px;
 }
 
-/* 5-column stats grid for volunteers */
+/* 5-column stats grid for volunteers — 仍被 VolunteersPage 使用 */
 .volunteers-stats {
   grid-template-columns: repeat(5, 1fr);
 }
@@ -2135,13 +1051,15 @@ body {
 }
 
 /* ============================================
-   Training Page 鍩硅〒涓績
+   Training Page 培訓中心
 ============================================ */
 
+/* 仍被 TrainingPage 使用 */
 .training-page {
   max-width: 1200px;
 }
 
+/* 仍被 TrainingPage 使用 */
 .training-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2149,13 +1067,7 @@ body {
   margin-bottom: 24px;
 }
 
-.training-categories {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  margin-bottom: 24px;
-}
-
+/* 仍被 ResourcesPage 使用（含 active 態） */
 .category-btn {
   padding: 8px 16px;
   border: 1px solid var(--border-color);
@@ -2176,6 +1088,7 @@ body {
   color: white;
 }
 
+/* 仍被 TrainingPage 使用（整個 course-card 家族） */
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -2225,17 +1138,12 @@ body {
   color: var(--text-secondary);
 }
 
+/* 仍被 mental-health/GAD7Questionnaire、PHQ9Questionnaire 使用（inline width 當進度條） */
 .progress-bar {
   height: 6px;
   background: var(--bg-hover);
   border-radius: 3px;
   overflow: hidden;
-}
-
-.progress-bar__fill {
-  height: 100%;
-  border-radius: 3px;
-  transition: width 0.3s ease;
 }
 
 .course-card__actions {
@@ -2246,20 +1154,10 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
+/* 仍被 GAD7/PHQ9 問卷使用 */
 .progress-text {
   font-size: 13px;
   color: var(--text-muted);
-}
-
-.course-content {
-  background: var(--bg-secondary);
-  padding: 16px;
-  border-radius: 8px;
-  margin: 16px 0;
-}
-
-.course-content h4 {
-  margin: 0 0 8px 0;
 }
 
 /* RWD */
@@ -2274,13 +1172,15 @@ body {
 }
 
 /* ============================================
-   Resources Page 鐗╄硣绠＄悊
+   Resources Page 物資管理
 ============================================ */
 
+/* 仍被 ResourcesPage 使用 */
 .resources-page {
   max-width: 1400px;
 }
 
+/* 仍被 ResourcesPage 使用 */
 .resources-stats {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -2288,10 +1188,12 @@ body {
   margin-bottom: 24px;
 }
 
+/* 仍被 ReportsAdminPage/ResourcesPage 使用 */
 .stat-card--danger .stat-card__value {
   color: #F44336;
 }
 
+/* 仍被 ResourcesPage 使用 */
 .resources-categories {
   display: flex;
   gap: 8px;
@@ -2299,6 +1201,7 @@ body {
   margin-bottom: 24px;
 }
 
+/* 仍被 ResourcesPage 使用 */
 .resources-table {
   width: 100%;
   border-collapse: collapse;
@@ -2325,10 +1228,12 @@ body {
   background: var(--bg-hover);
 }
 
+/* 仍被 ResourcesPage/ResourcesPublicPage 使用 */
 .resource-name {
   font-weight: 500;
 }
 
+/* 仍被 ResourcesPage 使用 */
 .resource-actions {
   display: flex;
   gap: 8px;
@@ -2350,20 +1255,18 @@ body {
 }
 
 /* ============================================
-   Phase E: 琛屽嫊瑁濈疆鍎寲
+   Phase E: 行動裝置優化
 ============================================ */
 
-/* 瑙告帶鍙嬪杽 - 鏇村ぇ鐨勯粸鎿婂崁鍩?*/
+/* 觸控友善 - 更大的點擊區域
+   （.btn 仍被 ui/Modal 使用；button 為元素選擇器；
+    .category-btn/.status-filter-btn/.form-* 使用者見前段） */
 @media (hover: none) and (pointer: coarse) {
 
   .btn,
   button {
     min-height: 44px;
     min-width: 44px;
-  }
-
-  .nav-item {
-    padding: 14px 16px;
   }
 
   .category-btn,
@@ -2376,36 +1279,21 @@ body {
   .form-select,
   .form-textarea {
     font-size: 16px;
-    /* 闃叉 iOS 绺斁 */
+    /* 防止 iOS 縮放 */
     padding: 14px;
   }
 }
 
-/* PWA 鍏ㄨ灑骞曟ā寮?*/
+/* PWA 全螢幕模式（body 為元素選擇器） */
 @media (display-mode: standalone) {
   body {
     padding-top: env(safe-area-inset-top);
     padding-bottom: env(safe-area-inset-bottom);
   }
-
-  .main-layout {
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-  }
 }
 
-/* 姗悜妯″紡瑾挎暣 */
-@media (orientation: landscape) and (max-height: 500px) {
-  .sidebar {
-    padding: 8px;
-  }
-
-  .nav-item {
-    padding: 8px 12px;
-  }
-}
-
-/* 闆㈢窔鎸囩ず鍣?*/
+/* 離線指示器 — 仍被 ui/OfflineIndicator.tsx 使用；
+   注意：OfflineIndicator 本身零 import（孤兒元件候選），圈掉後可同刪 */
 .offline-indicator {
   position: fixed;
   bottom: 20px;
@@ -2424,321 +1312,29 @@ body {
 }
 
 .offline-indicator::before {
-  content: '馃摗';
+  content: '📡';
 }
 
-/* 涓嬫媺鏇存柊鎻愮ず */
-.pull-to-refresh {
-  position: absolute;
-  top: -60px;
-  left: 0;
-  right: 0;
-  height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-}
-
-/* 瑙告帶鍥為 */
-.touch-feedback {
-  position: relative;
-  overflow: hidden;
-}
-
-.touch-feedback::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: inherit;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-
-.touch-feedback:active::after {
-  opacity: 1;
-}
-
-/* 鎵嬪嫝婊戝嫊鍗＄墖 */
-.swipeable-card {
-  touch-action: pan-y;
-  transition: transform 0.3s ease;
-}
-
-/* 搴曢儴瀹夊叏鍗€鍩?*/
-.bottom-nav {
-  padding-bottom: calc(16px + env(safe-area-inset-bottom));
-}
-
-/* 蹇€熸搷浣?FAB */
-.fab {
-  position: fixed;
-  bottom: calc(24px + env(safe-area-inset-bottom));
-  right: 24px;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  font-size: 24px;
-  cursor: pointer;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.fab:active {
-  transform: scale(0.95);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-}
-
-/* ============================================
-   Notifications Page 閫氱煡涓績
-============================================ */
-
-.notifications-page {
-  max-width: 800px;
-}
-
-.notification-filters {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 24px;
-}
-
-.notifications-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 32px;
-}
-
-.notification-card {
-  position: relative;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.notification-card:hover {
-  background: var(--bg-hover);
-}
-
-.notification-card.unread {
-  border-left: 3px solid var(--accent-primary);
-}
-
-.notification-card__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-}
-
+/* 仍被 notifications/NotificationBell.tsx 使用 */
 .notification-time {
   font-size: 12px;
   color: var(--text-muted);
 }
 
-.notification-title {
-  margin: 0 0 4px 0;
-  font-size: 15px;
-  font-weight: 600;
-}
-
-.notification-message {
-  margin: 0;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.unread-dot {
-  position: absolute;
-  top: 16px;
-  right: 16px;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-}
-
-.line-settings {
-  margin-top: 24px;
-}
-
-.line-settings h3 {
-  margin: 0 0 8px 0;
-}
-
-.card-desc {
-  color: var(--text-muted);
-  margin: 0 0 16px 0;
-}
-
-.line-status {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  margin-bottom: 16px;
-}
-
-.line-qr {
-  margin-top: 16px;
-  padding-top: 16px;
-  border-top: 1px solid var(--border-color);
-}
-
-.qr-placeholder {
-  width: 150px;
-  height: 150px;
-  background: var(--bg-secondary);
-  border: 2px dashed var(--border-color);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 12px;
-  margin-top: 8px;
-}
-
 /* ============================================
-   Mobile Header - Senteng Style Design
-   婕㈠牎閬稿柈銉婚€氱煡銉婚牠鍍?
-============================================ */
-
-.mobile-header {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 56px;
-  background: var(--bg-card);
-  border-bottom: 1px solid var(--border-color);
-  padding: 0 16px;
-  align-items: center;
-  justify-content: space-between;
-  z-index: 1000;
-  box-shadow: var(--shadow-sm);
-}
-
-.hamburger-btn {
-  width: 44px;
-  height: 44px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: transparent;
-  border: none;
-  font-size: 24px;
-  color: var(--text-primary);
-  cursor: pointer;
-  border-radius: var(--radius-md, 8px);
-  transition: background 0.2s;
-}
-
-.hamburger-btn:hover {
-  background: var(--bg-hover);
-}
-
-.mobile-header__title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.mobile-header__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.mobile-header__icon {
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  text-decoration: none;
-}
-
-.mobile-header__avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--accent-primary);
-  color: white;
-  font-size: 14px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* Sidebar Overlay */
-.sidebar-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 900;
-  backdrop-filter: blur(4px);
-}
-
-/* ============================================
-   Responsive Styles - Senteng Design Pattern
-   鍙冭€冨湒2,3闊挎噳寮忛爜闈㈣ō瑷?
+   Responsive Styles（僅存有主規則）
 ============================================ */
 
 @media (max-width: 768px) {
 
-  /* 椤ず鎵嬫鐗堥爞閮ㄥ皫瑕藉垪 */
-  .mobile-header {
-    display: flex;
-  }
-
-  /* Sidebar 闅辫棌锛岄€忛亷婕㈠牎閬稿柈闁嬪暉 */
-  .sidebar {
-    position: fixed;
-    left: -280px;
-    top: 0;
-    bottom: 0;
-    width: 280px !important;
-    z-index: 950;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    padding-top: 60px;
-    /* 鐐烘墜姗熼爞閮ㄥ皫瑕藉垪鐣欑┖闁?*/
-  }
-
-  .sidebar--open {
-    left: 0;
-  }
-
-  /* 閬僵椤ず */
-  .sidebar--open~.sidebar-overlay,
-  .sidebar-overlay {
-    display: block;
-  }
-
-  /* 涓诲収瀹瑰崁瑾挎暣 */
-  .main-content {
-    margin-left: 0 !important;
-    padding: 80px 16px 16px !important;
-  }
-
-  /* 闋侀潰妯欓闊挎噳寮?*/
+  /* 頁面標題響應式 — 仍被 20+ 頁使用 */
   .page-header {
     flex-direction: column;
     gap: 16px;
     align-items: stretch !important;
   }
 
+  /* 仍被 EventsPage/ResourcesPage/TrainingPage 等使用 */
   .page-header__right {
     width: 100%;
     display: flex;
@@ -2751,18 +1347,7 @@ body {
     width: 100%;
   }
 
-  /* 鍦板湒闋侀潰绡╅伕閬搁爡 - 琛屽嫊瑁濈疆鎻涜 */
-  .header-layer-toggles {
-    display: flex !important;
-    flex-wrap: wrap !important;
-    gap: 8px !important;
-  }
-
-  .header-layer-toggle {
-    white-space: nowrap;
-  }
-
-  /* Modal 闊挎噳寮?*/
+  /* Modal 響應式 — 仍被 resources 各 Tab/ResourcesPage/VolunteersPage 使用 */
   .modal-content,
   .modal-content--lg {
     width: 95vw !important;
@@ -2772,7 +1357,7 @@ body {
     margin: 8vh auto;
   }
 
-  /* 琛ㄥ柈鍏╂瑒璁婁竴娆?*/
+  /* 表單兩欄變一欄 — 仍被 TaskModal/DonationsPage 等 33 處使用 */
   .form-row {
     flex-direction: column;
     gap: 0;
@@ -2782,7 +1367,7 @@ body {
     width: 100%;
   }
 
-  /* 鎶€鑳介伕鎿囩恫鏍?- 2娆?*/
+  /* 技能選擇網格 — 仍被 ProfilePage/VolunteerProfileSetupPage 使用 */
   .skills-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 8px !important;
@@ -2794,10 +1379,9 @@ body {
     min-height: 44px;
   }
 
-  /* 绲辫▓鍗＄墖 - 2娆?*/
+  /* 統計卡片 - 2欄（.dashboard-stats 無 className 使用者，已自群組選擇器移除） */
   .volunteers-stats,
   .resources-stats,
-  .dashboard-stats,
   .stats-grid {
     grid-template-columns: repeat(2, 1fr) !important;
     gap: 12px !important;
@@ -2809,23 +1393,17 @@ body {
     text-align: center;
   }
 
-  .stat-icon {
-    width: 48px;
-    height: 48px;
-    font-size: 20px;
-  }
-
   .stat-value {
     font-size: 24px;
   }
 
-  /* 鎸夐垥瑙告帶鍗€ - 鏈€灏?44px */
+  /* 按鈕觸控區 - 最小 44px（.lk-btn 仍被 ui/Button、design-system/Button 使用） */
   .lk-btn,
   button {
     min-height: 44px;
   }
 
-  /* 琛ㄦ牸闊挎噳寮?*/
+  /* 表格響應式 */
   .resources-table,
   .events-table {
     font-size: 13px;
@@ -2838,17 +1416,12 @@ body {
     padding: 10px 6px;
   }
 
-  /* 浠诲嫏鐪嬫澘 - 鍠瑒鍫嗙枈 */
+  /* 任務看板 - 單欄堆疊 — 仍被 TasksPage 使用 */
   .task-board {
     grid-template-columns: 1fr !important;
   }
 
-  /* Dashboard 鍗€鍩?- 鍠瑒 */
-  .dashboard-sections {
-    grid-template-columns: 1fr;
-  }
-
-  /* 蹇楀伐鍗＄墖闊挎噳寮?*/
+  /* 志工卡片響應式 */
   .volunteer-card__actions {
     flex-direction: column;
     gap: 8px;
@@ -2858,7 +1431,7 @@ body {
     width: 100%;
   }
 
-  /* 绡╅伕鍗€闊挎噳寮?*/
+  /* 篩選區響應式 */
   .filter-bar {
     flex-direction: column;
     gap: 8px;
@@ -2869,9 +1442,8 @@ body {
     width: 100%;
   }
 
-  /* 鍒嗛绡╅伕婊惧嫊 */
-  .resources-categories,
-  .status-filters {
+  /* 分類篩選滑動（.status-filters 無 className 使用者，已自群組選擇器移除） */
+  .resources-categories {
     overflow-x: auto;
     flex-wrap: nowrap;
     gap: 8px;
@@ -2885,250 +1457,19 @@ body {
     min-height: 40px;
     padding: 8px 16px;
   }
-
-  /* ===== Mobile Sidebar Complete Fix ===== */
-  /* 鍋撮倞娆勫熀绀庝慨寰?- 寮峰埗瑕嗚搵鎵€鏈夎绐佹ǎ寮?*/
-  .sidebar {
-    width: 280px !important;
-    min-width: 280px !important;
-    max-width: 280px !important;
-    display: flex !important;
-    flex-direction: column !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-  }
-
-  .sidebar--open {
-    left: 0 !important;
-  }
-
-  /* Logo 瀹屾暣椤ず */
-  .sidebar .logo {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px !important;
-    margin-bottom: 12px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar .logo-icon {
-    width: 40px !important;
-    height: 40px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .sidebar .logo h1 {
-    display: block !important;
-    white-space: nowrap !important;
-    font-size: 16px !important;
-    writing-mode: horizontal-tb !important;
-  }
-
-  .sidebar .logo-subtitle {
-    display: block !important;
-    white-space: nowrap !important;
-    font-size: 11px !important;
-    writing-mode: horizontal-tb !important;
-  }
-
-  /* 绶ㄨ集閬稿柈鎸夐垥 - 寮峰埗姘村钩鎺掑垪 */
-  .sidebar .nav-edit-controls {
-    display: flex !important;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 8px !important;
-    padding: 8px !important;
-    margin: 0 8px 12px !important;
-    width: calc(100% - 16px) !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar .nav-edit-btn {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    justify-content: center !important;
-    gap: 6px !important;
-    padding: 10px 12px !important;
-    font-size: 13px !important;
-    white-space: nowrap !important;
-    writing-mode: horizontal-tb !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
-  /* 灏庤埅鍗€鍩?*/
-  .sidebar .nav {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 4px !important;
-    padding: 0 8px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  /* 灏庤埅闋呯洰鍖呰 - 纰轰繚姘村钩甯冨眬 */
-  .sidebar .nav-item-wrapper {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    width: 100% !important;
-  }
-
-  /* 鎷栨洺鎵嬫焺鍦ㄧЩ鍕曠闅辫棌 */
-  .sidebar .nav-item-drag-handle {
-    display: none !important;
-  }
-
-  /* 灏庤埅闋呯洰 - 纰轰繚姘村钩瀹屾暣椤ず */
-  .sidebar .nav-item {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 12px !important;
-    padding: 12px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-    border-radius: 8px !important;
-    writing-mode: horizontal-tb !important;
-  }
-
-  .sidebar .nav-icon {
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 24px !important;
-    height: 24px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .sidebar .nav-label {
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    font-size: 14px !important;
-    writing-mode: horizontal-tb !important;
-    flex: 1 !important;
-  }
-
-  /* 绶ㄨ集妯″紡涓嬬殑灏庤埅闋呯洰 */
-  .sidebar .nav-item--editing {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 8px !important;
-    padding: 8px 12px !important;
-    width: 100% !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar .nav-label-input {
-    flex: 1 !important;
-    min-width: 0 !important;
-    width: 100% !important;
-  }
-
-  /* 鐢ㄦ埗鍗€鍩?*/
-  .sidebar .sidebar-user {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 10px !important;
-    padding: 12px !important;
-    margin: auto 8px 8px !important;
-    width: calc(100% - 16px) !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar .sidebar-user__info {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: center !important;
-    gap: 10px !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
-  .sidebar .sidebar-user__avatar {
-    width: 36px !important;
-    height: 36px !important;
-    flex-shrink: 0 !important;
-  }
-
-  .sidebar .sidebar-user__details {
-    display: flex !important;
-    flex-direction: column !important;
-    overflow: hidden !important;
-    flex: 1 !important;
-    min-width: 0 !important;
-  }
-
-  .sidebar .sidebar-user__name,
-  .sidebar .sidebar-user__role {
-    display: block !important;
-    white-space: nowrap !important;
-    overflow: hidden !important;
-    text-overflow: ellipsis !important;
-    writing-mode: horizontal-tb !important;
-  }
-
-  .sidebar .sidebar-user__logout {
-    flex-shrink: 0 !important;
-  }
-
-  /* 鍋撮倞娆勫簳閮ㄧ増鏈硣瑷?*/
-  .sidebar .sidebar-footer {
-    display: block !important;
-    text-align: center !important;
-    padding: 12px !important;
-    margin: 8px !important;
-    font-size: 11px !important;
-    white-space: nowrap !important;
-    writing-mode: horizontal-tb !important;
-    width: calc(100% - 16px) !important;
-    box-sizing: border-box !important;
-  }
-
-  .sidebar .sidebar-footer span {
-    display: inline !important;
-    white-space: nowrap !important;
-    writing-mode: horizontal-tb !important;
-  }
 }
 
-/* 瓒呭皬铻㈠箷 (320-480px) */
+/* 超小螢幕 (320-480px) */
 @media (max-width: 480px) {
-  .mobile-header {
-    padding: 0 12px;
-    height: 52px;
-  }
 
-  .hamburger-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 22px;
-  }
-
-  .mobile-header__title {
-    font-size: 15px;
-  }
-
-  .main-content {
-    padding: 72px 12px 12px !important;
-  }
-
-  /* 绲辫▓鍗＄墖鍏ㄥ */
+  /* 統計卡片全寬 */
   .volunteers-stats,
   .resources-stats,
   .stats-grid {
     grid-template-columns: 1fr !important;
   }
 
-  /* 鎶€鑳介伕鎿囧叏瀵?*/
+  /* 技能選擇全寬 */
   .skills-grid {
     grid-template-columns: 1fr !important;
   }
@@ -3137,22 +1478,22 @@ body {
     padding: 12px !important;
   }
 
-  /* 闋侀潰妯欓瑾挎暣 */
+  /* 頁面標題調整 */
   .page h2 {
     font-size: 22px;
   }
 }
 
 /* ============================================
-   Event Detail Modal - 鐏芥儏浜嬩欢瑭虫儏褰堢獥
-   妤电啊涓€чⅷ鏍艰ō瑷?
+   Event Detail Modal - 災情事件詳情彈窗
+   極簡一致風格設計 — 仍被 EventsPage 使用（整段）
 ============================================ */
 
 .event-detail {
   padding: 8px 0;
 }
 
-/* 椤炲瀷鑸囧毚閲嶅害妯欑堡鍗€ */
+/* 類型與嚴重度標籤區 */
 .event-detail__header {
   display: flex;
   align-items: center;
@@ -3181,7 +1522,7 @@ body {
   border-radius: 6px;
 }
 
-/* 妯欓鑸囨弿杩?*/
+/* 標題與描述 */
 .event-detail h3 {
   font-size: 20px;
   font-weight: 600;
@@ -3199,7 +1540,8 @@ body {
   border-bottom: 1px solid var(--border-color, #e2e8f0);
 }
 
-/* 璩囪▕鍒楄〃 - 鏇村楝嗙殑闁撹窛 */
+/* 資訊列表（info-row/info-label/info-value 亦被 Insurance/VehicleManagementPage 沿用，
+   但該兩頁未包在 .event-detail__info 內，僅 EventsPage 命中此組選擇器） */
 .event-detail__info {
   display: flex;
   flex-direction: column;
@@ -3227,7 +1569,7 @@ body {
   line-height: 1.5;
 }
 
-/* 鎿嶄綔鎸夐垥鍗€ - 妤电啊涓€ц壊 */
+/* 操作按鈕區 */
 .event-detail__actions {
   display: flex;
   gap: 12px;
@@ -3250,7 +1592,7 @@ body {
   gap: 8px;
 }
 
-/* 涓€ф泛鑹叉寜閳曟ǎ寮?*/
+/* 中性色按鈕 */
 .event-detail__actions .btn-neutral,
 .event-detail__actions .lk-btn--secondary,
 .event-detail__actions button:not(.btn-primary):not(.lk-btn--primary) {
@@ -3266,7 +1608,7 @@ body {
   border-color: var(--slate-300, #cbd5e1);
 }
 
-/* 涓昏鎿嶄綔鎸夐垥 - 娣虹伆寮疯 */
+/* 主要操作按鈕 */
 .event-detail__actions .btn-primary,
 .event-detail__actions .lk-btn--primary {
   background: var(--slate-700, #334155);
@@ -3280,7 +1622,7 @@ body {
   border-color: var(--slate-800, #1e293b);
 }
 
-/* 闊挎噳寮忚鏁?*/
+/* 響應式調整 */
 @media (max-width: 480px) {
   .event-detail__actions {
     flex-direction: column;

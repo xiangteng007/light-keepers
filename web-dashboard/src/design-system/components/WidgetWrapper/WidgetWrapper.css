@@ -1,34 +1,32 @@
 /* ============================================
-   WidgetWrapper Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   WidgetWrapper Component — B3c 野戰手冊（R5/T3）
+   Hairline 面板：1px 規線、重要面板 2px；印刷平面性。
 ============================================ */
 
 .lk-widget {
-    background: var(--bg-card);
-    border-radius: var(--widget-radius);
-    border: 1px solid var(--border-color);
+    background: var(--surface-card, var(--bg-card));
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-default);
     overflow: hidden;
-    transition: all var(--duration-normal) var(--ease-smooth);
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 /* ===== Variants ===== */
 .lk-widget--default {
-    box-shadow: var(--shadow-sm);
+    box-shadow: none;
 }
 
+/* Elevated — 「重要面板」：2px 規線取代浮起陰影 */
 .lk-widget--elevated {
-    box-shadow: var(--shadow-md);
-    border: none;
-}
-
-.lk-widget--elevated:hover {
-    box-shadow: var(--shadow-lg);
+    border: 2px solid var(--border-dark);
+    background: var(--surface-raised, var(--bg-tertiary));
+    box-shadow: var(--shadow-xs);
 }
 
 .lk-widget--glass {
     background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur-sm));
+    -webkit-backdrop-filter: blur(var(--glass-blur-sm));
     border: 1px solid var(--glass-border);
 }
 
@@ -39,8 +37,8 @@
     justify-content: space-between;
     gap: var(--spacing-4);
     padding: var(--spacing-4) var(--widget-padding);
-    background: linear-gradient(180deg, rgba(196, 167, 125, 0.03) 0%, transparent 100%);
-    border-bottom: 1px solid var(--border-color);
+    background: transparent;
+    border-bottom: 1px solid var(--border-default);
     min-height: var(--widget-header-height);
 }
 
@@ -58,13 +56,13 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(196, 167, 125, 0.12);
-    border: 1.5px solid rgba(196, 167, 125, 0.25);
+    background: var(--primary-light, var(--surface-raised));
+    border: 1px solid var(--border-default);
     border-radius: var(--radius-md);
     font-size: 18px;
     flex-shrink: 0;
-    color: var(--color-gold-600);
-    transition: all var(--duration-fast) var(--ease-smooth);
+    color: var(--text-accent, var(--accent-primary));
+    transition: border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-widget__header-text {
@@ -78,7 +76,8 @@
     color: var(--text-primary);
     margin: 0;
     text-transform: uppercase;
-    letter-spacing: var(--letter-spacing-wide);
+    /* 中文字距 0；拉丁小標請由消費端加 .u-stencil（排印鐵律 §1） */
+    letter-spacing: var(--tracking-zh);
 }
 
 .lk-widget__subtitle {

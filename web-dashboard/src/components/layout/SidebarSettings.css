@@ -1,14 +1,16 @@
 /**
- * SidebarSettings.css
- * 
- * Styles for sidebar settings modal
+ * SidebarSettings.css — R5/T3 B3c 野戰手冊化
+ *
+ * 側欄設定深面板：2px 規線＋近直角（radius ≤6px）。
+ * 金色紀律：橄欖只給「作用態／拖放目標／完成鍵」；小標/圖示走軍規卡其。
+ * 顏色一律語義 token；平時/災時由 tokens.css Layer 8/9 自動換盤。
  * v2.1 - Group-based display with domain headers + RBAC level selector
  */
 
 .sidebar-settings__overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--v2-bg-dim, rgba(0, 0, 0, 0.45));
     z-index: 400;
 }
 
@@ -20,44 +22,46 @@
     width: 480px;
     max-width: 95vw;
     max-height: 85vh;
-    background: var(--layout-bg, #0b111b);
-    border: 1px solid var(--accent-gold, #d4a84b);
-    border-radius: 16px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    background: var(--surface-default);
+    border: 2px solid var(--border-default);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
     z-index: 401;
     display: flex;
     flex-direction: column;
     overflow: hidden;
 }
 
+/* 標題列規線（2px） */
 .sidebar-settings__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 2px solid var(--border-default);
 }
 
 .sidebar-settings__header h3 {
     margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--text-primary, #e8eaed);
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    letter-spacing: var(--tracking-zh, 0);
+    color: var(--text-primary);
 }
 
 .sidebar-settings__close {
     background: transparent;
     border: none;
-    color: var(--text-secondary, #9aa0a6);
+    color: var(--text-secondary);
     cursor: pointer;
     padding: 4px;
-    border-radius: 6px;
+    border-radius: var(--radius-xs);
     transition: all 0.2s;
 }
 
 .sidebar-settings__close:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary, #e8eaed);
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 .sidebar-settings__content {
@@ -68,8 +72,8 @@
 
 .sidebar-settings__hint {
     margin: 0 0 16px;
-    font-size: 12px;
-    color: var(--text-muted, #5f6368);
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-muted);
 }
 
 /* Group styles */
@@ -84,28 +88,29 @@
     flex-direction: column;
 }
 
+/* 群組小標：軍規卡其（中文字距 0，不散寫 letter-spacing） */
 .sidebar-settings__group-header {
     display: flex;
     align-items: center;
     gap: 8px;
     padding: 8px 4px;
-    color: var(--accent-gold, #d4a84b);
-    font-size: 13px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(212, 168, 75, 0.2);
+    color: var(--color-secondary);
+    font-size: var(--font-size-sm, 13px);
+    font-weight: var(--font-weight-semibold, 600);
+    border-bottom: 1px solid var(--border-default);
     margin-bottom: 8px;
 }
 
 .sidebar-settings__group-count {
     margin-left: auto;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: 11px;
-    font-weight: 500;
-    color: var(--text-muted, #5f6368);
-    background: rgba(255, 255, 255, 0.05);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-muted);
+    background: var(--surface-raised);
     padding: 2px 8px;
-    border-radius: 10px;
+    border-radius: var(--radius-xs);
 }
 
 .sidebar-settings__list {
@@ -114,21 +119,22 @@
     gap: 6px;
 }
 
+/* 項目列：hairline 框＋近直角 */
 .sidebar-settings__item {
     display: flex;
     align-items: center;
     gap: 10px;
     padding: 8px 10px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    border-radius: 8px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
     cursor: grab;
     transition: all 0.2s;
 }
 
 .sidebar-settings__item:hover {
-    background: rgba(255, 255, 255, 0.06);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
+    border-color: var(--border-dark);
 }
 
 .sidebar-settings__item.dragging {
@@ -136,19 +142,21 @@
     cursor: grabbing;
 }
 
+/* 拖放目標＝橄欖（作用態，合法用金） */
 .sidebar-settings__item.drag-over {
-    border-color: var(--accent-gold, #d4a84b);
-    background: rgba(212, 168, 75, 0.1);
+    border-color: var(--accent-gold);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
 }
 
 .sidebar-settings__drag-handle {
-    color: var(--text-muted, #5f6368);
+    color: var(--text-muted);
     cursor: grab;
     flex-shrink: 0;
 }
 
+/* 項目圖示：卡其小標色（金色紀律——不逐列上金） */
 .sidebar-settings__icon {
-    color: var(--accent-gold, #d4a84b);
+    color: var(--color-secondary);
     display: flex;
     align-items: center;
     flex-shrink: 0;
@@ -156,36 +164,37 @@
 
 .sidebar-settings__label {
     flex: 1;
-    font-size: 13px;
-    color: var(--text-primary, #e8eaed);
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-primary);
     cursor: text;
     padding: 4px 6px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition: background 0.2s;
     min-width: 80px;
 }
 
 .sidebar-settings__label:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: var(--surface-hover);
 }
 
 .sidebar-settings__path {
     font-size: 11px;
-    color: var(--text-muted, #5f6368);
-    font-family: monospace;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
     max-width: 100px;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
+/* 改名輸入框：編輯中＝橄欖框（作用態） */
 .sidebar-settings__input {
     flex: 1;
-    font-size: 13px;
-    color: var(--text-primary, #e8eaed);
-    background: rgba(0, 0, 0, 0.3);
-    border: 1px solid var(--accent-gold, #d4a84b);
-    border-radius: 4px;
+    font-size: var(--font-size-sm, 13px);
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    border: 1px solid var(--accent-gold);
+    border-radius: var(--radius-xs);
     padding: 4px 6px;
     outline: none;
     min-width: 80px;
@@ -194,17 +203,17 @@
 .sidebar-settings__visibility {
     background: transparent;
     border: none;
-    color: var(--text-muted, #5f6368);
+    color: var(--text-muted);
     cursor: pointer;
     padding: 4px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     transition: all 0.2s;
     flex-shrink: 0;
 }
 
 .sidebar-settings__visibility:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: var(--text-primary, #e8eaed);
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 /* RBAC Level Selector */
@@ -217,19 +226,20 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    background: rgba(212, 168, 75, 0.1);
-    border: 1px solid rgba(212, 168, 75, 0.3);
-    color: var(--accent-gold, #d4a84b);
+    background: var(--surface-default);
+    border: 1px solid var(--border-default);
+    color: var(--color-secondary);
     font-size: 11px;
     padding: 4px 8px;
-    border-radius: 4px;
+    border-radius: var(--radius-xs);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .sidebar-settings__level-btn:hover {
-    background: rgba(212, 168, 75, 0.2);
-    border-color: var(--accent-gold, #d4a84b);
+    background: var(--surface-hover);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
 }
 
 .sidebar-settings__level-dropdown {
@@ -237,10 +247,10 @@
     top: 100%;
     right: 0;
     margin-top: 4px;
-    background: var(--layout-bg, #0b111b);
-    border: 1px solid var(--accent-gold, #d4a84b);
-    border-radius: 8px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    background: var(--surface-default);
+    border: 1px solid var(--border-dark);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
     z-index: 500;
     overflow: hidden;
     min-width: 140px;
@@ -252,30 +262,33 @@
     padding: 8px 12px;
     background: transparent;
     border: none;
-    color: var(--text-secondary, #9aa0a6);
-    font-size: 12px;
+    color: var(--text-secondary);
+    font-size: var(--font-size-xs, 12px);
     text-align: left;
     cursor: pointer;
     transition: all 0.15s;
 }
 
 .sidebar-settings__level-option:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary, #e8eaed);
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
+/* 作用態＝橄欖細閂（左緣 inset 2px），不整塊填色 */
 .sidebar-settings__level-option.active {
-    background: rgba(212, 168, 75, 0.15);
-    color: var(--accent-gold, #d4a84b);
-    font-weight: 500;
+    background: transparent;
+    box-shadow: inset 2px 0 0 var(--accent-gold);
+    color: var(--accent-gold);
+    font-weight: var(--font-weight-medium, 500);
 }
 
+/* 頁尾規線（2px） */
 .sidebar-settings__footer {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 12px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-top: 2px solid var(--border-default);
 }
 
 .sidebar-settings__reset {
@@ -283,35 +296,36 @@
     align-items: center;
     gap: 6px;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-secondary, #9aa0a6);
-    font-size: 13px;
+    border: 1px solid var(--border-default);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 13px);
     padding: 8px 12px;
-    border-radius: 8px;
+    border-radius: var(--radius-xs);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .sidebar-settings__reset:hover {
-    background: rgba(255, 255, 255, 0.05);
-    color: var(--text-primary, #e8eaed);
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
+/* 完成鍵：橄欖實心（本面板唯一填色 CTA） */
 .sidebar-settings__done {
     display: flex;
     align-items: center;
     gap: 6px;
-    background: var(--accent-gold, #d4a84b);
+    background: var(--accent-gold);
     border: none;
-    color: #0b111b;
-    font-size: 13px;
-    font-weight: 500;
+    color: var(--text-inverse);
+    font-size: var(--font-size-sm, 13px);
+    font-weight: var(--font-weight-semibold, 600);
     padding: 8px 16px;
-    border-radius: 8px;
+    border-radius: var(--radius-xs);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .sidebar-settings__done:hover {
-    filter: brightness(1.1);
+    background: var(--accent-hover);
 }

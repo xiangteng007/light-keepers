@@ -1,17 +1,22 @@
 /**
- * EmergencyStatusBar.css
- * 
- * Expert Council Navigation Design v3.0
- * Emergency status bar styling
+ * EmergencyStatusBar.css — R5/T3 B3c 野戰手冊化
+ *
+ * 狀態安靜律（DESIGN_LANGUAGE v2 §B-5，參考航空 EFIS）：
+ * 底＝深面板灰字，不整塊填色；只有「等級章＋色點圖示＋2px 底規線」讓狀態色說話。
+ * 等寬讀數：經過時間/事件計數一律 mono＋tabular-nums。
+ * 紅色憲法：紅只給 Emergency/Critical（生命安全告警）；Warning 走琥珀。
  */
 
 .emergency-status-bar {
     width: 100%;
     padding: 8px 16px;
-    font-size: 13px;
-    font-weight: 500;
+    font-size: var(--font-size-sm);
+    font-weight: var(--font-weight-medium, 500);
+    color: var(--text-secondary);
+    background: var(--surface-default);
+    border-bottom: 2px solid var(--border-default);
     z-index: 1000;
-    animation: slideDown 0.3s ease;
+    animation: slideDown 150ms ease;
 }
 
 @keyframes slideDown {
@@ -25,26 +30,42 @@
     }
 }
 
-/* Level variants */
+/* ── 等級變體：只上「底規線＋等級章＋圖示」，不染整條 ── */
 .emergency-status-bar.warning {
-    background: linear-gradient(90deg, #92400E 0%, #D97706 50%, #92400E 100%);
-    color: #FEF3C7;
+    border-bottom-color: var(--color-warning);
+}
+
+.emergency-status-bar.warning .status-level,
+.emergency-status-bar.warning .status-icon {
+    color: var(--color-warning);
 }
 
 .emergency-status-bar.emergency {
-    background: linear-gradient(90deg, #991B1B 0%, #DC2626 50%, #991B1B 100%);
-    color: #FEE2E2;
+    border-bottom-color: var(--color-danger);
+}
+
+.emergency-status-bar.emergency .status-level,
+.emergency-status-bar.emergency .status-icon {
+    color: var(--color-danger);
 }
 
 .emergency-status-bar.critical {
-    background: linear-gradient(90deg, #581C87 0%, #9333EA 50%, #581C87 100%);
-    color: #F3E8FF;
-    animation: slideDown 0.3s ease, criticalPulse 2s ease-in-out infinite;
+    border-bottom-color: var(--color-critical);
+}
+
+.emergency-status-bar.critical .status-level,
+.emergency-status-bar.critical .status-icon {
+    color: var(--color-critical);
+}
+
+/* Critical 仍保留告警脈動（災時唯一合法動效） */
+.emergency-status-bar.critical .status-level {
+    animation: criticalPulse 2s ease-in-out infinite;
 }
 
 @keyframes criticalPulse {
     0%, 100% { opacity: 1; }
-    50% { opacity: 0.85; }
+    50% { opacity: 0.7; }
 }
 
 .status-bar-content {
@@ -80,25 +101,33 @@
 }
 
 .status-level {
-    font-weight: 700;
+    font-weight: var(--font-weight-bold, 700);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: var(--tracking-zh, 0);
     flex-shrink: 0;
 }
 
 .status-divider {
-    opacity: 0.5;
+    color: var(--border-dark);
     flex-shrink: 0;
 }
 
 .status-incident {
+    color: var(--text-primary);
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .status-location {
-    opacity: 0.8;
+    color: var(--text-secondary);
+}
+
+/* 等寬讀數：經過時間不跳動 */
+.status-elapsed {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-secondary);
 }
 
 .status-bar-right {
@@ -109,46 +138,52 @@
 }
 
 .status-count {
-    opacity: 0.8;
-    font-size: 12px;
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    color: var(--text-tertiary);
+    font-size: var(--font-size-xs);
 }
 
+/* 前往戰情：hairline 框按鈕（不填色；hover 才亮橄欖） */
 .status-action {
     display: flex;
     align-items: center;
     gap: 4px;
     padding: 4px 12px;
-    background: rgba(255, 255, 255, 0.15);
-    border-radius: 4px;
-    color: inherit;
+    background: transparent;
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
     text-decoration: none;
-    font-weight: 600;
+    font-weight: var(--font-weight-semibold, 600);
     transition: all 150ms ease;
 }
 
 .status-action:hover {
-    background: rgba(255, 255, 255, 0.25);
+    border-color: var(--accent-gold);
+    color: var(--accent-gold);
+    background: var(--surface-hover);
 }
 
 /* Responsive */
 @media (max-width: 768px) {
     .emergency-status-bar {
         padding: 6px 12px;
-        font-size: 12px;
+        font-size: var(--font-size-xs);
     }
-    
+
     .status-bar-content {
         flex-wrap: wrap;
     }
-    
+
     .status-incident {
         max-width: 200px;
     }
-    
+
     .status-count {
         display: none;
     }
-    
+
     .status-action span {
         display: none;
     }

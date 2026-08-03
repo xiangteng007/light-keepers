@@ -1,5 +1,5 @@
 // Lightkeepers VI Design System - UI Components
-// Premium Design: 極簡高端 · 現代 SaaS · 北歐溫暖
+// B3c 野戰手冊設計語言（R5/T3）：hairline 規線、平面印刷、橄欖強調、紅色憲法
 
 // Core Components
 export { Button } from './Button';

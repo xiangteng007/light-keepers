@@ -1,73 +1,69 @@
 /* ============================================
-   Button Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   Button Component — B3c 野戰手冊（R5/T3）
+   平面印刷質感：無漸層、無浮起、無光暈。
+   主按鈕＝橄欖實心＋深字；次要＝2px 描邊；
+   danger 受紅色憲法約束（見下方註記與 Button.tsx JSDoc）。
+
+   ⚠ 選擇器一律 .lk-btn.lk-btn（同 class 重複＝(0,2,0)）：
+   前朝 styles/tokens/components.css（經 globals.css 載入）宣告了
+   同名 .lk-btn 家族且 cascade 順序不定，會以 navy hover/#B91C1C
+   等舊色覆蓋本檔。根治＝移除該 @import（globals.css 不在本批
+   檔案集內），屆時可還原單層 class。
 ============================================ */
 
-.lk-btn {
+.lk-btn.lk-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--spacing-2);
-    font-family: var(--font-family-primary);
+    font-family: var(--font-sans, var(--font-family-primary));
     font-weight: var(--font-weight-semibold);
+    letter-spacing: var(--tracking-zh);
     border-radius: var(--btn-radius);
     cursor: pointer;
-    transition: all var(--duration-normal) var(--ease-smooth);
-    border: none;
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth),
+        color var(--duration-fast) var(--ease-smooth),
+        box-shadow var(--duration-fast) var(--ease-smooth);
+    border: 1px solid transparent;
     outline: none;
     white-space: nowrap;
     position: relative;
-    overflow: hidden;
 }
 
-/* Ripple effect layer */
-.lk-btn::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
-    opacity: 0;
-    transition: opacity var(--duration-fast) var(--ease-smooth);
-}
-
-.lk-btn:hover::before {
-    opacity: 1;
-}
-
-.lk-btn:disabled {
+.lk-btn.lk-btn:disabled {
     opacity: 0.5;
     cursor: not-allowed;
-    transform: none !important;
     box-shadow: none !important;
 }
 
 /* ===== Sizes ===== */
-.lk-btn--xs {
+.lk-btn.lk-btn--xs {
     height: var(--btn-height-xs);
     padding: var(--btn-padding-xs);
     font-size: var(--font-size-xs);
     border-radius: var(--radius-md);
 }
 
-.lk-btn--sm {
+.lk-btn.lk-btn--sm {
     height: var(--btn-height-sm);
     padding: var(--btn-padding-sm);
     font-size: var(--font-size-sm);
 }
 
-.lk-btn--md {
+.lk-btn.lk-btn--md {
     height: var(--btn-height-md);
     padding: var(--btn-padding-md);
     font-size: var(--font-size-base);
 }
 
-.lk-btn--lg {
+.lk-btn.lk-btn--lg {
     height: var(--btn-height-lg);
     padding: var(--btn-padding-lg);
     font-size: var(--font-size-md);
 }
 
-.lk-btn--xl {
+.lk-btn.lk-btn--xl {
     height: var(--btn-height-xl);
     padding: var(--btn-padding-xl);
     font-size: var(--font-size-lg);
@@ -76,97 +72,115 @@
 
 /* ===== Variants ===== */
 
-/* Primary */
-.lk-btn--primary {
-    background: var(--gradient-gold);
-    color: var(--color-brown-900);
-    box-shadow: var(--shadow-sm);
-}
-
-.lk-btn--primary:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow);
-}
-
-.lk-btn--primary:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-    box-shadow: var(--shadow-sm);
-}
-
-.lk-btn--primary:focus-visible {
-    box-shadow: var(--shadow-md), 0 0 0 3px rgba(196, 167, 125, 0.4);
-}
-
-/* Secondary */
-.lk-btn--secondary {
-    background: transparent;
-    color: var(--text-secondary);
-    border: 1.5px solid var(--border-color);
-}
-
-.lk-btn--secondary:hover:not(:disabled) {
-    background: var(--bg-hover);
-    border-color: var(--border-light);
-    color: var(--text-primary);
-}
-
-.lk-btn--secondary:focus-visible {
+/* Primary — 橄欖實心＋深字（B3c：唯一可行動高亮） */
+.lk-btn.lk-btn--primary {
+    background: var(--accent-primary);
+    color: var(--text-inverse);
     border-color: var(--accent-primary);
-    box-shadow: 0 0 0 3px rgba(196, 167, 125, 0.2);
 }
 
-/* Danger */
-.lk-btn--danger {
-    background: var(--gradient-danger);
-    color: white;
-    box-shadow: var(--shadow-sm);
+.lk-btn.lk-btn--primary:hover:not(:disabled) {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
 }
 
-.lk-btn--danger:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow-danger);
+.lk-btn.lk-btn--primary:active:not(:disabled) {
+    background: var(--color-primary-dark, var(--accent-primary));
+    border-color: var(--color-primary-dark, var(--accent-primary));
 }
 
-.lk-btn--danger:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
+.lk-btn.lk-btn--primary:focus-visible {
+    box-shadow: var(--focus-ring);
 }
 
-/* Success */
-.lk-btn--success {
-    background: var(--gradient-success);
-    color: white;
-    box-shadow: var(--shadow-sm);
-}
-
-.lk-btn--success:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg), var(--shadow-glow-success);
-}
-
-.lk-btn--success:active:not(:disabled) {
-    transform: translateY(0) scale(0.98);
-}
-
-/* Ghost */
-.lk-btn--ghost {
+/* Secondary — 2px 描邊（B3c 規線語彙），透明底 */
+.lk-btn.lk-btn--secondary {
     background: transparent;
-    color: var(--accent-primary);
+    color: var(--text-primary);
+    border: 2px solid var(--border-default);
 }
 
-.lk-btn--ghost:hover:not(:disabled) {
-    background: rgba(196, 167, 125, 0.1);
+.lk-btn.lk-btn--secondary:hover:not(:disabled) {
+    background: var(--surface-hover, var(--bg-hover));
+    border-color: var(--border-dark);
 }
 
-.lk-btn--ghost:active:not(:disabled) {
-    background: rgba(196, 167, 125, 0.15);
+.lk-btn.lk-btn--secondary:active:not(:disabled) {
+    background: var(--surface-pressed, var(--bg-active));
+}
+
+.lk-btn.lk-btn--secondary:focus-visible {
+    border-color: var(--border-focus);
+    box-shadow: var(--focus-ring);
+}
+
+/* Danger — 紅色憲法（DESIGN_LANGUAGE v2 §D）：
+   只准用於生命/安全語義（SOS、BLACK 傷票、禁入區、撤離、不可逆銷毀）。
+   一般錯誤/失敗流程請用 secondary＋琥珀訊息，不得掛 danger。
+   深紅底＋紙白字：對比 ≥6.8:1（#EDE9DA on #893336）。 */
+.lk-btn.lk-btn--danger {
+    background: var(--color-danger-dark, var(--color-danger));
+    color: var(--text-primary);
+    border-color: var(--color-danger);
+}
+
+.lk-btn.lk-btn--danger:hover:not(:disabled) {
+    background: var(--color-danger);
+    border-color: var(--color-danger-light, var(--color-danger));
+}
+
+.lk-btn.lk-btn--danger:active:not(:disabled) {
+    background: var(--color-danger-dark, var(--color-danger));
+}
+
+.lk-btn.lk-btn--danger:focus-visible {
+    box-shadow: 0 0 0 3px var(--color-danger-bg);
+}
+
+/* Success — 平面實心＋深字 */
+.lk-btn.lk-btn--success {
+    background: var(--color-success);
+    color: var(--text-inverse);
+    border-color: var(--color-success);
+}
+
+.lk-btn.lk-btn--success:hover:not(:disabled) {
+    background: var(--color-success-light, var(--color-success));
+    border-color: var(--color-success-light, var(--color-success));
+}
+
+.lk-btn.lk-btn--success:active:not(:disabled) {
+    background: var(--color-success-dark, var(--color-success));
+}
+
+.lk-btn.lk-btn--success:focus-visible {
+    box-shadow: var(--focus-ring);
+}
+
+/* Ghost — 無框文字鈕，hover 才浮出面 */
+.lk-btn.lk-btn--ghost {
+    background: transparent;
+    color: var(--text-accent, var(--accent-primary));
+}
+
+.lk-btn.lk-btn--ghost:hover:not(:disabled) {
+    background: var(--primary-light, var(--surface-hover));
+}
+
+.lk-btn.lk-btn--ghost:active:not(:disabled) {
+    background: var(--surface-pressed, var(--bg-active));
+}
+
+.lk-btn.lk-btn--ghost:focus-visible {
+    box-shadow: var(--focus-ring);
 }
 
 /* ===== Loading State ===== */
-.lk-btn--loading {
+.lk-btn.lk-btn--loading {
     pointer-events: none;
 }
 
-.lk-btn__spinner {
+.lk-btn .lk-btn__spinner {
     width: 16px;
     height: 16px;
     border: 2px solid transparent;

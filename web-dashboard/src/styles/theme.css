@@ -97,16 +97,16 @@
     height: 36px;
     padding: 0;
     background: transparent;
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 8px;
+    border: 1px solid var(--border-color, #2E3122);
+    border-radius: var(--radius-lg, 4px);
     cursor: pointer;
     transition: all 0.2s ease;
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary, #B4B3A6);
 }
 
 .theme-toggle:hover {
-    background: var(--bg-hover, #f1f5f9);
-    color: var(--text-primary, #1e293b);
+    background: var(--bg-hover, #20231A);
+    color: var(--text-primary, #EDE9DA);
     transform: scale(1.05);
 }
 
@@ -127,7 +127,8 @@
 
 .dark .theme-toggle:hover {
     background: var(--bg-hover);
-    color: #fbbf24;
+    /* B3c：橄欖＝唯一可行動高亮（舊亮色金 #fbbf24 已除役） */
+    color: var(--accent-gold, #9BA85C);
 }
 
 /* ============================================
@@ -145,10 +146,10 @@
     right: 0;
     margin-top: 8px;
     min-width: 150px;
-    background: var(--bg-card, #ffffff);
-    border: 1px solid var(--border-color, #e5e7eb);
-    border-radius: 10px;
-    box-shadow: var(--shadow-lg, 0 10px 15px rgba(0, 0, 0, 0.1));
+    background: var(--bg-card, #1C1E14);
+    border: 1px solid var(--border-color, #2E3122);
+    border-radius: var(--radius-xl, 6px);
+    box-shadow: var(--shadow-lg, 0 12px 30px rgba(0, 0, 0, 0.4));
     overflow: hidden;
     z-index: 1000;
     animation: slideDown 0.2s ease;
@@ -164,18 +165,18 @@
     border: none;
     cursor: pointer;
     font-size: 0.875rem;
-    color: var(--text-secondary, #64748b);
+    color: var(--text-secondary, #B4B3A6);
     transition: all 0.15s ease;
 }
 
 .theme-selector__option:hover {
-    background: var(--bg-hover, #f1f5f9);
-    color: var(--text-primary, #1e293b);
+    background: var(--bg-hover, #20231A);
+    color: var(--text-primary, #EDE9DA);
 }
 
 .theme-selector__option--active {
-    background: var(--primary-light, rgba(59, 130, 246, 0.1));
-    color: var(--primary-color, #3b82f6);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
+    color: var(--primary-color, #9BA85C);
 }
 
 .theme-selector__option-icon {
@@ -188,7 +189,7 @@
 }
 
 .theme-selector__option-check {
-    color: var(--primary-color, #3b82f6);
+    color: var(--primary-color, #9BA85C);
     font-size: 0.875rem;
 }
 

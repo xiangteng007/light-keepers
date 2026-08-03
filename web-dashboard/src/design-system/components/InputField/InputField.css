@@ -1,15 +1,28 @@
 /* ============================================
-   InputField Component - Premium Design
-   極簡高端 · 現代 SaaS · 北歐溫暖
+   InputField Component — B3c 野戰手冊（R5/T3）
+   深面板底＋1px 規線；focus＝橄欖環（--focus-ring）。
+   紅色憲法（DESIGN_LANGUAGE v2 §D）：表單驗證錯誤屬一般錯誤，
+   一律琥珀（--color-warning），紅色只留給生命/安全。
+
+   ⚠ 選擇器一律 .lk-input.lk-input：前朝 styles/tokens/components.css
+   把 .lk-input 當 <input> 元素樣式（width/padding/border/底色），
+   會污染本元件的容器 div；此處提高特異性並顯式歸零。
+   根治＝移除 globals.css 的該 @import（不在本批檔案集）。
 ============================================ */
 
-.lk-input {
+.lk-input.lk-input {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-1-5);
+    /* 歸零前朝 .lk-input（<input> 元素樣式）對容器的污染 */
+    width: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
 }
 
-.lk-input--full-width {
+.lk-input.lk-input--full-width {
     width: 100%;
 }
 
@@ -22,11 +35,11 @@
 }
 
 .lk-input--focused .lk-input__label {
-    color: var(--accent-primary);
+    color: var(--text-accent, var(--accent-primary));
 }
 
 .lk-input--error .lk-input__label {
-    color: var(--color-danger);
+    color: var(--color-warning);
 }
 
 /* ===== Wrapper ===== */
@@ -37,16 +50,17 @@
     background: var(--bg-secondary);
     border: var(--input-border);
     border-radius: var(--input-radius);
-    transition: all var(--duration-normal) var(--ease-smooth);
+    transition: background-color var(--duration-fast) var(--ease-smooth),
+        border-color var(--duration-fast) var(--ease-smooth);
 }
 
 .lk-input--focused .lk-input__wrapper {
-    border-color: var(--accent-primary);
-    background: var(--bg-card);
+    border-color: var(--border-focus);
+    background: var(--bg-tertiary);
 }
 
 .lk-input--error .lk-input__wrapper {
-    border-color: var(--color-danger);
+    border-color: var(--color-warning);
 }
 
 .lk-input--disabled .lk-input__wrapper {
@@ -61,33 +75,34 @@
 }
 
 .lk-input--filled.lk-input--focused .lk-input__wrapper {
-    background: var(--bg-card);
-    border-color: var(--accent-primary);
+    background: var(--bg-tertiary);
+    border-color: var(--border-focus);
 }
 
 /* Variant: Outlined */
 .lk-input--outlined .lk-input__wrapper {
     background: transparent;
-    border-width: 1.5px;
+    border-width: 2px;
 }
 
-/* ===== Focus Ring (Glow Effect) ===== */
+/* ===== Focus Ring（橄欖環，取代舊金色光暈） ===== */
 .lk-input__focus-ring {
     position: absolute;
-    inset: -3px;
-    border-radius: calc(var(--input-radius) + 3px);
+    inset: -1px;
+    border-radius: var(--input-radius);
     pointer-events: none;
     opacity: 0;
-    transition: opacity var(--duration-normal) var(--ease-smooth);
-    box-shadow: var(--shadow-glow);
+    transition: opacity var(--duration-fast) var(--ease-smooth);
+    box-shadow: var(--focus-ring);
 }
 
 .lk-input--focused .lk-input__focus-ring {
     opacity: 1;
 }
 
+/* 錯誤態焦點環＝琥珀（一般錯誤不掛紅） */
 .lk-input--error .lk-input__focus-ring {
-    box-shadow: var(--shadow-glow-danger);
+    box-shadow: 0 0 0 3px var(--color-warning-bg);
 }
 
 /* ===== Input Field ===== */
@@ -97,7 +112,7 @@
     background: transparent;
     border: none;
     outline: none;
-    font-family: var(--font-family-primary);
+    font-family: var(--font-sans, var(--font-family-primary));
     font-size: var(--font-size-base);
     color: var(--text-primary);
     padding: var(--input-padding);
@@ -147,7 +162,7 @@
 
 .lk-input--focused .lk-input__prefix,
 .lk-input--focused .lk-input__suffix {
-    color: var(--accent-primary);
+    color: var(--text-accent, var(--accent-primary));
 }
 
 .lk-input__prefix {
@@ -166,5 +181,5 @@
 }
 
 .lk-input__helper--error {
-    color: var(--color-danger);
+    color: var(--color-warning);
 }

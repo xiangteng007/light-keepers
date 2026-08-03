@@ -1,11 +1,15 @@
 /**
- * WidgetPicker.css
+ * WidgetPicker.css — R5/T3 B3c 野戰手冊化
+ *
+ * 挑選器深面板：2px 規線＋近直角（radius ≤6px）＋標題列/頁尾規線。
+ * 分類 chip＝近直角；作用態＝橄欖實心（每屏唯一填色元素）。
+ * 顏色一律語義 token；平時/災時由 tokens.css Layer 8/9 自動換盤。
  */
 
 .widget-picker-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.6);
+    background: var(--v2-bg-dim, rgba(0, 0, 0, 0.45));
     backdrop-filter: blur(4px);
     display: flex;
     align-items: center;
@@ -28,10 +32,10 @@
     width: 90%;
     max-width: 700px;
     max-height: 80vh;
-    background: rgba(30, 41, 59, 0.98);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    background: var(--surface-default);
+    border-radius: var(--radius-xl);
+    border: 2px solid var(--border-default);
+    box-shadow: var(--shadow-lg);
     display: flex;
     flex-direction: column;
     overflow: hidden;
@@ -50,18 +54,20 @@
     }
 }
 
-/* Header */
+/* Header — 標題列規線（2px） */
 .widget-picker__header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 16px 20px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid var(--border-default);
 }
 
 .widget-picker__header h2 {
-    font-size: 18px;
-    color: #e8eaed;
+    font-size: var(--font-size-lg, 18px);
+    font-weight: var(--font-weight-semibold, 600);
+    letter-spacing: var(--tracking-zh, 0);
+    color: var(--text-primary);
     margin: 0;
 }
 
@@ -71,17 +77,17 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: rgba(255, 255, 255, 0.1);
+    background: transparent;
     border: none;
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.6);
+    border-radius: var(--radius-xs);
+    color: var(--text-secondary);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .widget-picker__close:hover {
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
 /* Search */
@@ -92,23 +98,23 @@
 .widget-picker__search input {
     width: 100%;
     padding: 12px 16px;
-    background: rgba(0, 0, 0, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #e8eaed;
-    font-size: 14px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    color: var(--text-primary);
+    font-size: var(--font-size-base, 15px);
 }
 
 .widget-picker__search input:focus {
     outline: none;
-    border-color: var(--accent-gold, #d4a84b);
+    border-color: var(--border-focus);
 }
 
 .widget-picker__search input::placeholder {
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
 }
 
-/* Category Tabs */
+/* Category Tabs — 近直角 chip */
 .widget-picker__tabs {
     display: flex;
     gap: 8px;
@@ -119,25 +125,27 @@
 .widget-picker__tabs .tab {
     flex-shrink: 0;
     padding: 8px 14px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 20px;
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 13px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-default);
+    border-radius: var(--radius-xs);
+    color: var(--text-secondary);
+    font-size: var(--font-size-sm, 13px);
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
 }
 
 .widget-picker__tabs .tab:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: var(--surface-hover);
+    color: var(--text-primary);
 }
 
+/* 作用態 chip＝橄欖實心 */
 .widget-picker__tabs .tab.active {
-    background: var(--accent-gold, #d4a84b);
-    border-color: var(--accent-gold, #d4a84b);
-    color: #000;
-    font-weight: 600;
+    background: var(--accent-gold);
+    border-color: var(--accent-gold);
+    color: var(--text-inverse);
+    font-weight: var(--font-weight-semibold, 600);
 }
 
 /* Grid */
@@ -154,26 +162,25 @@
     grid-column: 1 / -1;
     text-align: center;
     padding: 40px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-muted);
 }
 
-/* Card */
+/* Card — hairline 框＋近直角 */
 .widget-picker__card {
     display: flex;
     align-items: center;
     gap: 12px;
     padding: 14px;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 12px;
+    background: var(--surface-raised);
+    border: 1px solid var(--border-light);
+    border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .widget-picker__card:hover {
-    background: rgba(212, 168, 75, 0.1);
-    border-color: var(--accent-gold, #d4a84b);
-    transform: translateY(-2px);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
+    border-color: var(--accent-gold);
 }
 
 .card-icon {
@@ -187,28 +194,31 @@
 }
 
 .card-info h4 {
-    font-size: 14px;
-    color: #e8eaed;
+    font-size: var(--font-size-base, 15px);
+    color: var(--text-primary);
     margin: 0 0 4px;
 }
 
 .card-info p {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-muted);
     margin: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
+/* 尺寸讀數：mono 不跳動 */
 .card-size {
     display: inline-block;
     margin-top: 4px;
     padding: 2px 6px;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    background: var(--surface-hover);
+    border-radius: var(--radius-xs);
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-tertiary);
 }
 
 .card-add {
@@ -217,9 +227,9 @@
     justify-content: center;
     width: 32px;
     height: 32px;
-    background: rgba(212, 168, 75, 0.2);
-    border-radius: 50%;
-    color: var(--accent-gold, #d4a84b);
+    background: var(--primary-light, rgba(155, 168, 92, 0.14));
+    border-radius: var(--radius-xs);
+    color: var(--accent-gold);
     opacity: 0;
     transition: opacity 0.2s;
 }
@@ -228,14 +238,14 @@
     opacity: 1;
 }
 
-/* Footer */
+/* Footer — 頁尾規線（2px） */
 .widget-picker__footer {
     padding: 12px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 2px solid var(--border-default);
     text-align: center;
 }
 
 .widget-picker__footer span {
-    font-size: 12px;
-    color: rgba(255, 255, 255, 0.4);
+    font-size: var(--font-size-xs, 12px);
+    color: var(--text-muted);
 }

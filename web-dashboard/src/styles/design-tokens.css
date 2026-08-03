@@ -13,15 +13,28 @@
  *
  * @version 3.0.0
  * @see docs/architecture/DESIGN_SYSTEM_CONSOLIDATION.md
+ *
+ * ── R5/T3 清掃盤點（2026-08-03）──
+ * import 現況：仍由 src/index.css 第 15 行 `@import url('./styles/design-tokens.css')`
+ * 載入（載入序在 tokens.css 之後）。
+ * grep 證據（src/ 全域 .ts/.tsx/.css）：本檔的組件類
+ *   .btn-metal / .btn-copper / .copper-divider / .gradient-bg /
+ *   .card-industrial / .tag-warning / .tag-danger
+ * 僅本檔自身出現，無任何 TSX/CSS 引用 → 全數死碼（K1/K2 工業鋼鐵世代遺留）。
+ * ApprovalCenterPage.css 等檔頭註解仍提及本檔，但實際只用 token 名，
+ * token 已由 tokens.css Layer 9（B3c）供給。
+ * 依 R5/T3 指示不刪檔，僅標註；後續批次可整檔移除並拔掉 index.css 的 import。
  */
 
 /* ============================================
    OLED 低耗電優化樣式
    ============================================ */
+/* @deprecated(tokens) 舊 K2 銅鋼裸 hex #1C1917 與 tokens.css Layer 9 的
+   --bg-primary(#16170F) 重複且相衝（本規則 0,1,1 勝過 globals.css 的
+   html,body 元素規則，data-theme="dark" 時會蓋掉 B3c 底色）→ 改走 token。 */
 [data-theme="dark"] body,
 [data-theme="copper-steel"] body {
-  /* 純黑背景 = 0 耗電 (OLED) */
-  background-color: #1C1917;
+  background-color: var(--bg-primary, #16170F);
 }
 
 /* 減少不必要的漸層（漸層需要更多像素發光） */
@@ -40,17 +53,22 @@
 /* ============================================
    CJK 文字優化
    ============================================ */
+/* B3c 排印鐵律 #1：中文字距永遠 0（舊 0.02em 會以 :lang 選擇器 0,1,0
+   蓋過 tokens.css Layer 10 的 body 規則）；斷行規則保留。 */
 :lang(zh-TW),
 :lang(zh-CN),
 :lang(ja),
 :lang(ko) {
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-zh, 0);
   word-break: keep-all;
   overflow-wrap: break-word;
 }
 
 /* ============================================
    工業風格組件樣式
+   @deprecated(dead-code) 以下所有類名（.btn-metal/.btn-copper/
+   .card-industrial/.tag-warning/.tag-danger）grep 全 src 無引用，
+   詳見檔頭 R5/T3 盤點。不新增使用。
    ============================================ */
 
 /* 金屬按鈕效果 - K1 亮鋼 */
