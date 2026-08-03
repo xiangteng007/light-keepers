@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { WarningIcon } from '../design-system/icons';
 import { Alert, Card, Button, Badge, Modal } from '../design-system';
 import EmptyState from '../components/shared/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton/Skeleton';

@@ -564,7 +564,7 @@ export default function ResourcesPage() {
                                 ) : logs.length === 0 ? (
                                     <tr>
                                         <td colSpan={isOwner ? 7 : 6} className="table-message-cell">
-                                            <EmptyState variant="minimal" icon={ScrollText} title="尚無物資紀錄" />
+                                            <EmptyState variant="minimal" icon={AuditIcon} title="尚無物資紀錄" />
                                         </td>
                                     </tr>
                                 ) : (
