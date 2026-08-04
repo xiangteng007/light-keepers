@@ -67,6 +67,17 @@ docker compose -f "$COMPOSE" --env-file "$ENVFILE" config >/dev/null
 log "up -d 核心服務（postgres backend nginx）"
 docker compose -f "$COMPOSE" --env-file "$ENVFILE" up -d postgres backend nginx
 
+# 自癒：ADM 環境下 dockerd 可能缺 LK bridge 的 MASQUERADE（O3 實測：容器
+# 對外全超時、NAT 表無 172.23 規則）。冪等補上——只針對 LK 自己的網段。
+NET_ID=$(docker network inspect lightkeepers-nas --format '{{.Id}}' 2>/dev/null | cut -c1-12)
+NET_SUBNET=$(docker network inspect lightkeepers-nas --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null)
+if [ -n "$NET_ID" ] && [ -n "$NET_SUBNET" ]; then
+    if ! iptables -t nat -C POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE 2>/dev/null; then
+        iptables -t nat -A POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE
+        log "已補 MASQUERADE：$NET_SUBNET ! -o br-$NET_ID（dockerd 規則缺失自癒）"
+    fi
+fi
+
 log "等 postgres healthy…"
 for i in $(seq 1 30); do
     st=$(docker inspect --format '{{.State.Health.Status}}' lk-postgres 2>/dev/null || echo none)
@@ -94,7 +105,9 @@ if [ -f "$LK_ROOT/.diag" ]; then
     LLM_HOST=$(grep ^LLM_BASE_URL "$ENVFILE" | sed 's#.*//##; s#[:/].*##')
     log "LLM host: $LLM_HOST"
     docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend sh -c "wget -qO- -T 4 http://$LLM_HOST:11434/v1/models 2>&1 | head -c 120; echo; echo exit=\$?" || true
-    docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend sh -c "ip route 2>/dev/null | head -3; wget -qO- -T 4 http://192.168.31.76:8080/healthz 2>&1 | head -c 40; echo; echo host-hairpin-exit=\$?" || true
+    docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend sh -c "wget -qO- -T 4 http://1.1.1.1 2>&1 | head -c 60; echo; echo inet-exit=\$?" || true
+    iptables -t nat -S POSTROUTING 2>/dev/null | grep -E "172\.2[0-9]|MASQ" | head -6
+    docker network inspect lightkeepers-nas --format "{{range .IPAM.Config}}{{.Subnet}}{{end}}" 2>/dev/null
     rm -f "$LK_ROOT/.diag"
 fi
 
