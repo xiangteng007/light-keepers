@@ -1,13 +1,10 @@
 name: Deploy to Cloud Run
 
-# 部署閘門：只在 main 分支的 "CI/CD Pipeline" 成功後才觸發。
-# 不再使用 push 觸發，避免測試紅燈仍然部署到 production。
-# workflow_dispatch 保留，供緊急修復／回滾時手動部署使用。
+# ⚠ DEPRECATED（S5.9，2026-08-04）：Cloud Run 部署路徑已停用，僅保留作回雲參考。
+# 現行部署目標是自架 NAS（infra/nas/）；GCP 生產環境已下線（D20）。
+# 原自動觸發（CI/CD Pipeline 成功後 workflow_run）已移除，避免誤部署；
+# 僅保留 workflow_dispatch，回雲時先確認 GCP 專案／憑證再手動執行。
 on:
-  workflow_run:
-    workflows: ["CI/CD Pipeline"]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
 
 env:

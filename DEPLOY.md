@@ -1,5 +1,9 @@
 # 🚀 Light Keepers 部署指南
 
+> **⚠ DEPRECATED（S5.9，2026-08-04）**：本文件描述的 GCP（Cloud Run／Cloud Build）部署路徑已停用，僅保留作回雲參考。
+> 現行部署目標是自架 NAS（見 `infra/nas/README.md`）；GCP 生產環境已下線且資料不可取回（D20）。
+> Vercel 帳號僅保留作網域管理用（D24），`vercel.json` 已撤除（D25）。
+
 ## 快速開始
 
 ### 1. LINE Bot 設定

@@ -1,8 +1,9 @@
 name: Deploy to Staging
 
+# ⚠ DEPRECATED（S5.9，2026-08-04）：GCP staging 部署已停用，僅保留作回雲參考。
+# staging 已定調為開發機 compose（D33），不再部署到 Cloud Run。
+# 原 push develop 自動觸發已移除；僅保留 workflow_dispatch。
 on:
-  push:
-    branches: [develop]
   workflow_dispatch:
 
 env:

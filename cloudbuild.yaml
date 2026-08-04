@@ -1,3 +1,7 @@
+# ⚠ DEPRECATED（S5.9，2026-08-04）：本檔已停用，僅保留作回雲參考。
+#   平台已改為自架 NAS 部署（infra/nas/），GCP Cloud Run 生產環境已下線（D20）。
+#   回雲時再依本檔重建 Cloud Build 觸發器。
+#
 # Light Keepers - GCP Cloud Build 配置
 # 自動建置並部署到 Cloud Run
 
