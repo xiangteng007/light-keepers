@@ -27,3 +27,7 @@ dist-ssr
 
 # CI lint 報告（Lint 棘輪閘門產生）
 eslint-report.json
+
+# Playwright 產物（跑測試自動生成，不進版控）
+playwright-report/
+test-results/
