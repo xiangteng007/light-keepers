@@ -3,7 +3,8 @@
  * 模組 C: 心理急救引導式對話
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PFAChatLog } from './entities/mood-log.entity';
@@ -64,6 +65,9 @@ export class PFAChatbotService {
     constructor(
         @InjectRepository(PFAChatLog)
         private chatLogRepository: Repository<PFAChatLog>,
+        // N1（S·2.4）：改走 LlmProviderService；原本裸 fetch Gemini 端點
+        // 且直讀 process.env.GEMINI_API_KEY（繞過 ConfigService）——兩者一併終結
+        @Optional() private readonly llm?: LlmProviderService,
     ) { }
 
     // ==================== 對話處理 ====================
@@ -193,14 +197,12 @@ export class PFAChatbotService {
     // ==================== 回應生成 ====================
 
     private async generateResponse(history: ChatMessage[], sentiment: SentimentResult): Promise<string> {
-        // 嘗試使用 Gemini API
-        const apiKey = process.env.GEMINI_API_KEY;
-
-        if (apiKey) {
+        // 經 LlmProviderService（LLM_PROVIDER 路由）；不可用或失敗→模板回應
+        if (this.llm?.isAvailable()) {
             try {
-                return await this.callGeminiAPI(history, sentiment);
+                return await this.generateLlmResponse(history, sentiment);
             } catch (error) {
-                this.logger.error('Gemini API error, falling back to templates', error);
+                this.logger.error('LLM response error, falling back to templates', error);
             }
         }
 
@@ -208,35 +210,21 @@ export class PFAChatbotService {
         return this.generateTemplateResponse(history, sentiment);
     }
 
-    private async callGeminiAPI(history: ChatMessage[], sentiment: SentimentResult): Promise<string> {
-        const apiKey = process.env.GEMINI_API_KEY;
+    private async generateLlmResponse(history: ChatMessage[], sentiment: SentimentResult): Promise<string> {
+        const dialogue = history
+            .map(m => (m.role === 'user' ? '使用者：' : '助手：') + m.content)
+            .join('\n');
 
-        const messages = [
-            { role: 'user', parts: [{ text: PFA_SYSTEM_PROMPT }] },
-            ...history.map(msg => ({
-                role: msg.role === 'user' ? 'user' : 'model',
-                parts: [{ text: msg.content }],
-            })),
-        ];
-
-        const response = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: messages,
-                    generationConfig: {
-                        maxOutputTokens: 256,
-                        temperature: 0.7,
-                    },
-                }),
-            }
-        );
-
-        const data = await response.json();
-        return data.candidates?.[0]?.content?.parts?.[0]?.text || this.generateTemplateResponse(history, sentiment);
+        const { text } = await this.llm!.generateText({
+            useCaseId: 'pfa.chat.v1',
+            systemPrompt: PFA_SYSTEM_PROMPT,
+            prompt: dialogue + '\n\n請以助手身分，用溫暖簡短（100 字內）的繁體中文回應最後一則使用者訊息。',
+            maxOutputTokens: 256,
+            temperature: 0.7,
+        });
+        return text.trim() || this.generateTemplateResponse(history, sentiment);
     }
+
 
     private generateTemplateResponse(history: ChatMessage[], sentiment: SentimentResult): string {
         const lastUserMessage = history.filter(m => m.role === 'user').pop()?.content || '';
