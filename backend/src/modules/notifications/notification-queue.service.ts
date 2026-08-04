@@ -169,45 +169,12 @@ export class NotificationQueueService {
     }
 
     private async sendPush(notification: NotificationPayload): Promise<void> {
-        const fcmServerKey = this.configService.get<string>('FCM_SERVER_KEY');
-
-        if (!fcmServerKey) {
-            this.logger.warn('FCM not configured, skipping push notification');
-            return;
-        }
-
-        // Get user FCM tokens from cache/DB
-        for (const userId of notification.recipients) {
-            const token = await this.cache.get<string>(`user:fcm_token:${userId}`);
-            if (!token) continue;
-
-            try {
-                const response = await fetch('https://fcm.googleapis.com/fcm/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `key=${fcmServerKey}`,
-                    },
-                    body: JSON.stringify({
-                        to: token,
-                        notification: {
-                            title: notification.title,
-                            body: notification.body,
-                            image: notification.imageUrl,
-                            click_action: notification.actionUrl,
-                        },
-                        data: notification.data,
-                        priority: notification.priority === NotificationPriority.URGENT ? 'high' : 'normal',
-                    }),
-                });
-
-                if (!response.ok) {
-                    throw new Error(`FCM error: ${response.status}`);
-                }
-            } catch (error) {
-                this.logger.error(`Push to ${userId} failed:`, error);
-            }
-        }
+        // Legacy FCM HTTP API（fcm.googleapis.com/fcm/send）已於 2024-06 被 Google
+        // 停用，原本打該端點的實作是死路徑，已移除（S5.5）。
+        // 替代通道 Web Push (VAPID) 屬工作項 S5.4，接回前 push 一律略過。
+        this.logger.warn(
+            `Push channel unavailable (legacy FCM API removed, pending S5.4 Web Push), skipping: ${notification.title}`,
+        );
     }
 
     private async sendLine(notification: NotificationPayload): Promise<void> {
