@@ -97,19 +97,19 @@
 
 | # | 任務 | 期別 | 理由 | 狀態 |
 |---|---|---|---|---|
-| F1 | S2.1：compose＋`.env.nas.example` 補 `LLM_PROVIDER=hybrid`、`LLM_MODEL=qwen2.5:7b-instruct` | S·2.1 | 兩檔各一兩行 | **READY**（不做則 LLM 全打 Gemini） |
-| F2 | `infra/nas/README.md` §8 過期項修（「LLM provider 尚未實作」已過期）＋儲存池段改「已建好」＋目錄/port 對照 A4 定案 | S·1.5 | 文件同步 | **READY** |
-| F3 | S4.5 RUNBOOK RTO 改寫：雙情境（資料壞 ≤4h／機器沒了=採購期+4h） | S·4.5 | 文件誠實化 | **READY** |
-| F4 | S4.7 SOP 三條寫入 RUNBOOK：停電切離線／應變期停 GPU 訓練／NAS 掛時人工告警管道 | S·4.7 | 文件 | **READY** |
-| F5 | S6.6 秘密清單與輪換程序文件（含 ENCRYPTION_KEY/rclone 密碼「換錯即永久不可解」警語） | S·6.6 | 清單文件 | **READY** |
-| F6 | S6.7 每月維護日 SOP（ADM/映像/CVE/磁碟/演練 checklist） | S·6.7 | 清單文件 | **READY** |
-| F7 | S7.1 開站公告草稿＋S7.3 PWA 重裝教學一頁 | S·7 | 文件草擬 | **READY** |
-| F8 | S5.9：`vercel.json` 撤 preview 部署＋`cloudbuild.yaml`/`DEPLOY.md` 標 deprecated＋`deploy.yml`/`deploy-staging.yml` 停用註記（Vercel 帳號保留管網域） | S·5.9 | 設定/標註 | **READY** |
-| F9 | S5.5 後端 legacy FCM 死路徑刪除（`notification-queue.sendPush` 的 `fcm.googleapis.com/fcm/send` 段；Google 已停用該 API） | S·5.5 | 死碼移除 | **READY** |
-| F10 | ReportSchedulePage 404 修：前端呼叫 `/report-schedules`→`reports/scheduler` 對齊 | P·4 遺留 | find-replace 級 | **READY** |
-| F11 | 死檔 service×3 刪（orgChartApi/shiftCalendarApi/payrollApi） | P·4 遺留 | 死碼移除 | **READY** |
-| F12 | `Layout.test.tsx` 殘留 lucide passthrough mock 移除＋scratchpad 級殘留清點 | P·R5 尾 | 清理 | **READY** |
-| F13 | 上位計畫執行進度表回寫（R5 收官/D 決策狀態/S 線進度同步三份 doc 一致） | 文件 | 對帳回寫 | **READY** |
+| F1 | S2.1：compose＋`.env.nas.example` 補 `LLM_PROVIDER=hybrid`、`LLM_MODEL=qwen2.5:7b-instruct` | S·2.1 | 兩檔各一兩行 | ✅ **已完成**（2026-08-04；compose config 通過） |
+| F2 | `infra/nas/README.md` §8 過期項修（「LLM provider 尚未實作」已過期）＋儲存池段改「已建好」＋目錄/port 對照 A4 定案 | S·1.5 | 文件同步 | ✅ **已完成**（2026-08-04；含 RTX 4080S/ADM 5.1.3 同步；全量 port/RAM 對帳表仍歸 O2） |
+| F3 | S4.5 RUNBOOK RTO 改寫：雙情境（資料壞 ≤4h／機器沒了=採購期+4h） | S·4.5 | 文件誠實化 | ✅ **已完成**（2026-08-04；RUNBOOK §7.2） |
+| F4 | S4.7 SOP 三條寫入 RUNBOOK：停電切離線／應變期停 GPU 訓練／NAS 掛時人工告警管道 | S·4.7 | 文件 | ✅ **已完成**（2026-08-04；RUNBOOK §7.7；內容待 owner 確認） |
+| F5 | S6.6 秘密清單與輪換程序文件（含 ENCRYPTION_KEY/rclone 密碼「換錯即永久不可解」警語） | S·6.6 | 清單文件 | ✅ **已完成**（2026-08-04；`docs/security/SECRETS_INVENTORY.md`） |
+| F6 | S6.7 每月維護日 SOP（ADM/映像/CVE/磁碟/演練 checklist） | S·6.7 | 清單文件 | ✅ **已完成**（2026-08-04；`docs/operations/MONTHLY_MAINTENANCE.md`；節奏待 owner 確認） |
+| F7 | S7.1 開站公告草稿＋S7.3 PWA 重裝教學一頁 | S·7 | 文件草擬 | ✅ **已完成**（2026-08-04；`RELAUNCH_ANNOUNCEMENT_DRAFT.md`＋`PWA_REINSTALL_GUIDE.md`；發布/動員待 owner） |
+| F8 | S5.9：`vercel.json` 撤 preview 部署＋`cloudbuild.yaml`/`DEPLOY.md` 標 deprecated＋`deploy.yml`/`deploy-staging.yml` 停用註記（Vercel 帳號保留管網域） | S·5.9 | 設定/標註 | ✅ **已完成**（2026-08-04；workflow 僅留 workflow_dispatch） |
+| F9 | S5.5 後端 legacy FCM 死路徑刪除（`notification-queue.sendPush` 的 `fcm.googleapis.com/fcm/send` 段；Google 已停用該 API） | S·5.5 | 死碼移除 | ✅ **已完成**（2026-08-04；`FCM_SERVER_KEY` 一併出 compose/env；spec 10/10 綠） |
+| F10 | ReportSchedulePage 404 修：前端呼叫 `/report-schedules`→`reports/scheduler` 對齊 | P·4 遺留 | find-replace 級 | ✅ **已完成**（2026-08-04；含動詞對齊與後端 `history` 路由順序修正；**殘留**：後端 enabled/cron vs 前端 isActive/frequency 的 DTO 形狀對齊，屬 SONNET 級另列） |
+| F11 | 死檔 service×3 刪（orgChartApi/shiftCalendarApi/payrollApi） | P·4 遺留 | 死碼移除 | ✅ **已完成**（2026-08-04；tsc 綠） |
+| F12 | `Layout.test.tsx` 殘留 lucide passthrough mock 移除＋scratchpad 級殘留清點 | P·R5 尾 | 清理 | ✅ **已完成**（2026-08-04；lucide mock 經查已於 3681268 移除無殘留；Playwright 產物 `playwright-report/`/`test-results/` 出版控＋入 .gitignore） |
+| F13 | 上位計畫執行進度表回寫（R5 收官/D 決策狀態/S 線進度同步三份 doc 一致） | 文件 | 對帳回寫 | ✅ **已完成**（2026-08-04；三份 doc 已對帳：REDESIGN 進度表/RELAUNCH A2·C4/MIGRATION S 表 10 項標記） |
 
 ### ✋ OWNER（無法代勞）
 

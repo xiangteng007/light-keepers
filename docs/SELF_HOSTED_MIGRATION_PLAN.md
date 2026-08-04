@@ -553,7 +553,7 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | S1.2 | 填 `.env`、build image、`compose up`，內網 `verify-stack.sh` 綠燈 | OPUS 陪同 | 1–2 | 🟡 首次部署常卡權限/路徑 |
 | S1.3 | schema 就位（情境 A：`migrate-db.sh`；情境 B/C：`migration:run` on baseline） | OPUS | 1–3 | 🔴 資料正確性 |
 | S1.4 | 前端 build + rsync + nginx 服務驗證 | SONNET | 0.5 | 🟢 |
-| S1.5 | 更新 `infra/nas/README.md` §8 過期項（LLM provider 已實作） | SONNET | 0.2 | 🟢 |
+| S1.5 | ✅ **2026-08-04 完成（F2）** 更新 `infra/nas/README.md` §8 過期項（LLM provider 已實作）＋儲存池段改「已建好」＋A4 共存約束入 §3.2 | SONNET | 0.2 | 🟢 |
 | S1.6 | **field-reports 附件直傳落地端點**（v1.2 新增）：local 模式 `action:'write'` 簽名 URL 在 nginx 上 405（README §8 已知缺口）——補一個驗證簽章並落檔的 backend 端點（驗證端 `LocalStorageProvider.verifySignedUrl()` 已存在），否則**現場照片直傳在 NAS 上是壞的** | OPUS | 1 | 🟠 災防關鍵功能 |
 
 ---
@@ -562,7 +562,7 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 
 | # | 工作 | 分工 | 人日 | 風險 |
 |---|---|---|---|---|
-| S2.1 | **補 `LLM_PROVIDER=hybrid` 到 compose 與 `.env.nas.example`**（D27）；`LLM_MODEL` 改為 `qwen2.5:7b-instruct`（D22） | SONNET | 0.2 | 🟢 **但不做則全案目標落空** |
+| S2.1 | ✅ **2026-08-04 完成（F1）** 補 `LLM_PROVIDER=hybrid` 到 compose 與 `.env.nas.example`（D27）；`LLM_MODEL` 改為 `qwen2.5:7b-instruct`（D22）；compose config 驗證通過 | SONNET | 0.2 | 🟢 |
 | S2.2 | owner 在工作站架 Ollama serve、開內網 11434、拉模型；設 `OLLAMA_KEEP_ALIVE` 讓模型常駐 | **owner** | — | 🟡 |
 | S2.3 | 跑 `backend/src/scripts/llm-benchmark.ts` 用**真實通報資料**（`--dataset`）複測（D13 建議） | OPUS | 0.5 | 🟢 |
 | S2.4 | 收斂 3 處純文字 Gemini 呼叫到 `LlmProviderService`（manuals / pfa-chatbot / voice SITREP） | SONNET | 1 | 🟡 pfa 直讀 `process.env` 需一併修 |
@@ -591,9 +591,9 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | S4.2 | **雙 WAN 備援網路**（4G/5G 路由器 failover）＋ `cloudflared` 多 connector replica | **owner** ＋ OPUS 設定 | 0.5 | 🔴 R2 |
 | S4.3 | **實際設定第二副本目標並跑一次 `restore-drill.sh --source=secondary`**，把 RTO 實測值寫進 RUNBOOK §7.3 | owner + OPUS | 1 | 🔴 R3 |
 | S4.4 | 第二副本改用 **rclone crypt → 加密雲端冷儲存**（D30；`infra/nas/backup/replicate.sh` 已支援，需設定 remote 與密碼保管） | OPUS | 0.5 | 🟠 個資 |
-| S4.5 | 修正 RUNBOOK 的 RTO 目標（區分「資料壞了 ≤4h」vs「機器沒了 = 採購前置期 + 4h」） | SONNET | 0.3 | 🟢 誠實性 |
+| S4.5 | ✅ **2026-08-04 完成（F3）** 修正 RUNBOOK 的 RTO 目標（區分「資料壞了 ≤4h」vs「機器沒了 = 採購前置期 + 4h」，RUNBOOK §7.2） | SONNET | 0.3 | 🟢 誠實性 |
 | S4.6 | NAS 實體安置驗收（RUNBOOK §7.6 清單，拍照存證） | **owner** | — | 🟠 |
-| S4.7 | **SOP 補三條拍板事項**：① 停電超過 UPS 續航 → 切離線模式 ② 應變期間暫停 GPU 訓練工作 ③ NAS 不可用時的人工告警替代管道（幹部 LINE 群組、電話樹） | OPUS + owner 確認 | 0.5 | 🟠 R1/R7/R9 |
+| S4.7 | ✅ **2026-08-04 三條已寫入 RUNBOOK §7.7（F4）**：① 停電超過 UPS 續航 → 切離線模式 ② 應變期間暫停 GPU 訓練工作 ③ NAS 不可用時的人工告警替代管道（幹部 LINE 群組、電話樹）。**待 owner 確認內容** | OPUS + owner 確認 | 0.5 | 🟠 R1/R7/R9 |
 
 ---
 
@@ -605,11 +605,11 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | S5.2 | CI 建 image 推 registry → NAS 拉取的部署路徑（取代 NAS 上手動 build 的 10–20 分鐘）。**🔴 前置鎖鏈（R13）：憑證輪換 → git 歷史清理 → push origin（161 commits）→ CI 才能接手**——歷史含真實個資與私鑰，push 前不可跳過清理；在鎖鏈解開前，image 一律由開發機 build 後傳 NAS（過渡程序寫進 RUNBOOK） | OPUS | 1–2 | 🟡 |
 | S5.3 | Cloudflare Pages 緊急靜態頁（不依賴 NAS，含 119／1991 指引） | SONNET | 0.5 | 🟢 |
 | S5.4 | 多通道告警降級鏈（D28）：**Web Push 死碼接回**（VAPID 金鑰 + 前端接線）、**Email 空殼補實**、LINE Push 升為主力 | OPUS | 2 | 🟠 R8 |
-| S5.5 | **刪除已被 Google 停用的 legacy FCM 路徑**（`notification-queue.sendPush` 的 `fcm.googleapis.com/fcm/send`），統一走 `firebase-admin` v1 | SONNET | 0.5 | 🟢 現在就是壞的 |
+| S5.5 | ✅ **2026-08-04 完成（F9）** 刪除已被 Google 停用的 legacy FCM 路徑（`notification-queue.sendPush` 的 `fcm.googleapis.com/fcm/send`；`FCM_SERVER_KEY` 一併出 compose/env），統一走 `firebase-admin` v1 | SONNET | 0.5 | 🟢 |
 | S5.6 | 公眾端點限流收緊；確認公眾頁**不開 WebSocket**（長連線無法被邊緣快取） | SONNET | 0.5 | 🟢 |
 | S5.7 | **Google Maps 收斂**（D31）：`MapPage`／`MapMarkers`／`MapInfoWindows`／`map-constants` 改用既有 MapLibre 元件；`DirectionsPanel` 改為**深連結開啟使用者手機原生地圖 App**，移除 `@react-google-maps/api` 依賴 | OPUS 設計 / SONNET 批次 | 2–3 | 🟡 需視覺回歸驗證 |
 | S5.8 | **L2「基地台模式」離線演練** + 離線可用頁清單文件 + `OfflinePrepPage` 加「準備度檢查」 | OPUS + owner | 1.5 | 🟠 |
-| S5.9 | 撤除 `vercel.json` 與 Vercel preview（D25）；`cloudbuild.yaml`／`DEPLOY.md` 標註 deprecated；`deploy.yml` 與 `deploy-staging.yml` 停用但保留作回雲參考（D33：staging 定調為開發機 compose） | SONNET | 0.3 | 🟢 |
+| S5.9 | ✅ **2026-08-04 完成（F8）** 撤除 `vercel.json`×2 與 Vercel preview（D25）；`cloudbuild.yaml`／`DEPLOY.md` 標註 deprecated；`deploy.yml` 與 `deploy-staging.yml` 移除自動觸發、僅留 workflow_dispatch 作回雲參考（D33） | SONNET | 0.3 | 🟢 |
 
 ---
 
@@ -624,8 +624,8 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 | S6.3 | **Cloud Logging／Error Reporting 替換**（M.6 承接，v1.1 漏排）：winston 檔案輪替（rotation 進 compose，避免塞滿 NVMe）＋ Sentry 免費額度收錯誤 | SONNET 接線 / OPUS 驗收 | 1 | 🟠 |
 | S6.4 | **NAS 部署回滾機制**：image 以 git SHA tag 版本化、NAS 上保留前一版 image、回滾 SOP 寫進 RUNBOOK——雲上有 Cloud Run revision 可退，**NAS 目前的回滾能力是零** | OPUS | 0.5 | 🟠 |
 | S6.5 | **pgdata 靜態加密評估**：開啟 ADM volume 加密後量測 DB 效能代價，結果回寫為 D34。背景：傷患資料與心理健康紀錄落在家用設備，主資料本體目前未加密（D30 只加密了第二副本） | OPUS | 0.5 | 🟠 個資 |
-| S6.6 | **秘密清單與輪換程序文件**：`.env` 一個檔案集中所有秘密（JWT／DB／LINE／ENCRYPTION_KEY／rclone crypt 密碼…）——列清單、定輪換週期與步驟、納入協會密碼保管流程。⚠ `ENCRYPTION_KEY` 與 rclone crypt 密碼**換錯即資料永久不可解**，要特別標註 | SONNET | 0.3 | 🟠 |
-| S6.7 | **「每月維護日」SOP**：ADM 更新、容器 image 更新、`npm audit`／CVE 掃描、磁碟容量檢查、演練排程檢查——固定每月第一個週末照清單跑，可由 agent 陪跑。雲上 Google 幫你 patch，NAS 上沒有人幫；**沒有這個，一年後這台 NAS 就是一台沒人敢動的黑盒子** | OPUS 撰寫 + owner 確認節奏 | 0.5 | 🟡 長期存亡 |
+| S6.6 | ✅ **2026-08-04 完成（F5）** 秘密清單與輪換程序文件：`docs/security/SECRETS_INVENTORY.md`——18 項盤點、輪換週期與步驟、保管流程；`ENCRYPTION_KEY` 與 rclone crypt 密碼「換錯即永久不可解」獨立成節 | SONNET | 0.3 | 🟠 |
+| S6.7 | ✅ **2026-08-04 SOP 已寫（F6）**：`docs/operations/MONTHLY_MAINTENANCE.md`——ADM/映像/CVE/磁碟/演練五段 checklist，每月第一個週末。**待 owner 確認節奏** | OPUS 撰寫 + owner 確認節奏 | 0.5 | 🟡 長期存亡 |
 | S6.8 | **N5105 效能基準實測**：P95 延遲、WebSocket 連線上限、公眾端點 QPS——「百人級並發足夠」目前是推估，要量測後寫進 `docs/BASELINE_METRICS.md`。**P5 的 PostGIS 索引併入同一次 migration 停機窗口執行**（同一次停機能吃掉的事一次做完） | OPUS | 1 | 🟠 |
 
 ### S7 — 使用者遷移與溝通（v1.2 新增）
@@ -634,9 +634,9 @@ L4  SMS（需付費，D18 既有決策項）                              ← �
 
 | # | 工作 | 分工 | 人日 | 風險 |
 |---|---|---|---|---|
-| S7.1 | 搬遷公告與時程：新網址、停機窗口、**JWT 更換 → 全員強制重新登入** | SONNET 草擬 + **owner 發布** | 0.3 | 🟢 |
+| S7.1 | ✅ **2026-08-04 草稿完成（F7）**：`docs/operations/RELAUNCH_ANNOUNCEMENT_DRAFT.md`（重新開站語境：帳號不延續→重新註冊、PWA 重裝、LINE 不用重加、服務水準說明）。**發布待 owner**（網域/日期補 ⬜ 後依檢查清單發） | SONNET 草擬 + **owner 發布** | 0.3 | 🟢 |
 | S7.2 | Firebase UID 帳號處置：若 D20 查證後 DB 中 `firebaseUid` 非空的帳號 > 0，補「Email 設定本地密碼」流程；若為 0，直接停用 `FirebaseAdminService` 的 Auth 路徑（§1.2-a 的判斷落地） | OPUS | 0.5–1 | 🟡 |
-| S7.3 | **PWA 重裝動員**（R14）：換網域使所有既有 PWA／快取／圖磚包作廢（§3.9-5）——上線後排一波重裝與圖磚下載，搭配 `OfflinePrepPage` 的準備度檢查；教學文件一頁 | **owner 動員** + SONNET 教學 | 0.3 | 🟠 |
+| S7.3 | **PWA 重裝動員**（R14）：✅ **教學一頁已完成（F7，2026-08-04）**：`docs/training/PWA_REINSTALL_GUIDE.md`（五步＋`/hub/offline` 離線整備＋FAQ）。**動員待 owner**（上線後排重裝與圖磚下載波次） | **owner 動員** + SONNET 教學 | 0.3 | 🟠 |
 | S7.4 | LINE 端切換驗證：好友關係與 rich menu 不受影響（Channel 本身不變，只換 webhook URL），但 **webhook 切換期間的訊息會遺失**——選離峰時段切、切完立即實測一則通報 | OPUS | 0.2 | 🟡 |
 
 ---

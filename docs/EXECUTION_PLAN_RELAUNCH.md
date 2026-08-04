@@ -14,7 +14,7 @@
 | # | 工作 | 模型 | 驗收 | 備註 |
 |---|---|---|---|---|
 | A1 | **Baseline migration**：以現有 entity 為準產生 1.2 基準 migration（~120 表），收斂兩個 migration 目錄為一（`src/migrations`）、併入 5 支未跑 migration、修損壞 migration；空庫 `migration:run` 一次建齊＝與 `SYNC_TABLES=true` 產物 diff 為零 | **OPUS 5** | 空 PostGIS 容器 run→schema diff 零；後端 3,499 tests 綠 | 全案最後技術硬前置；無停機窗口約束 |
-| A2 | S2.1：`infra/nas/docker-compose.nas.yml`＋`.env.nas.example` 補 `LLM_PROVIDER=hybrid`、`LLM_MODEL=qwen2.5:7b-instruct` | **SONNET 5** | 兩檔 diff＋compose config 通過 | 不做則 LLM 100% 打 Gemini |
+| A2 | ✅ **2026-08-04 完成（F1）** S2.1：`infra/nas/docker-compose.nas.yml`＋`.env.nas.example` 補 `LLM_PROVIDER=hybrid`、`LLM_MODEL=qwen2.5:7b-instruct` | **SONNET 5** | compose config 通過 ✅ | 已 commit local main |
 | A3 | S2.4：manuals／pfa-chatbot／voice(SITREP) 三處純文字 Gemini 直呼改注入 `LlmProviderService`（pfa 順修直讀 process.env） | **SONNET 5** | 三檔改線；既有 LLM 對測綠 | 規格明確的接線 |
 | A4 | NAS 共存適配：LK compose 依 A4 共存約束改版——目錄 `/volume2/docker/lightkeepers`＋`/volume1/backup/lightkeepers`、RAM 預算改為「部署時實測制」（postgres 2–4g 可調參數化）、host port 全量對帳表、比照 ST 建 `/volume1/Docker/LK/` 部署副本＋守門腳本 | **OPUS 5** | compose config 綠；port/RAM 對帳表入 README | 動 NAS 前讀 `ST/docs/NAS_OPERATIONS.md` |
 
@@ -34,7 +34,7 @@
 | C1 | S6.1/S6.2 告警鏈：UptimeRobot 外部監控＋備份/副本/LLM 降級三訊號經 LINE Bot 推 owner | **OPUS 5**（owner 開 UptimeRobot 帳號） | 拔線演練收到通知 |
 | C2 | S6.4 NAS 回滾機制（image SHA tag＋保留前版＋SOP）＋S6.3 winston 輪替+Sentry | **OPUS 5** | 回滾演練一次成功 |
 | C3 | S4.3/S4.4 備份第二副本實際設定（rclone crypt→雲端冷儲存）＋跨目標還原演練，RTO 實測入 RUNBOOK | **OPUS 5**（owner 開 B2/R2 帳號） | `restore-drill.sh --source=secondary` 綠 |
-| C4 | 文件批：RUNBOOK RTO 雙情境改寫、S4.7 SOP 三條（停電切離線/應變期停訓練/人工告警）、S6.6 秘密清單、S6.7 每月維護日 SOP、S7.1 開站公告草稿 | **SONNET 5** | owner 核可 |
+| C4 | ✅ **2026-08-04 產出完成（F3–F7）** 文件批：RUNBOOK RTO 雙情境改寫（§7.2）、S4.7 SOP 三條（§7.7）、S6.6 秘密清單（SECRETS_INVENTORY.md）、S6.7 每月維護日 SOP（MONTHLY_MAINTENANCE.md）、S7.1 開站公告草稿＋S7.3 PWA 教學。**待 owner 核可** | **SONNET 5** | owner 核可 |
 | C5 | S6.5 pgdata 加密評估（ADM volume 加密效能量測→回寫 D34） | **OPUS 5** | 量測數據＋建議 |
 
 ## Phase D — 產品完備（開站後，優先序由 owner 調）
