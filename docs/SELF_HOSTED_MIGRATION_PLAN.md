@@ -726,6 +726,23 @@ S7.1/S7.3 公告與 PWA 動員 ──────→ 綁定切換日前後執行
 | **D20** | **GCP 資料判定不可取回** → 本案自「搬遷」轉為**「重新開站」**路線 | ①S0.3 baseline migration 升為**硬前置**（且因線上 DB 已不存在，**D7/D15 停機窗口約束全部解除**——baseline 隨時可做，這是重大簡化）②S1.3 走全新 `migration:run`，`migrate-db.sh`/`migrate-gcs-files.sh` 降為不適用③S7.2（Firebase UID 帳號處置）自動消滅——無帳號可遷，**全員重新註冊**④誠實記載：歷史通報/志工/物資資料歸零，協會如有離線備份（Excel/紙本）另議匯入工作項 |
 | **D24** | **網域已於 Vercel 註冊** | 計畫的 Cloudflare 依賴（Tunnel Public Hostname／邊緣快取／Pages／Always Online）需要 zone 在 Cloudflare——**註冊商不用動，把 NS 指到 Cloudflare 免費方案即可**（Vercel 支援自訂 nameserver）。owner 動作：Cloudflare 開 zone → 抄兩筆 NS → Vercel 網域設定貼上。D25（撤 Vercel）微調：**帳號保留**（管網域用），只撤 preview 部署 |
 
+#### A4. ✅ 2026-08-04 定案：NAS 為現役實機（規格自 ST/DRONES 專案實查，D12/D21 關閉）
+
+**實機**：ASUSTOR **AS5404T**、ADM 5.1.3.RH72、hostname `SENTENG-DESIGN`、內網 `192.168.31.76`——**就是 ST 專案現役那台**，儲存池已建好：
+
+| 陣列 | 池 | 實況 |
+|---|---|---|
+| md2 RAID10 | `/volume2`（熱池） | 4×KLEVV 2TB SSD，btrfs 3.7T、剩 **3.6T**——LK 的 pgdata/uploads 落這裡 |
+| md1 RAID6 | `/volume1`（冷池） | 4×Seagate IronWolf 10TB，btrfs 19T、剩 **13T**——LK 備份落這裡 |
+
+`infra/nas/README.md` §3.2 的「建儲存池」步驟**已完成免做**；目錄改開在 `/volume2/docker/lightkeepers` 與 `/volume1/backup/lightkeepers` 即可。GPU 工作站經 DRONES 文件確認＝**RTX 4080 SUPER 16GB**（D21 關閉，D13 qwen2.5:7b 選型成立）。
+
+**⚠ 共存約束（新增，S1 部署前必查）**：
+1. 該 NAS 已跑 **13 個 st-\* 容器＋openclaw 五件套**（qdrant/redis/minio/chromadb/postgres）。已占用 host ports：3000/3100/3200/5433/5434/8000/8088——LK 的 nginx :8080 不衝突，但部署前 `docker ps` 全量對一次
+2. **RAM 是真正的緊張資源**：AS5404T 16GB 已被 ST 棧分食，LK compose 預算 postgres 4g＋backend 2g 可能過肥——S1.2 前先 `docker stats` 量實際餘裕，必要時 postgres 降 2g
+3. ST 慣例硬約束沿用：**動 NAS 前先讀 `ST/docs/NAS_OPERATIONS.md`**、不碰 xxt-agent/st-\* 既有容器、部署走 scp 到 `/volume1/Docker/` 副本＋守門腳本模式（LK 比照建 `/volume1/Docker/LK/`）
+4. 備份介質隔離原則該機已實踐（live=SSD 池/備份=HDD 池），LK 沿用同紀律
+
 #### B. 🔴 方向已定，待 owner 執行（事實查證／採購／註冊，無法由 agent 代勞）
 
 | # | 事項 | 需要 owner 做什麼 | 為何無法代勞 | 影響 |
