@@ -23,9 +23,16 @@ grep -q "CHANGE_ME" "$ENVFILE" && { log "FATAL: .env 仍有 CHANGE_ME 未填"; e
 
 # load_if_newer：tarball 比 image 建立時間新才 load
 if [ -f "$TARBALL" ]; then
-    tar_time=$(date -r "$TARBALL" +%s)
-    img_time=$(docker image inspect "$IMAGE" --format '{{.Created}}' 2>/dev/null \
-        | xargs -I{} date -d {} +%s 2>/dev/null || echo 0)
+    # BusyBox 安全版：映像不存在→img_time=0；解析失敗→數字保底
+    #（原寫法映像缺席時 img_time 為空 → [ -gt ] 吐 "sh: bad number" 且誤判已最新跳過 load）
+    tar_time=$(date -r "$TARBALL" +%s 2>/dev/null || echo 1)
+    img_time=0
+    if docker image inspect "$IMAGE" >/dev/null 2>&1; then
+        created=$(docker image inspect "$IMAGE" --format '{{.Created}}' 2>/dev/null)
+        img_time=$(date -d "$created" +%s 2>/dev/null || echo 0)
+    fi
+    case "$tar_time" in ''|*[!0-9]*) tar_time=1;; esac
+    case "$img_time" in ''|*[!0-9]*) img_time=0;; esac
     if [ "$tar_time" -gt "$img_time" ]; then
         log "tarball 較新（$tar_time > $img_time）→ docker load"
         gunzip -c "$TARBALL" | docker load
