@@ -3,6 +3,7 @@
 > **日期**: 2026-08-04。整併 `FULL_SYSTEM_REDESIGN_PLAN.md`（P 線）與 `SELF_HOSTED_MIGRATION_PLAN.md`（S 線）＋`EXECUTION_PLAN_RELAUNCH.md`。
 > **用途**: owner 開新 session 時，按模型挑「該層且 READY」的任務直接派工。
 > ⚠ 分層準則以**本文件為準**（EXECUTION_PLAN_RELAUNCH 中 FABLE=設計主導為舊定位，自本文件起 FABLE-5 改任最簡單層；設計類工作歸 OPUS-5）。
+> **v1.1（2026-08-04 補列）**: 首版遺漏的工作項全數入表——P·1.6 guard 收斂、P·5 全部（audit P0 功能/分頁 DTO/N+1）、P·6 全部（Resources 分析/API 版本 ADR/soft-delete 收尾）、民防 C2.2/C2.3/C3.1/C3.2、S1.6（field-reports 附件直傳落地端點）、S5.8（L2 離線演練體系）。兩份來源計畫的工作項至此無遺漏。
 
 ## 1. 總綱：兩條主線的關係
 
@@ -55,6 +56,15 @@
 | O18 | TV 牆模式（?wall=1 唯讀 3 秒法則大屏） | P·R 遺留 | 新介面設計 | **READY** |
 | O19 | C-3 auth 38 端點公開介面清單提案（產出給 owner 核） | P·P0 補強遺留 | 資安面判斷 | **READY** |
 | O20 | S7.4 LINE webhook 切換實測＋一則端到端通報 | S·7.4 | 對外正確性驗證 | BLOCKED-on-O4＋owner(B3) |
+| O21 | S1.6 field-reports 附件直傳落地端點：local storage `action:'write'` 簽章 URL 補驗簽＋落檔 backend 端點（`LocalStorageProvider.verifySignedUrl()` 已在）——不做則 NAS 上現場照片直傳是壞的 | S·1.6 | 災防關鍵功能正確性 | **READY**（NAS 實測段併 O3） |
+| O22 | 1.6 guard 新舊三版收斂為一套收尾（進度表標「執行中」） | P·1.6 | 授權正確性 | **READY** |
+| O23 | 5.1 audit P0 功能缺口（SITREP/IAP/志工篩選/去重/SLA/簽到簽退，XC-4） | P·5.1 | 新 entity 群＋核心流程 | BLOCKED-on-O1（新表落在 baseline 之後） |
+| O24 | 5.3 分頁 `PaginatedResponse` DTO 定型＋5.4 N+1 熱點修復 | P·5.3/5.4 | API 形狀取捨（前後端成對） | DTO 定型 **READY**；N+1 量測段 BLOCKED-on-O3（配 S6.8） |
+| O25 | 6.1 Resources/unified-resources 使用率分析報告＋6.2 API 版本策略 ADR | P·6.1/6.2 | 純分析與架構決策 | **READY** |
+| O26 | 6.3 soft-delete 收尾：DispatchTask/MissionSession 轉換、includeDeleted RBAC、restore endpoint | P·6.3 | 欄位 migration＋權限 | BLOCKED-on-O1 |
+| O27 | C2.3 四級通訊降級（L0–L3）SOP 定稿 | P·C2.3 | 韌性 SOP 取捨 | **READY**（L3 匯出實作在 N21） |
+| O28 | C3.1 CAP 協定收發＋EDXL round-trip 沙盒（技術面先行） | P·C3.1 | 標準介接正確性 | **READY**（正式介接等 D19 洽談，不卡技術面） |
+| O29 | S5.8/D6 離線演練體系：L2 基地台演練腳本＋離線可用頁清單＋`OfflinePrepPage` 準備度檢查 | S·5.8 | 韌性流程設計 | 腳本/清單/UI **READY**；實地演練 BLOCKED-on-B 上線＋owner |
 
 ### 🟡 SONNET-5（機械但非瑣碎）
 
@@ -77,6 +87,11 @@
 | N15 | S5.7 收尾：`DirectionsPanel` 深連結原生地圖＋全站移除 `@react-google-maps/api` 依賴 | S·5.7 | 依賴出清 | **READY** |
 | N16 | S6.3 winston 檔案輪替進 compose＋Sentry 免費額度接線 | S·6.3 | 跨服務設定 | **READY** |
 | N17 | S2.3 llm-benchmark 以真實通報資料複測 7b | S·2.3 | 跑腳本+報告 | BLOCKED-on-owner（工作站 Ollama） |
+| N18 | 5.2 audit P0 功能的前端頁面接線 | P·5.2 | 依 spec 接線 | BLOCKED-on-O23 |
+| N19 | 5.3 list 端點分頁批次改造（依 O24 定型 DTO，前後端成對 PR） | P·5.3 | 批次改造 | BLOCKED-on-O24 |
+| N20 | C2.2 分流站/後送追蹤/醫院容量看板 UI（依 C2.1 spec） | P·C2.2 | 依 spec 批次 UI | BLOCKED-on-O16 |
+| N21 | C2.3 L3 紙本包一鍵匯出 PDF 實作（依 O27 SOP） | P·C2.3 | 匯出實作 | BLOCKED-on-O27 |
+| N22 | C3.2 政府介接技術文件包（供 owner 洽談用） | P·C3.2 | 規格明確文件包 | **READY** |
 
 ### 🟢 FABLE-5（最簡單：一行修正/文件/清單/死碼）
 
@@ -115,4 +130,4 @@ UPS＋4G/5G 路由器採購｜工作站 Ollama 架設（S2.2）｜LINE/LIFF/Goog
 | D24（網域） | ✅ 已定案（Vercel 註冊、NS→Cloudflare 傳播中） | zone Active 後：O4、N12、N13 部署——**這是目前唯一的「等待事件」** |
 | D26（定位=內部為主公眾唯讀） | ✅ 已拍板 | S5 範圍定型（N12/N13/N14）；冷備機不採購 |
 | D27（LLM=hybrid） | ✅ 已拍板 | F1 直接照值落地、O5 的降級鏈成立 |
-| 尚未解的 | D-MCI×6→O16｜D2→N2｜R13→O15｜owner 實體項→O20/N17/O7 後半 |
+| 尚未解的 | D-MCI×6→O16（連鎖 N20）｜D2→N2｜R13→O15｜D19（政府介接洽談）→C3 正式介接（O28/N22 技術面不卡）｜owner 實體項→O20/N17/O7 後半 |
