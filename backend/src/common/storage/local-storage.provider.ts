@@ -29,11 +29,18 @@ export class LocalStorageProvider implements StorageProvider {
     private readonly basePath: string;
     private readonly publicUrl: string;
     private readonly signingSecret?: string;
+    private readonly uploadEndpoint: string;
 
     constructor(private readonly configService: ConfigService) {
         this.basePath = this.configService.get<string>('LOCAL_STORAGE_PATH') || './uploads';
         this.publicUrl = this.configService.get<string>('LOCAL_STORAGE_URL') || 'http://localhost:3000/uploads';
         this.signingSecret = this.configService.get<string>('LOCAL_STORAGE_SIGNING_SECRET') || undefined;
+        // O21：write 簽名 URL 的落地端點（backend PUT /api/v1/uploads/*）。
+        // 預設由 BASE_URL 推導；read URL 仍走 LOCAL_STORAGE_URL（nginx 靜態出檔）。
+        const apiBase =
+            this.configService.get<string>('LOCAL_STORAGE_UPLOAD_URL') ||
+            `${(this.configService.get<string>('BASE_URL') || 'http://localhost:3000').replace(/\/$/, '')}/api/v1/uploads`;
+        this.uploadEndpoint = apiBase.replace(/\/$/, '');
 
         this.logger.log(`Local Storage initialized - Path: ${this.basePath}`);
 
@@ -274,6 +281,25 @@ export class LocalStorageProvider implements StorageProvider {
         // reject traversal before it can be handed out as a URL.
         this.getFullPath(filePath);
 
+        const action = options?.action === 'write' ? 'write' : 'read';
+
+        if (action === 'write') {
+            // O21：write URL 一律指向 backend 落地端點（nginx /uploads/ 不收 PUT）。
+            // 無簽章密鑰＝簽不出可驗證的 capability URL，直接拒發（fail loud，
+            // 不再回傳一個必然 405 的 nginx URL 假裝成功）。
+            if (!this.signingSecret) {
+                throw new Error(
+                    'LOCAL_STORAGE_SIGNING_SECRET is required to issue write signed URLs ' +
+                    'in local storage mode (see infra/nas/README.md §7.2-2 / O21)',
+                );
+            }
+            const expiresAt =
+                options?.expiresAt ?? new Date(Date.now() + (options?.expiresIn || 3600) * 1000);
+            const expires = Math.floor(expiresAt.getTime() / 1000);
+            const signature = this.sign(filePath, action, expires);
+            return `${this.uploadEndpoint}/${filePath}?action=write&expires=${expires}&signature=${signature}`;
+        }
+
         const base = `${this.publicUrl}/${filePath}`;
         if (!this.signingSecret) {
             return base;
@@ -282,7 +308,6 @@ export class LocalStorageProvider implements StorageProvider {
         const expiresAt =
             options?.expiresAt ?? new Date(Date.now() + (options?.expiresIn || 3600) * 1000);
         const expires = Math.floor(expiresAt.getTime() / 1000);
-        const action = options?.action === 'write' ? 'write' : 'read';
         const signature = this.sign(filePath, action, expires);
 
         return `${base}?action=${action}&expires=${expires}&signature=${signature}`;
@@ -305,8 +330,14 @@ export class LocalStorageProvider implements StorageProvider {
             return false;
         }
 
-        const prefix = new URL(`${this.publicUrl}/`);
-        if (parsed.origin !== prefix.origin || !parsed.pathname.startsWith(prefix.pathname)) {
+        const readPrefix = new URL(`${this.publicUrl}/`);
+        const writePrefix = new URL(`${this.uploadEndpoint}/`);
+        let prefix: URL;
+        if (parsed.origin === readPrefix.origin && parsed.pathname.startsWith(readPrefix.pathname)) {
+            prefix = readPrefix;
+        } else if (parsed.origin === writePrefix.origin && parsed.pathname.startsWith(writePrefix.pathname)) {
+            prefix = writePrefix;
+        } else {
             return false;
         }
 
@@ -319,10 +350,34 @@ export class LocalStorageProvider implements StorageProvider {
             return false;
         }
 
+        return this.verifySignature(filePath, action, expires, signature);
+    }
+
+    /**
+     * O21：落地端點用的成分驗證（不重組 URL）。
+     * 簽章繫結 action:path:expires；timingSafeEqual 防 timing 攻擊。
+     */
+    verifySignature(
+        filePath: string,
+        action: 'read' | 'write',
+        expires: number,
+        signature: string,
+        now: Date = new Date(),
+    ): boolean {
+        if (!this.signingSecret || !signature) {
+            return false;
+        }
+        if (!Number.isFinite(expires) || expires * 1000 <= now.getTime()) {
+            return false;
+        }
+        try {
+            this.getFullPath(filePath); // 路徑穿越擋在驗章前
+        } catch {
+            return false;
+        }
         const expected = this.sign(filePath, action, expires);
         const given = Buffer.from(signature);
         const want = Buffer.from(expected);
-
         return given.length === want.length && crypto.timingSafeEqual(given, want);
     }
 

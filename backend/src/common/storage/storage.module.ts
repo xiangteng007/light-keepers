@@ -10,6 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { STORAGE_PROVIDER, StorageFeatureOptions, StorageProvider } from './storage.interface';
 import { GcsStorageProvider } from './gcs-storage.provider';
 import { LocalStorageProvider } from './local-storage.provider';
+import { UploadLandingController } from './upload-landing.controller';
 
 /**
  * Build the provider selected by `STORAGE_PROVIDER`, optionally pinned to a
@@ -38,6 +39,7 @@ export class StorageModule {
         return {
             module: StorageModule,
             imports: [ConfigModule],
+            controllers: [UploadLandingController],
             providers: [
                 {
                     provide: STORAGE_PROVIDER,
