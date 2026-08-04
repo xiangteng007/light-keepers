@@ -71,11 +71,16 @@ docker compose -f "$COMPOSE" --env-file "$ENVFILE" up -d postgres backend nginx
 # 對外全超時、NAT 表無 172.23 規則）。冪等補上——只針對 LK 自己的網段。
 NET_ID=$(docker network inspect lightkeepers-nas --format '{{.Id}}' 2>/dev/null | cut -c1-12)
 NET_SUBNET=$(docker network inspect lightkeepers-nas --format '{{range .IPAM.Config}}{{.Subnet}}{{end}}' 2>/dev/null)
-if [ -n "$NET_ID" ] && [ -n "$NET_SUBNET" ]; then
-    if ! iptables -t nat -C POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE 2>/dev/null; then
-        iptables -t nat -A POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE
-        log "已補 MASQUERADE：$NET_SUBNET ! -o br-$NET_ID（dockerd 規則缺失自癒）"
+IPT=""
+for c in iptables /usr/builtin/sbin/iptables /usr/sbin/iptables /sbin/iptables; do
+    command -v "$c" >/dev/null 2>&1 && { IPT="$c"; break; }
+done
+if [ -n "$IPT" ] && [ -n "$NET_ID" ] && [ -n "$NET_SUBNET" ]; then
+    if ! "$IPT" -t nat -C POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE 2>/dev/null; then
+        "$IPT" -t nat -A POSTROUTING -s "$NET_SUBNET" ! -o "br-$NET_ID" -j MASQUERADE             && log "已補 MASQUERADE：$NET_SUBNET ! -o br-$NET_ID（dockerd 規則缺失自癒）"             || log "WARN: MASQUERADE 補寫失敗（$IPT）"
     fi
+else
+    [ -z "$IPT" ] && log "WARN: 找不到 iptables，跳過 MASQUERADE 自癒"
 fi
 
 log "等 postgres healthy…"
