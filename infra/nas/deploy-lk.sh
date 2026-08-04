@@ -88,4 +88,14 @@ curl -sf -o /dev/null http://127.0.0.1:8080/ && log "OK  前端首頁" || log "W
 tables=$(docker exec lk-postgres psql -U "$(grep ^DB_USERNAME "$ENVFILE" | cut -d= -f2)" -d "$(grep ^DB_DATABASE "$ENVFILE" | cut -d= -f2)" -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'" 2>/dev/null || echo 0)
 log "schema 表數：$tables（baseline 預期 ≥123）"
 
+# 診斷模式：touch $LK_ROOT/.diag 後重跑即輸出容器內網路實測（用畢自刪旗標）
+if [ -f "$LK_ROOT/.diag" ]; then
+    log "=== DIAG：容器內對外連通實測 ==="
+    LLM_HOST=$(grep ^LLM_BASE_URL "$ENVFILE" | sed 's#.*//##; s#[:/].*##')
+    log "LLM host: $LLM_HOST"
+    docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend sh -c "wget -qO- -T 4 http://$LLM_HOST:11434/v1/models 2>&1 | head -c 120; echo; echo exit=\$?" || true
+    docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend sh -c "ip route 2>/dev/null | head -3; wget -qO- -T 4 http://192.168.31.76:8080/healthz 2>&1 | head -c 40; echo; echo host-hairpin-exit=\$?" || true
+    rm -f "$LK_ROOT/.diag"
+fi
+
 log "完成。完整驗收：$LK_ROOT/infra/nas/scripts/verify-stack.sh"
