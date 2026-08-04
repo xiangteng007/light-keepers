@@ -68,7 +68,9 @@ services:
       timeout: 5s
       retries: 5
       start_period: 60s
-    mem_limit: 4g
+    # A4 共存：AS5404T 16GB 與 ST 棧（13 容器+openclaw 五件套）分食——預設保守 2g，
+    # 部署前 docker stats 實測餘裕後可調（.env 設 LK_PG_MEM）
+    mem_limit: ${LK_PG_MEM:-2g}
     mem_reservation: 1g
     shm_size: 512m
     stop_grace_period: 60s
@@ -165,7 +167,7 @@ services:
       timeout: 5s
       retries: 3
       start_period: 90s
-    mem_limit: 2g
+    mem_limit: ${LK_BACKEND_MEM:-2g}
     mem_reservation: 512m
     stop_grace_period: 30s
     networks: [lk-internal]

@@ -25,6 +25,9 @@ describe('GcsStorageService（local 模式完整流程）', () => {
             STORAGE_PROVIDER: 'local',
             LOCAL_STORAGE_PATH: tmpRoot,
             LOCAL_STORAGE_URL: 'https://nas.example.org/uploads',
+            // O21：write 簽名 URL 需要密鑰（無密鑰拒發），並指向 backend 落地端點
+            LOCAL_STORAGE_SIGNING_SECRET: 'spec-secret',
+            BASE_URL: 'https://nas.example.org',
             ...overrides,
         };
         return { get: (key: string) => values[key] } as unknown as ConfigService;
@@ -55,8 +58,12 @@ describe('GcsStorageService（local 模式完整流程）', () => {
         // 路徑組成與 GCS 模式相同
         expect(upload.path).toBe('reports/ms1/fr1/att1');
         expect(upload.method).toBe('PUT');
-        // 沒有簽章密鑰時，URL 就是 nginx /uploads/ 直出的路徑
-        expect(upload.url).toBe('https://nas.example.org/uploads/reports/ms1/fr1/att1');
+        // O21：write URL 指向 backend 落地端點（nginx /uploads/ 不收 PUT），帶簽章參數
+        const uploadUrl = new URL(upload.url);
+        expect(uploadUrl.origin + uploadUrl.pathname)
+            .toBe('https://nas.example.org/api/v1/uploads/reports/ms1/fr1/att1');
+        expect(uploadUrl.searchParams.get('action')).toBe('write');
+        expect(uploadUrl.searchParams.get('signature')).toBeTruthy();
 
         // 模擬客戶端把檔案送達（NAS 上就是落在 bind mount 的 uploads 目錄）
         await provider.upload(upload.path, Buffer.from('photo-bytes'), {
@@ -77,7 +84,9 @@ describe('GcsStorageService（local 模式完整流程）', () => {
 
         const download = await service.generateDownloadUrl(upload.path);
         expect(download.method).toBe('GET');
-        expect(download.url).toBe('https://nas.example.org/uploads/reports/ms1/fr1/att1');
+        const downloadUrl = new URL(download.url);
+        expect(downloadUrl.origin + downloadUrl.pathname)
+            .toBe('https://nas.example.org/uploads/reports/ms1/fr1/att1');
 
         expect(await service.deleteFile(upload.path)).toBe(true);
         expect(await service.fileExists(upload.path)).toBe(false);
@@ -95,7 +104,10 @@ describe('GcsStorageService（local 模式完整流程）', () => {
         const result = await service.generateThumbnailUploadUrl('reports/ms1/fr1/att1.jpg');
 
         expect(result.path).toBe('reports/ms1/fr1/att1_thumb.webp');
-        expect(result.url).toBe('https://nas.example.org/uploads/reports/ms1/fr1/att1_thumb.webp');
+        const thumbUrl = new URL(result.url);
+        expect(thumbUrl.origin + thumbUrl.pathname)
+            .toBe('https://nas.example.org/api/v1/uploads/reports/ms1/fr1/att1_thumb.webp');
+        expect(thumbUrl.searchParams.get('action')).toBe('write');
     });
 
     it('設定簽章密鑰後 URL 帶到期參數，且仍指向同一個 /uploads 路徑', async () => {

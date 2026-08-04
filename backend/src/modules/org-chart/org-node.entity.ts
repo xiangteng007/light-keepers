@@ -13,7 +13,6 @@ export class OrgNode {
     type: 'organization' | 'division' | 'branch' | 'team' | 'unit';
 
     @Column({ type: 'uuid', nullable: true })
-    @Index()
     parentId: string | null;
 
     @Column({ type: 'varchar', length: 100, nullable: true })
