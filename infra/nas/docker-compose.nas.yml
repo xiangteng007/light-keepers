@@ -80,10 +80,10 @@ services:
   # NestJS 後端 —— 沿用 backend/Dockerfile（production stage）
   # ---------------------------------------------------------------------------
   backend:
-    build:
-      context: ../../backend
-      dockerfile: Dockerfile
+    # NAS 上不 build（N5105 10–20 分鐘且部署副本無 source）；映像一律由
+    # 開發機 docker build → save tarball → deploy-lk.sh load_if_newer 載入
     image: ${BACKEND_IMAGE:-lightkeepers/backend:local}
+    pull_policy: never
     container_name: lk-backend
     <<: *default-restart
     logging: *default-logging
