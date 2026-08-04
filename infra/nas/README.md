@@ -16,7 +16,7 @@
         └──────────────┬───────────────┘
                        │ 出站連線（NAS 主動連 CF，路由器不需 port forward）
    ┌───────────────────▼────────────────────────────────────────┐
-   │  ASUSTOR AS5404T（Celeron N5105 / 16GB / ADM 5.1.1）        │
+   │  ASUSTOR AS5404T（Celeron N5105 / 16GB / ADM 5.1.3）        │
    │                                                             │
    │   cloudflared ──▶ nginx:8080 ──┬──▶ backend:8080（NestJS）  │
    │                                │         │                  │
@@ -31,9 +31,9 @@
                        │ 內網 2.5GbE
                        ▼
         ┌──────────────────────────────────────┐
-        │  RTX 5090 工作站：Ollama serve        │
-        │  OpenAI-compatible :11434/v1          │
-        │  （AI 推論一律不落在 NAS 上）          │
+        │  RTX 4080 SUPER 16GB 工作站（D21）    │
+        │  Ollama serve，OpenAI-compatible      │
+        │  :11434/v1（AI 推論不落在 NAS 上）    │
         └──────────────────────────────────────┘
 
         Mac mini：備份第二副本（異地/異機）
@@ -72,12 +72,23 @@ docker --version
 docker compose version    # 需為 v2；若只有 v1 的 docker-compose，請先升級
 ```
 
-### 3.2 建立儲存池與目錄
+### 3.2 儲存池（已建好）與目錄
 
-1. **Storage Manager** → 建立兩個 Volume：
-   - `Volume 2`：4× M.2 NVMe，**RAID 10**
-   - `Volume 1`：4× 3.5" HDD，**RAID 6**
-2. 建立目錄（路徑須與 `.env` 中的 `NVME_DATA_ROOT` / `HDD_BACKUP_ROOT` 一致）：
+**儲存池已建好，免做**（A4 定案，2026-08-04）：目標機是 ST 專案現役的 AS5404T
+（hostname `SENTENG-DESIGN`、內網 `192.168.31.76`、ADM 5.1.3），兩個池皆已存在：
+
+| 陣列 | 池 | 實況 |
+|---|---|---|
+| md2 RAID10 | `/volume2`（熱池） | 4× KLEVV 2TB SSD，btrfs 3.7T、剩 3.6T——LK 的 pgdata/uploads 落這裡 |
+| md1 RAID6 | `/volume1`（冷池） | 4× Seagate IronWolf 10TB，btrfs 19T、剩 13T——LK 備份落這裡 |
+
+**⚠ 共存約束**：該機已跑 13 個 st-\* 容器＋openclaw 五件套，已占用 host ports
+`3000/3100/3200/5433/5434/8000/8088`——LK 的 nginx `:8080` 不衝突，但部署前務必
+`docker ps` 全量對一次（全量 port/RAM 對帳表屬工作項 O2）。RAM 已被 ST 棧分食，
+compose 的 postgres 4g 預算部署前先 `docker stats` 量實際餘裕，必要時降 2g。
+動 NAS 前先讀 `ST/docs/NAS_OPERATIONS.md`，不碰 st-\*/xxt-agent 既有容器。
+
+只需建立目錄（路徑須與 `.env` 中的 `NVME_DATA_ROOT` / `HDD_BACKUP_ROOT` 一致）：
 
 ```bash
 sudo mkdir -p /volume2/docker/lightkeepers/{pgdata,uploads,web}
@@ -514,11 +525,11 @@ nginx 端對應的設定在 `nginx/default.conf` 的 `location /uploads/`，重�
 | 項目 | 說明 | 建議歸屬 |
 |---|---|---|
 | ~~三個服務接上 storage 抽象層~~ | §7.2-1，已於 M.3b 完成（`StorageModule.forFeature()` + GCS/local 雙模式回歸測試） | ✅ 已完成 |
-| local 模式的簽名上傳落地端點 | §7.2-2，`action: 'write'` 的 URL 在 NAS 上無人接收（nginx 只做靜態出檔）。若要保留 field-reports 附件的前端直傳流程需補此端點 | 獨立工作項 |
+| local 模式的簽名上傳落地端點 | §7.2-2，`action: 'write'` 的 URL 在 NAS 上無人接收（nginx 只做靜態出檔）。若要保留 field-reports 附件的前端直傳流程需補此端點 | 工作項 S1.6（O21） |
 | `getSignedUrl()` 的簽章未被強制驗證 | §7.2-2，簽章已可產生（`LOCAL_STORAGE_SIGNING_SECRET`）與驗證（`verifySignedUrl()`），但要實際擋下未授權讀取需在 nginx 加 `auth_request` | 視需求，非搬遷阻斷項 |
-| LLM provider 接線 | `LLM_BASE_URL` 等 env 已備妥，實際的 OpenAI-compatible provider 尚未實作 | 工作項 M.2 |
-| Cloud Logging 替換 | winston 本地檔＋Sentry | 工作項 M.6 |
-| cloudbuild → GitHub Actions | build image 推到 NAS 可拉的 registry | 工作項 M.6 |
+| ~~LLM provider 接線~~ | 已於 M.2 完成（`LlmProviderService`，gemini/local/hybrid 三模式；預設值 `LLM_PROVIDER=hybrid` 已入 compose，S2.1）。殘留：manuals/pfa/voice-SITREP 三處純文字 Gemini 直呼待改抽象層（S2.4） | ✅ 已完成／殘留歸 S2.4 |
+| Cloud Logging 替換 | winston 檔案輪替進 compose＋Sentry 免費額度接線 | 工作項 S6.3（N16） |
+| cloudbuild → GitHub Actions | CI build image→NAS 拉取部署路徑 | 工作項 S5.2（O15，blocked-on-R13） |
 | ~~異地備份第二副本~~ | 自動化已於 C1.3 完成（`backup/replicate.sh`，見 §5.4）。**仍需人為設定目標並跑一次 `--source=secondary` 演練**才算生效 | ✅ 機制完成／待現場設定 |
 
 ---
