@@ -36,9 +36,9 @@
 
 | # | 任務 | 期別 | 理由 | 狀態 |
 |---|---|---|---|---|
-| O1 | **Baseline migration**：entity→基準 migration（~120 表）、雙 migration 目錄收斂、併 5 支未跑、空庫 run＝synchronize diff 零 | P·1.2＝S·A1 | schema 正確性即全案地基 | **READY**（D20 已解除窗口） |
-| O2 | NAS 共存適配：compose 目錄/RAM 參數化、port 對帳、`/volume1/Docker/LK/` 守門部署腳本 | S·A4 | 與 ST 棧共存的取捨 | **READY** |
-| O3 | NAS 起棧＋migration:run＋verify-stack 內網綠（B1） | S·B1 | 部署正確性 | BLOCKED-on-O1 |
+| O1 | **Baseline migration**：entity→基準 migration（~120 表）、雙 migration 目錄收斂、併 5 支未跑、空庫 run＝synchronize diff 零 | P·1.2＝S·A1 | schema 正確性即全案地基 | ✅ **已完成**（2026-08-04，branch `opus/migration-core`：122 表 Baseline＋11 支歸檔＋黃金標準驗證「No changes」；順修 org-node 重複 @Index） |
+| O2 | NAS 共存適配：compose 目錄/RAM 參數化、port 對帳、`/volume1/Docker/LK/` 守門部署腳本 | S·A4 | 與 ST 棧共存的取捨 | ✅ **已完成**（2026-08-04，branch `opus/migration-core`：LK_PG_MEM/LK_BACKEND_MEM 實測制＋deploy-lk.sh＋README §10 port/RAM 對帳） |
+| O3 | NAS 起棧＋migration:run＋verify-stack 內網綠（B1） | S·B1 | 部署正確性 | **READY**（O1 已完成解鎖；需 owner 陪跑 NAS 端操作） |
 | O4 | Cloudflare Tunnel＋Tailscale 管理面接通（B2） | S·B2 | 對外入口資安 | BLOCKED-on-zone-active（NS 傳播中） |
 | O5 | S2.5 AI 全面非阻斷＋fallback 演練＋hybrid 降級可觀測（R11） | S·2.5 | 韌性設計 | **READY** |
 | O6 | S5.4 通知降級鏈：Web Push(VAPID) 接回＋Email 空殼補實 | S·5.4 | 多通道告警正確性 | **READY** |
@@ -56,7 +56,7 @@
 | O18 | TV 牆模式（?wall=1 唯讀 3 秒法則大屏） | P·R 遺留 | 新介面設計 | **READY** |
 | O19 | C-3 auth 38 端點公開介面清單提案（產出給 owner 核） | P·P0 補強遺留 | 資安面判斷 | **READY** |
 | O20 | S7.4 LINE webhook 切換實測＋一則端到端通報 | S·7.4 | 對外正確性驗證 | BLOCKED-on-O4＋owner(B3) |
-| O21 | S1.6 field-reports 附件直傳落地端點：local storage `action:'write'` 簽章 URL 補驗簽＋落檔 backend 端點（`LocalStorageProvider.verifySignedUrl()` 已在）——不做則 NAS 上現場照片直傳是壞的 | S·1.6 | 災防關鍵功能正確性 | **READY**（NAS 實測段併 O3） |
+| O21 | S1.6 field-reports 附件直傳落地端點：local storage `action:'write'` 簽章 URL 補驗簽＋落檔 backend 端點 | S·1.6 | 災防關鍵功能正確性 | ✅ **已完成**（2026-08-04，branch `opus/migration-core`：PUT /api/v1/uploads/* capability URL＋write URL 改指落地端點＋無密鑰拒發＋9 案 spec；NAS 實測段仍併 O3） |
 | O22 | 1.6 guard 新舊三版收斂為一套收尾（進度表標「執行中」） | P·1.6 | 授權正確性 | **READY** |
 | O23 | 5.1 audit P0 功能缺口（SITREP/IAP/志工篩選/去重/SLA/簽到簽退，XC-4） | P·5.1 | 新 entity 群＋核心流程 | BLOCKED-on-O1（新表落在 baseline 之後） |
 | O24 | 5.3 分頁 `PaginatedResponse` DTO 定型＋5.4 N+1 熱點修復 | P·5.3/5.4 | API 形狀取捨（前後端成對） | DTO 定型 **READY**；N+1 量測段 BLOCKED-on-O3（配 S6.8） |
