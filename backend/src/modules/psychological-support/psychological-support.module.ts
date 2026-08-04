@@ -10,9 +10,11 @@ import { MoodLog, BlessingMessage, PFAChatLog } from './entities/mood-log.entity
 import { MoodTrackerService } from './mood-tracker.service';
 import { PFAChatbotService } from './pfa-chatbot.service';
 import { MoodTrackerController } from './mood-tracker.controller';
+import { LlmModule } from '../ai-queue/providers/llm.module';
 
 @Module({
     imports: [
+        LlmModule,
         TypeOrmModule.forFeature([MoodLog, BlessingMessage, PFAChatLog]),
         EventEmitterModule.forRoot(),
     ],

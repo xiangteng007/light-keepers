@@ -8,7 +8,8 @@
  * 3. 自動生成 SITREP 草稿
  */
 
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -62,6 +63,9 @@ export class VoiceTranscriptionService {
 
     constructor(
         private readonly configService: ConfigService,
+        // N1（S·2.4）：SITREP 摘要（純文字）走 LlmProviderService；
+        // 語音轉錄段仍直用 Gemini multimodal（D23 定案，本地無 ASR）
+        @Optional() private readonly llm?: LlmProviderService,
     ) { }
 
     // ==================== Audio Upload ====================
@@ -234,23 +238,15 @@ export class VoiceTranscriptionService {
 
         const transcripts = recentLogs.map(l => l.transcription).join('\n');
 
-        // Use Gemini to summarize into SITREP format
-        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-
-        if (!apiKey) {
+        // N1（S·2.4）：SITREP 摘要經 LlmProviderService（LLM_PROVIDER 路由）
+        if (!this.llm?.isAvailable()) {
             return this.mockSITREP(recentLogs);
         }
 
         try {
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{
-                                text: `根據以下無線電通訊記錄，整理成 SITREP（狀況報告）格式：
+            const { text } = await this.llm.generateText({
+                useCaseId: 'voice.sitrep.v1',
+                prompt: `根據以下無線電通訊記錄，整理成 SITREP（狀況報告）格式：
 
 通訊記錄：
 ${transcripts}
@@ -261,16 +257,9 @@ ${transcripts}
   "actions": "已採取行動",
   "needs": "需求與建議"
 }`,
-                            }],
-                        }],
-                    }),
-                }
-            );
-
-            if (!response.ok) throw new Error('Gemini API error');
-
-            const data = await response.json();
-            const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+                maxOutputTokens: 512,
+                temperature: 0.3,
+            });
 
             // Parse JSON from response
             const jsonMatch = text.match(/\{[\s\S]*\}/);

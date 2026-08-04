@@ -1,6 +1,5 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
 
 // 手冊資料 - 與前端同步
 const MANUALS_DATA = [
@@ -94,17 +93,11 @@ export interface AiSearchResponse {
 @Injectable()
 export class ManualsService {
     private readonly logger = new Logger(ManualsService.name);
-    private genAI: GoogleGenerativeAI | null = null;
-
-    constructor(private configService: ConfigService) {
-        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-        if (apiKey) {
-            this.genAI = new GoogleGenerativeAI(apiKey);
-            this.logger.log('Gemini AI initialized successfully');
-        } else {
-            this.logger.warn('GEMINI_API_KEY not found, AI search will be disabled');
-        }
-    }
+    /**
+     * N1（S·2.4）：AI 檢索改走 LlmProviderService——LLM_PROVIDER=gemini/local/hybrid
+     * 統一路由，不再直接 new GoogleGenerativeAI。無可用 provider 時退回關鍵字搜尋。
+     */
+    constructor(@Optional() private readonly llm?: LlmProviderService) { }
 
     // 取得所有手冊
     getAllManuals() {
@@ -120,14 +113,12 @@ export class ManualsService {
     async searchWithAI(query: string): Promise<AiSearchResponse> {
         const startTime = Date.now();
 
-        if (!this.genAI) {
-            // 如果沒有 API Key，使用簡單的關鍵字搜尋
+        if (!this.llm?.isAvailable()) {
+            // 無可用 LLM provider（雲端/本地皆未設）→ 關鍵字搜尋
             return this.fallbackSearch(query, startTime);
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
-
             // 準備手冊摘要給 AI
             const manualsSummary = MANUALS_DATA.map(m =>
                 `[${m.id}] ${m.categoryName} - ${m.title}: ${m.summary}`
@@ -148,9 +139,13 @@ ${manualsSummary}
   "answer": "簡短回答"
 }`;
 
-            const result = await model.generateContent(prompt);
-            const response = result.response;
-            const text = response.text();
+            const llmResponse = await this.llm.generateText({
+                useCaseId: 'manuals.search.v1',
+                prompt,
+                maxOutputTokens: 512,
+                temperature: 0.2,
+            });
+            const text = llmResponse.text;
 
             // 解析 AI 回應
             const jsonMatch = text.match(/\{[\s\S]*\}/);
@@ -181,7 +176,7 @@ ${manualsSummary}
             // JSON 解析失敗，使用備用搜尋
             return this.fallbackSearch(query, startTime);
         } catch (error) {
-            this.logger.error(`Gemini AI search error: ${error}`);
+            this.logger.error(`AI manual search error: ${error}`);
             return this.fallbackSearch(query, startTime);
         }
     }

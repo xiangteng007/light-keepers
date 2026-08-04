@@ -70,7 +70,7 @@
 
 | # | 任務 | 期別 | 理由 | 狀態 |
 |---|---|---|---|---|
-| N1 | S2.4 三處純文字 Gemini 直呼改 `LlmProviderService`（manuals/pfa/voice-SITREP，pfa 順修 process.env） | S·2.4 | 規格明確接線 | **READY** |
+| N1 | S2.4 三處純文字 Gemini 直呼改 `LlmProviderService`（manuals/pfa/voice-SITREP，pfa 順修 process.env） | S·2.4 | 規格明確接線 | ✅ **已完成**（2026-08-04，branch `sonnet/batch` 三 commit：三模組掛 LlmModule＋fallback 保留＋3 案路由 spec；全套 3,507 綠） |
 | N2 | 2.2 路由收斂＋redirect 落地 | P·2.2 | 批次路由手術 | BLOCKED-on-D2（owner 圈選） |
 | N3 | 雙前綴 controller×23 修正＋前端呼叫點同步 | P·4 遺留 | 批次修正 | **READY** |
 | N4 | C-6 行內型別 106 處分批補 DTO（棘輪基準 111→0） | P·P0 補強 | DTO 批次 | **READY** |
