@@ -131,8 +131,8 @@ services:
       # 預設不能是 gemini——那會讓 NAS 上所有 LLM 流量 100% 打雲端。
       LLM_PROVIDER: ${LLM_PROVIDER:-hybrid}
       LLM_BASE_URL: ${LLM_BASE_URL:?LLM_BASE_URL is required - point to workstation Ollama}
-      # D22 實機對測定案：qwen2.5:7b-instruct（95% 準確／6.4s／VRAM 4.7GB）
-      LLM_MODEL: ${LLM_MODEL:-qwen2.5:7b-instruct}
+      # D22 實機對測定案：qwen3:14b（95% 準確／6.4s／VRAM 4.7GB）
+      LLM_MODEL: ${LLM_MODEL:-qwen3:14b}
       LLM_API_KEY: ${LLM_API_KEY:-ollama}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
 
