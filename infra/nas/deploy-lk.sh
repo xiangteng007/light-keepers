@@ -40,10 +40,45 @@ for port in 8080; do
     [ -n "$holder" ] && { log "FATAL: port $port 被非 LK 容器占用：$holder"; exit 1; }
 done
 
+# 資料目錄（root 身分冪等確保；A4 定案路徑）
+NVME_ROOT="${NVME_DATA_ROOT:-/volume2/docker/lightkeepers}"
+HDD_ROOT="${HDD_BACKUP_ROOT:-/volume1/backup/lightkeepers}"
+mkdir -p "$NVME_ROOT/pgdata" "$NVME_ROOT/uploads" "$NVME_ROOT/web" "$HDD_ROOT/db" "$HDD_ROOT/uploads"
+chown -R 1000:1000 "$NVME_ROOT/uploads"
+chmod 755 "$NVME_ROOT/uploads"
+
+# 前端靜態檔：開發機 scp 到 $LK_ROOT/web-dist，這裡以 root 同步進 web volume
+if [ -d "$LK_ROOT/web-dist" ]; then
+    log "同步前端靜態檔 → $NVME_ROOT/web"
+    rsync -a --delete "$LK_ROOT/web-dist/" "$NVME_ROOT/web/"
+fi
+
 log "compose config 驗證"
 docker compose -f "$COMPOSE" --env-file "$ENVFILE" config >/dev/null
 
-log "up -d（只影響 lk-* 服務）"
-docker compose -f "$COMPOSE" --env-file "$ENVFILE" up -d
+# 核心棧：postgres → backend → nginx（cloudflared 等 zone Active、backup 等第二副本設定，皆延後）
+log "up -d 核心服務（postgres backend nginx）"
+docker compose -f "$COMPOSE" --env-file "$ENVFILE" up -d postgres backend nginx
 
-log "完成。驗收：$LK_ROOT/infra/nas/scripts/verify-stack.sh"
+log "等 postgres healthy…"
+for i in $(seq 1 30); do
+    st=$(docker inspect --format '{{.State.Health.Status}}' lk-postgres 2>/dev/null || echo none)
+    [ "$st" = healthy ] && break
+    sleep 2
+done
+[ "$st" = healthy ] || { log "FATAL: postgres 未達 healthy（狀態=$st）"; exit 1; }
+
+# baseline migration（O1 產物；dist-only image → 走編譯後 CLI）
+log "migration:run（dist/data-source.js）"
+docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend     node node_modules/typeorm/cli.js -d dist/data-source.js migration:run
+
+# 內部煙霧測試
+log "煙霧測試"
+sleep 3
+curl -sf http://127.0.0.1:8080/api/v1/health/live >/dev/null && log "OK  health/live" || { log "FAIL health/live"; exit 1; }
+curl -sf http://127.0.0.1:8080/api/v1/health/ready >/dev/null && log "OK  health/ready" || log "WARN health/ready 未過（看 backend logs）"
+curl -sf -o /dev/null http://127.0.0.1:8080/ && log "OK  前端首頁" || log "WARN 前端首頁未過"
+tables=$(docker exec lk-postgres psql -U "$(grep ^DB_USERNAME "$ENVFILE" | cut -d= -f2)" -d "$(grep ^DB_DATABASE "$ENVFILE" | cut -d= -f2)" -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'" 2>/dev/null || echo 0)
+log "schema 表數：$tables（baseline 預期 ≥123）"
+
+log "完成。完整驗收：$LK_ROOT/infra/nas/scripts/verify-stack.sh"
