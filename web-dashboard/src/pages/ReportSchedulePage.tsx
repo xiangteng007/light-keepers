@@ -93,10 +93,10 @@ export default function ReportSchedulePage() {
         }
     };
 
-    // 載入執行記錄
-    const loadExecutions = async (scheduleId: string) => {
+    // 載入執行記錄（後端僅有全域 history，無 per-schedule executions）
+    const loadExecutions = async (_scheduleId: string) => {
         try {
-            const res = await getScheduleExecutions(scheduleId, 10);
+            const res = await getScheduleExecutions(10);
             setExecutions(res.data.data || []);
         } catch (error) {
             console.error('Failed to load executions:', error);
@@ -110,7 +110,7 @@ export default function ReportSchedulePage() {
     // 切換啟用狀態
     const handleToggle = async (schedule: ReportSchedule) => {
         try {
-            await toggleReportSchedule(schedule.id);
+            await toggleReportSchedule(schedule.id, !schedule.isActive);
             loadSchedules();
         } catch (error) {
             console.error('Failed to toggle schedule:', error);

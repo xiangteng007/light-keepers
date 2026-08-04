@@ -45,34 +45,40 @@ export interface ReportExecution {
     createdAt: string;
 }
 
+// 後端實際路由是 reports/scheduler（report-scheduler.controller.ts）；
+// 舊前綴 /report-schedules 在後端不存在，所有呼叫都是 404。
+// ⚠ 後端回傳形狀（enabled / type / cron schedule）與上方 ReportSchedule
+//   介面（isActive / reportType / frequency）尚未對齊，此處僅修路徑與動詞。
+const BASE = '/reports/scheduler';
+
 // 取得所有報表排程
 export const getReportSchedules = () =>
-    api.get<{ success: boolean; data: ReportSchedule[]; count: number }>('/report-schedules');
+    api.get<{ success: boolean; data: ReportSchedule[]; count: number }>(BASE);
 
 // 取得單一排程
 export const getReportSchedule = (id: string) =>
-    api.get<{ success: boolean; data: ReportSchedule }>(`/report-schedules/${id}`);
+    api.get<{ success: boolean; data: ReportSchedule }>(`${BASE}/${id}`);
 
-// 取得排程執行記錄
-export const getScheduleExecutions = (id: string, limit?: number) =>
-    api.get<{ success: boolean; data: ReportExecution[]; count: number }>(`/report-schedules/${id}/executions`, { params: { limit } });
+// 取得報表產生記錄（後端僅有全域 history，無 per-schedule executions）
+export const getScheduleExecutions = (limit?: number) =>
+    api.get<{ success: boolean; data: ReportExecution[]; count: number }>(`${BASE}/history`, { params: { limit } });
 
 // 建立排程
 export const createReportSchedule = (data: Partial<ReportSchedule>) =>
-    api.post<{ success: boolean; data: ReportSchedule }>('/report-schedules', data);
+    api.post<{ success: boolean; data: ReportSchedule }>(BASE, data);
 
 // 更新排程
 export const updateReportSchedule = (id: string, data: Partial<ReportSchedule>) =>
-    api.patch<{ success: boolean; data: ReportSchedule }>(`/report-schedules/${id}`, data);
+    api.put<{ success: boolean; data: ReportSchedule }>(`${BASE}/${id}`, data);
 
-// 切換排程啟用狀態
-export const toggleReportSchedule = (id: string) =>
-    api.patch<{ success: boolean; data: ReportSchedule }>(`/report-schedules/${id}/toggle`);
+// 切換排程啟用狀態（後端是 enable/disable 兩個端點，需帶目標狀態）
+export const toggleReportSchedule = (id: string, enable: boolean) =>
+    api.post<{ success: boolean; message: string }>(`${BASE}/${id}/${enable ? 'enable' : 'disable'}`);
 
 // 手動執行排程
 export const executeReportSchedule = (id: string) =>
-    api.post<{ success: boolean; data: ReportExecution }>(`/report-schedules/${id}/execute`);
+    api.post<{ success: boolean; data: ReportExecution }>(`${BASE}/${id}/run`);
 
 // 刪除排程
 export const deleteReportSchedule = (id: string) =>
-    api.delete(`/report-schedules/${id}`);
+    api.delete(`${BASE}/${id}`);

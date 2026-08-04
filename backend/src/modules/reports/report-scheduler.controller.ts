@@ -41,6 +41,16 @@ export class ReportSchedulerController {
         };
     }
 
+    @Get('history')
+    @ApiOperation({ summary: 'Get report generation history' })
+    getHistory(@Query('limit') limit?: number) {
+        return {
+            success: true,
+            data: this.schedulerService.getReportHistory(limit),
+        };
+    }
+
+    // 注意：':id' 萬用路由必須排在 'history' 等具名路由之後，否則會把它們吃掉
     @Get(':id')
     @ApiOperation({ summary: 'Get scheduled report by ID' })
     getScheduledReport(@Param('id') id: string) {
@@ -140,15 +150,6 @@ export class ReportSchedulerController {
         return {
             success: result.status === 'success',
             data: result,
-        };
-    }
-
-    @Get('history')
-    @ApiOperation({ summary: 'Get report generation history' })
-    getHistory(@Query('limit') limit?: number) {
-        return {
-            success: true,
-            data: this.schedulerService.getReportHistory(limit),
         };
     }
 }
