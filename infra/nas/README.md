@@ -562,3 +562,41 @@ lk restart backend          # 重啟單一服務
 lk exec postgres psql -U <DB_USERNAME> -d <DB_DATABASE>
 lk down                     # 停止（資料在 host bind mount，不會遺失）
 ```
+
+---
+
+## 10. A4 共存部署（2026-08-04 定案：本機＝ST 現役 AS5404T）
+
+實機＝`SENTENG-DESIGN`（192.168.31.76、ADM 5.1.3），**已跑 ST 全棧**。§3.2 的建池步驟免做
+（/volume2=RAID10 SSD 熱池、/volume1=RAID6 HDD 冷池已在）；改遵守共存紀律：
+
+### 10.1 Host port 對帳（部署前 `docker ps` 再全量核一次）
+
+| Port | 佔用者 | 歸屬 |
+|---|---|---|
+| 3000 / 3100 / 3200 / 8088 | st-dashboard / st-gateway / WS bridge / st-butler | ST（勿動） |
+| 5433 / 5434 | openclaw-postgres / st-postgres | ST（勿動） |
+| 8000 | openclaw-chromadb | ST（勿動） |
+| **8080** | **lk nginx（本棧唯一對 host 發布的 port）** | **LK** |
+| （無） | lk postgres/backend/cloudflared——僅內部網路，不佔 host port | LK |
+
+`deploy-lk.sh` 內建 8080 衝突防線；LK postgres 不發布 host port，與 5433/5434 天然不撞。
+
+### 10.2 RAM 實測制
+
+16GB 與 ST 棧分食。部署前：`docker stats --no-stream` 記下餘裕，再回填 `.env` 的
+`LK_PG_MEM` / `LK_BACKEND_MEM`（預設各 2g，保守起步；postgres 吃緊時優先加它）。
+
+### 10.3 部署副本與守門（比照 ST 慣例）
+
+```
+開發機：docker build → docker save | gzip > lightkeepers-backend.tar.gz
+        rsync -av infra/ tarball → nas:/volume1/Docker/LK/
+NAS   ：sudo sh /volume1/Docker/LK/infra/nas/deploy-lk.sh   # load_if_newer＋config 驗證＋up
+```
+
+sudoers 免密白名單（比照 ST 的 st-deploy 條目，由 owner 互動式加入）：
+`<user> ALL=(ALL) NOPASSWD: /bin/sh /volume1/Docker/LK/infra/nas/deploy-lk.sh`
+
+鐵律：**動手前先讀 `ST/docs/NAS_OPERATIONS.md`**；任何情況不 stop/restart `st-*`、
+`openclaw-*`、xxt-agent 既有容器；LK 一律以 `lk-` 前綴命名容器。
