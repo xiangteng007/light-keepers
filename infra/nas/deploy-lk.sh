@@ -96,9 +96,13 @@ log "migration:run（dist/data-source.js）"
 docker compose -f "$COMPOSE" --env-file "$ENVFILE" exec -T backend     node node_modules/typeorm/cli.js -d dist/data-source.js migration:run
 
 # 內部煙霧測試
-log "煙霧測試"
-sleep 3
-curl -sf http://127.0.0.1:8080/api/v1/health/live >/dev/null && log "OK  health/live" || { log "FAIL health/live"; exit 1; }
+log "煙霧測試（輪詢至 60s——backend 冷啟動需時）"
+live=0
+for i in $(seq 1 12); do
+    curl -sf http://127.0.0.1:8080/api/v1/health/live >/dev/null 2>&1 && { live=1; break; }
+    sleep 5
+done
+[ "$live" = 1 ] && log "OK  health/live" || { log "FAIL health/live（60s 內未起）"; exit 1; }
 curl -sf http://127.0.0.1:8080/api/v1/health/ready >/dev/null && log "OK  health/ready" || log "WARN health/ready 未過（看 backend logs）"
 curl -sf -o /dev/null http://127.0.0.1:8080/ && log "OK  前端首頁" || log "WARN 前端首頁未過"
 tables=$(docker exec lk-postgres psql -U "$(grep ^DB_USERNAME "$ENVFILE" | cut -d= -f2)" -d "$(grep ^DB_DATABASE "$ENVFILE" | cut -d= -f2)" -tAc "SELECT count(*) FROM information_schema.tables WHERE table_schema='public'" 2>/dev/null || echo 0)
