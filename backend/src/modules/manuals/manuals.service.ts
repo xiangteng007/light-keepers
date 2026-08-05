@@ -1,5 +1,17 @@
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
+import { parseLlmJson } from '../ai-queue/providers/llm-json';
+import { withRegulatoryGuardrail } from '../ai-queue/prompts/regulatory-guardrail';
+
+/** AI 手冊搜尋的輸出 schema（供 runtime 的 JSON 約束使用） */
+export const MANUAL_SEARCH_SCHEMA = {
+    type: 'object',
+    properties: {
+        relevantManualIds: { type: 'array', items: { type: 'string' } },
+        answer: { type: 'string' },
+    },
+    required: ['relevantManualIds', 'answer'],
+} as const;
 
 // 手冊資料 - 與前端同步
 const MANUALS_DATA = [
@@ -141,16 +153,29 @@ ${manualsSummary}
 
             const llmResponse = await this.llm.generateText({
                 useCaseId: 'manuals.search.v1',
+                // 手冊問答最常被問到建築／消防／職安法規，是模型引用 GB 標準並
+                // 自稱「我國」的重災區 → 掛法規護欄
+                systemPrompt: withRegulatoryGuardrail(
+                    '你是一個災難應變專家助手，只依據提供的手冊清單作答。',
+                ),
                 prompt,
                 maxOutputTokens: 512,
                 temperature: 0.2,
+                // 由 runtime 約束成合法 JSON；原本只靠 prompt 說「請用 JSON 格式回覆」
+                json: true,
+                jsonSchema: MANUAL_SEARCH_SCHEMA,
             });
             const text = llmResponse.text;
 
-            // 解析 AI 回應
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
+            // 解析 AI 回應（保底：圍籬／前後說明文字／鍵沒引號／單引號／尾逗號）
+            const { value: parsed, outcome } = parseLlmJson<{
+                relevantManualIds?: string[];
+                answer?: string;
+            }>(text);
+            if (parsed) {
+                if (outcome === 'repaired') {
+                    this.logger.warn('Manual search JSON was malformed and had to be repaired');
+                }
                 const relevantIds: string[] = parsed.relevantManualIds || [];
                 const aiAnswer = parsed.answer || '';
 
