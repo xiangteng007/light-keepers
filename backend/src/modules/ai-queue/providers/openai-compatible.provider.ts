@@ -194,13 +194,29 @@ export class OpenAiCompatibleProvider implements LlmProvider {
             );
         }
 
+        // `json: true` turns on the same decoder-level constraint that `run()` uses.
+        // When a schema is supplied we also inline it, mirroring `run()`'s system prompt.
+        const systemPrompt = request.json
+            ? [
+                request.systemPrompt,
+                'Reply with a single valid JSON object and nothing else.',
+                'All keys and string values MUST be wrapped in double quotes.',
+                'Do not wrap the output in markdown code fences.',
+                request.jsonSchema
+                    ? `The object MUST conform to this JSON schema:\n${JSON.stringify(request.jsonSchema)}`
+                    : undefined,
+            ]
+                .filter(Boolean)
+                .join('\n')
+            : request.systemPrompt;
+
         const text = await this.chatCompletion({
             useCaseId: request.useCaseId,
-            systemPrompt: request.systemPrompt,
+            systemPrompt,
             prompt: request.prompt,
             maxOutputTokens: request.maxOutputTokens ?? 2048,
             temperature: request.temperature ?? 0.3,
-            jsonMode: false,
+            jsonMode: request.json === true,
         });
 
         return {

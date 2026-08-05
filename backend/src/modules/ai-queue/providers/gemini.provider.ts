@@ -189,6 +189,15 @@ export class GeminiProvider implements LlmProvider {
                 temperature: request.temperature ?? 0.3,
             },
         };
+        // Decoder-level JSON constraint, same guarantee `run()` already relies on.
+        // Callers that JSON.parse() the text must set `json: true` - prompt wording
+        // alone is not enough (observed: unquoted keys from qwen3:14b).
+        if (request.json) {
+            body.generationConfig.responseMimeType = 'application/json';
+            if (request.jsonSchema) {
+                body.generationConfig.responseSchema = request.jsonSchema;
+            }
+        }
         if (request.systemPrompt) {
             body.systemInstruction = { parts: [{ text: request.systemPrompt }] };
         }

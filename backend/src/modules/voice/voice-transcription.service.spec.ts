@@ -55,5 +55,54 @@ describe('VoiceTranscriptionService', () => {
             expect(sitrep.situation).toBeDefined();
             expect(sitrep.actions).toBeDefined();
         });
+
+        /** 有 LLM 可用時的路徑（預設 fixture 沒注入 provider，走 mockSITREP） */
+        async function withLlm(generateText: jest.Mock) {
+            const svc = new VoiceTranscriptionService(
+                configService as never,
+                { isAvailable: () => true, generateText } as never,
+            );
+            await svc.processAudioUpload('m-llm', Buffer.from('audio'));
+            await new Promise(r => setTimeout(r, 200));
+            return svc.generateSITREP('m-llm');
+        }
+
+        it('要求 runtime 產生合法 JSON（json + jsonSchema）', async () => {
+            const generateText = jest.fn().mockResolvedValue({
+                text: '{"situation":"s","actions":"a","needs":"n"}',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 10,
+            });
+
+            await withLlm(generateText);
+
+            const request = generateText.mock.calls[0][0];
+            expect(request.json).toBe(true);
+            expect(request.jsonSchema).toMatchObject({ required: ['situation', 'actions', 'needs'] });
+        });
+
+        it('鍵沒有引號的非法 JSON 仍能解析（不退回罐頭 SITREP）', async () => {
+            const generateText = jest.fn().mockResolvedValue({
+                text: '{situation: "南區積水", actions: "已封路", needs: "抽水機"}',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 10,
+            });
+
+            const sitrep = await withLlm(generateText);
+
+            expect(sitrep.situation).toBe('南區積水');
+            expect(sitrep.needs).toBe('抽水機');
+        });
+
+        it('完全解析不出來時退回罐頭 SITREP，不對外拋', async () => {
+            const generateText = jest.fn().mockResolvedValue({
+                text: '抱歉，我無法整理。',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 10,
+            });
+
+            const sitrep = await withLlm(generateText);
+            expect(sitrep.situation).toContain('語音回報');
+        });
     });
 });
