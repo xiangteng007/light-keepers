@@ -1,14 +1,16 @@
 ﻿/**
  * AI 災情類型分類服務
  *
- * M.2: 文字分類改走 LlmProviderService（LLM_PROVIDER=gemini/local/hybrid），
- * 不再直接 new GoogleGenerativeAI。影像分析（Vision）仍直接使用 Gemini，
- * 因為本地候選模型 Qwen2.5-Instruct 是純文字模型，沒有對應能力。
+ * M.2: 文字分類改走 LlmProviderService（LLM_PROVIDER=gemini/local/hybrid）。
+ *
+ * V.1: 影像三支（影像分析／水位估算／損壞評估）**也改走同一層抽象**，
+ * 由本地 qwen2.5vl:7b 擔任主力，hybrid 模式下本地不可用才降級 Gemini。
+ * 本服務因此不再持有任何 Gemini SDK 用戶端——雲端與否是 provider 層的事，
+ * 呼叫端只管丟 prompt + 影像。
  */
 
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 import { ReportType } from '../../reports/reports.entity';
 import {
     REPORT_TYPE_VALUES,
@@ -105,19 +107,14 @@ ${description}
 @Injectable()
 export class AiClassificationService {
     private readonly logger = new Logger(AiClassificationService.name);
-    /** Vision-only client. Text classification goes through `llm`. */
-    private genAI: GoogleGenerativeAI | null = null;
 
     constructor(
         private readonly configService: ConfigService,
         @Optional() private readonly llm?: LlmProviderService,
     ) {
-        const apiKey = this.configService.get<string>('GEMINI_API_KEY');
-        if (apiKey) {
-            this.genAI = new GoogleGenerativeAI(apiKey);
-            this.logger.log('Gemini Vision client initialized');
-        } else {
-            this.logger.warn('GEMINI_API_KEY not configured, image analysis disabled');
+
+        if (!this.llm?.isVisionAvailable()) {
+            this.logger.warn('No vision provider available, image analysis will return fallbacks');
         }
 
         if (!this.llm?.isAvailable()) {
@@ -166,9 +163,10 @@ export class AiClassificationService {
     /**
      * 解析 Vision 路徑的 JSON 回應。
      *
-     * Vision 三支（影像分析／水位估算／損壞評估）走 Gemini SDK 直連，
-     * 已在 `getGenerativeModel` 掛上 `responseMimeType: application/json`；
-     * 這裡是保底層，解析不出來就 throw，由各自的 catch 回退到預設值。
+     * Vision 三支（影像分析／水位估算／損壞評估）走 LlmProviderService，
+     * 已用 `json: true` 把約束下到解碼層（Ollama response_format /
+     * Gemini responseMimeType）；這裡是保底層——本地小模型比雲端更容易吐出
+     * 帶圍籬或鍵沒引號的 JSON，解析不出來就 throw，由各自的 catch 回退預設值。
      */
     // 回 any 是刻意的：三個 Vision 端點各自有不同的欄位形狀，且下游都已經
     // 用 `parsed.x || 預設值` 做過保護；在這裡強加共同型別只會逼出一堆轉型。
@@ -354,8 +352,8 @@ export class AiClassificationService {
         suggestedActions?: string[];
         detectedObjects?: string[];
     }> {
-        if (!this.genAI) {
-            this.logger.warn('Gemini not configured, using fallback');
+        if (!this.llm?.isVisionAvailable()) {
+            this.logger.warn('Vision provider unavailable, using fallback');
             return {
                 type: 'other',
                 confidence: 0.3,
@@ -365,12 +363,6 @@ export class AiClassificationService {
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
-                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
-                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
-                generationConfig: { responseMimeType: 'application/json' },
-            });
 
             const prompt = `
 你是一個專業的災害評估專家。請仔細分析這張圖片，判斷災害類型、嚴重程度，並提供專業評估。
@@ -397,16 +389,17 @@ ${additionalContext ? `額外資訊：${additionalContext}` : ''}
 只回覆 JSON，不要包含其他文字。
 `.trim();
 
-            const imagePart = {
-                inlineData: {
-                    data: imageBase64,
-                    mimeType,
-                },
-            };
 
-            const result = await model.generateContent([prompt, imagePart]);
-            const response = result.response;
-            const text = response.text().trim();
+            // 走 LLM 抽象層：本地 qwen2.5vl 為主，hybrid 下本地不可用才降級 Gemini。
+            // json:true 把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+            const visionResult = await this.llm!.generateWithVision({
+                useCaseId: 'vision.disasterImage.v1',
+                prompt,
+                imageBase64,
+                mimeType,
+                json: true,
+            });
+            const text = visionResult.text.trim();
 
             // 解析 JSON 回應
             const parsed = this.parseVisionResponse(text);
@@ -438,7 +431,7 @@ ${additionalContext ? `額外資訊：${additionalContext}` : ''}
         riskLevel: 'safe' | 'warning' | 'danger' | 'critical';
         description: string;
     }> {
-        if (!this.genAI) {
+        if (!this.llm?.isVisionAvailable()) {
             return {
                 floodLevel: 0,
                 confidence: 0.3,
@@ -449,12 +442,6 @@ ${additionalContext ? `額外資訊：${additionalContext}` : ''}
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
-                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
-                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
-                generationConfig: { responseMimeType: 'application/json' },
-            });
 
             const prompt = `
 你是一個水災評估專家。請分析這張圖片中的水位高度。
@@ -473,15 +460,17 @@ ${referenceHeight ? `參考物高度：${referenceHeight} 公分` : '請使用�
 只回覆 JSON。
 `.trim();
 
-            const imagePart = {
-                inlineData: {
-                    data: imageBase64,
-                    mimeType,
-                },
-            };
 
-            const result = await model.generateContent([prompt, imagePart]);
-            const text = result.response.text().trim();
+            // 走 LLM 抽象層：本地 qwen2.5vl 為主，hybrid 下本地不可用才降級 Gemini。
+            // json:true 把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+            const visionResult = await this.llm!.generateWithVision({
+                useCaseId: 'vision.floodLevel.v1',
+                prompt,
+                imageBase64,
+                mimeType,
+                json: true,
+            });
+            const text = visionResult.text.trim();
             const parsed = this.parseVisionJson(text);
 
             this.logger.log(`Flood level analysis: ${parsed.floodLevel}cm, risk: ${parsed.riskLevel}`);
@@ -521,7 +510,7 @@ ${referenceHeight ? `參考物高度：${referenceHeight} 公分` : '請使用�
         safetyStatus: 'safe' | 'caution' | 'dangerous' | 'evacuate';
         description: string;
     }> {
-        if (!this.genAI) {
+        if (!this.llm?.isVisionAvailable()) {
             return {
                 overallDamageLevel: 'moderate',
                 damagePercentage: 50,
@@ -535,12 +524,6 @@ ${referenceHeight ? `參考物高度：${referenceHeight} 公分` : '請使用�
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({
-                model: 'gemini-2.0-flash-exp',
-                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
-                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
-                generationConfig: { responseMimeType: 'application/json' },
-            });
 
             const typeContext = damageType
                 ? `這是一個${damageType === 'building' ? '建築物' : damageType === 'road' ? '道路' : damageType === 'vehicle' ? '車輛' : '一般'}損壞評估。`
@@ -565,15 +548,17 @@ ${typeContext}
 只回覆 JSON。
 `.trim();
 
-            const imagePart = {
-                inlineData: {
-                    data: imageBase64,
-                    mimeType,
-                },
-            };
 
-            const result = await model.generateContent([prompt, imagePart]);
-            const text = result.response.text().trim();
+            // 走 LLM 抽象層：本地 qwen2.5vl 為主，hybrid 下本地不可用才降級 Gemini。
+            // json:true 把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+            const visionResult = await this.llm!.generateWithVision({
+                useCaseId: 'vision.damageAssessment.v1',
+                prompt,
+                imageBase64,
+                mimeType,
+                json: true,
+            });
+            const text = visionResult.text.trim();
             const parsed = this.parseVisionJson(text);
 
             this.logger.log(`Damage assessment: ${parsed.overallDamageLevel} (${parsed.damagePercentage}%)`);

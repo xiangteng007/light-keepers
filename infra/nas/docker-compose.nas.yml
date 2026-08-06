@@ -133,6 +133,8 @@ services:
       LLM_BASE_URL: ${LLM_BASE_URL:?LLM_BASE_URL is required - point to workstation Ollama}
       # D22 更新（2026-08-05 owner 決策）：與 ST/DRONES 統一 qwen3:14b，避免單 GPU 上雙模型交替載入抖動
       LLM_MODEL: ${LLM_MODEL:-qwen3:14b}
+      # V.1 視覺模型；留空則視覺降級 Gemini（hybrid）
+      LLM_VISION_MODEL: ${LLM_VISION_MODEL:-qwen2.5vl:7b}
       LLM_API_KEY: ${LLM_API_KEY:-ollama}
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
 

@@ -8,6 +8,8 @@ import {
     LlmResponse,
     LlmTextRequest,
     LlmTextResponse,
+    LlmVisionRequest,
+    LlmVisionResponse,
     RateLimitError,
     ValidationError,
 } from './llm-provider.interface';
@@ -285,6 +287,44 @@ export class GeminiProvider implements LlmProvider {
                 error: (error as Error)?.message || String(error),
             };
         }
+    }
+
+    /**
+     * 視覺生成（降級路徑）。
+     *
+     * 本地 qwen2.5vl 為主，這裡是 hybrid 模式下本地不可用時的退路。
+     * 內部沿用既有的 `generateWithImage`，只是把回傳整成與本地一致的形狀，
+     * 讓呼叫端不必分辨自己拿到的是哪一邊的結果。
+     */
+    async generateWithVision(request: LlmVisionRequest): Promise<LlmVisionResponse> {
+        const startTime = Date.now();
+
+        const result = await this.generateWithImage({
+            systemPrompt: request.systemPrompt ?? '',
+            userPrompt: request.prompt,
+            imageBase64: request.imageBase64,
+            mimeType: request.mimeType,
+            maxOutputTokens: request.maxOutputTokens,
+        });
+
+        if (!result.success) {
+            throw new AiProviderError(
+                `Gemini vision failed: ${result.error ?? 'unknown'}`,
+                'GEMINI_VISION_FAILED',
+                true,
+            );
+        }
+
+        return {
+            text: typeof result.data === 'string' ? result.data : JSON.stringify(result.data),
+            modelName: 'gemini-2.0-flash-exp',
+            processingTimeMs: Date.now() - startTime,
+        };
+    }
+
+    /** Gemini 的視覺能力與文字共用同一把金鑰，故條件同 isConfigured() */
+    isVisionConfigured(): boolean {
+        return this.isConfigured();
     }
 
     /**

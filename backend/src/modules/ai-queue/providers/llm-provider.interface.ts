@@ -99,6 +99,32 @@ export interface LlmTextResponse {
 }
 
 /**
+ * Vision (multimodal) generation request.
+ *
+ * 影像一律以 base64 傳入，由 provider 決定包裝方式：
+ *  - 本地（OpenAI 相容）→ `image_url` 帶 `data:<mime>;base64,<b64>`（Ollama qwen2.5vl 吃這個）
+ *  - Gemini            → `inlineData { mimeType, data }`
+ * 呼叫端不需要知道差別。
+ */
+export interface LlmVisionRequest {
+    useCaseId?: string;
+    systemPrompt?: string;
+    prompt: string;
+    imageBase64: string;
+    mimeType: string;
+    /** 要求 JSON 輸出——約束下到解碼層，不靠 prompt 的「只回覆 JSON」 */
+    json?: boolean;
+    maxOutputTokens?: number;
+    temperature?: number;
+}
+
+export interface LlmVisionResponse {
+    text: string;
+    modelName: string;
+    processingTimeMs: number;
+}
+
+/**
  * Result of a lightweight reachability probe.
  */
 export interface LlmHealth {
@@ -122,7 +148,13 @@ export interface LlmProvider {
 
     generateText(request: LlmTextRequest): Promise<LlmTextResponse>;
 
+    /** 影像輸入生成。本地走 qwen2.5vl，Gemini 走既有 Vision API。 */
+    generateWithVision(request: LlmVisionRequest): Promise<LlmVisionResponse>;
+
     isConfigured(): boolean;
+
+    /** 視覺路徑是否可用（可能與文字路徑分開設定，例如缺 LLM_VISION_MODEL） */
+    isVisionConfigured(): boolean;
 
     /** Cheap reachability probe; must never throw. */
     healthCheck(): Promise<LlmHealth>;
