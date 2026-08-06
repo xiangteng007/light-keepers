@@ -21,6 +21,7 @@ import {
     MOJ_SOURCES,
     REFERENCE_ONLY_SOURCES,
     PLAN_HIERARCHY_SOURCES,
+    REGIONAL_PLAN_SOURCES,
     SOURCE_ATTRIBUTION,
     SOURCE_TYPE,
 } from './regulation-sources.mjs';
@@ -235,7 +236,8 @@ async function fetchAll() {
     }
 
     // 授權未確認來源：只登錄書目，不重製內文
-    for (const ref of REFERENCE_ONLY_SOURCES) {
+    // 六都地區計畫與基本計畫同屬「計畫非法規」，處置一致
+    for (const ref of [...REFERENCE_ONLY_SOURCES, ...REGIONAL_PLAN_SOURCES]) {
         chunks.push({
             id: `ref:${ref.id}`,
             corpusDomain: ref.domain,

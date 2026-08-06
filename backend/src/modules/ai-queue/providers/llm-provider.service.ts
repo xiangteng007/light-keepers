@@ -12,6 +12,7 @@ import {
     LlmVisionRequest,
     LlmVisionResponse,
 } from './llm-provider.interface';
+import { detectSimplified, withZhTwRetry } from '../prompts/zh-tw-guard';
 
 export type LlmProviderMode = 'gemini' | 'local' | 'hybrid';
 
@@ -105,11 +106,57 @@ export class LlmProviderService {
      * Free-form text generation.
      */
     async generateText(request: LlmTextRequest): Promise<LlmTextResponse> {
-        return this.dispatch(
-            request.useCaseId ?? 'text',
+        const useCaseId = request.useCaseId ?? 'text';
+        const first = await this.dispatch(
+            useCaseId,
             () => this.local.generateText(request),
             () => this.gemini.generateText(request),
         );
+        return this.enforceTraditional(useCaseId, first, () => {
+            const retryPrompt = withZhTwRetry(request.prompt);
+            return this.dispatch(
+                useCaseId,
+                () => this.local.generateText({ ...request, prompt: retryPrompt }),
+                () => this.gemini.generateText({ ...request, prompt: retryPrompt }),
+            );
+        });
+    }
+
+    /**
+     * 繁體中文護欄：偵測到簡體就用加強版 prompt **重試一次**。
+     *
+     * 只重試一次是刻意的——災防場景不能為了字形無限重試把延遲拉長。
+     * 第二次仍是簡體就照樣回傳，但留 WARN 讓退化率可觀測。
+     */
+    private async enforceTraditional<T extends { text: string }>(
+        useCaseId: string,
+        first: T,
+        retry: () => Promise<T>,
+    ): Promise<T> {
+        const hit = detectSimplified(first.text);
+        if (!hit.detected) return first;
+
+        this.logger.warn(
+            `簡體字偵測命中（${useCaseId}）：${hit.hits.join('')} ` +
+            `（比例 ${(hit.ratio * 100).toFixed(1)}%）—— 以加強 prompt 重試一次`,
+        );
+
+        try {
+            const second = await retry();
+            const again = detectSimplified(second.text);
+            if (again.detected) {
+                this.logger.warn(
+                    `重試後仍含簡體字（${useCaseId}）：${again.hits.join('')} —— 照原樣回傳`,
+                );
+            }
+            return second;
+        } catch (error) {
+            // 重試失敗不應該讓整個請求掛掉：第一次的結果雖然是簡體，仍然有內容
+            this.logger.warn(
+                `繁體重試失敗（${useCaseId}）：${(error as Error).message} —— 回傳第一次結果`,
+            );
+            return first;
+        }
     }
 
     /**

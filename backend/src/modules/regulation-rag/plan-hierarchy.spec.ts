@@ -143,14 +143,46 @@ describe('災害防救計畫三層階層', () => {
         });
     });
 
-    describe('sourceReport 揭露未 ingest 的兩層', () => {
-        it('業務計畫與地區計畫登錄為 pending 且不產生 chunk', () => {
+    describe('業務計畫仍未 ingest', () => {
+        it('登錄為 pending 且不產生 chunk（避免「以為有、其實沒有」）', () => {
             const pending = corpus.sourceReport.filter((s) => s.status === 'pending');
             expect(pending.map((s) => s.planLevel)).toEqual(
-                expect.arrayContaining([PlanLevel.OPERATIONAL, PlanLevel.REGIONAL]),
+                expect.arrayContaining([PlanLevel.OPERATIONAL]),
             );
             expect(corpus.chunks.some((c) => c.planLevel === PlanLevel.OPERATIONAL)).toBe(false);
-            expect(corpus.chunks.some((c) => c.planLevel === PlanLevel.REGIONAL)).toBe(false);
+        });
+    });
+
+    describe('六都地區災害防救計畫（§20 第一級：直轄市）', () => {
+        const regional = () => corpus.chunks.filter((c) => c.planLevel === PlanLevel.REGIONAL);
+        const SIX = ['TPE', 'NWT', 'TYC', 'TXG', 'TNN', 'KHH'];
+
+        it('六都齊備，各一筆，region 正確', () => {
+            expect(regional()).toHaveLength(6);
+            expect(regional().map((c) => c.region).sort()).toEqual([...SIX].sort());
+        });
+
+        it('🔴 六都全數授權未確認 → referenceOnly，不重製內文', () => {
+            for (const c of regional()) {
+                expect(c.referenceOnly).toBe(true);
+                expect(c.sourceType).toBe(SourceType.PLAN);
+                expect(c.licenceNote).toContain('授權未確認');
+            }
+        });
+
+        it('法源指向 §20、檢討週期 2 年（細則 §8）', () => {
+            for (const c of regional()) {
+                expect(c.legalBasis).toContain('第 20 條');
+                expect(c.reviewCycleYears).toBe(2);
+            }
+        });
+
+        it('市級：subRegion 為 null（鄉鎮市是第二級，尚未 ingest）', () => {
+            for (const c of regional()) expect(c.subRegion ?? null).toBeNull();
+        });
+
+        it('四範疇標籤齊備', () => {
+            for (const c of regional()) expect(c.scopeTags).toHaveLength(4);
         });
     });
 });

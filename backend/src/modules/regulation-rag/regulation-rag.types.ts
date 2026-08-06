@@ -20,7 +20,9 @@ export enum RegulationRegion {
     NATIONAL = 'NATIONAL',
     TPE = 'TPE',
     NWT = 'NWT',
+    TYC = 'TYC',
     TXG = 'TXG',
+    TNN = 'TNN',
     KHH = 'KHH',
     HUA = 'HUA',
 }
@@ -98,7 +100,9 @@ export const REGION_LABEL: Record<string, string> = {
     NATIONAL: '中央（全國適用）',
     TPE: '臺北市',
     NWT: '新北市',
+    TYC: '桃園市',
     TXG: '臺中市',
+    TNN: '臺南市',
     KHH: '高雄市',
     HUA: '花蓮縣',
 };
