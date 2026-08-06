@@ -68,4 +68,35 @@ describe('PFAChatbotService', () => {
         const stats = await service.getStats();
         expect(stats.totalConversations).toBeDefined();
     });
+
+    // 改進 2：使用者會在心理支持對話裡問到職災補助、理賠、災民權益等法規題。
+    // 實測模型會用溫暖的語氣講出不存在的法條，因此 PFA 也要掛護欄。
+    describe('法規護欄', () => {
+        function buildWithLlm(generateText: jest.Mock): PFAChatbotService {
+            const repo = {
+                save: jest.fn().mockResolvedValue({}),
+                find: jest.fn().mockResolvedValue([]),
+                count: jest.fn().mockResolvedValue(0),
+            };
+            return new PFAChatbotService(
+                repo as never,
+                { isAvailable: () => true, generateText } as never,
+            );
+        }
+
+        it('PFA 的 system prompt 同時保有 HopeBot 角色設定與法規護欄', async () => {
+            const generateText = jest.fn().mockResolvedValue({
+                text: '我聽到你說的了。',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 10,
+            });
+
+            await buildWithLlm(generateText).chat('u1', 's1', '職災補助有哪些規定？');
+
+            const { systemPrompt } = generateText.mock.calls[0][0];
+            expect(systemPrompt).toContain('HopeBot');
+            expect(systemPrompt).toContain('不要生成看起來合理的編號');
+            expect(systemPrompt).toContain('GB');
+        });
+    });
 });

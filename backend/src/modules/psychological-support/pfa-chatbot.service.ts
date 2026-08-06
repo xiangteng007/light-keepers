@@ -5,6 +5,7 @@
 
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
+import { withRegulatoryGuardrail } from '../ai-queue/prompts/regulatory-guardrail';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { PFAChatLog } from './entities/mood-log.entity';
@@ -217,7 +218,9 @@ export class PFAChatbotService {
 
         const { text } = await this.llm!.generateText({
             useCaseId: 'pfa.chat.v1',
-            systemPrompt: PFA_SYSTEM_PROMPT,
+            // 使用者會在對話中問到職災補助、保險理賠、災民權益等法規題；
+            // 護欄避免 HopeBot 用溫暖語氣講出一條不存在的法條（見 regulatory-guardrail.ts）
+            systemPrompt: withRegulatoryGuardrail(PFA_SYSTEM_PROMPT),
             prompt: dialogue + '\n\n請以助手身分，用溫暖簡短（100 字內）的繁體中文回應最後一則使用者訊息。',
             maxOutputTokens: 256,
             temperature: 0.7,

@@ -67,6 +67,29 @@ export interface LlmTextRequest {
     systemPrompt?: string;
     maxOutputTokens?: number;
     temperature?: number;
+
+    /**
+     * Ask the runtime to constrain decoding to valid JSON.
+     *
+     * Why this exists: several callers (disaster classification, manual search)
+     * prompt for JSON in plain text and then `JSON.parse()` the answer. A/B
+     * testing against `qwen3:14b` showed the model periodically emits JSON with
+     * **unquoted keys** - syntactically invalid, and no amount of prompt wording
+     * fixes it reliably. Both runtimes can enforce this at the decoder level
+     * (`response_format: json_object` / `responseMimeType: application/json`),
+     * so the guarantee should come from the runtime, not from model discipline.
+     *
+     * Callers must still handle parse failure: `json: true` guarantees the
+     * runtime *tried*, not that a stale/degraded endpoint complied.
+     */
+    json?: boolean;
+
+    /**
+     * Optional JSON schema, inlined into the system prompt when `json` is set.
+     * Kept separate from `LlmRequest.schema` because this path returns raw text
+     * (the caller owns parsing and field validation).
+     */
+    jsonSchema?: object;
 }
 
 export interface LlmTextResponse {

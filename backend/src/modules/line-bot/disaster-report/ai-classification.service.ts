@@ -16,6 +16,7 @@ import {
     detectMassCasualty,
 } from '../../reports/disaster-types';
 import { LlmProviderService } from '../../ai-queue/providers/llm-provider.service';
+import { parseLlmJson } from '../../ai-queue/providers/llm-json';
 
 export interface ClassificationResult {
     type: ReportType;
@@ -36,6 +37,24 @@ export interface ClassificationResult {
  *   1. 瓦斯氣爆等民生／工業爆炸維持 fire（既有語意，不得變更）
  *   2. 情資不足時保守判 explosion 而非 terror_attack
  */
+/**
+ * 災情分類的輸出 schema。
+ *
+ * 供 `LlmTextRequest.jsonSchema` 使用：Gemini 會直接拿去做 `responseSchema`，
+ * Ollama 這類只支援 `json_object` 的 runtime 則由 provider 內嵌進 system prompt。
+ * 欄位與 `ClassificationResult` 對應，型別清單維持與 prompt 一致（SSOT 是 disaster-types）。
+ */
+export const CLASSIFICATION_SCHEMA = {
+    type: 'object',
+    properties: {
+        type: { type: 'string', enum: [...REPORT_TYPE_VALUES] },
+        confidence: { type: 'number' },
+        massCasualty: { type: 'boolean' },
+        reasoning: { type: 'string' },
+    },
+    required: ['type', 'confidence'],
+} as const;
+
 export function buildClassificationPrompt(description: string): string {
     return `
 你是一個災害類型分類專家。請根據以下災情描述，判斷最可能的災害類型。
@@ -124,6 +143,11 @@ export class AiClassificationService {
                 prompt: buildClassificationPrompt(description),
                 maxOutputTokens: 512,
                 temperature: 0.2,
+                // 由 runtime 約束解碼成合法 JSON（Ollama response_format /
+                // Gemini responseMimeType）。實測 qwen3:14b 偶爾吐出「鍵沒有引號」
+                // 的非法 JSON，靠 prompt 措辭修不掉。
+                json: true,
+                jsonSchema: CLASSIFICATION_SCHEMA,
             });
 
             const parsed = this.parseAIResponse(response.text.trim());
@@ -140,13 +164,47 @@ export class AiClassificationService {
 
 
     /**
+     * 解析 Vision 路徑的 JSON 回應。
+     *
+     * Vision 三支（影像分析／水位估算／損壞評估）走 Gemini SDK 直連，
+     * 已在 `getGenerativeModel` 掛上 `responseMimeType: application/json`；
+     * 這裡是保底層，解析不出來就 throw，由各自的 catch 回退到預設值。
+     */
+    // 回 any 是刻意的：三個 Vision 端點各自有不同的欄位形狀，且下游都已經
+    // 用 `parsed.x || 預設值` 做過保護；在這裡強加共同型別只會逼出一堆轉型。
+    private parseVisionJson(text: string): any {
+        const { value, outcome, error } = parseLlmJson(text);
+        if (!value) {
+            throw new Error(`Unparseable vision response: ${error ?? 'unknown'}`);
+        }
+        if (outcome === 'repaired') {
+            this.logger.warn('Vision JSON was malformed and had to be repaired');
+        }
+        return value;
+    }
+
+    /**
      * 解析 AI 回應
      */
     private parseAIResponse(text: string): ClassificationResult {
         try {
-            // 移除可能的 markdown 代碼塊標記
-            const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            const parsed = JSON.parse(cleanText);
+            // 保底解析：圍籬、前後說明文字、鍵沒引號、單引號、尾逗號都能救回來。
+            // 救不回來就 throw，由 classifyDisasterType 落到關鍵字比對。
+            const { value: parsed, outcome, error } = parseLlmJson<{
+                type?: string;
+                confidence?: number;
+                reasoning?: string;
+                massCasualty?: boolean;
+            }>(text);
+
+            if (!parsed) {
+                throw new Error(`Unparseable AI response: ${error ?? 'unknown'}`);
+            }
+            if (outcome === 'repaired') {
+                // 代表 runtime 的 JSON 約束沒生效（舊版 runtime／被換掉的模型），
+                // 這次雖然救回來了，但值得在日誌留痕以便追蹤是哪個端點在退化。
+                this.logger.warn('AI classification JSON was malformed and had to be repaired');
+            }
 
             // 驗證回應格式
             if (!parsed.type || typeof parsed.confidence !== 'number') {
@@ -307,7 +365,12 @@ export class AiClassificationService {
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash-exp',
+                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
+                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+                generationConfig: { responseMimeType: 'application/json' },
+            });
 
             const prompt = `
 你是一個專業的災害評估專家。請仔細分析這張圖片，判斷災害類型、嚴重程度，並提供專業評估。
@@ -386,7 +449,12 @@ ${additionalContext ? `額外資訊：${additionalContext}` : ''}
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash-exp',
+                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
+                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+                generationConfig: { responseMimeType: 'application/json' },
+            });
 
             const prompt = `
 你是一個水災評估專家。請分析這張圖片中的水位高度。
@@ -414,8 +482,7 @@ ${referenceHeight ? `參考物高度：${referenceHeight} 公分` : '請使用�
 
             const result = await model.generateContent([prompt, imagePart]);
             const text = result.response.text().trim();
-            const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            const parsed = JSON.parse(cleanText);
+            const parsed = this.parseVisionJson(text);
 
             this.logger.log(`Flood level analysis: ${parsed.floodLevel}cm, risk: ${parsed.riskLevel}`);
             return {
@@ -468,7 +535,12 @@ ${referenceHeight ? `參考物高度：${referenceHeight} 公分` : '請使用�
         }
 
         try {
-            const model = this.genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+            const model = this.genAI.getGenerativeModel({
+                model: 'gemini-2.0-flash-exp',
+                // Vision 走 Gemini SDK 直連（本地模型是純文字，沒有這個能力）。
+                // 同樣把 JSON 約束下到解碼層，不靠 prompt 的「只回覆 JSON」。
+                generationConfig: { responseMimeType: 'application/json' },
+            });
 
             const typeContext = damageType
                 ? `這是一個${damageType === 'building' ? '建築物' : damageType === 'road' ? '道路' : damageType === 'vehicle' ? '車輛' : '一般'}損壞評估。`
@@ -502,8 +574,7 @@ ${typeContext}
 
             const result = await model.generateContent([prompt, imagePart]);
             const text = result.response.text().trim();
-            const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            const parsed = JSON.parse(cleanText);
+            const parsed = this.parseVisionJson(text);
 
             this.logger.log(`Damage assessment: ${parsed.overallDamageLevel} (${parsed.damagePercentage}%)`);
             return {
@@ -550,8 +621,7 @@ ${typeContext}
         detectedObjects?: string[];
     } {
         try {
-            const cleanText = text.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-            const parsed = JSON.parse(cleanText);
+            const parsed = this.parseVisionJson(text);
 
             // 驗證類型（清單來自 disaster-types SSOT）
             if (!(REPORT_TYPE_VALUES as readonly string[]).includes(parsed.type)) {

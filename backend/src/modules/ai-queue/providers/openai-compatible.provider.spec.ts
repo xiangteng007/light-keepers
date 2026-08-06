@@ -264,6 +264,49 @@ describe('OpenAiCompatibleProvider', () => {
             await expect(provider.generateText({ prompt: 'hi' }))
                 .rejects.toMatchObject({ code: 'NOT_CONFIGURED' });
         });
+
+        // 這組是「改進 1」的核心：JSON 的保證必須來自 runtime 的解碼約束，
+        // 而不是 prompt 裡的一句「只回覆 JSON」。實測 qwen3:14b 會吐出鍵沒引號的非法 JSON。
+        it('json: true 會送出 response_format=json_object', async () => {
+            fetchMock.mockResolvedValue(chatResponse('{"type":"fire"}'));
+            const provider = new OpenAiCompatibleProvider(makeConfig());
+
+            await provider.generateText({ prompt: 'classify', json: true });
+
+            const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+            expect(body.response_format).toEqual({ type: 'json_object' });
+        });
+
+        it('json: true 會把 schema 內嵌進 system prompt（Ollama 只吃 json_object）', async () => {
+            fetchMock.mockResolvedValue(chatResponse('{"type":"fire"}'));
+            const provider = new OpenAiCompatibleProvider(makeConfig());
+
+            await provider.generateText({
+                prompt: 'classify',
+                systemPrompt: '你是分類器',
+                json: true,
+                jsonSchema: SCHEMA,
+            });
+
+            const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+            const system = body.messages[0].content;
+            expect(body.messages[0].role).toBe('system');
+            expect(system).toContain('你是分類器');
+            expect(system).toContain('single valid JSON object');
+            expect(system).toContain('double quotes');
+            expect(system).toContain('"confidence"');
+        });
+
+        it('沒指定 json 時不加任何約束（自由文字路徑不受影響）', async () => {
+            fetchMock.mockResolvedValue(chatResponse('溫暖的回應'));
+            const provider = new OpenAiCompatibleProvider(makeConfig());
+
+            await provider.generateText({ prompt: 'chat', systemPrompt: 'be kind' });
+
+            const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+            expect(body.response_format).toBeUndefined();
+            expect(body.messages[0].content).toBe('be kind');
+        });
     });
 
     describe('healthCheck', () => {

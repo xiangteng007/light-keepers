@@ -10,6 +10,7 @@
 
 import { Injectable, Logger, Optional } from '@nestjs/common';
 import { LlmProviderService } from '../ai-queue/providers/llm-provider.service';
+import { parseLlmJson } from '../ai-queue/providers/llm-json';
 import { ConfigService } from '@nestjs/config';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -39,6 +40,20 @@ export interface SITREPDraft {
     timestamp: string;
     sourceAudioId: string;
 }
+
+/**
+ * SITREP 草稿的輸出 schema（供 runtime 的 JSON 約束使用）。
+ * `timestamp` / `sourceAudioId` 由伺服器補，不向模型索取。
+ */
+export const SITREP_DRAFT_SCHEMA = {
+    type: 'object',
+    properties: {
+        situation: { type: 'string' },
+        actions: { type: 'string' },
+        needs: { type: 'string' },
+    },
+    required: ['situation', 'actions', 'needs'],
+} as const;
 
 export interface VoiceLogEntry {
     id: string;
@@ -259,17 +274,27 @@ ${transcripts}
 }`,
                 maxOutputTokens: 512,
                 temperature: 0.3,
+                // 由 runtime 約束成合法 JSON；原本只在 prompt 裡寫「請以 JSON 格式輸出」
+                json: true,
+                jsonSchema: SITREP_DRAFT_SCHEMA,
             });
 
-            // Parse JSON from response
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                const parsed = JSON.parse(jsonMatch[0]);
+            // 保底解析（圍籬／前後說明文字／鍵沒引號／單引號／尾逗號）；
+            // 解析不出來就落到 mockSITREP，維持既有降級行為
+            const { value: parsed, outcome } = parseLlmJson<{
+                situation?: string;
+                actions?: string;
+                needs?: string;
+            }>(text);
+            if (parsed) {
+                if (outcome === 'repaired') {
+                    this.logger.warn('SITREP JSON was malformed and had to be repaired');
+                }
                 return {
                     ...parsed,
                     timestamp: new Date().toISOString(),
                     sourceAudioId: recentLogs[recentLogs.length - 1].id,
-                };
+                } as SITREPDraft;
             }
         } catch (error) {
             this.logger.error('SITREP generation failed:', error);

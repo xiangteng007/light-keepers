@@ -90,6 +90,52 @@ describe('AiClassificationService', () => {
             expect(result.reasoning).toBe('Keyword-based detection');
         });
 
+        // 改進 1：JSON 的保證下放到 runtime 的解碼約束
+        it('要求 runtime 產生合法 JSON（json + jsonSchema）', async () => {
+            llm.isAvailable.mockReturnValue(true);
+            llm.generateText.mockResolvedValue({
+                text: '{"type":"flood","confidence":0.9}',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 100,
+            });
+
+            await service.classifyDisasterType('淹水了');
+
+            const request = llm.generateText.mock.calls[0][0];
+            expect(request.json).toBe(true);
+            expect(request.jsonSchema).toMatchObject({ required: ['type', 'confidence'] });
+        });
+
+        // A/B 實測 qwen3:14b 真的吐過這種東西：鍵沒有引號 → 舊版 JSON.parse 直接爆，
+        // 分類整包退回關鍵字比對（準確度掉一大截）。保底解析要能救回來。
+        it('鍵沒有引號的非法 JSON 仍能正確分類（不退回關鍵字）', async () => {
+            llm.isAvailable.mockReturnValue(true);
+            llm.generateText.mockResolvedValue({
+                text: '{type: "air_raid", confidence: 0.88, massCasualty: true, reasoning: "防空警報"}',
+                modelName: 'qwen3:14b',
+                processingTimeMs: 130,
+            });
+
+            const result = await service.classifyDisasterType('防空警報響了');
+
+            expect(result.type).toBe('air_raid');
+            expect(result.confidence).toBeCloseTo(0.88);
+            expect(result.massCasualty).toBe(true);
+            expect(result.reasoning).not.toBe('Keyword-based detection');
+        });
+
+        it('單引號＋尾逗號＋圍籬的組合也能救回來', async () => {
+            llm.isAvailable.mockReturnValue(true);
+            llm.generateText.mockResolvedValue({
+                text: "```json\n{'type': 'landslide', 'confidence': 0.7,}\n```",
+                modelName: 'qwen3:14b',
+                processingTimeMs: 110,
+            });
+
+            const result = await service.classifyDisasterType('山崩了');
+            expect(result.type).toBe('landslide');
+        });
+
         it('should fall back to keywords on an unparseable response', async () => {
             llm.isAvailable.mockReturnValue(true);
             llm.generateText.mockResolvedValue({
