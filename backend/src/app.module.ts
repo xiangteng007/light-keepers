@@ -15,6 +15,7 @@ import { NcdrAlertsModule } from './modules/ncdr-alerts/ncdr-alerts.module';
 import { PublicResourcesModule } from './modules/public-resources/public-resources.module';
 import { PublicModule } from './modules/public/public.module';
 import { ManualsModule } from './modules/manuals/manuals.module';
+import { RegulationRagModule } from './modules/regulation-rag/regulation-rag.module';
 import { ReportsModule } from './modules/reports/reports.module';
 import { VolunteersModule } from './modules/volunteers/volunteers.module';
 import { TrainingModule } from './modules/training/training.module';
@@ -205,6 +206,8 @@ const ENABLE_STUB_MODULES = process.env.ENABLE_STUB_MODULES === 'true';
         PublicModule, // 🌐 Level0 公開端點
         IntakeModule, // 📥 v2.1 SSOT 統一通報入口
         ManualsModule,
+
+        RegulationRagModule,
         ReportsModule,
         VolunteersModule,
         TrainingModule,
