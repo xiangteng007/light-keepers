@@ -38,6 +38,11 @@ ENV PORT=8080
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package*.json ./
 
+# 法規 RAG 語料（backend/data/regulation-corpus.json）。
+# 這不是 TypeScript 產物，不會被 nest build 帶進 dist——沒有這行，
+# RegulationCorpusService 開機只會印一行 warning 然後把法規問答靜默停用。
+COPY --from=builder /app/data ./data
+
 # 只安裝生產依賴，並清理 npm cache 減少 image 大小
 RUN npm ci --legacy-peer-deps --omit=dev && \
     npm cache clean --force
