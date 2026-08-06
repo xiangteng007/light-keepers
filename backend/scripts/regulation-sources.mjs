@@ -119,20 +119,59 @@ export const MOJ_SOURCES = [
     },
 ];
 
+/** 來源性質：法規 vs 計畫 —— 授權與法律效力完全不同，不可混為一談 */
+export const SOURCE_TYPE = { REGULATION: 'regulation', PLAN: 'plan' };
+
+/**
+ * 災害防救計畫三層階層 —— 直接來自災害防救法本文（已對本系統語料逐條核對）：
+ *
+ *   §17 基本計畫：中央災害防救委員會擬訂 → 中央災害防救會報核定 → 行政院函送
+ *   §19 業務計畫：①公共事業 →中央目的事業主管機關核定
+ *                ②中央災害防救業務主管機關 →中央災害防救會報核定
+ *   §20 地區計畫：①直轄市、縣（市）政府
+ *                ②鄉（鎮、市）、山地原住民區公所
+ *                並明定下級不得牴觸上級（§20 II、V）
+ *
+ * 檢討週期（施行細則）：基本 5 年（§6）／業務 2 年（§7）／地區 2 年（§8）。
+ * ⚠ 母法 §17 只寫「應定期檢討」，**五年是施行細則 §6 才定的**，引用時勿張冠李戴。
+ */
+export const PLAN_LEVEL = {
+    BASIC: 'basic-plan',
+    OPERATIONAL: 'operational-plan',
+    REGIONAL: 'regional-plan',
+};
+
+/** 內容四範疇（本法 §18 計畫內容、施行細則 §6 檢討事項） */
+export const SCOPE = {
+    MITIGATION: 'mitigation',
+    PREPAREDNESS: 'preparedness',
+    RESPONSE: 'response',
+    RECOVERY: 'recovery',
+};
+
 /**
  * 授權未確認 —— 只登錄書目與官方連結，**不重製內文**。
  *
- * 《災害防救基本計畫》由中央災害防救會報核定，性質為計畫而非法規，
- * 不在全國法規資料庫，行政院網站頁尾標示「© 行政院版權所有」，
- * 未見政府資料開放授權宣告。依 owner 決策，改採「引用＋官方連結」。
+ * 《災害防救基本計畫》性質為**計畫非法規**，因此不在全國法規資料庫，
+ * 權威來源為行政院中央災害防救會報（cdprc.ey.gov.tw），該站頁尾標示
+ * 「© 行政院版權所有」，未見政府資料開放授權宣告 → 依 owner 決策採
+ * 「摘要＋官方連結」，不重製全文。
  */
 export const REFERENCE_ONLY_SOURCES = [
     {
         id: 'cdprc-basic-plan',
         name: '災害防救基本計畫',
         level: '計畫',
+        sourceType: SOURCE_TYPE.PLAN,
+        planLevel: PLAN_LEVEL.BASIC,
+        planVersion: '113-117',
+        planVersionNote: '現行版本＝民國 113–117 年計畫（前版 108–112）',
+        reviewCycleYears: 5,
+        legalBasis: '災害防救法第 17 條（檢討週期見同法施行細則第 6 條）',
+        scopeTags: [SCOPE.MITIGATION, SCOPE.PREPAREDNESS, SCOPE.RESPONSE, SCOPE.RECOVERY],
         domain: DOMAIN.DISASTER,
         region: REGION.NATIONAL,
+        subRegion: null,
         fullText: false,
         issuer: '行政院中央災害防救會報',
         url: 'https://cdprc.ey.gov.tw/Page/D99BAB0D863D6ACB',
@@ -140,11 +179,54 @@ export const REFERENCE_ONLY_SOURCES = [
             '授權未確認（行政院網站標示「© 行政院版權所有」，未見開放授權宣告）。' +
             '本系統僅登錄書目與官方連結，不重製內文。',
         summary:
-            '《災害防救基本計畫》為國家層級之災害防救計畫，由中央災害防救委員會擬訂、' +
-            '中央災害防救會報核定後由行政院函送各中央災害防救業務主管機關及地方政府據以實施；' +
-            '各級政府之災害防救業務計畫與地區災害防救計畫均須以本計畫為上位依據。' +
-            '依災害防救法施行細則，本計畫應定期檢討（每五年），必要時得隨時檢討。' +
-            '現行版本分期核定（98-102、103-107、108-112、113-117 年），全文請至官方連結查閱。',
+            '《災害防救基本計畫》為全國上位之災害防救計畫，法源為災害防救法第 17 條：' +
+            '由中央災害防救委員會擬訂，經中央災害防救會報核定後，由行政院函送各中央災害防救' +
+            '業務主管機關及直轄市、縣（市）政府據以辦理。其下為兩層：中央各業務主管機關與' +
+            '公共事業依第 19 條擬訂「災害防救業務計畫」（按災種），直轄市、縣（市）政府及' +
+            '鄉（鎮、市）、山地原住民區公所依第 20 條擬訂「地區災害防救計畫」，且下級計畫' +
+            '不得牴觸上級計畫。內容範疇涵蓋減災、整備、災害應變與災後復原重建。' +
+            '依施行細則第 6 條，中央災害防救委員會每五年應通盤檢討本計畫，必要時得隨時辦理。' +
+            '現行版本為民國 113–117 年計畫（前版 108–112）。全文請至官方連結查閱。',
+    },
+];
+
+/**
+ * 計畫階層的下兩層 —— 結構先立起來，內容待 owner 圈範圍後再 ingest。
+ *
+ * 刻意**不**把三層混成一堆：基本／業務／地區三者的擬訂機關、核定程序、
+ * 檢討週期、適用範圍都不同，混在一起檢索會讓使用者分不清哪一份管到自己。
+ */
+export const PLAN_HIERARCHY_SOURCES = [
+    {
+        id: 'cdprc-operational-plans',
+        name: '災害防救業務計畫',
+        sourceType: SOURCE_TYPE.PLAN,
+        planLevel: PLAN_LEVEL.OPERATIONAL,
+        reviewCycleYears: 2,
+        legalBasis: '災害防救法第 19 條（檢討週期見同法施行細則第 7 條）',
+        domain: DOMAIN.DISASTER,
+        region: REGION.NATIONAL,
+        issuer: '中央災害防救業務主管機關／公共事業',
+        url: 'https://cdprc.ey.gov.tw/Page/87848400D3DF0831',
+        status: 'pending',
+        note:
+            '按災種分別擬訂（水災、震災、土石流、火災…），可作 domain 之下的 tag。' +
+            '各部會分別發布，授權需逐份確認，尚未 ingest。',
+    },
+    {
+        id: 'local-regional-plans',
+        name: '地區災害防救計畫',
+        sourceType: SOURCE_TYPE.PLAN,
+        planLevel: PLAN_LEVEL.REGIONAL,
+        reviewCycleYears: 2,
+        legalBasis: '災害防救法第 20 條（檢討週期見同法施行細則第 8 條）',
+        domain: DOMAIN.DISASTER,
+        issuer: '直轄市、縣（市）政府／鄉（鎮、市）、山地原住民區公所',
+        status: 'pending',
+        note:
+            '兩級：①直轄市、縣（市）②鄉（鎮、市）、山地原住民區。' +
+            '對應資料模型的 region（縣市）與 subRegion（鄉鎮市）。' +
+            '各地方政府分別發布，尚未 ingest。',
     },
 ];
 

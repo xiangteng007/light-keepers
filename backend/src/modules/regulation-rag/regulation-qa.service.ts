@@ -144,9 +144,16 @@ export class RegulationQaService {
     }
 
     private noResultNotice(domain: RegulationDomain): string {
+        // 計畫類來源附上版本與法源，讓使用者知道自己該找哪一份、由誰核定
         const refs = this.corpus
             .referenceOnlySources(domain)
-            .map((r) => `《${r.lawName}》：${r.sourceUrl}`)
+            .map((r) => {
+                const bits = [`《${r.lawName}》`];
+                if (r.planVersion) bits.push(`（${r.planVersion} 年版，現行）`);
+                if (r.legalBasis) bits.push(`法源：${r.legalBasis}`);
+                bits.push(r.sourceUrl);
+                return bits.join(' ');
+            })
             .join('；');
         return (
             '本系統語料目前查無相關規定，因此不提供條號以免誤導。' +

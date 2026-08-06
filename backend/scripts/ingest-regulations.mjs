@@ -17,7 +17,13 @@ import { writeFileSync, readFileSync, existsSync, mkdirSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { MOJ_SOURCES, REFERENCE_ONLY_SOURCES, SOURCE_ATTRIBUTION } from './regulation-sources.mjs';
+import {
+    MOJ_SOURCES,
+    REFERENCE_ONLY_SOURCES,
+    PLAN_HIERARCHY_SOURCES,
+    SOURCE_ATTRIBUTION,
+    SOURCE_TYPE,
+} from './regulation-sources.mjs';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const OUT_DIR = join(__dirname, '..', 'data');
@@ -125,6 +131,12 @@ export function chunkArticles(source, parsed) {
         const base = {
             corpusDomain: source.domain,
             region: source.region,
+            subRegion: null,
+            sourceType: SOURCE_TYPE.REGULATION, // 法規，非計畫
+            planLevel: null,
+            planVersion: null,
+            reviewCycleYears: null,
+            legalBasis: null,
             lawId: source.pcode,
             lawName: source.name,
             lawLevel: source.level,
@@ -228,6 +240,13 @@ async function fetchAll() {
             id: `ref:${ref.id}`,
             corpusDomain: ref.domain,
             region: ref.region,
+            subRegion: ref.subRegion ?? null,
+            sourceType: ref.sourceType ?? SOURCE_TYPE.PLAN,
+            planLevel: ref.planLevel ?? null,
+            planVersion: ref.planVersion ?? null,
+            reviewCycleYears: ref.reviewCycleYears ?? null,
+            legalBasis: ref.legalBasis ?? null,
+            scopeTags: ref.scopeTags ?? [],
             lawId: ref.id,
             lawName: ref.name,
             lawLevel: ref.level,
@@ -239,8 +258,9 @@ async function fetchAll() {
             sourceUrl: ref.url,
             referenceOnly: true,
             licenceNote: ref.licenceNote,
+            issuer: ref.issuer ?? null,
             text: ref.summary,
-            embedText: `${ref.name}\n${ref.summary}`,
+            embedText: `${ref.name}（${ref.planVersion ?? ''}）\n${ref.summary}`,
             contentHash: sha256(ref.summary),
         });
         sourceReport.push({
@@ -248,8 +268,27 @@ async function fetchAll() {
             name: ref.name,
             domain: ref.domain,
             region: ref.region,
+            sourceType: ref.sourceType,
+            planLevel: ref.planLevel,
+            planVersion: ref.planVersion,
+            legalBasis: ref.legalBasis,
             status: 'reference-only',
             note: ref.licenceNote,
+        });
+    }
+
+    // 計畫階層的下兩層：僅登錄結構，尚未 ingest 內容（不產生 chunk）
+    for (const p of PLAN_HIERARCHY_SOURCES) {
+        sourceReport.push({
+            pcode: p.id,
+            name: p.name,
+            domain: p.domain,
+            region: p.region ?? null,
+            sourceType: p.sourceType,
+            planLevel: p.planLevel,
+            legalBasis: p.legalBasis,
+            status: p.status,
+            note: p.note,
         });
     }
 
