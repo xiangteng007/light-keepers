@@ -22,7 +22,9 @@ export const REGION = {
     NATIONAL: 'NATIONAL',
     TPE: 'TPE', // 臺北市
     NWT: 'NWT', // 新北市
+    TYC: 'TYC', // 桃園市
     TXG: 'TXG', // 臺中市
+    TNN: 'TNN', // 臺南市
     KHH: 'KHH', // 高雄市
     HUA: 'HUA', // 花蓮縣
 };
@@ -31,7 +33,9 @@ export const REGION_LABEL = {
     NATIONAL: '中央（全國適用）',
     TPE: '臺北市',
     NWT: '新北市',
+    TYC: '桃園市',
     TXG: '臺中市',
+    TNN: '臺南市',
     KHH: '高雄市',
     HUA: '花蓮縣',
 };
@@ -228,6 +232,88 @@ export const PLAN_HIERARCHY_SOURCES = [
             '對應資料模型的 region（縣市）與 subRegion（鄉鎮市）。' +
             '各地方政府分別發布，尚未 ingest。',
     },
+];
+
+/**
+ * 六都地區災害防救計畫（災防法 §20 第一級：直轄市）。
+ *
+ * 🔴 授權：地區計畫與基本計畫同屬「計畫非法規」，**不適用**全國法規資料庫的
+ *    開放授權。逐個確認結果：權威彙整在行政院中央災害防救會報（cdprc.ey.gov.tw，
+ *    頁尾「© 行政院版權所有」），各市消防局網站亦僅提供 PDF 下載而無開放授權宣告。
+ *    **六都全數授權未確認** → 依 owner 決策一律 `fullText: false`：
+ *    只登錄書目、發布機關、法源與官方連結，不重製任何計畫內文。
+ *
+ * subRegion 留 null —— 這一層是市級；§20 IV 的鄉（鎮、市）、山地原住民區
+ * 是第二級，欄位已就緒但尚未 ingest。
+ */
+const regionalPlan = (region, name, cityUrl, cdprcUrl) => ({
+    id: `regional-plan-${region.toLowerCase()}`,
+    name,
+    level: '計畫',
+    sourceType: SOURCE_TYPE.PLAN,
+    planLevel: PLAN_LEVEL.REGIONAL,
+    planVersion: null,
+    reviewCycleYears: 2,
+    legalBasis: '災害防救法第 20 條（檢討週期見同法施行細則第 8 條）',
+    scopeTags: [SCOPE.MITIGATION, SCOPE.PREPAREDNESS, SCOPE.RESPONSE, SCOPE.RECOVERY],
+    domain: DOMAIN.DISASTER,
+    region,
+    subRegion: null,
+    fullText: false,
+    issuer: `${REGION_LABEL[region]}災害防救會報`,
+    url: cityUrl,
+    indexUrl: cdprcUrl,
+    licenceNote:
+        '授權未確認（計畫非法規，不適用全國法規資料庫開放授權；' +
+        '中央彙整頁與市府網站均未見開放授權宣告）。僅登錄書目與官方連結，不重製內文。',
+    summary:
+        `《${name}》為 ${REGION_LABEL[region]} 依災害防救法第 20 條擬訂之地區災害防救計畫，` +
+        `由該市災害防救會報核定後實施，並報中央災害防救會報備查；` +
+        `依同法規定不得牴觸災害防救基本計畫及相關災害防救業務計畫。` +
+        `內容範疇涵蓋減災、整備、災害應變與災後復原重建。` +
+        `依施行細則第 8 條每二年應檢討一次，必要時得隨時辦理。` +
+        `全文請至官方連結查閱（本系統未重製內文）。`,
+});
+
+const CDPRC_REGIONAL_INDEX = 'https://cdprc.ey.gov.tw/Page/AF2F253C2D2B5F3E';
+
+export const REGIONAL_PLAN_SOURCES = [
+    regionalPlan(
+        REGION.TPE,
+        '臺北市地區災害防救計畫',
+        'https://www.119.gov.taipei/cp.aspx?n=23217FE9ADB86215',
+        CDPRC_REGIONAL_INDEX,
+    ),
+    regionalPlan(
+        REGION.NWT,
+        '新北市地區災害防救計畫',
+        'https://www.fire.ntpc.gov.tw/',
+        CDPRC_REGIONAL_INDEX,
+    ),
+    regionalPlan(
+        REGION.TYC,
+        '桃園市地區災害防救計畫',
+        'https://www.tyfd.gov.tw/',
+        CDPRC_REGIONAL_INDEX,
+    ),
+    regionalPlan(
+        REGION.TXG,
+        '臺中市地區災害防救計畫',
+        'https://www.fire.taichung.gov.tw/content/index.asp?Parser=1,10,234,53',
+        CDPRC_REGIONAL_INDEX,
+    ),
+    regionalPlan(
+        REGION.TNN,
+        '臺南市地區災害防救計畫',
+        'https://cdprc.ey.gov.tw/Page/C10B9C4A41D6D55F/df7f6ecd-f753-4dc0-ac18-c00b11456f1e',
+        CDPRC_REGIONAL_INDEX,
+    ),
+    regionalPlan(
+        REGION.KHH,
+        '高雄市地區災害防救計畫',
+        'https://fdkc.kcg.gov.tw/cp.aspx?n=AB42C8E0810857BC',
+        CDPRC_REGIONAL_INDEX,
+    ),
 ];
 
 /**
