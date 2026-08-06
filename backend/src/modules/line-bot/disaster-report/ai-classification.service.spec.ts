@@ -3,12 +3,14 @@ import { AiClassificationService, buildClassificationPrompt } from './ai-classif
 describe('AiClassificationService', () => {
     let service: AiClassificationService;
     let configService: { get: jest.Mock };
-    let llm: { isAvailable: jest.Mock; generateText: jest.Mock };
+    let llm: { isAvailable: jest.Mock; isVisionAvailable: jest.Mock; generateText: jest.Mock };
 
     beforeEach(() => {
         configService = { get: jest.fn().mockReturnValue('') };
         llm = {
             isAvailable: jest.fn().mockReturnValue(false),
+            // V.1：視覺路徑加進 LlmProviderService 契約後，test double 也要跟上
+            isVisionAvailable: jest.fn().mockReturnValue(false),
             generateText: jest.fn(),
         };
         service = new AiClassificationService(configService as any, llm as any);

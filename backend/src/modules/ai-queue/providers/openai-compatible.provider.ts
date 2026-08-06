@@ -8,6 +8,8 @@ import {
     LlmResponse,
     LlmTextRequest,
     LlmTextResponse,
+    LlmVisionRequest,
+    LlmVisionResponse,
     RateLimitError,
     ValidationError,
 } from './llm-provider.interface';
@@ -41,6 +43,8 @@ export class OpenAiCompatibleProvider implements LlmProvider {
     private readonly logger = new Logger(OpenAiCompatibleProvider.name);
     private readonly baseUrl: string;
     private readonly model: string;
+    /** 視覺模型（LLM_VISION_MODEL），與文字模型分開設定 */
+    private readonly visionModel: string;
     private readonly apiKey: string;
     private readonly connectTimeoutMs: number;
     private readonly requestTimeoutMs: number;
@@ -50,6 +54,7 @@ export class OpenAiCompatibleProvider implements LlmProvider {
         // Strip trailing slashes so `${baseUrl}/chat/completions` is always well formed
         this.baseUrl = (this.configService.get<string>('LLM_BASE_URL') || '').replace(/\/+$/, '');
         this.model = this.configService.get<string>('LLM_MODEL') || '';
+        this.visionModel = this.configService.get<string>('LLM_VISION_MODEL') || '';
         // Ollama accepts (and ignores) any key; keep a placeholder so the header is always valid
         this.apiKey = this.configService.get<string>('LLM_API_KEY') || '';
         this.connectTimeoutMs = this.toInt(this.configService.get('LLM_CONNECT_TIMEOUT_MS'), 3000);
@@ -226,6 +231,58 @@ export class OpenAiCompatibleProvider implements LlmProvider {
         };
     }
 
+    /**
+     * 視覺生成 —— OpenAI 相容的多模態 content 陣列，對應 Ollama 的 qwen2.5vl。
+     *
+     * 影像以 `data:<mime>;base64,<b64>` 形式放進 `image_url`。刻意不傳外部 URL：
+     * 讓 Ollama 去抓圖等於把「零雲端」破口開在模型端，且 NAS 與工作站的
+     * 網路可達性不同，圖抓不到會變成難查的偶發失敗。
+     */
+    async generateWithVision(request: LlmVisionRequest): Promise<LlmVisionResponse> {
+        const startTime = Date.now();
+
+        if (!this.isVisionConfigured()) {
+            throw new AiProviderError(
+                'Local vision not configured (need LLM_BASE_URL + LLM_VISION_MODEL)',
+                'NOT_CONFIGURED',
+                false,
+            );
+        }
+
+        const text = await this.chatCompletion({
+            useCaseId: request.useCaseId,
+            systemPrompt: request.systemPrompt,
+            prompt: request.prompt,
+            maxOutputTokens: request.maxOutputTokens ?? 2048,
+            temperature: request.temperature ?? 0.2,
+            jsonMode: request.json === true,
+            modelOverride: this.visionModel,
+            userContent: [
+                { type: 'text', text: request.prompt },
+                {
+                    type: 'image_url',
+                    image_url: {
+                        url: `data:${request.mimeType};base64,${request.imageBase64}`,
+                    },
+                },
+            ],
+        });
+
+        return {
+            text,
+            modelName: this.visionModel,
+            processingTimeMs: Date.now() - startTime,
+        };
+    }
+
+    isVisionConfigured(): boolean {
+        return !!this.baseUrl && !!this.visionModel;
+    }
+
+    get visionModelName(): string {
+        return this.visionModel;
+    }
+
     // ---------------------------------------------------------------------
     // Internals
     // ---------------------------------------------------------------------
@@ -240,16 +297,22 @@ export class OpenAiCompatibleProvider implements LlmProvider {
         maxOutputTokens: number;
         temperature: number;
         jsonMode: boolean;
+        /** 視覺路徑用：改掛在 user message 上的多模態 content 陣列 */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        userContent?: any;
+        /** 視覺路徑用：改用 LLM_VISION_MODEL 而非文字模型 */
+        modelOverride?: string;
     }): Promise<string> {
-        const messages: Array<{ role: string; content: string }> = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const messages: Array<{ role: string; content: any }> = [];
         if (options.systemPrompt) {
             messages.push({ role: 'system', content: options.systemPrompt });
         }
-        messages.push({ role: 'user', content: options.prompt });
+        messages.push({ role: 'user', content: options.userContent ?? options.prompt });
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const body: any = {
-            model: this.model,
+            model: options.modelOverride ?? this.model,
             messages,
             max_tokens: options.maxOutputTokens,
             temperature: options.temperature,

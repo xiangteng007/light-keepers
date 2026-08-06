@@ -9,6 +9,8 @@ import {
     LlmResponse,
     LlmTextRequest,
     LlmTextResponse,
+    LlmVisionRequest,
+    LlmVisionResponse,
 } from './llm-provider.interface';
 
 export type LlmProviderMode = 'gemini' | 'local' | 'hybrid';
@@ -108,6 +110,41 @@ export class LlmProviderService {
             () => this.local.generateText(request),
             () => this.gemini.generateText(request),
         );
+    }
+
+    /**
+     * 視覺（多模態）生成。
+     *
+     * 走與文字完全相同的 dispatch：local 模式失敗即拋（不靜默降級），
+     * hybrid 模式本地不可用才退 Gemini。
+     *
+     * 唯一的差別是 hybrid 下多一層檢查：本地**文字**可用不代表**視覺**可用
+     * （少設 LLM_VISION_MODEL 就會這樣）。此時直接走 Gemini，而不是打過去拿 400。
+     */
+    async generateWithVision(request: LlmVisionRequest): Promise<LlmVisionResponse> {
+        const useCaseId = request.useCaseId ?? 'vision';
+
+        if (this.mode === 'hybrid' && !this.local.isVisionConfigured()) {
+            this.logger.warn(
+                `Local vision not configured (LLM_VISION_MODEL missing) - using Gemini for ${useCaseId}`,
+            );
+            return this.gemini.generateWithVision(request);
+        }
+
+        return this.dispatch(
+            useCaseId,
+            () => this.local.generateWithVision(request),
+            () => this.gemini.generateWithVision(request),
+        );
+    }
+
+    /**
+     * 視覺路徑是否值得呼叫。呼叫端要能優雅降級（例如回 fallback 分類）時先查這個。
+     */
+    isVisionAvailable(): boolean {
+        if (this.mode === 'local') return this.local.isVisionConfigured();
+        if (this.mode === 'gemini') return this.gemini.isVisionConfigured();
+        return this.local.isVisionConfigured() || this.gemini.isVisionConfigured();
     }
 
     /**
