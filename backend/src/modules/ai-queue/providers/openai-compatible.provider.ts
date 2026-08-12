@@ -36,6 +36,21 @@ import {
  *   LLM_TIMEOUT_MS           generation timeout, default 60000
  *   LLM_MAX_RETRIES          retries for retryable failures, default 1
  */
+/**
+ * 預設輸出上限。原本是 2048，2026-08-12 因換 qwen3.5:9b 調到 8192。
+ *
+ * qwen3.5 是 thinking 模型，reasoning 會先吃掉 max_tokens 才輪到 content，而
+ * Ollama 的 OpenAI-compatible 端點**沒有**可用的 thinking 關閉開關（實測
+ * top-level `think:false` 反而讓 reasoning 衝到 8997 字元且 content 全空；
+ * `chat_template_kwargs.enable_thinking:false` 被直接忽略）。
+ *
+ * 後果不是變慢而是**靜默失敗**：finish_reason='length'、content=''，這裡的
+ * `JSON.parse` 就丟 ValidationError('Invalid JSON response from local LLM')。
+ * 實測（短英文 prompt，最容易誘發長 reasoning）：2048 → 空回應 2/8；8192 → 0/8。
+ * LK 自己的 zh-TW 長 prompt 兩者都 0/8，但短 prompt 的使用情境仍在，故拉高預設。
+ */
+const DEFAULT_MAX_OUTPUT_TOKENS = 8192;
+
 @Injectable()
 export class OpenAiCompatibleProvider implements LlmProvider {
     readonly providerName = 'local';
@@ -160,7 +175,7 @@ export class OpenAiCompatibleProvider implements LlmProvider {
             useCaseId: request.useCaseId,
             systemPrompt,
             prompt: request.prompt,
-            maxOutputTokens: request.maxOutputTokens ?? 2048,
+            maxOutputTokens: request.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
             temperature: 0.3,
             jsonMode: true,
         });
@@ -219,7 +234,7 @@ export class OpenAiCompatibleProvider implements LlmProvider {
             useCaseId: request.useCaseId,
             systemPrompt,
             prompt: request.prompt,
-            maxOutputTokens: request.maxOutputTokens ?? 2048,
+            maxOutputTokens: request.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
             temperature: request.temperature ?? 0.3,
             jsonMode: request.json === true,
         });
@@ -253,7 +268,7 @@ export class OpenAiCompatibleProvider implements LlmProvider {
             useCaseId: request.useCaseId,
             systemPrompt: request.systemPrompt,
             prompt: request.prompt,
-            maxOutputTokens: request.maxOutputTokens ?? 2048,
+            maxOutputTokens: request.maxOutputTokens ?? DEFAULT_MAX_OUTPUT_TOKENS,
             temperature: request.temperature ?? 0.2,
             jsonMode: request.json === true,
             modelOverride: this.visionModel,
